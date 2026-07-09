@@ -24,6 +24,8 @@ import android.text.InputType
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -33,6 +35,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.doOnAttach
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
@@ -46,12 +49,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
@@ -67,13 +71,14 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -97,6 +102,8 @@ interface NativeInputWidget {
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
+
+    var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
     fun onBackPressed()
@@ -107,9 +114,8 @@ interface NativeInputWidget {
     fun beginEnterAnimationPreview(isBottom: Boolean)
     fun endEnterAnimationPreview()
     fun selectAllText()
-    fun hideKeyboard()
-    fun showKeyboard()
     fun selectChatTab()
+    fun selectSearchTab()
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
     fun isChatTabSelected(): Boolean
@@ -117,7 +123,6 @@ interface NativeInputWidget {
     fun setVoiceSearchAvailable(available: Boolean)
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
-    fun submitAsChat(): Boolean
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -125,7 +130,9 @@ interface NativeInputWidget {
     fun getSelectedTool(): String?
     fun clearSelectedTool()
     fun onPromptSubmitted()
-    fun setModelPickerEnabled(enabled: Boolean)
+
+    /** Block all interaction with the widget's controls and dim them, or restore. */
+    fun setInteractionLocked(locked: Boolean)
 
     /**
      * Binds a reactive source of "should the model picker be enabled?"
@@ -146,6 +153,12 @@ interface NativeInputWidget {
      * The widget forwards changes into the [NativeInputState] so observers can react.
      */
     fun bindChatIdSource(source: Flow<String?>)
+
+    /** Binds a reactive source for the onboarding interaction lock (see [InteractionLock]). */
+    fun bindInteractionLockSource(source: Flow<InteractionLock>)
+
+    /** Binds a reactive source for emphasising the leading fire button (rendered only in Duck.ai mode). */
+    fun bindDuckAiFireButtonHighlightSource(source: Flow<Boolean>)
 
     fun bindAttachmentCallbacks(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
@@ -171,7 +184,14 @@ interface NativeInputWidget {
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     )
+
+    /**
+     * Re-fetches the chat-history suggestions for the current query from the source of truth.
+     * No-op when the chat suggestions aren't currently active (binding not created / chat tab not selected).
+     */
+    fun refreshChatSuggestions()
 
     fun asView(): View
 }
@@ -219,6 +239,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
+    private var interactionLockJob: Job? = null
+    private var interactionLockSource: Flow<InteractionLock>? = null
+    private var duckAiFireButtonHighlightJob: Job? = null
+    private var duckAiFireButtonHighlightSource: Flow<Boolean>? = null
+    private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
     private var submitAllowed: Boolean = true
@@ -230,13 +255,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var hasAttachments: Boolean = false
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
+
+    // Outlives a single suggestions presentation (survives clear() on tab switches); handed to chat-item
+    // plugins so they can collect into their adapters. Cancelled in tearDownChatSuggestions().
+    private var chatItemPluginScope: CoroutineScope? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+
+    // Re-runs the chat-suggestions fetch for the current query. Set in bindChatSuggestions, cleared in tearDownChatSuggestions.
+    private var refreshChatSuggestionsAction: (() -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
+    override var onCustomizeResponsesClicked: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
@@ -299,6 +332,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
+        observeInteractionLockSource()
+        observeDuckAiFireButtonHighlightSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -422,6 +457,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = null
         chatIdJob?.cancel()
         chatIdJob = null
+        interactionLockJob?.cancel()
+        interactionLockJob = null
+        duckAiFireButtonHighlightJob?.cancel()
+        duckAiFireButtonHighlightJob = null
+        pulseAnimation?.stop()
         submitEnabledJob?.cancel()
         submitEnabledJob = null
         openModelPickerJob?.cancel()
@@ -447,7 +487,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()
-                        (context as? Activity)?.hideKeyboard()
+                        hideKeyboard()
                         clearInputFocus()
                         widgetRoot?.visibility = GONE
                     }
@@ -455,17 +495,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         widgetRoot?.visibility = VISIBLE
                         if (isFocussed) {
                             requestInputFocus()
-                            (context as? Activity)?.showKeyboard(inputField)
+                            showKeyboard()
                         }
-                    }
-                    ChatState.READY -> {
-                        widgetRoot?.visibility = VISIBLE
                     }
                     else -> {}
                 }
             }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
+
+    private fun isSearchMode() = !isChatTabSelected()
 
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
@@ -475,10 +514,52 @@ class NativeInputModeWidget @JvmOverloads constructor(
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         configureBottomRowFocusVisibility()
+        hookClearButtonPixel()
+        hookEditorActionPixels()
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
+        }
+    }
+
+    /**
+     * Re-wraps the clear-button click listener (originally set by the base class in init) to also
+     * fire the omnibar clear pixel. We replace rather than stack because [View.setOnClickListener]
+     * replaces existing listeners; preserving base-class behaviour manually keeps the contract clear.
+     */
+    private fun hookClearButtonPixel() {
+        val clearBtn = findViewById<View>(R.id.inputFieldClearText) ?: return
+        clearBtn.setOnClickListener {
+            inputField.text.clear()
+            inputField.setSelection(0)
+            inputField.scrollTo(0, 0)
+            onClearTextTapped?.invoke()
+            viewModel.fireClearPressed(isSearchMode())
+        }
+    }
+
+    /**
+     * Re-wraps the IME editor-action listener (originally set by the base class in init) to also
+     * fire the omnibar keyboard-go pixel. The submit path is unchanged: we call [submitMessage] and
+     * return true exactly when the base class would (IME_ACTION_GO, or a hardware Enter when the
+     * widget submits on hardware Enter), so downstream behaviour is not affected. keyboard_go fires
+     * for both submit triggers, matching the base. (floating_return is the new-line button, wired in
+     * configureSubmitButtons, not a keyboard event.)
+     */
+    private fun hookEditorActionPixels() {
+        inputField.setOnEditorActionListener { _, actionId, keyEvent ->
+            val isHardwareEnter =
+                (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
+                    keyEvent.action == KeyEvent.ACTION_DOWN
+
+            if (actionId == EditorInfo.IME_ACTION_GO || (isHardwareEnter && shouldSubmitOnHardwareEnter())) {
+                submitMessage()
+                viewModel.fireKeyboardGoPressed(isSearchMode())
+                true
+            } else {
+                false
+            }
         }
     }
 
@@ -496,9 +577,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             nativeInputState?.let { updateFireButtonVisibility(it) }
-            if (!hasFocus && isDuckAiPageContext()) {
-                hideKeyboard()
-            }
         }
     }
 
@@ -616,6 +694,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         updateBackButtons(state)
         updateFireButtonVisibility(state)
+        updateDuckAiFireButtonHighlight(state)
+        setInteractionLocked(state.interactionLock != InteractionLock.Unlocked)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
@@ -673,6 +753,28 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
 
+    // Onboarding rendering for the leading (Duck.ai) fire button. The lock/dim comes from interactionLock; the
+    // pulse is driven independently by duckAiFireButtonHighlighted.
+    // Locked -> dimmed/disabled; LockedExceptDuckAiFireButton / Unlocked -> interactive. Pulse iff highlighted.
+    private fun updateDuckAiFireButtonHighlight(state: NativeInputState) {
+        val fireMenu = leadingFireButtonView() ?: return
+        val fireIcon = fireMenu.findViewById<View?>(R.id.inputFieldFireIconImageview)
+        val fireButtonLocked = state.interactionLock == InteractionLock.Locked
+        fireMenu.isEnabled = !fireButtonLocked
+        // The whole-widget dim from setInteractionLocked can't reach this view, because it lives in a sibling layout
+        fireMenu.alpha = if (fireButtonLocked) LOCKED_FIRE_ALPHA else 1f
+        when {
+            !state.duckAiFireButtonHighlighted || !fireMenu.isVisible || fireIcon == null -> pulseAnimation?.stop()
+            fireIcon.height > 0 -> ensurePulseAnimation(fireIcon)?.playOn(fireIcon)
+            else -> fireIcon.doOnNextLayout { nativeInputState?.let { updateDuckAiFireButtonHighlight(it) } }
+        }
+    }
+
+    private fun ensurePulseAnimation(view: View): PulseAnimation? {
+        if (pulseAnimation == null) pulseAnimation = view.findViewTreeLifecycleOwner()?.let { PulseAnimation(it) }
+        return pulseAnimation
+    }
+
     private fun removeMargins() {
         findViewById<EditText?>(R.id.inputField)?.updateLayoutParams<MarginLayoutParams> {
             marginStart = 0
@@ -724,6 +826,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
+                    // Only fire mode_switched when the toggle is visible (i.e. user-driven); programmatic
+                    // tab changes via applyState / selectChatTab / selectSearchTab run while toggleVisible
+                    // is false and must not fire the pixel. This mirrors pushToggleSelectionIfUserDriven().
+                    if (nativeInputState?.toggleVisible == true) {
+                        val directionToSearch = tab.position == 0
+                        val hadText = inputField.text?.isNotBlank() == true
+                        viewModel.fireModeSwitched(directionToSearch, hadText)
+                    }
                     pushToggleSelectionIfUserDriven()
                     refreshTabDependentButtons()
                 }
@@ -806,6 +916,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             }
             super.submitMessage(message)
         }
+        hideKeyboard()
     }
 
     private fun fireSubmissionPixels(hasText: Boolean) {
@@ -816,6 +927,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
         )
+        // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
+        // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
+        if (isDuckAiPageContext()) {
+            viewModel.fireSentPromptInChat()
+        }
     }
 
     override fun focusInput(activity: Activity?) {
@@ -878,18 +994,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
     }
 
-    override fun hideKeyboard() {
-        (context as? Activity)?.hideKeyboard(inputField)
+    fun hideKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.hideSoftInputFromWindow(windowToken, 0)
     }
 
-    override fun showKeyboard() {
-        (context as? Activity)?.showKeyboard(inputField)
+    fun showKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun selectChatTab() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         if (toggle.selectedTabPosition != 1) {
             toggle.getTabAt(1)?.select()
+        }
+    }
+
+    override fun selectSearchTab() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        if (toggle.selectedTabPosition != 0) {
+            toggle.getTabAt(0)?.select()
         }
     }
 
@@ -959,10 +1084,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.onPromptSubmitted()
     }
 
-    override fun setModelPickerEnabled(enabled: Boolean) {
-        viewModel.setModelPickerEnabled(enabled)
-    }
-
     override fun bindModelPickerEnabledSource(source: Flow<Boolean>) {
         modelPickerEnabledSource = source
         if (isAttachedToWindow) observeModelPickerEnabledSource()
@@ -990,6 +1111,36 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = source
             .distinctUntilChanged()
             .onEach { viewModel.setActiveChatId(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindInteractionLockSource(source: Flow<InteractionLock>) {
+        interactionLockSource = source
+        if (isAttachedToWindow) observeInteractionLockSource()
+    }
+
+    private fun observeInteractionLockSource() {
+        val source = interactionLockSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        interactionLockJob?.cancel()
+        interactionLockJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setInteractionLock(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindDuckAiFireButtonHighlightSource(source: Flow<Boolean>) {
+        duckAiFireButtonHighlightSource = source
+        if (isAttachedToWindow) observeDuckAiFireButtonHighlightSource()
+    }
+
+    private fun observeDuckAiFireButtonHighlightSource() {
+        val source = duckAiFireButtonHighlightSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        duckAiFireButtonHighlightJob?.cancel()
+        duckAiFireButtonHighlightJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setDuckAiFireButtonHighlighted(it) }
             .launchIn(scope)
     }
 
@@ -1098,33 +1249,54 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit,
     ) {
         this.onShowSuggestions = onShowSuggestions
         this.onClearSuggestions = onClearSuggestions
 
         // Lazy: bindChatSuggestions runs before attach, so @Inject fields and the ViewModel
-        // aren't ready yet. showSuggestions() only fires post-attach.
+        // aren't ready yet. The binding is created at attach (see onAttachedToWindow) or on the
+        // first showSuggestions(), whichever comes first — both run post-attach.
         fun ensureBinding(): NativeInputChatSuggestionsBinder.Binding {
             return chatSuggestionsBinding ?: chatSuggestionsBinder.create(
                 onChatSuggestionSelected = { suggestion ->
                     viewModel.fireChatHistorySelectedPixel(suggestion.pinned)
                     onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
                 },
+                onChatSuggestionDeleteClicked = { suggestion ->
+                    onChatSuggestionDelete(viewModel.buildChatSuggestionUrl(suggestion))
+                },
                 onChatUrlSuggestionClicked = { suggestion ->
                     viewModel.fireChatUrlSuggestionPixel(suggestion)
                     onChatUrlSuggestionClicked(suggestion)
+                },
+                onChatUrlSuggestionDeleteClicked = { suggestion ->
+                    viewModel.onDeleteChatUrlSuggestion(suggestion) { refreshChatSuggestions() }
                 },
                 onSearchForQuerySubmitted = { query ->
                     viewModel.fireDuckAiSearchForQuerySubmittedPixel()
                     onSearchForQuerySubmitted(query)
                 },
                 onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
-            ).also { chatSuggestionsBinding = it }
+            ).also { binding ->
+                chatSuggestionsBinding = binding
+                val owner = findViewTreeLifecycleOwner()
+                if (owner != null) {
+                    val pluginScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+                    chatItemPluginScope = pluginScope
+                    owner.lifecycleScope.launch {
+                        binding.loadPluginItems(context, pluginScope)
+                    }
+                }
+            }
         }
 
         fun showSuggestions(query: String) {
             fetchChatTabSuggestions(lifecycleOwner, query, ensureBinding())
         }
+
+        // Allow an external re-fetch (e.g. after a chat delete completes) using the current query.
+        this.refreshChatSuggestionsAction = { showSuggestions(text) }
 
         val previousOnSearchSelected = this.onSearchSelected
         this.onSearchSelected = { animate ->
@@ -1151,13 +1323,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onChatTextChanged = { text ->
             showSuggestions(text)
         }
+
+        // Load plugins at attach (or now, if already attached) rather than on the first Chat-tab show,
+        // so they're live regardless of the selected tab and their rows exist before the Chat tab first
+        // renders (otherwise a late insert flashes). ensureBinding() is idempotent.
+        doOnAttach { ensureBinding() }
     }
 
     private fun tearDownChatSuggestions() {
         hideChatSuggestions(hideList = true)
+        chatItemPluginScope?.cancel()
+        chatItemPluginScope = null
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
+        refreshChatSuggestionsAction = null
+    }
+
+    override fun refreshChatSuggestions() {
+        if (chatSuggestionsBinding == null || !isChatTabSelected()) return
+        refreshChatSuggestionsAction?.invoke()
     }
 
     override fun asView(): View = this
@@ -1327,6 +1512,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setSelectedTool(tool)
     }
 
+    override fun customizeResponsesClicked() {
+        onCustomizeResponsesClicked?.invoke()
+    }
+
     override fun showModelPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
     }
@@ -1343,7 +1532,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 useTopBar = false,
                 layoutResId = R.layout.view_native_input_screen_buttons,
             ).apply {
-                onSendClick = { submitMessage() }
+                onSendClick = {
+                    submitMessage()
+                    viewModel.fireFloatingSubmitPressed(isSearchMode())
+                }
                 onStopClick = { this@NativeInputModeWidget.stop() }
                 onVoiceChatClick = voiceChatClickWithPixel
                 setSendButtonVisible(false)
@@ -1360,7 +1552,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 useTopBar = true,
                 layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
-                onNewLineClick = { printNewLine() }
+                onNewLineClick = {
+                    printNewLine()
+                    viewModel.fireFloatingReturnPressed()
+                }
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
@@ -1372,9 +1567,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
+    private var interactionLocked = false
+
+    // Dims only this (transparent) widget, never the parent card surface, so the bar stays
+    // colour-uniform with the page. Touch interception covers the plugin containers too.
+    override fun setInteractionLocked(locked: Boolean) {
+        if (interactionLocked == locked) return
+        interactionLocked = locked
+        alpha = if (locked) LOCKED_ALPHA else 1f
+        if (locked) {
+            clearInputFocus()
+        }
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean = interactionLocked || super.onInterceptTouchEvent(ev)
+
     companion object {
         private const val MAX_LINES = 5
         private const val FOCUS_TRANSITION_DURATION_MS = 100L
+        private const val LOCKED_ALPHA = 0.4f
+        private const val LOCKED_FIRE_ALPHA = 0.4f
     }
 }
 

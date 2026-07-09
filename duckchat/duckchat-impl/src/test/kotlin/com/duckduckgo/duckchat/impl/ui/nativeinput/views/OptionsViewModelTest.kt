@@ -18,6 +18,9 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.models.Tool
@@ -49,7 +52,16 @@ class OptionsViewModelTest {
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val store = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val store = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
     private val duckChatPixels: DuckChatPixels = mock()
     private lateinit var testee: OptionsViewModel
 
@@ -123,6 +135,12 @@ class OptionsViewModelTest {
     fun whenImageGenDeselectedByUserThenDeselectedPixel() {
         testee.onToolDeselectedByUser(Tool.IMAGE_GENERATION)
         verify(duckChatPixels).fireImageGenerationDeselected()
+    }
+
+    @Test
+    fun whenCustomizeResponsesClickedThenFireCustomizeResponsesPixel() {
+        testee.onCustomizeResponsesClicked()
+        verify(duckChatPixels).fireCustomizeResponsesSelected()
     }
 
     @Test

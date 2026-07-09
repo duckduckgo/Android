@@ -409,4 +409,66 @@ class RealDuckChatPixelsTest {
         verify(mockTermsOfServiceHandler).userAcceptedTerms()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
     }
+
+    @Test
+    fun whenFireOmnibarShownThenCountAndDailyFired() = runTest {
+        testee.fireOmnibarShown()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireSentPromptInChatThenCountAndDailyFired() = runTest {
+        testee.fireSentPromptInChat()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireOmnibarQuerySubmittedThenCountCarriesLengthBucketAndDailyHasNoParams() = runTest {
+        testee.fireOmnibarQuerySubmitted("hi") // 2 chars -> "short"
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+            parameters = mapOf(DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short"),
+        )
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY,
+            parameters = emptyMap(),
+            encodedParameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenFireOmnibarModeSwitchedToSearchThenDirectionAndHadTextParamsFired() = runTest {
+        testee.fireOmnibarModeSwitched(directionToSearch = true, hadText = true)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+            parameters = mapOf("direction" to "to_search", "had_text" to "true"),
+        )
+    }
+
+    @Test
+    fun whenFireOmnibarBackButtonPressedInSearchModeThenModeParamFired() = runTest {
+        testee.fireOmnibarBackButtonPressed(isSearchMode = true)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED,
+            parameters = mapOf(DuckChatPixelParameters.INPUT_SCREEN_MODE to "search"),
+        )
+    }
 }

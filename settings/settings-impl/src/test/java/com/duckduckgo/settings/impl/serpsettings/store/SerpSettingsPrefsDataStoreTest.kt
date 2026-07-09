@@ -33,6 +33,7 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @Suppress("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -50,7 +51,7 @@ class SerpSettingsPrefsDataStoreTest {
         )
 
     private val testee: SerpSettingsDataStore =
-        SerpSettingsPrefsDataStore(testDataStore)
+        SerpSettingsPrefsDataStore(testDataStore, mock())
 
     companion object {
         val SERP_SETTINGS = stringPreferencesKey("SERP_SETTINGS")
@@ -114,5 +115,37 @@ class SerpSettingsPrefsDataStoreTest {
         val result = testee.getSerpSettings()
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenObserveSerpSettingsThenEmitsLatestStoredValue() = runTest {
+        assertNull(testee.observeSerpSettings().first())
+
+        val settings = """{"kbe":"3"}"""
+        testee.setSerpSettings(settings)
+
+        assertEquals(settings, testee.observeSerpSettings().first())
+    }
+
+    @Test
+    fun whenUpdateSerpSettingsThenTransformReceivesCurrentValueAndResultIsStored() = runTest {
+        testee.setSerpSettings("""{"ko":"1"}""")
+
+        testee.updateSerpSettings { current ->
+            assertEquals("""{"ko":"1"}""", current)
+            """{"ko":"1","kbe":"3"}"""
+        }
+
+        assertEquals("""{"ko":"1","kbe":"3"}""", testee.getSerpSettings())
+    }
+
+    @Test
+    fun whenUpdateSerpSettingsOnEmptyStoreThenTransformReceivesNull() = runTest {
+        testee.updateSerpSettings { current ->
+            assertNull(current)
+            """{"kbe":"2"}"""
+        }
+
+        assertEquals("""{"kbe":"2"}""", testee.getSerpSettings())
     }
 }

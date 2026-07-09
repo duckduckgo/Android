@@ -27,6 +27,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -56,6 +59,12 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: RestoreSubscriptionViewModel by bindViewModel()
     private val binding: ActivityRestoreSubscriptionBinding by viewBinding()
 
@@ -69,8 +78,15 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         val params = intent.getActivityParams(RestoreSubscriptionScreenWithParams::class.java)
         isOriginWeb = params?.isOriginWeb ?: true
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         setupToolbar(toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         viewModel.init()
 
@@ -93,6 +109,12 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         binding.restoreSubscriptionGooglePlayLayout.setOnClickListener {
             viewModel.restoreFromStore(isOriginWeb)
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->

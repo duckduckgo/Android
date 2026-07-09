@@ -63,6 +63,21 @@ fun String.toTldPlusOne(): String? {
 }
 
 /**
+ * The registrable domain (eTLD+1) for this host, or the host itself when there is none (IPs, `localhost`).
+ * Shared so the per-site key derivation can't drift between call sites.
+ */
+fun String.toTldPlusOneOrSelf(): String = if (isIpv4Literal()) this else toTldPlusOne() ?: this
+
+private fun String.isIpv4Literal(): Boolean {
+    val octets = split('.')
+    if (octets.size != 4) return false
+    return octets.all { octet ->
+        val value = octet.toIntOrNull()
+        value != null && value in 0..255
+    }
+}
+
+/**
  * Compares the current semantic version string with the target semantic version string.
  *
  * The version strings can have an arbitrary number of parts separated by dots (e.g. "x.y.z").

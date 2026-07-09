@@ -81,6 +81,7 @@ interface WebViewClientListener {
     fun handleAppLink(
         appLink: SpecialUrlDetector.UrlType.AppLink,
         isForMainFrame: Boolean,
+        hasGesture: Boolean,
     ): Boolean
 
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
@@ -92,6 +93,13 @@ interface WebViewClientListener {
     fun openMessageInNewTab(message: Message)
 
     fun openLinkInNewTab(uri: Uri)
+
+    /**
+     * Called for a main-frame duck.ai navigation. When the page is shown inside a custom tab, the
+     * implementation opens the Duck Chat experience, closes the custom tab, and returns `true` so
+     * the navigation is not loaded in the custom tab. Returns `false` otherwise (let navigation proceed).
+     */
+    fun handleDuckChatUrlInCustomTab(uri: Uri): Boolean
 
     fun recoverFromRenderProcessGone()
 
@@ -105,7 +113,7 @@ interface WebViewClientListener {
 
     fun surrogateDetected(surrogate: SurrogateResponse)
 
-    fun isDesktopSiteEnabled(): Boolean
+    suspend fun isDesktopSiteEnabled(url: String): Boolean
 
     fun isTabInForeground(): Boolean
 

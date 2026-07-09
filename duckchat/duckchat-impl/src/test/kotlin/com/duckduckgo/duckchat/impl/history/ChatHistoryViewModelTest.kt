@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
@@ -703,7 +704,7 @@ class ChatHistoryViewModelTest {
             assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
         }
         assertEquals(
-            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a")))),
+            listOf(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a"), BrowserMode.REGULAR))),
             dataClearingTrigger.calls,
         )
         assertTrue(repository.deletedChatIds.isEmpty())
@@ -821,7 +822,7 @@ class ChatHistoryViewModelTest {
             expectNoEvents() // no confirmation state set
         }
         assertEquals(
-            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a")))),
+            listOf(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a"), BrowserMode.REGULAR))),
             dataClearingTrigger.calls,
         )
         assertTrue(repository.deletedChatIds.isEmpty())

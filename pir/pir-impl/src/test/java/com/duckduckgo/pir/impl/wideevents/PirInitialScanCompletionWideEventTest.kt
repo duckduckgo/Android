@@ -270,6 +270,27 @@ class PirInitialScanCompletionWideEventTest {
     }
 
     @Test
+    fun whenManualInitialResumeRunStartedAndNoFlowOpenThenNothingIsStarted() = runTest {
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL_RESUME)
+
+        verifyNoInteractions(wideEventClient)
+        assertFalse(dataStore.hasInitialScanEverStarted)
+    }
+
+    @Test
+    fun whenManualInitialResumeRunStartedWhileFlowOpenThenForegroundCountIncremented() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(1L))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL_RESUME)
+
+        // The resume continues the open journey flow (no second flowStart) and counts as a foreground run.
+        verify(wideEventClient).flowStart(any(), any(), any(), any())
+        assertEquals(2, dataStore.initialScanCompletionForegroundRunCount)
+        assertEquals(0, dataStore.initialScanCompletionScheduledRunCount)
+    }
+
+    @Test
     fun whenScanCompletedAndAllJobsDoneThenFlowFinishedWithSuccess() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
@@ -477,6 +498,9 @@ private class FakePirDataStore : PirDataStore {
     override var dauLastSentMs: Long = 0L
     override var wauLastSentMs: Long = 0L
     override var mauLastSentMs: Long = 0L
+    override var interactionDauLastSentMs: Long = 0L
+    override var interactionWauLastSentMs: Long = 0L
+    override var interactionMauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
     override var latestBackgroundScanRunInMs: Long = 0L
@@ -498,6 +522,9 @@ private class FakePirDataStore : PirDataStore {
         dauLastSentMs = 0L
         wauLastSentMs = 0L
         mauLastSentMs = 0L
+        interactionDauLastSentMs = 0L
+        interactionWauLastSentMs = 0L
+        interactionMauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
         hasInitialScanEverStarted = false

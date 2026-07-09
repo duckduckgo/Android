@@ -62,6 +62,11 @@ sealed class Command {
         val sourceTabId: String? = null,
     ) : Command()
 
+    class OpenInFireTab(
+        val query: String,
+        val sourceTabId: String? = null,
+    ) : Command()
+
     class OpenMessageInNewTab(
         val message: Message,
         val sourceTabId: String? = null,
@@ -100,6 +105,8 @@ sealed class Command {
     data object HideKeyboard : Command()
 
     data object HideKeyboardForChat : Command()
+
+    data object DropAddressBarFocus : Command()
 
     class ShowFullScreen(
         val view: View,
@@ -481,6 +488,13 @@ sealed class Command {
 
     data object CloseCustomTab : Command()
 
+    /**
+     * Finishes only the [CustomTabActivity] (not the whole task). Used when the custom tab is being
+     * dismissed while another activity (e.g. the Duck Chat host) is being launched into the same task,
+     * where [CloseCustomTab]'s `finishAndRemoveTask()` would tear down that activity too.
+     */
+    data object FinishCustomTab : Command()
+
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
 
     data class ShowAutoconsentAnimation(
@@ -493,6 +507,7 @@ sealed class Command {
 
     data class LaunchInputScreen(
         val duckAiEndCtaVariant: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
+        val launchOnChat: Boolean = false,
     ) : Command()
 
     data object LaunchDuckChatHistory : Command()

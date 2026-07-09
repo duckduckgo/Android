@@ -31,14 +31,20 @@ import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncNewBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -64,19 +70,34 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var binding: ConnectSyncBinding
     private val viewModel: SyncConnectViewModel by bindViewModel()
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
     ) { result ->
-        if (result != EnterCodeContractOutput.Error) {
-            viewModel.onLoginSuccess()
+        when (result) {
+            EnterCodeContractOutput.LoginSuccess,
+            EnterCodeContractOutput.SwitchAccountSuccess,
+            -> viewModel.onLoginSuccess()
+            EnterCodeContractOutput.Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            EnterCodeContractOutput.Cancelled -> {}
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
 
         lifecycleScope.launch {
             withContext(dispatcherProvider.io()) {
@@ -91,8 +112,16 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                         ConnectSyncBinding.OldBinding(viewBinding)
                     }
 
+                    if (edgeToEdgeEnabled) {
+                        enableTransparentEdgeToEdge()
+                    }
+
                     setContentView(binding.root)
                     setupToolbar(binding.includeToolbar.toolbar)
+
+                    if (edgeToEdgeEnabled) {
+                        configureEdgeToEdgeInsets()
+                    }
 
                     onBackPressedDispatcher.addCallback(this@SyncConnectActivity) {
                         onUserCancelled()
@@ -105,6 +134,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     }
                 }
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = false)
     }
 
     override fun onResume() {
@@ -129,6 +164,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(extractSource())
+            // Observe at CREATED, not STARTED: STARTED re-subscribes on every foreground, re-firing
+            // viewState.onStart and regenerating the pairing code. CREATED also avoids dropping terminal commands.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -165,6 +202,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
+            is AskJoinerConfirmation -> askJoinerConfirmation(it.peerName, it.peerKind)
+            is AskHostConfirmation -> askHostConfirmation(it.peerName, it.peerKind)
         }
     }
 
@@ -191,6 +231,34 @@ class SyncConnectActivity : DuckDuckGoActivity() {
             ).show()
     }
 
+    private fun askJoinerConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
+                },
+            ).show()
+    }
+
     private fun extractSource(): String? = intent.getStringExtra(SOURCE_INTENT_KEY)
 
     companion object {
@@ -207,6 +275,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 private sealed interface ConnectSyncBinding {
     val root: View
     val includeToolbar: IncludeDefaultToolbarBinding
+    val contentView: View
     val qrCodeReader: SyncBarcodeView
     val qrCodeImageView: ImageView
     val copyCodeButton: DaxButtonGhost
@@ -214,6 +283,7 @@ private sealed interface ConnectSyncBinding {
     data class OldBinding(private val binding: ActivityConnectSyncBinding) : ConnectSyncBinding {
         override val root: View get() = binding.root
         override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val contentView: View get() = binding.contentScrollView
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
@@ -222,6 +292,7 @@ private sealed interface ConnectSyncBinding {
     data class NewBinding(private val binding: ActivityConnectSyncNewBinding) : ConnectSyncBinding {
         override val root: View get() = binding.root
         override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val contentView: View get() = binding.contentScrollView
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton

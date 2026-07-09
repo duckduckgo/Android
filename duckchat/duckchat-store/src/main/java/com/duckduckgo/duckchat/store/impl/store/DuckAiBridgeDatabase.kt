@@ -21,6 +21,13 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/**
+ * The regular-mode native Duck.ai chat store. Shares [DuckAiBridgeChatEntity], [DuckAiBridgeSettingEntity] and
+ * [DuckAiBridgeFileMetaEntity] with its Fire-mode counterpart [FireModeDuckAiDatabase].
+ *
+ * Any schema change to these entities must bump the version in BOTH databases: add a data-preserving migration
+ * here (and increment the version), and bump the version of [FireModeDuckAiDatabase] too.
+ */
 @Database(
     entities = [DuckAiBridgeChatEntity::class, DuckAiBridgeSettingEntity::class, DuckAiBridgeFileMetaEntity::class],
     version = 3,

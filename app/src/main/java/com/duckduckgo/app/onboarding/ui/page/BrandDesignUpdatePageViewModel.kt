@@ -27,17 +27,17 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.StepProgress
+import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
@@ -80,6 +80,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.forPlan
@@ -119,14 +120,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
-    private val quickSetupPixelSender: QuickSetupPixelSender,
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
     private val orchestrator: LinearOnboardingOrchestrator,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
 
     // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
@@ -158,11 +158,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
-        val isDuckAiIntroAnimationEnabled: Boolean = false,
-        val isCustomAiOnboardingCopyEnabled: Boolean = false,
-    ) {
-        val maxPageCount = 3
-    }
+        val isCustomAiOnboardingFlow: Boolean = false,
+        val currentPageNumber: Int? = null,
+        // Total steps in the indicator. Set alongside currentPageNumber from the plan-derived StepProgress
+        // (orchestrator flow) or the legacy flow's fixed 3-step sequence. Only read while an indicator is shown.
+        val maxPageCount: Int = DEFAULT_STEP_COUNT,
+    )
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -173,6 +174,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
 
     private var notificationPermissionFlowStarted = false
+
+    private var notificationPermissionGranted: Boolean? = null
 
     // Which flow drives this run, chosen once at construction. Legacy = the in-VM state machine;
     // Orchestrator = translate fragment callbacks to LinearOnboardingOrchestrator events and render its
@@ -208,7 +211,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             val defaultBrowserChecked: Boolean,
             val widgetChecked: Boolean,
         ) : Command
-        data class PlayIntroAnimation(val withDuckAi: Boolean) : Command
+        data class PlayIntroAnimation(val withDuckAi: Boolean = false) : Command
+        data object HandOffToBrowserActivity : Command
     }
 
     fun onDialogTapped() {
@@ -223,12 +227,27 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         _viewState.update { it.copy(hasAnimatedCurrentDialog = true) }
     }
 
-    private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
-        _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
+    private fun setCurrentDialog(
+        dialogType: PreOnboardingDialogType,
+        currentPageNumber: Int? = null,
+        totalSteps: Int = DEFAULT_STEP_COUNT,
+    ) {
+        _viewState.update {
+            it.copy(
+                currentDialog = dialogType,
+                hasAnimatedCurrentDialog = false,
+                currentPageNumber = currentPageNumber,
+                maxPageCount = totalSteps,
+            )
+        }
         fireDialogShownPixel(dialogType)
     }
 
-    private fun setInputScreenPreviewDialog(isSearchDefault: Boolean) {
+    private fun setInputScreenPreviewDialog(
+        isSearchDefault: Boolean,
+        currentPageNumber: Int?,
+        totalSteps: Int = DEFAULT_STEP_COUNT,
+    ) {
         _viewState.update {
             it.copy(
                 currentDialog = INPUT_SCREEN_PREVIEW,
@@ -236,6 +255,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
                 inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
                 inputScreenPreviewIsSearchSelected = isSearchDefault,
+                currentPageNumber = currentPageNumber,
+                maxPageCount = totalSteps,
             )
         }
         fireDialogShownPixel(INPUT_SCREEN_PREVIEW)
@@ -247,19 +268,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-            AI_COMPARISON_CHART -> {
-                // TODO add pixel when trigger is wired
-            }
+            AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW -> {
-            }
-
-            QUICK_SETUP -> {
-                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
-            }
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
         }
+        viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
 
     fun onIntroAnimationStarted() {
@@ -283,7 +298,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onInputModeDemoQuerySubmitted(
         query: String,
         isChat: Boolean,
-    ) = flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
+        fromSuggestion: Boolean,
+    ) {
+        flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat, fromSuggestion = fromSuggestion)
+    }
 
     fun onDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true)
@@ -402,6 +420,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun notificationRuntimePermissionRequested() {
         pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
 
     fun notificationRuntimePermissionGranted() {
@@ -409,12 +428,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
+        notificationPermissionGranted = true
     }
 
-    private suspend fun isAppReinstall(): Boolean =
-        withContext(dispatchers.io()) {
-            appBuildConfig.isAppReinstall()
-        }
+    fun notificationRuntimePermissionDenied() {
+        notificationPermissionGranted = false
+    }
 
     private suspend fun showQuickSetupDialog() {
         val splitEnabled = isSplitOmnibarEnabled()
@@ -490,7 +509,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         fun loadDaxDialog()
         fun onPrimaryCta(dialog: PreOnboardingDialogType)
         fun onSecondaryCta(dialog: PreOnboardingDialogType)
-        fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean)
+        fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean)
         fun onDefaultBrowserResult(isDefaultBrowser: Boolean)
     }
 
@@ -499,9 +518,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         override fun start() {
             viewModelScope.launch(dispatchers.io()) {
-                val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
-                _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
-                _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
+                _commands.send(Command.PlayIntroAnimation())
             }
         }
 
@@ -521,7 +538,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 } ?: false
 
                 // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
-                val isReinstall = isAppReinstall()
+                val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
 
                 val dialogType = when {
                     canRestore -> {
@@ -549,11 +566,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
                         pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
                         syncAutoRestore.restoreSyncAccount()
-                        setCurrentDialog(COMPARISON_CHART)
+                        setCurrentDialog(COMPARISON_CHART, currentPageNumber = 1)
                     }
                 }
 
-                INITIAL, INITIAL_REINSTALL_USER -> setCurrentDialog(COMPARISON_CHART)
+                INITIAL, INITIAL_REINSTALL_USER -> setCurrentDialog(COMPARISON_CHART, currentPageNumber = 1)
 
                 COMPARISON_CHART -> {
                     viewModelScope.launch {
@@ -565,7 +582,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                                 } else {
                                     pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
                                     _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-                                    setCurrentDialog(ADDRESS_BAR_POSITION)
+                                    setCurrentDialog(ADDRESS_BAR_POSITION, currentPageNumber = 2)
                                 }
                                 false
                             } else {
@@ -594,22 +611,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 ADDRESS_BAR_POSITION -> {
                     viewModelScope.launch {
                         applyAddressBarPositionSelection()
-                        setCurrentDialog(INPUT_SCREEN)
+                        setCurrentDialog(INPUT_SCREEN, currentPageNumber = 3)
                     }
                 }
 
                 INPUT_SCREEN -> {
                     viewModelScope.launch {
                         applyInputScreenSelection()
-                        if (_viewState.value.inputScreenSelected) {
-                            when (duckAiOnboardingExperimentManager.enroll()) {
-                                null,
-                                CONTROL,
-                                -> _commands.send(Command.Finish)
-
-                                TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
-                                TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
-                            }
+                        if (_viewState.value.inputScreenSelected && duckAiOnboardingAvailability.isDuckAiOnboardingEnabled()) {
+                            setInputScreenPreviewDialog(isSearchDefault = true, currentPageNumber = null)
                         } else {
                             _commands.send(Command.Finish)
                         }
@@ -626,12 +636,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     viewModelScope.launch {
                         applyAddressBarPositionSelection(fireTelemetry = false)
                         applyInputScreenSelection(fireTelemetry = false)
-                        val state = _viewState.value
-                        quickSetupPixelSender.fireClicked(
-                            isReinstallUser = state.isReinstallUser,
-                            addressBarPosition = state.selectedAddressBarPosition,
-                            inputScreenSelected = state.inputScreenSelected,
-                        )
                         _commands.send(Command.OnboardingSkipped)
                     }
                 }
@@ -653,7 +657,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
-                    setCurrentDialog(COMPARISON_CHART)
+                    setCurrentDialog(COMPARISON_CHART, currentPageNumber = 1)
                     pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
                 }
 
@@ -675,7 +679,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
         }
 
-        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean) {
             viewModelScope.launch {
                 if (isChat) {
                     _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
@@ -688,7 +692,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         override fun onDefaultBrowserResult(isDefaultBrowser: Boolean) {
             viewModelScope.launch {
                 _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-                setCurrentDialog(ADDRESS_BAR_POSITION)
+                setCurrentDialog(ADDRESS_BAR_POSITION, currentPageNumber = 2)
             }
         }
     }
@@ -699,7 +703,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         override fun start() {
             seedHasPlayedIntroAnimation()
-            observeOrchestratorState()
+            viewModelScope.launch {
+                // Resolve the custom AI signal before collecting orchestrator state,
+                // so the flag is set before any dialog is applied.
+                // Custom AI plan gate requires orchestrator usage,
+                // so this is okay to apply only to OrchestratorFlow and ignore for LegacyFlow.
+                _viewState.update { it.copy(isCustomAiOnboardingFlow = customAiOnboardingStore.isEnabled()) }
+                observeOrchestratorState()
+            }
         }
 
         override fun onIntroAnimationFinished() = emit(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -708,12 +719,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         // (requested from onIntroAnimationFinished) to load the next dax dialog. In orchestrator mode
         // the orchestrator owns which first dialog comes next via step preconditions, so this call
         // only signals that the notification_permission step is done -> Advance.
-        override fun loadDaxDialog() = emit(NewUserOnboardingEvent.NotificationPermissionFinished)
+        override fun loadDaxDialog() = emit(NewUserOnboardingEvent.NotificationPermissionFinished(granted = notificationPermissionGranted))
 
         override fun onPrimaryCta(dialog: PreOnboardingDialogType) {
             when (dialog) {
                 SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
-                INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, INPUT_SCREEN_PREVIEW ->
+                INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW ->
                     emit(NewUserOnboardingEvent.ContinueClicked)
                 SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.SkipConfirmed)
                 ADDRESS_BAR_POSITION ->
@@ -724,7 +735,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     val state = _viewState.value
                     emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
                 }
-                AI_COMPARISON_CHART -> Unit
             }
         }
 
@@ -737,8 +747,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
 
         // The step records the query into the run; the Completed handler reads it off state.result.
-        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) =
-            emit(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = query, isChat = isChat))
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean) =
+            emit(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = query, isChat = isChat, fromSuggestion = fromSuggestion))
 
         override fun onDefaultBrowserResult(isDefaultBrowser: Boolean) =
             emit(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = isDefaultBrowser))
@@ -746,13 +756,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         // The fragment-scoped VM is recreated on every OnboardingActivity entry. Seed past-intro state
         // synchronously so a mid-flow re-entry does not replay the intro before the collector catches up.
         private fun seedHasPlayedIntroAnimation() {
-            val pastIntro = when (val state = orchestrator.state.value) {
+            val isPastIntro = when (val state = orchestrator.state.value) {
                 is LinearOnboardingState.InProgress ->
                     (state.currentStep as? NewUserOnboardingActivityStep)?.id != NewUserOnboardingStepIds.INTRO_ANIMATION
                 is LinearOnboardingState.Completed, is LinearOnboardingState.Skipped -> true
                 LinearOnboardingState.NotStarted -> false
             }
-            if (pastIntro) {
+            if (isPastIntro) {
                 _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
             }
         }
@@ -762,8 +772,21 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
                 .onEach { state ->
                     when (state) {
-                        is LinearOnboardingState.InProgress ->
-                            (state.currentStep as? NewUserOnboardingActivityStep)?.let { applyDialog(it.resolveDialog()) }
+                        is LinearOnboardingState.InProgress -> {
+                            val step = state.currentStep
+                            when (step.host) {
+                                LinearOnboardingHost.OnboardingActivity -> {
+                                    // stay
+                                }
+                                LinearOnboardingHost.BrowserActivity -> {
+                                    _commands.send(Command.HandOffToBrowserActivity)
+                                    return@onEach
+                                }
+                            }
+                            if (step is NewUserOnboardingActivityStep) {
+                                applyDialog(step.resolveDialog(), state.stepIndicatorProgress())
+                            }
+                        }
                         is LinearOnboardingState.Completed -> {
                             when (val result = state.result as? NewUserOnboardingResult) {
                                 is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
@@ -779,10 +802,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         // Maps the current step's dialog onto the same viewState/commands the fragment already renders.
         // Reuses setCurrentDialog / setInputScreenPreviewDialog so shown pixels fire exactly as in legacy.
-        private suspend fun applyDialog(dialog: NewUserOnboardingActivityDialog) {
+        private suspend fun applyDialog(dialog: NewUserOnboardingActivityDialog, progress: StepProgress?) {
+            // Step-indicator dialogs derive their "page N of M" from the plan-position progress; null = no indicator.
+            val page = progress?.current
+            val total = progress?.total ?: DEFAULT_STEP_COUNT
             when (dialog) {
                 is NewUserOnboardingActivityDialog.IntroAnimation -> {
-                    _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = dialog.withDuckAi) }
                     _commands.send(Command.PlayIntroAnimation(withDuckAi = dialog.withDuckAi))
                 }
                 NewUserOnboardingActivityDialog.NotificationPermission -> {
@@ -800,7 +825,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     setCurrentDialog(INITIAL_REINSTALL_USER)
                 }
                 NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
-                NewUserOnboardingActivityDialog.ComparisonChart -> setCurrentDialog(COMPARISON_CHART)
+                NewUserOnboardingActivityDialog.ComparisonChart ->
+                    setCurrentDialog(COMPARISON_CHART, currentPageNumber = page, totalSteps = total)
+                NewUserOnboardingActivityDialog.AiComparisonChart ->
+                    setCurrentDialog(AI_COMPARISON_CHART, currentPageNumber = page, totalSteps = total)
                 NewUserOnboardingActivityDialog.DefaultBrowserPrompt -> {
                     val intent = defaultRoleBrowserDialog.createIntent(context)
                     if (intent != null) {
@@ -812,11 +840,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 }
                 is NewUserOnboardingActivityDialog.AddressBarPosition -> {
                     _viewState.update { it.copy(showSplitOption = dialog.showSplitOption) }
-                    setCurrentDialog(ADDRESS_BAR_POSITION)
+                    setCurrentDialog(ADDRESS_BAR_POSITION, currentPageNumber = page, totalSteps = total)
                 }
-                NewUserOnboardingActivityDialog.InputScreen -> setCurrentDialog(INPUT_SCREEN)
+                NewUserOnboardingActivityDialog.InputScreen ->
+                    setCurrentDialog(INPUT_SCREEN, currentPageNumber = page, totalSteps = total)
                 is NewUserOnboardingActivityDialog.InputScreenPreview ->
-                    setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault)
+                    setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, currentPageNumber = page, totalSteps = total)
                 NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption -> setCurrentDialog(SKIP_ONBOARDING_OPTION)
                 is NewUserOnboardingActivityDialog.QuickSetup -> {
                     _viewState.update {
@@ -839,5 +868,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private companion object {
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
+
+        // Legacy flow renders a fixed 3-step indicator; the orchestrator flow overrides this per step from the
+        // plan-derived total. Used as the default until an indicator step sets the real count.
+        private const val DEFAULT_STEP_COUNT = 3
     }
 }

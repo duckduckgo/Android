@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
@@ -66,6 +67,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.CoroutineScope
@@ -110,11 +112,13 @@ class TabSwitcherViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val tabTitleResolver: TabTitleResolver,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val fireTabsPromos: FireTabsPromos,
+    private val remoteMessageModel: RemoteMessageModel,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
 
-    private val currentMode: StateFlow<BrowserMode> =
+    val currentMode: StateFlow<BrowserMode> =
         if (fireModeAvailable) {
             browserModeStateHolder.currentMode
         } else {
@@ -134,6 +138,35 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
+    private val _viewState = MutableStateFlow(
+        ViewState(
+            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
+            isBrowserModeToggleVisible = fireModeAvailable,
+            browserMode = currentMode.value,
+        ),
+    )
+
+    private var tabSwitcherPromoHandled = false
+
+    init {
+        viewModelScope.launch {
+            val showPromo = withContext(dispatcherProvider.io()) {
+                val activeMessage = remoteMessageModel.getActiveMessage()
+                val isFireTabsCampaign = activeMessage?.id == FireTabsPromos.FIRE_TABS_PROMO_MESSAGE_ID
+                isFireTabsCampaign &&
+                    currentMode.value == BrowserMode.REGULAR &&
+                    fireTabsPromos.canShowTabSwitcherPromo()
+            }
+            // Re-check the dismiss flag after the suspending read: the user may have toggled modes meanwhile.
+            if (showPromo && !tabSwitcherPromoHandled) {
+                tabSwitcherPromoHandled = true
+                fireTabsPromos.onTabSwitcherPromoShown()
+                pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
+                _viewState.update { it.copy(isFireTabsPromoVisible = true) }
+            }
+        }
+    }
+
     private val tabSwitcherItemsFlow: Flow<TabItems> = tabRepositoryFlow.flatMapLatest { repo ->
         combine(
             repo.flowTabs.debounce(100.milliseconds),
@@ -150,13 +183,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.map { it.itemsOrEmpty }.asLiveData()
 
-    private val _viewState = MutableStateFlow(
-        ViewState(
-            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
-            isBrowserModeToggleVisible = fireModeAvailable,
-            browserMode = currentMode.value,
-        ),
-    )
     val viewState = combine(
         _viewState,
         tabSwitcherItemsFlow,
@@ -255,6 +281,11 @@ class TabSwitcherViewModel @Inject constructor(
         command.value = Command.DismissSnackbar
 
         browserModeStateHolder.switchTo(mode)
+
+        // The promo banner has served its purpose once the user toggles modes; dismiss it so it does not
+        // reappear when returning to regular mode (this ViewModel survives the toggle-triggered recreate).
+        tabSwitcherPromoHandled = true
+        _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }
 
     suspend fun onTabSelected(tabId: String) {
@@ -525,6 +556,8 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
+        } else if (viewState.value.showFireTabsEmptyState) {
+            command.value = Command.SwitchToRegularMode
         } else {
             command.value = Command.Close
         }
@@ -535,6 +568,8 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
+        } else if (viewState.value.showFireTabsEmptyState) {
+            command.value = Command.SwitchToRegularMode
         } else {
             command.value = Command.Close
         }
@@ -623,6 +658,13 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onFireTabsPromoDismissed() {
+        if (!_viewState.value.isFireTabsPromoVisible) return
+        tabSwitcherPromoHandled = true
+        pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
+        _viewState.update { it.copy(isFireTabsPromoVisible = false) }
+    }
+
     fun onTrackerAnimationInfoPanelClicked() {
         trackersAnimationInfoPanelPixels.fireInfoPanelTapped()
         command.value = ShowAnimatedTileDismissalDialog
@@ -701,6 +743,7 @@ class TabSwitcherViewModel @Inject constructor(
         val browserMode: BrowserMode = BrowserMode.REGULAR,
         val regularTabCount: Int? = null,
         val isBrowserModeToggleVisible: Boolean = false,
+        val isFireTabsPromoVisible: Boolean = false,
     ) {
         val tabSwitcherItems: List<TabSwitcherItem> = tabItems.itemsOrEmpty
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()

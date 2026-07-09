@@ -13,6 +13,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import org.junit.Assert.*
 import org.junit.Assume.assumeFalse
@@ -40,6 +44,10 @@ class SubscriptionPixelTest(
                 PAYWALL_NOT_SEEN_D7,
                 PAYWALL_NOT_SEEN_D14,
                 PAYWALL_NOT_SEEN_D30,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED,
             ),
         )
 
@@ -50,7 +58,15 @@ class SubscriptionPixelTest(
 
     @Test
     fun `pixel name has pixel type suffix`() {
-        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
+        assumeFalse(
+            pixel in listOf(
+                PURCHASE_SUCCESS_ORIGIN,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED,
+            ),
+        )
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             val expectedSuffix = when (pixelType) {
                 is Count -> "_c"

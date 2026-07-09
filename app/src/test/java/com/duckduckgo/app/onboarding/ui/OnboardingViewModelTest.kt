@@ -21,9 +21,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
@@ -72,8 +72,6 @@ class OnboardingViewModelTest {
 
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
-    private val onboardingStore: OnboardingStore = mock()
-
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -83,6 +81,8 @@ class OnboardingViewModelTest {
         on { state } doReturn orchestratorState
     }
 
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -91,9 +91,9 @@ class OnboardingViewModelTest {
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
             dismissedCtaDao = dismissedCtaDao,
-            onboardingStore = onboardingStore,
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
             linearOnboardingOrchestrator = linearOnboardingOrchestrator,
+            duckAiOnboardingDemo = duckAiOnboardingDemo,
         )
     }
 
@@ -104,29 +104,18 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenOnboardingDoneWithDefaultFlowThenNoCtasDismissedAndDuckAiOnboardingFlowNotSet() = runTest {
+    fun whenOnboardingDoneWithDefaultFlowThenNoCtasDismissedAndDemoNotArmed() = runTest {
         testee.onOnboardingDone()
 
         verifyNoInteractions(dismissedCtaDao)
-        verify(onboardingStore, never()).setDuckAiOnboardingFlow()
+        verify(duckAiOnboardingDemo, never()).arm()
     }
 
     @Test
-    fun whenOnboardingDoneWithDuckAiFocusedFlowThenDuckAiOnboardingFlowIsSet() = runTest {
+    fun whenOnboardingDoneWithDuckAiFocusedFlowThenDemoIsArmed() = runTest {
         testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
 
-        verify(onboardingStore).setDuckAiOnboardingFlow()
-    }
-
-    @Test
-    fun whenOnboardingDoneWithDuckAiFocusedFlowThenStandardDaxCtasAreDismissed() = runTest {
-        testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
-
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
+        verify(duckAiOnboardingDemo).arm()
     }
 
     @Test
@@ -135,7 +124,7 @@ class OnboardingViewModelTest {
 
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
         verifyNoMoreInteractions(dismissedCtaDao)
-        verify(onboardingStore, never()).setDuckAiOnboardingFlow()
+        verify(duckAiOnboardingDemo, never()).arm()
     }
 
     @Test

@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':app-build-config-api')
+    implementation project(':browser-mode-api')
     implementation project(':common-utils')
     implementation project(':data-store-api')
     implementation project(':duckchat-api')

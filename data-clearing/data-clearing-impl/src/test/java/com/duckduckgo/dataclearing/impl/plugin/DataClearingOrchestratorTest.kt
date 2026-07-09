@@ -16,6 +16,7 @@
 
 package com.duckduckgo.dataclearing.impl.plugin
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
@@ -62,7 +63,11 @@ class DataClearingOrchestratorTest {
         val plugin = recordingPlugin(receivedTypes)
         val orchestrator = createOrchestrator(plugin)
 
-        val types = setOf<ClearableData>(ClearableData.Tabs.Single("tab1"), ClearableData.DuckChats.Selected(setOf("url")))
+        val types =
+            setOf<ClearableData>(
+                ClearableData.Tabs.SingleForMode("tab1", BrowserMode.REGULAR),
+                ClearableData.DuckChats.SelectedForMode(setOf("url"), BrowserMode.REGULAR),
+            )
         orchestrator.clearData(types)
 
         assertEquals(1, receivedTypes.size)

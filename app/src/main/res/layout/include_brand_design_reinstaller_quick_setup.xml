@@ -97,6 +97,7 @@
             app:quickSetupRowSecondaryText="@string/preOnboardingAddressBarPositionTop" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/addressBarSearchOptionsDivider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:defaultPadding="false"

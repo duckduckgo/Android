@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Los geht\'s!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="preOnboardingDaxDialog2Button">Wähle deinen Browser</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo bietet auch ein <b>optionales kostenpflichtiges Abonnement</b> mit einem sicheren <b>VPN</b> und <b>fortschrittlicher, privater KI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Probiere es kostenlos aus!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wusstest du das?</string>
 
@@ -1031,10 +1033,63 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Wie sagt man „Ente“ auf Englisch?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Wie sagt man „Ente“ auf Spanisch?</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Das ist Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private KI-Chats, die du jederzeit mit dem <b>Fire Button</b> löschen kannst. Probier’s doch mal aus! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Du schaffst das!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Verwende die Adressleiste, um zu suchen und Websites zu besuchen oder für private KI-Chats zu Duck.ai zu wechseln.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Schlag ein!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Bereit anzufangen?&lt;br/&gt;Probier die Suchfunktion oder den KI-Chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privat suchen</string>
+    <string name="preOnboardingInputModeDemoChatHint">Alles privat fragen</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Erkläre den Aktienmarkt, als wäre ich 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plane einen perfekten Tag in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Überrasche mich!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Was sind 10 faszinierende Fakten aus Wissenschaft, Natur und Geschichte?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Bereit, privat und kostenlos mit ChatGPT, Claude und anderen KIs zu chatten, in einem Browser, der dich aktiv schützt?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Zur Erinnerung: Du kannst Duck.ai überall dort nutzen, wo du das Chat-Symbol siehst</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">KI-Chat starten</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">KI-Schutz aktiviert!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Beliebte KIs</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alle Chats werden anonymisiert</string>
+    <string name="preOnboardingAiComparisonChartItem2">Kein Konto erforderlich, um auf alle KI-Funktionen zuzugreifen</string>
+    <string name="preOnboardingAiComparisonChartItem3">Verwendet deine Chats niemals zum Trainieren von KI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Zugriff auf ChatGPT, Claude und mehr, alles an einem Ort</string>
+    <string name="preOnboardingAiComparisonChartButton">Probiere Duck.ai aus!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Probiere jetzt einen privaten KI-Chat aus!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Möchtest du DuckDuckGo zu deinem Standardbrowser machen?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Wir bieten auch ein kostenpflichtiges Abonnement für fortschrittliche KI-Modelle mit höheren Chat-Limits von GPT und Claude, einem sicheren VPN und mehr.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Nur Suchen</string>
     <string name="input_screen_user_pref_with_ai_updated">Wechseln zwischen\nSuche und Duck.ai</string>
 
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bestätigen</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">In einem Fire-Tab öffnen</string>
+    <string name="openInBackgroundTab">Im Hintergrund öffnen</string>
+    <string name="browserModeToggleFireDescription">Zu Fire-Modus-Tabs wechseln</string>
+    <string name="browserModeToggleRegularDescription">Zu regulären Tabs wechseln</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-Tab</string>
+    <string name="fireTabNewTabPageTitle">Fire-Tab</string>
+    <string name="fireTabsEmptyStateTitle">Fire-Tabs</string>
+    <string name="fireTabsFeatureNoHistory">Durchsuchen ohne Speichern des lokalen Verlaufs</string>
+    <string name="fireTabsFeatureDifferentAccount">Melde dich mit einem anderen Konto bei einer Website an</string>
+    <string name="fireTabsFeatureTroubleshoot">Website-Fehlerbehebung</string>
+    <string name="fireTabsExplainer">Fire Tabs sind von anderen Browserdaten isoliert. Ihre Daten werden gelöscht, wenn du alle Fenster schließt. Sie haben den gleichen Tracking-Schutz wie andere Tabs.</string>
+    <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
 </resources>

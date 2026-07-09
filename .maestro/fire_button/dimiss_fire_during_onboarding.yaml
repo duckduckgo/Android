@@ -13,6 +13,8 @@ tags:
 
       - runFlow: ../shared/pre_onboarding.yaml
 
+      # pre_onboarding ends on a search result page; type the test URL into the omnibar
+      # (the native input field only exists on the new-tab page).
       - tapOn:
           id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"

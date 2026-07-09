@@ -39,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -508,7 +509,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext()
+            testee.addPageContext(fromPlaceholderTap = true)
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
@@ -575,7 +576,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext()
+            testee.addPageContext(fromPlaceholderTap = true)
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
@@ -976,10 +977,48 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when replace prompt then summarize prompt selected pixel fired`() = runTest {
+    fun `when replace prompt then summarize prompt selected pixel not fired`() = runTest {
         testee.replacePrompt("", "summarize this")
 
+        verify(duckChatPixels, never()).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when summarize quick action clicked in legacy mode then summarize prompt selected pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        testee.onQuickActionClicked("")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE, testee.viewState.value.quickActionState)
         verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when summarize quick action clicked in submit mode then summarize prompt selected pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE (no summarize pixel)
+
+        testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click -> fires summarize pixel
+
+        verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when ask about page quick action clicked then summarize prompt selected pixel not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        verify(duckChatPixels, never()).reportContextualSummarizePromptSelected()
     }
 
     @Test
@@ -1174,6 +1213,23 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `onNewChatRequestedFromPopup emits new chat subscription and reports popup pixel`() = runTest {
+        testee.subscriptionEventDataFlow.test {
+            testee.onSheetOpened("tab-1")
+            testee.onNewChatRequestedFromPopup()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(duckChatPixels).reportContextualSheetNewChatFromPopup()
+        verify(duckChatPixels, never()).reportContextualSheetNewChat()
+    }
+
+    @Test
     fun `onChatPageLoaded in Input Mode doesn't store url`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
@@ -1286,6 +1342,38 @@ class DuckChatContextualViewModelTest {
 
         assertNull(contextualDataStore.getTabChatUrl(tabId))
         assertEquals("", testee.viewState.value.prompt)
+    }
+
+    @Test
+    fun `when new chat requested then attached page context is reset`() = runTest {
+        val tabId = "tab-1"
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onSheetOpened(tabId)
+        testee.onPageContextReceived(tabId, pageContext)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showContext)
+        assertFalse(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when new chat requested then a removed context flag is reset`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.userRemovedContext)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.userRemovedContext)
+        assertFalse(testee.viewState.value.showContext)
     }
 
     @Test
@@ -1705,7 +1793,9 @@ class DuckChatContextualViewModelTest {
 
         testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click — should not re-attach
 
-        verify(duckChatPixels, times(1)).reportContextualPlaceholderContextTapped()
+        // ASK_ABOUT_PAGE attaches context internally; it is not a placeholder tap, so the
+        // placeholder-tapped pixel must not fire on this path.
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextTapped()
         verify(duckChatPixels, times(1)).reportContextualPageContextManuallyAttachedNative()
     }
 
@@ -1877,6 +1967,45 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet opened in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when new chat triggered in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.onNewChatRequested()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when removePageContext reverts to ASK_ABOUT_PAGE then placeholder shown pixel is not fired but removed pixel is`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.removePageContext()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels).reportContextualPageContextRemovedNative()
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
     fun `when fire confirmed then sheet is hidden`() = runTest {
         testee.commands.test {
             testee.onSheetOpened("tab-1")
@@ -1914,6 +2043,9 @@ class DuckChatContextualViewModelTest {
             assertTrue(awaitItem() is DuckChatContextualViewModel.Command.LaunchChatHistory)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualChatsMenuTapped()
+        verify(duckChatPixels, never()).reportContextualViewAllChatsTapped()
     }
 
     @Test
@@ -1933,6 +2065,8 @@ class DuckChatContextualViewModelTest {
             assertEquals("c1", command.recentChats[0].chatId)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualChatsMenuTapped()
     }
 
     @Test
@@ -2187,6 +2321,7 @@ class DuckChatContextualViewModelTest {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
         private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
+        private val nativeChatInputEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -2207,19 +2342,22 @@ class DuckChatContextualViewModelTest {
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
         override suspend fun isInputScreenEverEnabled(): Boolean = false
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
-        override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
-        override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
+        override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = emptyFlow()
+        override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
+        override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
-        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
         override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
+        override suspend fun hasUserEnabledChatHistory(): Boolean = false
+        override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
     }
 

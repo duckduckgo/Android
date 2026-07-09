@@ -2,12 +2,28 @@ appId: com.duckduckgo.mobile.android
 ---
 - runFlow:
     when:
-        notVisible:
-            id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
+      notVisible:
+        id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
     commands:
-        - hideKeyboard
-        - assertVisible:
-            id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
+      - runFlow:
+          when:
+            notVisible:
+              id: 'com.duckduckgo.mobile.android:id/inputFieldFireIconImageview'
+          commands:
+            - hideKeyboard
 
-- tapOn:
-    id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
+- runFlow:
+    when:
+      visible:
+        id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
+    commands:
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/fireIconImageView'
+
+- runFlow:
+    when:
+      visible:
+        id: 'com.duckduckgo.mobile.android:id/inputFieldFireIconImageview'
+    commands:
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/inputFieldFireIconImageview'

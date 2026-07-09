@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -30,6 +31,8 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
+import com.duckduckgo.remote.messaging.api.DisplayConditions
+import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
@@ -48,6 +51,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
 @RunWith(AndroidJUnit4::class)
@@ -66,12 +70,14 @@ class AppRemoteMessagingRepositoryTest {
 
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
     private val remoteMessageImageStore: RemoteMessageImageStore = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
 
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
         getMessageMapper(),
         remoteMessageImageStore,
+        currentTimeProvider,
     )
 
     @After
@@ -471,6 +477,75 @@ class AppRemoteMessagingRepositoryTest {
         assertNull(result)
     }
 
+    @Test
+    fun whenMarkAsShownThenFirstShownDateStampedOnce() {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessage("id"))
+
+        testee.markAsShown(aRemoteMessage("id"))
+        assertEquals(1000L, dao.messagesById("id")?.firstShownDate)
+
+        // a second impression must not move the timestamp
+        testee.markAsShown(aRemoteMessage("id"))
+        assertEquals(1000L, dao.messagesById("id")?.firstShownDate)
+    }
+
+    @Test
+    fun whenExpiryThresholdReachedThenMessageDismissedAndConfigInvalidated() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(5))
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5)))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertNull(testee.message())
+        assertEquals(Status.DISMISSED, dao.messagesById("id")?.status)
+        // mirrors dismissMessage(): invalidate so the next eligible message is scheduled
+        verify(remoteMessagingConfigRepository).invalidate()
+    }
+
+    @Test
+    fun whenExpiryThresholdIsZeroThenMessageNeverExpires() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(99))
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 0)))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals("id", testee.message()?.id)
+    }
+
+    @Test
+    fun whenWithinExpiryThresholdThenMessageReturned() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(3))
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5)))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals("id", testee.message()?.id)
+        assertEquals(Status.SCHEDULED, dao.messagesById("id")?.status)
+    }
+
+    @Test
+    fun whenNeverShownThenNotExpiredEvenPastThreshold() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(TimeUnit.DAYS.toMillis(99))
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5)))
+
+        assertEquals("id", testee.message()?.id)
+    }
+
+    @Test
+    fun whenNoExpiryConfiguredThenMessageNeverExpires() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(3650))
+        testee.activeMessage(aRemoteMessage("id"))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals("id", testee.message()?.id)
+    }
+
+    @Test
+    fun whenMessageHasDisplayConditionsThenStoredAndReadBackIntact() = runTest {
+        val conditions = DisplayConditions(trigger = MessageTrigger.AFTER_IDLE, dismissAfterDaysShown = 5)
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", conditions))
+
+        assertEquals(conditions, testee.message()?.displayConditions)
+    }
+
     companion object {
         fun aRemoteMessage(id: String) = RemoteMessage(
             id = id,
@@ -487,5 +562,10 @@ class AppRemoteMessagingRepositoryTest {
             exclusionRules = emptyList(),
             surfaces = listOf(Surface.NEW_TAB_PAGE),
         )
+
+        fun aRemoteMessageWithDisplayConditions(
+            id: String,
+            displayConditions: DisplayConditions,
+        ) = aRemoteMessage(id).copy(displayConditions = displayConditions)
     }
 }

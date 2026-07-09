@@ -51,12 +51,16 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FIRST_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_DAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_MAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
@@ -433,6 +437,26 @@ interface PirPixelSender {
      * Emits a pixel to report Monthly Active Users for PIR.
      */
     fun reportMAU()
+
+    /**
+     * Emits a pixel to report user-interacted Daily Active Users for PIR (the PIR dashboard was presented).
+     */
+    fun reportInteractionDAU()
+
+    /**
+     * Emits a pixel to report user-interacted Weekly Active Users for PIR (the PIR dashboard was presented).
+     */
+    fun reportInteractionWAU()
+
+    /**
+     * Emits a pixel to report user-interacted Monthly Active Users for PIR (the PIR dashboard was presented).
+     */
+    fun reportInteractionMAU()
+
+    /**
+     * Emits a unique pixel (once per install) when the user starts their first PIR scan.
+     */
+    fun reportFirstScanStarted()
 
     /**
      * Emits a pixel to report weekly data on orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.
@@ -1047,6 +1071,22 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_ENGAGEMENT_MAU)
     }
 
+    override fun reportInteractionDAU() {
+        enqueueFire(PIR_INTERACTION_DAU, usageParams())
+    }
+
+    override fun reportInteractionWAU() {
+        enqueueFire(PIR_INTERACTION_WAU, usageParams())
+    }
+
+    override fun reportInteractionMAU() {
+        enqueueFire(PIR_INTERACTION_MAU, usageParams())
+    }
+
+    override fun reportFirstScanStarted() {
+        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams())
+    }
+
     override fun reportWeeklyChildOrphanedOptOuts(
         brokerUrl: String,
         childParentRecordDifference: Int,
@@ -1585,6 +1625,12 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_MANUAL_RESET)
     }
 
+    private fun usageParams(): Map<String, String> = mapOf(
+        // hardcoded values for now until we support freemium
+        PARAM_KEY_IS_AUTHENTICATED to "true",
+        PARAM_KEY_FREE_SCAN to "false",
+    )
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1627,6 +1673,7 @@ class RealPirPixelSender @Inject constructor(
 
     private fun PirExecutionType.toScanTriggerParam(): String = when (this) {
         PirExecutionType.MANUAL_INITIAL -> "onboarding"
+        PirExecutionType.MANUAL_INITIAL_RESUME -> "onboarding_resume"
         PirExecutionType.MANUAL_EDIT_PROFILE -> "profile_edit"
         PirExecutionType.SCHEDULED -> "scheduled"
     }
@@ -1646,6 +1693,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_ATTEMPT_NUMBER = "attempt_number"
         private const val PARAM_TOTAL_FETCH = "totalFetchAttempts"
         private const val PARAM_TOTAL_EMAIL_CONFIRMATION = "totalEmailConfirmationJobs"
+        private const val PARAM_KEY_IS_AUTHENTICATED = "is_authenticated"
+        private const val PARAM_KEY_FREE_SCAN = "free_scan"
 
         private const val PARAM_KEY_BROKER = "data_broker"
         private const val PARAM_KEY_PARENT = "parent"

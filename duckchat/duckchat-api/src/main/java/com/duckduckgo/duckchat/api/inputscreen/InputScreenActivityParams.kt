@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.api.inputscreen
 
 import android.app.Activity
 import androidx.activity.result.ActivityResult
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.io.Serializable
 
@@ -33,6 +34,7 @@ import java.io.Serializable
  * @param duckAiOnboardingEndCta which variant of the Duck.AI onboarding end CTA to render — [DuckAiOnboardingEndCtaVariant.NONE]
  *  to suppress it, [DuckAiOnboardingEndCtaVariant.LEGACY] for the original visual, or [DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE]
  *  for the redesigned variant.
+ * @param initialInputMode if null, falls back to user preference (Search / Chat / Last Used)
  */
 data class InputScreenActivityParams(
     val query: String,
@@ -40,7 +42,7 @@ data class InputScreenActivityParams(
     val browserButtonsConfig: InputScreenBrowserButtonsConfig,
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
-    val launchOnChat: Boolean = false,
+    val initialInputMode: InputMode? = null,
     val showReturnHatch: Boolean = false,
     val isNewTab: Boolean = false,
     val duckAiOnboardingEndCta: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
@@ -92,6 +94,9 @@ data object InputScreenActivityResultParams {
 
     /** Key for the target tab ID when result is [InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED] */
     const val TAB_ID_PARAM = "tab_id"
+
+    /** Key for the target tab's [com.duckduckgo.browsermode.api.BrowserMode] name when result is [InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED] */
+    const val TAB_MODE_PARAM = "tab_mode"
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"

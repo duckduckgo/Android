@@ -46,6 +46,13 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.self().isEnabled()
                 edgeToEdgeFeature.browser().isEnabled()
                 edgeToEdgeFeature.settings().isEnabled()
+                edgeToEdgeFeature.autofill().isEnabled()
+                edgeToEdgeFeature.sync().isEnabled()
+                edgeToEdgeFeature.vpn().isEnabled()
+                edgeToEdgeFeature.webview().isEnabled()
+                edgeToEdgeFeature.onboarding().isEnabled()
+                edgeToEdgeFeature.misc().isEnabled()
+                edgeToEdgeFeature.bottomSheets().isEnabled()
             }
         }
     }
@@ -54,6 +61,13 @@ class RealEdgeToEdgeProvider @Inject constructor(
         val bucketToggle = when (bucket) {
             EdgeToEdgeBucket.BROWSER -> edgeToEdgeFeature.browser()
             EdgeToEdgeBucket.SETTINGS -> edgeToEdgeFeature.settings()
+            EdgeToEdgeBucket.AUTOFILL -> edgeToEdgeFeature.autofill()
+            EdgeToEdgeBucket.SYNC -> edgeToEdgeFeature.sync()
+            EdgeToEdgeBucket.VPN -> edgeToEdgeFeature.vpn()
+            EdgeToEdgeBucket.WEBVIEW -> edgeToEdgeFeature.webview()
+            EdgeToEdgeBucket.ONBOARDING -> edgeToEdgeFeature.onboarding()
+            EdgeToEdgeBucket.MISC -> edgeToEdgeFeature.misc()
+            EdgeToEdgeBucket.BOTTOM_SHEETS -> edgeToEdgeFeature.bottomSheets()
         }
         bucketToggle.isEnabled()
     } else {

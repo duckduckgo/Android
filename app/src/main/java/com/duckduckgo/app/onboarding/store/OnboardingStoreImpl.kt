@@ -22,16 +22,21 @@ import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
+import dagger.SingleInstanceIn
 import java.util.Locale
 import javax.inject.Inject
 
+@SingleInstanceIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : OnboardingStore {
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     override var onboardingDialogJourney: String?
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
@@ -219,10 +224,6 @@ class OnboardingStoreImpl @Inject constructor(
 
     override fun isDuckAiOnboardingFlow(): Boolean {
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
-    }
-
-    override fun isCustomAiOnboardingFlow(): Boolean {
-        return false
     }
 
     companion object {

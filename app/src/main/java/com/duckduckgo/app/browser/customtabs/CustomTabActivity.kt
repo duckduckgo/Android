@@ -18,11 +18,8 @@ package com.duckduckgo.app.browser.customtabs
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.os.Message
-import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -74,8 +71,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-            updateLayoutForDisplayCutout(resources.configuration.orientation)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
         setContentView(binding.root)
@@ -104,7 +101,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ) {
         val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
-        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal)
+        val clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA)
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage)
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
@@ -130,29 +128,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
             skipHome = true,
             toolbarColor = viewState.toolbarColor,
             isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
+            clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA),
         )
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
         transaction.commit()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            updateLayoutForDisplayCutout(newConfig.orientation)
-        }
-    }
-
-    private fun updateLayoutForDisplayCutout(orientation: Int) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
-            }
-        }
     }
 
     companion object {
@@ -162,6 +142,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             text: String?,
             toolbarColor: Int?,
             isExternal: Boolean,
+            clientPackage: String? = null,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
@@ -170,9 +151,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (toolbarColor != null) {
                     putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 }
+                if (clientPackage != null) {
+                    putExtra(CLIENT_PACKAGE_EXTRA, clientPackage)
+                }
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

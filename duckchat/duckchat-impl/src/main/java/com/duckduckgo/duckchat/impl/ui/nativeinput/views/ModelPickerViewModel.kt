@@ -174,6 +174,7 @@ class ModelPickerViewModel @Inject constructor(
                 if (model.id != recoverySelectedModelId.value) {
                     duckChatPixels.fireModelSelected(model.id)
                 }
+                duckChatPixels.fireSubmitChangeModel(model.id)
                 recoverySelectedModelId.value = model.id
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
@@ -212,13 +213,13 @@ class ModelPickerViewModel @Inject constructor(
     }
 
     @DrawableRes
-    fun getIconResForModel(model: AIChatModel): Int? = when (model.provider) {
+    fun getIconResForModel(model: AIChatModel): Int = when (model.provider) {
         ModelProvider.OPENAI -> R.drawable.ic_ai_model_openai_16
         ModelProvider.ANTHROPIC -> R.drawable.ic_ai_model_claude_16
         ModelProvider.MISTRAL -> R.drawable.ic_ai_model_mistral_16
         ModelProvider.META -> R.drawable.ic_ai_model_llama_16
-        ModelProvider.OSS -> R.drawable.ic_ai_model_oss_16
-        ModelProvider.UNKNOWN -> null
+        // OSS doubles as the fallback for unrecognised providers so a model never renders without an icon.
+        ModelProvider.OSS, ModelProvider.UNKNOWN -> R.drawable.ic_ai_model_oss_16
     }
 
     private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =

@@ -17,7 +17,8 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -43,14 +44,11 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, boundType = NativeInputStatePublisher::class)
 class RealNativeInputStateStore @Inject constructor(
     // Lazy avoids a Dagger cycle: TabRepository's impl (TabDataRepository) injects
-    // NativeInputStatePublisher to clearTab on tab eviction. Resolving TabRepository
-    // lazily lets Dagger construct both without circularity. The lazy is only
-    // dereferenced when `state` is collected for the first time.
-    //
-    // Qualified @RegularMode because the unqualified TabRepository is only bound in
-    // ActivityScope; AppScope consumers must pick a mode explicitly. Duck.ai native
-    // input state follows regular-mode tabs.
-    @RegularMode private val tabRepository: Lazy<TabRepository>,
+    // NativeInputStatePublisher to clearTab on tab eviction. Resolving the per-mode
+    // repository provider lazily lets Dagger construct both without circularity. The
+    // lazy is only dereferenced when `state` is collected for the first time.
+    private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) :
     NativeInputStateProvider,
     NativeInputStatePublisher {
@@ -58,7 +56,8 @@ class RealNativeInputStateStore @Inject constructor(
     private val flows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
 
     override val state: Flow<NativeInputState> by lazy {
-        tabRepository.get().flowSelectedTab
+        browserModeStateHolder.currentMode
+            .flatMapLatest { mode -> tabRepositoryProvider.get().forMode(mode).flowSelectedTab }
             .filterNotNull()
             .map { it.tabId }
             .distinctUntilChanged()

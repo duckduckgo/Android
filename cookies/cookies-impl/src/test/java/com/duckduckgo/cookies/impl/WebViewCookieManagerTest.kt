@@ -18,6 +18,7 @@ package com.duckduckgo.cookies.impl
 
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
@@ -54,7 +55,7 @@ class WebViewCookieManagerTest {
 
     @Before
     fun setup() {
-        whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+        whenever(cookieManagerProvider.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.setCookie(any(), any(), any())).then {
             (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
         }

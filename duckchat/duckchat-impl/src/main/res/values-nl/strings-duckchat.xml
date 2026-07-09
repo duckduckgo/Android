@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Verberg AI-gegenereerde afbeeldingen.</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert AI-gegenereerde afbeeldingen uit de zoekresultaten van afbeeldingen.</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nooit</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Op aanvraag</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Soms</string>
+    <string name="duckAiSearchAssistVisibilityOften">Vaak</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">DuckDuckGo zonder AI gebruiken</string>
+    <string name="duckAiUseWithoutAiDescription">Hiermee schakel je Duck.ai uit, verberg je antwoorden op basis van AI in zoekresultaten en filter je bekende AI-spamsites in zoekresultaten voor afbeeldingen.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI is momenteel uitgeschakeld in de browser, dus je ziet geen antwoorden op basis van AI meer en minder door AI gegenereerde afbeeldingen in de zoekresultaten voor afbeeldingen.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Schakelen tussen zoeken en Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Door AI gegenereerde afbeeldingen verbergen</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Hiermee filter je bekende AI-spamsites uit de zoekresultaten voor afbeeldingen. <annotation link="learn_more">Meer informatie</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Inschakelen in de instellingen voor AI-functies</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Beheren in de instellingen voor AI-functies</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Pagina-inhoud automatisch verzenden</string>
     <string name="duckAIContextualAutomaticContextMessage">Pagina-inhoud automatisch naar Duck.ai verzenden</string>
     <string name="duckAIContextualAttachPageContent">Pagina-inhoud bijvoegen</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Stel een vraag over de pagina</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Vraag iets privé</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Recente chats</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Chat wissen</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Alle chats weergeven</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Je kunt het!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Gebruik de adresbalk om websites te zoeken en te bezoeken, of schakel over naar Duck.ai voor een privé-chat met AI.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+    <string name="duckAiEndCtaButton">High five!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>
@@ -169,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Tonen</string>
     <string name="duck_ai_chat_history_download_error">Kan chat niet exporteren</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kan chats niet exporteren</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Zoek in DuckDuckGo</string>
+    <string name="native_input_chat_hint">Vraag iets privé…</string>
+    <string name="native_input_chat_duck_mode_hint">Antwoord…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Redeneringsmodus</string>
+    <string name="duckChatReasoningModeFastTitle">Snel</string>
+    <string name="duckChatReasoningModeFastSubtitle">Antwoordt snel</string>
+    <string name="duckChatReasoningModeReasoningTitle">Redenering</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Voor complexe taken</string>
+    <string name="duckChatReasoningModeExtendedTitle">Uitgebreide redenering</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Voor analytische taken</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Chat starten</string>
+    <string name="duckChatStopStreamingContentDescription">Antwoorden stoppen</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Afbeelding verwijderen</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Je kunt slechts %1$d afbeeldingen tegelijk bijvoegen.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Je kunt slechts %1$d afbeeldingen per gesprek bijvoegen.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Foto maken</string>
+    <string name="attachmentAttachPhoto">Afbeelding toevoegen</string>
+    <string name="attachmentAttachFile">Bestand toevoegen</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Bestand verwijderen</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Je kunt slechts %1$d bestanden per gesprek bijvoegen.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Het bestand overschrijdt de maximale grootte van %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Een van de bijgevoegde bestanden bevat meer pagina\'s dan we ondersteunen. Upload bestanden met %1$d pagina\'s of minder.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">De bijgevoegde bestanden overschrijden de maximale totale grootte van %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Bestand uploaden</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Opties Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">%1$s verwijderen</string>
+    <string name="duckChatOptionsMenuCreateImage">Afbeelding maken</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Tekst omzetten in afbeeldingen</string>
+    <string name="duckChatOptionsMenuWebSearch">Zoeken op het web</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Antwoorden van internet</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Antwoorden aanpassen</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Stel toon, lengte en gedrag in</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Menu Duck.ai openen</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Instellingen Duck.ai</string>
 </resources>

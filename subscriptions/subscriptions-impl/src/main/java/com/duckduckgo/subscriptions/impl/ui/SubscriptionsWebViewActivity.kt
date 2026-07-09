@@ -46,7 +46,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
@@ -54,6 +57,9 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -125,6 +131,7 @@ data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val toolbarConfig: ToolbarConfig = DaxSubscription,
     val origin: String? = null,
+    val launchPixel: String? = null,
 ) : ActivityParams {
 
     sealed class ToolbarConfig : Serializable {
@@ -181,6 +188,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     lateinit var pixelSender: SubscriptionPixelSender
 
     @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
     lateinit var duckChat: DuckChat
 
     @Inject
@@ -194,6 +204,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -223,8 +239,21 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             logcat { "Subscription Flow: entering with params $it" }
         }
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
+        if (savedInstanceState == null) {
+            params.launchPixel?.let { pixel.fire(it) }
+        }
+
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -423,6 +452,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
+            // The subscription web flow runs in the default profile, so its downloads use the Regular cookie jar.
+            browserMode = BrowserMode.REGULAR,
         )
 
         if (hasWriteStoragePermission()) {
@@ -479,6 +510,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
     }
 
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = true)
+    }
+
     private fun setupInternalToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -514,7 +551,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
@@ -613,7 +650,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        finish()
+                        finishToSettings()
                     }
                 },
             )
@@ -631,7 +668,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                         if (subscriptionEventData != null) {
                             subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
                         } else {
-                            finish()
+                            finishToSettings()
                         }
                     }
                 },
@@ -681,12 +718,23 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         subscriptionJsMessaging.onResponse(data)
     }
 
-    private fun backToSettings() {
+    private fun finishToSettings() {
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
+        } else {
+            globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+            }
         }
         finish()
     }
+
+    private fun hasCompletedPurchaseFlow(): Boolean =
+        when (viewModel.currentPurchaseViewState.value.purchaseState) {
+            is PurchaseStateView.Success, PurchaseStateView.Waiting, PurchaseStateView.Recovered -> true
+            else -> false
+        }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
@@ -724,6 +772,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onBackPressed() {
         if (canGoBack()) {
             binding.webview.goBack()
+        } else if (hasCompletedPurchaseFlow()) {
+            finishToSettings()
         } else {
             super.onBackPressed()
         }
@@ -744,7 +794,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         binding.webview.stopLoading()
         binding.webview.removeJavascriptInterface(subscriptionJsMessaging.context)
         binding.webview.removeJavascriptInterface(itrJsMessaging.context)
-        binding.root.removeView(binding.webview)
+        binding.webViewContainer.removeView(binding.webview)
         binding.webview.destroy()
     }
 

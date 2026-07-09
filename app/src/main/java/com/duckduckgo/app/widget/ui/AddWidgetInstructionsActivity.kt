@@ -25,7 +25,11 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
@@ -37,9 +41,23 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     private val instructionsButtons
         get() = binding.includeAddWidgetInstructionButtons
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.addWidgetInstructionsContent)
+            edgeToEdgeHandler.applyNavigationBarInsets(instructionsButtons.root, drawBehindGestureNav = false)
+        }
         configureListeners()
         configureCommandObserver()
     }

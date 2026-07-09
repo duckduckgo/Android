@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
@@ -48,9 +49,10 @@ class TabRepositoryActivityModule {
      * mid-construction — the activity recreates on real mode changes, so the next instance
      * captures the new value cleanly.
      *
-     * [CustomTabActivity] always resolves to [BrowserMode.REGULAR] regardless of the state holder:
-     * Custom Tabs are launched by third-party apps and must not inherit the user's Fire-mode
-     * session, nor leak Custom Tab browsing into Fire-mode storage.
+     * [CustomTabActivity] and [WebViewActivity] always resolve to [BrowserMode.REGULAR] regardless of
+     * the state holder: Custom Tabs are launched by third-party apps, and [WebViewActivity] is a
+     * standalone in-app web viewer (help/settings/external links), not a browser tab. Neither should
+     * inherit the user's Fire-mode session, and both keep their WebView on the default profile.
      */
     @Provides
     @SingleInstanceIn(ActivityScope::class)
@@ -58,7 +60,7 @@ class TabRepositoryActivityModule {
         activity: AppCompatActivity,
         browserModeStateHolder: BrowserModeStateHolder,
     ): BrowserMode = when (activity) {
-        is CustomTabActivity -> BrowserMode.REGULAR
+        is CustomTabActivity, is WebViewActivity -> BrowserMode.REGULAR
         else -> browserModeStateHolder.currentMode.value
     }
 

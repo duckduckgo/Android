@@ -60,9 +60,9 @@ tags:
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/close"
             - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
+                id: "com.duckduckgo.mobile.android:id/inputField"
             - tapOn:
-                id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
+                id: "com.duckduckgo.mobile.android:id/inputField"
             - inputText: "https://www.publisher-company.site/product.html?p=200"
             - pressKey: Enter
             - assertVisible:

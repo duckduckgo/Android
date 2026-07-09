@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -30,10 +31,12 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -347,5 +350,33 @@ class RealPirScanSchedulerTest {
         verify(mockWorkManager).cancelUniqueWork(eq(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION))
         verify(mockWorkManager).cancelUniqueWork(eq(PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS))
         verify(mockWorkManager).cancelUniqueWork(eq(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY))
+    }
+
+    @Test
+    fun whenScheduledScanWorkerIsRunningThenIsScheduledScanRunningReturnsTrue() = runTest {
+        val running: WorkInfo = mock()
+        whenever(running.state).thenReturn(WorkInfo.State.RUNNING)
+        whenever(mockWorkManager.getWorkInfosForUniqueWorkFlow(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN))
+            .thenReturn(flowOf(listOf(running)))
+
+        assertTrue(testee.isScheduledScanRunning())
+    }
+
+    @Test
+    fun whenScheduledScanWorkerIsEnqueuedThenIsScheduledScanRunningReturnsFalse() = runTest {
+        val enqueued: WorkInfo = mock()
+        whenever(enqueued.state).thenReturn(WorkInfo.State.ENQUEUED)
+        whenever(mockWorkManager.getWorkInfosForUniqueWorkFlow(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN))
+            .thenReturn(flowOf(listOf(enqueued)))
+
+        assertFalse(testee.isScheduledScanRunning())
+    }
+
+    @Test
+    fun whenNoScheduledScanWorkThenIsScheduledScanRunningReturnsFalse() = runTest {
+        whenever(mockWorkManager.getWorkInfosForUniqueWorkFlow(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN))
+            .thenReturn(flowOf(emptyList()))
+
+        assertFalse(testee.isScheduledScanRunning())
     }
 }

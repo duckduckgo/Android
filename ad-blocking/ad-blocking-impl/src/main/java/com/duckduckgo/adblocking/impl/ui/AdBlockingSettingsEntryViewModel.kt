@@ -22,11 +22,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,12 +47,13 @@ import javax.inject.Inject
 class AdBlockingSettingsEntryViewModel @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val dispatcherProvider: DispatcherProvider,
+    private val feature: AdBlockingExtensionFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val isVisible: Boolean = false)
 
     sealed class Command {
-        data object OpenSettings : Command()
+        data class OpenSettings(val params: ActivityParams) : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -77,7 +80,12 @@ class AdBlockingSettingsEntryViewModel @Inject constructor(
 
     fun onSettingClicked() {
         viewModelScope.launch {
-            command.send(OpenSettings)
+            val params = if (feature.adBlockingUXImprovements().isEnabled()) {
+                AdBlockingSettingsV2NoParams
+            } else {
+                AdBlockingSettingsNoParams
+            }
+            command.send(OpenSettings(params))
         }
     }
 }

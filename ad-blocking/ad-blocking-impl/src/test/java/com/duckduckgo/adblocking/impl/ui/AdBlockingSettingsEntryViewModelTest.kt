@@ -16,14 +16,19 @@
 
 package com.duckduckgo.adblocking.impl.ui
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -31,6 +36,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class AdBlockingSettingsEntryViewModelTest {
 
     @get:Rule
@@ -38,11 +44,16 @@ class AdBlockingSettingsEntryViewModelTest {
 
     private val statusChecker: AdBlockingStatusChecker = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
+    private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
 
-    private fun createViewModel() = AdBlockingSettingsEntryViewModel(
-        statusChecker,
-        coroutineRule.testDispatcherProvider,
-    )
+    private fun createViewModel(uxImprovements: Boolean = false): AdBlockingSettingsEntryViewModel {
+        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(remoteEnableState = uxImprovements))
+        return AdBlockingSettingsEntryViewModel(
+            statusChecker,
+            coroutineRule.testDispatcherProvider,
+            feature,
+        )
+    }
 
     @Test
     fun whenShownInSettingsThenVisible() = runTest {
@@ -92,6 +103,28 @@ class AdBlockingSettingsEntryViewModelTest {
             viewModel.onSettingClicked()
 
             assertTrue(awaitItem() is OpenSettings)
+        }
+    }
+
+    @Test
+    fun whenSettingClickedAndUxImprovementsDisabledThenOpensLegacyScreen() = runTest {
+        val viewModel = createViewModel(uxImprovements = false)
+
+        viewModel.commands().test {
+            viewModel.onSettingClicked()
+
+            assertEquals(AdBlockingSettingsNoParams, (awaitItem() as OpenSettings).params)
+        }
+    }
+
+    @Test
+    fun whenSettingClickedAndUxImprovementsEnabledThenOpensV2Screen() = runTest {
+        val viewModel = createViewModel(uxImprovements = true)
+
+        viewModel.commands().test {
+            viewModel.onSettingClicked()
+
+            assertEquals(AdBlockingSettingsV2NoParams, (awaitItem() as OpenSettings).params)
         }
     }
 }
