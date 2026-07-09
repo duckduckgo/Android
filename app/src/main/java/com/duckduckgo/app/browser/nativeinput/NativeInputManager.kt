@@ -30,6 +30,7 @@ import android.widget.FrameLayout
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +41,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -91,6 +93,8 @@ class NativeInputCallbacks(
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onFireButtonPressed: () -> Unit = {},
+    val onTabSwitcherPressed: () -> Unit = {},
+    val onBrowserMenuPressed: () -> Unit = {},
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
@@ -188,6 +192,8 @@ class RealNativeInputManager @Inject constructor(
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var navBarRoot: View? = null
+    private var navBarTabCountLiveData: LiveData<Int>? = null
+    private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
@@ -487,6 +493,7 @@ class RealNativeInputManager @Inject constructor(
         val navBarView = createNavBarView(layoutInflater)
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
+        bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             // Restore the cache before setting text — triggerAutocomplete preserves the
             // current searchResults, so a stale cache (post-submit reset, or overwritten by
@@ -641,6 +648,9 @@ class RealNativeInputManager @Inject constructor(
             rootView.removeView(it)
             navBarRoot = null
         }
+        navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
+        navBarTabCountObserver = null
+        navBarTabCountLiveData = null
         floatingSubmitContainer?.let {
             (it.parent as? ViewGroup)?.removeView(it)
             floatingSubmitContainer = null
@@ -664,6 +674,47 @@ class RealNativeInputManager @Inject constructor(
 
     private fun createNavBarView(layoutInflater: LayoutInflater): View {
         return layoutInflater.inflate(R.layout.input_mode_widget_nav_bar, rootView, false)
+    }
+
+    private fun bindNavBar(
+        navBarView: View,
+        widgetView: View,
+        lifecycleOwner: LifecycleOwner,
+        tabs: LiveData<List<TabEntity>>,
+        callbacks: NativeInputCallbacks,
+    ) {
+        bindInputModeNavBar(
+            navBarView = navBarView,
+            // Matches the widget's Back handler: drop input focus so the IME hide sticks, then close.
+            onBack = {
+                widgetFrom(widgetView)?.clearInputFocus()
+                hideNativeInput()
+            },
+            onFire = callbacks.onFireButtonPressed,
+            onTabs = callbacks.onTabSwitcherPressed,
+            onBrowserMenu = callbacks.onBrowserMenuPressed,
+        )
+        bindNavBarTabCount(navBarView, lifecycleOwner, tabs)
+    }
+
+    /**
+     * Mirrors [NativeInputWidget.bindTabCount]: the fragment's viewLifecycleOwner is reused across
+     * show/hide cycles, so the previous observer is removed before re-observing — otherwise each cycle
+     * stacks an observer that keeps updating a detached nav bar button.
+     */
+    private fun bindNavBarTabCount(
+        navBarView: View,
+        lifecycleOwner: LifecycleOwner,
+        tabs: LiveData<List<TabEntity>>,
+    ) {
+        val tabsButton = navBarView.findViewById<TabSwitcherButton?>(R.id.inputFieldTabsMenu) ?: return
+        navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
+        val tabCount = tabs.map { it.size }
+        val observer = Observer<Int> { count -> tabsButton.count = count }
+        navBarTabCountLiveData = tabCount
+        navBarTabCountObserver = observer
+        tabCount.observe(lifecycleOwner, observer)
+        tabsButton.count = tabCount.value ?: 0
     }
 
     private fun bindWidget(
@@ -806,7 +857,7 @@ class RealNativeInputManager @Inject constructor(
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
-        applyWindowChrome(widgetView, isBottom)
+        applyWindowChrome(widgetView, isBottom, navBarHeightPx)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
             animator.applyLayoutTransitions(widgetView, isBottom)
@@ -835,7 +886,7 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
+    private fun applyWindowChrome(widgetView: View, isBottom: Boolean, navBarHeightPx: Int) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
@@ -857,7 +908,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
-        layoutCoordinator.configureContentOffset(widgetView, isBottom)
+        layoutCoordinator.configureContentOffset(widgetView, isBottom, navBarHeightPx)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
     }
 
@@ -1021,6 +1072,23 @@ class RealNativeInputManager @Inject constructor(
         private const val FADE_OUT_DURATION_MS = 150L
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
+}
+
+/**
+ * Wires the persistent input-mode nav bar's controls to their actions. Pure view wiring (findViewById +
+ * setOnClickListener) kept out of the manager so it can be unit-tested without the full attach path.
+ */
+internal fun bindInputModeNavBar(
+    navBarView: View,
+    onBack: () -> Unit,
+    onFire: () -> Unit,
+    onTabs: () -> Unit,
+    onBrowserMenu: () -> Unit,
+) {
+    navBarView.findViewById<View?>(R.id.inputModeWidgetNavBack)?.setOnClickListener { onBack() }
+    navBarView.findViewById<View?>(R.id.inputFieldFireButton)?.setOnClickListener { onFire() }
+    navBarView.findViewById<View?>(R.id.inputFieldTabsMenu)?.setOnClickListener { onTabs() }
+    navBarView.findViewById<View?>(R.id.inputFieldBrowserMenu)?.setOnClickListener { onBrowserMenu() }
 }
 
 internal data class VoiceButtonAvailability(

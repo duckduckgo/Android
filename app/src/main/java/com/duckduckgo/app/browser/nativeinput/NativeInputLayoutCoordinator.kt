@@ -175,7 +175,7 @@ class NativeInputLayoutCoordinator(
         }
     }
 
-    fun configureContentOffset(widgetView: View, isBottom: Boolean) {
+    fun configureContentOffset(widgetView: View, isBottom: Boolean, navBarInsetPx: Int = 0) {
         data class Target(val view: View, val basePadding: Padding)
 
         val newTabContent =
@@ -246,9 +246,14 @@ class NativeInputLayoutCoordinator(
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
-            if (isBottom || isLogoOnlyContent(view)) return 0
-            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
-            return maxOf(0, anchorBottomInWindow - viewLocation[1])
+            val logoOnly = isLogoOnlyContent(view)
+            val widgetTopOffsetPx = if (!logoOnly && !isBottom) {
+                val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+                anchorBottomInWindow - viewLocation[1]
+            } else {
+                0
+            }
+            return contentTopInset(isBottom, logoOnly, navBarInsetPx, widgetTopOffsetPx)
         }
 
         fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
@@ -307,8 +312,9 @@ class NativeInputLayoutCoordinator(
         // Some offset inputs change without moving rootView/widgetView (hatch height, logo visibility,
         // NTP reflow), which the per-view listeners miss. The window-shared viewTreeObserver fires on
         // every global layout pass — broad by design; kept cheap via the isWidgetAnimating skip and
-        // no-op applyPadding.
-        val ntpContentView = newTabContent?.takeIf { !isBottom }
+        // no-op applyPadding. Needed in both modes: bottom mode's nav bar top inset also flips with
+        // logo-only transitions (hatch/RMF/AppTP banner appearing).
+        val ntpContentView = newTabContent
         val globalLayoutListener =
             ViewTreeObserver.OnGlobalLayoutListener {
                 if (isWidgetAnimating) return@OnGlobalLayoutListener
@@ -391,3 +397,20 @@ class NativeInputLayoutCoordinator(
  */
 internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean, sectionsVisible: Boolean): Boolean =
     logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible && !sectionsVisible
+
+/**
+ * The top padding the NTP/browser content needs to clear the input-mode chrome.
+ *
+ * - Logo-only content is never inset, so the centered logo doesn't shift between Search and the taller
+ *   Duck.ai tab (and it can't collide with the short top nav bar anyway).
+ * - Bottom mode: the widget sits at the bottom, so the only top chrome is the persistent nav bar — inset by
+ *   [navBarInsetPx] so the content isn't drawn under it.
+ * - Top mode: the widget sits below the nav bar, so [widgetTopOffsetPx] (content top → widget bottom) already
+ *   accounts for the nav bar; clamp negatives to zero.
+ */
+internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInsetPx: Int, widgetTopOffsetPx: Int): Int =
+    when {
+        isLogoOnly -> 0
+        isBottom -> navBarInsetPx
+        else -> maxOf(0, widgetTopOffsetPx)
+    }

@@ -1514,6 +1514,8 @@ class BrowserTabFragment :
                 },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
+                onTabSwitcherPressed = { onTabsButtonPressed() },
+                onBrowserMenuPressed = { onBrowserMenuButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
