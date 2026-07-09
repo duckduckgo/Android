@@ -150,6 +150,7 @@ interface LinearOnboardingStep {
 enum class LinearOnboardingHost {
     OnboardingActivity,
     BrowserActivity,
+    SubscriptionOnboardingActivity,
 }
 
 /** A marker for events. Concrete event types live with the plan provider. The orchestrator only routes them to [LinearOnboardingStep.transition]. */

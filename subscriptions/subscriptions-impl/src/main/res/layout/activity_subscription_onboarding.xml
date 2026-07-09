@@ -14,29 +14,8 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subscriptionOnboardingContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
-    android:padding="@dimen/keyline_4">
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingWelcomeText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingWelcomeText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="h1" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/subscriptionOnboardingWelcomeContinueButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/subscriptionOnboardingWelcomeContinue"
-        app:daxButtonSize="large"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:background="?attr/daxColorBackground" />

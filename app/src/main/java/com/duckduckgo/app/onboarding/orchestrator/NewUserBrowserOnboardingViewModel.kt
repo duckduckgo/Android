@@ -74,6 +74,10 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
                 _commands.send(Command.HandOffToOnboardingActivity)
                 return
             }
+            else -> {
+                // Any other host is not this VM's screen (this VM only drives the new-user onboarding plan); ignore.
+                return
+            }
         }
         if (step is NewUserBrowserActivityStep) {
             when (val action = step.resolveAction()) {
