@@ -48,12 +48,24 @@ class NativeInputLayoutCoordinator(
      */
     private var isWidgetAnimating: Boolean = false
 
-    fun buildWidgetLayoutParams(isBottom: Boolean): ViewGroup.LayoutParams {
+    fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         ).apply {
             gravity = if (isBottom) Gravity.BOTTOM else Gravity.TOP
+            // In top mode the persistent nav bar occupies the top strip, so offset the widget below it
+            // instead of overlapping. Bottom mode sits at the bottom and needs no offset.
+            topMargin = if (isBottom) 0 else topInsetPx
+        }
+    }
+
+    fun buildNavBarLayoutParams(heightPx: Int): ViewGroup.LayoutParams {
+        return CoordinatorLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            heightPx,
+        ).apply {
+            gravity = Gravity.TOP
         }
     }
 

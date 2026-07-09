@@ -637,6 +637,10 @@ class RealNativeInputManager @Inject constructor(
             rootView.removeView(it)
             removed = true
         }
+        rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout)?.let {
+            rootView.removeView(it)
+            navBarRoot = null
+        }
         floatingSubmitContainer?.let {
             (it.parent as? ViewGroup)?.removeView(it)
             floatingSubmitContainer = null
@@ -789,8 +793,11 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun attachWidget(widgetView: View, navBarView: View, isBottom: Boolean, tabId: String) {
-        rootView.addView(navBarView, layoutCoordinator.buildWidgetLayoutParams(false))
-        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
+        // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
+        val navBarHeightPx = navBarView.layoutParams?.height?.takeIf { it > 0 } ?: 0
+        rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+        // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
+        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))
         widgetRoot = widgetView
         navBarRoot = navBarView
 

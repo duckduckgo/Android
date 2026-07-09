@@ -22,8 +22,8 @@
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/daxColorToolbar"
     android:paddingStart="@dimen/keyline_2"
-    android:paddingTop="@dimen/keyline_1"
-    android:paddingEnd="@dimen/keyline_2">
+    android:paddingBottom="@dimen/keyline_1"
+    android:paddingEnd="@dimen/keyline_1">
 
     <ImageView
         android:id="@+id/inputModeWidgetNavBack"

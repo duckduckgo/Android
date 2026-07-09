@@ -142,6 +142,20 @@ class RealNativeInputManagerTest {
         assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
     }
 
+    @Test
+    fun whenWidgetRemovedThenNavBarAlsoRemoved() {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeWidgetNavLayout })
+
+        showNativeInput()
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout))
+    }
+
     private fun showNativeInput() {
         testee.showNativeInput(
             tabId = "tab",
