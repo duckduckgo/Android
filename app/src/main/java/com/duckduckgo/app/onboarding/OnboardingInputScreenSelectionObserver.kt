@@ -93,10 +93,10 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .launchIn(appCoroutineScope)
     }
 
-    private fun canProcess(): Boolean{
-         // AI flows enable the real setting themselves, just-in-time before the End CTA, so a
-         // pre-ESTABLISHED match there is expected rather than a user override. Detection only
-         // applies to flows that defer the setting to ESTABLISHED (i.e. non-AI flows).
+    private fun canProcess(): Boolean {
+        // AI flows enable the real setting themselves, just-in-time before the End CTA, so a
+        // pre-ESTABLISHED match there is expected rather than a user override. Detection only
+        // applies to flows that defer the setting to ESTABLISHED (i.e. non-AI flows).
         return !onboardingStore.isDuckAiOnboardingFlow()
     }
 }
