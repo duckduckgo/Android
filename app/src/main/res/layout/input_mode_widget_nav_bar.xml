@@ -19,9 +19,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/inputModeWidgetNavLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/daxColorToolbar"
     android:paddingStart="@dimen/keyline_2"
+    android:paddingTop="@dimen/keyline_1"
     android:paddingEnd="@dimen/keyline_2">
 
     <ImageView
@@ -37,6 +38,7 @@
         android:src="@drawable/ic_arrow_left_small_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:tint="?attr/daxColorPrimaryIcon" />
 
     <FrameLayout
@@ -46,6 +48,7 @@
         android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/duckChatFireButtonContentDescription"
         app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -63,6 +66,7 @@
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
@@ -71,6 +75,7 @@
         android:layout_height="@dimen/toolbarIcon"
         android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/duckChatBrowserMenuContentDescription"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

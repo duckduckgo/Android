@@ -1235,13 +1235,7 @@ class BrowserTabFragment :
             binding = binding,
         )
 
-        val nativeInputRoot = if (omnibarType == OmnibarType.SINGLE_BOTTOM){
-            binding.rootView
-        } else {
-            binding.includeInputFieldNavBarRoot
-        }
-
-        nativeInputManager.init(omnibar, binding.rootView, binding.includeInputFieldNavBarRoot, viewLifecycleOwner) {
+        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
 

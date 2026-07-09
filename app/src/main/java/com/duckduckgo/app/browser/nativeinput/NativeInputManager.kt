@@ -107,7 +107,6 @@ interface NativeInputManager {
     fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
-        topNavRootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit = {},
     )
@@ -188,6 +187,7 @@ class RealNativeInputManager @Inject constructor(
     private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+    private var navBarRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
@@ -200,13 +200,12 @@ class RealNativeInputManager @Inject constructor(
     override fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
-        topNavRootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit,
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
-        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, topNavRootView, this.omnibarController)
+        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
             .onEach { isEnabled ->
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
@@ -485,6 +484,7 @@ class RealNativeInputManager @Inject constructor(
         }
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
+        val navBarView = createNavBarView(layoutInflater)
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
@@ -508,7 +508,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         }
-        attachWidget(widgetView, isBottom, tabId)
+        attachWidget(widgetView, navBarView, isBottom, tabId)
         lifecycleOwner.lifecycleScope.launch {
             if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
         }
@@ -658,6 +658,10 @@ class RealNativeInputManager @Inject constructor(
         return layoutInflater.inflate(layoutRes, rootView, false)
     }
 
+    private fun createNavBarView(layoutInflater: LayoutInflater): View {
+        return layoutInflater.inflate(R.layout.input_mode_widget_nav_bar, rootView, false)
+    }
+
     private fun bindWidget(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
@@ -784,9 +788,11 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View, isBottom: Boolean, tabId: String) {
+    private fun attachWidget(widgetView: View, navBarView: View, isBottom: Boolean, tabId: String) {
+        rootView.addView(navBarView, layoutCoordinator.buildWidgetLayoutParams(false))
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
+        navBarRoot = navBarView
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
