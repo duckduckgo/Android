@@ -1996,7 +1996,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     getString(R.string.preOnboardingInputModeDemoTitleCustomAi)
                 } else {
                     getString(R.string.preOnboardingInputModeDemoTitle)
-                }
+                }.html(requireContext())
                 binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitleHidden.text = title
                 binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.text = title
                 binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.alpha = 1f
