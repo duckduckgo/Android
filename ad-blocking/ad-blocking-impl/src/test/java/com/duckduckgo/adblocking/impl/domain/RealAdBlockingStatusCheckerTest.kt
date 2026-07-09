@@ -187,7 +187,7 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = false
         enabledByDefaultFlow.value = true
 
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test
@@ -202,7 +202,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasNoPreferenceAndDefaultChangesThenCurrentStateReflectsIt() {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
 
         enabledByDefaultFlow.value = true
         assertEquals(AdBlockingState.Enabled.Default, checker.currentState())
@@ -264,7 +264,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasDisabledThenObserveStateEmitsDisabled() = runTest {
         userEnabledFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
@@ -272,7 +272,7 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = false
         enabledByDefaultFlow.value = true
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
@@ -288,14 +288,14 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
     fun whenNotSetAndDefaultFlowChangesThenObserveStateReflectsIt() = runTest {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
 
         enabledByDefaultFlow.value = true
         assertEquals(AdBlockingState.Enabled.Default, checker.observeState().first())
@@ -312,7 +312,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasDisabledThenCurrentStateIsDisabled() {
         userEnabledFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test
@@ -329,7 +329,7 @@ class RealAdBlockingStatusCheckerTest {
         assertEquals(AdBlockingState.Enabled.UserEnabled, checker.currentState())
 
         userEnabledFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test

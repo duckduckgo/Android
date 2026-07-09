@@ -100,7 +100,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenDisabledThenShowsConsentDescription() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         createViewModel().viewState.test {
             val state = expectMostRecentItem()
@@ -191,7 +191,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenViewModelCreatedThenFiresSettingsOpenedPixels() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         createViewModel()
 
@@ -201,7 +201,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenBlockAdsToggledOnThenFiresEnabledPixels() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         createViewModel().onBlockAdsToggled(enabled = true)
 

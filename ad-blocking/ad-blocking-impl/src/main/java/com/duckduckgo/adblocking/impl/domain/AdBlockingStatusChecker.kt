@@ -62,7 +62,10 @@ interface AdBlockingStatusChecker {
 
 sealed interface AdBlockingState {
     data object Uninitialized : AdBlockingState
-    data object Disabled : AdBlockingState
+    sealed interface Disabled : AdBlockingState {
+        data object Permanent : Disabled
+        data object UntilRelaunch : Disabled
+    }
     sealed interface Enabled : AdBlockingState {
         data object UserEnabled : Enabled
         data object Default : Enabled
@@ -134,11 +137,11 @@ class RealAdBlockingStatusChecker @Inject constructor(
         ) { userSetting, enabledByDefault ->
             when (userSetting) {
                 true -> AdBlockingState.Enabled.UserEnabled
-                false -> AdBlockingState.Disabled
+                false -> AdBlockingState.Disabled.Permanent
                 null -> if (enabledByDefault) {
                     AdBlockingState.Enabled.Default
                 } else {
-                    AdBlockingState.Disabled
+                    AdBlockingState.Disabled.Permanent
                 }
             }
         }

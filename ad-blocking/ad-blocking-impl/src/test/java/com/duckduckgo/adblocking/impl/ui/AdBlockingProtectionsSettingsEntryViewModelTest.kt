@@ -48,7 +48,7 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     @Test
     fun whenPlacementIsProtectionsThenVisible() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -61,7 +61,7 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     @Test
     fun whenPlacementIsOtherThenNotVisible() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -74,7 +74,7 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     @Test
     fun whenPlacementIsHiddenThenNotVisible() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -113,7 +113,7 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     @Test
     fun whenStateIsDisabledThenStatusIsOff() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)

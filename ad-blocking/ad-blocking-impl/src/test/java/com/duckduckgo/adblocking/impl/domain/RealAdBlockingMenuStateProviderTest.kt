@@ -104,7 +104,7 @@ class RealAdBlockingMenuStateProviderTest {
 
     @Test
     fun whenYoutubeAndDisabledThenDisabled() = runTest {
-        stateFlow.value = AdBlockingState.Disabled
+        stateFlow.value = AdBlockingState.Disabled.Permanent
 
         assertEquals(AdBlockingMenuState.Disabled, provider.observe(youtubeUrl).first())
     }
