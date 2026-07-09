@@ -1567,19 +1567,34 @@ sealed class DaxBubbleCta(
         val restartWavingDax: Boolean get() = false
         val wavingDaxSpec: WavingDaxSpec
 
-        fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
+        fun configureWavingDax(
+            dax: LottieAnimationView,
+            deviceInfo: DeviceInfo,
+            improvementsEnabled: Boolean = false,
+        ) {
             val spec = wavingDaxSpec
             val density = dax.resources.displayMetrics.density
             dax.rotation = spec.rotationDegrees
-            dax.translationX = spec.translationXDp * density
-            dax.translationY = spec.translationYDp * density
+            if (improvementsEnabled) {
+                dax.translationY = spec.bottomTranslationYDp * density
+            } else {
+                dax.translationX = spec.translationXDp * density
+                dax.translationY = spec.translationYDp * density
+            }
             (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
                 lp.startToStart = if (spec.anchorToCardOnTablet && deviceInfo.isTablet()) {
                     R.id.brandDesignCardView
                 } else {
                     ConstraintLayout.LayoutParams.PARENT_ID
                 }
-                lp.height = (spec.heightDp * density).toInt()
+                if (improvementsEnabled) {
+                    lp.topToBottom = ConstraintLayout.LayoutParams.UNSET
+                    lp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                } else {
+                    lp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    lp.topToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    lp.height = (spec.maxHeightDp * density).toInt()
+                }
                 dax.layoutParams = lp
             }
         }
@@ -1589,9 +1604,12 @@ sealed class DaxBubbleCta(
         val rotationDegrees: Float,
         val translationXDp: Float,
         val translationYDp: Float,
-        val heightDp: Float,
+        val minHeightDp: Float,
+        val maxHeightDp: Float,
         val anchorToCardOnTablet: Boolean,
-    )
+    ) {
+        val bottomTranslationYDp: Float get() = translationYDp + maxHeightDp
+    }
 
     abstract class BrandDesignUpdateBubbleCta(
         ctaId: CtaId,
@@ -1607,6 +1625,7 @@ sealed class DaxBubbleCta(
         open val isLightTheme: Boolean,
         open val deviceInfo: DeviceInfo,
         open val onboardingImprovementsEnabled: Boolean = true,
+        open val onboardingImprovementsV2Enabled: Boolean = true,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1658,7 +1677,7 @@ sealed class DaxBubbleCta(
 
         private val wavingDaxController: WavingDaxController? by lazy {
             if (onboardingImprovementsEnabled && this is ShowsWavingDax) {
-                WavingDaxController(showArrow, deviceInfo)
+                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec, improvementsV2Enabled = onboardingImprovementsV2Enabled)
             } else {
                 null
             }
@@ -1695,7 +1714,11 @@ sealed class DaxBubbleCta(
         internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
             container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
                 if (showsWavingDax != null && !container.isPhoneLandscape()) {
-                    showsWavingDax.configureWavingDax(dax, deviceInfo)
+                    showsWavingDax.configureWavingDax(
+                        dax = dax,
+                        deviceInfo = deviceInfo,
+                        improvementsEnabled = onboardingImprovementsEnabled && onboardingImprovementsV2Enabled,
+                    )
                     if (onboardingImprovementsEnabled) {
                         dax.isInvisible = true
                     } else {

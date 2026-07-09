@@ -46,4 +46,12 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun onboardingImprovements(): Toggle
+
+    /**
+     * Gates this branch's onboarding sizing refinements: the welcome-page decoration fit engine
+     * and the new-tab waving-Dax room-based sizing. Off restores develop's sizing behavior.
+     * onboardingImprovements still gates whether the waving Dax appears at all.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun onboardingImprovementsV2(): Toggle
 }

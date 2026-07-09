@@ -35,6 +35,7 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
     val isCustomAiOnboardingFlow: Boolean,
+    override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
@@ -51,6 +52,7 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
+    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
@@ -59,7 +61,8 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
         rotationDegrees = 0f,
         translationXDp = -40f,
         translationYDp = -150f,
-        heightDp = 178f,
+        minHeightDp = 178f,
+        maxHeightDp = 178f,
         anchorToCardOnTablet = true,
     )
 

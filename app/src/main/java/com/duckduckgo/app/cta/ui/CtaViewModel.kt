@@ -149,6 +149,10 @@ class CtaViewModel @Inject constructor(
         onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
     }
 
+    private suspend fun isOnboardingImprovementsV2Enabled(): Boolean = withContext(dispatchers.io()) {
+        onboardingBrandDesignUpdateToggles.onboardingImprovementsV2().isEnabled()
+    }
+
     /**
      * Whether the legacy `InputScreenActivity` is in play. When false, the native input widget is shown
      * instead (gated in `RealDuckChat.cacheUserSettings()` by `DuckChatFeature.nativeInputField()` + user settings).
@@ -427,6 +431,7 @@ class CtaViewModel @Inject constructor(
                         isLightTheme = appTheme.isLightModeEnabled(),
                         deviceInfo = deviceInfo,
                         isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                     )
                 } else {
                     DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
@@ -451,6 +456,7 @@ class CtaViewModel @Inject constructor(
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                     )
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
@@ -466,6 +472,7 @@ class CtaViewModel @Inject constructor(
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
                     )
                 } else {
@@ -484,6 +491,7 @@ class CtaViewModel @Inject constructor(
                         isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                     )
                 } else {
                     DaxBubbleCta.DaxSubscriptionCta(

@@ -29,11 +29,13 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
@@ -127,6 +129,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             syncAutoRestore = mock(),
             orchestrator = orchestrator,
             customAiOnboardingStore = customAiOnboardingStore,
+            onboardingBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(OnboardingBrandDesignUpdateToggles::class.java),
         )
 
     @Test
