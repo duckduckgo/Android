@@ -329,7 +329,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
 
         protectionsSettingsPlugin.forEach { plugin ->
-            viewsPrivacy.topInContextSection.addView(plugin.getView(this))
+            viewsPrivacy.protectionsPluginsPlaceholder.addView(plugin.getView(this))
         }
     }
 
