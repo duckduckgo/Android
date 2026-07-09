@@ -67,6 +67,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
+    implementation project(':onboarding-api')
     implementation project(':remote-messaging-api')
     implementation project(':settings-api')
     implementation project(path: ':statistics-api')

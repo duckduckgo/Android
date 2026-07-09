@@ -79,6 +79,7 @@ import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -148,6 +149,14 @@ class CtaViewModelTest {
     private val mockSubscriptionPromoCtaShownPlugin: SubscriptionPromoCtaShownPlugin = mock()
     private val mockSubscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin> = mock {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
+    }
+
+    private var canShowContextualCta = true
+    private val mockContextualCtaSuppressorPlugin: ContextualCtaSuppressorPlugin = mock {
+        onBlocking { canShowCta(any()) } doAnswer { canShowContextualCta }
+    }
+    private val mockContextualCtaSuppressorPlugins: PluginPoint<ContextualCtaSuppressorPlugin> = mock {
+        on { getPlugins() } doReturn listOf(mockContextualCtaSuppressorPlugin)
     }
 
     private val mockDuckChat: DuckChat = mock()
@@ -226,6 +235,7 @@ class CtaViewModelTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
+            contextualCtaSuppressorPlugins = mockContextualCtaSuppressorPlugins,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
@@ -387,6 +397,23 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+        val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
+    fun whenContextualCtaSuppressorPluginSuppressesButOnboardingCompletedThenReturnBrokenSitePrompt() = runTest {
+        canShowContextualCta = false
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
         val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
@@ -997,6 +1024,37 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
         )
         assertNull(value)
+    }
+
+    @Test
+    fun whenContextualCtaSuppressorPluginSuppressesThenReturnNull() = runTest {
+        canShowContextualCta = false
+        givenDaxOnboardingActive()
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertNull(value)
+    }
+
+    @Test
+    fun whenContextualCtaSuppressorPluginDoesNotSuppressThenReturnCta() = runTest {
+        canShowContextualCta = true
+        givenDaxOnboardingActive()
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        ) as OnboardingDaxDialogCta
+
+        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
     }
 
     @Test
