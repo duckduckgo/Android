@@ -114,6 +114,9 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): MatchedResult {
+        // The request type depends only on (url, requestHeaders), so it is invariant across rules. Computing it once.
+        var type: String? = null
+        var typeResolved = false
         compiled.rules.forEach { compiledRule ->
             val rule = compiledRule.rule
             val regex = if (precompileRegex) {
@@ -122,7 +125,10 @@ class TdsClient(
                 ".*${rule.rule}.*".toRegex()
             }
             if (url.matches(regex)) {
-                val type = urlToTypeMapper.map(url, requestHeaders)
+                if (!typeResolved) {
+                    type = urlToTypeMapper.map(url, requestHeaders)
+                    typeResolved = true
+                }
 
                 if (rule.options != null) {
                     if (!matchedDomainAndTypes(rule.options.domains, rule.options.types, documentUrl, type)) {
