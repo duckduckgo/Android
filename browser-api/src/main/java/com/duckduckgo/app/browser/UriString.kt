@@ -54,6 +54,27 @@ class UriString {
 
         fun host(uriString: String): String? = Uri.parse(uriString).baseHost
 
+        /**
+         * Strips the port from [url], leaving the rest of the URL (scheme, host, path, query and
+         * fragment) intact.
+         *
+         * The reconstruction is only performed when a port is actually present; URLs without a
+         * port (the common case) are returned unchanged, avoiding unnecessary allocations.
+         * On any parsing failure the original [url] is returned.
+         */
+        fun removePort(url: String): String {
+            return try {
+                val uri = Uri.parse(url)
+                if (uri.port == -1) {
+                    url
+                } else {
+                    uri.buildUpon().authority(uri.host).build().toString()
+                }
+            } catch (e: Exception) {
+                url
+            }
+        }
+
         fun sameOrSubdomain(
             child: String,
             parent: String,

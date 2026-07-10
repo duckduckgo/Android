@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.browser.UriString.Companion.removePort
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
@@ -34,7 +35,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
-import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -91,7 +91,7 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-        val cleanedUrl = removePortFromUrl(url)
+        val cleanedUrl = removePort(url)
         val documentUrlString = documentUrl.toString()
 
         if (checkFirstParty && firstParty(documentUrl, cleanedUrl)) {
@@ -147,15 +147,6 @@ class TrackerDetectorImpl @Inject constructor(
                 .build()
         } else {
             uri
-        }
-    }
-
-    private fun removePortFromUrl(url: String): String {
-        return try {
-            val uri = Uri.parse(url)
-            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
-        } catch (e: Exception) {
-            url
         }
     }
 
