@@ -749,6 +749,7 @@ class BrowserTabViewModel @Inject constructor(
     private var adBlockingAnimationClaimed = false
     private var isPageLoading = false
     private var pendingAdBlockingAnimation: Command.StartAdBlockingAnimation? = null
+    private var adBlockingAnimationJob: Job? = null
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var faviconRequestedForDomain: String? = null
@@ -2152,7 +2153,8 @@ class BrowserTabViewModel @Inject constructor(
         adBlockingAnimationClaimed = false
         pendingAdBlockingAnimation = null
         isPageLoading = true
-        viewModelScope.launch {
+        adBlockingAnimationJob?.cancel()
+        adBlockingAnimationJob = viewModelScope.launch {
             handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true))
         }
         cleanupBlobDownloadReplyProxyMaps(url)
@@ -2403,7 +2405,8 @@ class BrowserTabViewModel @Inject constructor(
         // SPA url change: the page is already loaded, so the badge (if any) shows immediately.
         adBlockingAnimationClaimed = false
         pendingAdBlockingAnimation = null
-        viewModelScope.launch {
+        adBlockingAnimationJob?.cancel()
+        adBlockingAnimationJob = viewModelScope.launch {
             handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false))
         }
         site?.url = url
@@ -5814,7 +5817,7 @@ class BrowserTabViewModel @Inject constructor(
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 
         // SPA url changes have no document reload to defer the ad-blocking badge against, so it would
-        // otherwise pop instantly. A short delay makes the badge feel intentional.
+        // otherwise pop instantly.
         private const val SPA_AD_BLOCKING_BADGE_DELAY_MS = 250L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
