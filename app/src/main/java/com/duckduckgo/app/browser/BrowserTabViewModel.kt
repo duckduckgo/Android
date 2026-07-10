@@ -2135,23 +2135,18 @@ class BrowserTabViewModel @Inject constructor(
             // Full document load still in progress: defer until it reaches 100% (see progressChanged).
             isPageLoad && !pageAlreadyLoaded -> pendingAdBlockingAnimation = badge
             // Load already finished before this ran (progress reached 100 before pageChanged): show now.
-            isPageLoad -> emitAdBlockingBadge(badge)
+            isPageLoad -> command.value = badge
             // SPA navigation has no document load to defer against; a short delay stops it popping instantly.
             else -> {
                 delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
-                emitAdBlockingBadge(badge)
+                command.value = badge
             }
         }
     }
 
-    private fun emitAdBlockingBadge(badge: Command.StartAdBlockingAnimation) {
-        if (currentOmnibarViewState().isEditing) {
-            // Omnibar is focused, so the badge can't animate; release the claim so trackers/cookies aren't
-            // suppressed for the rest of the page.
-            adBlockingAnimationClaimed = false
-        } else {
-            command.value = badge
-        }
+    fun onAdBlockingAnimationSuppressed() {
+        // The omnibar was focused so the badge didn't animate; release exclusivity so trackers/cookies can.
+        adBlockingAnimationClaimed = false
     }
 
     private fun pageChanged(
@@ -2536,7 +2531,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (newProgress == 100) {
             pendingAdBlockingAnimation?.let {
-                emitAdBlockingBadge(it)
+                command.value = it
                 pendingAdBlockingAnimation = null
             }
         }

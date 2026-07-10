@@ -729,6 +729,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 createAdBlockingAnimation(command.icon, command.text)
             }
 
+            Command.AdBlockingAnimationSuppressed -> {
+                omnibarTextListener?.onAdBlockingAnimationSuppressed()
+            }
+
             MoveCaretToFront -> {
                 moveCaretToFront()
             }

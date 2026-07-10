@@ -4141,6 +4141,10 @@ class BrowserTabFragment :
                 override fun onTrackersCountFinished() {
                     // no-op
                 }
+
+                override fun onAdBlockingAnimationSuppressed() {
+                    viewModel.onAdBlockingAnimationSuppressed()
+                }
             },
         )
     }

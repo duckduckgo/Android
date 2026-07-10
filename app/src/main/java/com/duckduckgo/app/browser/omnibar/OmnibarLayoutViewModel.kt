@@ -321,6 +321,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             @field:DrawableRes val icon: Int,
             @field:StringRes val text: Int,
         ) : Command()
+        data object AdBlockingAnimationSuppressed : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
@@ -1123,15 +1124,21 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             is LaunchAdBlockingAnimation -> {
-                // No focus gate here: BrowserTabViewModel only emits this when the omnibar is unfocused,
-                // so it is the single source of truth (a second gate could leave its exclusivity claim stuck).
-                _viewState.update {
-                    it.copy(
-                        leadingIconState = PrivacyShield,
-                    )
-                }
-                viewModelScope.launch {
-                    command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
+                val hasFocus = _viewState.value.hasFocus
+                if (!hasFocus) {
+                    _viewState.update {
+                        it.copy(
+                            leadingIconState = PrivacyShield,
+                        )
+                    }
+                    viewModelScope.launch {
+                        command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
+                    }
+                } else {
+                    // Badge can't animate while focused; tell the browser so it releases the exclusivity claim.
+                    viewModelScope.launch {
+                        command.send(Command.AdBlockingAnimationSuppressed)
+                    }
                 }
             }
 

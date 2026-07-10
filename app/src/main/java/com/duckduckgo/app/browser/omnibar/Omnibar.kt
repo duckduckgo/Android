@@ -122,6 +122,8 @@ class Omnibar(
         fun onShowSuggestions(state: OmnibarTextState)
 
         fun onTrackersCountFinished()
+
+        fun onAdBlockingAnimationSuppressed()
     }
 
     fun interface InputScreenLaunchListener {

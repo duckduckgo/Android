@@ -9959,17 +9959,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSpaNavigationAndOmnibarFocusedThenBadgeSkippedAndClaimReleased() = runTest {
+    fun whenAdBlockingAnimationSuppressedThenClaimReleasedAndTrackersCanAnimate() = runTest {
         loadUrl("https://www.youtube.com")
         givenAdBlockingBadgeWillShow()
-        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
+        // Ad-blocking claims exclusivity for the page...
         testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
         advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
 
-        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
-
-        // Claim was released because the badge could not animate, so trackers can still animate.
+        // ...but if the omnibar reports the badge was suppressed (focused), the claim is released.
+        testee.onAdBlockingAnimationSuppressed()
         testee.onStartTrackersAnimation()
         assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
     }
