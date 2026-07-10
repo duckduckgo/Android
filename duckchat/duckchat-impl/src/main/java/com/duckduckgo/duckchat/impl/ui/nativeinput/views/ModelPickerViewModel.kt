@@ -185,12 +185,13 @@ class ModelPickerViewModel @Inject constructor(
             }
             return
         }
-        val userTier = modelManager.modelState.value.userTier
+        val modelState = modelManager.modelState.value
+        val userTier = modelState.userTier
         val requiredTier = model.requiredTier ?: run {
             logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin)?.let { upsell ->
+        routeUpsell(userTier, requiredTier, surface.origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
                 source = "model_picker",
                 currentTier = userTier.toParam(),
