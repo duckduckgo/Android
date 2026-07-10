@@ -192,6 +192,9 @@ class RealNativeInputManager @Inject constructor(
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var navBarRoot: View? = null
+    private var navBarShown: Boolean? = null
+    private var navBarHeightPx: Int = 0
+    private var navBarIsBottom: Boolean = false
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
@@ -490,10 +493,12 @@ class RealNativeInputManager @Inject constructor(
         }
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
-        val navBarView = createNavBarView(layoutInflater)
+        // The nav bar belongs to browser input only. Duck.ai (and, via a separate manager, contextual)
+        // never show it.
+        val navBarView = if (!omnibarController.isDuckAiMode()) createNavBarView(layoutInflater) else null
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
-        bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
+        if (navBarView != null) bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             // Restore the cache before setting text — triggerAutocomplete preserves the
             // current searchResults, so a stale cache (post-submit reset, or overwritten by
@@ -516,6 +521,10 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
+        applyNavBarVisibility(
+            show = shouldShowNavBar(isBrowserContext = navBarView != null, isInputEmpty = prefillText.isEmpty()),
+            animate = false,
+        )
         lifecycleOwner.lifecycleScope.launch {
             if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
         }
@@ -598,6 +607,12 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
+            onInputTextEmptyChanged = { isEmpty ->
+                applyNavBarVisibility(
+                    show = shouldShowNavBar(isBrowserContext = navBarRoot != null, isInputEmpty = isEmpty),
+                    animate = true,
+                )
+            },
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
@@ -648,6 +663,7 @@ class RealNativeInputManager @Inject constructor(
             rootView.removeView(it)
             navBarRoot = null
         }
+        navBarShown = null
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         navBarTabCountObserver = null
         navBarTabCountLiveData = null
@@ -843,10 +859,35 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View, navBarView: View, isBottom: Boolean, tabId: String) {
+    /**
+     * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
+     * is already in the target state. On change it slides the bar (and, in top mode, the widget) and
+     * reflows content to clear or reclaim the bar strip.
+     */
+    private fun applyNavBarVisibility(show: Boolean, animate: Boolean) {
+        val navBar = navBarRoot ?: return
+        val widget = widgetRoot ?: return
+        if (!shouldAnimateNavBar(navBarShown, show)) return
+        navBarShown = show
+        animator.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = navBarIsBottom,
+            heightPx = navBarHeightPx,
+            show = show,
+            animate = animate,
+        )
+        layoutCoordinator.configureContentOffset(widget, navBarIsBottom, navBarInsetPx = if (show) navBarHeightPx else 0)
+    }
+
+    private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
-        val navBarHeightPx = navBarView.layoutParams?.height?.takeIf { it > 0 } ?: 0
-        rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+        val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
+        this.navBarHeightPx = navBarHeightPx
+        this.navBarIsBottom = isBottom
+        if (navBarView != null) {
+            rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+        }
         // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))
         widgetRoot = widgetView
@@ -857,7 +898,7 @@ class RealNativeInputManager @Inject constructor(
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
-        applyWindowChrome(widgetView, isBottom, navBarHeightPx)
+        applyWindowChrome(widgetView, isBottom)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
             animator.applyLayoutTransitions(widgetView, isBottom)
@@ -886,7 +927,7 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyWindowChrome(widgetView: View, isBottom: Boolean, navBarHeightPx: Int) {
+    private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
@@ -908,7 +949,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
-        layoutCoordinator.configureContentOffset(widgetView, isBottom, navBarHeightPx)
+        layoutCoordinator.configureContentOffset(widgetView, isBottom)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
     }
 
