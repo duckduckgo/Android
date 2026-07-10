@@ -28,11 +28,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+/**
+ * Extends [NewDownloadState] with operations that don't  have to be exposed to consumers outside of :downloads-impl.
+ */
+interface InternalNewDownloadState : NewDownloadState {
+    /**
+     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
+     */
+    fun onDownloadsScreenViewed()
+}
+
+@ContributesBinding(AppScope::class, boundType = NewDownloadState::class)
+@ContributesBinding(AppScope::class, boundType = InternalNewDownloadState::class)
 @SingleInstanceIn(AppScope::class)
 class RealNewDownloadState @Inject constructor(
     sharedPreferencesProvider: SharedPreferencesProvider,
-) : NewDownloadState {
+) : InternalNewDownloadState {
 
     private val preferences: SharedPreferences =
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false)

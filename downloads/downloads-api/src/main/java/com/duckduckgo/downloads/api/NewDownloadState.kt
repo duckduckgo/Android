@@ -40,9 +40,4 @@ interface NewDownloadState {
      * Indicates that a new download has completed, and the user should be notified about it until they view the downloads screen.
      */
     fun onDownloadComplete()
-
-    /**
-     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
-     */
-    fun onDownloadsScreenViewed()
 }

@@ -23,7 +23,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
-import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DownloadViewItem.Empty
 import com.duckduckgo.downloads.impl.DownloadViewItem.Header
@@ -62,7 +61,7 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
-    private val mockNewDownloadState: NewDownloadState = mock()
+    private val mockNewDownloadState: InternalNewDownloadState = mock()
 
     private val context: Context = mock()
 
