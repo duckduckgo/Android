@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.model.DownloadItem
 

@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Uložiť do stiahnutých</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Z: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Odstrániť všetko</string>
+    <string name="downloadsActivityNoItemsDescription">Zatiaľ žiadne stiahnuté súbory</string>
+    <string name="downloadsActivityTitle">Stiahnuté</string>
+    <string name="downloadsAllFilesDeletedMessage">Všetky súbory sa odstránili</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Zmazané: %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Súbor už neexistuje</string>
+    <string name="downloadsItemMenuCancel">Zrušiť</string>
+    <string name="downloadsItemMenuDelete">Vymazať</string>
+    <string name="downloadsItemMenuShare">Zdieľať</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Viac možností pre %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
+    <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
+    <string name="downloadsShareTitle">Zdieľať s...</string>
+    <string name="downloadsStateInProgress">Prebieha…</string>
+    <string name="downloadsUndoActionName">Vrátenie späť</string>
 </resources>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.2)" variant="all" version="8.13.2">
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/downloads/impl/DownloadsNewTabShortcutPlugin.kt"
+            line="63"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/downloads/impl/DownloadsNewTabShortcutPlugin.kt"
+            line="65"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/downloads/impl/RealDownloadsFileActions.kt"
+            line="93"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this method; see https://g.co/dev/packagevisibility for details"
+        errorLine1="            if (intent.resolveActivity(packageManager) != null) {"
+        errorLine2="                       ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/downloads/impl/RealDownloadsFileActions.kt"
+            line="41"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;downloadsSearchHint&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
+        errorLine1="    &lt;string name=&quot;downloadsSearchHint&quot;>Search&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-downloads.xml"
+            line="53"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Sdílet s...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Del med ...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Κοινή χρήση με...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Jaa...&lt;/string>"
+        errorLine2="                                       ~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Podijeli s...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Dalintis su...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Delen met...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Partilhar com...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Distribuie către...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsShareTitle&quot;>Zdieľať s...&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-downloads.xml"
+            line="50"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>Probíhá...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>I gang ...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>Σε εξέλιξη...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>En cours...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>U tijeku...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>Vykdoma...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>Notiek...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>Bezig...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;downloadsStateInProgress&quot;>În curs...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-downloads.xml"
+            line="51"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val host = if (download.isDataUrl) null else runCatching { Uri.parse(download.url).baseHost }.getOrNull()"
+        errorLine2="                                                                       ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/downloads/impl/DownloadConfirmationFragment.kt"
+            line="115"
+            column="72"/>
+    </issue>
+
+</issues>

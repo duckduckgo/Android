@@ -26,6 +26,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -51,7 +52,7 @@ class RealBrowserMenuViewStateFactoryTest {
     private val fullscreenModeFlow = MutableStateFlow(false)
     private val popupMenuShortcutFlow = MutableStateFlow(false)
     private val voiceChatEntryFlow = MutableStateFlow(false)
-    private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val newDownloadState: NewDownloadState = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
@@ -61,7 +62,7 @@ class RealBrowserMenuViewStateFactoryTest {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector)
     }
 
     @Test

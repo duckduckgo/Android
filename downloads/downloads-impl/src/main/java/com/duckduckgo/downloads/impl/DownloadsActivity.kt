@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import android.content.Intent
@@ -29,11 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
-import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
@@ -48,6 +43,14 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.CancelDownload
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayUndoMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.OpenFile
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.ShareFile
+import com.duckduckgo.downloads.impl.DownloadsViewModel.ViewState
+import com.duckduckgo.downloads.impl.databinding.ActivityDownloadsBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest

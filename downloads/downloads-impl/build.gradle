@@ -31,6 +31,9 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    lint {
+        baseline file("lint-baseline.xml")
+    }
 }
 
 dependencies {
@@ -47,6 +50,8 @@ dependencies {
     implementation project(path: ':data-store-api')
     implementation project(path: ':cookies-api')
     implementation project(path: ':browser-mode-api')
+    implementation project(path: ':new-tab-page-api')
+    implementation project(path: ':navigation-api')
 
     implementation AndroidX.dataStore.preferences
     implementation AndroidX.core.ktx
@@ -91,6 +96,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':data-store-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
