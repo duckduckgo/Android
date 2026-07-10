@@ -226,9 +226,7 @@ class BrowserMenuBottomSheet(
 
     /**
      * Adds the contributed top-of-menu sections (if any) into their container, and keeps the single
-     * trailing divider shown only while at least one section is visible. Contributed views hide
-     * themselves asynchronously, so a global-layout listener re-derives the divider visibility on every
-     * layout pass (the guarded write prevents a relayout loop).
+     * trailing divider shown only while at least one section is visible.
      */
     private fun addTopInContextSections() {
         val url = currentUrl ?: return
