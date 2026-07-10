@@ -25,11 +25,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-/**
- * Per-tab decider for the ad-blocking omnibar badge. Owns detection, dedup, and the feature-flag
- * gate; returns a Show/Skip outcome per navigation. Scoped to the fragment so [lastAnimatedVideoId]
- * dedup state is per-tab.
- */
 @SingleInstanceIn(FragmentScope::class)
 @ContributesBinding(scope = FragmentScope::class, boundType = AdBlockingOmnibarAnimationProvider::class)
 class RealAdBlockingOmnibarAnimation @Inject constructor(

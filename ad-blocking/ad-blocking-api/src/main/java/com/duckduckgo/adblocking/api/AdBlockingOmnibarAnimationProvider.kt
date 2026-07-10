@@ -19,12 +19,6 @@ package com.duckduckgo.adblocking.api
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
-/**
- * Output-only surface, scoped per-tab, that tells the omnibar coordinator whether the ad-blocking
- * badge should animate for the current navigation. The omnibar owns *whether* it animates and
- * *how* it renders; ad-blocking owns the decision and the content (icon + copy). The coordinator
- * learns nothing about how the decision was reached — only the Show/Skip outcome and its content.
- */
 interface AdBlockingOmnibarAnimationProvider {
 
     /**
