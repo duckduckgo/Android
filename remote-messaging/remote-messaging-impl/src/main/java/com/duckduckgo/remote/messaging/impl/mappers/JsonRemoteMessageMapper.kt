@@ -122,8 +122,7 @@ private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>
         titleText = jsonItem.titleText.failIfEmpty(),
         descriptionText = jsonItem.descriptionText.orEmpty().failIfEmpty(),
         placeholder = jsonItem.placeholder.orEmpty().asPlaceholder(),
-        primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
-            ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+        primaryAction = jsonItem.primaryAction?.toAction(actionMappers),
         primaryActionText = jsonItem.primaryActionText.orEmpty(),
         matchingRules = jsonItem.matchingRules.orEmpty(),
         exclusionRules = jsonItem.exclusionRules.orEmpty(),
