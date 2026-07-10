@@ -85,8 +85,9 @@ class TrackerDetectorImpl @Inject constructor(
         val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
-        val sameEntity = sameNetworkName(url, documentUrl)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
+        val urlNetwork = entityLookup.entityForUrl(url)
+        val sameEntity = sameNetwork(urlNetwork, documentUrl)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
@@ -109,8 +110,9 @@ class TrackerDetectorImpl @Inject constructor(
         val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
-        val sameEntity = sameNetworkName(documentUrl, url)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
+        val urlNetwork = entityLookup.entityForUrl(url)
+        val sameEntity = sameNetwork(urlNetwork, documentUrl)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
@@ -168,22 +170,18 @@ class TrackerDetectorImpl @Inject constructor(
     ): Boolean =
         sameOrSubdomainPair(firstUrl, secondUrl)
 
-    private fun sameNetworkName(
-        first: Uri,
-        second: String,
-    ): Boolean {
-        val firstNetwork = entityLookup.entityForUrl(first) ?: return false
-        val secondNetwork = entityLookup.entityForUrl(second) ?: return false
-        return firstNetwork.name == secondNetwork.name
-    }
-
-    private fun sameNetworkName(
-        url: Uri,
+    /**
+     * Whether the request URL and the document belong to the same entity. The request URL's entity
+     * ([urlNetwork]) is resolved once by the caller and passed in, so it is not looked up again here;
+     * the document's entity is only resolved when the request URL actually maps to an entity.
+     */
+    private fun sameNetwork(
+        urlNetwork: Entity?,
         documentUrl: Uri,
     ): Boolean {
-        val firstNetwork = entityLookup.entityForUrl(url) ?: return false
-        val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
-        return firstNetwork.name == secondNetwork.name
+        if (urlNetwork == null) return false
+        val documentNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
+        return urlNetwork.name == documentNetwork.name
     }
 
     @VisibleForTesting
