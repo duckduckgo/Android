@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">Odeslat anonymní hlášení o chybě službě DuckDuckGo. Pomoz vylepšit blokování reklam pro všechny!</string>
     <string name="ad_blocking_disabled_primary_action">Poslat zprávu o chybě</string>
     <string name="ad_blocking_disabled_secondary_action">Zrušit</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Vypnuto do opětovného spuštění</string>
 </resources>
