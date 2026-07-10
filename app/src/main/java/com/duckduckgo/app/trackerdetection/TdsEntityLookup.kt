@@ -38,22 +38,14 @@ class TdsEntityLookup @Inject constructor(
     var entities: List<TdsEntity> = emptyList()
 
     @WorkerThread
-    override fun entityForUrl(url: String): Entity? {
-        val uri = url.toUri()
-        val host = uri.baseHost ?: return null
-
-        // try searching for exact domain
-        val direct = lookUpEntityInDatabase(host)
-        if (direct != null) return direct
-
-        // remove the first subdomain, and try again
-        val parentDomain = uri.removeSubdomain() ?: return null
-        return entityForUrl(parentDomain)
-    }
+    override fun entityForUrl(url: String): Entity? = entityForUri(url.toUri()) { it.baseHost }
 
     @WorkerThread
-    override fun entityForUrl(uri: Uri): Entity? {
-        val host = uri.host ?: return null
+    override fun entityForUrl(url: Uri): Entity? = entityForUri(url) { it.host }
+
+    @WorkerThread
+    private fun entityForUri(uri: Uri, hostSelector: (Uri) -> String?): Entity? {
+        val host = hostSelector(uri) ?: return null
 
         // try searching for exact domain
         val direct = lookUpEntityInDatabase(host)
@@ -61,7 +53,7 @@ class TdsEntityLookup @Inject constructor(
 
         // remove the first subdomain, and try again
         val parentDomain = uri.removeSubdomain() ?: return null
-        return entityForUrl(parentDomain.toUri())
+        return entityForUri(parentDomain.toUri(), hostSelector)
     }
 
     @WorkerThread
