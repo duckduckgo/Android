@@ -21,7 +21,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.UriString.Companion.removePort
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -43,7 +43,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val adClickManager: AdClickManager,
@@ -88,7 +88,7 @@ class TrackerDetectorImpl @Inject constructor(
         val urlNetwork = entityLookup.entityForUrl(url)
         val sameEntity = sameNetwork(urlNetwork, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
-        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+        val isDocumentInAllowedList = userAllowListRepository.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
@@ -113,7 +113,7 @@ class TrackerDetectorImpl @Inject constructor(
         val urlNetwork = entityLookup.entityForUrl(url)
         val sameEntity = sameNetwork(urlNetwork, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
-        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+        val isDocumentInAllowedList = userAllowListRepository.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
     }
@@ -189,9 +189,9 @@ class TrackerDetectorImpl @Inject constructor(
         get() = clients.count()
 }
 
-private fun UserAllowListDao.isDocumentAllowListed(document: Uri?): Boolean {
+private fun UserAllowListRepository.isDocumentAllowListed(document: Uri?): Boolean {
     document?.host?.let {
-        return contains(it)
+        return isDomainInUserAllowList(it)
     }
     return false
 }
