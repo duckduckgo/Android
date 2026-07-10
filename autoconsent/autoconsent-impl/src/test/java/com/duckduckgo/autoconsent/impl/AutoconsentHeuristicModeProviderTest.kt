@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autoconsent.impl
 
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -40,36 +39,41 @@ class AutoconsentHeuristicModeProviderTest {
     @Test
     fun whenHeuristicActionDisabledThenHeuristicModeIsOff() {
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = false))
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
 
         assertEquals("off", provider.getHeuristicMode())
     }
 
     @Test
-    fun whenPreferenceIsMaxThenHeuristicModeIsTier2() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+    fun whenClickAcceptEnabledThenHeuristicModeIsTier2() {
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
 
         assertEquals("tier2", provider.getHeuristicMode())
     }
 
     @Test
-    fun whenPreferenceIsDefaultAndSettingEnabledThenHeuristicModeIsTier1() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+    fun whenUserSettingEnabledAndClickAcceptDisabledAndSettingEnabledThenHeuristicModeIsTier1() {
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = false
 
         assertEquals("tier1", provider.getHeuristicMode())
     }
 
     @Test
-    fun whenPreferenceIsDefaultAndSettingDisabledThenHeuristicModeIsReject() {
+    fun whenUserSettingEnabledAndClickAcceptDisabledAndSettingDisabledThenHeuristicModeIsReject() {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = false
 
         assertEquals("reject", provider.getHeuristicMode())
     }
 
     @Test
-    fun whenPreferenceIsOffThenHeuristicModeIsOff() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.OFF
+    fun whenUserSettingDisabledThenHeuristicModeIsOff() {
+        settingsRepository.userSetting = false
+        settingsRepository.clickAcceptEnabled = true
 
         assertEquals("off", provider.getHeuristicMode())
     }

@@ -19,15 +19,14 @@ package com.duckduckgo.autoconsent.impl.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface AutoconsentSettingsDataStore {
-    var cookiePopUpPreference: CookiePopUpPreference
     var userSetting: Boolean
+    var clickAcceptEnabled: Boolean
     var firstPopupHandled: Boolean
     fun invalidateCache()
 }
@@ -40,7 +39,7 @@ class RealAutoconsentSettingsDataStore constructor(
 ) : AutoconsentSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    private var cachedCookiePopUpPreference: CookiePopUpPreference? = null
+    private var cachedUserSetting: Boolean? = null
 
     private var _defaultValue: Boolean? = null
     private val defaultValue: Boolean
@@ -53,33 +52,29 @@ class RealAutoconsentSettingsDataStore constructor(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cachedCookiePopUpPreference = readCookiePopUpPreference()
+            cachedUserSetting = readUserSetting()
         }
     }
 
-    override var cookiePopUpPreference: CookiePopUpPreference
+    override var userSetting: Boolean
         get() {
-            return cachedCookiePopUpPreference ?: readCookiePopUpPreference().also {
-                cachedCookiePopUpPreference = it
+            return cachedUserSetting ?: readUserSetting().also {
+                cachedUserSetting = it
             }
         }
         set(value) {
-            val enabled = value != CookiePopUpPreference.OFF
             preferences.edit(commit = true) {
-                putString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, value.name)
-                putBoolean(AUTOCONSENT_USER_SETTING, enabled)
+                putBoolean(AUTOCONSENT_USER_SETTING, value)
             }.also {
-                cachedCookiePopUpPreference = value
+                cachedUserSetting = value
             }
         }
 
-    override var userSetting: Boolean
-        get() = cookiePopUpPreference != CookiePopUpPreference.OFF
+    override var clickAcceptEnabled: Boolean
+        get() = preferences.getBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, false)
         set(value) {
-            cookiePopUpPreference = if (value) {
-                CookiePopUpPreference.DEFAULT
-            } else {
-                CookiePopUpPreference.OFF
+            preferences.edit(commit = true) {
+                putBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, value)
             }
         }
 
@@ -94,49 +89,18 @@ class RealAutoconsentSettingsDataStore constructor(
     override fun invalidateCache() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
-            cachedCookiePopUpPreference = null
+            cachedUserSetting = null
         }
     }
 
-    private fun readCookiePopUpPreference(): CookiePopUpPreference {
-        if (preferences.contains(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE)) {
-            return parsePreference(preferences.getString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, null))
-        }
-        val migrated = migrateFromLegacySetting()
-        if (preferences.contains(AUTOCONSENT_USER_SETTING)) {
-            preferences.edit(commit = true) {
-                putString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, migrated.name)
-            }
-        }
-        return migrated
-    }
-
-    private fun migrateFromLegacySetting(): CookiePopUpPreference {
-        return if (preferences.contains(AUTOCONSENT_USER_SETTING)) {
-            if (preferences.getBoolean(AUTOCONSENT_USER_SETTING, false)) {
-                CookiePopUpPreference.DEFAULT
-            } else {
-                CookiePopUpPreference.OFF
-            }
-        } else if (defaultValue) {
-            CookiePopUpPreference.DEFAULT
-        } else {
-            CookiePopUpPreference.OFF
-        }
-    }
-
-    private fun parsePreference(value: String?): CookiePopUpPreference {
-        return try {
-            CookiePopUpPreference.valueOf(value!!)
-        } catch (_: Exception) {
-            CookiePopUpPreference.DEFAULT
-        }
+    private fun readUserSetting(): Boolean {
+        return preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
     }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.autoconsent.store.settings"
         private const val AUTOCONSENT_USER_SETTING = "AutoconsentUserSetting"
-        private const val AUTOCONSENT_COOKIE_POP_UP_PREFERENCE = "AutoconsentCookiePopUpPreference"
+        private const val AUTOCONSENT_CLICK_ACCEPT_ENABLED = "AutoconsentClickAcceptEnabled"
         private const val AUTOCONSENT_FIRST_POPUP_HANDLED = "AutoconsentFirstPopupHandled"
     }
 }

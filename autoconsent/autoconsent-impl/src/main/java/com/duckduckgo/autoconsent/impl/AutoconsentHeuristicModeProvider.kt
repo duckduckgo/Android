@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autoconsent.impl
 
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
@@ -40,11 +39,15 @@ class RealAutoconsentHeuristicModeProvider @Inject constructor(
             return "off"
         }
 
-        val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
-        return when (settingsRepository.cookiePopUpPreference) {
-            CookiePopUpPreference.MAX -> "tier2"
-            CookiePopUpPreference.DEFAULT -> if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
-            CookiePopUpPreference.OFF -> "off"
+        if (!settingsRepository.userSetting) {
+            return "off"
         }
+
+        if (settingsRepository.clickAcceptEnabled) {
+            return "tier2"
+        }
+
+        val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+        return if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
     }
 }

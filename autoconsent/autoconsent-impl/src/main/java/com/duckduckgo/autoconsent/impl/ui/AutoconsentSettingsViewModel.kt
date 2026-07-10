@@ -22,7 +22,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_OFF
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_ON
@@ -45,15 +44,10 @@ class AutoconsentSettingsViewModel @Inject constructor(
     private val autoconsentFeature: AutoconsentFeature,
 ) : ViewModel() {
     data class ViewState(
-        val selectedPreference: CookiePopUpPreference,
+        val autoManageEnabled: Boolean,
+        val popUpsWithoutOptOutsEnabled: Boolean,
         val autoconsentEnabled: Boolean,
-    ) {
-        val autoManageEnabled: Boolean
-            get() = selectedPreference != CookiePopUpPreference.OFF
-
-        val popUpsWithoutOptOutsEnabled: Boolean
-            get() = selectedPreference == CookiePopUpPreference.MAX
-    }
+    )
 
     sealed class Command {
         data class LaunchLearnMoreWebPage(
@@ -77,40 +71,18 @@ class AutoconsentSettingsViewModel @Inject constructor(
 
     fun onAutoManageCookiePopUpsToggled(enabled: Boolean) {
         if (!isCookiePopUpPreferenceSettingEnabled()) return
-        val preference = if (enabled) {
-            CookiePopUpPreference.DEFAULT
-        } else {
-            CookiePopUpPreference.OFF
-        }
-        updateCookiePopUpPreference(preference)
+        updateAutoconsentSetting(enabled)
     }
 
     fun onPopUpsWithoutOptOutsToggled(enabled: Boolean) {
         if (!isCookiePopUpPreferenceSettingEnabled()) return
-        val preference = if (enabled) {
-            CookiePopUpPreference.MAX
-        } else {
-            CookiePopUpPreference.DEFAULT
-        }
-        updateCookiePopUpPreference(preference)
-    }
-
-    private fun updateCookiePopUpPreference(preference: CookiePopUpPreference) {
         viewModelScope.launch {
-            pixel.fire(
-                if (preference == CookiePopUpPreference.OFF) {
-                    SETTINGS_AUTOCONSENT_OFF
-                } else {
-                    SETTINGS_AUTOCONSENT_ON
-                },
-            )
-            autoconsent.changeCookiePopUpPreference(preference)
+            autoconsent.changeClickAcceptEnabled(enabled)
             viewStateFlow.emit(buildViewState())
         }
     }
 
-    fun onUserToggleAutoconsent(enabled: Boolean) {
-        if (isCookiePopUpPreferenceSettingEnabled()) return
+    private fun updateAutoconsentSetting(enabled: Boolean) {
         viewModelScope.launch {
             pixel.fire(
                 if (enabled) {
@@ -124,6 +96,11 @@ class AutoconsentSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onUserToggleAutoconsent(enabled: Boolean) {
+        if (isCookiePopUpPreferenceSettingEnabled()) return
+        updateAutoconsentSetting(enabled)
+    }
+
     fun onLearnMoreSelected() {
         viewModelScope.launch { command.send(Command.LaunchLearnMoreWebPage()) }
     }
@@ -133,10 +110,10 @@ class AutoconsentSettingsViewModel @Inject constructor(
     }
 
     private fun buildViewState(): ViewState {
-        val selectedPreference = autoconsent.getCookiePopUpPreference()
         return ViewState(
-            selectedPreference = selectedPreference,
-            autoconsentEnabled = selectedPreference != CookiePopUpPreference.OFF,
+            autoManageEnabled = autoconsent.isAutoconsentEnabled(),
+            popUpsWithoutOptOutsEnabled = autoconsent.isClickAcceptEnabled(),
+            autoconsentEnabled = autoconsent.isSettingEnabled(),
         )
     }
 

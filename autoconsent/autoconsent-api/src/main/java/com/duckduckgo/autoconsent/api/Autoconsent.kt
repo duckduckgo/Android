@@ -37,14 +37,14 @@ interface Autoconsent {
     fun changeSetting(setting: Boolean)
 
     /**
-     * Updates the user's cookie pop-up blocking preference.
+     * Updates whether autoconsent may click accept on pop-ups without opt-outs.
      */
-    fun changeCookiePopUpPreference(preference: CookiePopUpPreference)
+    fun changeClickAcceptEnabled(enabled: Boolean)
 
     /**
-     * @return the user's cookie pop-up blocking preference.
+     * @return `true` if autoconsent may click accept on pop-ups without opt-outs.
      */
-    fun getCookiePopUpPreference(): CookiePopUpPreference
+    fun isClickAcceptEnabled(): Boolean
 
     /**
      * @return `true` if autoconsent was enabled by the user, `false` otherwise.

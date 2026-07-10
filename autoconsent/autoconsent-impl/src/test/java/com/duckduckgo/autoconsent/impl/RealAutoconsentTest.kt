@@ -19,7 +19,6 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
@@ -120,32 +119,32 @@ class RealAutoconsentTest {
     }
 
     @Test
-    fun whenChangeCookiePopUpPreferenceThenRepoSetValueChanged() {
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.MAX)
-        assertEquals(CookiePopUpPreference.MAX, settingsRepository.cookiePopUpPreference)
+    fun whenChangeClickAcceptEnabledThenRepoSetValueChanged() {
+        autoconsent.changeClickAcceptEnabled(true)
+        assertTrue(settingsRepository.clickAcceptEnabled)
 
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.OFF)
-        assertEquals(CookiePopUpPreference.OFF, autoconsent.getCookiePopUpPreference())
+        autoconsent.changeClickAcceptEnabled(false)
+        assertFalse(autoconsent.isClickAcceptEnabled())
     }
 
     @Test
-    fun whenChangeCookiePopUpPreferenceToDefaultThenSettingEnabled() {
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.DEFAULT)
+    fun whenChangeSettingToTrueThenSettingEnabled() {
+        autoconsent.changeSetting(true)
 
         assertTrue(autoconsent.isSettingEnabled())
     }
 
     @Test
-    fun whenChangeCookiePopUpPreferenceToOffThenSettingDisabled() {
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.DEFAULT)
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.OFF)
+    fun whenChangeSettingToFalseThenSettingDisabled() {
+        autoconsent.changeSetting(true)
+        autoconsent.changeSetting(false)
 
         assertFalse(autoconsent.isSettingEnabled())
     }
 
     @Test
-    fun whenInjectAutoconsentWithCookiePopUpPreferenceEnabledThenCallEvaluate() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+    fun whenInjectAutoconsentWithUserSettingEnabledThenCallEvaluate() {
+        settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
 
         autoconsent.injectAutoconsent(webView, URL)

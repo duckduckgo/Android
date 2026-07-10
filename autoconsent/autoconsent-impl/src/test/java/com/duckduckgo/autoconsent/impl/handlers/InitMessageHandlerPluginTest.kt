@@ -22,7 +22,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
@@ -165,7 +164,7 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessMessageIfNoSettingsThenDoNotCallEvaluate() {
         settingsCache = RealAutoconsentSettingsCache()
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -177,7 +176,7 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessMessageIfCanNotParseSettingsThenDoNotCallEvaluate() {
         settingsCache.updateSettings("{\"random\": []}")
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -188,7 +187,8 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageWithMaxPreferenceThenHeuristicModeIsTier2() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {}}")
 
@@ -207,7 +207,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageWithDefaultPreferenceThenHeuristicModeIsTier1() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
@@ -227,7 +227,8 @@ class InitMessageHandlerPluginTest {
     @Test
     @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessMessageAndPopupHandledResponseSentIsCorrect() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
         settingsRepository.firstPopupHandled = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
@@ -247,7 +248,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageThenOnResultReceivedCalled() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -274,7 +275,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessAndAutoconsentIsEnabledThenFireInitPixel() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -282,9 +283,9 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenCookiePopUpPreferenceSettingDisabledAndPreferenceIsDefaultThenInitProceeds() {
+    fun whenCookiePopUpPreferenceSettingDisabledAndUserSettingEnabledThenInitProceeds() {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
@@ -343,7 +344,8 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenHeuristicActionToggleDisabledThenHeuristicModeIsOff() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
@@ -356,7 +358,8 @@ class InitMessageHandlerPluginTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenHeuristicActionToggleEnabledThenHeuristicModeIsTier2() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.MAX
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
 
@@ -444,7 +447,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.userSetting = true
         settingsCache.updateSettings(mockRulesetJson)
         feature.ruleFiltering().setRawStoredState(Toggle.State(enable = false))
 

@@ -20,13 +20,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -48,95 +46,72 @@ class RealAutoconsentSettingsDataStoreTest {
     fun setup() {
         context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE).edit().clear().commit()
         feature.onByDefault().setRawStoredState(Toggle.State(enable = true))
-        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
     }
 
     @Test
-    fun whenLegacyUserSettingIsFalseThenMigratesToDoNotBlock() = runTest {
-        preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
-
-        assertEquals(CookiePopUpPreference.OFF, createDataStore().cookiePopUpPreference)
+    fun whenNoStoredSettingAndOnByDefaultThenUserSettingIsTrue() = runTest {
+        assertTrue(createDataStore().userSetting)
     }
 
     @Test
-    fun whenLegacyUserSettingIsTrueThenMigratesToBlockStandard() = runTest {
-        preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, true).commit()
-
-        assertEquals(CookiePopUpPreference.DEFAULT, createDataStore().cookiePopUpPreference)
-    }
-
-    @Test
-    fun whenNoLegacySettingAndOnByDefaultThenMigratesToBlockStandard() = runTest {
-        assertEquals(CookiePopUpPreference.DEFAULT, createDataStore().cookiePopUpPreference)
-    }
-
-    @Test
-    fun whenNoLegacySettingAndOffByDefaultThenMigratesToDoNotBlock() = runTest {
+    fun whenNoStoredSettingAndOffByDefaultThenUserSettingIsFalse() = runTest {
         feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
 
-        assertEquals(CookiePopUpPreference.OFF, createDataStore().cookiePopUpPreference)
+        assertFalse(createDataStore().userSetting)
     }
 
     @Test
-    fun whenReadBeforeRemoteConfigThenPreferenceUpdatesAfterCacheInvalidation() = runTest {
+    fun whenReadBeforeRemoteConfigThenUserSettingUpdatesAfterCacheInvalidation() = runTest {
         feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
         val dataStore = createDataStore()
 
-        assertEquals(CookiePopUpPreference.OFF, dataStore.cookiePopUpPreference)
-        assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
+        assertFalse(dataStore.userSetting)
+        assertFalse(preferences().contains(USER_SETTING_KEY))
 
         feature.onByDefault().setRawStoredState(Toggle.State(enable = true))
         dataStore.invalidateCache()
 
-        assertEquals(CookiePopUpPreference.DEFAULT, dataStore.cookiePopUpPreference)
-        assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
+        assertTrue(dataStore.userSetting)
+        assertFalse(preferences().contains(USER_SETTING_KEY))
     }
 
     @Test
-    fun whenPreferenceAlreadyStoredThenMigrationIsIdempotent() = runTest {
-        val dataStore = createDataStore()
-        dataStore.cookiePopUpPreference = CookiePopUpPreference.MAX
-        preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
+    fun whenUserSettingAlreadyStoredThenDefaultIsNotApplied() = runTest {
+        preferences().edit().putBoolean(USER_SETTING_KEY, false).commit()
 
-        assertEquals(CookiePopUpPreference.MAX, createDataStore().cookiePopUpPreference)
+        assertFalse(createDataStore().userSetting)
     }
 
     @Test
-    fun whenUserSettingSetToTrueThenLegacySettingIsTrue() {
+    fun whenUserSettingSetToTrueThenStoredValueIsTrue() {
         val dataStore = createDataStore()
         dataStore.userSetting = true
 
         assertTrue(dataStore.userSetting)
-        assertEquals(CookiePopUpPreference.DEFAULT, dataStore.cookiePopUpPreference)
-        assertTrue(preferences().getBoolean(LEGACY_USER_SETTING_KEY, false))
+        assertTrue(preferences().getBoolean(USER_SETTING_KEY, false))
     }
 
     @Test
-    fun whenUserSettingSetToFalseThenLegacySettingIsFalse() {
+    fun whenUserSettingSetToFalseThenStoredValueIsFalse() {
         val dataStore = createDataStore()
         dataStore.userSetting = false
 
         assertFalse(dataStore.userSetting)
-        assertEquals(CookiePopUpPreference.OFF, dataStore.cookiePopUpPreference)
-        assertFalse(preferences().getBoolean(LEGACY_USER_SETTING_KEY, true))
+        assertFalse(preferences().getBoolean(USER_SETTING_KEY, true))
     }
 
     @Test
-    fun whenCookiePopUpPreferenceSetToMaxThenLegacySettingMirrorsTrue() {
-        val dataStore = createDataStore()
-        dataStore.cookiePopUpPreference = CookiePopUpPreference.MAX
-
-        assertTrue(dataStore.userSetting)
-        assertTrue(preferences().getBoolean(LEGACY_USER_SETTING_KEY, false))
+    fun whenClickAcceptEnabledNotStoredThenDefaultsToFalse() {
+        assertFalse(createDataStore().clickAcceptEnabled)
     }
 
     @Test
-    fun whenCookiePopUpPreferenceSetToOffThenLegacySettingMirrorsFalse() {
+    fun whenClickAcceptEnabledSetToTrueThenStoredValueIsTrue() {
         val dataStore = createDataStore()
-        dataStore.cookiePopUpPreference = CookiePopUpPreference.OFF
+        dataStore.clickAcceptEnabled = true
 
-        assertFalse(dataStore.userSetting)
-        assertFalse(preferences().getBoolean(LEGACY_USER_SETTING_KEY, true))
+        assertTrue(dataStore.clickAcceptEnabled)
+        assertTrue(preferences().getBoolean(CLICK_ACCEPT_ENABLED_KEY, false))
     }
 
     private fun preferences() = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
@@ -152,7 +127,7 @@ class RealAutoconsentSettingsDataStoreTest {
 
     companion object {
         private const val PREFS_FILENAME = "com.duckduckgo.autoconsent.store.settings"
-        private const val LEGACY_USER_SETTING_KEY = "AutoconsentUserSetting"
-        private const val COOKIE_POP_UP_PREFERENCE_KEY = "AutoconsentCookiePopUpPreference"
+        private const val USER_SETTING_KEY = "AutoconsentUserSetting"
+        private const val CLICK_ACCEPT_ENABLED_KEY = "AutoconsentClickAcceptEnabled"
     }
 }

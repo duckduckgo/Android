@@ -32,7 +32,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityAutoconsentSettingsBinding
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
@@ -147,7 +146,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         with(binding) {
             val isProtectionEnabled = if (showCookiePopUpPreferenceSetting) {
-                viewState.selectedPreference != CookiePopUpPreference.OFF
+                viewState.autoManageEnabled
             } else {
                 viewState.autoconsentEnabled
             }

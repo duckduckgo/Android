@@ -21,7 +21,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
@@ -78,9 +77,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     reloadLoopDetector.updateUrl(webView, url)
 
-                    val preference = settingsRepository.cookiePopUpPreference
-
-                    if (preference == CookiePopUpPreference.OFF) {
+                    if (!settingsRepository.userSetting) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }

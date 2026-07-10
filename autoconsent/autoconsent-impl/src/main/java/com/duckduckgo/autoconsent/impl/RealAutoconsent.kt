@@ -23,7 +23,6 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
@@ -84,25 +83,19 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun changeSetting(setting: Boolean) {
-        changeCookiePopUpPreference(
-            if (setting) {
-                CookiePopUpPreference.DEFAULT
-            } else {
-                CookiePopUpPreference.OFF
-            },
-        )
+        settingsRepository.userSetting = setting
     }
 
-    override fun changeCookiePopUpPreference(preference: CookiePopUpPreference) {
-        settingsRepository.cookiePopUpPreference = preference
-    }
-
-    override fun getCookiePopUpPreference(): CookiePopUpPreference {
-        return settingsRepository.cookiePopUpPreference
+    override fun changeClickAcceptEnabled(enabled: Boolean) {
+        settingsRepository.clickAcceptEnabled = enabled
     }
 
     override fun isSettingEnabled(): Boolean {
-        return settingsRepository.cookiePopUpPreference != CookiePopUpPreference.OFF
+        return settingsRepository.userSetting
+    }
+
+    override fun isClickAcceptEnabled(): Boolean {
+        return settingsRepository.clickAcceptEnabled
     }
 
     override fun isAutoconsentEnabled(): Boolean {
