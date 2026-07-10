@@ -216,7 +216,6 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 )
                 if (item.primaryAction != null) {
                     binding.endImage.show()
-                    binding.action.isClickable = true
                     binding.action.setOnClickListener {
                         listener.onItemClicked(item)
                     }

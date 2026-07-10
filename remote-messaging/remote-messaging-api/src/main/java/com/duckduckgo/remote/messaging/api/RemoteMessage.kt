@@ -33,7 +33,7 @@ import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 
-data class RemoteMessage constructor(
+data class RemoteMessage(
     val id: String,
     val content: Content,
     val matchingRules: List<Int>,
@@ -196,7 +196,7 @@ sealed class CardItem {
      * Represents both TWO_LINE_LIST_ITEM and FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.
      * The [type] field determines the visual styling.
      */
-    data class ListItem constructor(
+    data class ListItem(
         override val id: String,
         override val type: CardItemType,
         override val titleText: String,
