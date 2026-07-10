@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
+    <string name="preOnboardingComparisonChartDuckAi">Használd a ChatGPT-t privát módon a beépített Duck.ai segítségével</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Célzott hirdetések és felugró sütiablakok blokkolása</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube-videók lejátszása hirdetések nélkül</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Szeretnél a címsorból könnyen hozzáférni a privát AI-csevegéshez?</string>
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 
