@@ -46,6 +46,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
+import com.duckduckgo.adblocking.api.AdBlockingAnimation
+import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
@@ -583,6 +585,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
+    private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -743,6 +746,9 @@ class BrowserTabViewModel @Inject constructor(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private var adBlockingAnimationClaimed = false
+    private var isPageLoading = false
+    private var pendingAdBlockingAnimation: Command.StartAdBlockingAnimation? = null
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var faviconRequestedForDomain: String? = null
@@ -2116,11 +2122,39 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
+    private suspend fun handleAdBlockingAnimation(animation: AdBlockingAnimation) {
+        when (animation) {
+            is AdBlockingAnimation.Show -> {
+                adBlockingAnimationClaimed = true
+                val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
+                if (isPageLoading) {
+                    pendingAdBlockingAnimation = badge
+                } else {
+                    delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
+                    if (!adBlockingAnimationClaimed) return
+                    command.value = badge
+                }
+            }
+
+            AdBlockingAnimation.Skip -> {
+                // Leave trackers/cookies to animate as usual.
+            }
+        }
+    }
+
     private fun pageChanged(
         url: String,
         title: String?,
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
+        // Reset before fanning out so a fresh ad-blocking claim for this navigation isn't cleared.
+        // The badge is deferred until this document load reaches 100% (see progressChanged).
+        adBlockingAnimationClaimed = false
+        pendingAdBlockingAnimation = null
+        isPageLoading = true
+        viewModelScope.launch {
+            handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true))
+        }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -2366,6 +2400,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
+        // SPA url change: the page is already loaded, so the badge (if any) shows immediately.
+        adBlockingAnimationClaimed = false
+        pendingAdBlockingAnimation = null
+        viewModelScope.launch {
+            handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false))
+        }
         site?.url = url
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -2469,6 +2509,14 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) return
+
+        if (newProgress == 100) {
+            isPageLoading = false
+            pendingAdBlockingAnimation?.let {
+                command.value = it
+                pendingAdBlockingAnimation = null
+            }
+        }
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
@@ -5658,6 +5706,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
+        if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive for this page
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             if (isCosmetic) {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
@@ -5735,6 +5784,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStartTrackersAnimation() {
+        if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive for this page
         val site = siteLiveData.value
         val trackerEvents = site?.orderedTrackerBlockedEntities()
         command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)
@@ -5762,6 +5812,10 @@ class BrowserTabViewModel @Inject constructor(
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
+
+        // SPA url changes have no document reload to defer the ad-blocking badge against, so it would
+        // otherwise pop instantly. A short delay makes the badge feel intentional.
+        private const val SPA_AD_BLOCKING_BADGE_DELAY_MS = 250L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

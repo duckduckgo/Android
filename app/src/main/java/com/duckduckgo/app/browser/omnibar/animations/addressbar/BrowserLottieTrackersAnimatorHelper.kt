@@ -36,6 +36,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -188,6 +189,138 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             startCookiesAnimation(context, omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
+        }
+    }
+
+    override fun createAdBlockingAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        shieldViews: List<View>,
+        badgeBackground: View,
+        badgeAnimationView: LottieAnimationView,
+        badgeScene: ViewGroup,
+        icon: Int,
+        text: Int,
+    ) {
+        // Ad-blocking is exclusive: cancel any in-flight tracker/cookie animation before showing.
+        conflatedJob.cancel()
+        addressBarTrackersAnimator.cancelAnimation()
+        stopTrackersAnimation()
+
+        this.cookieScene = badgeScene
+        this.cookieViewBackground = badgeBackground
+        this.cookieView = badgeAnimationView
+        startAdBlockingAnimation(context, omnibarViews + shieldViews, icon, text)
+    }
+
+    /**
+     * Scene-only badge animation (no Lottie): shows a static [iconRes] and [textRes] that slides in
+     * from the address bar, holds, then slides out. Timing is delay-driven; the icon is a plain
+     * drawable rather than a Lottie composition.
+     */
+    private fun startAdBlockingAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        iconRes: Int,
+        textRes: Int,
+    ) {
+        if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
+        isCookiesAnimationRunning = true
+
+        firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
+        secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+
+        hasCookiesAnimationBeenCanceled = false
+        val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
+        cookieView.show()
+        cookieView.alpha = 0F
+        cookieView.setImageResource(iconRes) // static icon — no Lottie
+
+        val slideInTransition: Transition = createSlideTransition()
+        val slideOutTransition: Transition = createSlideTransition()
+
+        // After the text slides in, hold briefly then slide out + fade out the badge views.
+        slideInTransition.addListener(
+            object : TransitionListener {
+                override fun onTransitionEnd(transition: Transition) {
+                    AnimatorSet().apply {
+                        play(commonAddressBarAnimationHelper.animateFadeIn(cookieView, 0L)) // holds via startDelay
+                        startDelay = COOKIES_ANIMATION_DELAY
+                        addListener(
+                            doOnEnd {
+                                if (!hasCookiesAnimationBeenCanceled) {
+                                    AnimatorSet().apply {
+                                        TransitionManager.go(firstScene, slideOutTransition)
+                                        play(commonAddressBarAnimationHelper.animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                            .with(
+                                                commonAddressBarAnimationHelper.animateFadeOut(
+                                                    cookieViewBackground,
+                                                    COOKIES_ANIMATION_FADE_OUT_DURATION,
+                                                ),
+                                            )
+                                        addListener(
+                                            doOnEnd {
+                                                cookieView.gone()
+                                                isCookiesAnimationRunning = false
+                                                listener?.onAnimationFinished()
+                                            },
+                                        )
+                                        start()
+                                    }
+                                } else {
+                                    isCookiesAnimationRunning = false
+                                    listener?.onAnimationFinished()
+                                }
+                            },
+                        )
+                        start()
+                    }
+                }
+
+                override fun onTransitionStart(transition: Transition) {}
+                override fun onTransitionCancel(transition: Transition) {}
+                override fun onTransitionPause(transition: Transition) {}
+                override fun onTransitionResume(transition: Transition) {}
+            },
+        )
+
+        // After slide out finished, hide the scene and fade the omnibar back in.
+        slideOutTransition.addListener(
+            object : TransitionListener {
+                override fun onTransitionEnd(transition: Transition) {
+                    if (!hasCookiesAnimationBeenCanceled) {
+                        AnimatorSet().apply {
+                            play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
+                            start()
+                        }
+                        cookieScene.gone()
+                    } else {
+                        isCookiesAnimationRunning = false
+                        listener?.onAnimationFinished()
+                    }
+                }
+
+                override fun onTransitionStart(transition: Transition) {}
+                override fun onTransitionCancel(transition: Transition) {}
+                override fun onTransitionPause(transition: Transition) {}
+                override fun onTransitionResume(transition: Transition) {}
+            },
+        )
+
+        // Fade omnibar out, fade the badge in, then drive the text slide-in directly (no Lottie).
+        AnimatorSet().apply {
+            play(commonAddressBarAnimationHelper.animateViewsOut(allOmnibarViews))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieViewBackground))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieView))
+            addListener(
+                onEnd = {
+                    cookieScene.show()
+                    cookieScene.alpha = 1F
+                    TransitionManager.go(secondScene, slideInTransition)
+                    cookieScene.findViewById<DaxTextView>(R.id.cookiesManagedText)?.setText(textRes)
+                },
+            )
+            start()
         }
     }
 

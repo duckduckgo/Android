@@ -408,6 +408,13 @@ class Omnibar(
         omnibarView.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 
+    fun createAdBlockingAnimation(
+        icon: Int,
+        text: Int,
+    ) {
+        omnibarView.decorate(Decoration.LaunchAdBlockingAnimation(icon, text))
+    }
+
     fun cancelTrackersAnimation() {
         omnibarView.decorate(Decoration.CancelAnimations)
     }

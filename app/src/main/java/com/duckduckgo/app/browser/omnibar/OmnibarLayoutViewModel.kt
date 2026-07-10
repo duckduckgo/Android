@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,6 +46,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
@@ -314,6 +317,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         ) : Command()
 
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
+        data class StartAdBlockingAnimation(
+            @field:DrawableRes val icon: Int,
+            @field:StringRes val text: Int,
+        ) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
@@ -1111,6 +1118,20 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 ),
                             )
                         }
+                    }
+                }
+            }
+
+            is LaunchAdBlockingAnimation -> {
+                val hasFocus = _viewState.value.hasFocus
+                if (!hasFocus) {
+                    _viewState.update {
+                        it.copy(
+                            leadingIconState = PrivacyShield,
+                        )
+                    }
+                    viewModelScope.launch {
+                        command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
                     }
                 }
             }

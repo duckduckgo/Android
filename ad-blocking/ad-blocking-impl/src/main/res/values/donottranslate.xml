@@ -15,4 +15,5 @@
   -->
 
 <resources>
+    <string name="ad_blocking_omnibar_badge_text">YouTube Ad Block On</string>
 </resources>

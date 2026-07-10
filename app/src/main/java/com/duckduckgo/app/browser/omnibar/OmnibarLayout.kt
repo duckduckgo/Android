@@ -81,6 +81,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
@@ -95,6 +96,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.model.Decoration.HighlightOmnibarItem
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
@@ -303,6 +305,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    internal val adBlockingAnimation: LottieAnimationView by lazy { findViewById(R.id.adBlockingAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     override val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
     override val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
@@ -722,6 +725,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 createCookiesAnimation(command.isCosmetic)
             }
 
+            is StartAdBlockingAnimation -> {
+                createAdBlockingAnimation(command.icon, command.text)
+            }
+
             MoveCaretToFront -> {
                 moveCaretToFront()
             }
@@ -1060,6 +1067,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 createCookiesAnimation(isCosmetic = decoration.isCosmetic, enqueueAnimation = true)
             }
 
+            is LaunchAdBlockingAnimation -> {
+                viewModel.onAnimationStarted(decoration)
+            }
+
             is ChangeCustomTabTitle -> {
                 viewModel.onCustomTabTitleUpdate(decoration)
             }
@@ -1132,6 +1143,24 @@ class OmnibarLayout @JvmOverloads constructor(
                 sceneRoot,
                 isCosmetic,
                 enqueueAnimation,
+            )
+        }
+    }
+
+    private fun createAdBlockingAnimation(
+        icon: Int,
+        text: Int,
+    ) {
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.createAdBlockingAnimation(
+                context,
+                omnibarViews(),
+                shieldViews(),
+                animatedIconBackgroundView,
+                adBlockingAnimation,
+                sceneRoot,
+                icon,
+                text,
             )
         }
     }

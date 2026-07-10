@@ -534,6 +534,11 @@ sealed class Command {
 
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
 
+    data class StartAdBlockingAnimation(
+        @DrawableRes val icon: Int,
+        @StringRes val text: Int,
+    ) : Command()
+
     data class PageContextReceived(
         val tabId: String,
         val pageContext: String,

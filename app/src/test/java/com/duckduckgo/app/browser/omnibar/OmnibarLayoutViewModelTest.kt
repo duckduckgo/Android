@@ -2101,6 +2101,30 @@ class OmnibarLayoutViewModelTest {
         )
     }
 
+    @Test
+    fun whenAdBlockingAnimationStartedAndNotFocusedThenStartAdBlockingAnimationCommandSent() = runTest {
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            expectMostRecentItem().assertCommand(Command.StartAdBlockingAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAdBlockingAnimationStartedAndFocusedThenNoAdBlockingCommandSent() = runTest {
+        testee.onOmnibarFocusChanged(true, "query")
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            assertFalse(expectMostRecentItem() is Command.StartAdBlockingAnimation)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun givenSomeTrackers(): List<Entity> {
         val network = TestingEntity("Network", "Network", 1.0)
         val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
