@@ -22,6 +22,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
@@ -262,6 +263,48 @@ class EdgeToEdgeHandler @Inject constructor() {
         ViewCompat.requestApplyInsets(view)
     }
 
+    /**
+     * Installs a navigation-bar scrim: a view sized to the bottom (tappable) navigation inset and filled with
+     * [scrimColor], added over the content so it renders behind the transparent navigation bar.
+     *
+     * Use for a surface whose own background does not reliably reach behind the navigation bar in every state —
+     * e.g. a collapsible/draggable BottomSheetDialog, whose sheet surface only extends behind the bar while it is
+     * settled expanded. The caller must already pad its content clear of the navigation bar (e.g. via
+     * applyBottomSystemBarInsetPadding) so the scrim only repaints the otherwise-empty strip; where the surface
+     * does cover the strip the scrim sits on top in the identical colour and is seamless. Idempotent per window;
+     * no scrim under gesture navigation (the tappable-element inset is 0 there), so the surface stays edge-to-edge
+     * behind the gesture pill.
+     *
+     * Unlike the status-bar scrim, the colour is passed in rather than resolved from a framework attr: the
+     * navigation-bar colour is transparent under the edge-to-edge themes, and `common-utils` can't reference the
+     * design-system surface attr.
+     *
+     * @param anchor Any view attached to the target window; its window content frame hosts the scrim.
+     * @param scrimColor The colour painted behind the navigation bar (typically the surface colour).
+     */
+    fun applyNavigationBarScrim(anchor: View, @ColorInt scrimColor: Int) {
+        val contentRoot = anchor.rootView?.findViewById<ViewGroup>(android.R.id.content) ?: return
+        if (contentRoot.findViewWithTag<View>(NAVIGATION_BAR_SCRIM_TAG) != null) return
+
+        val scrim = View(anchor.context).apply {
+            tag = NAVIGATION_BAR_SCRIM_TAG
+            setBackgroundColor(scrimColor)
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.BOTTOM)
+        }
+        contentRoot.addView(scrim)
+
+        ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
+            // tappableElement (not navigationBars): the button-bar height under 2/3-button navigation, but 0 under
+            // gesture navigation — so no scrim is painted there and the surface stays edge-to-edge behind the pill.
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.tappableElement()).bottom
+            if (v.layoutParams.height != bottom) {
+                v.updateLayoutParams { height = bottom }
+            }
+            insets
+        }
+        ViewCompat.requestApplyInsets(scrim)
+    }
+
     private fun View.applyInsets(apply: (WindowInsetsCompat) -> Unit) {
         ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
             apply(insets)
@@ -318,5 +361,6 @@ class EdgeToEdgeHandler @Inject constructor() {
 
     companion object {
         private const val STATUS_BAR_SCRIM_TAG = "edge_to_edge_status_bar_scrim"
+        private const val NAVIGATION_BAR_SCRIM_TAG = "edge_to_edge_navigation_bar_scrim"
     }
 }

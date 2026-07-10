@@ -40,6 +40,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.applyTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.store.AppComponentsPrefsDataStore
@@ -147,6 +148,7 @@ class AppComponentsActivity : AppCompatActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(findViewById<View>(R.id.app_components_root))
         edgeToEdgeHandler.applyStatusBarInsets(findViewById<View>(R.id.app_bar_layout))
+        findViewById<View>(R.id.view_pager).applyBottomSystemBarInsetPadding()
         installNavigationBarScrim()
     }
 

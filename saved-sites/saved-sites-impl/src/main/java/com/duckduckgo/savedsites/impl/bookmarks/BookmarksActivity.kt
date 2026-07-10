@@ -486,6 +486,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     }
                 },
             )
+            .setEdgeToEdgeEnabled(edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
         faviconPrompt.show()
     }
 
