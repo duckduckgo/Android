@@ -34,8 +34,6 @@ class RealNewDownloadState @Inject constructor(
     sharedPreferencesProvider: SharedPreferencesProvider,
 ) : NewDownloadState {
 
-    // No migration from the previous SettingsDataStore-backed flag: it is a single self-correcting
-    // boolean, so on upgrade it simply defaults to false and is set again on the next completed download.
     private val preferences: SharedPreferences =
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false)
 
