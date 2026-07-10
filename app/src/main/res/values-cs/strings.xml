@@ -880,7 +880,6 @@
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
     <string name="preOnboardingAddressBarOkButton">Další</string>
@@ -943,7 +942,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 
@@ -1069,7 +1067,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 

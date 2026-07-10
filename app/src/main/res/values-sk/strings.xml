@@ -880,7 +880,6 @@
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
@@ -943,7 +942,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
 
@@ -1069,7 +1067,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
     <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
 

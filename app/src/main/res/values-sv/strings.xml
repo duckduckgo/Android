@@ -844,7 +844,6 @@
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
@@ -903,7 +902,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vill du ha enkel tillgång till privat AI-chatt?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 
@@ -1029,7 +1027,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hej!</string>
     <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare\nsom ger dig kontroll?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och integritetsskydd är alltid på.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
 

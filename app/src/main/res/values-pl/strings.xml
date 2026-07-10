@@ -880,7 +880,6 @@
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
@@ -943,7 +942,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
 
@@ -1069,7 +1067,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Cześć!</string>
     <string name="preOnboardingWelcomeDialogBody1">Chcesz skorzystać z szybszej przeglądarki, która daje Ci kontrolę?</string>
     <string name="preOnboardingWelcomeDialogBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d z %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
 
