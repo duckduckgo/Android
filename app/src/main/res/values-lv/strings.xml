@@ -862,6 +862,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
+    <string name="preOnboardingComparisonChartDuckAi">Izmanto ChatGPT privāti ar iebūvēto Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloķē mērķētās reklāmas un sīkfailu uznirstošos logus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Atskaņo YouTube videoklipus bez reklāmām</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
@@ -922,6 +925,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vai vēlies ērti piekļūt privātai mākslīgā intelekta tērzēšanai adreses joslā?</string>
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
