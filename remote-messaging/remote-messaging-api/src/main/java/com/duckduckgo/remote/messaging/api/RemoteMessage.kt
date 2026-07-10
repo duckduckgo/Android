@@ -202,7 +202,7 @@ sealed class CardItem {
         override val titleText: String,
         val descriptionText: String,
         val placeholder: Placeholder,
-        val primaryAction: Action,
+        val primaryAction: Action?,
         val primaryActionText: String = "",
         val matchingRules: List<Int>,
         val exclusionRules: List<Int>,
