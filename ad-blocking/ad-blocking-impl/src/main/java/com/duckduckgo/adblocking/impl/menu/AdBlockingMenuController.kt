@@ -39,6 +39,11 @@ interface AdBlockingMenuController {
      * Applies the user's selection to the persisted setting and/or the session override.
      */
     fun onChoiceSelected(choice: AdBlockingChoice)
+
+    /**
+     * Enables ad blocking directly, without showing the choice sheet.
+     */
+    fun enable()
 }
 
 @ContributesBinding(AppScope::class)
@@ -71,4 +76,6 @@ class RealAdBlockingMenuController @Inject constructor(
             }
         }
     }
+
+    override fun enable() = onChoiceSelected(AdBlockingChoice.ALWAYS_ON)
 }

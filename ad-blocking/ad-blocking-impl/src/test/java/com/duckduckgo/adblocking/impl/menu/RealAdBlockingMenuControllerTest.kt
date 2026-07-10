@@ -117,4 +117,14 @@ class RealAdBlockingMenuControllerTest {
         assertEquals(false, userEnabledFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
+
+    @Test
+    fun whenEnableThenPersistsEnabledAndClearsSession() = runTest {
+        sessionStore.setDisabledUntilRelaunch()
+
+        controller.enable()
+
+        assertEquals(true, userEnabledFlow.value)
+        assertFalse(sessionStore.isDisabledUntilRelaunch())
+    }
 }

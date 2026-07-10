@@ -64,6 +64,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     private var url: Uri? = null
     private var onHostClick: (() -> Unit)? = null
     private var scope: CoroutineScope? = null
+    private var menuState: AdBlockingMenuState = AdBlockingMenuState.Hidden
 
     init {
         orientation = VERTICAL
@@ -81,7 +82,10 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
 
         val url = this.url ?: return
         menuItem.setOnClickListener {
-            showMenuBottomSheet()
+            when (menuState) {
+                AdBlockingMenuState.Disabled -> menuController.enable()
+                else -> showMenuBottomSheet()
+            }
             onHostClick?.invoke()
         }
 
@@ -111,6 +115,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     }
 
     private fun render(state: AdBlockingMenuState) {
+        this.menuState = state
         when (state) {
             AdBlockingMenuState.Hidden -> isGone = true
             AdBlockingMenuState.Enabled -> {
