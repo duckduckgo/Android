@@ -650,6 +650,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun removeWidget(): Boolean {
+        animator.cancelAnimation()
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
             rootView.removeView(it)
@@ -869,6 +870,7 @@ class RealNativeInputManager @Inject constructor(
         val widget = widgetRoot ?: return
         if (!shouldAnimateNavBar(navBarShown, show)) return
         navBarShown = show
+        val navBarInset = if (show) navBarHeightPx else 0
         animator.animateNavBarVisibility(
             navBarView = navBar,
             widgetView = widget,
@@ -876,8 +878,12 @@ class RealNativeInputManager @Inject constructor(
             heightPx = navBarHeightPx,
             show = show,
             animate = animate,
+            // Re-apply after the slide settles so the top-mode "show" case (widget rides down to its
+            // final position) recomputes the offset from where the widget actually lands.
+            onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
         )
-        layoutCoordinator.configureContentOffset(widget, navBarIsBottom, navBarInsetPx = if (show) navBarHeightPx else 0)
+        // Apply immediately too, so the inset tracks the toggle without waiting for the animation.
+        layoutCoordinator.updateNavBarInset(navBarInset)
     }
 
     private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {

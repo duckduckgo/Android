@@ -48,6 +48,9 @@ class NativeInputLayoutCoordinator(
      */
     private var isWidgetAnimating: Boolean = false
 
+    private var navBarInsetPx: Int = 0
+    private var reapplyContentOffset: (() -> Unit)? = null
+
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -176,6 +179,7 @@ class NativeInputLayoutCoordinator(
     }
 
     fun configureContentOffset(widgetView: View, isBottom: Boolean, navBarInsetPx: Int = 0) {
+        this.navBarInsetPx = navBarInsetPx
         data class Target(val view: View, val basePadding: Padding)
 
         val newTabContent =
@@ -253,7 +257,7 @@ class NativeInputLayoutCoordinator(
             } else {
                 0
             }
-            return contentTopInset(isBottom, logoOnly, navBarInsetPx, widgetTopOffsetPx)
+            return contentTopInset(isBottom, logoOnly, this@NativeInputLayoutCoordinator.navBarInsetPx, widgetTopOffsetPx)
         }
 
         fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
@@ -300,6 +304,7 @@ class NativeInputLayoutCoordinator(
             applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
+        reapplyContentOffset = { applyOffset() }
         widgetView.post { applyOffset() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -329,6 +334,7 @@ class NativeInputLayoutCoordinator(
                     ntpGroup?.layoutTransition = previousNtpTransition
                     pendingContentLayoutTransition = null
                     widgetAnimationFrameHandler = null
+                    reapplyContentOffset = null
                     isWidgetAnimating = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
@@ -340,6 +346,15 @@ class NativeInputLayoutCoordinator(
                 }
             },
         )
+    }
+
+    /**
+     * Updates the nav bar top-inset used by the (already-registered) content-offset listeners and
+     * re-applies immediately. Cheap: no new listeners — unlike re-calling [configureContentOffset].
+     */
+    fun updateNavBarInset(px: Int) {
+        navBarInsetPx = px
+        reapplyContentOffset?.invoke()
     }
 
     fun onWidgetAnimationFrame(card: View) {
