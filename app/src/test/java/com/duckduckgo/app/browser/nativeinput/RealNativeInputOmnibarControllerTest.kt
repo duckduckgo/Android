@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -50,6 +51,8 @@ class RealNativeInputOmnibarControllerTest {
 
     private val aiTitle = TextView(context).apply { id = R.id.aiTitle }
     private val duckAIFreePill = View(context).apply { id = R.id.duckAIFreePill }
+    private val duckAIFreePillUpgrade = View(context).apply { id = R.id.duckAIFreePillUpgrade }
+    private val duckAIFreePillChevron = View(context).apply { id = R.id.duckAIFreePillChevron }
 
     private val omnibarView = object : FrameLayout(context), OmnibarView by mock() {}.apply {
         addView(fireIconMenu)
@@ -58,6 +61,8 @@ class RealNativeInputOmnibarControllerTest {
         addView(browserMenu)
         addView(aiTitle)
         addView(duckAIFreePill)
+        addView(duckAIFreePillUpgrade)
+        addView(duckAIFreePillChevron)
     }
 
     @Test
@@ -108,6 +113,21 @@ class RealNativeInputOmnibarControllerTest {
         testee.hideBackground()
 
         assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenOverlayActiveAndTierFreeNoUpgradeThenPillShownButUpgradeAffordanceHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        testee.updateTierTitle(DuckAiTier.FreeNoUpgrade) {}
+
+        testee.hideBackground()
+
+        // The "Free Plan" pill stays visible, but the upgrade CTA/chevron are gone and it isn't tappable.
+        assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+        assertEquals(View.GONE, duckAIFreePillUpgrade.visibility)
+        assertEquals(View.GONE, duckAIFreePillChevron.visibility)
+        assertEquals(View.GONE, aiTitle.visibility)
+        assertFalse(duckAIFreePill.isClickable)
     }
 
     @Test

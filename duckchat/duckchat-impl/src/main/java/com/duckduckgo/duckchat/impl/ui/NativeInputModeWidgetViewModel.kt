@@ -371,6 +371,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }
 
+    val isSubscriptionEligible: Flow<Boolean> = modelManager.modelState
+        .map { it.isSubscriptionEligible }
+        .distinctUntilChanged()
+
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
     val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()

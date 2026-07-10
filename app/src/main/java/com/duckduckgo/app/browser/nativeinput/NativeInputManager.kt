@@ -675,8 +675,12 @@ class RealNativeInputManager @Inject constructor(
                 onCameraCaptureRequested = callbacks.onCameraCaptureRequested,
                 onFilePickerRequested = callbacks.onFilePickerRequested,
             )
-            onPaidTierChanged = { isPaid ->
-                val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
+            onPaidTierChanged = { isPaid, isSubscriptionEligible ->
+                val tier = when {
+                    isPaid -> DuckAiTier.Paid
+                    isSubscriptionEligible -> DuckAiTier.Free
+                    else -> DuckAiTier.FreeNoUpgrade
+                }
                 omnibarController.updateTierTitle(tier) {
                     fireChatHeaderUpgradeTapped(tier)
                     launchPurchase()

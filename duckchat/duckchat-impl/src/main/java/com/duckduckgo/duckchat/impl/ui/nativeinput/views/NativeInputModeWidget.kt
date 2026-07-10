@@ -97,7 +97,7 @@ interface NativeInputWidget {
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
-    var onPaidTierChanged: ((Boolean) -> Unit)?
+    var onPaidTierChanged: ((isPaid: Boolean, isSubscriptionEligible: Boolean) -> Unit)?
     var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
@@ -307,7 +307,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         onVoiceSearchClick?.invoke()
     }
-    override var onPaidTierChanged: ((Boolean) -> Unit)? = null
+    override var onPaidTierChanged: ((isPaid: Boolean, isSubscriptionEligible: Boolean) -> Unit)? = null
         set(value) {
             field = value
             if (value != null && isAttachedToWindow) observeTier()
@@ -1421,8 +1421,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeTier() {
         tierJob?.cancel()
-        tierJob = viewModel.isPaidTier
-            .onEach { hasDuckAiPlus -> onPaidTierChanged?.invoke(hasDuckAiPlus) }
+        tierJob = combine(viewModel.isPaidTier, viewModel.isSubscriptionEligible) { isPaid, isEligible ->
+            isPaid to isEligible
+        }
+            .onEach { (isPaid, isEligible) -> onPaidTierChanged?.invoke(isPaid, isEligible) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
