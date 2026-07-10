@@ -126,11 +126,14 @@ class TrackerDetectorImpl @Inject constructor(
         isDocumentInAllowedList: Boolean,
         entity: Entity?,
     ): TrackingEvent {
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
         val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
         val isATrackerAllowed = result.isATracker && !result.matches
-        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
+        val shouldBlock = result.matches &&
+            !sameEntity &&
+            !isInTrackerAllowList &&
+            !isInAdClickAllowList &&
+            !contentBlocking.isAnException(documentUrlString)
 
         val status = when {
             sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
