@@ -440,29 +440,19 @@ class WebViewRequestInterceptor(
         documentUrl: Uri?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
-    ): TrackingEvent? {
-        val url = request.url
-        if (request.isForMainFrame || documentUrl == null) {
-            return null
-        }
-
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
-        webViewClientListener?.trackerDetected(trackingEvent)
-        return trackingEvent
-    }
-
-    private fun trackingEvent(
-        request: WebResourceRequest,
-        documentUrl: Uri?,
-        webViewClientListener: WebViewClientListener?,
-        checkFirstParty: Boolean = true,
-        url: String = request.url.toString(),
+        uncloakedHost: String? = null,
     ): TrackingEvent? {
         if (request.isForMainFrame || documentUrl == null) {
             return null
         }
 
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
+        // When a CNAME-cloaked host has been uncloaked, evaluate that host (String overload);
+        // otherwise evaluate the request URL directly (Uri overload).
+        val trackingEvent = if (uncloakedHost != null) {
+            trackerDetector.evaluate(uncloakedHost, documentUrl, checkFirstParty, request.requestHeaders)
+        } else {
+            trackerDetector.evaluate(request.url, documentUrl, checkFirstParty, request.requestHeaders)
+        } ?: return null
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent
     }
