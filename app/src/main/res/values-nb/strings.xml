@@ -1076,5 +1076,6 @@
     <string name="fireTabsNewTabButton">Ny Fire-fane</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYHET!</b> Prøv Fire-faner for å surfe uten å lagre lokal historikk.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Vil du slette Fire-faner og dataene i dem?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åpne filen. Se etter kompatibel app.</string>
 </resources>

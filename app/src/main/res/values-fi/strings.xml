@@ -1076,5 +1076,6 @@
     <string name="fireTabsNewTabButton">Uusi Fire-välilehti</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUTTA!</b> Kokeile Fire-välilehtiä selataksesi ilman paikallisen historian tallentamista.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Poistetaanko Fire-välilehdet ja niiden tiedot?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Tiedoston avaaminen ei onnistu. Tarkista yhteensopiva sovellus.</string>
 </resources>

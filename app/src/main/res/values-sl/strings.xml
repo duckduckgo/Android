@@ -1116,5 +1116,6 @@
     <string name="fireTabsNewTabButton">Nov zavihek Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Preizkusite zavihke Fire za brskanje brez shranjevanja lokalne zgodovine.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Želite izbrisati zavihke Fire in njihove podatke?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
 </resources>
