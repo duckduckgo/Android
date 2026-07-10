@@ -747,7 +747,6 @@ class BrowserTabViewModel @Inject constructor(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private var adBlockingAnimationClaimed = false
-    private var isPageLoading = false
     private var pendingAdBlockingAnimation: Command.StartAdBlockingAnimation? = null
     private var adBlockingAnimationJob: Job? = null
     private val browserStateModifier = BrowserStateModifier()
@@ -2123,23 +2122,35 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    private suspend fun handleAdBlockingAnimation(animation: AdBlockingAnimation) {
-        when (animation) {
-            is AdBlockingAnimation.Show -> {
-                adBlockingAnimationClaimed = true
-                val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
-                if (isPageLoading) {
-                    pendingAdBlockingAnimation = badge
-                } else {
-                    delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
-                    if (!adBlockingAnimationClaimed) return
-                    command.value = badge
-                }
+    private suspend fun handleAdBlockingAnimation(
+        animation: AdBlockingAnimation,
+        isPageLoad: Boolean,
+        pageAlreadyLoaded: Boolean,
+    ) {
+        if (animation !is AdBlockingAnimation.Show) return
+        // Claim exclusivity now so trackers/cookies triggered during the load are suppressed.
+        adBlockingAnimationClaimed = true
+        val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
+        when {
+            // Full document load still in progress: defer until it reaches 100% (see progressChanged).
+            isPageLoad && !pageAlreadyLoaded -> pendingAdBlockingAnimation = badge
+            // Load already finished before this ran (progress reached 100 before pageChanged): show now.
+            isPageLoad -> emitAdBlockingBadge(badge)
+            // SPA navigation has no document load to defer against; a short delay stops it popping instantly.
+            else -> {
+                delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
+                emitAdBlockingBadge(badge)
             }
+        }
+    }
 
-            AdBlockingAnimation.Skip -> {
-                // Leave trackers/cookies to animate as usual.
-            }
+    private fun emitAdBlockingBadge(badge: Command.StartAdBlockingAnimation) {
+        if (currentOmnibarViewState().isEditing) {
+            // Omnibar is focused, so the badge can't animate; release the claim so trackers/cookies aren't
+            // suppressed for the rest of the page.
+            adBlockingAnimationClaimed = false
+        } else {
+            command.value = badge
         }
     }
 
@@ -2149,13 +2160,19 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
         // Reset before fanning out so a fresh ad-blocking claim for this navigation isn't cleared.
-        // The badge is deferred until this document load reaches 100% (see progressChanged).
+        // The badge is deferred until this document load reaches 100% (see progressChanged), unless the
+        // load already completed before this ran — pageChanged is dispatched async and can arrive after
+        // progressChanged(100), so capture completion now to still show the badge in that race.
         adBlockingAnimationClaimed = false
         pendingAdBlockingAnimation = null
-        isPageLoading = true
+        val pageAlreadyLoaded = hasCompletedPageLoad
         adBlockingAnimationJob?.cancel()
         adBlockingAnimationJob = viewModelScope.launch {
-            handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true))
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true),
+                isPageLoad = true,
+                pageAlreadyLoaded = pageAlreadyLoaded,
+            )
         }
         cleanupBlobDownloadReplyProxyMaps(url)
 
@@ -2407,7 +2424,11 @@ class BrowserTabViewModel @Inject constructor(
         pendingAdBlockingAnimation = null
         adBlockingAnimationJob?.cancel()
         adBlockingAnimationJob = viewModelScope.launch {
-            handleAdBlockingAnimation(adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false))
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
+                isPageLoad = false,
+                pageAlreadyLoaded = false,
+            )
         }
         site?.url = url
         onSiteChanged()
@@ -2514,9 +2535,8 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().browserShowing) return
 
         if (newProgress == 100) {
-            isPageLoading = false
             pendingAdBlockingAnimation?.let {
-                command.value = it
+                emitAdBlockingBadge(it)
                 pendingAdBlockingAnimation = null
             }
         }

@@ -9948,6 +9948,69 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSpaNavigationAndOmnibarNotFocusedThenAdBlockingBadgeShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenSpaNavigationAndOmnibarFocusedThenBadgeSkippedAndClaimReleased() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // Claim was released because the badge could not animate, so trackers can still animate.
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenSpaNavigationSupersededByAnotherThenOnlyLatestBadgeShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=a")
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=b")
+        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+
+        assertCommandIssuedTimes<Command.StartAdBlockingAnimation>(1)
+    }
+
+    @Test
+    fun whenPageLoadAndOmnibarNotFocusedThenAdBlockingBadgeShownWhenProgressReaches100() = runTest {
+        givenAdBlockingBadgeWillShow()
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        // Full-page badge is deferred until the document load completes.
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadCompletesBeforePageChangedThenAdBlockingBadgeStillShown() = runTest {
+        givenAdBlockingBadgeWillShow()
+        setBrowserShowing(true)
+
+        // Simulate the race: progress reaches 100 before the (async) pageChanged runs.
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
@@ -10331,6 +10394,12 @@ class BrowserTabViewModelTest {
     )
 
     private fun omnibarViewState() = testee.omnibarViewState.value!!
+
+    private fun givenAdBlockingBadgeWillShow() {
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+    }
 
     private fun loadingViewState() = testee.loadingViewState.value!!
 

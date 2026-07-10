@@ -2114,13 +2114,15 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenAdBlockingAnimationStartedAndFocusedThenNoAdBlockingCommandSent() = runTest {
+    fun whenAdBlockingAnimationStartedAndFocusedThenStartAdBlockingAnimationCommandStillSent() = runTest {
+        // The omnibar no longer gates the ad-blocking badge on focus: BrowserTabViewModel is the single
+        // focus authority and only emits this decoration when the omnibar is unfocused.
         testee.onOmnibarFocusChanged(true, "query")
 
         testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
 
         testee.commands().test {
-            assertFalse(expectMostRecentItem() is Command.StartAdBlockingAnimation)
+            expectMostRecentItem().assertCommand(Command.StartAdBlockingAnimation::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

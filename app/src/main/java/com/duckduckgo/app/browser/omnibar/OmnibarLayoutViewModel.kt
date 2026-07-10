@@ -1123,16 +1123,15 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             is LaunchAdBlockingAnimation -> {
-                val hasFocus = _viewState.value.hasFocus
-                if (!hasFocus) {
-                    _viewState.update {
-                        it.copy(
-                            leadingIconState = PrivacyShield,
-                        )
-                    }
-                    viewModelScope.launch {
-                        command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
-                    }
+                // No focus gate here: BrowserTabViewModel only emits this when the omnibar is unfocused,
+                // so it is the single source of truth (a second gate could leave its exclusivity claim stuck).
+                _viewState.update {
+                    it.copy(
+                        leadingIconState = PrivacyShield,
+                    )
+                }
+                viewModelScope.launch {
+                    command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
                 }
             }
 
