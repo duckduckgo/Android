@@ -2040,6 +2040,9 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 logcat { "WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
+                // Drop any prior page's deferred badge synchronously, before a progressChanged(100) for this
+                // navigation can flush it (pageChanged below runs async and would reset too late).
+                resetAdBlockingAnimationState()
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2066,6 +2069,8 @@ class BrowserTabViewModel @Inject constructor(
 
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
+                // Drop any prior page's deferred badge synchronously (see NewPage above).
+                resetAdBlockingAnimationState()
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2134,14 +2139,15 @@ class BrowserTabViewModel @Inject constructor(
         when {
             // Full document load still in progress: defer until it reaches 100% (see progressChanged).
             isPageLoad && !pageAlreadyLoaded -> pendingAdBlockingAnimation = badge
-            // Load already finished before this ran (progress reached 100 before pageChanged): show now.
-            isPageLoad -> command.value = badge
-            // SPA navigation has no document load to defer against; a short delay stops it popping instantly.
-            else -> {
-                delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
-                command.value = badge
-            }
+            // Already-loaded page load, or an SPA navigation (already debounced by urlUpdated): show now.
+            else -> command.value = badge
         }
+    }
+
+    private fun resetAdBlockingAnimationState() {
+        adBlockingAnimationClaimed = false
+        pendingAdBlockingAnimation = null
+        adBlockingAnimationJob?.cancel()
     }
 
     fun onAdBlockingAnimationSuppressed() {
@@ -2154,14 +2160,11 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
-        // Reset before fanning out so a fresh ad-blocking claim for this navigation isn't cleared.
         // The badge is deferred until this document load reaches 100% (see progressChanged), unless the
         // load already completed before this ran — pageChanged is dispatched async and can arrive after
         // progressChanged(100), so capture completion now to still show the badge in that race.
-        adBlockingAnimationClaimed = false
-        pendingAdBlockingAnimation = null
+        resetAdBlockingAnimationState()
         val pageAlreadyLoaded = hasCompletedPageLoad
-        adBlockingAnimationJob?.cancel()
         adBlockingAnimationJob = viewModelScope.launch {
             handleAdBlockingAnimation(
                 adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true),
@@ -2414,11 +2417,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
-        // SPA url change: the page is already loaded, so the badge (if any) shows immediately.
-        adBlockingAnimationClaimed = false
-        pendingAdBlockingAnimation = null
-        adBlockingAnimationJob?.cancel()
+        // SPA url change: the page is already loaded. Debounce before deciding so rapid same-video url
+        // updates (e.g. /watch?v=B then /watch?v=B&t=…) collapse into a single decision — otherwise the
+        // first decision advances the dedup state and the superseding update skips the badge entirely.
+        resetAdBlockingAnimationState()
         adBlockingAnimationJob = viewModelScope.launch {
+            delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
             handleAdBlockingAnimation(
                 adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
                 isPageLoad = false,

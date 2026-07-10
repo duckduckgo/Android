@@ -405,6 +405,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -9985,6 +9986,43 @@ class BrowserTabViewModelTest {
         advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
 
         assertCommandIssuedTimes<Command.StartAdBlockingAnimation>(1)
+    }
+
+    @Test
+    fun whenSpaNavigationsFireRapidlyThenAnimationDecidedOnlyForSettledUrl() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+        val superseded = "https://www.youtube.com/watch?v=a"
+        val settled = "https://www.youtube.com/watch?v=b"
+
+        testee.onHistoryUrlChanged(superseded)
+        testee.onHistoryUrlChanged(settled)
+        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+
+        // The superseded url must never reach getAnimation, otherwise it would advance the dedup state and
+        // the settled url would be skipped.
+        verifyBlocking(mockAdBlockingOmnibarAnimationProvider, never()) { getAnimation(eq(superseded), any()) }
+        verifyBlocking(mockAdBlockingOmnibarAnimationProvider) { getAnimation(eq(settled), eq(false)) }
+        assertCommandIssuedTimes<Command.StartAdBlockingAnimation>(1)
+    }
+
+    @Test
+    fun whenNavigatingAwayBeforeDeferredBadgeShownThenStaleBadgeNotShownOnNewPage() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val nonVideo = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+
+        loadUrl(video) // full-page load: badge deferred until progress reaches 100
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // Navigate to a non-video page (NewPage); its load completing must not flush the stale video badge.
+        testee.navigationStateChanged(buildWebNavigation(currentUrl = nonVideo, originalUrl = nonVideo))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
     }
 
     @Test
