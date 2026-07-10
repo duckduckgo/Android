@@ -169,6 +169,7 @@ interface NativeInputWidget {
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
+        onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit = {},
     )
 
     fun bindTabCount(
@@ -1226,6 +1227,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
+        onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit,
     ) {
         this.onSearchTextChanged = onSearchTextChanged
         this.onSearchSelected = { _ ->
@@ -1233,6 +1235,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         this.onSearchSent = onSearchSubmitted
         this.onChatSent = onChatSubmitted
+        this.onInputTextEmptyChanged = onInputTextEmptyChanged
     }
 
     override fun bindTabCount(
