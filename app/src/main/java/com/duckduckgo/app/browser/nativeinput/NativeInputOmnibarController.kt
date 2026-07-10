@@ -40,6 +40,7 @@ import com.google.android.material.card.MaterialCardView
 
 sealed class DuckAiTier {
     data object Free : DuckAiTier()
+    data object FreeNoUpgrade : DuckAiTier()
     data object Paid : DuckAiTier()
     data object Unknown : DuckAiTier()
 }
@@ -179,6 +180,8 @@ class RealNativeInputOmnibarController(
     private fun applyTierText(omnibarView: View) {
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
+        val freePillUpgrade = omnibarView.findViewById<View?>(R.id.duckAIFreePillUpgrade)
+        val freePillChevron = omnibarView.findViewById<View?>(R.id.duckAIFreePillChevron)
         if (!tierVisible) {
             aiTitle?.gone()
             freePill?.gone()
@@ -194,7 +197,18 @@ class RealNativeInputOmnibarController(
             is DuckAiTier.Free -> {
                 aiTitle?.gone()
                 freePill?.show()
+                freePillUpgrade?.show()
+                freePillChevron?.show()
+                freePill?.isClickable = true
                 freePill?.setOnClickListener { currentUpgradeClick?.invoke() }
+            }
+            is DuckAiTier.FreeNoUpgrade -> {
+                aiTitle?.gone()
+                freePill?.show()
+                freePillUpgrade?.gone()
+                freePillChevron?.gone()
+                freePill?.setOnClickListener(null)
+                freePill?.isClickable = false
             }
             is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
                 freePill?.gone()
