@@ -42,17 +42,17 @@
         app:tint="?attr/daxColorPrimaryIcon" />
 
     <FrameLayout
-        android:id="@+id/inputFieldFireButton"
+        android:id="@+id/inputModeWidgetNavFire"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/duckChatFireButtonContentDescription"
-        app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
+        app:layout_constraintEnd_toStartOf="@id/inputModeWidgetNavTabs"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/fireIconImageView"
+            android:id="@+id/inputModeWidgetNavFireIcon"
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
@@ -62,15 +62,15 @@
     </FrameLayout>
 
     <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
-        android:id="@+id/inputFieldTabsMenu"
+        android:id="@+id/inputModeWidgetNavTabs"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
-        app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
+        app:layout_constraintEnd_toStartOf="@id/inputModeWidgetNavMenu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/inputFieldBrowserMenu"
+        android:id="@+id/inputModeWidgetNavMenu"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         android:background="@drawable/selectable_item_rounded_corner_background"
@@ -80,7 +80,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/browserMenuImageView"
+            android:id="@+id/inputModeWidgetNavMenuIcon"
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
@@ -89,7 +89,7 @@
             android:src="@drawable/ic_menu_hamburger_24" />
 
         <View
-            android:id="@+id/browserMenuHighlight"
+            android:id="@+id/inputModeWidgetNavMenuHighlight"
             android:layout_width="7dp"
             android:layout_height="7dp"
             android:layout_gravity="end"

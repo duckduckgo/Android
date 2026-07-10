@@ -702,11 +702,10 @@ class RealNativeInputManager @Inject constructor(
     ) {
         bindInputModeNavBar(
             navBarView = navBarView,
-            // Matches the widget's Back handler: drop input focus so the IME hide sticks, then close.
-            onBack = {
-                widgetFrom(widgetView)?.clearInputFocus()
-                hideNativeInput()
-            },
+            // Route through the widget's Back handler so it drops focus (IME hide sticks), closes, and
+            // fires the same back-button pixel — telemetry stays consistent whether the user taps this
+            // nav bar back (empty field) or the toggle-row back (with text).
+            onBack = { widgetFrom(widgetView)?.onBackPressed() },
             onFire = callbacks.onFireButtonPressed,
             onTabs = callbacks.onTabSwitcherPressed,
             onBrowserMenu = callbacks.onBrowserMenuPressed,
@@ -724,7 +723,7 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
     ) {
-        val tabsButton = navBarView.findViewById<TabSwitcherButton?>(R.id.inputFieldTabsMenu) ?: return
+        val tabsButton = navBarView.findViewById<TabSwitcherButton?>(R.id.inputModeWidgetNavTabs) ?: return
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         val tabCount = tabs.map { it.size }
         val observer = Observer<Int> { count -> tabsButton.count = count }
@@ -1133,9 +1132,9 @@ internal fun bindInputModeNavBar(
     onBrowserMenu: () -> Unit,
 ) {
     navBarView.findViewById<View?>(R.id.inputModeWidgetNavBack)?.setOnClickListener { onBack() }
-    navBarView.findViewById<View?>(R.id.inputFieldFireButton)?.setOnClickListener { onFire() }
-    navBarView.findViewById<View?>(R.id.inputFieldTabsMenu)?.setOnClickListener { onTabs() }
-    navBarView.findViewById<View?>(R.id.inputFieldBrowserMenu)?.setOnClickListener { onBrowserMenu() }
+    navBarView.findViewById<View?>(R.id.inputModeWidgetNavFire)?.setOnClickListener { onFire() }
+    navBarView.findViewById<View?>(R.id.inputModeWidgetNavTabs)?.setOnClickListener { onTabs() }
+    navBarView.findViewById<View?>(R.id.inputModeWidgetNavMenu)?.setOnClickListener { onBrowserMenu() }
 }
 
 internal data class VoiceButtonAvailability(

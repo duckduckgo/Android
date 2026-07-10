@@ -46,9 +46,9 @@ class InputModeNavBarBinderTest {
 
     private fun navBarWithAllButtons(): View = FrameLayout(context).apply {
         addView(View(context).apply { id = R.id.inputModeWidgetNavBack })
-        addView(View(context).apply { id = R.id.inputFieldFireButton })
-        addView(View(context).apply { id = R.id.inputFieldTabsMenu })
-        addView(View(context).apply { id = R.id.inputFieldBrowserMenu })
+        addView(View(context).apply { id = R.id.inputModeWidgetNavFire })
+        addView(View(context).apply { id = R.id.inputModeWidgetNavTabs })
+        addView(View(context).apply { id = R.id.inputModeWidgetNavMenu })
     }
 
     @Test
@@ -69,7 +69,7 @@ class InputModeNavBarBinderTest {
         val navBar = navBarWithAllButtons()
         bind(navBar)
 
-        navBar.findViewById<View>(R.id.inputFieldFireButton).performClick()
+        navBar.findViewById<View>(R.id.inputModeWidgetNavFire).performClick()
 
         assertEquals(0, back)
         assertEquals(1, fire)
@@ -82,7 +82,7 @@ class InputModeNavBarBinderTest {
         val navBar = navBarWithAllButtons()
         bind(navBar)
 
-        navBar.findViewById<View>(R.id.inputFieldTabsMenu).performClick()
+        navBar.findViewById<View>(R.id.inputModeWidgetNavTabs).performClick()
 
         assertEquals(0, back)
         assertEquals(0, fire)
@@ -95,7 +95,7 @@ class InputModeNavBarBinderTest {
         val navBar = navBarWithAllButtons()
         bind(navBar)
 
-        navBar.findViewById<View>(R.id.inputFieldBrowserMenu).performClick()
+        navBar.findViewById<View>(R.id.inputModeWidgetNavMenu).performClick()
 
         assertEquals(0, back)
         assertEquals(0, fire)
