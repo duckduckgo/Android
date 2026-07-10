@@ -880,6 +880,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
+    <string name="preOnboardingComparisonChartDuckAi">Koristi ChatGPT privatno s ugrađenim Duck.ai-jem</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokiraj ciljane oglase i skočne prozore kolačića</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Reproduciraj YouTube videozapise bez oglasa</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
@@ -942,6 +945,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Želiš li jednostavan pristup privatnom AI čavrljanju u adresnoj traci?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 
