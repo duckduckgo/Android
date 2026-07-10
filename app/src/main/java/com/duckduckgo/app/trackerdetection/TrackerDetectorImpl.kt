@@ -52,11 +52,19 @@ class TrackerDetectorImpl @Inject constructor(
     private val clients = CopyOnWriteArrayList<Client>()
 
     /**
+     * We're only interested in [BLOCKING] clients. Recomputed only when [addClient] runs. Evaluation reads
+     * this directly instead of filtering [clients] on every request.
+     */
+    @Volatile
+    private var blockingClients: List<Client> = emptyList()
+
+    /**
      * Adds a new client. If the client's name matches an existing client, old client is replaced
      */
     override fun addClient(client: Client) {
         clients.removeAll { client.name == it.name }
         clients.add(client)
+        blockingClients = clients.filter { it.name.type == BLOCKING }
     }
 
     override fun evaluate(
@@ -74,8 +82,7 @@ class TrackerDetectorImpl @Inject constructor(
             return null
         }
 
-        val result = clients
-            .filter { it.name.type == BLOCKING }
+        val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
         val sameEntity = sameNetworkName(url, documentUrl)
@@ -99,8 +106,7 @@ class TrackerDetectorImpl @Inject constructor(
             return null
         }
 
-        val result = clients
-            .filter { it.name.type == BLOCKING }
+        val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
         val sameEntity = sameNetworkName(documentUrl, url)
