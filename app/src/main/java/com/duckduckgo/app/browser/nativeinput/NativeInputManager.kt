@@ -1126,3 +1126,18 @@ internal fun computeVoiceButtonAvailability(
         voiceChatAvailable = isDuckAiTabSelected && isVoiceChatEntryEnabled,
     )
 }
+
+/**
+ * The persistent input-mode nav bar is shown only for browser input and only while the input field
+ * is empty (whitespace counts as text). Duck.ai and contextual input never show it.
+ */
+internal fun shouldShowNavBar(isBrowserContext: Boolean, isInputEmpty: Boolean): Boolean =
+    isBrowserContext && isInputEmpty
+
+/**
+ * Whether a visibility change is needed. [currentShown] is null before the first apply, which always
+ * applies (snaps to the resting state); otherwise apply only when the target differs — this makes
+ * repeated same-state callbacks (e.g. the prefill-driven emptiness callback) no-ops.
+ */
+internal fun shouldAnimateNavBar(currentShown: Boolean?, targetShown: Boolean): Boolean =
+    currentShown != targetShown
