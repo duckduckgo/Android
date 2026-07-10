@@ -76,7 +76,7 @@ class TrackerDetectorImpl @Inject constructor(
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
@@ -101,7 +101,7 @@ class TrackerDetectorImpl @Inject constructor(
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
         val sameEntity = sameNetworkName(documentUrl, url)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)

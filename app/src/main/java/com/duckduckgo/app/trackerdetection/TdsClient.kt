@@ -61,7 +61,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val compiled = findCompiledTracker(host(url)) ?: return Client.Result(matches = false, isATracker = false)
+        val compiled = findCompiledTracker(host(url)) ?: return Client.Result.NO_MATCH
         val matches = matchesTrackerEntry(compiled, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -77,7 +77,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val compiled = findCompiledTracker(url.host) ?: return Client.Result(matches = false, isATracker = false)
+        val compiled = findCompiledTracker(url.host) ?: return Client.Result.NO_MATCH
         val matches = matchesTrackerEntry(compiled, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
