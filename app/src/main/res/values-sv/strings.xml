@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi">Använd ChatGPT privat med Duck.ai inbyggt</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blockera riktade annonser och cookie-popup-fönster</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Spela upp YouTube-videor utan annonser</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vill du ha enkel tillgång till privat AI-chatt?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vill du ha enkel tillgång till privat AI-chatt i adressfältet?</string>
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 
