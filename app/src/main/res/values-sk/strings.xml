@@ -880,6 +880,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
+    <string name="preOnboardingComparisonChartDuckAi">Používaj ChatGPT súkromne s integrovaným Duck.ai.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj cielené reklamy a vyskakovacie okná o súboroch cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Prehrávaj videá z YouTube bez reklám</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
@@ -942,6 +945,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chceš mať jednoduchý prístup k súkromnému AI chatu v adresnom riadku?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
 
