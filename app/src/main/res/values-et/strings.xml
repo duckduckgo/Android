@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
     <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
+    <string name="preOnboardingComparisonChartDuckAi">Kasuta ChatGPT-d privaatselt sisseehitatud Duck.ai abil</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokeeri sihitud reklaamid ja küpsiste hüpikaknad</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Esita YouTube\'i videoid ilma reklaamideta</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
     <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
     <string name="preOnboardingAddressBarOkButton">Järgmine</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Kas soovite lihtsat juurdepääsu privaatsele AI-vestlusele?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Kas soovid aadressiribal hõlpsat juurdepääsu privaatsele tehisintellekti vestlusele?</string>
     <string name="preOnboardingInputScreenButton">Järgmine</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tehisintellekti funktsioonid on privaatsed ja valikulised. Saate muudatusi teha suvandis <b>Seaded > Tehisintellekti funktsioonid</b>.]]></string>
 
