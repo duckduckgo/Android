@@ -974,7 +974,10 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun launchPurchase() {
-        globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+        globalActivityStarter.start(
+            rootView.context,
+            SubscriptionPurchase(origin = PURCHASE_ORIGIN, featurePage = DUCK_AI_FEATURE_PAGE),
+        )
     }
 
     /**
@@ -1005,6 +1008,7 @@ class RealNativeInputManager @Inject constructor(
         private const val WIDGET_ELEVATION_DP = 8f
         private const val FADE_OUT_DURATION_MS = 150L
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
+        private const val PURCHASE_ORIGIN = "funnel_duckai_android__freelabel"
     }
 }
 
