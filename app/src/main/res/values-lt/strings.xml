@@ -880,6 +880,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
     <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
+    <string name="preOnboardingComparisonChartDuckAi">Naudok „ChatGPT“ privačiai su integruotu „Duck.ai“.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuoti tikslinę reklamą ir slapukų iškylančiuosius langus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Rodyti „YouTube“ vaizdo įrašus be reklamos</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
@@ -942,6 +945,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Norite lengvos prieigos prie privačių DI pokalbių?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Ar norite adreso juostoje lengvai pasiekti privatų DI pokalbį?</string>
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
 
