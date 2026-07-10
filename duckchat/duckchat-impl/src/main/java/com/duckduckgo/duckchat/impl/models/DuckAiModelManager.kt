@@ -44,6 +44,7 @@ data class ModelState(
     val selectedModelId: String? = null,
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
+    val isSubscriptionEligible: Boolean = false,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
     /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
@@ -153,6 +154,7 @@ class RealDuckAiModelManager @Inject constructor(
                     val available = ReasoningResolver.availableModes(
                         supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                        isEligible = isSubscriptionEligible,
                     )
                     val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
@@ -161,6 +163,7 @@ class RealDuckAiModelManager @Inject constructor(
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
                         userTier = userTier,
+                        isSubscriptionEligible = isSubscriptionEligible,
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
@@ -200,6 +203,7 @@ class RealDuckAiModelManager @Inject constructor(
                 val available = ReasoningResolver.availableModes(
                     supported = model.supportedReasoningEfforts,
                     effortAccess = model.reasoningEffortAccess,
+                    isEligible = _modelState.value.isSubscriptionEligible,
                 )
                 val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
                 _modelState.value = _modelState.value.copy(
