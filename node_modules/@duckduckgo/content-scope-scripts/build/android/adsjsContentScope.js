@@ -2203,7 +2203,7 @@
       if (isJSONObject(value)) {
         value = value[path[i]];
       } else if (isJSONArray(value)) {
-        value = value[Number.parseInt(path[i])];
+        value = value[Number.parseInt(path[i], 10)];
       } else {
         value = void 0;
       }
@@ -2211,8 +2211,7 @@
     }
     return value;
   }
-  function setIn(object, path, value) {
-    let createPath = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
+  function setIn(object, path, value, createPath = false) {
     if (path.length === 0) {
       return value;
     }
@@ -2254,7 +2253,7 @@
       }
       const updatedObject = shallowClone(object);
       if (isJSONArray(updatedObject)) {
-        updatedObject.splice(Number.parseInt(key2), 1);
+        updatedObject.splice(Number.parseInt(key2, 10), 1);
       }
       if (isJSONObject(updatedObject)) {
         delete updatedObject[key2];
@@ -2273,7 +2272,7 @@
         throw new TypeError(`Array expected at path ${JSON.stringify(parentPath)}`);
       }
       const updatedItems = shallowClone(items);
-      updatedItems.splice(Number.parseInt(index), 0, value);
+      updatedItems.splice(Number.parseInt(index, 10), 0, value);
       return updatedItems;
     });
   }
