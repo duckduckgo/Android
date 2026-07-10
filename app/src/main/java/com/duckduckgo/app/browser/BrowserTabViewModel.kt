@@ -2130,17 +2130,15 @@ class BrowserTabViewModel @Inject constructor(
     private fun handleAdBlockingAnimation(
         animation: AdBlockingAnimation,
         isPageLoad: Boolean,
-        pageAlreadyLoaded: Boolean,
     ) {
         if (animation !is AdBlockingAnimation.Show) return
         // Claim exclusivity now so trackers/cookies triggered during the load are suppressed.
         adBlockingAnimationClaimed = true
         val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
-        when {
-            // Full document load still in progress: defer until it reaches 100% (see progressChanged).
-            isPageLoad && !pageAlreadyLoaded -> pendingAdBlockingAnimation = badge
-            // Already-loaded page load, or an SPA navigation: show now.
-            else -> command.value = badge
+        if (isPageLoad && currentLoadingViewState().isLoading) {
+            pendingAdBlockingAnimation = badge
+        } else {
+            command.value = badge
         }
     }
 
@@ -2148,6 +2146,13 @@ class BrowserTabViewModel @Inject constructor(
         adBlockingAnimationClaimed = false
         pendingAdBlockingAnimation = null
         adBlockingAnimationJob?.cancel()
+    }
+
+    private fun flushPendingAdBlockingAnimation() {
+        pendingAdBlockingAnimation?.let {
+            command.value = it
+            pendingAdBlockingAnimation = null
+        }
     }
 
     fun onAdBlockingAnimationSuppressed() {
@@ -2160,16 +2165,11 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
-        // The badge is deferred until this document load reaches 100% (see progressChanged), unless the
-        // load already completed before this ran — pageChanged is dispatched async and can arrive after
-        // progressChanged(100), so capture completion now to still show the badge in that race.
         resetAdBlockingAnimationState()
-        val pageAlreadyLoaded = hasCompletedPageLoad
         adBlockingAnimationJob = viewModelScope.launch {
             handleAdBlockingAnimation(
                 adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true),
                 isPageLoad = true,
-                pageAlreadyLoaded = pageAlreadyLoaded,
             )
         }
         cleanupBlobDownloadReplyProxyMaps(url)
@@ -2425,7 +2425,6 @@ class BrowserTabViewModel @Inject constructor(
             handleAdBlockingAnimation(
                 adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
                 isPageLoad = false,
-                pageAlreadyLoaded = false,
             )
         }
         site?.url = url
@@ -2533,10 +2532,7 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().browserShowing) return
 
         if (newProgress == 100) {
-            pendingAdBlockingAnimation?.let {
-                command.value = it
-                pendingAdBlockingAnimation = null
-            }
+            flushPendingAdBlockingAnimation()
         }
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)

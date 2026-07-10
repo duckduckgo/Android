@@ -9953,7 +9953,7 @@ class BrowserTabViewModelTest {
         givenAdBlockingBadgeWillShow()
 
         testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
-        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+        advanceUntilIdle() // let the launched decision coroutine run
 
         assertCommandIssued<Command.StartAdBlockingAnimation>()
     }
@@ -9965,7 +9965,7 @@ class BrowserTabViewModelTest {
 
         // Ad-blocking claims exclusivity for the page...
         testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
-        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+        advanceUntilIdle() // let the launched decision coroutine run
         testee.onStartTrackersAnimation()
         assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
 
@@ -9996,7 +9996,8 @@ class BrowserTabViewModelTest {
             onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
         }
 
-        loadUrl(video) // full-page load: badge deferred until progress reaches 100
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video)
         assertCommandNotIssued<Command.StartAdBlockingAnimation>()
 
         // Navigate to a non-video page (NewPage); its load completing must not flush the stale video badge.
@@ -10007,14 +10008,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageLoadAndOmnibarNotFocusedThenAdBlockingBadgeShownWhenProgressReaches100() = runTest {
+    fun whenPageLoadInProgressAndOmnibarNotFocusedThenAdBlockingBadgeDeferredUntilProgressReaches100() = runTest {
         givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
         loadUrl("https://www.youtube.com/watch?v=abc")
 
-        // Full-page badge is deferred until the document load completes.
         assertCommandNotIssued<Command.StartAdBlockingAnimation>()
 
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadNavigationButNotLoadingThenAdBlockingBadgeShownImmediately() = runTest {
+        givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = false)
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
         assertCommandIssued<Command.StartAdBlockingAnimation>()
     }
 
