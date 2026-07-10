@@ -2127,7 +2127,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    private suspend fun handleAdBlockingAnimation(
+    private fun handleAdBlockingAnimation(
         animation: AdBlockingAnimation,
         isPageLoad: Boolean,
         pageAlreadyLoaded: Boolean,
@@ -2139,7 +2139,7 @@ class BrowserTabViewModel @Inject constructor(
         when {
             // Full document load still in progress: defer until it reaches 100% (see progressChanged).
             isPageLoad && !pageAlreadyLoaded -> pendingAdBlockingAnimation = badge
-            // Already-loaded page load, or an SPA navigation (already debounced by urlUpdated): show now.
+            // Already-loaded page load, or an SPA navigation: show now.
             else -> command.value = badge
         }
     }
@@ -2417,12 +2417,11 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
-        // SPA url change: the page is already loaded. Debounce before deciding so rapid same-video url
-        // updates (e.g. /watch?v=B then /watch?v=B&t=…) collapse into a single decision — otherwise the
-        // first decision advances the dedup state and the superseding update skips the badge entirely.
+        // SPA url change: the page is already loaded, so decide and show immediately. Emitting synchronously
+        // (before a superseding UrlUpdated can cancel the job) is what makes the badge reliable on YouTube,
+        // which fires several UrlUpdated events per in-app navigation.
         resetAdBlockingAnimationState()
         adBlockingAnimationJob = viewModelScope.launch {
-            delay(SPA_AD_BLOCKING_BADGE_DELAY_MS)
             handleAdBlockingAnimation(
                 adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
                 isPageLoad = false,
@@ -5834,10 +5833,6 @@ class BrowserTabViewModel @Inject constructor(
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
-
-        // SPA url changes have no document reload to defer the ad-blocking badge against, so it would
-        // otherwise pop instantly.
-        private const val SPA_AD_BLOCKING_BADGE_DELAY_MS = 250L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

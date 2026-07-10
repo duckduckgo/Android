@@ -405,7 +405,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -9977,33 +9976,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSpaNavigationSupersededByAnotherThenOnlyLatestBadgeShown() = runTest {
+    fun whenSpaNavigationsFireRapidlyThenBadgeStillShown() = runTest {
         loadUrl("https://www.youtube.com")
         givenAdBlockingBadgeWillShow()
 
         testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=a")
         testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=b")
-        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
+        advanceTimeBy(1L)
 
-        assertCommandIssuedTimes<Command.StartAdBlockingAnimation>(1)
-    }
-
-    @Test
-    fun whenSpaNavigationsFireRapidlyThenAnimationDecidedOnlyForSettledUrl() = runTest {
-        loadUrl("https://www.youtube.com")
-        givenAdBlockingBadgeWillShow()
-        val superseded = "https://www.youtube.com/watch?v=a"
-        val settled = "https://www.youtube.com/watch?v=b"
-
-        testee.onHistoryUrlChanged(superseded)
-        testee.onHistoryUrlChanged(settled)
-        advanceTimeBy(300L) // exceeds the 250ms SPA badge delay
-
-        // The superseded url must never reach getAnimation, otherwise it would advance the dedup state and
-        // the settled url would be skipped.
-        verifyBlocking(mockAdBlockingOmnibarAnimationProvider, never()) { getAnimation(eq(superseded), any()) }
-        verifyBlocking(mockAdBlockingOmnibarAnimationProvider) { getAnimation(eq(settled), eq(false)) }
-        assertCommandIssuedTimes<Command.StartAdBlockingAnimation>(1)
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
     }
 
     @Test
