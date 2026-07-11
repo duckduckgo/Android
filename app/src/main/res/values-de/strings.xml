@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
     <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
+    <string name="preOnboardingComparisonChartDuckAi">Nutze ChatGPT privat mit integriertem Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Gezielte Werbung und Cookie-Pop-ups blockieren</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube-Videos ohne Werbung abspielen</string>
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
     <string name="preOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
     <string name="preOnboardingAddressBarOkButton">Weiter</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Möchtest du über die Adressleiste einfach auf den privaten KI-Chat zugreifen?</string>
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 
