@@ -25,13 +25,12 @@ data class TelemetryPixelConfig(
     val isEnabled: Boolean get() = state == "enabled"
 }
 
-data class TelemetryTriggerConfig(
-    val type: String = "period",
-    val period: TelemetryPeriodConfig = TelemetryPeriodConfig(),
-    val source: String? = null,
-) {
-    val isImmediate: Boolean get() = type == "immediate"
-    val isPeriod: Boolean get() = type == "period"
+sealed class TelemetryTriggerConfig {
+    /** Fires once per [period], accumulating parameter values across all matching events in the window. */
+    data class Period(val period: TelemetryPeriodConfig) : TelemetryTriggerConfig()
+
+    /** Fires immediately on each matching [source] event: no period, persistence, dedup, or foreground gating. */
+    data class Immediate(val source: String) : TelemetryTriggerConfig()
 }
 
 data class TelemetryPeriodConfig(
@@ -44,14 +43,21 @@ data class TelemetryPeriodConfig(
         get() = seconds.toLong() + minutes.toLong() * 60 + hours.toLong() * 3600 + days.toLong() * 86400
 }
 
-data class TelemetryParameterConfig(
-    val template: String,
-    val source: String? = null,
-    val dataKey: String? = null,
-    val buckets: Map<String, BucketConfig> = emptyMap(),
-) {
-    val isCounter: Boolean get() = template == "counter"
-    val isData: Boolean get() = template == "data"
+sealed class TelemetryParameterConfig {
+    /** Counts matching [source] events into [buckets]; emitted as a bucket-name pixel parameter. */
+    data class Counter(
+        val source: String,
+        val buckets: Map<String, BucketConfig>,
+    ) : TelemetryParameterConfig()
+
+    /**
+     * Forwards `webEvent.data[dataKey]` into the pixel. Immediate pixels read the triggering event's data and
+     * omit [source]; aggregate (period) pixels set [source] to select which event supplies the value.
+     */
+    data class Data(
+        val dataKey: String,
+        val source: String? = null,
+    ) : TelemetryParameterConfig()
 }
 
 data class BucketConfig(

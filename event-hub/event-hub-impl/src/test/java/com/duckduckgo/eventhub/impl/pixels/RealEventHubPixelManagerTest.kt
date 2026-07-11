@@ -1379,7 +1379,7 @@ class RealEventHubPixelManagerTest {
         assertEquals(timeProvider.time + expectedPeriodMillis, newState.periodEndMillis)
 
         // And the stored config in the new period should reflect the latest config
-        assertEquals(3600L, newState.config.trigger.period.periodSeconds)
+        assertEquals(3600L, newState.config.periodConfig.periodSeconds)
     }
 
     @Test
@@ -1393,9 +1393,10 @@ class RealEventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
 
         val storedConfig = captor.firstValue.config
-        assertEquals("test", storedConfig.parameters["count"]!!.source)
-        assertEquals(86400L, storedConfig.trigger.period.periodSeconds)
-        assertEquals(7, storedConfig.parameters["count"]!!.buckets.size)
+        val storedCount = storedConfig.parameters["count"] as TelemetryParameterConfig.Counter
+        assertEquals("test", storedCount.source)
+        assertEquals(86400L, storedConfig.periodConfig.periodSeconds)
+        assertEquals(7, storedCount.buckets.size)
     }
 
     // --- multi-pixel config lifecycle ---
@@ -1451,8 +1452,8 @@ class RealEventHubPixelManagerTest {
         val stateB1 = savedStates.allValues.find { it.pixelName == "pixel_b" }!!
 
         // Both use config [1]
-        assertEquals(60L, stateA1.config.trigger.period.periodSeconds)
-        assertEquals(120L, stateB1.config.trigger.period.periodSeconds)
+        assertEquals(60L, stateA1.config.periodConfig.periodSeconds)
+        assertEquals(120L, stateB1.config.periodConfig.periodSeconds)
 
         // Step 2: config [2] loads — pixels A and B still use config [1]
         org.mockito.Mockito.reset(repository, pixel)
@@ -1497,7 +1498,7 @@ class RealEventHubPixelManagerTest {
         assertEquals("pixel_a", newStateA2.pixelName)
 
         // New pixel A cycle uses config [2] (90s period)
-        assertEquals(90L, newStateA2.config.trigger.period.periodSeconds)
+        assertEquals(90L, newStateA2.config.periodConfig.periodSeconds)
 
         // Step 4: config [3] loads — pixel A on [2], pixel B still on [1]
         org.mockito.Mockito.reset(repository, pixel)
@@ -1533,10 +1534,10 @@ class RealEventHubPixelManagerTest {
         assertEquals("pixel_b", newStateB3.pixelName)
 
         // New pixel B cycle uses config [3] (300s period)
-        assertEquals(300L, newStateB3.config.trigger.period.periodSeconds)
+        assertEquals(300L, newStateB3.config.periodConfig.periodSeconds)
 
         // Pixel A is still on config [2]
-        assertEquals(90L, aAfter3.config.trigger.period.periodSeconds)
+        assertEquals(90L, aAfter3.config.periodConfig.periodSeconds)
     }
 
     // --- robustness ---
@@ -1572,13 +1573,12 @@ class RealEventHubPixelManagerTest {
 
         assertEquals(pixelConfig.name, restored.name)
         assertEquals(pixelConfig.state, restored.state)
-        assertEquals(pixelConfig.trigger.period.days, restored.trigger.period.days)
-        assertEquals(pixelConfig.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
+        assertEquals(pixelConfig.periodConfig.days, restored.periodConfig.days)
+        assertEquals(pixelConfig.periodConfig.periodSeconds, restored.periodConfig.periodSeconds)
         assertEquals(pixelConfig.parameters.size, restored.parameters.size)
 
-        val originalParam = pixelConfig.parameters["count"]!!
-        val restoredParam = restored.parameters["count"]!!
-        assertEquals(originalParam.template, restoredParam.template)
+        val originalParam = pixelConfig.parameters["count"] as TelemetryParameterConfig.Counter
+        val restoredParam = restored.parameters["count"] as TelemetryParameterConfig.Counter
         assertEquals(originalParam.source, restoredParam.source)
         assertEquals(originalParam.buckets.size, restoredParam.buckets.size)
         assertEquals(originalParam.buckets["0"]!!.gte, restoredParam.buckets["0"]!!.gte)
@@ -2552,3 +2552,7 @@ class RealEventHubPixelManagerTest {
         override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
     }
 }
+
+/** Every fixture in this test uses a period trigger; this narrows to it for assertions. */
+private val TelemetryPixelConfig.periodConfig: TelemetryPeriodConfig
+    get() = (trigger as TelemetryTriggerConfig.Period).period

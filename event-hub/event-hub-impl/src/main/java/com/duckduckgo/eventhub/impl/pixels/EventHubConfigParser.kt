@@ -85,27 +85,39 @@ object EventHubConfigParser {
     }
 
     fun serializePixelConfig(config: TelemetryPixelConfig): String? {
+        val triggerJson = when (val trigger = config.trigger) {
+            is TelemetryTriggerConfig.Period -> TelemetryTriggerJson(
+                type = PERIOD,
+                period = TelemetryPeriodJson(
+                    seconds = trigger.period.seconds,
+                    minutes = trigger.period.minutes,
+                    hours = trigger.period.hours,
+                    days = trigger.period.days,
+                ),
+            )
+            is TelemetryTriggerConfig.Immediate -> TelemetryTriggerJson(
+                type = IMMEDIATE,
+                source = trigger.source,
+            )
+        }
         val pixelJson = TelemetryPixelJson(
             state = config.state,
-            trigger = TelemetryTriggerJson(
-                type = config.trigger.type,
-                period = TelemetryPeriodJson(
-                    seconds = config.trigger.period.seconds,
-                    minutes = config.trigger.period.minutes,
-                    hours = config.trigger.period.hours,
-                    days = config.trigger.period.days,
-                ),
-                source = config.trigger.source,
-            ),
+            trigger = triggerJson,
             parameters = config.parameters.mapValues { (_, paramConfig) ->
-                TelemetryParameterJson(
-                    template = paramConfig.template,
-                    source = paramConfig.source,
-                    dataKey = paramConfig.dataKey,
-                    buckets = paramConfig.buckets.takeIf { it.isNotEmpty() }?.mapValues { (_, bucket) ->
-                        BucketJson(gte = bucket.gte, lt = bucket.lt)
-                    },
-                )
+                when (paramConfig) {
+                    is TelemetryParameterConfig.Counter -> TelemetryParameterJson(
+                        template = COUNTER,
+                        source = paramConfig.source,
+                        buckets = paramConfig.buckets.takeIf { it.isNotEmpty() }?.mapValues { (_, bucket) ->
+                            BucketJson(gte = bucket.gte, lt = bucket.lt)
+                        },
+                    )
+                    is TelemetryParameterConfig.Data -> TelemetryParameterJson(
+                        template = DATA,
+                        source = paramConfig.source,
+                        dataKey = paramConfig.dataKey,
+                    )
+                }
             },
         )
         return runCatching { pixelAdapter.toJson(pixelJson) }
@@ -121,7 +133,7 @@ object EventHubConfigParser {
             toParameterConfig(paramJson)?.let { parameters[paramName] = it }
         }
         // Period pixels need at least one parameter to produce a payload; immediate pixels may fire with none.
-        if (trigger.isPeriod && parameters.isEmpty()) return null
+        if (trigger is TelemetryTriggerConfig.Period && parameters.isEmpty()) return null
 
         return TelemetryPixelConfig(
             name = name,
@@ -142,11 +154,11 @@ object EventHubConfigParser {
                     days = periodJson.days,
                 )
                 if (period.periodSeconds <= 0) return null
-                TelemetryTriggerConfig(type = PERIOD, period = period)
+                TelemetryTriggerConfig.Period(period)
             }
             IMMEDIATE -> {
                 val source = json.source?.takeIf { it.isNotEmpty() } ?: return null
-                TelemetryTriggerConfig(type = IMMEDIATE, source = source)
+                TelemetryTriggerConfig.Immediate(source)
             }
             else -> null
         }
@@ -161,12 +173,12 @@ object EventHubConfigParser {
                     BucketConfig(gte = bucketJson.gte, lt = bucketJson.lt)
                 }
                 if (buckets.isEmpty()) return null
-                TelemetryParameterConfig(template = COUNTER, source = source, buckets = buckets)
+                TelemetryParameterConfig.Counter(source = source, buckets = buckets)
             }
             DATA -> {
                 val dataKey = json.dataKey?.takeIf { it.isNotEmpty() } ?: return null
                 // source is optional: aggregate pixels use it to select the source event; immediate pixels omit it.
-                TelemetryParameterConfig(template = DATA, source = json.source, dataKey = dataKey)
+                TelemetryParameterConfig.Data(dataKey = dataKey, source = json.source)
             }
             else -> null
         }

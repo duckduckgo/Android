@@ -59,16 +59,18 @@ class EventHubConfigParserTest {
 
         val pixel = telemetry[0]
         assertTrue(pixel.isEnabled)
-        assertEquals(1, pixel.trigger.period.days)
-        assertEquals(86400L, pixel.trigger.period.periodSeconds)
+        val period = (pixel.trigger as TelemetryTriggerConfig.Period).period
+        assertEquals(1, period.days)
+        assertEquals(86400L, period.periodSeconds)
     }
 
     @Test
     fun `counter parameter with map buckets parsed correctly`() {
         val telemetry = EventHubConfigParser.parseTelemetry(settingsJson)
-        val param = telemetry[0].parameters["count"]!!
+        val param = telemetry[0].parameters["count"]
 
-        assertTrue(param.isCounter)
+        assertTrue(param is TelemetryParameterConfig.Counter)
+        param as TelemetryParameterConfig.Counter
         assertEquals("test", param.source)
         assertEquals(7, param.buckets.size)
 
@@ -101,7 +103,7 @@ class EventHubConfigParserTest {
             }
         """.trimIndent()
         val telemetry = EventHubConfigParser.parseTelemetry(json)
-        assertEquals(30L, telemetry[0].trigger.period.periodSeconds)
+        assertEquals(30L, (telemetry[0].trigger as TelemetryTriggerConfig.Period).period.periodSeconds)
     }
 
     @Test
@@ -273,10 +275,15 @@ class EventHubConfigParserTest {
         assertNotNull(restored)
         assertEquals(original.name, restored!!.name)
         assertEquals(original.state, restored.state)
-        assertEquals(original.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
+        assertEquals(
+            (original.trigger as TelemetryTriggerConfig.Period).period.periodSeconds,
+            (restored.trigger as TelemetryTriggerConfig.Period).period.periodSeconds,
+        )
         assertEquals(original.parameters.size, restored.parameters.size)
-        assertEquals(original.parameters["count"]!!.source, restored.parameters["count"]!!.source)
-        assertEquals(original.parameters["count"]!!.buckets.size, restored.parameters["count"]!!.buckets.size)
+        val originalCount = original.parameters["count"] as TelemetryParameterConfig.Counter
+        val restoredCount = restored.parameters["count"] as TelemetryParameterConfig.Counter
+        assertEquals(originalCount.source, restoredCount.source)
+        assertEquals(originalCount.buckets.size, restoredCount.buckets.size)
     }
 
     @Test
@@ -284,10 +291,9 @@ class EventHubConfigParserTest {
         val config = TelemetryPixelConfig(
             name = "test",
             state = "enabled",
-            trigger = TelemetryTriggerConfig(period = TelemetryPeriodConfig(days = 1)),
+            trigger = TelemetryTriggerConfig.Period(TelemetryPeriodConfig(days = 1)),
             parameters = mapOf(
-                "c" to TelemetryParameterConfig(
-                    template = "counter",
+                "c" to TelemetryParameterConfig.Counter(
                     source = "e",
                     buckets = linkedMapOf("0+" to BucketConfig(gte = 0, lt = null)),
                 ),
@@ -317,6 +323,6 @@ class EventHubConfigParserTest {
         """.trimIndent()
         val telemetry = EventHubConfigParser.parseTelemetry(json)
         assertEquals(1, telemetry.size)
-        assertEquals(5400L, telemetry[0].trigger.period.periodSeconds) // 1h30m = 5400s
+        assertEquals(5400L, (telemetry[0].trigger as TelemetryTriggerConfig.Period).period.periodSeconds) // 1h30m = 5400s
     }
 }

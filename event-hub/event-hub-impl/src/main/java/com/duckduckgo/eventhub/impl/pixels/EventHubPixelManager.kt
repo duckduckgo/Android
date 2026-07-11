@@ -136,12 +136,14 @@ class RealEventHubPixelManager @Inject constructor(
 
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis >= pixelState.periodEndMillis) continue
+                // Only period pixels are persisted as states; immediate pixels fire above and never reach here.
+                if (pixelState.config.trigger !is TelemetryTriggerConfig.Period) continue
 
                 val updatedParams = pixelState.params.toMutableMap()
                 var changed = false
 
                 for ((paramName, paramConfig) in pixelState.config.parameters) {
-                    if (paramConfig.isCounter && paramConfig.source == eventType) {
+                    if (paramConfig is TelemetryParameterConfig.Counter && paramConfig.source == eventType) {
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
                         if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
@@ -156,7 +158,7 @@ class RealEventHubPixelManager @Inject constructor(
                         val newValue = paramState.value + 1
                         updatedParams[paramName] = paramState.copy(value = newValue)
                         logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
-                    } else if (paramConfig.isData && paramConfig.source == eventType) {
+                    } else if (paramConfig is TelemetryParameterConfig.Data && paramConfig.source == eventType) {
                         // Aggregate data params keep the most recent value seen on the matching source event.
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         updatedParams[paramName] = paramState.copy(lastDataValue = extractDataParam(eventData, paramConfig.dataKey))
@@ -173,7 +175,8 @@ class RealEventHubPixelManager @Inject constructor(
 
     private fun fireImmediatePixels(eventType: String, eventData: JSONObject?) {
         for (config in getTelemetryConfigs()) {
-            if (!config.isEnabled || !config.trigger.isImmediate || config.trigger.source != eventType) continue
+            val trigger = config.trigger
+            if (!config.isEnabled || trigger !is TelemetryTriggerConfig.Immediate || trigger.source != eventType) continue
             logcat(DEBUG) { "EventHub: firing immediate pixel ${config.name}" }
             pixel.enqueueFire(
                 pixelName = config.name,
@@ -215,7 +218,7 @@ class RealEventHubPixelManager @Inject constructor(
     private fun initMissingPixels(): Long {
         var nextDeadline = Long.MAX_VALUE
         for (pixelConfig in getTelemetryConfigs()) {
-            if (!pixelConfig.trigger.isPeriod) continue
+            if (pixelConfig.trigger !is TelemetryTriggerConfig.Period) continue
             if (repository.getPixelState(pixelConfig.name) == null) {
                 val deadline = startNewPeriod(pixelConfig)
                 if (deadline != null) {
@@ -246,7 +249,7 @@ class RealEventHubPixelManager @Inject constructor(
                 nextDeadline = minOf(nextDeadline, pixelState.periodEndMillis)
             }
             for (pixelConfig in telemetry) {
-                if (!pixelConfig.trigger.isPeriod) continue
+                if (pixelConfig.trigger !is TelemetryTriggerConfig.Period) continue
                 if (repository.getPixelState(pixelConfig.name) == null) {
                     val deadline = startNewPeriod(pixelConfig)
                     if (deadline != null) {
@@ -279,13 +282,15 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun fireTelemetry(pixelState: PixelState): Long? {
+        // Only period pixels are ever persisted, so the trigger is always a Period here.
+        val periodConfig = (pixelState.config.trigger as? TelemetryTriggerConfig.Period)?.period ?: return null
         val (parameters, encodedParameters) = buildPixel(pixelState)
 
         if (parameters.isNotEmpty() || encodedParameters.isNotEmpty()) {
             val attributionParams = mapOf(
                 PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
                     pixelState.periodStartMillis,
-                    pixelState.config.trigger.period,
+                    periodConfig,
                 ).toString(),
             )
             val allParams = parameters + attributionParams
@@ -306,12 +311,13 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
-        if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
+        val trigger = pixelConfig.trigger
+        if (trigger !is TelemetryTriggerConfig.Period || !isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
         }
         val nowMillis = timeProvider.currentTimeMillis()
-        val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
+        val periodMillis = trigger.period.periodSeconds * 1000
         val periodEndMillis = nowMillis + periodMillis
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
@@ -333,13 +339,13 @@ class RealEventHubPixelManager @Inject constructor(
         val encodedParameters = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelState.config.parameters) {
-            if (paramConfig.isCounter) {
+            if (paramConfig is TelemetryParameterConfig.Counter) {
                 val value = (pixelState.params[paramName] ?: ParamState(0)).value
                 val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucketName != null) {
                     parameters[paramName] = bucketName
                 }
-            } else if (paramConfig.isData) {
+            } else if (paramConfig is TelemetryParameterConfig.Data) {
                 pixelState.params[paramName]?.lastDataValue?.let { encodedParameters[paramName] = it }
             }
         }
@@ -350,7 +356,7 @@ class RealEventHubPixelManager @Inject constructor(
     private fun buildDataParams(config: TelemetryPixelConfig, eventData: JSONObject?): Map<String, String> {
         val encodedParameters = mutableMapOf<String, String>()
         for ((paramName, paramConfig) in config.parameters) {
-            if (!paramConfig.isData) continue
+            if (paramConfig !is TelemetryParameterConfig.Data) continue
             extractDataParam(eventData, paramConfig.dataKey)?.let { encodedParameters[paramName] = it }
         }
         return encodedParameters
