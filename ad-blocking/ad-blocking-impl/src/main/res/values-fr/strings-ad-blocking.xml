@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">Envoyez un rapport anonyme de dysfonctionnement à DuckDuckGo. Contribuez à améliorer le blocage des publicités pour tous !</string>
     <string name="ad_blocking_disabled_primary_action">Envoyer un rapport de défaillance</string>
     <string name="ad_blocking_disabled_secondary_action">Annuler</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Désactivé jusqu\'au redémarrage</string>
 </resources>
