@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
+    <string name="preOnboardingComparisonChartDuckAi">Utilisez ChatGPT en toute confidentialité grâce à l\'intégration de Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloquez les publicités ciblées et les fenêtres contextuelles de cookies</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Lecture de vidéos YouTube sans publicités</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
     <string name="preOnboardingAddressBarTitle">Où dois-je placer votre barre d\'adresse ?</string>
     <string name="preOnboardingAddressBarOkButton">Suivant</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vous voulez accéder facilement au chat IA privé ?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vous souhaitez accéder facilement à un chat privé alimenté par l\'IA depuis la barre d\'adresse ?</string>
     <string name="preOnboardingInputScreenButton">Suivant</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Les fonctionnalités d\'IA sont privées et facultatives. Vous pouvez apporter des modifications dans <b>Paramètres > Fonctionnalités d\'IA</b>.]]></string>
 
