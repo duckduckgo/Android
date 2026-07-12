@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
     <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
+    <string name="preOnboardingComparisonChartDuckAi">Käytä ChatGPT:tä yksityisesti sisäänrakennetulla Duck.ai:lla</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Estä kohdennetut mainokset ja evästeponnahdusikkunat</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Toista YouTube-videoita ilman mainoksia</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
     <string name="preOnboardingAddressBarTitle">Mihin osoitepalkki pitäisi sijoittaa?</string>
     <string name="preOnboardingAddressBarOkButton">Seuraava</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Haluatko helpon pääsyn yksityiseen tekoälychattiin?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Haluatko helpon pääsyn yksityiseen tekoälykeskusteluun osoiterivillä?</string>
     <string name="preOnboardingInputScreenButton">Seuraava</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tekoälyominaisuudet ovat yksityisiä ja valinnaisia. Voit tehdä muutoksia kohdassa <b>Asetukset > Tekoälyominaisuudet</b>.]]></string>
 
