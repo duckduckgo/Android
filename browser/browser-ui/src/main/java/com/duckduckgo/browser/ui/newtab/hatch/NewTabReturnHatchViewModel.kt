@@ -121,11 +121,14 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // while the activity-mode repo supplies the tabs count shown in the tab button.
     // The tabs button shows only when native input is enabled AND the address bar isn't search-only.
     // In search-only the hatch mirrors the legacy chrome, which has no tabs entry here.
+    // It is also hidden when the nav bar flag is on: those users get a tabs button in the input-mode
+    // nav bar instead, so the hatch shouldn't duplicate it.
     private val shouldShowTabsButton: Flow<Boolean> = combine(
         duckChat.observeNativeInputFieldUserSettingEnabled(),
         duckChatInputModeState.inputModeCapability,
-    ) { nativeInputEnabled, capability ->
-        nativeInputEnabled && capability != NativeInputState.InputMode.SEARCH_ONLY
+        duckChat.observeNativeInputNavBarEnabled(),
+    ) { nativeInputEnabled, capability, navBarEnabled ->
+        nativeInputEnabled && capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
     }
 
     val viewState = snapshotTarget.flatMapLatest { target ->
