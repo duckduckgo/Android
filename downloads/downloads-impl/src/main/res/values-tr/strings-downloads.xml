@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Paylaş…</string>
     <string name="downloadsStateInProgress">Devam ediyor…</string>
     <string name="downloadsUndoActionName">Geri al</string>
+    <string name="downloadsSearchHint">Arama yap</string>
 </resources>
