@@ -46,6 +46,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.transition.doOnEnd as doOnTransitionEnd
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -249,72 +250,54 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val slideOutTransition: Transition = createSlideTransition()
 
         // After the text slides in, hold briefly then slide out + fade out the badge views.
-        slideInTransition.addListener(
-            object : TransitionListener {
-                override fun onTransitionEnd(transition: Transition) {
-                    AnimatorSet().apply {
-                        play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L)) // holds via startDelay
-                        startDelay = COOKIES_ANIMATION_DELAY
-                        addListener(
-                            doOnEnd {
-                                if (!hasAdBlockingAnimationBeenCanceled) {
-                                    AnimatorSet().apply {
-                                        TransitionManager.go(adBlockingFirstScene, slideOutTransition)
-                                        play(commonAddressBarAnimationHelper.animateFadeOut(adBlockingView, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                            .with(
-                                                commonAddressBarAnimationHelper.animateFadeOut(
-                                                    adBlockingViewBackground,
-                                                    COOKIES_ANIMATION_FADE_OUT_DURATION,
-                                                ),
-                                            )
-                                        addListener(
-                                            doOnEnd {
-                                                adBlockingView.gone()
-                                                isAdBlockingAnimationRunning = false
-                                                listener?.onAnimationFinished()
-                                            },
-                                        )
-                                        start()
-                                    }
-                                } else {
-                                    isAdBlockingAnimationRunning = false
-                                    listener?.onAnimationFinished()
-                                }
-                            },
-                        )
-                        start()
-                    }
-                }
-
-                override fun onTransitionStart(transition: Transition) {}
-                override fun onTransitionCancel(transition: Transition) {}
-                override fun onTransitionPause(transition: Transition) {}
-                override fun onTransitionResume(transition: Transition) {}
-            },
-        )
+        slideInTransition.doOnTransitionEnd {
+            AnimatorSet().apply {
+                play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L)) // holds via startDelay
+                startDelay = COOKIES_ANIMATION_DELAY
+                addListener(
+                    doOnEnd {
+                        if (!hasAdBlockingAnimationBeenCanceled) {
+                            AnimatorSet().apply {
+                                TransitionManager.go(adBlockingFirstScene, slideOutTransition)
+                                play(commonAddressBarAnimationHelper.animateFadeOut(adBlockingView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                    .with(
+                                        commonAddressBarAnimationHelper.animateFadeOut(
+                                            adBlockingViewBackground,
+                                            COOKIES_ANIMATION_FADE_OUT_DURATION,
+                                        ),
+                                    )
+                                addListener(
+                                    doOnEnd {
+                                        adBlockingView.gone()
+                                        isAdBlockingAnimationRunning = false
+                                        listener?.onAnimationFinished()
+                                    },
+                                )
+                                start()
+                            }
+                        } else {
+                            isAdBlockingAnimationRunning = false
+                            listener?.onAnimationFinished()
+                        }
+                    },
+                )
+                start()
+            }
+        }
 
         // After slide out finished, hide the scene and fade the omnibar back in.
-        slideOutTransition.addListener(
-            object : TransitionListener {
-                override fun onTransitionEnd(transition: Transition) {
-                    if (!hasAdBlockingAnimationBeenCanceled) {
-                        AnimatorSet().apply {
-                            play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
-                            start()
-                        }
-                        adBlockingScene.gone()
-                    } else {
-                        isAdBlockingAnimationRunning = false
-                        listener?.onAnimationFinished()
-                    }
+        slideOutTransition.doOnTransitionEnd {
+            if (!hasAdBlockingAnimationBeenCanceled) {
+                AnimatorSet().apply {
+                    play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
+                    start()
                 }
-
-                override fun onTransitionStart(transition: Transition) {}
-                override fun onTransitionCancel(transition: Transition) {}
-                override fun onTransitionPause(transition: Transition) {}
-                override fun onTransitionResume(transition: Transition) {}
-            },
-        )
+                adBlockingScene.gone()
+            } else {
+                isAdBlockingAnimationRunning = false
+                listener?.onAnimationFinished()
+            }
+        }
 
         // Fade omnibar out, fade the badge in, then drive the text slide-in directly (no Lottie).
         AnimatorSet().apply {
