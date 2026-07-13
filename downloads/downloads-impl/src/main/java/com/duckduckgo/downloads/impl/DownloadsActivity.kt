@@ -84,6 +84,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         get() = binding.searchBar
 
     private var searchMenuItem: MenuItem? = null
+    private var deleteAllMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,6 +137,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         searchMenuItem = menu.findItem(R.id.action_search)
+        deleteAllMenuItem = menu.findItem(R.id.downloads_delete_all)
+        setMenuItemsVisibility(viewModel.viewState.value.hasDownloads)
         initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)
     }
@@ -216,12 +219,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         downloadsAdapter.updateData(viewState.filteredItems)
-        searchMenuItem?.isVisible = itemsAvailable(viewState)
+        setMenuItemsVisibility(viewState.hasDownloads)
     }
 
-    private fun itemsAvailable(viewState: ViewState): Boolean {
-        // The empty view is part of the list.
-        return viewState.filteredItems.size > 1
+    private fun setMenuItemsVisibility(hasDownloads: Boolean) {
+        searchMenuItem?.isVisible = hasDownloads
+        deleteAllMenuItem?.isVisible = hasDownloads
     }
 
     private fun setupRecyclerView() {

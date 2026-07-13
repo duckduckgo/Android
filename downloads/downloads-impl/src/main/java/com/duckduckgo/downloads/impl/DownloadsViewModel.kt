@@ -59,7 +59,7 @@ class DownloadsViewModel @Inject constructor(
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
-        val enableSearch: Boolean = false,
+        val hasDownloads: Boolean = false,
         val downloadItems: List<DownloadViewItem> = emptyList(),
         val filteredItems: List<DownloadViewItem> = emptyList(),
     )
@@ -92,7 +92,7 @@ class DownloadsViewModel @Inject constructor(
             else -> items.ifEmpty { listOf(Empty) }
         }
         val filteredItemsList = if (filter.isEmpty()) downloadItemsList else filtered(items, filter)
-        ViewState(enableSearch = items.isNotEmpty(), downloadItems = downloadItemsList, filteredItems = filteredItemsList)
+        ViewState(hasDownloads = items.any { it is Item }, downloadItems = downloadItemsList, filteredItems = filteredItemsList)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     fun commands(): Flow<Command> {
