@@ -34,11 +34,11 @@
     <string name="ad_blocking_menu_title">Annonseblokkering på YouTube</string>
     <string name="ad_blocking_menu_close_content_description">Lukk</string>
     <string name="ad_blocking_menu_always_on">Alltid på</string>
-    <string name="ad_blocking_menu_disable_until_relaunch">Deaktiver til relansering</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Deaktiver til neste oppstart</string>
     <string name="ad_blocking_menu_always_off">Alltid av</string>
-    <string name="ad_blocking_disabled_popup_title">Fungerer ikke annonseblokkering for YouTube?</string>
-    <string name="ad_blocking_disabled_popup_description">Send en anonym funksjonssviktrapport til DuckDuckGo. Bidra til å gjøre annonseblokkering bedre for alle!</string>
-    <string name="ad_blocking_disabled_primary_action">Send funksjonssviktrapport</string>
+    <string name="ad_blocking_disabled_popup_title">Fungerer ikke annonseblokkering på YouTube?</string>
+    <string name="ad_blocking_disabled_popup_description">Send en anonym feilrapport til DuckDuckGo. Bidra til å gjøre annonseblokkering bedre for alle!</string>
+    <string name="ad_blocking_disabled_primary_action">Send feilrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
-    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til relansering</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiver til neste oppstart</string>
 </resources>
