@@ -79,6 +79,11 @@ class RealAdBlockingOmnibarAnimationTest {
     }
 
     @Test
+    fun whenWatchUrlHasEmptyVideoIdThenSkip() = runTest {
+        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=", pageChanged = true) is AdBlockingAnimation.Skip)
+    }
+
+    @Test
     fun whenNonVideoUrlThenSkip() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/results?search_query=cats", pageChanged = true) is AdBlockingAnimation.Skip)
     }

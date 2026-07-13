@@ -73,8 +73,8 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
         if (!domainMatcher.matches(uri)) return null
         val segments = uri.pathSegments
         return when (segments.firstOrNull()) {
-            "watch" -> uri.getQueryParameter("v")
-            "shorts", "live", "clip" -> segments.getOrNull(1)
+            "watch" -> uri.getQueryParameter("v")?.takeIf { it.isNotBlank() }
+            "shorts", "live", "clip" -> segments.getOrNull(1)?.takeIf { it.isNotBlank() }
             else -> null
         }
     }
