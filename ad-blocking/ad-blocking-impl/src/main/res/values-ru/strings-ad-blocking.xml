@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Проигрыватель Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра без отвлекающих элементов, чтобы просмотренные видео не влияли на вашу ленту YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Блокировка рекламы</string>
+    <string name="ad_blocking_settings_header_description">Блокирует навязчивые трекеры до их загрузки, устраняя рекламу с отслеживанием</string>
+    <string name="contingencyMessageTitle">Блокировка рекламы на YouTube недоступна</string>
+    <string name="contingencyMessageContent">Недавние изменения на YouTube повлияли на работу блокировки рекламы. Мы занимаемся решением этой проблемы и благодарим вас за понимание.</string>
+    <string name="contingencyMessagePrimaryButton">Понятно</string>
+    <string name="contingencyMessageCloseContentDescription">Закрыть</string>
 </resources>

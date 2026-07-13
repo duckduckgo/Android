@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo премахва рекламите на видеоклипове в YouTube, за да можете да гледате видеоклипове без прекъсване. <annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Отваря видеоклипове в режим на киносалон без разсейване, който предотвратява влиянието на гледаното съдържание върху емисията в YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Блокиране на реклами</string>
+    <string name="ad_blocking_settings_header_description">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването</string>
+    <string name="contingencyMessageTitle">Блокирането на реклами в YouTube е недостъпно</string>
+    <string name="contingencyMessageContent">Блокирането на реклами е засегнато от скорошни промени в YouTube. Работим за отстраняване на тези проблеми и оценяваме Вашето разбиране</string>
+    <string name="contingencyMessagePrimaryButton">Разбрах</string>
+    <string name="contingencyMessageCloseContentDescription">Затваряне</string>
 </resources>

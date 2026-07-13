@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. <annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Avab videod segajatevabas kinorežiimis, mis hoiab ära selle, et vaadatav sisu mõjutaks sinu YouTube’i voogu.</string>
+    <string name="ad_blocking_settings_title_v2">Reklaamide blokeerimine</string>
+    <string name="ad_blocking_settings_header_description">Blokeerib invasiivsed jälgijad enne nende laadimist, kõrvaldades tõhusalt reklaamid, mis tuginevad jälgimisele</string>
+    <string name="contingencyMessageTitle">YouTube\'i reklaamiblokeerija pole saadaval</string>
+    <string name="contingencyMessageContent">YouTube\'i hiljutised muudatused on mõjutanud reklaamide blokeerimist. Töötame nende probleemide lahendamise nimel ja täname sind mõistva suhtumise eest</string>
+    <string name="contingencyMessagePrimaryButton">Sain aru</string>
+    <string name="contingencyMessageCloseContentDescription">Sulge</string>
 </resources>

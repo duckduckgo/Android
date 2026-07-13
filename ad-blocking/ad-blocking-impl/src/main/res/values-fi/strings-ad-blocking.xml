@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo estää videomainokset YouTubessa, joten voit katsoa videoita keskeytyksettä. <annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Avaa videot häiriöttömässä teatteritilassa, jolloin katsomasi sisältö ei vaikuta YouTube-syötteeseesi.</string>
+    <string name="ad_blocking_settings_title_v2">Mainosten esto</string>
+    <string name="ad_blocking_settings_header_description">Estää tunkeilevat seurantaohjelmat ennen niiden latautumista, mikä eliminoi tehokkaasti seurantaa käyttävät mainokset</string>
+    <string name="contingencyMessageTitle">YouTube-mainosten esto ei ole käytettävissä</string>
+    <string name="contingencyMessageContent">YouTuben viimeaikaiset muutokset ovat vaikuttaneet mainosten estämiseen. Pyrimme korjaamaan nämä ongelmat. Kiitos ymmärryksestä.</string>
+    <string name="contingencyMessagePrimaryButton">Selvä</string>
+    <string name="contingencyMessageCloseContentDescription">Sulje</string>
 </resources>

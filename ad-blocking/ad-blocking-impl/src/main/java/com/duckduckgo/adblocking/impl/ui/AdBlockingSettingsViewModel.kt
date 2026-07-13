@@ -30,6 +30,7 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -49,6 +50,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class AdBlockingSettingsViewModel @Inject constructor(
     statusChecker: AdBlockingStatusChecker,
+    feature: AdBlockingExtensionFeature,
     private val repository: AdBlockingSettingsRepository,
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
@@ -63,6 +65,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val isEnabled: Boolean = false,
         val showConsentDescription: Boolean? = null,
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
+        val isContingencyMode: Boolean = false,
+        val isStatusIndicatorOn: Boolean = false,
     )
 
     sealed class Command {
@@ -73,10 +77,16 @@ class AdBlockingSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
         duckPlayer.observeUserPreferences(),
-    ) { state, duckPlayerPreferences ->
+        feature.adBlockingUXImprovements().enabled(),
+        feature.enableContingencyMode().enabled(),
+    ) { state, duckPlayerPreferences, uxImprovements, contingencyModeOn ->
+        val isEnabled = state is AdBlockingState.Enabled
+        val isContingencyMode = uxImprovements && contingencyModeOn
         ViewState(
-            isEnabled = state is AdBlockingState.Enabled,
+            isEnabled = isEnabled,
             showConsentDescription = state !is AdBlockingState.Enabled.Default,
+            isContingencyMode = isContingencyMode,
+            isStatusIndicatorOn = isEnabled && !isContingencyMode,
             duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
         )
     }

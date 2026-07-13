@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blochează reclamele video pe YouTube, astfel încât să poți viziona videoclipuri fără întrerupere. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Deschide videoclipurile într-un mod cinematografic fără distrageri, care te împiedică să influențezi fluxul de YouTube prin ceea ce vizionezi.</string>
+    <string name="ad_blocking_settings_title_v2">Blocarea reclamelor</string>
+    <string name="ad_blocking_settings_header_description">Blochează tehnologiile de urmărire invazive înainte de a se încărca, eliminând eficient reclamele care se bazează pe urmărire</string>
+    <string name="contingencyMessageTitle">Blocarea reclamelor pe YouTube este indisponibilă</string>
+    <string name="contingencyMessageContent">Blocarea reclamelor a fost afectată de modificările recente aduse YouTube. Lucrăm pentru a remedia aceste probleme și apreciem înțelegerea ta</string>
+    <string name="contingencyMessagePrimaryButton">Am înțeles</string>
+    <string name="contingencyMessageCloseContentDescription">Închide</string>
 </resources>
