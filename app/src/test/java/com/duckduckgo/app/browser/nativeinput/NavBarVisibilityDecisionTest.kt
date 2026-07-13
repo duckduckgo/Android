@@ -16,11 +16,32 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NavBarVisibilityDecisionTest {
+
+    @Test
+    fun `nav bar is created only with the flag on, in browser, and Search and Duck ai mode`() {
+        assertTrue(shouldCreateNavBar(featureEnabled = true, isDuckAiMode = false, inputMode = InputMode.SEARCH_AND_DUCK_AI))
+    }
+
+    @Test
+    fun `nav bar is not created when the flag is off`() {
+        assertFalse(shouldCreateNavBar(featureEnabled = false, isDuckAiMode = false, inputMode = InputMode.SEARCH_AND_DUCK_AI))
+    }
+
+    @Test
+    fun `nav bar is not created in search-only mode`() {
+        assertFalse(shouldCreateNavBar(featureEnabled = true, isDuckAiMode = false, inputMode = InputMode.SEARCH_ONLY))
+    }
+
+    @Test
+    fun `nav bar is not created in Duck ai conversation mode`() {
+        assertFalse(shouldCreateNavBar(featureEnabled = true, isDuckAiMode = true, inputMode = InputMode.SEARCH_AND_DUCK_AI))
+    }
 
     @Test
     fun `nav bar shows only in browser context with an empty field`() {

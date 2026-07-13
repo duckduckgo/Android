@@ -185,6 +185,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
+    private var isNavBarFeatureEnabled: Boolean = false
     private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
@@ -236,6 +237,9 @@ class RealNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
         duckChatInputModeState.inputModeCapability
             .onEach { inputModeCapability = it }
+            .launchIn(lifecycleOwner.lifecycleScope)
+        duckChat.observeNativeInputNavBarEnabled()
+            .onEach { isNavBarFeatureEnabled = it }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -494,8 +498,13 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
         // The nav bar belongs to browser input only. Duck.ai (and, via a separate manager, contextual)
-        // never show it.
-        val navBarView = if (!omnibarController.isDuckAiMode()) createNavBarView(layoutInflater) else null
+        // never show it. Gated behind the nativeInputNavBar flag and Search & Duck.ai mode — search-only
+        // users, or users without the flag, never get it.
+        val navBarView = if (shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability)) {
+            createNavBarView(layoutInflater)
+        } else {
+            null
+        }
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (navBarView != null) bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
@@ -1177,6 +1186,15 @@ internal fun computeVoiceButtonAvailability(
         voiceChatAvailable = isDuckAiTabSelected && isVoiceChatEntryEnabled,
     )
 }
+
+/**
+ * Whether to create the nav bar for this input session. It's a browser-input affordance gated behind the
+ * [nativeInputNavBar][com.duckduckgo.duckchat.impl.feature.DuckChatFeature.nativeInputNavBar] flag and the
+ * Search & Duck.ai input mode: search-only users, Duck.ai/contextual input, or a disabled flag never get it.
+ * Once created, per-state visibility is decided by [shouldShowNavBar].
+ */
+internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, inputMode: NativeInputState.InputMode): Boolean =
+    featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
 /**
  * The persistent input-mode nav bar is shown only for browser input and only while the input field
