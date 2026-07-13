@@ -744,7 +744,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when back pressed in fire mode with no fire tabs then switch to regular mode`() = runTest {
+    fun `when back pressed in fire mode with no fire tabs then switch to regular mode and close`() = runTest {
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
@@ -760,11 +760,11 @@ class TabSwitcherViewModelTest {
         testee.onBackButtonPressed()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        assertEquals(Command.SwitchToRegularModeAndClose, commandCaptor.lastValue)
     }
 
     @Test
-    fun `when up pressed in fire mode with no fire tabs then switch to regular mode`() = runTest {
+    fun `when up pressed in fire mode with no fire tabs then switch to regular mode and close`() = runTest {
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
@@ -780,7 +780,7 @@ class TabSwitcherViewModelTest {
         testee.onUpButtonPressed()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        assertEquals(Command.SwitchToRegularModeAndClose, commandCaptor.lastValue)
     }
 
     @Test
@@ -2089,7 +2089,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when closing the last fire tab then switches to regular mode`() = runTest {
+    fun `when closing the last fire tab then shows undo without changing mode`() = runTest {
         val fireTab = TabEntity("fire-1", url = "https://fire.example", position = 1)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(fireTab)))
@@ -2109,11 +2109,11 @@ class TabSwitcherViewModelTest {
 
         verify(mockFireTabRepository).markDeletable(fireTab)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf("fire-1")), commandCaptor.lastValue)
     }
 
     @Test
-    fun `when closing all fire tabs then switches to regular mode instead of showing undo`() = runTest {
+    fun `when closing all fire tabs then shows undo without changing mode`() = runTest {
         val fireTabs = listOf(
             TabEntity("fire-1", url = "https://fire.example/1", position = 1),
             TabEntity("fire-2", url = "https://fire.example/2", position = 2),
@@ -2135,7 +2135,7 @@ class TabSwitcherViewModelTest {
 
         verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        assertEquals(Command.ShowUndoDeleteTabsMessage(fireTabs.map { it.tabId }), commandCaptor.lastValue)
     }
 
     @Test

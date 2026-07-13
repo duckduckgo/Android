@@ -48,6 +48,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -264,6 +266,8 @@ class TabSwitcherActivity :
     private var fadeInAnimationStarted = false
     private var switchedModeFromDrag = false
 
+    private var finishingAfterModeSwitch = false
+
     private var lastSnackbar: DefaultSnackbar? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
@@ -370,7 +374,7 @@ class TabSwitcherActivity :
             viewModel.currentMode
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect { mode ->
-                    if (mode != currentBrowserMode) {
+                    if (mode != currentBrowserMode && !finishingAfterModeSwitch) {
                         recreate()
                     }
                 }
@@ -615,6 +619,17 @@ class TabSwitcherActivity :
             .start()
     }
 
+    private fun showFireTabsEmptyState() {
+        val emptyState = binding.fireTabsEmptyState.root
+        if (emptyState.isVisible) return
+
+        if (tabsRecycler.isVisible && tabsAdapter.itemCount > 0) {
+            TransitionManager.beginDelayedTransition(binding.tabsContainer, Fade())
+        }
+        emptyState.show()
+        tabsRecycler.gone()
+    }
+
     private fun updateToolbarTitle(
         mode: Mode,
         tabCount: Int,
@@ -676,8 +691,7 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 if (it.showFireTabsEmptyState && !fadingOutForRecreate) {
-                    binding.fireTabsEmptyState.root.show()
-                    tabsRecycler.gone()
+                    showFireTabsEmptyState()
 
                     // No fade-in runs in the empty state, so settle the post-recreate flags here; otherwise
                     // fadingInAfterRecreate stays true forever and the mode toggle (guarded on it) is stuck disabled.
@@ -920,7 +934,11 @@ class TabSwitcherActivity :
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
             Command.ShowFireBottomSheet -> onFireButtonClicked()
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
-            Command.SwitchToRegularMode -> fadeOutTabsThenRecreate(BrowserMode.REGULAR, fromUser = false)
+            Command.SwitchToRegularModeAndClose -> {
+                finishingAfterModeSwitch = true
+                viewModel.onBrowserModeToggled(BrowserMode.REGULAR)
+                finishAfterTransition()
+            }
         }
     }
 

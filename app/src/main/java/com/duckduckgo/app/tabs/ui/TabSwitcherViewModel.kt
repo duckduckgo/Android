@@ -240,7 +240,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
         data object ShowFireBottomSheet : Command()
         data object DismissSnackbar : Command()
-        data object SwitchToRegularMode : Command()
+        data object SwitchToRegularModeAndClose : Command()
     }
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
@@ -455,9 +455,7 @@ class TabSwitcherViewModel @Inject constructor(
                 tabRepository.markDeletable(tabIds)
 
                 if (fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
-                    // emptying all Fire tabs returns the user to Regular mode, matching the single-tab
-                    // close path; the tab switcher stays open instead of closing with an undo snackbar
-                    command.value = Command.SwitchToRegularMode
+                    command.value = Command.ShowUndoDeleteTabsMessage(tabIds)
                 } else {
                     // the undo snackbar will be displayed when the tab switcher is closed
                     command.value = Command.CloseAndShowUndoMessage(tabIds)
@@ -486,7 +484,7 @@ class TabSwitcherViewModel @Inject constructor(
             val isLastTab = tabs.size == 1
             if (isLastTab && fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
                 markTabAsDeletable(tab, swipeGestureUsed)
-                command.value = Command.SwitchToRegularMode
+                command.value = Command.ShowUndoDeleteTabsMessage(listOf(tab.id))
             } else if (isLastTab) {
                 // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                 markTabAsDeletable(tab, swipeGestureUsed)
@@ -557,7 +555,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
         } else if (viewState.value.showFireTabsEmptyState) {
-            command.value = Command.SwitchToRegularMode
+            command.value = Command.SwitchToRegularModeAndClose
         } else {
             command.value = Command.Close
         }
@@ -569,7 +567,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
         } else if (viewState.value.showFireTabsEmptyState) {
-            command.value = Command.SwitchToRegularMode
+            command.value = Command.SwitchToRegularModeAndClose
         } else {
             command.value = Command.Close
         }
