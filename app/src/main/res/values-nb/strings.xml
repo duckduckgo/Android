@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokker popup-vinduer om informasjonskapsler</string>
     <string name="preOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
     <string name="preOnboardingComparisonChartItem5">Slett nettleserdata med én knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi">Bruk ChatGPT privat med innebygd Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokker målrettede annonser og popup-vinduer om informasjonskapsler</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Vis YouTube-videoer uten annonser</string>
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
     <string name="preOnboardingAddressBarOkButton">Neste</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du ha enklere tilgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vil du ha enkel tilgang til privat AI-chat i adresselinjen?</string>
     <string name="preOnboardingInputScreenButton">Neste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funksjoner er private og valgfrie. Du kan gjøre endringer i <b>Innstillinger > AI-funksjoner</b>.]]></string>
 
