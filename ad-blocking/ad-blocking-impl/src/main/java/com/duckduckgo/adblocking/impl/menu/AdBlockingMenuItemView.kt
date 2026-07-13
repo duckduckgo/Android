@@ -68,6 +68,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
+        isGone = true
         addView(menuItem)
     }
 
