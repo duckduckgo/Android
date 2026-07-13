@@ -36,5 +36,9 @@
     <string name="ad_blocking_menu_always_on">Всегда включено</string>
     <string name="ad_blocking_menu_disable_until_relaunch">Отключить до перезапуска</string>
     <string name="ad_blocking_menu_always_off">Всегда выключено</string>
+    <string name="ad_blocking_disabled_popup_title">Блокировка рекламы на YouTube не работает?</string>
+    <string name="ad_blocking_disabled_popup_description">Отправьте анонимное сообщение о проблеме в DuckDuckGo. Помогите улучшить блокировку рекламы для всех!</string>
+    <string name="ad_blocking_disabled_primary_action">Сообщить о проблеме</string>
+    <string name="ad_blocking_disabled_secondary_action">Отменить</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Отключено до перезапуска</string>
 </resources>
