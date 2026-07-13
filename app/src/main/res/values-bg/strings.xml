@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
+    <string name="preOnboardingComparisonChartDuckAi">Използвайте ChatGPT поверително с вграден Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Блокиране на целенасочени реклами и изскачащи прозорци за „бисквитки“</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Гледане на видеоклипове в YouTube без реклами</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Искате лесен достъп до поверителен чат с AI в адресната лента?</string>
     <string name="preOnboardingInputScreenButton">Следващ</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
