@@ -38,6 +38,7 @@ import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -74,6 +75,28 @@ class DownloadsViewModelTest {
                 mockNewDownloadState,
             )
         model
+    }
+
+    @Test
+    fun whenNoDownloadsThenHasDownloadsFalse() = runTest {
+        val list = emptyList<DownloadItem>()
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
+        testee.onItemVisibilityChanged(true)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().hasDownloads)
+        }
+    }
+
+    @Test
+    fun whenAtLeastOneDownloadThenHasDownloadsTrue() = runTest {
+        val list = listOf(oneItem())
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
+        testee.onItemVisibilityChanged(true)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().hasDownloads)
+        }
     }
 
     @Test
@@ -274,6 +297,8 @@ class DownloadsViewModelTest {
             assertEquals(3, items.downloadItems.size)
             assertEquals(1, items.filteredItems.size)
             assertTrue(items.filteredItems[0] is Empty)
+            // Search must stay available while filtering, even when the filter matches nothing.
+            assertTrue(items.hasDownloads)
         }
     }
 
