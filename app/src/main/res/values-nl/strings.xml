@@ -844,6 +844,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
+    <string name="preOnboardingComparisonChartDuckAi">Gebruik ChatGPT privé met Duck.ai ingebouwd</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Gerichte advertenties en cookiepop-ups blokkeren</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube-video\'s afspelen zonder advertenties</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
@@ -902,6 +905,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Wil je eenvoudig toegang tot privé AI-chat in de adresbalk?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 
