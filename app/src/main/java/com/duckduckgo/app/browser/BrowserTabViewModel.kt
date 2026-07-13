@@ -5727,13 +5727,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
-        if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive for this page
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             if (isCosmetic) {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
             } else {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
+            if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
             // TODO remove launch once address bar trackers animation is enabled permanently
             viewModelScope.launch {
                 if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
