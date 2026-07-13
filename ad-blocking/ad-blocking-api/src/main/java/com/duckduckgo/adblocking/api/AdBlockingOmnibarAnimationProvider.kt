@@ -34,5 +34,16 @@ sealed class AdBlockingAnimation {
         @field:StringRes val text: Int,
     ) : AdBlockingAnimation()
 
+    /**
+     * No badge should show for [url] (not an ad-blocked video page, or the feature is off). Any prior
+     * badge exclusivity for the page should be released.
+     */
     data object Skip : AdBlockingAnimation()
+
+    /**
+     * An in-page change that stayed on the same already-badged video: don't re-animate, but keep the
+     * current badge state (so a prior badge's exclusivity is preserved across the several url-change
+     * events a single navigation can emit).
+     */
+    data object Retain : AdBlockingAnimation()
 }

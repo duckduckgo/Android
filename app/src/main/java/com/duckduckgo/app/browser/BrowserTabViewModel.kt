@@ -2131,19 +2131,23 @@ class BrowserTabViewModel @Inject constructor(
         animation: AdBlockingAnimation,
         isPageLoad: Boolean,
     ) {
-        if (animation !is AdBlockingAnimation.Show) return
-        // Claim exclusivity now so trackers/cookies triggered during the load are suppressed.
-        adBlockingAnimationClaimed = true
-        val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
-        if (isPageLoad && currentLoadingViewState().isLoading) {
-            pendingAdBlockingAnimation = badge
-        } else {
-            command.value = badge
+        when (animation) {
+            is AdBlockingAnimation.Show -> {
+                // Claim exclusivity now so trackers/cookies triggered during the load are suppressed.
+                adBlockingAnimationClaimed = true
+                val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
+                if (isPageLoad && currentLoadingViewState().isLoading) {
+                    pendingAdBlockingAnimation = badge
+                } else {
+                    command.value = badge
+                }
+            }
+            is AdBlockingAnimation.Skip -> adBlockingAnimationClaimed = false
+            is AdBlockingAnimation.Retain -> Unit
         }
     }
 
     private fun resetAdBlockingAnimationState() {
-        adBlockingAnimationClaimed = false
         pendingAdBlockingAnimation = null
         adBlockingAnimationJob?.cancel()
     }

@@ -51,9 +51,9 @@ class RealAdBlockingOmnibarAnimationTest {
     }
 
     @Test
-    fun whenUrlChangedToSameVideoIdThenSkip() = runTest {
+    fun whenUrlChangedToSameVideoIdThenRetain() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
-        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = false) is AdBlockingAnimation.Skip)
+        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = false) is AdBlockingAnimation.Retain)
     }
 
     @Test

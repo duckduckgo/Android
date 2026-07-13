@@ -9976,6 +9976,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSameVideoRepeatEventReturnsRetainThenClaimKeptAndTrackersStaySuppressed() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Retain
+        }
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
     fun whenSpaNavigationsFireRapidlyThenBadgeStillShown() = runTest {
         loadUrl("https://www.youtube.com")
         givenAdBlockingBadgeWillShow()

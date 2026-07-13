@@ -53,7 +53,7 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
                     lastAnimatedVideoId = null
                     AdBlockingAnimation.Skip
                 }
-                lastAnimatedVideoId -> AdBlockingAnimation.Skip
+                lastAnimatedVideoId -> AdBlockingAnimation.Retain
                 else -> {
                     lastAnimatedVideoId = videoId
                     showBadge()
