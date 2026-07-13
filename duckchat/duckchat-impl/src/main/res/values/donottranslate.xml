@@ -20,6 +20,7 @@
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
     <!-- Subscription onboarding - Duck.ai step (placeholder copy) -->
+    <string name="subscriptionOnboardingDuckAiTitle">Duck.ai step</string>
     <string name="subscriptionOnboardingDuckAiText">Duck.ai onboarding step</string>
     <string name="subscriptionOnboardingDuckAiNext">Next</string>
 

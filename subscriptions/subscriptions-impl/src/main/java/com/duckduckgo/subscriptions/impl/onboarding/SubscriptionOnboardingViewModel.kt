@@ -25,6 +25,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
@@ -61,6 +62,9 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 
     private var started = false
 
+    // Mirrors the current step's InProgress.canGoBack, so onBack() knows whether to go back or exit.
+    private var canGoBack = false
+
     fun start() {
         if (started) return
         started = true
@@ -78,6 +82,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             is LinearOnboardingState.InProgress -> {
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
+                    canGoBack = state.canGoBack
                     _commands.send(Command.ShowStep(step.stepPlugin))
                 }
             }
@@ -90,7 +95,18 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         if (outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
             stepStore.setCompleted(stepId)
         }
-        viewModelScope.launch { orchestrator.onEvent(StepFinished(stepId)) }
+        viewModelScope.launch { orchestrator.onEvent(StepFinished(stepId, outcome)) }
+    }
+
+    fun onBack() {
+        viewModelScope.launch {
+            if (canGoBack) {
+                orchestrator.onEvent(BackPressed)
+            } else {
+                // Nothing earlier in the flow: back on the first step leaves onboarding.
+                _commands.send(Command.Finish)
+            }
+        }
     }
 
     fun onExit() {

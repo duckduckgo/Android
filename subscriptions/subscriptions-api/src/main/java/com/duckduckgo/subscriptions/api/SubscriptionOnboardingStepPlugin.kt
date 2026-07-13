@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.api
 
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 
 /**
@@ -30,6 +31,10 @@ import androidx.fragment.app.Fragment
 interface SubscriptionOnboardingStepPlugin {
     /** Stable id for this step. Also the key used to persist completion. */
     val stepId: String
+
+    /** Title shown in the host's toolbar while this step is on screen. */
+    @get:StringRes
+    val titleResId: Int
 
     /** Whether this step should be shown to the current user (e.g. gated by feature flag / entitlement). Skipped when false. */
     suspend fun shouldShow(): Boolean

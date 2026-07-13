@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.subscriptions.onboarding
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -29,6 +30,8 @@ import javax.inject.Inject
 class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
     override val stepId: String = DUCK_AI_STEP_ID
+
+    override val titleResId: Int = R.string.subscriptionOnboardingDuckAiTitle
 
     override suspend fun shouldShow(): Boolean = true
 

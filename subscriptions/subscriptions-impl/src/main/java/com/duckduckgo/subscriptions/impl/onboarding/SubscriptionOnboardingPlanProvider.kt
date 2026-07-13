@@ -20,8 +20,10 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
 import dagger.SingleInstanceIn
@@ -57,6 +59,7 @@ class SubscriptionOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when {
                     event is StepFinished && event.stepId == stepPlugin.stepId -> Advance
+                    event is BackPressed -> GoBack
                     else -> Stay
                 }
             },

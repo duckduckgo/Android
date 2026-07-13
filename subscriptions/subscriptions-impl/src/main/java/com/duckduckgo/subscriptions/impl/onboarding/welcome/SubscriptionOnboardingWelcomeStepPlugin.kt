@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -29,6 +30,8 @@ import javax.inject.Inject
 class SubscriptionOnboardingWelcomeStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
     override val stepId: String = WELCOME_STEP_ID
+
+    override val titleResId: Int = R.string.subscriptionOnboardingWelcomeTitle
 
     override suspend fun shouldShow(): Boolean = true
 

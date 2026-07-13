@@ -21,8 +21,11 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
@@ -52,9 +55,16 @@ class SubscriptionOnboardingPlanProviderTest {
     fun whenStepFinishedForCurrentStepThenAdvancesOtherwiseStays() = runTest {
         val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
 
-        assertEquals(Advance, step.transition(StepFinished("welcome")))
-        assertEquals(Stay, step.transition(StepFinished("vpn")))
+        assertEquals(Advance, step.transition(StepFinished("welcome", COMPLETED)))
+        assertEquals(Stay, step.transition(StepFinished("vpn", COMPLETED)))
         assertEquals(Stay, step.transition(object : LinearOnboardingEvent {}))
+    }
+
+    @Test
+    fun whenBackPressedThenGoesBack() = runTest {
+        val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
+
+        assertEquals(GoBack, step.transition(BackPressed))
     }
 
     @Test
@@ -78,6 +88,7 @@ class SubscriptionOnboardingPlanProviderTest {
     private fun stubPlugin(id: String, shouldShow: Boolean = true) =
         object : SubscriptionOnboardingStepPlugin {
             override val stepId: String = id
+            override val titleResId: Int = 0
             override suspend fun shouldShow(): Boolean = shouldShow
             override fun createFragment(): Fragment = Fragment()
         }

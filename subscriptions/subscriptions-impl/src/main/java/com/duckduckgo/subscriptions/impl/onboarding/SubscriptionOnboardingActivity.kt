@@ -18,6 +18,8 @@ package com.duckduckgo.subscriptions.impl.onboarding
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -58,6 +60,17 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
+
+        // Route the system back gesture (and the toolbar up arrow, via onOptionsItemSelected) through the ViewModel.
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBack()
+                }
+            },
+        )
 
         viewModel.commands
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -65,6 +78,14 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
             .launchIn(lifecycleScope)
 
         viewModel.start()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
@@ -84,6 +105,7 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
     }
 
     private fun showStep(stepPlugin: SubscriptionOnboardingStepPlugin) {
+        supportActionBar?.setTitle(stepPlugin.titleResId)
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, stepPlugin.createFragment(), stepPlugin.stepId)
         }
