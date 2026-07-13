@@ -235,12 +235,18 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
-        // Re-evaluate an already-attached nav bar when the mode/flag change: switching to Search-only
-        // (or turning the flag off) while the input is open must hide it, not leave it up until teardown.
         duckChatInputModeState.inputModeCapability
             .onEach {
                 inputModeCapability = it
-                refreshNavBarVisibility()
+                // A live switch to Search-only means the browser no longer uses native input. Tear down an
+                // open widget so the legacy omnibar returns instead of lingering as a toggle-less widget
+                // until the user closes and refocuses (hideNativeInput no-ops when nothing is shown).
+                // Otherwise re-evaluate the nav bar for the new mode.
+                if (!isNativeInputActive()) {
+                    hideNativeInput(animate = false)
+                } else {
+                    refreshNavBarVisibility()
+                }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeNativeInputNavBarEnabled()
