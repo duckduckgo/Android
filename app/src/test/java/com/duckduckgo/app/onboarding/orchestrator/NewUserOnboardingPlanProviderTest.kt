@@ -25,10 +25,10 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -977,7 +977,9 @@ class NewUserOnboardingPlanProviderTest {
 
     // region Home-screen prompts experiment composition
 
-    private suspend fun stepIdsFor(onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant): List<String> {
+    private suspend fun stepIdsFor(
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
+    ): List<String> {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
         return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
     }
@@ -1018,7 +1020,9 @@ class NewUserOnboardingPlanProviderTest {
 
     // region Step-indicator regression guard
 
-    private suspend fun indicatorCountFor(onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant): Int {
+    private suspend fun indicatorCountFor(
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
+    ): Int {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
         return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
             .count { (it as? NewUserOnboardingActivityStep)?.showsStepIndicator == true }
