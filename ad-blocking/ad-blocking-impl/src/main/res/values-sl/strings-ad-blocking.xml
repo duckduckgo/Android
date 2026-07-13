@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">DuckDuckGo pošljite anonimno poročilo o prekinitvi delovanja. Pomagajte izboljšati blokiranje oglasov za vse uporabnike.</string>
     <string name="ad_blocking_disabled_primary_action">Pošlji poročilo o prekinitvi delovanja</string>
     <string name="ad_blocking_disabled_secondary_action">Prekliči</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Onemogočeno do vnovičnega zagona</string>
 </resources>
