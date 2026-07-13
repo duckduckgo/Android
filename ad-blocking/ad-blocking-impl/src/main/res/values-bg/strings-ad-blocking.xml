@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">Изпратете анонимен сигнал за повреда до DuckDuckGo. Помогнете за подобряване на блокирането на реклами за всички!</string>
     <string name="ad_blocking_disabled_primary_action">Изпращане на сигнал за повреда</string>
     <string name="ad_blocking_disabled_secondary_action">Отмяна</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Деактивирано до рестартиране</string>
 </resources>
