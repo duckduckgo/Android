@@ -68,8 +68,8 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
     override fun render(state: AdBlockingSettingsViewModel.ViewState) {
         super.render(state)
         binding.adBlockingStatusIndicator.setStatus(state.isStatusIndicatorOn)
-        binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch
-        binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch
+        binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
+        binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
         if (state.disabledUntilRelaunch) {
             binding.blockAdsToggleUntilRelaunch.quietlySetIsChecked(state.isEnabled, untilRelaunchToggleListener)
         }
@@ -81,12 +81,10 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
             },
         )
         if (state.isContingencyMode) {
-            binding.blockAdsToggle.gone()
             binding.adBlockingDescription.gone()
             binding.contingencyModeItem.show()
         } else {
             binding.contingencyModeItem.gone()
-            binding.blockAdsToggle.show()
         }
     }
 }
