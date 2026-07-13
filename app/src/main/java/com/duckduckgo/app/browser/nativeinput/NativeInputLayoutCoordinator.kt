@@ -384,7 +384,11 @@ class NativeInputLayoutCoordinator(
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
         val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
-            widgetView.translationY = 0f
+            // Only reset bottom-anchored widgets. A top-anchored widget's translationY is owned by the
+            // nav bar visibility — the widget rides up by the nav bar height when the bar hides — so
+            // zeroing it here (this runs a frame after attach) would clobber that ride-up and leave a
+            // gap under the top chrome when reopening with prefilled text.
+            if (isBottom) widgetView.translationY = 0f
             return
         }
         fun applyOffset() {
