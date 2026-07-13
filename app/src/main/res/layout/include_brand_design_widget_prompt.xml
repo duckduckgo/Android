@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/keyline_3">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/widgetPromptTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/preOnboardingWidgetPromptTitle"
+            android:visibility="invisible"
+            app:typography="onboarding_title" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/widgetPromptTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="?attr/daxColorPrimaryText" />
+
+    </FrameLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/widgetPromptBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:alpha="0"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="@dimen/keyline_3"
+        android:text="@string/preOnboardingWidgetPromptBody"
+        app:typography="onboarding_body"
+        tools:alpha="1" />
+
+    <LinearLayout
+        android:id="@+id/widgetPromptMedia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_6"
+        android:alpha="0"
+        android:orientation="vertical"
+        tools:alpha="1">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_1"
+            android:adjustViewBounds="true"
+            android:background="@drawable/onboarding_widget_prompt_sketch_frame"
+            android:importantForAccessibility="no"
+            android:paddingHorizontal="@dimen/keyline_1"
+            android:paddingTop="@dimen/keyline_1"
+            android:scaleType="fitXY"
+            android:src="@drawable/onboarding_widget_prompt_preview"
+            tools:visibility="gone" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/onboarding_phone_sketch_line" />
+
+    </LinearLayout>
+
+</LinearLayout>

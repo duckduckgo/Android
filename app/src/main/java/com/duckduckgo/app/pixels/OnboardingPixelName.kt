@@ -22,6 +22,7 @@ enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName
     ONBOARDING_QUICK_SETUP("onboarding_quick-setup"),
     ONBOARDING_WELCOME("onboarding_welcome"),
     ONBOARDING_SET_DEFAULT("onboarding_set-default"),
+    ONBOARDING_WIDGET_PROMPT("onboarding_widget-prompt"),
     ONBOARDING_ADDRESS_BAR_POSITION("onboarding_address-bar-position"),
     ONBOARDING_SEARCH_EXPERIENCE("onboarding_search-experience"),
     ONBOARDING_SKIP_ONBOARDING("onboarding_skip-onboarding"),

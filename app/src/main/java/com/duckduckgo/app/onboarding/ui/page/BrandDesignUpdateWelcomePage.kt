@@ -80,6 +80,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
@@ -153,6 +154,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
+    private var homeScreenPromptFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
     private var quickSetupFadeInAnimatorSet: AnimatorSet? = null
@@ -212,7 +214,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         return inflater.cloneInContext(contextThemeWrapper)
     }
 
-    private fun updateAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
+    private fun updateAddressBarPositionOptions(
+        selectedOption: OmnibarType,
+        showSplitOption: Boolean = false,
+        animate: Boolean = true,
+    ) {
         with(binding.daxDialogCta.addressBarContent.addressBarPicker) {
             setLightMode(appTheme.isLightModeEnabled())
             isSplitOptionVisible = showSplitOption
@@ -356,44 +362,50 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     backgroundIntroAnimatorSet?.start()
                 }
             }
-            addAnimatorListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: android.animation.Animator) {
-                    if (!isDuckAiIntroAnimationEnabled) {
-                        introInProgress.value = false
-                        viewModel.onIntroAnimationFinished()
+            addAnimatorListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        if (!isDuckAiIntroAnimationEnabled) {
+                            introInProgress.value = false
+                            viewModel.onIntroAnimationFinished()
+                        }
                     }
-                }
-            })
+                },
+            )
             playAnimation()
         }
         introAnimatorSet = buildIntroAnimatorSet().apply {
-            addListener(object : AnimatorListenerAdapter() {
-                private var cancelled = false
+            addListener(
+                object : AnimatorListenerAdapter() {
+                    private var cancelled = false
 
-                override fun onAnimationCancel(animation: Animator) {
-                    cancelled = true
-                }
-
-                override fun onAnimationEnd(animation: Animator) {
-                    if (cancelled) {
-                        if (isDuckAiIntroAnimationEnabled) {
-                            introInProgress.value = false
-                            viewModel.onIntroAnimationFinished()
-                        }
-                        return
+                    override fun onAnimationCancel(animation: Animator) {
+                        cancelled = true
                     }
-                    if (!isDuckAiIntroAnimationEnabled) return
-                    prepareDuckAiIntroAnimation()
-                    binding.duckAiIntroAnimation.isVisible = true
-                    binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            introInProgress.value = false
-                            viewModel.onIntroAnimationFinished()
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (cancelled) {
+                            if (isDuckAiIntroAnimationEnabled) {
+                                introInProgress.value = false
+                                viewModel.onIntroAnimationFinished()
+                            }
+                            return
                         }
-                    })
-                    binding.duckAiIntroAnimation.playAnimation()
-                }
-            })
+                        if (!isDuckAiIntroAnimationEnabled) return
+                        prepareDuckAiIntroAnimation()
+                        binding.duckAiIntroAnimation.isVisible = true
+                        binding.duckAiIntroAnimation.addAnimatorListener(
+                            object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    introInProgress.value = false
+                                    viewModel.onIntroAnimationFinished()
+                                }
+                            },
+                        )
+                        binding.duckAiIntroAnimation.playAnimation()
+                    }
+                },
+            )
             start()
         }
     }
@@ -411,12 +423,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 height = viewHeightPx
             }
 
-            setFontAssetDelegate(object : FontAssetDelegate() {
-                override fun fetchFont(fontFamily: String): Typeface {
-                    return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
-                        ?: Typeface.DEFAULT
-                }
-            })
+            setFontAssetDelegate(
+                object : FontAssetDelegate() {
+                    override fun fetchFont(fontFamily: String): Typeface {
+                        return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
+                            ?: Typeface.DEFAULT
+                    }
+                },
+            )
 
             val textColor = resolveOnboardingTextPrimary(context)
             addValueCallback(KeyPath("**", "Duck.ai"), LottieProperty.COLOR) { textColor }
@@ -714,6 +728,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
+        homeScreenPromptFadeInAnimatorSet?.cancel()
+        homeScreenPromptFadeInAnimatorSet = null
+        binding.daxDialogCta.widgetPromptContent.widgetPromptTitle.cancelAnimation()
         inputScreenFadeInAnimatorSet?.removeAllListeners()
         inputScreenFadeInAnimatorSet?.cancel()
         inputScreenFadeInAnimatorSet = null
@@ -760,6 +777,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     override fun onResume() {
         super.onResume()
         viewModel.checkQuickSetupSwitchesState()
+        viewModel.checkAddWidgetPromptResult()
     }
 
     override fun onActivityResult(
@@ -1017,6 +1035,90 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
+                WIDGET_PROMPT -> {
+                    dismissBottomWingAnimation()
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.widgetPromptContent.root.isVisible = true
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+
+                    binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+
+                    val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
+                    val bodyView = binding.daxDialogCta.widgetPromptContent.widgetPromptBody
+                    val widgetPromptImage = binding.daxDialogCta.widgetPromptContent.widgetPromptMedia
+                    bodyView.text = getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+                    bodyView.alpha = 0f
+                    widgetPromptImage.alpha = 0f
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingWidgetPromptPrimaryCta)
+                    binding.daxDialogCta.primaryCta.alpha = 0f
+                    binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
+                    binding.daxDialogCta.secondaryCta.alpha = 0f
+
+                    titleView.cancelAnimation()
+                    titleView.text = ""
+                    titleView.alpha = 1f
+
+                    binding.daxDialogCta.cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                    binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
+
+                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.ComparisonChart)
+
+                    binding.daxDialogCta.stepIndicator.animateToStep(currentPageNumber, maxPageCount)
+
+                    val transition = ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            if (view == null) return
+                            titleView.startOnboardingTypingAnimation(getString(R.string.preOnboardingWidgetPromptTitle).preventWidows()) {
+                                binding.daxDialogCta.secondaryCta.isVisible = true
+                                homeScreenPromptFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(bodyView, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(widgetPromptImage, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(
+                                        object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                isAnimating = false
+                                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
+                                            }
+                                        },
+                                    )
+                                    start()
+                                }
+                            }
+                        }
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
+                    binding.daxDialogCta.root.translationZ = 1f.toPx()
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
+                }
+
                 SKIP_ONBOARDING_OPTION -> {
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
@@ -1092,6 +1194,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.widgetPromptContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
                     updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
@@ -1646,6 +1750,62 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
 
+            WIDGET_PROMPT -> {
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                binding.bottomWingAnimation.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.addressBarContent.root.isVisible = false
+                binding.daxDialogCta.inputScreenContent.root.isVisible = false
+                binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = false
+                binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = false
+
+                binding.daxDialogCta.widgetPromptContent.root.isVisible = true
+
+                // No bobbing dax/bottom wing decoration on this dialog — always pin to the top,
+                // otherwise a fresh view (e.g. after a rotation-triggered recreation) falls back
+                // to the top-level layout's default bottom-anchored bias.
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    verticalBias = 0f
+                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                }
+
+                val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
+                titleView.cancelAnimation()
+                titleView.text = getString(R.string.preOnboardingWidgetPromptTitle).preventWidows()
+                titleView.alpha = 1f
+                binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
+                    getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+                binding.daxDialogCta.widgetPromptContent.widgetPromptBody.alpha = 1f
+                binding.daxDialogCta.widgetPromptContent.widgetPromptMedia.alpha = 1f
+
+                binding.daxDialogCta.cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
+                binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
+
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingWidgetPromptPrimaryCta)
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+
+                binding.daxDialogCta.secondaryCta.visibility = View.VISIBLE
+                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
+                binding.daxDialogCta.secondaryCta.alpha = 1f
+                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
+
+                binding.daxDialogCta.stepIndicator.alpha = 1f
+                binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
+            }
+
             SKIP_ONBOARDING_OPTION -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
@@ -1717,6 +1877,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
                 binding.daxDialogCta.secondaryCta.isVisible = false
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.widgetPromptContent.root.isVisible = false
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
                 updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
@@ -2020,6 +2181,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 setInputScreenPreviewInputMode(InputMode.CHAT, tabState.inputScreenPreviewChatSuggestions)
                             }
                         }
+
                         override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
                         override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
                     },
@@ -2092,7 +2254,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun bindQuickSetupSelection(position: OmnibarType, withAi: Boolean) {
+    private fun bindQuickSetupSelection(
+        position: OmnibarType,
+        withAi: Boolean,
+    ) {
         with(binding.daxDialogCta.reinstallerQuickSetupContent) {
             addressBarPositionItem.setIcon(addressBarPositionIconRes(position))
             addressBarPositionItem.setSecondaryText(addressBarPositionLabelRes(position))
@@ -2347,6 +2512,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 inputScreenContent.inputScreenTitle,
                 inputScreenPreviewContent.inputScreenPreviewTitle,
                 reinstallerQuickSetupContent.quickSetupTitle,
+                widgetPromptContent.widgetPromptTitle,
             ).filter { it.hasAnimationStarted() }.forEach { it.performClick() }
         }
 
@@ -2360,6 +2526,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenPreviewFadeInAnimatorSet?.end()
         quickSetupFadeInAnimatorSet?.end()
         suggestionButtonsAnimatorSet?.end()
+        homeScreenPromptFadeInAnimatorSet?.end()
 
         // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one.
         // Only do this on the comparison chart: those runnables are only ever scheduled by playCheckIconAnimation(),

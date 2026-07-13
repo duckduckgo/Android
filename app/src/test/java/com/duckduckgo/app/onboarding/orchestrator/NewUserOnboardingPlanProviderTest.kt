@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -102,6 +103,7 @@ class NewUserOnboardingPlanProviderTest {
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
+    private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -123,6 +125,8 @@ class NewUserOnboardingPlanProviderTest {
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
             whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
+            whenever(homeScreenPromptsExperiment.enroll())
+                .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -144,6 +148,7 @@ class NewUserOnboardingPlanProviderTest {
             customAiOnboardingStore = customAiOnboardingStore,
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
+            onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
         )
     }
 
@@ -966,6 +971,63 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
         orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
         verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked())
+    }
+
+    // endregion
+
+    // region Home-screen prompts experiment composition
+
+    private suspend fun stepIdsFor(onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant): List<String> {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
+        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
+    }
+
+    @Test
+    fun whenControlThenNoNewPagesInPlan() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
+    // The dock-only/dock-and-widget cohorts are exercised once add_to_dock's implementation lands
+    // on its own branch — until then those cohorts simply see no new pages here, same as CONTROL.
+
+    @Test
+    fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET),
+        )
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
+        )
+    }
+
+    @Test
+    fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
+        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+    }
+
+    // endregion
+
+    // region Step-indicator regression guard
+
+    private suspend fun indicatorCountFor(onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant): Int {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
+        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
+            .count { (it as? NewUserOnboardingActivityStep)?.showsStepIndicator == true }
+    }
+
+    @Test
+    fun stepIndicatorTotalsMatchCohort() = runTest {
+        val control = indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY))
     }
 
     // endregion

@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -83,6 +84,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -124,6 +126,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun setUp() {
         runBlocking {
             whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
+            whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(false)
         }
     }
 
@@ -1672,6 +1675,109 @@ class BrandDesignUpdatePageViewModelTest {
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
         )
+
+    // endregion
+
+    // region Widget prompt (orchestrator-driven flow)
+
+    // These hand-built steps mirror the shapes NewUserOnboardingPlanProvider's widgetPromptStep()/
+    // addWidgetStep() resolve to (Task 5); the orchestrator here is the mock, so `transition` is never actually
+    // invoked to advance state — these tests only assert the VM's dialog rendering and CTA -> event mapping.
+    private fun widgetPromptStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.WIDGET_PROMPT,
+            pixelName = null,
+            showsStepIndicator = true,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
+        )
+
+    private fun addWidgetStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_WIDGET,
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddWidget },
+        )
+
+    private fun inProgressOn(step: NewUserOnboardingActivityStep) =
+        LinearOnboardingState.InProgress(
+            rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
+            currentStepIndex = 0,
+        )
+
+    @Test
+    fun whenWidgetPromptPrimaryThenAddWidgetRequestedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(widgetPromptStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.WIDGET_PROMPT, testee.viewState.value.currentDialog)
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.AddWidgetRequested)
+    }
+
+    // TODO: this only covers the VM's CTA -> event mapping (WidgetPromptSkipped). Asserting that the add_widget
+    // step is then actually skipped requires the real addWidgetStep()/ctx.skipAddWidget precondition wired by
+    // NewUserOnboardingPlanProvider (Task 5) driven through a real LinearOnboardingOrchestratorImpl, as in
+    // BrandDesignUpdatePageViewModelOrchestratorTest — this file's mock orchestrator never evaluates preconditions
+    // or advances plan state. The precondition-skip behaviour itself is covered by NewUserOnboardingPlanProviderTest.
+    @Test
+    fun whenWidgetPromptSecondaryThenWidgetPromptSkippedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(widgetPromptStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.WidgetPromptSkipped)
+    }
+
+    @Test
+    fun whenAddWidgetDialogAppliedThenLaunchAddWidgetPromptCommandAndNoAdvance() = runTest {
+        orchestratorState.value = inProgressOn(addWidgetStep())
+        val testee = createViewModel()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchAddWidgetPrompt)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        // No page of its own (PreOnboardingDialogType has no AddWidget entry) and no orchestrator event yet -
+        // advancing only happens later, from checkAddWidgetPromptResult() on the next onResume.
+        assertNull(testee.viewState.value.currentDialog)
+        verify(mockOrchestrator, never()).onEvent(any())
+    }
+
+    @Test
+    fun whenResumeAfterAddWidgetPromptWithWidgetInstalledThenAdvancesWithAdded() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        orchestratorState.value = inProgressOn(addWidgetStep())
+        val testee = createViewModel()
+        advanceUntilIdle() // applies the AddWidget dialog: sends LaunchAddWidgetPrompt, marks the flow started
+
+        testee.checkAddWidgetPromptResult()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = true))
+    }
+
+    @Test
+    fun whenResumeWithoutAddWidgetPromptStartedThenNoWidgetEvent() = runTest {
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        testee.checkAddWidgetPromptResult()
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockWidgetCapabilities)
+        verify(mockOrchestrator, never()).onEvent(any())
+    }
 
     // endregion
 }

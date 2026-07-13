@@ -177,6 +177,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private var notificationPermissionGranted: Boolean? = null
 
+    // Set when the add-widget system prompt has been launched from the add_widget step. The next
+    // onResume re-checks hasInstalledWidgets, fires the confirmed pixel (in the step), and advances.
+    private var addWidgetPromptFlowStarted = false
+
     // Which flow drives this run, chosen once at construction. Legacy = the in-VM state machine;
     // Orchestrator = translate fragment callbacks to LinearOnboardingOrchestrator events and render its
     // state. Either way the intra-dialog interaction methods below are shared and behave identically.
@@ -272,7 +276,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP, WIDGET_PROMPT -> Unit
         }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
@@ -415,6 +419,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         viewModelScope.launch {
             val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
             _commands.send(Command.SyncAddWidgetSwitch(isChecked = hasWidget))
+        }
+    }
+
+    fun checkAddWidgetPromptResult() {
+        if (!addWidgetPromptFlowStarted) return
+        viewModelScope.launch {
+            val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
+            addWidgetPromptFlowStarted = false
+            orchestrator.onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = hasWidget))
         }
     }
 
@@ -596,8 +609,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     }
                 }
 
-                AI_COMPARISON_CHART -> {
-                    // Unreachable in both paths today (no AI_COMPARISON_CHART step / trigger).
+                AI_COMPARISON_CHART, WIDGET_PROMPT -> {
+                    // Unreachable in the legacy flow (no AI_COMPARISON_CHART/WIDGET_PROMPT step or trigger).
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
@@ -673,7 +686,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     }
                 }
 
-                INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
+                INITIAL,
+                COMPARISON_CHART,
+                AI_COMPARISON_CHART,
+                ADDRESS_BAR_POSITION,
+                INPUT_SCREEN,
+                INPUT_SCREEN_PREVIEW,
+                QUICK_SETUP,
+                WIDGET_PROMPT,
+                -> {
                     // no-op
                 }
             }
@@ -735,6 +756,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     val state = _viewState.value
                     emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
                 }
+                WIDGET_PROMPT -> emit(NewUserOnboardingEvent.AddWidgetRequested)
             }
         }
 
@@ -742,7 +764,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             when (dialog) {
                 INITIAL_REINSTALL_USER, SYNC_RESTORE -> emit(NewUserOnboardingEvent.SkipRequested)
                 SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.ResumeRequested)
-                INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+                WIDGET_PROMPT -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
+                INITIAL,
+                COMPARISON_CHART,
+                AI_COMPARISON_CHART,
+                ADDRESS_BAR_POSITION,
+                INPUT_SCREEN,
+                INPUT_SCREEN_PREVIEW,
+                QUICK_SETUP,
+                -> Unit
             }
         }
 
@@ -837,6 +867,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
                         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
                     }
+                }
+                NewUserOnboardingActivityDialog.WidgetPrompt ->
+                    setCurrentDialog(WIDGET_PROMPT, currentPageNumber = page, totalSteps = total)
+                NewUserOnboardingActivityDialog.AddWidget -> {
+                    // Action step: launch the system add-widget prompt and mark the flow started.
+                    // Advance happens on the next onResume via checkAddWidgetPromptResult(). No page of its own,
+                    // like DefaultBrowserPrompt — the widget_prompt page stays visible under the system dialog.
+                    addWidgetPromptFlowStarted = true
+                    _commands.send(Command.LaunchAddWidgetPrompt)
                 }
                 is NewUserOnboardingActivityDialog.AddressBarPosition -> {
                     _viewState.update { it.copy(showSplitOption = dialog.showSplitOption) }

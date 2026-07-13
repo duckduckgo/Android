@@ -52,6 +52,9 @@ sealed interface OnboardingPixelAction {
     data class Clicked(val engaged: Boolean? = null) : OnboardingPixelAction
 
     data class SetDefaultConfirmed(val isDdgDefault: Boolean) : OnboardingPixelAction
+
+    /** Widget-prompt confirmed result. value = added | not_added. */
+    data class WidgetConfirmed(val added: Boolean) : OnboardingPixelAction
     data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelAction
     data class AddressBarClicked(val position: OmnibarType) : OnboardingPixelAction
     data class SearchExperienceClicked(val withAi: Boolean) : OnboardingPixelAction
@@ -133,6 +136,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.SetDefaultConfirmed ->
                 fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.isDdgDefault) VALUE_DDG else VALUE_OTHER)
+
+            is OnboardingPixelAction.WidgetConfirmed ->
+                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.added) VALUE_ADDED else VALUE_NOT_ADDED)
 
             is OnboardingPixelAction.NotificationsConfirmed ->
                 fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.granted) VALUE_GRANTED else VALUE_DENIED)
@@ -290,6 +296,8 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val VALUE_DISMISS = "dismiss"
         private const val VALUE_DDG = "ddg"
         private const val VALUE_OTHER = "other"
+        private const val VALUE_ADDED = "added"
+        private const val VALUE_NOT_ADDED = "not_added"
         private const val VALUE_GRANTED = "granted"
         private const val VALUE_DENIED = "denied"
         private const val SEARCH_ONLY = "search_only"

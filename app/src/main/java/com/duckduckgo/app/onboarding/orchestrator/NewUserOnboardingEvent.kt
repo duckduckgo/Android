@@ -47,4 +47,17 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
      * See [NewUserOnboardingPlanProvider.abortingOnDevSkip].
      */
     data object SkipNewUserOnboardingDevOptionClicked : NewUserOnboardingEvent
+
+    /** Widget-prompt page: user tapped the primary "Add widget" CTA. */
+    data object AddWidgetRequested : NewUserOnboardingEvent
+
+    /** Widget-prompt page: user tapped the secondary "Maybe later" CTA. */
+    data object WidgetPromptSkipped : NewUserOnboardingEvent
+
+    /**
+     * The add-widget system prompt flow has returned (resume after launch). [widgetAdded] is the
+     * re-checked `hasInstalledWidgets` result; advances the add_widget step. There is no decline
+     * callback from requestPinAppWidget, so this is derived from onResume, not a result callback.
+     */
+    data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
 }
