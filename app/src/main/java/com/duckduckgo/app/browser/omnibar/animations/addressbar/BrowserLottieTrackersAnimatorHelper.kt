@@ -74,6 +74,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
 
+    private lateinit var adBlockingView: LottieAnimationView
+    private lateinit var adBlockingScene: ViewGroup
+    private lateinit var adBlockingViewBackground: View
+    private var isAdBlockingAnimationRunning = false
+    private var hasAdBlockingAnimationBeenCanceled = false
+    private lateinit var adBlockingFirstScene: Scene
+    private lateinit var adBlockingSecondScene: Scene
+
     override fun startTrackersAnimation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
@@ -82,7 +90,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>?,
         useLightAnimation: Boolean?,
     ) {
-        if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
+        if (isCookiesAnimationRunning || isAdBlockingAnimationRunning) return // let an in-flight badge/cookie animation finish to avoid glitches
         if (trackersAnimationView.isAnimating) return
 
         this.trackersAnimation = trackersAnimationView
@@ -146,7 +154,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         customBackgroundColor: Int?,
         useSoftwareRenderingMode: Boolean,
     ) {
-        if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
+        if (isCookiesAnimationRunning || isAdBlockingAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
         addressBarTrackersAnimator.startAnimation(
             context = context,
@@ -206,10 +214,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         conflatedJob.cancel()
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
+        stopCookiesAnimation()
 
-        this.cookieScene = badgeScene
-        this.cookieViewBackground = badgeBackground
-        this.cookieView = badgeAnimationView
+        this.adBlockingScene = badgeScene
+        this.adBlockingViewBackground = badgeBackground
+        this.adBlockingView = badgeAnimationView
         startAdBlockingAnimation(context, omnibarViews + shieldViews, icon, text)
     }
 
@@ -225,16 +234,16 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         textRes: Int,
     ) {
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
-        isCookiesAnimationRunning = true
+        isAdBlockingAnimationRunning = true
 
-        firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
-        secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.cookie_scene_1, context)
+        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.cookie_scene_2, context)
 
-        hasCookiesAnimationBeenCanceled = false
+        hasAdBlockingAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
-        cookieView.show()
-        cookieView.alpha = 0F
-        cookieView.setImageResource(iconRes) // static icon — no Lottie
+        adBlockingView.show()
+        adBlockingView.alpha = 0F
+        adBlockingView.setImageResource(iconRes) // static icon — no Lottie
 
         val slideInTransition: Transition = createSlideTransition()
         val slideOutTransition: Transition = createSlideTransition()
@@ -244,31 +253,31 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             object : TransitionListener {
                 override fun onTransitionEnd(transition: Transition) {
                     AnimatorSet().apply {
-                        play(commonAddressBarAnimationHelper.animateFadeIn(cookieView, 0L)) // holds via startDelay
+                        play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L)) // holds via startDelay
                         startDelay = COOKIES_ANIMATION_DELAY
                         addListener(
                             doOnEnd {
-                                if (!hasCookiesAnimationBeenCanceled) {
+                                if (!hasAdBlockingAnimationBeenCanceled) {
                                     AnimatorSet().apply {
-                                        TransitionManager.go(firstScene, slideOutTransition)
-                                        play(commonAddressBarAnimationHelper.animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                        TransitionManager.go(adBlockingFirstScene, slideOutTransition)
+                                        play(commonAddressBarAnimationHelper.animateFadeOut(adBlockingView, COOKIES_ANIMATION_FADE_OUT_DURATION))
                                             .with(
                                                 commonAddressBarAnimationHelper.animateFadeOut(
-                                                    cookieViewBackground,
+                                                    adBlockingViewBackground,
                                                     COOKIES_ANIMATION_FADE_OUT_DURATION,
                                                 ),
                                             )
                                         addListener(
                                             doOnEnd {
-                                                cookieView.gone()
-                                                isCookiesAnimationRunning = false
+                                                adBlockingView.gone()
+                                                isAdBlockingAnimationRunning = false
                                                 listener?.onAnimationFinished()
                                             },
                                         )
                                         start()
                                     }
                                 } else {
-                                    isCookiesAnimationRunning = false
+                                    isAdBlockingAnimationRunning = false
                                     listener?.onAnimationFinished()
                                 }
                             },
@@ -288,14 +297,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         slideOutTransition.addListener(
             object : TransitionListener {
                 override fun onTransitionEnd(transition: Transition) {
-                    if (!hasCookiesAnimationBeenCanceled) {
+                    if (!hasAdBlockingAnimationBeenCanceled) {
                         AnimatorSet().apply {
                             play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
                             start()
                         }
-                        cookieScene.gone()
+                        adBlockingScene.gone()
                     } else {
-                        isCookiesAnimationRunning = false
+                        isAdBlockingAnimationRunning = false
                         listener?.onAnimationFinished()
                     }
                 }
@@ -310,14 +319,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         // Fade omnibar out, fade the badge in, then drive the text slide-in directly (no Lottie).
         AnimatorSet().apply {
             play(commonAddressBarAnimationHelper.animateViewsOut(allOmnibarViews))
-                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieViewBackground))
-                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieView))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(adBlockingViewBackground))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView))
             addListener(
                 onEnd = {
-                    cookieScene.show()
-                    cookieScene.alpha = 1F
-                    TransitionManager.go(secondScene, slideInTransition)
-                    cookieScene.findViewById<DaxTextView>(R.id.cookiesManagedText)?.setText(textRes)
+                    adBlockingScene.show()
+                    adBlockingScene.alpha = 1F
+                    TransitionManager.go(adBlockingSecondScene, slideInTransition)
+                    adBlockingScene.findViewById<DaxTextView>(R.id.cookiesManagedText)?.setText(textRes)
                 },
             )
             start()
@@ -339,6 +348,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
+        stopAdBlockingAnimation()
         omnibarViews.forEach { it.alpha = 1f }
     }
 
@@ -551,6 +561,19 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieViewBackground.alpha = 0f
         cookieScene.gone()
         cookieView.gone()
+    }
+
+    private fun stopAdBlockingAnimation() {
+        if (!::adBlockingViewBackground.isInitialized || !::adBlockingView.isInitialized) return
+
+        hasAdBlockingAnimationBeenCanceled = true
+        if (this::adBlockingFirstScene.isInitialized) {
+            TransitionManager.go(adBlockingFirstScene)
+        }
+        shieldAnimation?.alpha = 1f
+        adBlockingViewBackground.alpha = 0f
+        adBlockingScene.gone()
+        adBlockingView.gone()
     }
 
     private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
