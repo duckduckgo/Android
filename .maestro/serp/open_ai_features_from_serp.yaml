@@ -1,0 +1,40 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+name: "AI Features: open native AI Features settings from the SERP menu"
+tags:
+  - serpFlows
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - assertVisible:
+          text: "Search"
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://duckduckgo.com"
+      - pressKey: Enter
+
+      # Tap the side-menu button *inside the web page* (top right, next to "Duck.ai"). This button does not have an id.
+      - tapOn:
+          text: "Menu"
+          index: 0
+
+      # Navigate the in-page settings: Settings > AI Features > Manage in Browser Settings.
+      - tapOn:
+          text: "Settings"
+      - tapOn:
+          text: "AI Features"
+      - tapOn:
+          text: "Manage in Browser Settings"
+
+      # "Manage in Browser Settings" deep-links into the native "AI Features" settings screen.
+      - assertVisible:
+          text: "AI Features"
+      - assertVisible:
+          text: "DuckDuckGo AI features are private and optional.*"
