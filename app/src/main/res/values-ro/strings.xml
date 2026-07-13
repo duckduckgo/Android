@@ -862,6 +862,9 @@
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
+    <string name="preOnboardingComparisonChartDuckAi">Folosește ChatGPT în privat cu Duck.ai încorporat</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blochează reclamele direcționate și ferestrele pop-up pentru module cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Redă videoclipuri YouTube fără reclame</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
@@ -922,6 +925,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vrei acces rapid la chat privat cu AI în bara de adrese?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 
