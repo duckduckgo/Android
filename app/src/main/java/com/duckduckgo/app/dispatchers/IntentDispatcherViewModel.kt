@@ -29,7 +29,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -43,7 +42,6 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class IntentDispatcherViewModel @Inject constructor(
-    private val customTabDetector: CustomTabDetector,
     private val dispatcherProvider: DispatcherProvider,
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -91,8 +89,6 @@ class IntentDispatcherViewModel @Inject constructor(
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl && !isDuckAiUrl
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
-
-                customTabDetector.setCustomTab(customTabRequested)
 
                 _viewState.emit(
                     viewState.value.copy(

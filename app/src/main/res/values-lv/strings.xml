@@ -685,21 +685,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
-    <string name="downloadsActivityTitle">Lejupielādes</string>
-    <string name="downloadsActivityNoItemsDescription">Vēl nav lejupielādēts neviens fails</string>
-    <string name="downloadsShareTitle">Kopīgot ar…</string>
     <string name="downloadsDownloadFinishedActionName">Atvērt</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Fails vairs nepastāv</string>
-    <string name="downloadsItemMenuShare">Kopīgot</string>
-    <string name="downloadsItemMenuDelete">Dzēst</string>
-    <string name="downloadsItemMenuCancel">Atcelt</string>
-    <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izdzēsts %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Citas iespējas %1$s</string>
-    <string name="downloadsUndoActionName">Atsaukt</string>
-    <string name="downloadsStateInProgress">Notiek...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
@@ -721,8 +707,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
-    <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
 
@@ -1095,4 +1079,22 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Apstiprināt</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Atvērt Fire cilnē</string>
+    <string name="openInBackgroundTab">Atvērt fonā</string>
+    <string name="browserModeToggleFireDescription">Pārslēdzies uz Fire režīma cilnēm</string>
+    <string name="browserModeToggleRegularDescription">Pārslēgties uz parastajām cilnēm</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire cilne</string>
+    <string name="fireTabNewTabPageTitle">Fire cilne</string>
+    <string name="fireTabsEmptyStateTitle">Fire cilnes</string>
+    <string name="fireTabsFeatureNoHistory">Pārlūkot, nesaglabājot vietējo vēsturi</string>
+    <string name="fireTabsFeatureDifferentAccount">Pierakstīties vietnē ar citu kontu</string>
+    <string name="fireTabsFeatureTroubleshoot">Tīmekļa vietņu problēmu novēršana</string>
+    <string name="fireTabsExplainer">Fire cilnes ir izolētas no citiem pārlūkprogrammas datiem. Tās visas aizverot, to dati tiek iznīcināti. Tām ir tāda pati izsekošanas aizsardzība kā citām cilnēm.</string>
+    <string name="fireTabsNewTabButton">Jauna Fire cilne</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>JAUNUMS!</b> Izmēģini Fire Tabs, lai pārlūkotu, nesaglabājot vietējo vēsturi.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

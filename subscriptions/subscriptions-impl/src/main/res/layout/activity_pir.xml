@@ -29,6 +29,7 @@
             layout="@layout/privacy_pro_toolbar"/>
 
     <ScrollView
+            android:id="@+id/contentScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

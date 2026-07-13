@@ -24,6 +24,8 @@ import android.view.MotionEvent
 import android.view.View.MeasureSpec
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnLayout
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
@@ -59,7 +61,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
 
     private val touchSlop: Int = ViewConfiguration.get(context).scaledTouchSlop
 
-    private var listener: ((BrowserMode) -> Unit)? = null
+    private var listener: ((BrowserMode, fromDrag: Boolean) -> Unit)? = null
     private var currentMode: BrowserMode? = null
 
     private var dragging = false
@@ -108,7 +110,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
         }
     }
 
-    fun setOnModeChangedListener(listener: (BrowserMode) -> Unit) {
+    fun setOnModeChangedListener(listener: (BrowserMode, fromDrag: Boolean) -> Unit) {
         this.listener = listener
     }
 
@@ -171,7 +173,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
                     // Let the ViewModel publish the change; setMode arrives via the flow
                     // and finishes the animation. Don't pre-animate here — keeps a single
                     // source of truth and avoids a snap-and-jump if the switch is vetoed.
-                    listener?.invoke(snappedMode)
+                    listener?.invoke(snappedMode, true)
                 } else {
                     // No mode change — snap the indicator back to the current segment.
                     animateIndicatorTo(snappedMode, animated = true)
@@ -208,7 +210,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
             BrowserMode.FIRE -> BrowserMode.REGULAR
             BrowserMode.REGULAR, null -> BrowserMode.FIRE
         }
-        listener?.invoke(target)
+        listener?.invoke(target, false)
     }
 
     private companion object {

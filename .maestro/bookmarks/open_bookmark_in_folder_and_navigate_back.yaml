@@ -14,7 +14,7 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
 
             - tapOn:
-                  id: "inputField"
+                  id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/"
             - pressKey: Enter
             - assertVisible:
@@ -26,8 +26,7 @@ tags:
             - tapOn:
                   text: "add bookmark"
             - tapOn:
-                  id: "omnibarTextInputClickCatcher"
-            - eraseText
+                  id: "omnibarTextInput"
             - inputText: "https://www.search-company.site/"
             - pressKey: Enter
             - assertVisible:

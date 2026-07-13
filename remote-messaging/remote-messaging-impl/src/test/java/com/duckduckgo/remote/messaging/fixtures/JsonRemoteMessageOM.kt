@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.fixtures
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
+import com.duckduckgo.remote.messaging.impl.models.JsonDisplayConditions
 import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
@@ -159,6 +160,7 @@ object JsonRemoteMessageOM {
         matchingRules: List<Int> = emptyList(),
         translations: Map<String, JsonContentTranslations> = emptyMap(),
         surfaces: List<String>? = null,
+        displayConditions: JsonDisplayConditions? = null,
     ) = JsonRemoteMessage(
         id = id,
         content = content,
@@ -166,6 +168,7 @@ object JsonRemoteMessageOM {
         matchingRules = matchingRules,
         translations = translations,
         surfaces = surfaces,
+        displayConditions = displayConditions,
     )
 
     fun aJsonRemoteMessagingConfig(

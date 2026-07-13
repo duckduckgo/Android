@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -31,6 +32,7 @@ class PendingDownloadStoreTest {
         url = url,
         subfolder = "Downloads",
         directory = File("/tmp"),
+        browserMode = BrowserMode.REGULAR,
     )
 
     private fun putAndTrack(download: PendingFileDownload): String {

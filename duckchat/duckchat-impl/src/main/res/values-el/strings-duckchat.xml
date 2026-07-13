@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Απόκρυψη εικόνων που δημιουργήθηκαν με τεχνητή νοημοσύνη</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Φιλτράρει τις εικόνες που δημιουργούνται με τεχνητή νοημοσύνη από τα αποτελέσματα αναζήτησης εικόνων</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Ποτέ</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Κατ\' απαίτηση</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Μερικές φορές</string>
+    <string name="duckAiSearchAssistVisibilityOften">Συχνά</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Χρησιμοποιήστε το DuckDuckGo χωρίς AI</string>
+    <string name="duckAiUseWithoutAiDescription">Απενεργοποιεί το Duck.ai, αποκρύπτει από την αναζήτηση απαντήσεις που υποβοηθούνται από τεχνητή νοημοσύνη και φιλτράρει γνωστούς ιστότοπους με απατηλό περιεχόμενο τεχνητής νοημοσύνης στα αποτελέσματα αναζήτησης εικόνων.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Η τεχνητή νοημοσύνη είναι προς το παρόν απενεργοποιημένη στο πρόγραμμα περιήγησης, επομένως δεν θα βλέπεις πλέον απαντήσεις που υποβοηθούνται από τεχνητή νοημοσύνη και θα βλέπεις λιγότερες εικόνες που δημιουργούνται από τεχνητή νοημοσύνη στα αποτελέσματα αναζήτησης εικόνων.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Εναλλαγή μεταξύ Αναζήτησης και Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Απόκρυψη εικόνων που δημιουργήθηκαν με τεχνητή νοημοσύνη</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Αποκλείει γνωστούς ιστότοπους με απατηλό περιεχόμενο τεχνητής νοημοσύνης από τα αποτελέσματα αναζήτησης εικόνων. <annotation link="learn_more">Μάθετε περισσότερα</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ενεργοποίηση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Διαχείριση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
@@ -182,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Εμφάνιση</string>
     <string name="duck_ai_chat_history_download_error">Δεν ήταν δυνατή η εξαγωγή της συνομιλίας</string>
     <string name="duck_ai_chat_history_bulk_download_error">Δεν ήταν δυνατή η εξαγωγή των συνομιλιών</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Αναζήτηση DuckDuckGo</string>
+    <string name="native_input_chat_hint">Ρώτα οτιδήποτε ιδιωτικά…</string>
+    <string name="native_input_chat_duck_mode_hint">Απάντηση…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Λειτουργία συλλογιστικής</string>
+    <string name="duckChatReasoningModeFastTitle">Γρήγορα</string>
+    <string name="duckChatReasoningModeFastSubtitle">Άμεσες απαντήσεις</string>
+    <string name="duckChatReasoningModeReasoningTitle">Συλλογιστική</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Για σύνθετες εργασίες</string>
+    <string name="duckChatReasoningModeExtendedTitle">Εκτεταμένη συλλογιστική</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Για εργασίες ανάλυσης</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Έναρξη συνομιλίας</string>
+    <string name="duckChatStopStreamingContentDescription">Διακοπή δημιουργίας</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Αφαίρεση εικόνας</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Μπορείτε να επισυνάψετε μόνο %1$d εικόνες κάθε φορά.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Μπορείτε να επισυνάψετε μόνο %1$d εικόνες ανά συνομιλία.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Τραβήξτε φωτογραφία</string>
+    <string name="attachmentAttachPhoto">Προσθήκη εικόνας</string>
+    <string name="attachmentAttachFile">Προσθήκη αρχείου</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Αφαίρεση αρχείου</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Μπορείτε να επισυνάψετε μόνο %1$d αρχεία ανά συνομιλία.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Το αρχείο υπερβαίνει το μέγιστο μέγεθος των %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Ένα από τα συνημμένα αρχεία έχει περισσότερες σελίδες από όσες υποστηρίζουμε. Μεταφορτώστε αρχεία με %1$d σελίδες ή λιγότερες.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Τα συνημμένα αρχεία υπερβαίνουν το όριο συνολικού μεγέθους των %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Μεταφόρτωση αρχείου</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Επιλογές Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Αφαίρεση %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Δημιουργία εικόνας</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Μετατροπή κειμένου σε εικόνες</string>
+    <string name="duckChatOptionsMenuWebSearch">Αναζήτηση στο διαδίκτυο</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Βρείτε απαντήσεις από το διαδίκτυο</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Προσαρμογή απαντήσεων</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Ορισμός τόνου, μήκους και συμπεριφοράς</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Άνοιγμα μενού Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Ρυθμίσεις Duck.ai</string>
 </resources>

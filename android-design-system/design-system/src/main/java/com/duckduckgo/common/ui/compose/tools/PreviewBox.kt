@@ -16,15 +16,21 @@
 
 package com.duckduckgo.common.ui.compose.tools
 
+import android.view.ContextThemeWrapper
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.R
 
 @Composable
 fun PreviewBoxInverted(
@@ -43,12 +49,23 @@ fun PreviewBox(
     color: @Composable () -> Color = { DuckDuckGoTheme.colors.backgrounds.background },
     content: @Composable BoxScope.() -> Unit,
 ) {
-    DuckDuckGoTheme {
-        Box(
-            modifier = modifier
-                .background(color())
-                .padding(all = 16.dp),
-            content = content,
+    val isDarkTheme = isSystemInDarkTheme()
+    val baseContext = LocalContext.current
+    // Previews lack the View theme that painterResource uses to resolve drawable `?attr/daxColor*` fills, so without it icons render transparent.
+    val themedContext = remember(baseContext, isDarkTheme) {
+        ContextThemeWrapper(
+            baseContext,
+            if (isDarkTheme) R.style.Theme_DuckDuckGo_Dark else R.style.Theme_DuckDuckGo_Light,
         )
+    }
+    CompositionLocalProvider(LocalContext provides themedContext) {
+        DuckDuckGoTheme(isDarkTheme = isDarkTheme) {
+            Box(
+                modifier = modifier
+                    .background(color())
+                    .padding(all = 16.dp),
+                content = content,
+            )
+        }
     }
 }

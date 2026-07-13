@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
-    <string name="downloadsActivityTitle">Prenosi</string>
-    <string name="downloadsActivityNoItemsDescription">Nobena datoteka še ni bila prenesena</string>
-    <string name="downloadsShareTitle">Deli s/z …</string>
     <string name="downloadsDownloadFinishedActionName">Odpri</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datoteka ne obstaja več</string>
-    <string name="downloadsItemMenuShare">Deli</string>
-    <string name="downloadsItemMenuDelete">Izbriši</string>
-    <string name="downloadsItemMenuCancel">Preklic</string>
-    <string name="downloadsActivityMenuDeleteAll">Izbriši vse</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Vse datoteke so bile izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Več možnosti za: %1$s</string>
-    <string name="downloadsUndoActionName">Prekliči spremembe</string>
-    <string name="downloadsStateInProgress">Poteka …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Zaščita pred sledenjem aplikacij</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
-    <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
 
@@ -1115,4 +1099,22 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potrdi</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Odpri v zavihku Fire</string>
+    <string name="openInBackgroundTab">Odpri v ozadju</string>
+    <string name="browserModeToggleFireDescription">Preklopi na zavihke v načinu Fire</string>
+    <string name="browserModeToggleRegularDescription">Preklopi na običajne zavihke</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Zavihek Fire</string>
+    <string name="fireTabNewTabPageTitle">Zavihek Fire</string>
+    <string name="fireTabsEmptyStateTitle">Zavihki Fire</string>
+    <string name="fireTabsFeatureNoHistory">Brskaj brez shranjevanja lokalne zgodovine</string>
+    <string name="fireTabsFeatureDifferentAccount">Prijava v spletno mesto z drugim računom</string>
+    <string name="fireTabsFeatureTroubleshoot">Odpravljanje težav s spletnimi mesti</string>
+    <string name="fireTabsExplainer">Zavihki Fire so ločeni od drugih podatkov brskanja. Njihovi podatki se izbrišejo, ko jih vse zaprete. Imajo enako zaščito pred sledenjem kot drugi zavihki.</string>
+    <string name="fireTabsNewTabButton">Nov zavihek Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Preizkusite zavihke Fire za brskanje brez shranjevanja lokalne zgodovine.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Želite izbrisati zavihke Fire in njihove podatke?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
 </resources>

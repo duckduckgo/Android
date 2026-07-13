@@ -185,12 +185,13 @@ class ModelPickerViewModel @Inject constructor(
             }
             return
         }
-        val userTier = modelManager.modelState.value.userTier
+        val modelState = modelManager.modelState.value
+        val userTier = modelState.userTier
         val requiredTier = model.requiredTier ?: run {
             logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin)?.let { upsell ->
+        routeUpsell(userTier, requiredTier, surface.origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
                 source = "model_picker",
                 currentTier = userTier.toParam(),
@@ -213,13 +214,13 @@ class ModelPickerViewModel @Inject constructor(
     }
 
     @DrawableRes
-    fun getIconResForModel(model: AIChatModel): Int? = when (model.provider) {
+    fun getIconResForModel(model: AIChatModel): Int = when (model.provider) {
         ModelProvider.OPENAI -> R.drawable.ic_ai_model_openai_16
         ModelProvider.ANTHROPIC -> R.drawable.ic_ai_model_claude_16
         ModelProvider.MISTRAL -> R.drawable.ic_ai_model_mistral_16
         ModelProvider.META -> R.drawable.ic_ai_model_llama_16
-        ModelProvider.OSS -> R.drawable.ic_ai_model_oss_16
-        ModelProvider.UNKNOWN -> null
+        // OSS doubles as the fallback for unrecognised providers so a model never renders without an icon.
+        ModelProvider.OSS, ModelProvider.UNKNOWN -> R.drawable.ic_ai_model_oss_16
     }
 
     private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =

@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
@@ -115,10 +116,10 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (sessionStarted) return
         sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
+            // If deep-linking, neither showQRCode() nor legacy polling should run
+            if (isDeepLink) return@launch
             if (shouldUseV2()) {
-                if (!isDeepLink) {
-                    startV2Present()
-                }
+                startV2Present()
                 return@launch
             }
             showQRCode()
@@ -293,8 +294,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
     ) {
-        syncPixels.fireSetupFailed(outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
+        syncPixels.fireSetupFailed(SYNC_EXCHANGE, outcome)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_EXCHANGE, outcome)
         // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
@@ -443,7 +444,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onEnterCodeResult(result: EnterCodeContractOutput) {
         viewModelScope.launch {
             when (result) {
-                EnterCodeContractOutput.Error -> {}
+                EnterCodeContractOutput.Error -> command.send(FinishWithError)
+                EnterCodeContractOutput.Cancelled -> {}
                 EnterCodeContractOutput.LoginSuccess -> {
                     // Manual entry: EnterCodeViewModel fires "Setup success"; only fire login pixel here.
                     syncPixels.fireLoginPixel()
@@ -486,7 +488,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (isDeepLink) return
 
         when (this) {
-            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE)
+            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE, reason = SetupFailureReason.UNRECOGNIZED_CODE)
             else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V1)
         }
     }

@@ -52,7 +52,8 @@
             app:layout_constraintEnd_toStartOf="@+id/duckAiInputScreenWithAiContainer"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
 
             <ImageView
                 android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
@@ -95,7 +96,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/duckAiInputScreenWithoutAiContainer"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
 
             <ImageView
                 android:id="@+id/duckAiInputScreenToggleWithAiImage"
@@ -115,6 +117,7 @@
                 android:orientation="horizontal">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckAiInputScreenToggleWithAiText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -162,6 +165,14 @@
         android:visibility="gone"
         app:primaryText="@string/duck_ai_shortcut_settings_title"
         app:secondaryText="@string/duck_ai_shortcut_settings_description" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/duckAiWebSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:trailingIcon="@drawable/ic_open_in_24_small"
+        app:primaryText="@string/duckAiSettingsTitle" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/duckAIAutomaticContext"

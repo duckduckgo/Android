@@ -39,6 +39,7 @@ interface FireDialog {
         const val EVENT_ON_SHOW = "onShow"
         const val EVENT_ON_CANCEL = "onCancel"
         const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
+        const val EVENT_ON_CHAT_CLEAR_COMPLETE = "onChatClearFinished"
         const val EVENT_CLEAR_WITHOUT_RESTART_STARTED = "onClearWithoutRestartStarted"
         const val EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE = "onSingleTabClearFinished"
         const val EVENT_ON_FIRE_TABS_CLEARED = "onFireTabsCleared"

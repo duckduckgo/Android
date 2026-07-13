@@ -11,6 +11,8 @@ tags:
             - launchApp:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
+            - tapOn:
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site/#ad-id-5"
             - pressKey: Enter
             - assertVisible:
@@ -52,14 +54,14 @@ tags:
             - action: back
             - action: back
             - tapOn:
-                id: "omnibarTextInputClickCatcher"
+                id: "omnibarTextInput"
             - copyTextFrom:
-                id: "inputField"
+                id: "omnibarTextInput"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
             - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
             - tapOn:
-                id: "omnibarTextInputClickCatcher"
+                id: "omnibarTextInput"
             - pasteText
             - pressKey: Enter
             - assertVisible:

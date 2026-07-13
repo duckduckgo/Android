@@ -161,6 +161,14 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun showNTPAfterIdleReturn(): Toggle
 
+    /**
+     * @return `true` when the remote config has the global "ntpAsDefaultAfterIdleReturn" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun ntpAsDefaultAfterIdleReturn(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
@@ -396,4 +404,31 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun webViewSessionPersistence(): Toggle
+
+    /**
+     * Kill switch: when enabled, an Activity.recreate() (mode switch / config change) is not treated as an
+     * app background->foreground, so BrowserApplicationStateInfo skips the onClose()/onOpen() pipeline for it.
+     * Disable to restore firing the full lifecycle pipeline on every recreate. Defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun recreateAwareLifecycle(): Toggle
+
+    /**
+     * Kill switch for the trampoline-activity based Clear Data shortcut implementation.
+     * When enabled (default), the Clear Data shortcut routes through a non-exported trampoline activity,
+     * and the legacy PERFORM_FIRE_ON_ENTRY_EXTRA handler on BrowserActivity is suppressed.
+     * When disabled, falls back to the legacy BrowserActivity + PERFORM_FIRE_ON_ENTRY_EXTRA intent surface.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useFireAppShortcutTrampoline(): Toggle
+
+    /**
+     * Controls whether the endless loop fix is enabled for custom tabs. When enabled,
+     * HTTP navigations shouldn't launch apps unless started with a user gesture.
+     * @return `true` when the remote config has the global "customTabEndlessLoopFix" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun customTabEndlessLoopFix(): Toggle
 }

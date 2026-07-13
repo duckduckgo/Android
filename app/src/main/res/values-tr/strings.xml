@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
-    <string name="downloadsActivityTitle">İndirilenler</string>
-    <string name="downloadsActivityNoItemsDescription">Henüz indirilen dosya yok</string>
-    <string name="downloadsShareTitle">Paylaş…</string>
     <string name="downloadsDownloadFinishedActionName">Aç</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Dosya artık mevcut değil</string>
-    <string name="downloadsItemMenuShare">Paylaş</string>
-    <string name="downloadsItemMenuDelete">Sil</string>
-    <string name="downloadsItemMenuCancel">İptal</string>
-    <string name="downloadsActivityMenuDeleteAll">Tümünü Sil</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s silindi</string>
-    <string name="downloadsAllFilesDeletedMessage">Tüm dosyalar silindi</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s için daha fazla seçenek</string>
-    <string name="downloadsUndoActionName">Geri al</string>
-    <string name="downloadsStateInProgress">Devam ediyor…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Uygulama İzleme Koruması</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
-    <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
 
@@ -1075,4 +1059,22 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Onayla</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Fire Sekmesinde Aç</string>
+    <string name="openInBackgroundTab">Arka Planda Aç</string>
+    <string name="browserModeToggleFireDescription">Fire modu sekmelerine geçin</string>
+    <string name="browserModeToggleRegularDescription">Normal sekmelere geç</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire Sekmesi</string>
+    <string name="fireTabNewTabPageTitle">Fire Sekmesi</string>
+    <string name="fireTabsEmptyStateTitle">Fire Sekmeleri</string>
+    <string name="fireTabsFeatureNoHistory">Yerel geçmişi kaydetmeden göz atın</string>
+    <string name="fireTabsFeatureDifferentAccount">Bir sitede farklı bir hesapla oturum açın</string>
+    <string name="fireTabsFeatureTroubleshoot">Web sitelerindeki sorunları giderin</string>
+    <string name="fireTabsExplainer">Fire Sekmeleri diğer tarayıcı verilerinden izole edilmiştir. Tüm pencereleri kapattığınızda veriler imha edilir. Diğer sekmelerle aynı izleme korumasını sunarlar.</string>
+    <string name="fireTabsNewTabButton">Yeni Fire Sekmesi</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>YENİ!</b> Yerel geçmişi kaydetmeden göz atmak için Fire Sekmelerini deneyin.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 </resources>

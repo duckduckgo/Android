@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Laadi alla PDF-ina</string>
     <string name="sync_restore_on_reinstall_title">Taasta andmed rakenduse uuesti installimisel</string>
     <string name="sync_restore_on_reinstall_description">Kui installid DuckDuckGo rakenduse uuesti, küsime, kas soovid oma andmed selles seadmes taastada.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Kasuta funktsiooni „Sync &amp; Backup“, et pääseda oma vestlustele ligi kõikidelt seadmetelt.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sünkrooni teise seadmega</string>
+    <string name="sync_chat_bottom_sheet_title">Sünkroniseerime vestlused\nsinu seadmete vahel!</string>
+    <string name="sync_chat_bottom_sheet_description">Leia QR-kood oma teises seadmes DuckDuckGo rakendusest, minnes menüüsse Seaded › Sync &amp; Backup › Sünkrooni teise seadmega.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skanni QR-kood</string>
+    <string name="sync_chat_bottom_sheet_negative">Mitte praegu</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Kas sünkroonida andmed?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sünkrooni kohe</string>
+    <string name="sync_v2_joiner_confirmation_negative">Tühista</string>
+
+    <string name="sync_v2_host_confirmation_title">Kas sünkroonida andmed?</string>
+    <string name="sync_v2_host_confirmation_positive">Sünkrooni kohe</string>
+    <string name="sync_v2_host_confirmation_negative">Tühista</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” pääseb ligi sinu sünkroonitud DuckDuckGo paroolidele, automaatse täitmise andmetele ja Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ pääseb ligi sinu sünkroonitud Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Teine seade pääseb ligi sinu sünkroonitud DuckDuckGo paroolidele, automaatse täitmise andmetele ja Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Teine seade pääseb ligi sinu sünkroonitud Duck.ai vestlustele.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sünkroonimine nurjus.</string>
+    <string name="sync_v2_error_pairing_rejected">Sünkroonimine tühistati sinu teisest seadmest.</string>
+    <string name="sync_v2_error_pairing_canceled">Sünkroonimine tühistati.</string>
+    <string name="sync_v2_error_upgrade_required">Värskenda DuckDuckGo brauserit ja proovi uuesti.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sünkrooni see seade juba ühendatud DuckDuckGo brauserist mõnes teises seadmes</string>
+    <string name="sync_v2_error_try_again">Proovi uuesti.</string>
+    <string name="sync_v2_error_got_it">Sain aru</string>
+    <string name="sync_v2_already_paired_title">Juba sünkroonitud.</string>
+    <string name="sync_v2_already_paired_message">Need seadmed on juba Sync &amp; Backupiga ühendatud.</string>
+
 </resources>

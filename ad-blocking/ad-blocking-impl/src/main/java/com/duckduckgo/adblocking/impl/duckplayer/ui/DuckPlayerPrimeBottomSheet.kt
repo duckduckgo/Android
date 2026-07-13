@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.duckplayer.ui
 
 import android.app.Dialog
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,16 +27,36 @@ import com.airbnb.lottie.LottieCompositionFactory
 import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ModalDuckPlayerBinding
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class DuckPlayerPrimeBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var binding: ModalDuckPlayerBinding
     private val isFromDuckPlayerPage: Boolean by lazy { requireArguments().getBoolean(FROM_DUCK_PLAYER_PAGE) }
 
-    override fun getTheme(): Int = R.style.DuckPlayerBottomSheetDialogTheme
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.DuckPlayerBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.DuckPlayerBottomSheetDialogTheme
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +79,9 @@ class DuckPlayerPrimeBottomSheet : BottomSheetDialogFragment() {
         }
         binding.closeButton.setOnClickListener {
             dismiss()
+        }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.root.applyBottomSystemBarInsetPadding()
         }
         return binding.root
     }

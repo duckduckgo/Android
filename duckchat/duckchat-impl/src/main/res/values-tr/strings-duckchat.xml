@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Hiçbir zaman</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Talep Üzerine</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Bazen</string>
+    <string name="duckAiSearchAssistVisibilityOften">Sıklıkla</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">DuckDuckGo\'yu AI Olmadan Kullanın</string>
+    <string name="duckAiUseWithoutAiDescription">Duck.ai\'yi devre dışı bırakır, aramalarda yapay zeka destekli yanıtları gizler ve görsel arama sonuçlarında bilinen yapay zeka spam sitelerini filtreler.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Tarayıcıda yapay zeka şimdilik devre dışı bırakıldı. Bu nedenle artık yapay zeka destekli yanıtları göremeyecek ve görsel arama sonuçlarında yapay zeka tarafından oluşturulmuş daha az görsel göreceksiniz.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Arama ile\nDuck.ai arasında geçiş yapın</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Görsel arama sonuçlarından bilinen yapay zeka spam sitelerini filtreler. <annotation link="learn_more">Daha fazla bilgi</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">AI Özellikleri Ayarlarında etkinleştir</string>
     <string name="duck_ai_paid_settings_manage_in_settings">AI Özellikleri Ayarlarında Yönet</string>
@@ -182,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Göster</string>
     <string name="duck_ai_chat_history_download_error">Sohbet dışa aktarılamadı</string>
     <string name="duck_ai_chat_history_bulk_download_error">Sohbetler dışa aktarılamadı</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">DuckDuckGo\'da Ara</string>
+    <string name="native_input_chat_hint">Gizli bir şekilde her şeyi sorabilirsiniz…</string>
+    <string name="native_input_chat_duck_mode_hint">Yanıtla…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Akıl yürütme modu</string>
+    <string name="duckChatReasoningModeFastTitle">Hızlı</string>
+    <string name="duckChatReasoningModeFastSubtitle">Hızlı yanıt verir</string>
+    <string name="duckChatReasoningModeReasoningTitle">Akıl yürütme</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Karmaşık görevler için</string>
+    <string name="duckChatReasoningModeExtendedTitle">Genişletilmiş Akıl Yürütme</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Analitik görevler için</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Sohbeti başlat</string>
+    <string name="duckChatStopStreamingContentDescription">Oluşturmayı durdur</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Görseli kaldır</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Bir defada yalnızca %1$d görsel ekleyebilirsiniz.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Konuşma başına en fazla %1$d görsel ekleyebilirsiniz.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Fotoğraf Çek</string>
+    <string name="attachmentAttachPhoto">Görsel Ekle</string>
+    <string name="attachmentAttachFile">Dosya Ekle</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Dosyayı kaldır</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Konuşma başına en fazla %1$d dosya ekleyebilirsiniz.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Dosya, maksimum %1$d MB boyut sınırını aşıyor.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Ekli dosyalardan biri, desteklediğimizden daha fazla sayfa içeriyor. Lütfen %1$d veya daha az sayfa içeren dosyalar yükleyin.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Ekli dosyalar, toplam boyut sınırını (%1$d MB) aşıyor.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Bir dosya yükle</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai seçenekleri</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Kaldır: %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Görsel Oluşturun</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Metni görsellere dönüştürün</string>
+    <string name="duckChatOptionsMenuWebSearch">Web Araması</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Web kaynaklı yanıtlar</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Yanıtları Özelleştir</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Tonu, uzunluğu ve davranış biçimini belirleyin</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Duck.ai menüsünü aç</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Duck.ai Ayarları</string>
 </resources>

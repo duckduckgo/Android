@@ -12,3 +12,8 @@ appId: com.duckduckgo.mobile.android
         visible: "Delete All"
     commands:
         - tapOn: "Delete All"
+- runFlow:
+    when:
+        visible: "Delete Chat"
+    commands:
+        - tapOn: "Delete Chat"

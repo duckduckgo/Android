@@ -29,6 +29,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -40,8 +41,10 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -383,6 +386,7 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val chatSuggestionsStore: ChatSuggestionsStore,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -412,6 +416,7 @@ class RealDuckChat @Inject constructor(
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
     private val _inputQuery = MutableStateFlow("")
+    private val _inputModeCapability = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -625,6 +630,8 @@ class RealDuckChat @Inject constructor(
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
 
+    override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
+
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
@@ -795,7 +802,7 @@ class RealDuckChat @Inject constructor(
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean {
-        val cookieManager = cookiesManager.get()
+        val cookieManager = cookiesManager.forMode(BrowserMode.REGULAR)
         val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
         val isMigrationCompleted = ddgCookies.contains("migration_status_dev_01=migrated_dev_01")
         return isMigrationCompleted
@@ -824,6 +831,10 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun hasUserEnabledChatHistory(): Boolean {
         return duckChatFeatureRepository.isAIChatHistoryEnabled()
+    }
+
+    override fun observeHasChatSuggestions(): Flow<Boolean> {
+        return chatSuggestionsStore.hasChatSuggestions
     }
 
     override fun buildChatUrl(chatId: String): String {
@@ -856,6 +867,8 @@ class RealDuckChat @Inject constructor(
     override fun setInputQuery(query: String) {
         _inputQuery.value = query
     }
+
+    override val inputModeCapability: StateFlow<NativeInputState.InputMode> = _inputModeCapability.asStateFlow()
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
@@ -924,9 +937,20 @@ class RealDuckChat @Inject constructor(
             isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
             isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
             _nativeChatInputEnabled.value = isNativeChatInputEnabled
+            val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+
+            // Mirrors NativeInputModeWidgetViewModel.getInputMode: the address bar offers the
+            // Search↔Duck.ai toggle only when Duck.ai is on (feature + user) and the address-bar
+            // Duck.ai setting is on; otherwise it is search-only.
+            _inputModeCapability.value = if (isDuckChatFeatureEnabled && isDuckChatUserEnabled && inputScreenUserSettingEnabled) {
+                NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+            } else {
+                NativeInputState.InputMode.SEARCH_ONLY
+            }
+
             val showInputScreen =
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-                    duckChatFeatureRepository.isInputScreenUserSettingEnabled() && !isNativeInputFieldEnabled
+                    inputScreenUserSettingEnabled && !isNativeInputFieldEnabled
             _showInputScreen.emit(showInputScreen)
 
             _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled

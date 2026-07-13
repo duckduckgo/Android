@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Masquer les images générées par l\'IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtre les images générées par l\'IA des résultats de recherche d\'images</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Jamais</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">À la demande</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Parfois</string>
+    <string name="duckAiSearchAssistVisibilityOften">Souvent</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Utiliser DuckDuckGo sans IA</string>
+    <string name="duckAiUseWithoutAiDescription">Désactive Duck.ai, masque les réponses assistées par l\'IA dans la recherche et filtre les sites de spam liés à l\'IA dans les résultats de recherche d\'images.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">L\'IA est actuellement désactivée dans le navigateur ; vous ne verrez donc plus de réponses assistées par l\'IA et verrez moins d\'images générées par l\'IA dans les résultats de recherche d\'images.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Basculer entre la recherche et Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Masquer les images générées par l\'IA</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtre les sites de spam IA connus dans les résultats de recherche d\'images. <annotation link="learn_more">En savoir plus</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>
@@ -182,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Afficher</string>
     <string name="duck_ai_chat_history_download_error">Impossible d\'exporter la discussion</string>
     <string name="duck_ai_chat_history_bulk_download_error">Impossible d\'exporter les discussions</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Rechercher avec DuckDuckGo</string>
+    <string name="native_input_chat_hint">Posez toutes vos questions en privé…</string>
+    <string name="native_input_chat_duck_mode_hint">Répondre…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Mode raisonnement</string>
+    <string name="duckChatReasoningModeFastTitle">Rapide</string>
+    <string name="duckChatReasoningModeFastSubtitle">Répond rapidement</string>
+    <string name="duckChatReasoningModeReasoningTitle">Raisonnement</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Pour des tâches complexes</string>
+    <string name="duckChatReasoningModeExtendedTitle">Raisonnement étendu</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Pour les tâches analytiques</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Démarrer le chat</string>
+    <string name="duckChatStopStreamingContentDescription">Arrêter de générer</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Supprimer l\'image</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Vous ne pouvez joindre que %1$d images à la fois.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Vous ne pouvez joindre que %1$d images par conversation.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Prendre une photo</string>
+    <string name="attachmentAttachPhoto">Ajouter une image</string>
+    <string name="attachmentAttachFile">Ajouter un fichier</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Supprimer le fichier</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Vous ne pouvez joindre que %1$d fichiers par conversation.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Le fichier dépasse la taille maximale de %1$d Mo.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">L\'un des fichiers joints comporte plus de pages que nous ne prenons en charge. Veuillez télécharger des fichiers de %1$d pages ou moins.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Les fichiers joints dépassent la limite totale de taille de %1$d Mo.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Importer un fichier</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Options Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Supprimer %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Créer une image</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Transformer le texte en images</string>
+    <string name="duckChatOptionsMenuWebSearch">Recherche sur le Web</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Trouver des réponses sur le Web</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Personnaliser les réponses</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Définir le ton, la durée et le comportement</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Ouvrir le menu Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Paramètres Duck.ai</string>
 </resources>

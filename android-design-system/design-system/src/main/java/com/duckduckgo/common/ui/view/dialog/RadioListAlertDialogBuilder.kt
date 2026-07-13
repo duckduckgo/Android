@@ -17,7 +17,16 @@
 package com.duckduckgo.common.ui.view.dialog
 
 import android.content.Context
+import android.text.Annotation
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RadioGroup
@@ -26,6 +35,7 @@ import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.button.RadioButton
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
@@ -49,6 +59,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var listener: EventListener = DefaultEventListener()
     private var titleText: CharSequence = ""
     private var messageText: CharSequence = ""
+    private var messageClickable: Boolean = false
     private var positiveButtonText: CharSequence = ""
     private var positiveButtonType: ButtonType = ButtonType.PRIMARY
     private var negativeButtonText: CharSequence = ""
@@ -74,6 +85,47 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setMessage(text: CharSequence): RadioListAlertDialogBuilder {
         messageText = text
+        return this
+    }
+
+    fun setClickableMessage(textSequence: CharSequence, annotation: String, onClick: () -> Unit): RadioListAlertDialogBuilder {
+        val fullText = textSequence as SpannedString
+        val spannableString = SpannableString(fullText)
+        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                onClick()
+            }
+        }
+
+        annotations?.find { it.value == annotation }?.let {
+            spannableString.apply {
+                setSpan(
+                    clickableSpan,
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                setSpan(
+                    UnderlineSpan(),
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                setSpan(
+                    ForegroundColorSpan(
+                        context.getColorFromAttr(R.attr.daxColorAccentBlue),
+                    ),
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+        }
+
+        messageText = spannableString
+        messageClickable = true
+
         return this
     }
 
@@ -170,6 +222,9 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.radioListDialogMessage.gone()
         } else {
             binding.radioListDialogMessage.text = messageText
+            if (messageClickable) {
+                binding.radioListDialogMessage.movementMethod = LinkMovementMethod.getInstance()
+            }
         }
 
         optionList.forEachIndexed { index, option ->

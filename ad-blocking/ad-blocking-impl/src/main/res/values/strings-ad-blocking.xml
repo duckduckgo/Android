@@ -22,4 +22,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blocks video ads on YouTube, so you can watch videos without interruption. <annotation type="learn_more_link">Learn more</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opens videos in a distraction-free theater mode that prevents what you watch from influencing your YouTube feed.</string>
+    <string name="ad_blocking_settings_title_v2">Ad Blocking</string>
+    <string name="ad_blocking_settings_header_description">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking</string>
+    <string name="contingencyMessageTitle">YouTube Ad Blocking Unavailable</string>
+    <string name="contingencyMessageContent">Ad Blocking has been affected by recent changes to YouTube. We\'re working to fix these issues and appreciate your understanding</string>
+    <string name="contingencyMessagePrimaryButton">Got It</string>
+    <string name="contingencyMessageCloseContentDescription">Close</string>
 </resources>

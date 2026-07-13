@@ -42,6 +42,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -96,6 +98,8 @@ class OmnibarLayoutViewModelTest {
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckChatInputModeState: DuckChatInputModeState = mock()
+    private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
@@ -148,6 +152,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
+        whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
@@ -199,6 +204,7 @@ class OmnibarLayoutViewModelTest {
             browserMenuHighlight = browserMenuHighlight,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
+            duckChatInputModeState = duckChatInputModeState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
             urlDisplayRepository = urlDisplayRepository,
@@ -1619,6 +1625,43 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputFieldEnabledButSearchOnlyThenShowClickCatcherFalse() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSearchOnlyButInDuckAiViewModeThenShowClickCatcherTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+        testee.onViewModeChanged(ViewMode.DuckAI)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSearchOnlyThenShowContextualSheetIconFalse() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showContextualSheetIcon)
             cancelAndIgnoreRemainingEvents()
         }
     }

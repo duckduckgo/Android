@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerar bort AI-genererade bilder från bildsökningsresultaten</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Aldrig</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">På begäran</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Ibland</string>
+    <string name="duckAiSearchAssistVisibilityOften">Ofta</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Använd DuckDuckGo utan AI</string>
+    <string name="duckAiUseWithoutAiDescription">Inaktiverar Duck.ai, döljer AI-assisterade svar i sökningen och filtrerar bort kända webbplatser för AI-spam från sökresultaten för bilder.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI är för närvarande inaktiverat i webbläsaren, så du kommer inte längre att se AI-assisterade svar och du kommer att se färre AI-genererade bilder i bildsökresultaten.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Växla mellan\nsökning och Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrerar bort kända webbplatser för AI-spam från sökresultaten för bilder. <annotation link="learn_more">Läs mer</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
@@ -182,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Visa</string>
     <string name="duck_ai_chat_history_download_error">Kunde inte exportera chatt</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kunde inte exportera chattar</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Sök DuckDuckGo</string>
+    <string name="native_input_chat_hint">Fråga vad som helst privat…</string>
+    <string name="native_input_chat_duck_mode_hint">Svara…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Resonemangsläge</string>
+    <string name="duckChatReasoningModeFastTitle">Snabb</string>
+    <string name="duckChatReasoningModeFastSubtitle">Svarar snabbt</string>
+    <string name="duckChatReasoningModeReasoningTitle">Resonemang</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">För komplexa uppgifter</string>
+    <string name="duckChatReasoningModeExtendedTitle">Utökat resonemang</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">För analytiska uppgifter</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Starta chatt</string>
+    <string name="duckChatStopStreamingContentDescription">Sluta generera</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Ta bort bild</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Du kan bara bifoga %1$d bilder åt gången.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Du kan bara bifoga %1$d bilder per konversation.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Ta foto</string>
+    <string name="attachmentAttachPhoto">Lägg till bild</string>
+    <string name="attachmentAttachFile">Lägg till fil</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Ta bort fil</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Du kan bara bifoga %1$d filer per konversation.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Filen överskrider den maximala storleken på %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">En av de bifogade filerna har fler sidor än vad vi har stöd för. Ladda upp filer med högst %1$d sidor.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">De bifogade filerna överskrider den totala storleksgränsen på %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Ladda upp en fil</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Inställningar för Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Ta bort %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Skapa bild</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Förvandla text till bilder</string>
+    <string name="duckChatOptionsMenuWebSearch">Webbsökning</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Hämta svar från webben</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Anpassa svar</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Ställ in ton, längd och beteende</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Öppna Duck.ai-menyn</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Duck.ai-inställningar</string>
 </resources>

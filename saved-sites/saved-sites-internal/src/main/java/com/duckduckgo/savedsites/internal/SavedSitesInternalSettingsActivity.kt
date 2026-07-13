@@ -34,6 +34,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
@@ -67,6 +68,9 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var importFromGoogle: ImportFromGoogle
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val importBookmarksFileLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -80,7 +84,9 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
         configureImportBookmarksEventHandlers()
         setupBookmarksPreImportDialogResultListener()
@@ -223,6 +229,12 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun String.showSnackbar(duration: Int = Snackbar.LENGTH_LONG) {
         Snackbar.make(binding.root, this, duration).show()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     companion object {

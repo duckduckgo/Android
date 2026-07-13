@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -68,8 +69,8 @@ import kotlin.coroutines.suspendCoroutine
 class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()!!
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
+    private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
     private val userAllowListRepository = mock<UserAllowListRepository>()

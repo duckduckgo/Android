@@ -25,9 +25,7 @@ import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.fakes.FakePixel
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -85,7 +83,6 @@ class BlockListInterceptorApiPluginTest {
             inventory,
             moshi,
             fakePixel,
-            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
         )
     }
 

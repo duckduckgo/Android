@@ -783,10 +783,12 @@ class SyncConnectViewModelTest {
         }
 
         verify(syncPixels).fireSyncSetupFailed(
-            eq(SetupFailureReason.TRANSPORT_FAILURE),
-            eq(SetupPath.PAIRING),
-            isNull(),
-            isNull(),
+            screenType = eq(SYNC_CONNECT),
+            reason = eq(SetupFailureReason.TRANSPORT_FAILURE),
+            path = eq(SetupPath.PAIRING),
+            myRole = isNull(),
+            peerKind = isNull(),
+            timeoutStage = isNull(),
         )
     }
 

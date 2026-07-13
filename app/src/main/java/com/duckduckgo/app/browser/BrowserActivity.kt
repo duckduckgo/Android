@@ -77,16 +77,14 @@ import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
+import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
-import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ORIGIN_CHAT_AUTOCOMPLETE
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -96,7 +94,6 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -168,16 +165,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var clearDataAction: ClearDataAction
-
-    @Inject
-    lateinit var dataClearing: ManualDataClearing
-
-    @Inject
-    lateinit var fireDataStore: FireDataStore
-
-    @Inject
-    lateinit var dataClearingWideEvent: DataClearingWideEvent
+    lateinit var appShortcutDataClearer: AppShortcutDataClearer
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
@@ -491,6 +479,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 FireDialog.EVENT_ON_CANCEL -> {
                     pendingDuckAiOnboardingFire = false
                     pixel.fire(FIRE_DIALOG_CANCEL)
+                    if (bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_CHAT_AUTOCOMPLETE) {
+                        currentTab?.onChatDeleteCancelled()
+                    }
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
                 }
@@ -504,6 +495,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.dismissDuckAiFireOnboardingCta()
                     } else {
                         externalIntentProcessingState.onIntentRequestToShowSnackbar()
+                    }
+                }
+                FireDialog.EVENT_ON_CHAT_CLEAR_COMPLETE -> {
+                    if (bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_CHAT_AUTOCOMPLETE) {
+                        currentTab?.onChatDeleteConfirmed()
+                        currentTab?.refreshAutoComplete()
                     }
                 }
                 FireDialog.EVENT_ON_FIRE_TABS_CLEARED -> {
@@ -784,39 +781,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                    val clearOptions = fireDataStore.getManualClearOptions()
-                    dataClearingWideEvent.start(
-                        entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
-                        clearOptions = clearOptions,
-                    )
-                    try {
-                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = currentBrowserMode)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
+                // The legitimate shortcut goes through [FireShortcutTrampolineActivity]; this legacy handler is only active if FF disabled.
+                if (androidBrowserConfigFeature.useFireAppShortcutTrampoline().isEnabled()) {
+                    logcat(INFO) {
+                        "$PERFORM_FIRE_ON_ENTRY_EXTRA received but fireShortcutTrampoline kill switch is on; ignoring"
                     }
-                } else {
-                    dataClearingWideEvent.startLegacy(
-                        entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_APP_SHORTCUT,
-                        clearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA,
-                        clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    )
-                    try {
-                        clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                        clearDataAction.setAppUsedSinceLastClearFlag(false)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = false)
+                    return@launch
                 }
+                logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
+                appShortcutDataClearer.clearFromAppShortcut(currentBrowserMode)
             }
-
             return
         }
 
@@ -943,8 +918,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
     }
@@ -1350,7 +1326,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect { mode ->
                     if (mode != currentBrowserMode) {
-                        modeSwitchRecreateSignal.markPending()
+                        // Only needed on the old path: with recreateAwareLifecycle on,
+                        // the recreate's onOpen is suppressed so FirstScreenHandler never runs
+                        if (!androidBrowserConfigFeature.recreateAwareLifecycle().isEnabled()) {
+                            modeSwitchRecreateSignal.markPending()
+                        }
                         recreate()
                     }
                 }
@@ -1855,7 +1835,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     )
 
     private fun showSetAsDefaultBrowserDialog() {
-        val dialog = DefaultBrowserBottomSheetDialog(context = this)
+        val dialog = DefaultBrowserBottomSheetDialog(context = this, edgeToEdgeProvider = edgeToEdgeProvider)
         dialog.eventListener =
             object : EventListener {
                 override fun onShown() {

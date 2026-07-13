@@ -21,8 +21,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -42,6 +46,8 @@ class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val subscriptionsManager: SubscriptionsManager,
+    private val reminderStore: SubscriptionExpirationReminderStore,
+    private val pixelSender: SubscriptionPixelSender,
 ) : SubscriptionExpirationReminderScheduler {
 
     override suspend fun scheduleReminderNotification(daysBeforeCancel: Int) {
@@ -54,16 +60,24 @@ class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
         val delayMillis = expiresOrRenewsAt - TimeUnit.DAYS.toMillis(daysBeforeCancel.toLong()) - System.currentTimeMillis()
         if (delayMillis <= 0) return
 
+        reminderStore.daysBeforeCancel = daysBeforeCancel
+
         val request = OneTimeWorkRequestBuilder<SubscriptionExpirationReminderWorker>()
             .addTag(EXPIRATION_REMINDER_WORK_TAG)
             .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
             .build()
 
-        workManager.enqueue(request)
+        runCatching { workManager.enqueue(request) }
+            .onSuccess { pixelSender.reportExpirationReminderScheduled() }
+            .onFailure { throwable ->
+                logcat(ERROR) { "Failed to schedule subscription expiration reminder: ${throwable.asLog()}" }
+                pixelSender.reportExpirationReminderSchedulingError()
+            }
     }
 
     override fun cancelScheduledNotification() {
         workManager.cancelAllWorkByTag(EXPIRATION_REMINDER_WORK_TAG)
+        reminderStore.daysBeforeCancel = null
     }
 
     companion object {

@@ -33,6 +33,7 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @Suppress("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -50,7 +51,7 @@ class SerpSettingsPrefsDataStoreTest {
         )
 
     private val testee: SerpSettingsDataStore =
-        SerpSettingsPrefsDataStore(testDataStore)
+        SerpSettingsPrefsDataStore(testDataStore, mock())
 
     companion object {
         val SERP_SETTINGS = stringPreferencesKey("SERP_SETTINGS")

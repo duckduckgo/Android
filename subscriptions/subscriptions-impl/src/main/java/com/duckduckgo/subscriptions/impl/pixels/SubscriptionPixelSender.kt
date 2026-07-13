@@ -67,6 +67,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
@@ -136,6 +140,10 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
     fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
+    fun reportExpirationReminderScheduled()
+    fun reportExpirationReminderSchedulingError()
+    fun reportExpirationReminderNotFiredInactiveSubscription()
+    fun reportExpirationReminderNotFiredPermissionsRejected()
 }
 
 @ContributesBinding(AppScope::class)
@@ -361,6 +369,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             ),
         )
     }
+
+    override fun reportExpirationReminderScheduled() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED)
+
+    override fun reportExpirationReminderSchedulingError() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR)
+
+    override fun reportExpirationReminderNotFiredInactiveSubscription() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION)
+
+    override fun reportExpirationReminderNotFiredPermissionsRejected() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED)
 
     private fun fire(
         pixel: SubscriptionPixel,

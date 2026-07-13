@@ -17,6 +17,7 @@
 package com.duckduckgo.downloads.impl
 
 import android.annotation.SuppressLint
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
@@ -244,11 +245,12 @@ class UrlFileDownloaderTest {
             mimeType = mimeType,
             subfolder = "folder",
             directory = File("directory"),
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
     private class FakeCookieManagerWrapper(private val cookie: String? = null) : CookieManagerWrapper {
-        override fun getCookie(url: String): String? {
+        override fun getCookie(url: String, browserMode: BrowserMode): String? {
             return cookie
         }
     }

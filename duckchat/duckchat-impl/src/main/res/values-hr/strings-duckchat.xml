@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nikada</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na zahtjev</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Ponekad</string>
+    <string name="duckAiSearchAssistVisibilityOften">Često</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Koristi DuckDuckGo bez AI</string>
+    <string name="duckAiUseWithoutAiDescription">Onemogućuje Duck.ai, skriva odgovore potpomognute umjetnom inteligencijom u pretraživanju i filtrira poznata web-mjesta s neželjenom umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Umjetna inteligencija trenutno je onemogućena u pregledniku pa više nećeš vidjeti odgovore potpomognute umjetnom inteligencijom i vidjet ćeš manje slika generiranih umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Prebacuj se između pretraživanja i Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrira poznata neželjena web-mjesta s AI-jem iz rezultata pretraživanja slika. <annotation link="learn_more">Saznaj više</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Omogući u postavkama AI značajki</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljaj u postavkama AI značajki</string>
@@ -184,4 +201,68 @@
     <string name="duck_ai_chat_history_download_view">Prikaži</string>
     <string name="duck_ai_chat_history_download_error">Izvoz čavrljanja nije moguć</string>
     <string name="duck_ai_chat_history_bulk_download_error">Izvoz čavrljanja nije uspio</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Pretraži DuckDuckGo</string>
+    <string name="native_input_chat_hint">Privatno pitaj bilo što…</string>
+    <string name="native_input_chat_duck_mode_hint">Odgovori…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Način rasuđivanja</string>
+    <string name="duckChatReasoningModeFastTitle">Brzo</string>
+    <string name="duckChatReasoningModeFastSubtitle">Brzi odgovori</string>
+    <string name="duckChatReasoningModeReasoningTitle">Rasuđivanje</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Za složene zadatke</string>
+    <string name="duckChatReasoningModeExtendedTitle">Prošireno rasuđivanje</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Za analitičke zadatke</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Započni čavrljanje</string>
+    <string name="duckChatStopStreamingContentDescription">Zaustavi generiranje</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Ukloni sliku</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Možeš priložiti samo %1$d slikea odjednom.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Možeš priložiti samo %1$d slika po razgovoru.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Snimi fotografiju</string>
+    <string name="attachmentAttachPhoto">Dodaj sliku</string>
+    <string name="attachmentAttachFile">Dodaj datoteku</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Ukloni datoteku</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Možeš priložiti samo %1$d datoteka po razgovoru.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Datoteka prelazi maksimalnu veličinu od %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Jedna od priloženih datoteka ima više stranica nego što podržavamo. Prenosi datoteke s najviše %1$d stranica.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Priložene datoteke prelaze ukupno ograničenje veličine od %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Prenesi datoteku</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Opcije za Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Ukloni %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Izradi sliku</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Pretvori tekst u slike</string>
+    <string name="duckChatOptionsMenuWebSearch">Pretraživanje mreže</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Odgovori iz internetskih izvora</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Prilagodi odgovore</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Postavi ton, duljinu i ponašanje</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Otvori izbornik Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Postavke usluge Duck.ai</string>
 </resources>

@@ -42,6 +42,8 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
@@ -130,7 +132,8 @@ class SyncLoginViewModel @Inject constructor(
 
     /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
-        syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupFailed(SYNC_EXCHANGE, outcome)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_EXCHANGE, outcome)
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
                 syncPixels.fireLoginPixel()

@@ -1,7 +1,7 @@
 {
   "name": "Centeda",
   "url": "centeda.com",
-  "version": "0.91.0",
+  "version": "0.92.0",
   "addedDatetime": 1677736800000,
   "optOutUrl": "https://centeda.com/ng/control/privacy",
   "steps": [
@@ -225,5 +225,5 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": null
+  "removedAt": 1783342151487
 }

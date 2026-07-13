@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Stáhnout jako PDF</string>
     <string name="sync_restore_on_reinstall_title">Obnovit při přeinstalaci aplikace</string>
     <string name="sync_restore_on_reinstall_description">Pokud přeinstaluješ aplikaci DuckDuckGo, zeptáme se tě, jestli chceš obnovit data na tomto zařízení.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Získej přístup ke svým chatům napříč všemi zařízeními pomocí funkce Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Synchronizovat s jiným zařízením</string>
+    <string name="sync_chat_bottom_sheet_title">Pojďme synchronizovat tvé chaty napříč tvými zařízeními!</string>
+    <string name="sync_chat_bottom_sheet_description">QR kód najdeš v aplikaci DuckDuckGo na druhém zařízení v nabídce Nastavení › Sync &amp; Backup › Synchronizace s jiným zařízením.</string>
+    <string name="sync_chat_bottom_sheet_positive">Naskenuj QR kód</string>
+    <string name="sync_chat_bottom_sheet_negative">Teď ne</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Synchronizovat data?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Synchronizovat</string>
+    <string name="sync_v2_joiner_confirmation_negative">Zrušit</string>
+
+    <string name="sync_v2_host_confirmation_title">Synchronizovat data?</string>
+    <string name="sync_v2_host_confirmation_positive">Synchronizovat</string>
+    <string name="sync_v2_host_confirmation_negative">Zrušit</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" bude mít přístup k tvým synchronizovaným heslům z DuckDuckGo, údajům pro automatické vyplňování a chatům v Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ bude mít přístup k tvým synchronizovaným chatům Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Druhé zařízení bude mít přístup k tvým synchronizovaným heslům z DuckDuckGo, údajům pro automatické vyplňování a chatům v Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Druhé zařízení bude mít přístup k tvým synchronizovaným chatům s Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synchronizace se nezdařila.</string>
+    <string name="sync_v2_error_pairing_rejected">Synchronizace byla zrušena na tvém druhém zařízení.</string>
+    <string name="sync_v2_error_pairing_canceled">Synchronizace byla zrušena.</string>
+    <string name="sync_v2_error_upgrade_required">Aktualizuj prohlížeč DuckDuckGo a zkus to znovu.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Synchronizuj toto zařízení z již připojeného prohlížeče DuckDuckGo na jiném zařízení</string>
+    <string name="sync_v2_error_try_again">Zkus to znovu.</string>
+    <string name="sync_v2_error_got_it">Rozumím</string>
+    <string name="sync_v2_already_paired_title">Už se synchronizuje.</string>
+    <string name="sync_v2_already_paired_message">Tato zařízení jsou již připojena k Sync &amp; Backup.</string>
+
 </resources>

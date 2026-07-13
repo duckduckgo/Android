@@ -63,7 +63,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
           maestro_include_tags: privacyTest
-          maestro_api_level: 35
+          maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}

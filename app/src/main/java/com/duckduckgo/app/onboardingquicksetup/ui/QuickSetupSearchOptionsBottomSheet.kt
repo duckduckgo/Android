@@ -27,7 +27,10 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetQuickSetupSearchOptionsBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.R
@@ -45,6 +48,9 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     private var initialWithAi: Boolean = true
     private var withAi: Boolean = true
@@ -87,7 +93,16 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         binding.quickSetupSearchOptionsCloseButton.setOnClickListener {
             dismiss()
         }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
         return binding.root
+    }
+
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    } else {
+        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {

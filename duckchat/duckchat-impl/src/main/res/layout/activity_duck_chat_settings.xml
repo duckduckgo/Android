@@ -83,6 +83,14 @@
                 app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/duckAiWebSettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:trailingIcon="@drawable/ic_open_in_24_small"
+                app:primaryText="@string/duckAiSettingsTitle" />
+
             <include
                 android:id="@+id/inputScreenSettings"
                 layout="@layout/include_duck_ai_input_screen_settings" />
@@ -118,6 +126,14 @@
                 app:primaryText="@string/duckAiHideAiGeneratedImagesTitle"
                 app:secondaryText="@string/duckAiHideAiGeneratedImagesDescription"
                 app:showSwitch="false" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAINoAiItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiUseWithoutAiTitle"
+                app:secondaryText="@string/duckAiUseWithoutAiDescription" />
 
         </LinearLayout>
     </ScrollView>

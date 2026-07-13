@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Last ned som PDF</string>
     <string name="sync_restore_on_reinstall_title">Gjenopprett ved ny appinstallasjon</string>
     <string name="sync_restore_on_reinstall_description">Hvis du installerer DuckDuckGo-appen på nytt, spør vi deg om du vil gjenopprette dataene dine på denne enheten.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Få tilgang til chattene på alle enhetene dine med Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Synkroniser med en annen enhet</string>
+    <string name="sync_chat_bottom_sheet_title">La oss synkronisere chattene på\nalle enhetene dine!</string>
+    <string name="sync_chat_bottom_sheet_description">Finn QR-koden på DuckDuckGo-appen på den andre enheten din ved å gå til Innstillinger › Sync &amp; Backup › Synkroniser med en annen enhet.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skann QR-kode</string>
+    <string name="sync_chat_bottom_sheet_negative">Ikke nå</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Vil du synkronisere dataene dine?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Synkroniser nå</string>
+    <string name="sync_v2_joiner_confirmation_negative">Avbryt</string>
+
+    <string name="sync_v2_host_confirmation_title">Vil du synkronisere dataene dine?</string>
+    <string name="sync_v2_host_confirmation_positive">Synkroniser nå</string>
+    <string name="sync_v2_host_confirmation_negative">Avbryt</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">«%1$s» får tilgang til dine synkroniserte DuckDuckGo-passord, autofylldata og Duck.ai-chatter.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">«%1$s» får tilgang til dine synkroniserte Duck.ai-chatter.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Den andre enheten får tilgang til dine synkroniserte DuckDuckGo-passord, autofylldata og Duck.ai-chatter.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Den andre enheten får tilgang til dine synkroniserte Duck.ai-chatter.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synkroniseringen mislyktes.</string>
+    <string name="sync_v2_error_pairing_rejected">Synkroniseringen er avbrutt fra den andre enheten.</string>
+    <string name="sync_v2_error_pairing_canceled">Synkronisering avbrutt.</string>
+    <string name="sync_v2_error_upgrade_required">Oppdater DuckDuckGo-nettleseren og prøv igjen.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Synkroniser denne enheten fra en allerede tilkoblet DuckDuckGo-nettleser på en annen enhet</string>
+    <string name="sync_v2_error_try_again">Prøv igjen.</string>
+    <string name="sync_v2_error_got_it">Den er grei</string>
+    <string name="sync_v2_already_paired_title">Allerede synkronisert.</string>
+    <string name="sync_v2_already_paired_message">Disse enhetene er allerede koblet til Sync &amp; Backup.</string>
+
 </resources>

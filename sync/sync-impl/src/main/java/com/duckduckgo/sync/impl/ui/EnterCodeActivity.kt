@@ -153,7 +153,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             is Command.AskJoinerConfirmation -> askJoinerConfirmation(command.peerName, command.peerKind)
             is Command.AskHostConfirmation -> askHostConfirmation(command.peerName, command.peerKind)
             Command.FinishWithError -> {
-                setResult(RESULT_CANCELED)
+                val resultIntent = Intent().putExtra(EXTRA_FINISHED_WITH_ERROR, true)
+                setResult(RESULT_CANCELED, resultIntent)
                 finish()
             }
         }
@@ -228,6 +229,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         private const val EXTRA_CODE_TYPE = "codeType"
 
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
+        const val EXTRA_FINISHED_WITH_ERROR = "finishedWithError"
 
         internal fun intent(context: Context, codeType: Code): Intent {
             return Intent(context, EnterCodeActivity::class.java).apply {

@@ -52,6 +52,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.room.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

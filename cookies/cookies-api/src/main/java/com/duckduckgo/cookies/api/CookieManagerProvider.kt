@@ -17,11 +17,27 @@
 package com.duckduckgo.cookies.api
 
 import android.webkit.CookieManager
+import com.duckduckgo.browsermode.api.BrowserMode
 
 /** Public interface for CookieManagerProvider */
 interface CookieManagerProvider {
     /**
-     * This method returns the [CookieManager] instance. This is a singleton instance.
+     * Returns the [CookieManager] for the given [mode]. Callers always specify the mode explicitly — the
+     * tab/activity's frozen mode for WebView-bound work, or the mode carried with a deferred request.
      */
-    fun get(): CookieManager?
+    fun forMode(mode: BrowserMode): CookieManager?
+}
+
+/**
+ * Sets [cookieString] for [url] in every browser mode's cookie jar (the default profile plus any
+ * non-default ones), flushing each.
+ */
+fun CookieManagerProvider.setCookieForAllModes(url: String, cookieString: String) {
+    BrowserMode.entries
+        .mapNotNull { forMode(it) }
+        .distinct()
+        .forEach { cookieManager ->
+            cookieManager.setCookie(url, cookieString)
+            cookieManager.flush()
+        }
 }

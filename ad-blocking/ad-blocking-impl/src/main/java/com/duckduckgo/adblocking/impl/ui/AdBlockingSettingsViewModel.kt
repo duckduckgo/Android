@@ -18,6 +18,9 @@ package com.duckduckgo.adblocking.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_DISABLED_COUNT
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_DISABLED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_COUNT
@@ -27,6 +30,7 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -37,7 +41,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -46,8 +50,10 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class AdBlockingSettingsViewModel @Inject constructor(
     statusChecker: AdBlockingStatusChecker,
+    feature: AdBlockingExtensionFeature,
     private val repository: AdBlockingSettingsRepository,
     private val pixel: Pixel,
+    duckPlayer: DuckPlayer,
 ) : ViewModel() {
 
     init {
@@ -58,6 +64,9 @@ class AdBlockingSettingsViewModel @Inject constructor(
     data class ViewState(
         val isEnabled: Boolean = false,
         val showConsentDescription: Boolean? = null,
+        val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
+        val isContingencyMode: Boolean = false,
+        val isStatusIndicatorOn: Boolean = false,
     )
 
     sealed class Command {
@@ -65,13 +74,22 @@ class AdBlockingSettingsViewModel @Inject constructor(
         data object OpenDuckPlayerSettings : Command()
     }
 
-    val viewState: StateFlow<ViewState> = statusChecker.observeState()
-        .map { state ->
-            ViewState(
-                isEnabled = state is AdBlockingState.Enabled,
-                showConsentDescription = state !is AdBlockingState.Enabled.Default,
-            )
-        }
+    val viewState: StateFlow<ViewState> = combine(
+        statusChecker.observeState(),
+        duckPlayer.observeUserPreferences(),
+        feature.adBlockingUXImprovements().enabled(),
+        feature.enableContingencyMode().enabled(),
+    ) { state, duckPlayerPreferences, uxImprovements, contingencyModeOn ->
+        val isEnabled = state is AdBlockingState.Enabled
+        val isContingencyMode = uxImprovements && contingencyModeOn
+        ViewState(
+            isEnabled = isEnabled,
+            showConsentDescription = state !is AdBlockingState.Enabled.Default,
+            isContingencyMode = isContingencyMode,
+            isStatusIndicatorOn = isEnabled && !isContingencyMode,
+            duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
+        )
+    }
         .stateIn(
             viewModelScope,
             started = WhileSubscribed(),

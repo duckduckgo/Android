@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.di.SyncPromotion
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
@@ -34,12 +35,15 @@ import javax.inject.Inject
 interface SyncPromotionDataStore {
     suspend fun hasPromoBeenDismissed(promotionType: PromotionType): Boolean
     suspend fun recordPromoDismissed(promotionType: PromotionType)
+    suspend fun getPromoImpressionCount(promotionType: PromotionType): Long
+    suspend fun recordPromoImpression(promotionType: PromotionType)
     suspend fun clearPromoHistory(promotionType: PromotionType)
 
     sealed interface PromotionType {
         object BookmarksScreen : PromotionType
         object PasswordsScreen : PromotionType
         object BookmarkAddedDialog : PromotionType
+        object ChatTabPage : PromotionType
     }
 }
 
@@ -49,31 +53,60 @@ class SyncPromotionDataStoreImpl @Inject constructor(
 ) : SyncPromotionDataStore {
 
     override suspend fun hasPromoBeenDismissed(promotionType: PromotionType): Boolean {
-        val key = promotionType.key()
+        val key = promotionType.dismissKey()
         return dataStore.data.map { it[key] }.firstOrNull() != null
     }
 
     override suspend fun recordPromoDismissed(promotionType: PromotionType) {
-        val key = promotionType.key()
+        val key = promotionType.dismissKey()
         dataStore.edit { it[key] = System.currentTimeMillis() }
     }
 
-    override suspend fun clearPromoHistory(promotionType: PromotionType) {
-        val key = promotionType.key()
-        dataStore.edit { it.remove(key) }
+    override suspend fun getPromoImpressionCount(promotionType: PromotionType): Long {
+        val key = promotionType.impressionsKey()
+        return dataStore.data.map { it[key] }.firstOrNull() ?: 0
     }
 
-    private fun PromotionType.key(): Preferences.Key<Long> {
+    override suspend fun recordPromoImpression(promotionType: PromotionType) {
+        val key = promotionType.impressionsKey()
+        dataStore.edit { it[key] = (it[key] ?: 0) + 1 }
+    }
+
+    override suspend fun clearPromoHistory(promotionType: PromotionType) {
+        val dismissKey = promotionType.dismissKey()
+        val impressionKey = promotionType.impressionsKey()
+        dataStore.edit {
+            it.remove(dismissKey)
+            it.remove(impressionKey)
+        }
+    }
+
+    private fun PromotionType.dismissKey(): Preferences.Key<Long> {
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoDismissedKey
             BookmarksScreen -> bookmarksScreenPromoDismissedKey
             PasswordsScreen -> passwordsPromoDismissedKey
+            ChatTabPage -> chatTabPagePromoDismissedKey
+        }
+    }
+
+    private fun PromotionType.impressionsKey(): Preferences.Key<Long> {
+        return when (this) {
+            BookmarkAddedDialog -> bookmarkAddedDialogPromoImpressionsKey
+            BookmarksScreen -> bookmarksScreenPromoImpressionsKey
+            PasswordsScreen -> passwordsPromoImpressionsKey
+            ChatTabPage -> chatTabPagePromoImpressionsKey
         }
     }
 
     companion object {
         private val bookmarksScreenPromoDismissedKey = longPreferencesKey("bookmarks_promo_dismissed")
+        private val bookmarksScreenPromoImpressionsKey = longPreferencesKey("bookmarks_promo_impressions")
         private val bookmarkAddedDialogPromoDismissedKey = longPreferencesKey("bookmark_added_dialog_promo_dismissed")
+        private val bookmarkAddedDialogPromoImpressionsKey = longPreferencesKey("bookmark_added_dialog_promo_impressions")
         private val passwordsPromoDismissedKey = longPreferencesKey("passwords_promo_dismissed")
+        private val passwordsPromoImpressionsKey = longPreferencesKey("passwords_promo_impressions")
+        private val chatTabPagePromoDismissedKey = longPreferencesKey("chat_tab_page_promo_dismissed")
+        private val chatTabPagePromoImpressionsKey = longPreferencesKey("chat_tab_page_promo_impressions")
     }
 }

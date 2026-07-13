@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ui.SyncActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
@@ -72,6 +73,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var browserNav: BrowserNav
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val barcodeLauncher = registerForActivityResult(
         ScanContract(),
     ) { result: ScanIntentResult ->
@@ -95,7 +99,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         configureListeners()
@@ -144,6 +150,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
+        binding.clearHistoryChatTabPagePromo.setOnClickListener { viewModel.onClearHistoryChatTabPagePromoClicked() }
         binding.userIdTextView.setOnClickListener { copyToClipboard("User ID", binding.userIdTextView.text.toString()) }
         binding.deviceNameTextView.setOnClickListener { copyToClipboard("Device Name", binding.deviceNameTextView.text.toString()) }
         binding.deviceIdTextView.setOnClickListener { copyToClipboard("Device ID", binding.deviceIdTextView.text.toString()) }
@@ -267,6 +274,12 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             logcat(LogPriority.ERROR) { "Sync-ScopedToken: failed to encode QR: ${e.message}" }
             null
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun getScanOptions(): ScanOptions {

@@ -49,7 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
     <!-- Default Toggle Position -->
-    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Jauna cilnes slēdža pozīcija</string>
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Pārslēga novietojums jaunā cilnē</string>
     <string name="duckAiDefaultTogglePositionSearch">Meklēt</string>
     <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
     <string name="duckAiDefaultTogglePositionLastUsed">Pēdējo reizi lietots</string>
@@ -94,6 +94,23 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Paslēpt MI ģenerētus attēlus</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Izvēlies, cik bieži vēlies redzēt ar MI atbalstītas atbildes savos meklējumos.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nekad</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Pēc pieprasījuma</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Dažreiz</string>
+    <string name="duckAiSearchAssistVisibilityOften">Bieži</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Lieto DuckDuckGo bez MI</string>
+    <string name="duckAiUseWithoutAiDescription">Atspējo Duck.ai, paslēpj mākslīgā intelekta atbildes meklēšanā un filtrē zināmas MI spama vietnes attēlu meklēšanas rezultātos.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Mākslīgais intelekts (MI) pašlaik pārlūkā ir atspējots, tāpēc vairs neredzēsi MI atbildes un attēlu meklēšanas rezultātos redzēsi mazāk ar MI ģenerētu attēlu.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Pārslēdzies starp meklēšanu un Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Paslēpt ar MI ģenerētus attēlus</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Izfiltrē zināmas mākslīgā intelekta spama vietnes no attēlu meklēšanas rezultātiem. <annotation link="learn_more">Uzzināt vairāk</annotation></string>
 
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
@@ -183,4 +200,68 @@
     <string name="duck_ai_chat_history_download_view">Rādīt</string>
     <string name="duck_ai_chat_history_download_error">Nevarēja eksportēt tērzēšanu</string>
     <string name="duck_ai_chat_history_bulk_download_error">Neizdevās eksportēt tērzēšanas</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Meklēt DuckDuckGo</string>
+    <string name="native_input_chat_hint">Jautā jebko privāti…</string>
+    <string name="native_input_chat_duck_mode_hint">Atbildēt…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Spriešanas režīms</string>
+    <string name="duckChatReasoningModeFastTitle">Ātri</string>
+    <string name="duckChatReasoningModeFastSubtitle">Atbild ātri</string>
+    <string name="duckChatReasoningModeReasoningTitle">Spriešana</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Sarežģītiem uzdevumiem</string>
+    <string name="duckChatReasoningModeExtendedTitle">Paplašināta spriestspēja</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Analītiskiem uzdevumiem</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Sākt tērzēšanu</string>
+    <string name="duckChatStopStreamingContentDescription">Apturēt ģenerēšanu</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Noņemt attēlu</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Vienlaikus var pievienot ne vairāk kā %1$d attēlus.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Vienai sarunai var pievienot ne vairāk %1$d attēlus.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Uzņemt foto</string>
+    <string name="attachmentAttachPhoto">Pievienot attēlu</string>
+    <string name="attachmentAttachFile">Pievienot failu</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Noņemt failu</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Katrai sarunai var pievienot ne vairāk kā %1$d failus.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Fails pārsniedz maksimālo lielumu %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Vienam no pievienotajiem failiem ir vairāk lapu, nekā mēs atbalstām. Lūdzu, augšupielādē failus, kuros ir ne vairāk kā %1$d lapas.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Pievienotie failu pārsniedz kopējo lieluma ierobežojumu %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Augšupielādēt failu</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai opcijas</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Noņemt %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Izveidot attēlu</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Pārvērst tekstu attēlos</string>
+    <string name="duckChatOptionsMenuWebSearch">Tīmekļa meklēšana</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Meklē atbildes tīmeklī</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Pielāgo atbildes</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Iestati toni, garumu un uzvedību</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Atvērt Duck.ai izvēlni</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Duck.ai iestatījumi</string>
 </resources>

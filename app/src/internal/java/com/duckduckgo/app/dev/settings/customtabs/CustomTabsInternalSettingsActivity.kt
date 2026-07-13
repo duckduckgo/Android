@@ -39,23 +39,36 @@ import com.duckduckgo.app.browser.databinding.ActivityCustomTabsInternalSettings
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityCustomTabsInternalSettingsBinding by viewBinding()
     private lateinit var defaultAppActivityResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         registerActivityResultLauncher()
         configureListeners()
         updateDefaultBrowserLabel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.defaultBrowser, drawBehindGestureNav = false)
     }
 
     private fun registerActivityResultLauncher() {

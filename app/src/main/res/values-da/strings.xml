@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">Der er ikke downloadet nogen filer endnu</string>
-    <string name="downloadsShareTitle">Del med ...</string>
     <string name="downloadsDownloadFinishedActionName">Åben</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Filen findes ikke længere</string>
-    <string name="downloadsItemMenuShare">Del</string>
-    <string name="downloadsItemMenuDelete">Slet</string>
-    <string name="downloadsItemMenuCancel">Afbestil</string>
-    <string name="downloadsActivityMenuDeleteAll">Slet alle</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Flere muligheder for %1$s</string>
-    <string name="downloadsUndoActionName">Fortryd</string>
-    <string name="downloadsStateInProgress">I gang ...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">App-sporingsbeskyttelse</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
-    <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
 
     <!-- Windows Settings -->
 
@@ -1075,4 +1059,22 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekræft</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Åbn i en Fire-fane</string>
+    <string name="openInBackgroundTab">Åbn i baggrunden</string>
+    <string name="browserModeToggleFireDescription">Skift til Fire-faner</string>
+    <string name="browserModeToggleRegularDescription">Skift til almindelige faner</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-fane</string>
+    <string name="fireTabNewTabPageTitle">Fire-fane</string>
+    <string name="fireTabsEmptyStateTitle">Fire-faner</string>
+    <string name="fireTabsFeatureNoHistory">Gennemse uden at gemme lokal historik</string>
+    <string name="fireTabsFeatureDifferentAccount">Log ind på et websted med en anden konto</string>
+    <string name="fireTabsFeatureTroubleshoot">Fejlfinding på websteder</string>
+    <string name="fireTabsExplainer">Fire-faner er isoleret fra andre browserdata. Dine data slettes, når du lukker dem alle. De giver dig samme sporingsbeskyttelse som andre faner.</string>
+    <string name="fireTabsNewTabButton">Ny Fire-fane</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYT!</b> Prøv Fire-faner for at surfe uden at gemme lokal historik.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Slet Fire-faner og deres data?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
 </resources>

@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скриване на изображения, генерирани от изкуствен интелект</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Филтрира в резултатите от търсенето изображенията, генерирани от изкуствен интелект</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Никога</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">При поискване</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Понякога</string>
+    <string name="duckAiSearchAssistVisibilityOften">Често</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Използвайте DuckDuckGo без AI</string>
+    <string name="duckAiUseWithoutAiDescription">Деактивира Duck.ai, скрива подпомогнатите от AI отговори в търсенето и филтрира известни спам AI сайтове в резултатите от търсенето на изображения.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI в момента е деактивиран в браузъра, затова вече няма да виждате подпомогнати от AI отговори и ще виждате по-малко генерирани от AI изображения в резултатите от търсенето на изображения.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Превключвайте между\nТърсене и Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Скриване на изображения, генерирани от изкуствен интелект</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Филтрира известни спам AI сайтове в резултатите от търсенето на изображения. <annotation link="learn_more">Научете повече</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Активиране в настройките на AI функции</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Управление на настройките на AI функциите</string>
@@ -182,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Показване</string>
     <string name="duck_ai_chat_history_download_error">Неуспешно експортиране на чата</string>
     <string name="duck_ai_chat_history_bulk_download_error">Неуспешно експортиране на чатове</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Търсене с DuckDuckGo</string>
+    <string name="native_input_chat_hint">Задайте въпрос поверително…</string>
+    <string name="native_input_chat_duck_mode_hint">Отговор…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Плюс</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Режим на обосновка</string>
+    <string name="duckChatReasoningModeFastTitle">Бързо</string>
+    <string name="duckChatReasoningModeFastSubtitle">Бързи отговори</string>
+    <string name="duckChatReasoningModeReasoningTitle">Обосновка</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">За сложни задачи</string>
+    <string name="duckChatReasoningModeExtendedTitle">Разширена обосновка</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">За аналитични задачи</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Започнете чат</string>
+    <string name="duckChatStopStreamingContentDescription">Спри генерирането</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Премахване на изображението</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Можете да прикачите само %1$d изображения едновременно.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Можете да прикачите само %1$d изображения на разговор.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Направете снимка</string>
+    <string name="attachmentAttachPhoto">Добавяне на изображение</string>
+    <string name="attachmentAttachFile">Добавяне на файл</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Премахване на файл</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Можете да прикачите само %1$d файла на разговор.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Файлът надвишава максималния размер от %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Един от прикачените файлове има повече страници, отколкото поддържаме. Качете файлове с максимум %1$d страници.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Прикачените файлове надвишават общия лимит за размер от %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Качване на файл</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Опции за Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Премахване на %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Създаване на изображение</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Превръщане на текст в изображения</string>
+    <string name="duckChatOptionsMenuWebSearch">Търсене в мрежата</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Извличане на отговори от мрежата</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Персонализиране на отговорите</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Задаване на тон, продължителност и поведение</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Отваряне на менюто на Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Настройки на Duck.ai</string>
 </resources>

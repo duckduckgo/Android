@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Allalaadimised</string>
-    <string name="downloadsActivityTitle">Allalaadimised</string>
-    <string name="downloadsActivityNoItemsDescription">Ühtegi faili pole veel alla laaditud</string>
-    <string name="downloadsShareTitle">Jaga…</string>
     <string name="downloadsDownloadFinishedActionName">Avatud</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Faili pole enam olemas</string>
-    <string name="downloadsItemMenuShare">Jaga</string>
-    <string name="downloadsItemMenuDelete">Kustuta</string>
-    <string name="downloadsItemMenuCancel">Tühista</string>
-    <string name="downloadsActivityMenuDeleteAll">Kustuta kõik</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Kustutatud %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Kõik failid kustutatud</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Lisavalikud %1$s jaoks</string>
-    <string name="downloadsUndoActionName">Võta tagasi</string>
-    <string name="downloadsStateInProgress">Pooleli…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Rakenduse jälgimise kaitse</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>
-    <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
 
     <!-- Windows Settings -->
 
@@ -1075,4 +1059,22 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Kinnita</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Ava Fire vahekaardil</string>
+    <string name="openInBackgroundTab">Ava taustal</string>
+    <string name="browserModeToggleFireDescription">Lülitu Fire-režiimi vahekaartidele</string>
+    <string name="browserModeToggleRegularDescription">Lülitu tavalistele vahekaartidele</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire vahekaart</string>
+    <string name="fireTabNewTabPageTitle">Fire vahekaart</string>
+    <string name="fireTabsEmptyStateTitle">Fire vahekaardid</string>
+    <string name="fireTabsFeatureNoHistory">Sirvi kohalikku ajalugu salvestamata</string>
+    <string name="fireTabsFeatureDifferentAccount">Logi saidile sisse teise kontoga</string>
+    <string name="fireTabsFeatureTroubleshoot">Tõrkeotsing veebilehtedel</string>
+    <string name="fireTabsExplainer">Fire vahekaardid on teistest brauseriandmetest isoleeritud. Nende andmed põletatakse, kui sa need kõik sulged. Need pakuvad sulle sama jälgimiskaitset kui teisedki vahekaardid.</string>
+    <string name="fireTabsNewTabButton">Uus Fire vahekaart</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUS!</b> Proovi Fire vahekaarte, et sirvida ilma kohalikku ajalugu salvestamata.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Kas kustutada Fire vahekaardid ja nende andmed?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
 </resources>

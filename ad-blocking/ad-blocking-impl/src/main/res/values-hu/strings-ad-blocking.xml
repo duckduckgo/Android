@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">A DuckDuckGo blokkolja a videohirdetéseket a YouTube-on, így megszakítás nélkül nézhetsz videókat. <annotation type="learn_more_link">További információk</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Zavaró elemektől mentes, mozis nézetben nyitja meg a videókat, így a nézett tartalom nem befolyásolja a YouTube-hírfolyamodat.</string>
+    <string name="ad_blocking_settings_title_v2">Hirdetésblokkolás</string>
+    <string name="ad_blocking_settings_header_description">Még betöltés előtt blokkolja az invazív nyomkövetőket, így hatékonyan kiküszöböljük a nyomkövetésre épülő hirdetéseket</string>
+    <string name="contingencyMessageTitle">YouTube-hirdetésblokkolás nem érhető el</string>
+    <string name="contingencyMessageContent">A hirdetésblokkolást érintették a YouTube legutóbbi módosításai. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
+    <string name="contingencyMessagePrimaryButton">Értem</string>
+    <string name="contingencyMessageCloseContentDescription">Bezárás</string>
 </resources>
