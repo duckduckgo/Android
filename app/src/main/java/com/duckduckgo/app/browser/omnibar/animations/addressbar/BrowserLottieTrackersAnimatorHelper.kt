@@ -37,6 +37,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -240,6 +241,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         adBlockingView.show()
         adBlockingView.alpha = 0F
         adBlockingView.setImageResource(iconRes)
+        // The static player icon has no built-in inset (unlike the cookie Lottie), so pad it off the
+        // badge container's leading edge to line it up with the cookie/tracker icons.
+        adBlockingView.setPaddingRelative(AD_BLOCKING_ICON_START_PADDING_DP.toPx(), 0, 0, 0)
 
         val slideInTransition: Transition = createSlideTransition()
         val slideOutTransition: Transition = createSlideTransition()
@@ -564,6 +568,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         // Allows enough time for the tracker animation to finish and the address bar to settle
         // before starting the cookies animation
         private const val DELAY_BETWEEN_ANIMATIONS_DURATION = 1500L
+
+        private const val AD_BLOCKING_ICON_START_PADDING_DP = 6
     }
 }
 
