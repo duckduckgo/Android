@@ -232,6 +232,9 @@
     <string name="attachmentAttachPhoto">Add Image</string>
     <string name="attachmentAttachFile">Add File</string>
 
+    <!-- Page context attachment -->
+    <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
+
     <!-- File attachment -->
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
     <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
