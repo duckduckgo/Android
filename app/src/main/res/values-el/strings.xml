@@ -1076,6 +1076,5 @@
     <string name="fireTabsNewTabButton">Νέα καρτέλα Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ΝΕΟ!</b> Δοκιμάστε τις καρτέλες Fire για περιήγηση χωρίς να αποθηκεύετε το τοπικό ιστορικό.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
 </resources>

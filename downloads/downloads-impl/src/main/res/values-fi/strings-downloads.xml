@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Jaa...</string>
     <string name="downloadsStateInProgress">Käynnissä…</string>
     <string name="downloadsUndoActionName">Kumoa</string>
-    <string name="downloadsSearchHint">Hae</string>
 </resources>

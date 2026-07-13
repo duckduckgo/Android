@@ -1076,6 +1076,5 @@
     <string name="fireTabsNewTabButton">Nuova scheda Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVITÀ!</b> Prova le schede Fire per navigare senza salvare la cronologia locale.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Eliminare le schede Fire e i relativi dati?</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
 </resources>

@@ -1076,6 +1076,5 @@
     <string name="fireTabsNewTabButton">Uus Fire vahekaart</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUS!</b> Proovi Fire vahekaarte, et sirvida ilma kohalikku ajalugu salvestamata.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Kas kustutada Fire vahekaardid ja nende andmed?</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
 </resources>

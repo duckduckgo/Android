@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Deli s/z …</string>
     <string name="downloadsStateInProgress">Poteka …</string>
     <string name="downloadsUndoActionName">Prekliči spremembe</string>
-    <string name="downloadsSearchHint">Iskanje</string>
 </resources>

@@ -1076,6 +1076,5 @@
     <string name="fireTabsNewTabButton">Nouvel onglet Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOUVEAU !</b> Essayez les onglets Fire pour naviguer sans enregistrer l\'historique local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Supprimer les onglets Fire et leurs données ?</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
 </resources>
