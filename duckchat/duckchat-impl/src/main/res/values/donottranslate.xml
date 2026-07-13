@@ -23,4 +23,7 @@
     <string name="duckChatContextualAskAboutTab">Ask about tab</string>
     <string name="duckChatContextualAskAboutPage">Ask about page</string>
 
+    <!-- Page context attachment -->
+    <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
+
 </resources>
