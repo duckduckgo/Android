@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Намерете QR кода в приложението DuckDuckGo на другото устройство, като отворите Настройки › Sync &amp; Backup › Синхронизиране с друго устройство.</string>
     <string name="sync_chat_bottom_sheet_positive">Сканиране на QR код</string>
     <string name="sync_chat_bottom_sheet_negative">Не сега</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_joiner_confirmation_negative">Отмяна</string>
+
+    <string name="sync_v2_host_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_host_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_host_confirmation_negative">Отмяна</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Другото устройство ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Другото устройство ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Неуспешно синхронизиране.</string>
+    <string name="sync_v2_error_pairing_rejected">Синхронизирането е прекратено от другото Ви устройство.</string>
+    <string name="sync_v2_error_pairing_canceled">Синхронизирането е прекратено.</string>
+    <string name="sync_v2_error_upgrade_required">Актуализирайте браузъра DuckDuckGo и опитайте отново.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Синхронизирайте това устройство от вече свързан браузър DuckDuckGo на друго устройство</string>
+    <string name="sync_v2_error_try_again">Моля, опитайте отново.</string>
+    <string name="sync_v2_error_got_it">Разбрах</string>
+    <string name="sync_v2_already_paired_title">Вече е синхронизирано.</string>
+    <string name="sync_v2_already_paired_message">Тези устройства вече са свързани към „Sync &amp; Backup“.</string>
+
 </resources>
