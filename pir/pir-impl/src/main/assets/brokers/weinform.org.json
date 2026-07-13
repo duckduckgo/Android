@@ -1,7 +1,7 @@
 {
   "name": "WeInform",
   "url": "weinform.org",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.weinform.org/api/helper/optOutLight/search",
   "steps": [
@@ -12,7 +12,7 @@
         {
           "actionType": "navigate",
           "url": "https://www.weinform.org/api/helper/optOutLight/search",
-          "id": "c89890c9-0b0b-49d5-b72a-152afebea3aa"
+          "id": "6005c1b2-ceb9-4a8e-b3ed-ef554c109b53"
         },
         {
           "actionType": "expectation",
@@ -22,7 +22,7 @@
               "selector": "#pageForm"
             }
           ],
-          "id": "65c4efa6-5543-4827-85ac-9beda826f3e9"
+          "id": "059c8bb8-31d0-446d-8b48-db89abe2c6cb"
         },
         {
           "actionType": "fillForm",
@@ -46,7 +46,7 @@
               "selector": "select[name='state']"
             }
           ],
-          "id": "9c021278-27a7-4711-8a1a-24d39ac88924"
+          "id": "ea812639-cc80-470b-9d71-bdcce866b2ce"
         },
         {
           "actionType": "click",
@@ -56,7 +56,7 @@
               "selector": "#pageFormSubmitBtn"
             }
           ],
-          "id": "20c9a47d-c2a0-4e33-a1a0-2bfe6f3efe46"
+          "id": "5d80bafa-0fee-4cb1-a86c-74f9194d935d"
         },
         {
           "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
@@ -67,17 +67,7 @@
               "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "cft-b371ee5f-8818-44f4-b36d-77b97fc4c69e"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": ".header"
-            }
-          ],
-          "id": "840e1115-7bab-4b9c-862c-311ba49a383f"
+          "id": "cft-b77785cc-bb08-4be6-87ac-bacdc71cae20"
         },
         {
           "actionType": "expectation",
@@ -87,58 +77,76 @@
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
             }
           ],
-          "id": "f8751aac-4d41-4aa9-89d2-35c80eaf2a6a"
+          "id": "98b30ce4-0207-40d3-97e2-f745ea988976"
         },
         {
-          "actionType": "condition",
-          "_comment": "captcha is not always present at this stage",
-          "expectations": [
+          "actionType": "getCaptchaInfo",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+          "id": "dae7372d-eebd-41d5-999e-aadedb6c0290"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+          "id": "3bcbbf93-31c6-4f32-9ea8-9149038c5e71"
+        },
+        {
+          "actionType": "click",
+          "elements": [
             {
-              "type": "element",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+              "type": "button",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
             }
           ],
-          "actions": [
-            {
-              "actionType": "getCaptchaInfo",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
-              "id": "79a765f3-c1bb-4c2d-af18-071725f0ddee"
-            },
-            {
-              "actionType": "solveCaptcha",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
-              "id": "4a2a35f3-3526-43fa-a24e-d519b8a000d6"
-            },
-            {
-              "actionType": "click",
-              "failSilently": true,
-              "elements": [
-                {
-                  "type": "button",
-                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
-                }
-              ],
-              "id": "e5b42120-6dcf-4413-9139-523cbc71cc5a"
-            }
-          ],
-          "id": "ebe52f0a-0176-4853-8f9b-447868a05cd4"
+          "id": "c05e387a-5886-4976-817f-67ab9ffbed3c"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": ".header"
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]"
             }
           ],
-          "id": "766ccef8-c27f-4dc7-9691-ba6377fd6fe6"
+          "id": "c20d72f8-f1d4-49fc-bae4-0e96a8e22a93"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//img[starts-with(@src, 'data:')]",
+          "id": "d33eec7b-5d4d-4dd1-b374-ba3b4bad8bc5"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//input",
+          "id": "a8d9453b-0acb-4753-a88e-0159bb62d88a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//button"
+            }
+          ],
+          "id": "74b0aa16-6145-4aa3-abe1-59c3240d2edf"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(text(), 'Select the person')]"
+            }
+          ],
+          "id": "d72a07a3-b7f9-407f-a812-1e98ea88f802"
         },
         {
           "actionType": "extract",
           "selector": "//h2[contains(text(), 'Select the person')]/following-sibling::div/div",
-          "noResultsSelector": "//p[contains(text(), 'unable to find')]|//p[contains(text(), 'Too many')]",
+          "noResultsSelector": "//h1[contains(text(), 'unable to find')]",
           "profile": {
             "name": {
               "selector": ".//span[contains(text(), 'Name')]/following-sibling::span[1]"
@@ -154,7 +162,7 @@
               "identifierType": "hash"
             }
           },
-          "id": "fd69267b-59ce-4b1a-ba94-e1fd3dd99474"
+          "id": "0319a59f-5978-4e9c-a62e-0ff90bbd4440"
         }
       ]
     },
