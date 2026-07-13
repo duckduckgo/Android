@@ -33,6 +33,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -62,7 +63,9 @@ class RxPixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
-    private val pixelSenderFeature: PixelSenderFeature,
+    // Lazy breaks a Dagger dependency cycle: the remote-feature proxy depends on VariantManager,
+    // which transitively depends on this PixelSender.
+    private val pixelSenderFeature: Lazy<PixelSenderFeature>,
     private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
 ) : PixelSender, MainProcessLifecycleObserver {
 
@@ -201,7 +204,7 @@ class RxPixelSender @Inject constructor(
     private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(statisticsDataStore.variant) ?: ""
 
     private fun shouldSendAtb(pixelName: String): Boolean {
-        if (!pixelSenderFeature.self().isEnabled()) return true
+        if (!pixelSenderFeature.get().self().isEnabled()) return true
         return pixelRequiringAtbPlugins.getPlugins().any { plugin ->
             plugin.names().any { pixelName.startsWith(it) }
         }

@@ -112,7 +112,7 @@ class RxPixelSenderTest {
                 override fun shouldFirePixelsAsDev() = true
             },
             pixelFiredRepository,
-            pixelSenderFeature,
+            { pixelSenderFeature },
             pixelRequiringAtbPlugins,
         )
     }
