@@ -16,10 +16,21 @@
 
 package com.duckduckgo.adblocking.impl.menu
 
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_DISABLE_TAPPED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_DISABLE_TAPPED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_ENABLE_TAPPED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_ENABLE_TAPPED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_OFF_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_OFF_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_ON_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_ON_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +43,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -51,6 +63,7 @@ class RealAdBlockingMenuControllerTest {
     private val statusChecker: AdBlockingStatusChecker = mock {
         on { currentState() } doReturn AdBlockingState.Enabled.UserEnabled
     }
+    private val pixel: Pixel = mock()
 
     private val controller = RealAdBlockingMenuController(
         settingsRepository,
@@ -58,6 +71,7 @@ class RealAdBlockingMenuControllerTest {
         statusChecker,
         coroutineRule.testScope,
         coroutineRule.testDispatcherProvider,
+        pixel,
     )
 
     @Test
@@ -99,6 +113,14 @@ class RealAdBlockingMenuControllerTest {
     }
 
     @Test
+    fun whenAlwaysOnSelectedThenFiresPickerAlwaysOnPixels() {
+        controller.onChoiceSelected(AdBlockingChoice.ALWAYS_ON)
+
+        verify(pixel).fire(AD_BLOCKING_PICKER_ALWAYS_ON_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AD_BLOCKING_PICKER_ALWAYS_ON_COUNT)
+    }
+
+    @Test
     fun whenDisableUntilRelaunchSelectedThenSetsSessionAndLeavesPersistedUntouched() = runTest {
         userEnabledFlow.value = true
 
@@ -106,6 +128,14 @@ class RealAdBlockingMenuControllerTest {
 
         assertTrue(sessionStore.isDisabledUntilRelaunch())
         assertEquals(true, userEnabledFlow.value)
+    }
+
+    @Test
+    fun whenDisableUntilRelaunchSelectedThenFiresPickerDisableUntilRelaunchPixels() {
+        controller.onChoiceSelected(AdBlockingChoice.DISABLE_UNTIL_RELAUNCH)
+
+        verify(pixel).fire(AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_COUNT)
     }
 
     @Test
@@ -119,10 +149,44 @@ class RealAdBlockingMenuControllerTest {
     }
 
     @Test
-    fun whenEnableThenPersistsEnabledAndClearsSession() = runTest {
+    fun whenAlwaysOffSelectedThenFiresPickerAlwaysOffPixels() {
+        controller.onChoiceSelected(AdBlockingChoice.ALWAYS_OFF)
+
+        verify(pixel).fire(AD_BLOCKING_PICKER_ALWAYS_OFF_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AD_BLOCKING_PICKER_ALWAYS_OFF_COUNT)
+    }
+
+    @Test
+    fun whenEnableTappedThenPersistsEnabledAndClearsSession() = runTest {
         sessionStore.setDisabledUntilRelaunch()
 
-        controller.enable()
+        controller.onEnableTapped()
+
+        assertEquals(true, userEnabledFlow.value)
+        assertFalse(sessionStore.isDisabledUntilRelaunch())
+    }
+
+    @Test
+    fun whenEnableTappedThenFiresMenuEnableTappedPixels() {
+        controller.onEnableTapped()
+
+        verify(pixel).fire(AD_BLOCKING_MENU_ENABLE_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AD_BLOCKING_MENU_ENABLE_TAPPED_COUNT)
+    }
+
+    @Test
+    fun whenDisableTappedThenFiresMenuDisableTappedPixels() {
+        controller.onDisableTapped()
+
+        verify(pixel).fire(AD_BLOCKING_MENU_DISABLE_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AD_BLOCKING_MENU_DISABLE_TAPPED_COUNT)
+    }
+
+    @Test
+    fun whenDisableTappedThenDoesNotChangeState() = runTest {
+        userEnabledFlow.value = true
+
+        controller.onDisableTapped()
 
         assertEquals(true, userEnabledFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
