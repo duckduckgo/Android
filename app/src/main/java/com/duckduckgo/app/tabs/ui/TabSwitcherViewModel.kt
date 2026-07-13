@@ -718,7 +718,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        return if (!isTrackersAnimationInfoPanelHidden) {
+        return if (!isTrackersAnimationInfoPanelHidden && browserMode != BrowserMode.FIRE) {
             val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {

@@ -1676,6 +1676,35 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun `when in fire mode then tab switcher items do not include animation tile`() = runTest {
+        val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
+            setTrackersAnimationInfoTileHidden(false)
+        }
+
+        val fireTab1 = TabEntity("1", position = 1)
+        val fireTab2 = TabEntity("2", position = 2)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(fireTab1, fireTab2)))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab1))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        currentModeFlow.value = BrowserMode.FIRE
+
+        val testee = createViewModel(fakeTabSwitcherDataStore)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        val items = testee.viewState.value.tabSwitcherItems
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assertTrue(item is TabSwitcherItem.Tab)
+        }
+    }
+
+    @Test
     fun `when animated info panel positive button clicked then animated info panel is hidden`() = runTest {
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
