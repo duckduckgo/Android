@@ -15,12 +15,4 @@
   -->
 
 <resources>
-    <string name="ad_blocking_menu_disable">Disable YouTube Ad Blocking</string>
-    <string name="ad_blocking_menu_enable">Enable YouTube Ad Blocking</string>
-    <string name="ad_blocking_menu_title">YouTube Ad Blocking</string>
-    <string name="ad_blocking_menu_close_content_description">Close</string>
-    <string name="ad_blocking_menu_always_on">Always On</string>
-    <string name="ad_blocking_menu_disable_until_relaunch">Disable Until Relaunch</string>
-    <string name="ad_blocking_menu_always_off">Always Off</string>
-    <string name="ad_blocking_settings_disabled_until_relaunch">Disabled until relaunch</string>
 </resources>
