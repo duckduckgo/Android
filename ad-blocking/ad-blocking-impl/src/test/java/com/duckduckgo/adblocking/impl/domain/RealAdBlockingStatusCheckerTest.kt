@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,10 +79,11 @@ class RealAdBlockingStatusCheckerTest {
             userEnabledFlow.value = enabled
         }
     }
+    private val sessionStore = RealAdBlockingSessionStore()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val checker by lazy {
-        RealAdBlockingStatusChecker(feature, settingsRepository, testScope)
+        RealAdBlockingStatusChecker(feature, settingsRepository, sessionStore, testScope)
     }
 
     @After
@@ -187,7 +189,7 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = false
         enabledByDefaultFlow.value = true
 
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test
@@ -202,7 +204,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasNoPreferenceAndDefaultChangesThenCurrentStateReflectsIt() {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
 
         enabledByDefaultFlow.value = true
         assertEquals(AdBlockingState.Enabled.Default, checker.currentState())
@@ -264,7 +266,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasDisabledThenObserveStateEmitsDisabled() = runTest {
         userEnabledFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
@@ -272,7 +274,7 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = false
         enabledByDefaultFlow.value = true
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
@@ -288,14 +290,14 @@ class RealAdBlockingStatusCheckerTest {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
     }
 
     @Test
     fun whenNotSetAndDefaultFlowChangesThenObserveStateReflectsIt() = runTest {
         userEnabledFlow.value = null
         enabledByDefaultFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.observeState().first())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
 
         enabledByDefaultFlow.value = true
         assertEquals(AdBlockingState.Enabled.Default, checker.observeState().first())
@@ -312,7 +314,7 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUserHasDisabledThenCurrentStateIsDisabled() {
         userEnabledFlow.value = false
 
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test
@@ -329,7 +331,7 @@ class RealAdBlockingStatusCheckerTest {
         assertEquals(AdBlockingState.Enabled.UserEnabled, checker.currentState())
 
         userEnabledFlow.value = false
-        assertEquals(AdBlockingState.Disabled, checker.currentState())
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.currentState())
     }
 
     @Test
@@ -339,8 +341,52 @@ class RealAdBlockingStatusCheckerTest {
             override suspend fun setEnabled(enabled: Boolean) = Unit
         }
 
-        val checker = RealAdBlockingStatusChecker(feature, pendingRepository, testScope)
+        val checker = RealAdBlockingStatusChecker(feature, pendingRepository, sessionStore, testScope)
 
         assertEquals(AdBlockingState.Uninitialized, checker.currentState())
+    }
+
+    @Test
+    fun whenSessionDisabledThenCannotInjectEvenIfPersistedEnabled() {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertFalse(checker.canInject())
+    }
+
+    @Test
+    fun whenSessionDisabledThenClearedThenCanInjectAgain() {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+        assertFalse(checker.canInject())
+
+        sessionStore.clear()
+        assertTrue(checker.canInject())
+    }
+
+    @Test
+    fun whenSessionDisabledThenObserveCanInjectEmitsFalse() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertFalse(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenSessionDisabledThenObserveStateEmitsUntilRelaunchEvenIfPersistedEnabled() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertEquals(AdBlockingState.Disabled.UntilRelaunch, checker.observeState().first())
+    }
+
+    @Test
+    fun whenSessionClearedThenObserveStateReflectsPersistedAgain() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+        assertEquals(AdBlockingState.Disabled.UntilRelaunch, checker.observeState().first())
+
+        sessionStore.clear()
+        assertEquals(AdBlockingState.Enabled.UserEnabled, checker.observeState().first())
     }
 }

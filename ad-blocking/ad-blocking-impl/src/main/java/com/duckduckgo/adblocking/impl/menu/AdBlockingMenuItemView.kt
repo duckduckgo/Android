@@ -36,7 +36,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -48,6 +47,9 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
 
     @Inject
     lateinit var menuStateProvider: AdBlockingMenuStateProvider
+
+    @Inject
+    lateinit var menuController: AdBlockingMenuController
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -62,9 +64,11 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     private var url: Uri? = null
     private var onHostClick: (() -> Unit)? = null
     private var scope: CoroutineScope? = null
+    private var menuState: AdBlockingMenuState = AdBlockingMenuState.Hidden
 
     init {
         orientation = VERTICAL
+        isGone = true
         addView(menuItem)
     }
 
@@ -79,7 +83,10 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
 
         val url = this.url ?: return
         menuItem.setOnClickListener {
-            showMenuBottomSheet()
+            when (menuState) {
+                AdBlockingMenuState.Disabled -> menuController.enable()
+                else -> showMenuBottomSheet()
+            }
             onHostClick?.invoke()
         }
 
@@ -99,16 +106,17 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     }
 
     private fun showMenuBottomSheet() {
-        AdBlockingMenuBottomSheetDialog(context).apply {
+        AdBlockingMenuBottomSheetDialog(context, menuController.currentChoice()).apply {
             eventListener = object : AdBlockingMenuBottomSheetDialog.EventListener {
                 override fun onChoiceSelected(choice: AdBlockingChoice) {
-                    logcat { "AdBlocking menu choice selected: $choice" }
+                    menuController.onChoiceSelected(choice)
                 }
             }
         }.show()
     }
 
     private fun render(state: AdBlockingMenuState) {
+        this.menuState = state
         when (state) {
             AdBlockingMenuState.Hidden -> isGone = true
             AdBlockingMenuState.Enabled -> {
