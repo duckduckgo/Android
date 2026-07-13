@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">Trimite un raport anonim despre erori către DuckDuckGo. Ajută la îmbunătățirea blocării reclamelor pentru toată lumea!</string>
     <string name="ad_blocking_disabled_primary_action">Trimite raportul de erori</string>
     <string name="ad_blocking_disabled_secondary_action">Anulează</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Dezactivat până la relansare</string>
 </resources>
