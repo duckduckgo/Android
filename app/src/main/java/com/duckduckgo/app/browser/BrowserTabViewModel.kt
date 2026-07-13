@@ -747,8 +747,13 @@ class BrowserTabViewModel @Inject constructor(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private var adBlockingAnimationClaimed = false
-    private var pendingAdBlockingAnimation: Command.StartAdBlockingAnimation? = null
+    private var pendingAdBlockingAnimation: PendingAdBlockingBadge? = null
     private var adBlockingAnimationJob: Job? = null
+
+    // Bumped once per real navigation (NewPage). A deferred badge is tagged with the token it was
+    // created under and only flushed if the token still matches, so a badge deferred for one page
+    // can't be shown after the user has navigated to another.
+    private var adBlockingNavToken = 0
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var faviconRequestedForDomain: String? = null
@@ -2040,9 +2045,10 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 logcat { "WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
-                // Drop any prior page's deferred badge synchronously, before a progressChanged(100) for this
-                // navigation can flush it (pageChanged below runs async and would reset too late).
-                resetAdBlockingAnimationState()
+                // A real navigation: bump the token synchronously so any prior page's deferred badge is
+                // invalidated before a progressChanged(100) for this navigation can flush it (pageChanged
+                // below runs async and would decide too late).
+                adBlockingNavToken++
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2069,8 +2075,9 @@ class BrowserTabViewModel @Inject constructor(
 
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
-                // Drop any prior page's deferred badge synchronously (see NewPage above).
-                resetAdBlockingAnimationState()
+                // No token bump here: an UrlUpdated is a same-load event (e.g. YouTube fires several per
+                // in-app navigation), so a badge deferred for this load must keep the token it was
+                // created under. urlUpdated() below cancels any in-flight decision before re-deciding.
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2127,6 +2134,11 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
+    private data class PendingAdBlockingBadge(
+        val command: Command.StartAdBlockingAnimation,
+        val token: Int,
+    )
+
     private fun handleAdBlockingAnimation(
         animation: AdBlockingAnimation,
         isPageLoad: Boolean,
@@ -2137,26 +2149,33 @@ class BrowserTabViewModel @Inject constructor(
                 adBlockingAnimationClaimed = true
                 val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
                 if (isPageLoad && currentLoadingViewState().isLoading) {
-                    pendingAdBlockingAnimation = badge
+                    pendingAdBlockingAnimation = PendingAdBlockingBadge(badge, adBlockingNavToken)
                 } else {
                     command.value = badge
+                    pendingAdBlockingAnimation = null
                 }
             }
-            is AdBlockingAnimation.Skip -> adBlockingAnimationClaimed = false
+            is AdBlockingAnimation.Skip -> {
+                adBlockingAnimationClaimed = false
+                pendingAdBlockingAnimation = null
+            }
             is AdBlockingAnimation.Retain -> Unit
         }
     }
 
     private fun resetAdBlockingAnimationState() {
-        pendingAdBlockingAnimation = null
+        // Cancel any in-flight animation decision. The nav-token guard (not nulling here) is what
+        // protects a deferred badge from being shown on the wrong page.
         adBlockingAnimationJob?.cancel()
     }
 
     private fun flushPendingAdBlockingAnimation() {
         pendingAdBlockingAnimation?.let {
-            command.value = it
-            pendingAdBlockingAnimation = null
+            if (it.token == adBlockingNavToken) {
+                command.value = it.command
+            }
         }
+        pendingAdBlockingAnimation = null
     }
 
     fun onAdBlockingAnimationSuppressed() {
