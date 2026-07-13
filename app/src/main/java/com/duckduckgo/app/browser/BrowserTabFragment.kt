@@ -1229,10 +1229,12 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        val omnibarType = settingsDataStore.omnibarType
         omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
+            omnibarType = omnibarType,
             binding = binding,
         )
+
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
@@ -1512,6 +1514,8 @@ class BrowserTabFragment :
                 },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
+                onTabSwitcherPressed = { onTabsButtonPressed() },
+                onBrowserMenuPressed = { onBrowserMenuButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
