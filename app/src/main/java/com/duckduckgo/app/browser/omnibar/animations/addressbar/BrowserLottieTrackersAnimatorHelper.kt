@@ -223,11 +223,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         startAdBlockingAnimation(context, omnibarViews + shieldViews, icon, text)
     }
 
-    /**
-     * Scene-only badge animation (no Lottie): shows a static [iconRes] and [textRes] that slides in
-     * from the address bar, holds, then slides out. Timing is delay-driven; the icon is a plain
-     * drawable rather than a Lottie composition.
-     */
     private fun startAdBlockingAnimation(
         context: Context,
         omnibarViews: List<View>,
@@ -244,15 +239,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
         adBlockingView.show()
         adBlockingView.alpha = 0F
-        adBlockingView.setImageResource(iconRes) // static icon — no Lottie
+        adBlockingView.setImageResource(iconRes)
 
         val slideInTransition: Transition = createSlideTransition()
         val slideOutTransition: Transition = createSlideTransition()
 
-        // After the text slides in, hold briefly then slide out + fade out the badge views.
         slideInTransition.doOnTransitionEnd {
             AnimatorSet().apply {
-                play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L)) // holds via startDelay
+                play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L))
                 startDelay = COOKIES_ANIMATION_DELAY
                 addListener(
                     doOnEnd {
@@ -285,7 +279,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             }
         }
 
-        // After slide out finished, hide the scene and fade the omnibar back in.
         slideOutTransition.doOnTransitionEnd {
             if (!hasAdBlockingAnimationBeenCanceled) {
                 AnimatorSet().apply {
@@ -299,7 +292,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             }
         }
 
-        // Fade omnibar out, fade the badge in, then drive the text slide-in directly (no Lottie).
         AnimatorSet().apply {
             play(commonAddressBarAnimationHelper.animateViewsOut(allOmnibarViews))
                 .with(commonAddressBarAnimationHelper.animateFadeIn(adBlockingViewBackground))

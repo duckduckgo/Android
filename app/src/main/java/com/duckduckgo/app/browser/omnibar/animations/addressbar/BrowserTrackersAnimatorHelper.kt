@@ -91,8 +91,7 @@ interface BrowserTrackersAnimatorHelper {
     )
 
     /**
-     * Renders the ad-blocking badge. [icon] and [text] are resource ids owned by the ad-blocking
-     * feature; the omnibar owns only how the badge is animated. Ad-blocking is exclusive, so this
+     * Renders the ad-blocking badge. Ad-blocking is exclusive, so this
      * cancels any in-flight animation before showing.
      */
     fun createAdBlockingAnimation(

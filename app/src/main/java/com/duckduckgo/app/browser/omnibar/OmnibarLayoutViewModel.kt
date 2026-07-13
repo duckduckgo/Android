@@ -1135,7 +1135,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                         command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
                     }
                 } else {
-                    // Badge can't animate while focused; tell the browser so it releases the exclusivity claim.
                     viewModelScope.launch {
                         command.send(Command.AdBlockingAnimationSuppressed)
                     }
