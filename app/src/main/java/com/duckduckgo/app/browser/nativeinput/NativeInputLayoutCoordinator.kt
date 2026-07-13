@@ -140,7 +140,7 @@ class NativeInputLayoutCoordinator(
             // rides the widget up via translationY (a render transform, not a layout change), so .bottom
             // alone would offset for the old nav-bar-shown position and leave a gap the size of the nav bar.
             // Bottom mode's nav bar doesn't ride the widget, so its offset stays layout-based.
-            val topOffset = autocompleteTopOffset(isBottom, widgetView.bottom + widgetView.translationY.toInt(), autoCompleteList.top)
+            val topOffset = autocompleteTopOffset(isBottom, widgetView.bottom + widgetView.translationY.toInt(), autoCompleteList.top, navBarInsetPx)
             val bottomOffset = autocompleteBottomOffset(isBottom, autoCompleteList.bottom, widgetView.top)
             applyPadding(deltaTop = topOffset, deltaBottom = bottomOffset)
         }
@@ -445,13 +445,15 @@ internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInset
     }
 
 /**
- * Top padding the autocomplete list needs to sit below the input widget (top mode only; bottom mode
- * clears the widget from below). [widgetVisualBottomPx] must be the widget's on-screen bottom — its layout
- * bottom plus translationY — because the nav bar hide slides the widget up via translationY, and a
- * layout-only bottom would leave a gap the size of the nav bar once the bar is gone.
+ * Top padding the autocomplete list needs to clear the top chrome.
+ * - Top mode: sit below the input widget. [widgetVisualBottomPx] must be the widget's on-screen bottom —
+ *   its layout bottom plus translationY — because the nav bar hide slides the widget up via translationY,
+ *   and a layout-only bottom would leave a gap the size of the nav bar once the bar is gone.
+ * - Bottom mode: the widget is at the bottom, so the only top chrome is the nav bar — inset by
+ *   [navBarInsetPx] (zero when the bar is hidden) so the suggestions aren't drawn under it.
  */
-internal fun autocompleteTopOffset(isBottom: Boolean, widgetVisualBottomPx: Int, autoCompleteListTopPx: Int): Int =
-    if (isBottom) 0 else maxOf(0, widgetVisualBottomPx - autoCompleteListTopPx)
+internal fun autocompleteTopOffset(isBottom: Boolean, widgetVisualBottomPx: Int, autoCompleteListTopPx: Int, navBarInsetPx: Int): Int =
+    if (isBottom) navBarInsetPx else maxOf(0, widgetVisualBottomPx - autoCompleteListTopPx)
 
 /**
  * Bottom counterpart of [autocompleteTopOffset]: in bottom mode the list clears the widget from below.

@@ -892,6 +892,11 @@ class RealNativeInputManager @Inject constructor(
         this.navBarIsBottom = isBottom
         if (navBarView != null) {
             rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+            // Bottom omnibar only: the autocomplete list overlaps the top strip and would draw over the
+            // bar (e.g. the Duck.ai tab's suggestions), so float it above. Top omnibar has no such overlap,
+            // and the elevation shadow there would tint the bar's background so it no longer matches the
+            // content — leave it flat.
+            if (isBottom) navBarView.translationZ = WIDGET_ELEVATION_DP.toPx()
         }
         // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))

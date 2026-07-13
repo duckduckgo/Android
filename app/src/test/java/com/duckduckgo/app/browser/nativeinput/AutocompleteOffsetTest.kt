@@ -22,25 +22,30 @@ import org.junit.Test
 class AutocompleteOffsetTest {
 
     @Test
-    fun `bottom mode does not offset the list from the top`() {
-        assertEquals(0, autocompleteTopOffset(isBottom = true, widgetVisualBottomPx = 640, autoCompleteListTopPx = 304))
+    fun `bottom mode offsets the list below the nav bar when the bar is shown`() {
+        assertEquals(168, autocompleteTopOffset(isBottom = true, widgetVisualBottomPx = 640, autoCompleteListTopPx = 304, navBarInsetPx = 168))
     }
 
     @Test
-    fun `top mode offsets the list below the widget's visual bottom`() {
-        assertEquals(336, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 640, autoCompleteListTopPx = 304))
+    fun `bottom mode does not offset the list when the nav bar is hidden`() {
+        assertEquals(0, autocompleteTopOffset(isBottom = true, widgetVisualBottomPx = 640, autoCompleteListTopPx = 304, navBarInsetPx = 0))
+    }
+
+    @Test
+    fun `top mode ignores the nav bar inset and offsets below the widget's visual bottom`() {
+        assertEquals(336, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 640, autoCompleteListTopPx = 304, navBarInsetPx = 168))
     }
 
     @Test
     fun `top mode uses the visual bottom so a widget ridden up by the nav bar hide shrinks the offset`() {
         // Nav bar (168px) hidden: widget layout bottom 640 rides up via translationY -168 → visual bottom 472.
         // Using the layout bottom (640) would leave a 168px gap; the visual bottom removes it.
-        assertEquals(168, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 472, autoCompleteListTopPx = 304))
+        assertEquals(168, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 472, autoCompleteListTopPx = 304, navBarInsetPx = 0))
     }
 
     @Test
     fun `top mode clamps a negative offset to zero when the widget sits above the list`() {
-        assertEquals(0, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 100, autoCompleteListTopPx = 304))
+        assertEquals(0, autocompleteTopOffset(isBottom = false, widgetVisualBottomPx = 100, autoCompleteListTopPx = 304, navBarInsetPx = 0))
     }
 
     @Test
