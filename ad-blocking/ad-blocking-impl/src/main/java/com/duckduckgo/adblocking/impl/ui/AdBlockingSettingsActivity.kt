@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -39,8 +40,13 @@ class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
     override val duckPlayerEntry: DaxListItem get() = binding.duckPlayerEntry
     override val duckPlayerDescription: DaxTextView get() = binding.duckPlayerDescription
 
+    override val rootView: View get() = binding.root
+    override val appBarLayout: View get() = binding.includeToolbar.appBarLayout
+    override val contentScrollView: View get() = binding.contentScrollView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        maybeEnableEdgeToEdge()
         setContentView(binding.root)
         configure()
     }

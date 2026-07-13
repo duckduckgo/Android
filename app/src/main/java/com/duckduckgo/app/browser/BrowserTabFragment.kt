@@ -1820,6 +1820,7 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
+            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
         )
 
         when (browserMode) {
@@ -5456,6 +5457,7 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -6382,6 +6384,7 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {

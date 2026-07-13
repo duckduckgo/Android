@@ -16,10 +16,25 @@
 
 package com.duckduckgo.common.ui.internal.ui
 
+import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +47,7 @@ import com.duckduckgo.common.ui.internal.ui.store.appComponentsDataStore
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -62,6 +78,7 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
+    private val edgeToEdgeHandler = EdgeToEdgeHandler()
 
     @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,10 +88,13 @@ class AppComponentsActivity : AppCompatActivity() {
             selectedTheme
         }
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge(isDarkTheme = isDarkThemeEnabled(selectedTheme))
         setContentView(R.layout.activity_app_components)
         viewPager = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
         darkThemeSwitch = findViewById(R.id.dark_theme_switch)
+
+        configureEdgeToEdgeInsets()
 
         tabLayout.setupWithViewPager(viewPager)
         val adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
@@ -93,6 +113,58 @@ class AppComponentsActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    private fun isDarkThemeEnabled(selectedTheme: DuckDuckGoTheme): Boolean {
+        return when (selectedTheme) {
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+                uiManager.nightMode == UiModeManager.MODE_NIGHT_YES
+            }
+            DuckDuckGoTheme.DARK -> true
+            else -> false
+        }
+    }
+
+    private fun enableTransparentEdgeToEdge(isDarkTheme: Boolean) {
+        val barStyle = if (isDarkTheme) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                } else {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
+            }
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(findViewById<View>(R.id.app_components_root))
+        edgeToEdgeHandler.applyStatusBarInsets(findViewById<View>(R.id.app_bar_layout))
+        edgeToEdgeHandler.applyNavigationBarInsets(viewPager, drawBehindGestureNav = true)
+        installNavigationBarScrim()
+    }
+
+    private fun installNavigationBarScrim() {
+        val typedValue = TypedValue()
+        if (!theme.resolveAttribute(android.R.attr.navigationBarColor, typedValue, true)) return
+        val content = findViewById<ViewGroup>(android.R.id.content)
+        val scrim = View(this).apply {
+            setBackgroundColor(typedValue.data)
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.BOTTOM)
+        }
+        content.addView(scrim)
+        ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
+            v.updateLayoutParams { height = insets.getInsets(WindowInsetsCompat.Type.tappableElement()).bottom }
+            insets
+        }
+        ViewCompat.requestApplyInsets(scrim)
     }
 
     companion object {

@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
@@ -46,8 +47,13 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
 
     override val learnMoreScreenTitle: Int = R.string.ad_blocking_settings_title_v2
 
+    override val rootView: View get() = binding.root
+    override val appBarLayout: View get() = binding.includeToolbar.appBarLayout
+    override val contentScrollView: View get() = binding.contentScrollView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        maybeEnableEdgeToEdge()
         setContentView(binding.root)
         setTitle(R.string.ad_blocking_settings_title_v2)
         configure()
