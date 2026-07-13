@@ -24,8 +24,6 @@ import android.view.MotionEvent
 import android.view.View.MeasureSpec
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
-import androidx.core.view.doOnAttach
-import androidx.core.view.doOnLayout
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
