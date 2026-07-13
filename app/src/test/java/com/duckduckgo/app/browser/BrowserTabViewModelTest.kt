@@ -266,6 +266,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -648,6 +649,13 @@ class BrowserTabViewModelTest {
     }
     private val mockAdBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider = mock {
         onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+    }
+    private val brokenSiteReportTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val brokenSiteReportTriggerPlugin: BrokenSiteReportTriggerPlugin = mock {
+        on { observeReportRequests() } doReturn brokenSiteReportTriggerFlow
+    }
+    private val mockBrokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin> = mock {
+        on { getPlugins() } doReturn listOf(brokenSiteReportTriggerPlugin)
     }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
@@ -1046,6 +1054,7 @@ class BrowserTabViewModelTest {
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
+                brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
@@ -3071,6 +3080,29 @@ class BrowserTabViewModelTest {
         testee.onBrokenSiteSelected()
         val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("", command.data.url)
+    }
+
+    @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsThenBrokenSiteFeedbackCommandIssued() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+
+        brokenSiteReportTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.data.url)
+    }
+
+    @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsWhileTabHiddenThenNoReport() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+        testee.onViewHidden()
+        advanceUntilIdle()
+
+        brokenSiteReportTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<Command.BrokenSiteFeedback>()
     }
 
     @Test

@@ -322,6 +322,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -573,6 +574,7 @@ class BrowserTabViewModel @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
+    private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
@@ -764,6 +766,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
+    private var brokenSiteReportTriggerJob: Job? = null
 
     /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
      * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
@@ -888,6 +891,7 @@ class BrowserTabViewModel @Inject constructor(
 
         observeAccessibilitySettings()
         observeRefreshTriggers()
+        observeBrokenSiteReportTriggers()
 
         savedSitesRepository
             .getFavorites()
@@ -1046,6 +1050,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onViewRecreated() {
         observeAccessibilitySettings()
         observeRefreshTriggers()
+        observeBrokenSiteReportTriggers()
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
@@ -1121,6 +1126,20 @@ class BrowserTabViewModel @Inject constructor(
             .debounce(REFRESH_TRIGGER_DEBOUNCE_MILLIS)
             .flatMapLatest { refreshOnViewVisible.asStateFlow().filter { it }.take(1) }
             .onEach { command.value = NavigationCommand.Refresh }
+            .launchIn(viewModelScope)
+    }
+
+    fun observeBrokenSiteReportTriggers() {
+        brokenSiteReportTriggerJob?.cancel()
+        brokenSiteReportTriggerJob = brokenSiteReportTriggerPlugins.getPlugins()
+            .map { plugin ->
+                plugin.observeReportRequests()
+                    .catch { logcat(WARN) { "Broken site report trigger failed: ${it.asLog()}" } }
+            }
+            .merge()
+            // The trigger flow fires in every tab's ViewModel; only the visible tab should report.
+            .filter { refreshOnViewVisible.value }
+            .onEach { onBrokenSiteSelected() }
             .launchIn(viewModelScope)
     }
 

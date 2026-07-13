@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 class AdBlockingDisabledBottomSheetDialog(
     builderContext: Context,
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
+    private val brokenSiteReportRequester: BrokenSiteReportRequester,
 ) : BottomSheetDialog(
     builderContext,
     if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
@@ -50,7 +51,10 @@ class AdBlockingDisabledBottomSheetDialog(
         }
 
         binding.adBlockingDisabledCloseButton.setOnClickListener { dismiss() }
-        binding.adBlockingDisabledPrimaryButton.setOnClickListener { dismiss() }
+        binding.adBlockingDisabledPrimaryButton.setOnClickListener {
+            brokenSiteReportRequester.requestReport()
+            dismiss()
+        }
         binding.adBlockingDisabledSecondaryButton.setOnClickListener { dismiss() }
     }
 }

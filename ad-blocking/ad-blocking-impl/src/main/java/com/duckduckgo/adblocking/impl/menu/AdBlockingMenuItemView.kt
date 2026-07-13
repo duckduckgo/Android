@@ -58,6 +58,9 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
+    @Inject
+    lateinit var brokenSiteReportRequester: BrokenSiteReportRequester
+
     private val menuItem: MenuItemView by lazy {
         MenuItemView(context).apply {
             setSize(MenuItemViewSize.MEDIUM)
@@ -124,7 +127,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     }
 
     private fun showDisabledBottomSheet() {
-        AdBlockingDisabledBottomSheetDialog(context, edgeToEdgeProvider).show()
+        AdBlockingDisabledBottomSheetDialog(context, edgeToEdgeProvider, brokenSiteReportRequester).show()
     }
 
     private fun render(state: AdBlockingMenuState) {
