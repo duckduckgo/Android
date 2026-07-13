@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
@@ -144,8 +145,8 @@ class SyncConnectViewModel @Inject constructor(
 
     /** Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter and Scanner paths. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
-        syncPixels.fireSetupFailed(outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_CONNECT)
+        syncPixels.fireSetupFailed(SYNC_CONNECT, outcome)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_CONNECT, outcome)
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
             is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
@@ -338,7 +339,7 @@ class SyncConnectViewModel @Inject constructor(
 
     private fun SyncAuthCode.onCodeScanned() {
         when (this) {
-            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_CONNECT)
+            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_CONNECT, reason = SetupFailureReason.UNRECOGNIZED_CODE)
             else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V1)
         }
     }

@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">In Downloads speichern</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Von: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Alle löschen</string>
+    <string name="downloadsActivityNoItemsDescription">Noch keine Dateien heruntergeladen</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsAllFilesDeletedMessage">Alle Dateien gelöscht</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s gelöscht</string>
+    <string name="downloadsFileNotFoundErrorMessage">Datei existiert nicht mehr</string>
+    <string name="downloadsItemMenuCancel">Abbrechen</string>
+    <string name="downloadsItemMenuDelete">Löschen</string>
+    <string name="downloadsItemMenuShare">Teilen</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mehr Optionen für %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Erhalte eine Benachrichtigung, wenn Downloads abgeschlossen sind.</string>
+    <string name="downloadsNotifyMeTitle">Erfahre, wann Downloads bereit sind</string>
+    <string name="downloadsShareTitle">Teilen mit …</string>
+    <string name="downloadsStateInProgress">In Bearbeitung …</string>
+    <string name="downloadsUndoActionName">Rückgängig machen</string>
 </resources>

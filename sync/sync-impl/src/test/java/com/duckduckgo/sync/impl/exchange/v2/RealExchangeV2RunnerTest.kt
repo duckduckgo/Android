@@ -33,7 +33,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -130,11 +132,12 @@ class RealExchangeV2RunnerTest {
         }
     }
 
-    @Test fun `deliverIncomingMessage without a session is a no-op`() = runTest {
+    @Test fun `deliverIncomingMessage without a session emits PairingSessionNotReady`() = runTest {
         val runner = newRunner()
-        runner.events.test {
+        runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
             runner.deliverIncomingMessage(Hello("{}"))
-            expectNoEvents()
+            val event = awaitItem()
+            assertEquals(SessionErrorKind.PairingSessionNotReady, event.kind)
         }
     }
 
@@ -395,15 +398,15 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
     }
 
-    @Test fun `Scanner hello during negotiating aborts and tears down the session`() = runTest {
+    @Test fun `Scanner hello during negotiating emits UnexpectedSecondHello SessionError and tears down`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startScan("")
 
-        runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
+        runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
             runner.deliverIncomingMessage(Hello("{}"))
             val event = awaitItem()
-            assertSame(ExchangeV2State.Aborted, event.to)
+            assertSame(SessionErrorKind.UnexpectedSecondHello, event.kind)
         }
         assertNull(runner.currentState)
     }
@@ -458,10 +461,14 @@ class RealExchangeV2RunnerTest {
 
         advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline
 
-        val timedOut = runner.events.replayCache
-            .filterIsInstance<ExchangeV2Event.SessionError>()
-            .any { it.message.contains("timed out", ignoreCase = true) }
-        assertTrue("expected a 'timed out' SessionError", timedOut)
+        val sessionErrors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>()
+        val timedOut = sessionErrors.singleOrNull { it.message.contains("timed out", ignoreCase = true) }
+        assertNotNull("expected a 'timed out' SessionError", timedOut)
+        assertEquals(
+            "deadline timeouts must carry the SessionTimeout kind so the consumer can map them to SESSION_TIMEOUT.code",
+            SessionErrorKind.SessionTimeout,
+            timedOut!!.kind,
+        )
         assertNull(runner.currentState)
     }
 
@@ -492,10 +499,15 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startPresent()
 
-        val errored = runner.events.replayCache
+        val pollError = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
-            .any { it.message.contains("boom") }
-        assertTrue("expected a SessionError from the failed poll loop", errored)
+            .singleOrNull { it.message.contains("boom") }
+        assertNotNull("expected a SessionError from the failed poll loop", pollError)
+        assertEquals(
+            "non-timeout SessionErrors must keep the default Unknown kind so they continue to map to PAIRING_FAILED.code",
+            SessionErrorKind.Unknown,
+            pollError!!.kind,
+        )
         assertNull(runner.currentState)
     }
 

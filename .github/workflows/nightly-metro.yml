@@ -101,7 +101,7 @@ jobs:
         run: ./gradlew assemble${{ matrix.variant }} -Pforce-default-variant -Pskip-onboarding -Pddg.di=Metro -x lint
 
       - name: Create Asana task on failure
-        if: ${{ failure() }}
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

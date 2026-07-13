@@ -76,4 +76,25 @@ class StringExtensionsTest {
         assertEquals("127.0.0.1", "127.0.0.1".toTldPlusOneOrSelf())
         assertEquals("localhost", "localhost".toTldPlusOneOrSelf())
     }
+
+    @Test
+    fun whenStringHasSingleSpaceThenPreventWidowsLeavesItUnchanged() {
+        assertEquals("Protections activated!", "Protections activated!".preventWidows())
+    }
+
+    @Test
+    fun whenStringHasMultipleSpacesThenPreventWidowsBindsOnlyTheLastSpace() {
+        val nbsp = '\u00A0'
+        assertEquals("AI protections${nbsp}activated!", "AI protections activated!".preventWidows())
+    }
+
+    @Test
+    fun whenStringHasNoSpaceThenPreventWidowsLeavesItUnchanged() {
+        assertEquals("Protections", "Protections".preventWidows())
+    }
+
+    @Test
+    fun whenStringEndsWithSpaceThenPreventWidowsLeavesItUnchanged() {
+        assertEquals("Protections activated ", "Protections activated ".preventWidows())
+    }
 }

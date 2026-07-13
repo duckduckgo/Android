@@ -24,7 +24,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -42,7 +45,14 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
-    override fun getTheme(): Int = R.style.DownloadsBottomSheetDialogTheme
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.DownloadsBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.DownloadsBottomSheetDialogTheme
+    }
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     val listener: DownloadConfirmationDialogListener
         get() {
@@ -88,6 +98,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
         setupDownload()
         setupViews(binding)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
         return binding.root
     }
 

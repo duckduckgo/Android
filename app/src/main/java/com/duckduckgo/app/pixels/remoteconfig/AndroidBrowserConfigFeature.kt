@@ -161,6 +161,14 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun showNTPAfterIdleReturn(): Toggle
 
+    /**
+     * @return `true` when the remote config has the global "ntpAsDefaultAfterIdleReturn" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun ntpAsDefaultAfterIdleReturn(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 

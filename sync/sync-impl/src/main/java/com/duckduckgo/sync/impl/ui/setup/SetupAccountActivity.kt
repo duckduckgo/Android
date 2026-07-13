@@ -107,8 +107,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     }
 
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = true)
+        // This screen has no toolbar and its content is a full-bleed daxColorSurface fragment container. Pad that
+        // container on every edge so its surface background bleeds behind the transparent system bars: without this
+        // the status-bar scrim (daxColorBackground) would show a colour different from the surface body.
+        edgeToEdgeHandler.applySystemBarInsets(binding.fragmentContainerView)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

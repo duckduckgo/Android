@@ -21,6 +21,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialogRootView"
         style="@style/AutofillDialogRootViewStyle"
         android:paddingBottom="@dimen/autofillBottomSheetBottomPadding">
 

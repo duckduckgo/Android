@@ -60,6 +60,9 @@ sealed interface OnboardingPixelAction {
         val isChat: Boolean,
     ) : OnboardingPixelAction
 
+    /** A suggestion-screen click. value = suggested | custom. */
+    data class SuggestionClicked(val fromSuggestion: Boolean) : OnboardingPixelAction
+
     data class QuickSetupClicked(
         val addressBarPosition: OmnibarType,
         val inputScreenSelected: Boolean,
@@ -68,6 +71,15 @@ sealed interface OnboardingPixelAction {
 
 interface OnboardingPixelSender {
     fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction)
+
+    /**
+     * Like [fire], but for contextual onboarding steps: their CTA can only ever be shown once and
+     * resolved once (dismissed or confirmed) — never re-shown, unlike linear onboarding steps. The
+     * dedup tag omits the value, so whichever value fires first for a given pixel+event is
+     * authoritative and any later duplicate (e.g. from a stray navigation callback on a stale CTA
+     * reference) is silently absorbed instead of double-counted.
+     */
+    fun fireContextual(pixelName: OnboardingPixelName, action: OnboardingPixelAction)
 
     /**
      * Records that the user went down the search branch of onboarding. Persisted so it can be
@@ -134,8 +146,26 @@ class RealOnboardingPixelSender @Inject constructor(
             is OnboardingPixelAction.TryInputClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, tryInputValue(action.fromSuggestion, action.isChat))
 
+            is OnboardingPixelAction.SuggestionClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM)
+
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
+        }
+    }
+
+    override fun fireContextual(pixelName: OnboardingPixelName, action: OnboardingPixelAction) {
+        when (action) {
+            OnboardingPixelAction.Shown ->
+                fireStep(pixelName, PIXEL_EVENT_SHOWN, includeValueInTag = false)
+
+            is OnboardingPixelAction.Clicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.engaged?.let(::engageOrDismiss), includeValueInTag = false)
+
+            is OnboardingPixelAction.SuggestionClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM, includeValueInTag = false)
+
+            else -> error("Unsupported contextual onboarding action: $action")
         }
     }
 
@@ -168,6 +198,7 @@ class RealOnboardingPixelSender @Inject constructor(
         pixelName: OnboardingPixelName,
         event: String,
         value: String? = null,
+        includeValueInTag: Boolean = true,
     ) {
         appCoroutineScope.launch {
             val params = buildStandardParams().toMutableMap()
@@ -175,7 +206,9 @@ class RealOnboardingPixelSender @Inject constructor(
             value?.let { params[PIXEL_PARAM_VALUE] = it }
             val tag = buildString {
                 append(pixelName.pixelName).append("_").append(event)
-                value?.let { append("_").append(it) }
+                if (includeValueInTag) {
+                    value?.let { append("_").append(it) }
+                }
             }
             pixel.fire(pixel = pixelName, parameters = params, type = Unique(tag = tag))
         }

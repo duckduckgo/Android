@@ -49,6 +49,7 @@ abstract class OptionsBubbleCta(
     isLightTheme: Boolean,
     deviceInfo: DeviceInfo,
     onboardingImprovementsEnabled: Boolean = true,
+    onboardingImprovementsV2Enabled: Boolean = true,
     showArrow: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = ctaId,
@@ -64,6 +65,7 @@ abstract class OptionsBubbleCta(
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
     onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ) {
     override val activeIncludeId: Int = R.id.optionsContent
     override val showArrow: Boolean = showArrow

@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Diğer cihazınızdaki DuckDuckGo uygulamasında Ayarlar › Sync &amp; Backup › Başka Bir Cihazla Senkronize Et seçeneğine giderek QR kodunu bulun.</string>
     <string name="sync_chat_bottom_sheet_positive">QR kodunu tara</string>
     <string name="sync_chat_bottom_sheet_negative">Şimdi Değil</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Verileriniz senkronize edilsin mi?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Şimdi Senkronize Et</string>
+    <string name="sync_v2_joiner_confirmation_negative">İptal</string>
+
+    <string name="sync_v2_host_confirmation_title">Verileriniz senkronize edilsin mi?</string>
+    <string name="sync_v2_host_confirmation_positive">Şimdi Senkronize Et</string>
+    <string name="sync_v2_host_confirmation_negative">İptal</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\", senkronize edilmiş DuckDuckGo şifrelerinize, otomatik doldurma verilerinize ve Duck.ai sohbetlerinize erişebilecek.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\", senkronize edilmiş Duck.ai sohbetlerinize erişebilecek.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Diğer cihaz, senkronize edilmiş DuckDuckGo şifrelerinize, otomatik doldurma verilerinize ve Duck.ai sohbetlerinize erişebilecek.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Diğer cihaz, senkronize edilmiş Duck.ai sohbetlerinize erişebilecek.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Senkronizasyon başarısız oldu.</string>
+    <string name="sync_v2_error_pairing_rejected">Diğer cihazınızdan senkronizasyon iptal edildi.</string>
+    <string name="sync_v2_error_pairing_canceled">Senkronizasyon iptal edildi.</string>
+    <string name="sync_v2_error_upgrade_required">DuckDuckGo tarayıcısını güncelleyin ve tekrar deneyin.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Lütfen bu cihazı, başka bir cihazda zaten bağlı olan bir DuckDuckGo tarayıcısından senkronize edin</string>
+    <string name="sync_v2_error_try_again">Lütfen tekrar deneyin.</string>
+    <string name="sync_v2_error_got_it">Anladım</string>
+    <string name="sync_v2_already_paired_title">Zaten senkronize edildi.</string>
+    <string name="sync_v2_already_paired_message">Bu cihazlar zaten Sync &amp; Backup\'a bağlı.</string>
+
 </resources>

@@ -47,7 +47,10 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCreden
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -71,7 +74,14 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.AutofillBottomSheetDialogTheme
+    }
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -115,6 +125,9 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
         return binding.root
     }
 

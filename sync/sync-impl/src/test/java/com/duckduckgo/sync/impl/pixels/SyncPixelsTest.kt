@@ -359,10 +359,11 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun whenSetupFailedWithAllDimsThenPixelFiredWithReasonPathRoleAndPeer() {
+    fun whenSyncSetupFailedWithPathRolePeerKindThenAllIncludedInPixel() {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
         testee.fireSyncSetupFailed(
+            ScreenType.SYNC_CONNECT,
             SetupFailureReason.TRANSPORT_FAILURE,
             SetupPath.PAIRING,
             SetupRole.JOINER,
@@ -372,6 +373,7 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "joiner",
@@ -383,14 +385,15 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun whenSetupFailedWithReasonOnlyThenOptionalDimsOmitted() {
+    fun whenSyncSetupFailedWithoutPathRolePeerKindThenThoseParamsOmitted() {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
-        testee.fireSyncSetupFailed(SetupFailureReason.UNEXPECTED_FAILURE)
+        testee.fireSyncSetupFailed(ScreenType.SYNC_EXCHANGE, SetupFailureReason.UNEXPECTED_FAILURE)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -402,11 +405,15 @@ class RealSyncPixelsTest {
     fun whenFireSetupFailedForUpgradeRequiredThenNeedsUpgrade() {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
-        testee.fireSetupFailed(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST))
+        testee.fireSetupFailed(
+            ScreenType.SYNC_CONNECT,
+            DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+        )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
@@ -421,6 +428,7 @@ class RealSyncPixelsTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
         testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
             DispatchOutcome.Failed(
                 reason = "boom",
                 code = AccountErrorCodes.INVALID_CODE.code,
@@ -431,6 +439,7 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
@@ -441,8 +450,8 @@ class RealSyncPixelsTest {
 
     @Test
     fun whenFireSetupFailedForCancellationCodesThenPixelNotFired() {
-        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
-        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
+        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
+        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
 
         verifyNoInteractions(pixel)
     }
@@ -485,8 +494,8 @@ class RealSyncPixelsTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
         testee.fireSetupCancelledIfDenied(
-            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
             ScreenType.SYNC_CONNECT,
+            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
 
         verify(pixel).fire(
@@ -501,14 +510,30 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun whenFireSetupCancelledIfDeniedForPeerRejectionOrOtherThenNotFired() {
+    fun whenFireSetupCancelledIfDeniedForPeerRejectionThenAbandonedFired() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
         testee.fireSetupCancelledIfDenied(
+            ScreenType.SYNC_EXCHANGE,
             DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
-            ScreenType.SYNC_CONNECT,
         )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupCancelledIfDeniedForNonCancellationOutcomeThenNotFired() {
         testee.fireSetupCancelledIfDenied(
-            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
             ScreenType.SYNC_CONNECT,
+            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
         )
 
         verifyNoInteractions(pixel)
@@ -608,6 +633,184 @@ class RealSyncPixelsTest {
         testee.fireAiChatsRescopeTokenError(error)
 
         verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun whenBarcodeScannerParseErrorWithReasonThenPixelFiredWithReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireBarcodeScannerParseError(ScreenType.SYNC_CONNECT, reason = SetupFailureReason.UNRECOGNIZED_CODE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredFailureWithReasonThenPixelFiredWithReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupCodePastedParseFailure(ScreenType.SYNC_EXCHANGE, reason = SetupFailureReason.UNRECOGNIZED_CODE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForSessionTimeoutCodeThenSessionTimeoutReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(reason = "Session timed out", code = AccountErrorCodes.SESSION_TIMEOUT.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForCreateAccountFailedCodeThenAccountCreationFailedReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_CONNECT,
+            DispatchOutcome.Failed(reason = "create_account_failed", code = AccountErrorCodes.CREATE_ACCOUNT_FAILED.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "account_creation_failed",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForAccountUpgradeFailedCodeThenAccountUpgradeFailedReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(reason = "upgrade_failed", code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "account_upgrade_failed",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForAlreadyPairedCodeThenAlreadyPairedReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(reason = "same_account", code = AccountErrorCodes.ALREADY_PAIRED.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForAlreadyConnectedOutcomeThenAlreadyPairedReasonWithPairingPath() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        // v2 same-account case: both peers exchange intros and discover a matching user_id
+        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.AlreadyConnected)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedWithTimeoutStageThenPixelIncludesTimeoutStageParam() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(
+                reason = "Session timed out",
+                code = AccountErrorCodes.SESSION_TIMEOUT.code,
+                timeoutStage = SyncPixels.TimeoutStage.WAITING_FOR_CONFIRMATION,
+            ),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
+                SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE to "waiting_for_confirmation",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForPairingUnavailableCodeThenProtocolErrorReason() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(reason = "pairing_unavailable", code = AccountErrorCodes.PAIRING_UNAVAILABLE.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_REASON to "protocol_error",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
     }
 
     private fun givenSomeDailyStats(): DailyStats {

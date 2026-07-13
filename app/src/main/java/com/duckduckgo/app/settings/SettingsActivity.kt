@@ -104,6 +104,7 @@ import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessag
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.settings.api.ProtectionsSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
@@ -161,6 +162,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _threatProtectionSettingsPlugin: PluginPoint<ThreatProtectionSettingsPlugin>
     private val threatProtectionSettingsPlugin by lazy {
         _threatProtectionSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _protectionsSettingsPlugin: PluginPoint<ProtectionsSettingsPlugin>
+    private val protectionsSettingsPlugin by lazy {
+        _protectionsSettingsPlugin.getPlugins()
     }
 
     @Inject
@@ -319,6 +326,10 @@ class SettingsActivity : DuckDuckGoActivity() {
             threatProtectionSettingsPlugin.forEach { plugin ->
                 viewsPrivacy.settingsSectionThreatProtection.addView(plugin.getView(this))
             }
+        }
+
+        protectionsSettingsPlugin.forEach { plugin ->
+            viewsPrivacy.protectionsPluginsPlaceholder.addView(plugin.getView(this))
         }
     }
 

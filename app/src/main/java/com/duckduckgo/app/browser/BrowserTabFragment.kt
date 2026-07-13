@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -312,6 +313,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
@@ -542,6 +544,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var topInContextSections: PluginPoint<TopInContextSection>
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -1228,10 +1233,12 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        val omnibarType = settingsDataStore.omnibarType
         omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
+            omnibarType = omnibarType,
             binding = binding,
         )
+
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
@@ -1511,6 +1518,8 @@ class BrowserTabFragment :
                 },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
+                onTabSwitcherPressed = { onTabsButtonPressed() },
+                onBrowserMenuPressed = { onBrowserMenuButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
@@ -1621,8 +1630,8 @@ class BrowserTabFragment :
         launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
-    private fun onTabsButtonLongPressed() {
-        launch { viewModel.onNewTabMenuItemClicked(longPress = true) }
+    private fun onTabsButtonLongPressed(): Boolean {
+        return viewModel.onNewTabMenuItemClicked(longPress = true)
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -1694,6 +1703,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onPrivacyShieldSelected()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1818,6 +1828,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
+            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
+            topInContextSections = topInContextSections.getPlugins(),
+            currentUrl = viewModel.url?.toUri(),
         )
 
         when (browserMode) {
@@ -3065,7 +3078,7 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> {
-                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground)
+                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground, it.fillHeightDp, it.fillMaxHeightFraction)
                 if (it.backgroundColorAttr != 0) {
                     setNewTabBackgroundColor(it.backgroundColorAttr)
                 }
@@ -3186,6 +3199,8 @@ class BrowserTabFragment :
     private fun setBrowserBackgroundRes(
         @DrawableRes backgroundRes: Int,
         useRebrandBackground: Boolean,
+        fillHeightDp: Float = 0f,
+        fillMaxHeightFraction: Float = 1f,
     ) {
         if (useRebrandBackground) {
             newBrowserTab.browserBackground.apply {
@@ -3195,6 +3210,11 @@ class BrowserTabFragment :
             newBrowserTab.rebrandBrowserBackground.apply {
                 setImageResource(backgroundRes)
                 isVisible = true
+                if (fillHeightDp > 0f) {
+                    setFillHeight(fillHeightDp.toPx(context).toInt(), fillMaxHeightFraction)
+                } else {
+                    clearFill()
+                }
             }
         } else {
             newBrowserTab.rebrandBrowserBackground.gone()
@@ -3926,8 +3946,8 @@ class BrowserTabFragment :
                     this@BrowserTabFragment.onTabsButtonPressed()
                 }
 
-                override fun onTabsButtonLongPressed() {
-                    this@BrowserTabFragment.onTabsButtonLongPressed()
+                override fun onTabsButtonLongPressed(): Boolean {
+                    return this@BrowserTabFragment.onTabsButtonLongPressed()
                 }
 
                 override fun onFireButtonPressed() {
@@ -5447,6 +5467,7 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -6331,7 +6352,12 @@ class BrowserTabFragment :
             }
 
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                setBrowserBackgroundRes(
+                    configuration.backgroundRes,
+                    useRebrandBackground = true,
+                    fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
+                    fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
+                )
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
                 configureBrandDesignFitListener()
                 brandDesignDialogScrollView.post { configuration.applyFit() }
@@ -6368,6 +6394,7 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {
@@ -6495,6 +6522,7 @@ class BrowserTabFragment :
                     HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
+                        edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
                     object : HomeScreenWidgetBottomSheetDialog.EventListener {
@@ -6801,6 +6829,14 @@ class BrowserTabFragment :
 
     fun refreshAutoComplete() {
         nativeInputManager.refreshChatSuggestions()
+    }
+
+    fun onChatDeleteConfirmed() {
+        nativeInputManager.onChatDeleteConfirmed()
+    }
+
+    fun onChatDeleteCancelled() {
+        nativeInputManager.onChatDeleteCancelled()
     }
 }
 

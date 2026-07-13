@@ -152,10 +152,8 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun configureSkipButton() {
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
-                // When the orchestrator is driving onboarding it owns the skip: it terminates to
-                // Skipped and the active page navigates. Only navigate here when it isn't engaged.
-                viewModel.devOnlyFullyCompleteAllOnboarding()
-                if (!viewModel.orchestratorDriven) {
+                val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()
+                if (shouldNavigate) {
                     startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
                     finish()
                 }

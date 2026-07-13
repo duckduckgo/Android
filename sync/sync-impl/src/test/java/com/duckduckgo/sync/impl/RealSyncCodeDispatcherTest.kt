@@ -16,14 +16,23 @@
 
 package com.duckduckgo.sync.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.PEER_RECOVERY_CODE_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.RECOVERY_CODE_PREPARATION_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
+import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -32,18 +41,16 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -60,15 +67,15 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealSyncCodeDispatcherTest {
 
-    private val syncFeature: SyncFeature = mock()
-    private val canUseV2: Toggle = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val qrCode: ExchangeV2QrCode = mock()
 
-    private val runnerEventsFlow = MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
+    private val runnerEventsFlow = MutableSharedFlow<ExchangeV2Event>(replay = 0)
     private val runner: ExchangeV2Runner = mock<ExchangeV2Runner>().also {
         whenever(it.events).thenReturn(runnerEventsFlow)
         whenever(it.eventsSince(any())).thenAnswer { invocation ->
@@ -84,13 +91,12 @@ class RealSyncCodeDispatcherTest {
         runner = runner,
     )
 
-    private fun setV2(enabled: Boolean) {
-        whenever(syncFeature.canUseV2ConnectFlow()).thenReturn(canUseV2)
-        whenever(canUseV2.isEnabled()).thenReturn(enabled)
+    private fun configureFeatureFlag(canUseV2Code: Boolean) {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(Toggle.State(enable = canUseV2Code))
     }
 
-    @Test fun `FF off - returns Legacy with whatever parseSyncAuthCode returned, and never touches qrCode parse`() {
-        setV2(false)
+    @Test fun `v2 flag off - returns Legacy with whatever parseSyncAuthCode returned, and never touches qrCode parse`() {
+        configureFeatureFlag(canUseV2Code = false)
         val expectedAuthCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = "pk", userId = "u"))
         whenever(syncAccountRepository.parseSyncAuthCode("the-code")).thenReturn(expectedAuthCode)
 
@@ -100,8 +106,8 @@ class RealSyncCodeDispatcherTest {
         verify(qrCode, never()).parse(any())
     }
 
-    @Test fun `FF off - v1 Connect codes return Legacy(Connect) unchanged`() {
-        setV2(false)
+    @Test fun `v2 flag off - v1 Connect codes return Legacy(Connect) unchanged`() {
+        configureFeatureFlag(canUseV2Code = false)
         val connect = SyncAuthCode.Connect(mock())
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(connect)
 
@@ -110,8 +116,8 @@ class RealSyncCodeDispatcherTest {
         assertSame(connect, decision.authCode)
     }
 
-    @Test fun `FF off - v1 Exchange codes return Legacy(Exchange) unchanged`() {
-        setV2(false)
+    @Test fun `v2 flag off - v1 Exchange codes return Legacy(Exchange) unchanged`() {
+        configureFeatureFlag(canUseV2Code = false)
         val exchange = SyncAuthCode.Exchange(mock())
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(exchange)
 
@@ -120,8 +126,8 @@ class RealSyncCodeDispatcherTest {
         assertSame(exchange, decision.authCode)
     }
 
-    @Test fun `FF off - Unknown codes still bubble back as Legacy(Unknown)`() {
-        setV2(false)
+    @Test fun `v2 flag off - Unknown codes still bubble back as Legacy(Unknown)`() {
+        configureFeatureFlag(canUseV2Code = false)
         val unknown = SyncAuthCode.Unknown("garbage")
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(unknown)
 
@@ -130,8 +136,8 @@ class RealSyncCodeDispatcherTest {
         assertSame(unknown, decision.authCode)
     }
 
-    @Test fun `FF off - even a v2-shaped code is routed via legacy parseSyncAuthCode (no v2 parser touched)`() {
-        setV2(false)
+    @Test fun `v2 flag off - even a v2-shaped code is routed via legacy parseSyncAuthCode (no v2 parser touched)`() {
+        configureFeatureFlag(canUseV2Code = false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Unknown("v2-shaped-input"))
 
         dispatcher.route("https://duckduckgo.com/sync/pairing/#&code2=anything")
@@ -140,8 +146,8 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository).parseSyncAuthCode("https://duckduckgo.com/sync/pairing/#&code2=anything")
     }
 
-    @Test fun `FF on but v2 parser returns LinkingV1 - falls back to legacy stack`() {
-        setV2(true)
+    @Test fun `v2 flag on but v2 parser returns LinkingV1 - falls back to legacy stack`() {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.LinkingV1)
         val connect = SyncAuthCode.Connect(mock())
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(connect)
@@ -151,8 +157,8 @@ class RealSyncCodeDispatcherTest {
         assertSame(connect, decision.authCode)
     }
 
-    @Test fun `FF on but v2 parser returns Unknown - falls back to legacy stack`() {
-        setV2(true)
+    @Test fun `v2 flag on but v2 parser returns Unknown - falls back to legacy stack`() {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
         val recovery = SyncAuthCode.Recovery(RecoveryCode(primaryKey = "pk", userId = "u"))
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(recovery)
@@ -162,8 +168,8 @@ class RealSyncCodeDispatcherTest {
         assertSame(recovery, decision.authCode)
     }
 
-    @Test fun `FF on, v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
-        setV2(true)
+    @Test fun `v2 flag on, v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
@@ -186,8 +192,8 @@ class RealSyncCodeDispatcherTest {
         assertTrue(dispatcher.isV2ExchangeUnderway())
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - flow emits LoggedIn after processCode succeeds`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - flow emits LoggedIn after processCode succeeds`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-1")
             put("secret", "s-1")
@@ -204,9 +210,9 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcomes.single())
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
         // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
-        setV2(true)
+        configureFeatureFlag(canUseV2Code = true)
         val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val expectedBytes = java.util.Base64.getUrlDecoder().decode(base64urlSecret)
         val rawJson = JSONObject().apply {
@@ -227,8 +233,8 @@ class RealSyncCodeDispatcherTest {
         assertArrayEquals(expectedBytes, java.util.Base64.getDecoder().decode(primaryKey))
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg with missing user_id - emits Failed without calling processCode`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg with missing user_id - emits Failed without calling processCode`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("secret", "s-1")
             put("cid", "ddg")
@@ -242,8 +248,8 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=3party - flow calls joinAccountFromThirdPartyRecoveryCode`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - flow calls joinAccountFromThirdPartyRecoveryCode`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -260,8 +266,8 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
@@ -285,8 +291,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals("2.0", recovery.getString("v"))
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
@@ -296,7 +302,7 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
-                code = com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                code = ALREADY_SIGNED_IN.code,
                 reason = "Already signed in",
             ),
         )
@@ -317,8 +323,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals("u-other", recovery.getString("user_id"))
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
@@ -328,7 +334,7 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
-                code = com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                code = ALREADY_SIGNED_IN.code,
                 reason = "Already signed in",
             ),
         )
@@ -345,8 +351,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals("u-other", recovery.getString("user_id"))
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN then logoutAndJoinNewAccount failure surfaces as Failed`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN then logoutAndJoinNewAccount failure surfaces as Failed`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
             put("secret", "s-other")
@@ -355,24 +361,24 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
-                code = com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                code = ALREADY_SIGNED_IN.code,
                 reason = "Already signed in",
             ),
         )
         whenever(syncAccountRepository.logoutAndJoinNewAccount(any())).thenReturn(
-            Result.Error(code = com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED.code, reason = "Login failed"),
+            Result.Error(code = LOGIN_FAILED.code, reason = "Login failed"),
         )
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
         assertEquals(
-            DispatchOutcome.Failed("Login failed", com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED.code, path = SetupPath.RECOVERY),
+            DispatchOutcome.Failed("Login failed", LOGIN_FAILED.code, path = SetupPath.RECOVERY),
             outcome,
         )
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -381,7 +387,7 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(
             Result.Error(
-                code = com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                code = ALREADY_SIGNED_IN.code,
                 reason = "Already signed in",
             ),
         )
@@ -391,7 +397,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals(
             DispatchOutcome.Failed(
                 "Already signed in",
-                com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                ALREADY_SIGNED_IN.code,
                 path = SetupPath.RECOVERY,
             ),
             outcome,
@@ -399,8 +405,8 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).logoutAndJoinNewAccount(any())
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=ddg - non-ALREADY_SIGNED_IN error still becomes Failed`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - non-ALREADY_SIGNED_IN error still becomes Failed`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u")
             put("secret", "AQID") // valid base64 so decoding succeeds and processCode is reached
@@ -416,8 +422,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.Failed("Some other error", path = SetupPath.RECOVERY), outcome)
     }
 
-    @Test fun `FF on, v2 RecoveryCode cid=3party - repository error becomes Failed with reason preserved`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - repository error becomes Failed with reason preserved`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -433,8 +439,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.Failed("BE rejected", path = SetupPath.RECOVERY), outcome)
     }
 
-    @Test fun `FF on, v2 RecoveryCode with unknown cid - emits Failed with the cid in the reason`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, v2 RecoveryCode with unknown cid - emits Failed with the cid in the reason`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         val rawJson = JSONObject().apply {
             put("user_id", "u")
             put("secret", "s")
@@ -448,8 +454,8 @@ class RealSyncCodeDispatcherTest {
         assertTrue((outcome as DispatchOutcome.Failed).reason.contains("future-credential"))
     }
 
-    @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() {
-        setV2(false)
+    @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() = runTest {
+        configureFeatureFlag(canUseV2Code = false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Recovery(mock()))
 
         dispatcher.route("any")
@@ -459,7 +465,7 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Legacy path - dispatcher does not start the v2 runner`() {
-        setV2(false)
+        configureFeatureFlag(canUseV2Code = false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Unknown("x"))
 
         dispatcher.route("any")
@@ -467,22 +473,22 @@ class RealSyncCodeDispatcherTest {
         verify(runner, never()).startScan(any())
     }
 
-    @Test fun `FF on, LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
-        val staleJoinerDone = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event.Transition(
+        val staleJoinerDone = ExchangeV2Event.Transition(
             timestampMs = 1L,
-            from = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner.Waiting,
-            to = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner.Done,
-            trigger = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+            from = ExchangeV2State.Joiner.Waiting,
+            to = ExchangeV2State.Joiner.Done,
+            trigger = ExchangeV2Message.RecoveryCodeResponse(
                 rawJson = "{}",
                 recoveryCode = "stale-code-from-prior-session",
             ),
             localTrigger = null,
         )
-        val staleFlow = MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 10)
+        val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
         staleFlow.tryEmit(staleJoinerDone)
         whenever(runner.events).thenReturn(staleFlow)
         whenever(runner.eventsSince(any())).thenAnswer { invocation ->
@@ -492,13 +498,15 @@ class RealSyncCodeDispatcherTest {
 
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
 
-        val outcome = kotlinx.coroutines.withTimeoutOrNull(100) { decision.outcomes.first() }
-        assertEquals(null, outcome)
+        decision.outcomes.test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `FF on, LinkingV2 - runner_startScan deferred until Flow is collected (cold)`() = runTest {
-        setV2(true)
+    @Test fun `v2 flag on, LinkingV2 - runner_startScan deferred until Flow is collected (cold)`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
@@ -507,13 +515,13 @@ class RealSyncCodeDispatcherTest {
 
         verify(runner, never()).startScan(any())
 
-        kotlinx.coroutines.withTimeoutOrNull(50) { decision.outcomes.first() }
+        decision.outcomes.test { cancelAndIgnoreRemainingEvents() }
         verify(runner).startScan(eq("v2-url"))
     }
 
-    @Test fun `FF on, LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
+    @Test fun `v2 flag on, LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
         // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
-        setV2(true)
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
@@ -533,20 +541,22 @@ class RealSyncCodeDispatcherTest {
         val recoveryCodeB64 = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.toByteArray())
 
         val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.take(1).toList() }
-        runnerEventsFlow.emit(
-            ExchangeV2Event.Transition(
-                timestampMs = System.currentTimeMillis(),
-                from = ExchangeV2State.Joiner.Waiting,
-                to = ExchangeV2State.Joiner.Done,
-                trigger = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
-                    rawJson = payloadJson,
-                    recoveryCode = recoveryCodeB64,
+        flow.test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(
+                        rawJson = payloadJson,
+                        recoveryCode = recoveryCodeB64,
+                    ),
+                    localTrigger = null,
                 ),
-                localTrigger = null,
-            ),
-        )
-        job.join()
+            )
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
 
         val captor = org.mockito.kotlin.argumentCaptor<SyncAuthCode>()
         verify(syncAccountRepository).processCode(captor.capture(), anyOrNull())
@@ -581,123 +591,108 @@ class RealSyncCodeDispatcherTest {
             linkingCode = linkingCode,
         )
 
-    @Test fun `presentV2 emits LinkingCodeReady when runner emits SessionStarted with a linkingCode`() = runTest {
-        val flow = dispatcher.presentV2()
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-            flow.take(1).collect { outcomes += it }
+    @Test fun `Presenter emits LinkingCodeReady when runner emits SessionStarted with a linkingCode`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(sessionStarted(linkingCode = "https://duckduckgo.com/sync/pairing?code2=abc"))
+            assertEquals(
+                DispatchOutcome.LinkingCodeReady("https://duckduckgo.com/sync/pairing?code2=abc"),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        runnerEventsFlow.emit(sessionStarted(linkingCode = "https://duckduckgo.com/sync/pairing?code2=abc"))
-        job.join()
-
-        assertEquals(1, outcomes.size)
-        assertEquals(
-            DispatchOutcome.LinkingCodeReady("https://duckduckgo.com/sync/pairing?code2=abc"),
-            outcomes.single(),
-        )
     }
 
-    @Test fun `presentV2 ignores SessionStarted with null linkingCode (Scanner side leakage protection)`() = runTest {
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
-        runnerEventsFlow.emit(sessionStarted(linkingCode = null))
-        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Done))
-        job.join()
-
-        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST), outcomes.single())
+    @Test fun `Presenter ignores SessionStarted with null linkingCode (Scanner side leakage protection)`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(sessionStarted(linkingCode = null))
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Done))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    @Test fun `presentV2 emits HostConfirmationRequested with peerName when runner reaches Host_Confirming`() = runTest {
+    @Test fun `Presenter emits HostConfirmationRequested with peerName when runner reaches Host_Confirming`() = runTest {
         whenever(runner.peerName).thenReturn("Peer Phone")
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
-        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
-        job.join()
-
-        assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), outcomes.single())
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
+            assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    @Test fun `presentV2 carries third-party peer kind on HostConfirmationRequested`() = runTest {
+    @Test fun `Presenter carries third-party peer kind on HostConfirmationRequested`() = runTest {
         whenever(runner.peerName).thenReturn("Peer Phone")
         whenever(runner.peerKind).thenReturn("3party")
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
-        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
-        job.join()
-
-        assertEquals(
-            DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.THIRD_PARTY),
-            outcomes.single(),
-        )
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
+            assertEquals(
+                DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.THIRD_PARTY),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    @Test fun `presentV2 carries ddg peer kind on JoinerConfirmationRequested`() = runTest {
+    @Test fun `Presenter carries ddg peer kind on JoinerConfirmationRequested`() = runTest {
         whenever(runner.peerName).thenReturn("Peer Phone")
         whenever(runner.peerKind).thenReturn("ddg")
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
-        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming))
-        job.join()
-
-        assertEquals(
-            DispatchOutcome.JoinerConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.DDG),
-            outcomes.single(),
-        )
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming))
+            assertEquals(
+                DispatchOutcome.JoinerConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.DDG),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    @Test fun `presentV2 emits LoggedIn with Host role and peer kind when runner reaches Host_Done`() = runTest {
+    @Test fun `Presenter emits LoggedIn with Host role and peer kind when runner reaches Host_Done`() = runTest {
         whenever(runner.peerKind).thenReturn("3party")
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                dispatcher.presentV2().first { it is DispatchOutcome.LoggedIn || it is DispatchOutcome.Failed }
-            }
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Sending, to = ExchangeV2State.Host.Done))
-            job.await()
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.THIRD_PARTY), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.THIRD_PARTY), outcome)
     }
 
-    @Test fun `presentV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter maps a version-too-new SessionError to UpgradeRequired`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 ExchangeV2Event.SessionError(
                     timestampMs = System.currentTimeMillis(),
                     message = "Peer requires protocol v3; please update this app",
                 ),
             )
-            job.await()
+            assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), outcome)
     }
 
-    @Test fun `route LinkingV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
-        setV2(true)
+    @Test fun `Scanner maps a version-too-new SessionError to UpgradeRequired`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
-        val outcome = withTimeoutOrNull(1000) {
-            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+        val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+        flow.test {
             runnerEventsFlow.emit(
                 ExchangeV2Event.SessionError(
                     timestampMs = System.currentTimeMillis(),
                     message = "Peer requires protocol v3; please update this app",
                 ),
             )
-            job.await()
+            assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), outcome)
     }
 
-    @Test fun `route LinkingV2 - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
-        setV2(true)
+    @Test fun `Scanner - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
-        val outcome = withTimeoutOrNull(1000) {
-            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+        val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+        flow.test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Host.Confirming,
@@ -705,22 +700,21 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = LocalTrigger.UserDeniedHost,
                 ),
             )
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
-            outcome,
-        )
     }
 
-    @Test fun `route LinkingV2 - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
-        setV2(true)
+    @Test fun `Scanner - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
-        val outcome = withTimeoutOrNull(1000) {
-            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+        val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+        flow.test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Host.Sending,
@@ -728,17 +722,16 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = LocalTrigger.HostUnavailable,
                 ),
             )
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
-            outcome,
-        )
     }
 
-    @Test fun `presentV2 emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Host.Confirming,
@@ -746,17 +739,16 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = LocalTrigger.UserDeniedHost,
                 ),
             )
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
-            outcome,
-        )
     }
 
-    @Test fun `presentV2 emits Failed host_unavailable when Host_Aborted carries HostUnavailable trigger`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter emits Failed host_unavailable when Host_Aborted carries HostUnavailable trigger`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Host.Sending,
@@ -764,55 +756,84 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = LocalTrigger.HostUnavailable,
                 ),
             )
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
-            outcome,
-        )
     }
 
-    @Test fun `presentV2 emits AlreadyConnected when runner reaches SameAccountAbort`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter emits AlreadyConnected when runner reaches SameAccountAbort`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.SameAccountAbort))
-            job.await()
+            assertEquals(DispatchOutcome.AlreadyConnected, awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.AlreadyConnected, outcome)
     }
 
-    @Test fun `presentV2 emits Failed when runner emits SessionError`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter emits Failed when runner emits SessionError`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 ExchangeV2Event.SessionError(timestampMs = System.currentTimeMillis(), message = "channel 5xx"),
             )
-            job.await()
+            assertEquals(DispatchOutcome.Failed("channel 5xx", PAIRING_FAILED.code, path = SetupPath.PAIRING), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.Failed("channel 5xx", PAIRING_FAILED.code, path = SetupPath.PAIRING), outcome)
     }
 
-    @Test fun `presentV2 emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
-            }
+    @Test fun `Presenter maps a RecoveryCodePreparationFailed-kind SessionError to Failed with RECOVERY_CODE_PREPARATION_FAILED code`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Couldn't generate a recovery code: boom",
+                    kind = SessionErrorKind.RecoveryCodePreparationFailed,
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "Couldn't generate a recovery code: boom",
+                    RECOVERY_CODE_PREPARATION_FAILED.code,
+                    path = SetupPath.PAIRING,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter maps a SessionTimeout-kind SessionError to Failed with SESSION_TIMEOUT code`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Session timed out",
+                    kind = SessionErrorKind.SessionTimeout,
+                ),
+            )
+            assertEquals(DispatchOutcome.Failed("Session timed out", SESSION_TIMEOUT.code, path = SetupPath.PAIRING), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "joiner_done_missing_recovery_code",
+                    NO_RECOVERY_CODE.code,
+                    path = SetupPath.PAIRING,
+                    myRole = SetupRole.JOINER,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed(
-                "Pairing completed without a recovery code",
-                NO_RECOVERY_CODE.code,
-                path = SetupPath.PAIRING,
-                myRole = SetupRole.JOINER,
-            ),
-            outcome,
-        )
     }
 
-    @Test fun `presentV2 emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
-        setV2(true)
+    @Test fun `Presenter emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -828,17 +849,14 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
             rawJson = "{}",
             recoveryCode = b64,
         )
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
         whenever(runner.peerKind).thenReturn("ddg")
 
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
-            }
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
@@ -848,15 +866,14 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = null,
                 ),
             )
-            job.await()
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER, PeerKind.DDG), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER, PeerKind.DDG), outcome)
         verify(syncAccountRepository).processCode(any(), anyOrNull())
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
 
-    @Test fun `presentV2 emits LoggedIn via 3party upgrade when Joiner_Done carries a cid=3party recovery code`() = runTest {
-        setV2(true)
+    @Test fun `Presenter emits LoggedIn via 3party upgrade when Joiner_Done carries a cid=3party recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -872,16 +889,13 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
             rawJson = "{}",
             recoveryCode = b64,
         )
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
 
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
-            }
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
@@ -891,16 +905,15 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = null,
                 ),
             )
-            job.await()
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER), outcome)
         verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(any())
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `presentV2 emits Failed with cancelled-on-this-device reason when Joiner reaches AbortedLocal`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter emits Failed PAIRING_CANCELLED when Joiner_AbortedLocal driven by UserDeniedJoiner`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
@@ -908,28 +921,56 @@ class RealSyncCodeDispatcherTest {
                     localTrigger = LocalTrigger.UserDeniedJoiner,
                 ),
             )
-            job.await()
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "user_denied_joiner",
+                    PAIRING_CANCELLED.code,
+                    path = SetupPath.PAIRING,
+                    myRole = SetupRole.JOINER,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(
-            DispatchOutcome.Failed(
-                "Pairing cancelled on this device",
-                PAIRING_CANCELLED.code,
-                path = SetupPath.PAIRING,
-                myRole = SetupRole.JOINER,
-            ),
-            outcome,
-        )
     }
 
-    @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {
+    @Test fun `Presenter emits Failed UNEXPECTED_EVENT when Joiner_AbortedLocal driven by wire message`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits Failed UNEXPECTED_EVENT when Host_Aborted driven by wire message`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}"),
+                ),
+            )
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter calls runner_startPresent when Flow is collected`() = runTest {
         val flow = dispatcher.presentV2()
         verify(runner, never()).startPresent()
 
-        withTimeoutOrNull(50) { flow.first() }
+        flow.test { cancelAndIgnoreRemainingEvents() }
         verify(runner).startPresent()
     }
 
-    @Test fun `presentV2 cancels runner when collecting coroutine is cancelled`() = runTest {
+    @Test fun `Presenter cancels runner when collecting coroutine is cancelled`() = runTest {
         val flow = dispatcher.presentV2()
         val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
             flow.collect { /* no-op */ }
@@ -942,10 +983,10 @@ class RealSyncCodeDispatcherTest {
         verify(runner).cancel()
     }
 
-    @Test fun `driveV2Linking cancels runner when collecting coroutine is cancelled`() = runTest {
-        setV2(true)
+    @Test fun `Scanner cancels runner when collecting coroutine is cancelled`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+            ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "c",
                 publicKey = "k",
                 version = "2",
@@ -963,30 +1004,26 @@ class RealSyncCodeDispatcherTest {
         verify(runner).cancel()
     }
 
-    @Test fun `presentV2 terminates silently when another SessionStarted with different channel arrives`() = runTest {
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-            dispatcher.presentV2().toList(outcomes)
+    @Test fun `Presenter terminates silently when another SessionStarted with different channel arrives`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(sessionStarted(linkingCode = "code-for-own-channel"))
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionStarted(
+                    timestampMs = System.currentTimeMillis(),
+                    pairingRole = PairingRole.Scanner,
+                    ownChannelId = "other-channel",
+                    linkingCode = null,
+                ),
+            )
+            assertEquals(DispatchOutcome.LinkingCodeReady("code-for-own-channel"), awaitItem())
+            awaitComplete()
         }
-        runnerEventsFlow.emit(sessionStarted(linkingCode = "code-for-own-channel"))
-        runnerEventsFlow.emit(
-            ExchangeV2Event.SessionStarted(
-                timestampMs = System.currentTimeMillis(),
-                pairingRole = PairingRole.Scanner,
-                ownChannelId = "other-channel",
-                linkingCode = null,
-            ),
-        )
-        job.join()
-
-        assertEquals(1, outcomes.size)
-        assertEquals(DispatchOutcome.LinkingCodeReady("code-for-own-channel"), outcomes.single())
     }
 
-    @Test fun `driveV2Linking terminates silently when another SessionStarted with different channel arrives`() = runTest {
-        setV2(true)
+    @Test fun `Scanner terminates silently when another SessionStarted with different channel arrives`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+            ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "peer-channel",
                 publicKey = "k",
                 version = "2",
@@ -994,59 +1031,51 @@ class RealSyncCodeDispatcherTest {
         )
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
 
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-            decision.outcomes.toList(outcomes)
+        decision.outcomes.test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionStarted(
+                    timestampMs = System.currentTimeMillis(),
+                    pairingRole = PairingRole.Scanner,
+                    ownChannelId = "scanner-own-channel",
+                    linkingCode = null,
+                ),
+            )
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionStarted(
+                    timestampMs = System.currentTimeMillis(),
+                    pairingRole = PairingRole.Presenter,
+                    ownChannelId = "different-channel",
+                    linkingCode = "code",
+                ),
+            )
+            awaitComplete()
         }
-        runnerEventsFlow.emit(
-            ExchangeV2Event.SessionStarted(
-                timestampMs = System.currentTimeMillis(),
-                pairingRole = PairingRole.Scanner,
-                ownChannelId = "scanner-own-channel",
-                linkingCode = null,
-            ),
-        )
-        runnerEventsFlow.emit(
-            ExchangeV2Event.SessionStarted(
-                timestampMs = System.currentTimeMillis(),
-                pairingRole = PairingRole.Presenter,
-                ownChannelId = "different-channel",
-                linkingCode = "code",
-            ),
-        )
-        job.join()
-
-        assertTrue("expected no outcomes, got $outcomes", outcomes.isEmpty())
     }
 
-    @Test fun `presentV2 emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
-        val outcomes = mutableListOf<DispatchOutcome>()
-        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-            dispatcher.presentV2().take(1).collect { outcomes += it }
+    @Test fun `Presenter emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
+            val outcome = awaitItem()
+            assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+            cancelAndIgnoreRemainingEvents()
         }
-        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
-        job.join()
-
-        assertTrue("expected Failed, got ${outcomes.single()}", outcomes.single() is DispatchOutcome.Failed)
     }
 
-    @Test fun `linking flow emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
-        setV2(true)
+    @Test fun `Scanner emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
-                decision.outcomes.first { it is DispatchOutcome.Failed }
-            }
+        decision.outcomes.test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
-            job.await()
+            val outcome = awaitItem()
+            assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
     }
 
-    @Test fun `presentV2 filters out events from before session start`() = runTest {
+    @Test fun `Presenter filters out events from before session start`() = runTest {
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
         staleFlow.tryEmit(
             ExchangeV2Event.Transition(
@@ -1063,21 +1092,22 @@ class RealSyncCodeDispatcherTest {
             staleFlow.filter { it.timestampMs >= since }
         }
 
-        val outcome = withTimeoutOrNull(100) { dispatcher.presentV2().first() }
-        assertEquals(null, outcome)
+        dispatcher.presentV2().test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun startLinking(): kotlinx.coroutines.flow.Flow<DispatchOutcome> {
-        setV2(true)
+        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
         return (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
     }
 
-    @Test fun `linking - AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - Joiner_AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
@@ -1085,15 +1115,15 @@ class RealSyncCodeDispatcherTest {
                     trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
                 ),
             )
-            job.await()
+            val outcome = awaitItem()
+            assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+            assertEquals(PAIRING_REJECTED.code, (outcome as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
-        assertEquals(PAIRING_REJECTED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - AbortedByHost with RecoveryCodeUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - Joiner_AbortedByHost with RecoveryCodeUnavailable maps to Failed PEER_RECOVERY_CODE_UNAVAILABLE`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
@@ -1101,59 +1131,87 @@ class RealSyncCodeDispatcherTest {
                     trigger = ExchangeV2Message.RecoveryCodeUnavailable(rawJson = "{}"),
                 ),
             )
-            job.await()
+            assertEquals(PEER_RECOVERY_CODE_UNAVAILABLE.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(PAIRING_UNAVAILABLE.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - Joiner AbortedLocal maps to Failed PAIRING_CANCELLED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Confirming, to = ExchangeV2State.Joiner.AbortedLocal))
-            job.await()
+    @Test fun `Scanner - Joiner_AbortedLocal with UserDeniedJoiner maps to Failed PAIRING_CANCELLED`() = runTest {
+        startLinking().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    localTrigger = LocalTrigger.UserDeniedJoiner,
+                ),
+            )
+            assertEquals(PAIRING_CANCELLED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(PAIRING_CANCELLED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - Joiner_AbortedLocal driven by wire message maps to Failed UNEXPECTED_EVENT`() = runTest {
+        startLinking().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Scanner - Host_Aborted driven by wire message maps to Failed UNEXPECTED_EVENT`() = runTest {
+        startLinking().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Scanner - Aborted maps to Failed UNEXPECTED_EVENT`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
-            job.await()
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - Joiner Done without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - Joiner_Done without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
-            job.await()
+            assertEquals(NO_RECOVERY_CODE.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(NO_RECOVERY_CODE.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - SessionError maps to Failed PAIRING_FAILED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - SessionError maps to Failed PAIRING_FAILED`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(ExchangeV2Event.SessionError(timestampMs = System.currentTimeMillis(), message = "channel 500"))
-            job.await()
+            assertEquals(PAIRING_FAILED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - Host Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+    @Test fun `Scanner - Host_Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
+        startLinking().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Confirming, to = ExchangeV2State.Host.Aborted))
-            job.await()
+            assertEquals(NEGOTIATION_ABORTED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `present - AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter - Joiner_AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
@@ -1161,17 +1219,80 @@ class RealSyncCodeDispatcherTest {
                     trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
                 ),
             )
-            job.await()
+            assertEquals(PAIRING_REJECTED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(PAIRING_REJECTED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `present - Host Aborted with no localTrigger maps to Failed NEGOTIATION_ABORTED`() = runTest {
-        val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+    @Test fun `Presenter - Host_Aborted with no localTrigger maps to Failed NEGOTIATION_ABORTED`() = runTest {
+        dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Confirming, to = ExchangeV2State.Host.Aborted))
-            job.await()
+            assertEquals(NEGOTIATION_ABORTED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `Scanner - Joiner_AbortedByHost with an unrecognised trigger maps to Failed PAIRING_REJECTED (peer_aborted)`() = runTest {
+        startLinking().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            val outcome = awaitItem() as DispatchOutcome.Failed
+            assertEquals(PAIRING_REJECTED.code, outcome.code)
+            assertEquals("peer_aborted", outcome.reason)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Scanner - Joiner_AbortedLocal with no trigger maps to Failed PAIRING_FAILED (joiner_local_aborted)`() = runTest {
+        startLinking().test {
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Joiner.Confirming, to = ExchangeV2State.Joiner.AbortedLocal),
+            )
+            val outcome = awaitItem() as DispatchOutcome.Failed
+            assertEquals(PAIRING_FAILED.code, outcome.code)
+            assertEquals("joiner_local_aborted", outcome.reason)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits Failed when Joiner_Done carries a recovery code with unknown cid`() = runTest {
+        val recoveryJson = JSONObject().apply {
+            put(
+                "recovery",
+                JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", "future-credential")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val b64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64)
+
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = responseMessage,
+                    localTrigger = null,
+                ),
+            )
+            val outcome = awaitItem() as DispatchOutcome.Failed
+            assertTrue("expected reason to mention the unknown cid, got '${outcome.reason}'", outcome.reason.contains("future-credential"))
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
 }

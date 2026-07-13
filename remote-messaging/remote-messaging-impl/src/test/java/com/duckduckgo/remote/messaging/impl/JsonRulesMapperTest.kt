@@ -50,7 +50,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         FakeMatchingAttribute(value = false),
                         Flavor(value = emptyList(), fallback = null),
                     ),
@@ -64,7 +64,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Locale(value = listOf("ES"), fallback = null),
                         Flavor(value = emptyList(), fallback = null),
                     ),
@@ -78,7 +78,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Locale(value = listOf("ES"), fallback = true),
                         Flavor(value = emptyList(), fallback = false),
                     ),
@@ -92,7 +92,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Locale(value = emptyList(), fallback = true),
                         Flavor(value = emptyList(), fallback = false),
                     ),
@@ -106,7 +106,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Locale(value = emptyList(), fallback = null),
                         Flavor(value = emptyList(), fallback = null),
                     ),
@@ -120,7 +120,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = null),
                     ),
@@ -134,7 +134,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                     ),
@@ -151,7 +151,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(value = 28, fallback = null),
                         SearchCount(value = 28, fallback = null),
                         Bookmarks(value = 28, fallback = null),
@@ -171,7 +171,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(value = 15, min = 20, max = 28, fallback = null),
                         SearchCount(value = 15, min = 20, max = 28, fallback = null),
                         Bookmarks(value = 15, min = 20, max = 28, fallback = null),
@@ -191,7 +191,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(min = 20, max = 28, fallback = null),
                         SearchCount(min = 20, max = 28, fallback = null),
                         Bookmarks(min = 20, max = 28, fallback = null),
@@ -211,7 +211,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(min = -1, max = 28, fallback = null),
                         SearchCount(min = -1, max = 28, fallback = null),
                         Bookmarks(min = -1, max = 28, fallback = null),
@@ -231,7 +231,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(min = 20, max = -1, fallback = null),
                         SearchCount(min = 20, max = -1, fallback = null),
                         Bookmarks(min = 20, max = -1, fallback = null),
@@ -251,7 +251,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(min = 20, max = 28, fallback = true),
                         SearchCount(min = 20, max = 28, fallback = true),
                         Bookmarks(min = 20, max = 28, fallback = true),
@@ -271,7 +271,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                         Unknown(fallback = true),
@@ -291,7 +291,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                         Unknown(fallback = true),
@@ -311,7 +311,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = null),
                         Unknown(fallback = null),
@@ -331,7 +331,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(),
                         SearchCount(),
                         Bookmarks(),
@@ -351,7 +351,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Api(fallback = true),
                         SearchCount(fallback = true),
                         Bookmarks(fallback = true),
@@ -368,7 +368,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(value = "28", fallback = null),
                         AppVersion(value = "28", fallback = null),
                     ),
@@ -382,7 +382,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(value = "15", min = "20", max = "28", fallback = null),
                         AppVersion(value = "15", min = "20", max = "28", fallback = null),
                     ),
@@ -396,7 +396,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "20", max = "28", fallback = null),
                         AppVersion(min = "20", max = "28", fallback = null),
                     ),
@@ -410,7 +410,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "20", max = "", fallback = null),
                         AppVersion(min = "20", max = "", fallback = null),
                     ),
@@ -424,7 +424,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "", max = "28", fallback = null),
                         AppVersion(min = "", max = "28", fallback = null),
                     ),
@@ -438,7 +438,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "20", max = "28", fallback = true),
                         AppVersion(min = "20", max = "28", fallback = true),
                     ),
@@ -452,7 +452,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "", max = "", fallback = null),
                         AppVersion(min = "", max = "", fallback = null),
                     ),
@@ -466,7 +466,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         WebView(min = "", max = "", fallback = true),
                         AppVersion(min = "", max = "", fallback = true),
                     ),
@@ -482,7 +482,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         InstalledGPlay(value = true),
                         DefaultBrowser(value = true),
                         EmailEnabled(value = true),
@@ -500,7 +500,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         InstalledGPlay(value = true, fallback = true),
                         DefaultBrowser(value = true, fallback = true),
                         EmailEnabled(value = true, fallback = true),
@@ -518,7 +518,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = null),
                         Unknown(fallback = null),
@@ -536,7 +536,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                         Unknown(fallback = true),
@@ -554,7 +554,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = null),
                         Unknown(fallback = null),
@@ -572,7 +572,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                         Unknown(fallback = true),
@@ -592,7 +592,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         AppId(value = "com.duckduckgo.mobile.android.debug"),
                         Atb(value = "v298-8"),
                         AppAtb(value = "v298-8"),
@@ -614,7 +614,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         AppId(value = "com.duckduckgo.mobile.android.debug", fallback = true),
                         Atb(value = "v298-8", fallback = true),
                         AppAtb(value = "v298-8", fallback = true),
@@ -636,7 +636,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = null),
                         Unknown(fallback = null),
@@ -658,7 +658,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                         Unknown(fallback = true),
                         Unknown(fallback = true),
@@ -680,7 +680,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         AppId(value = "", fallback = null),
                         Atb(value = "", fallback = null),
                         AppAtb(value = "", fallback = null),
@@ -702,7 +702,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         AppId(value = "", fallback = true),
                         Atb(value = "", fallback = true),
                         AppAtb(value = "", fallback = true),
@@ -719,7 +719,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2),
                     ),
                 ),
@@ -731,7 +731,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2, fallback = true),
                     ),
                 ),
@@ -743,7 +743,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                     ),
                 ),
@@ -755,7 +755,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                     ),
                 ),
@@ -767,7 +767,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                     ),
                 ),
@@ -779,7 +779,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                     ),
                 ),
@@ -791,7 +791,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = true),
                     ),
                 ),
@@ -804,7 +804,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     ),
                 ),
                 matchingRule(
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = true),
                     ),
@@ -820,7 +820,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                 ),
                 matchingRule(
                     percentile = 0.4f,
-                    matchingAttribute = arrayOf(
+                    matchingAttribute = arrayOf<MatchingAttribute>(
                         Unknown(fallback = null),
                         Unknown(fallback = true),
                     ),

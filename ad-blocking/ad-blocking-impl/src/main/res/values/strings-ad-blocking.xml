@@ -22,4 +22,22 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blocks video ads on YouTube, so you can watch videos without interruption. <annotation type="learn_more_link">Learn more</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opens videos in a distraction-free theater mode that prevents what you watch from influencing your YouTube feed.</string>
+    <string name="ad_blocking_settings_title_v2">Ad Blocking</string>
+    <string name="ad_blocking_settings_header_description">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking</string>
+    <string name="contingencyMessageTitle">YouTube Ad Blocking Unavailable</string>
+    <string name="contingencyMessageContent">Ad Blocking has been affected by recent changes to YouTube. We\'re working to fix these issues and appreciate your understanding</string>
+    <string name="contingencyMessagePrimaryButton">Got It</string>
+    <string name="contingencyMessageCloseContentDescription">Close</string>
+    <string name="ad_blocking_menu_disable">Disable YouTube Ad Blocking</string>
+    <string name="ad_blocking_menu_enable">Enable YouTube Ad Blocking</string>
+    <string name="ad_blocking_menu_title">YouTube Ad Blocking</string>
+    <string name="ad_blocking_menu_close_content_description">Close</string>
+    <string name="ad_blocking_menu_always_on">Always On</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Disable Until Relaunch</string>
+    <string name="ad_blocking_menu_always_off">Always Off</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube Ad Blocking not working?</string>
+    <string name="ad_blocking_disabled_popup_description">Send an anonymous breakage report to DuckDuckGo. Help make ad blocking better for everyone!</string>
+    <string name="ad_blocking_disabled_primary_action">Send Breakage Report</string>
+    <string name="ad_blocking_disabled_secondary_action">Cancel</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Disabled until relaunch</string>
 </resources>

@@ -625,6 +625,7 @@
                         app:typography="body2_bold" />
 
                     <ImageView
+                        android:id="@+id/duckAIFreePillChevron"
                         android:layout_width="14dp"
                         android:layout_height="14dp"
                         android:layout_marginStart="2dp"

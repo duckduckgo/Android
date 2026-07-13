@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Kitame įrenginyje esančioje programėlėje „DuckDuckGo“ rasite QR kodą nuėję į Nustatymai › Sync &amp; Backup › Sinchronizuoti su kitu įrenginiu.</string>
     <string name="sync_chat_bottom_sheet_positive">Nuskaityti QR kodą</string>
     <string name="sync_chat_bottom_sheet_negative">Ne dabar</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sinchronizuoti duomenis?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sinchronizuoti dabar</string>
+    <string name="sync_v2_joiner_confirmation_negative">Atšaukti</string>
+
+    <string name="sync_v2_host_confirmation_title">Sinchronizuoti duomenis?</string>
+    <string name="sync_v2_host_confirmation_positive">Sinchronizuoti dabar</string>
+    <string name="sync_v2_host_confirmation_negative">Atšaukti</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ turės prieigą prie tavo sinchronizuotų „DuckDuckGo“ slaptažodžių, automatinio pildymo duomenų ir „Duck.ai“ pokalbių.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ turės prieigą prie tavo sinchronizuotų „Duck.ai“ pokalbių.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Kitas įrenginys turės prieigą prie tavo sinchronizuotų „DuckDuckGo“ slaptažodžių, automatinio pildymo duomenų ir „Duck.ai“ pokalbių.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Kitas įrenginys turės prieigą prie tavo sinchronizuotų „Duck.ai“ pokalbių.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sinchronizavimas nepavyko.</string>
+    <string name="sync_v2_error_pairing_rejected">Sinchronizavimas atšauktas iš kito tavo įrenginio.</string>
+    <string name="sync_v2_error_pairing_canceled">Sinchronizavimas atšauktas.</string>
+    <string name="sync_v2_error_upgrade_required">Atnaujink „DuckDuckGo“ naršyklę ir bandyk dar kartą.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sinchronizuok šį įrenginį naudodamas jau prijungtą „DuckDuckGo“ naršyklę kitame įrenginyje.</string>
+    <string name="sync_v2_error_try_again">Bandyk dar kartą.</string>
+    <string name="sync_v2_error_got_it">Supratau</string>
+    <string name="sync_v2_already_paired_title">Jau sinchronizuota.</string>
+    <string name="sync_v2_already_paired_message">Šie įrenginiai jau prijungti prie „Sync &amp; Backup“.</string>
+
 </resources>

@@ -93,7 +93,7 @@ private fun androidx.sqlite.db.SupportSQLiteDatabase.insertWideEvent(
             ?
         )
         """.trimIndent(),
-        arrayOf(id, activeIntervals),
+        arrayOf<Any>(id, activeIntervals),
     )
 }
 

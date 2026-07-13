@@ -23,4 +23,22 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokira video oglase na YouTubeu, tako da videozapise možeš gledati bez prekida. <annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Otvara videozapise u kino načinu rada bez ometanja koji sprječava da ono što gledaš utječe na tvoj YouTube feed.</string>
+    <string name="ad_blocking_settings_title_v2">Blokiranje oglasa</string>
+    <string name="ad_blocking_settings_header_description">Blokira invazivne alate za praćenje prije nego što se učitaju, učinkovito eliminirajući oglase koji se oslanjaju na praćenje</string>
+    <string name="contingencyMessageTitle">Blokiranje oglasa na YouTubeu nije dostupno</string>
+    <string name="contingencyMessageContent">Blokiranje oglasa pogođeno je nedavnim promjenama na YouTubeu. Radimo na rješavanju tih problema i cijenimo tvoje razumijevanje</string>
+    <string name="contingencyMessagePrimaryButton">Shvaćam</string>
+    <string name="contingencyMessageCloseContentDescription">Zatvori</string>
+    <string name="ad_blocking_menu_disable">Onemogući blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_enable">Omogući blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_title">Blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_close_content_description">Zatvori</string>
+    <string name="ad_blocking_menu_always_on">Uvijek uključeno</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Onemogući do ponovnog pokretanja</string>
+    <string name="ad_blocking_menu_always_off">Uvijek isključeno</string>
+    <string name="ad_blocking_disabled_popup_title">Blokiranje oglasa na YouTubeu ne funkcionira?</string>
+    <string name="ad_blocking_disabled_popup_description">Pošalji anonimnu prijavu kvara DuckDuckGou. Pomozi nam da poboljšamo blokiranje oglasa za sve!</string>
+    <string name="ad_blocking_disabled_primary_action">Pošalji izvješće o problemu</string>
+    <string name="ad_blocking_disabled_secondary_action">Otkaži</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Onemogućeno do ponovnog pokretanja</string>
 </resources>

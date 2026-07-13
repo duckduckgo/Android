@@ -20,7 +20,7 @@ tags:
 
       # get to autofill form
       - tapOn:
-          id: "inputField"
+          id: "omnibarTextInput"
       - inputText: "https://autofill.me/form/login-simple"
       - pressKey: Enter
       - runFlow: ../steps/decline_autofill_prompt.yaml

@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Atsisiuntimai</string>
-    <string name="downloadsActivityTitle">Atsisiuntimai</string>
-    <string name="downloadsActivityNoItemsDescription">Nėra atsisiųstų failų</string>
-    <string name="downloadsShareTitle">Dalintis su...</string>
     <string name="downloadsDownloadFinishedActionName">Atviras</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Failo nebėra</string>
-    <string name="downloadsItemMenuShare">Bendrinti</string>
-    <string name="downloadsItemMenuDelete">Trinti</string>
-    <string name="downloadsItemMenuCancel">Atšaukti</string>
-    <string name="downloadsActivityMenuDeleteAll">Ištrinti viską</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Ištrinta %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Visi failai ištrinti</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Daugiau parinkčių, skirtų %1$s</string>
-    <string name="downloadsUndoActionName">Anuliuoti</string>
-    <string name="downloadsStateInProgress">Vykdoma...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Programų sekimo apsauga</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Slapukai valdomi</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Sužinokite, kada atsisiuntimai bus paruošti</string>
-    <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
 
     <!-- Windows Settings -->
 
@@ -1132,4 +1116,5 @@
     <string name="fireTabsNewTabButton">Naujas „Fire“ skirtukas</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NAUJIENA!</b> Išbandykite „Fire“ skirtukus naršymui neišsaugant vietinės naršymo istorijos.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ar trinti „Fire“ skirtukus ir jų duomenis?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
 </resources>

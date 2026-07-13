@@ -48,6 +48,7 @@ data class DaxEndBrandDesignUpdateContextualCta(
     deviceInfo = deviceInfo,
     backgroundRes = CommonR.drawable.bg_onboarding_end,
 ) {
+    override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 160f, tabletFillHeightDp = 240f, maxHeightFraction = 0.4f)
     override val markAsReadOnShow: Boolean = true
 
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent

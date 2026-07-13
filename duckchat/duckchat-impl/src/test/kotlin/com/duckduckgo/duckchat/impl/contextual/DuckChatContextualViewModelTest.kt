@@ -2347,6 +2347,7 @@ class DuckChatContextualViewModelTest {
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
         override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
+        override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = emptyFlow()
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)

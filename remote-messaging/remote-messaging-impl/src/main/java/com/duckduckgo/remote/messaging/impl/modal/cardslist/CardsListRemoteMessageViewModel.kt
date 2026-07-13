@@ -191,12 +191,13 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     }
 
     override fun onItemClicked(item: CardItem.ListItem) {
-        viewModelScope.launch {
-            val message = lastRemoteMessageSeen ?: return@launch
-            val action = item.primaryAction
-            val command = commandActionMapper.asCommand(action)
-            _command.send(command)
-            cardsListPixelHelper.fireCardItemClickedPixel(message, item)
+        item.primaryAction?.let { action ->
+            viewModelScope.launch {
+                val message = lastRemoteMessageSeen ?: return@launch
+                val command = commandActionMapper.asCommand(action)
+                _command.send(command)
+                cardsListPixelHelper.fireCardItemClickedPixel(message, item)
+            }
         }
     }
 

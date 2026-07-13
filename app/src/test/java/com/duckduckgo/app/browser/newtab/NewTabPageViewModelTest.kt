@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,6 +36,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
@@ -70,6 +72,7 @@ class NewTabPageViewModelTest {
     private var mockCommandActionMapper: CommandActionMapper = mock()
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
+    private var mockAfterIdleMessageTriggerProvider: AfterIdleMessageTriggerProvider = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
@@ -86,6 +89,7 @@ class NewTabPageViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
+        whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
 
         testee = createTestee()
@@ -99,6 +103,7 @@ class NewTabPageViewModelTest {
             showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             remoteMessagingModel = mockRemoteMessageModel,
+            afterIdleMessageTriggerProvider = mockAfterIdleMessageTriggerProvider,
             playStoreUtils = mockPlaystoreUtils,
             savedSitesRepository = mockSavedSitesRepository,
             syncEngine = mockSyncEngine,
@@ -112,6 +117,21 @@ class NewTabPageViewModelTest {
             ctaViewModel = mockCtaViewModel,
             browserMode = browserMode,
         )
+    }
+
+    @Test
+    fun whenActiveTriggerIsAfterIdleThenObservesMessagesWithThatTrigger() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(MessageTrigger.AFTER_IDLE))
+        // Only the AFTER_IDLE overload returns the message; the no-trigger default (stubbed in setUp) returns
+        // null, so the message surfacing proves the VM threaded AFTER_IDLE into observeActiveMessages.
+        whenever(mockRemoteMessageModel.observeActiveMessages(MessageTrigger.AFTER_IDLE)).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
     }
 
     @Test

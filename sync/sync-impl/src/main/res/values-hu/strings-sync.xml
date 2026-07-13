@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">A másik eszközödön keresd meg a QR-kódot a DuckDuckGo alkalmazás Beállítások › Sync &amp; Backup › Szinkronizálás másik eszközzel menüpontjában.</string>
     <string name="sync_chat_bottom_sheet_positive">QR-kód beolvasása</string>
     <string name="sync_chat_bottom_sheet_negative">Most nem</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Szinkronizálod az adataidat?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Szinkronizálás</string>
+    <string name="sync_v2_joiner_confirmation_negative">Mégsem</string>
+
+    <string name="sync_v2_host_confirmation_title">Szinkronizálod az adataidat?</string>
+    <string name="sync_v2_host_confirmation_positive">Szinkronizálás</string>
+    <string name="sync_v2_host_confirmation_negative">Mégsem</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">A(z) „%1$s” hozzáférhet a szinkronizált DuckDuckGo-jelszavaidhoz, az automatikus kitöltési adataidhoz és a Duck.ai-csevegéseidhez.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">A(z) „%1$s” hozzáférhet a szinkronizált Duck.ai-csevegéseidhez.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">A másik eszköz hozzáférhet a szinkronizált DuckDuckGo-jelszavaidhoz, az automatikus kitöltési adataidhoz és a Duck.ai-csevegéseidhez.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">A másik eszköz hozzáférhet a szinkronizált Duck.ai-csevegéseidhez.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">A szinkronizálás sikertelen.</string>
+    <string name="sync_v2_error_pairing_rejected">A szinkronizálás megszakítva a másik eszközödről.</string>
+    <string name="sync_v2_error_pairing_canceled">A szinkronizálás megszakítva.</string>
+    <string name="sync_v2_error_upgrade_required">Frissítsd a DuckDuckGo böngészőt, és próbálkozz újra.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Szinkronizáld ezt az eszközt egy másik eszközön már csatlakoztatott DuckDuckGo böngészőből.</string>
+    <string name="sync_v2_error_try_again">Próbálkozz újra.</string>
+    <string name="sync_v2_error_got_it">Értem</string>
+    <string name="sync_v2_already_paired_title">Már szinkronizálva.</string>
+    <string name="sync_v2_already_paired_message">Ezek az eszközök már csatlakoztatva vannak a Sync &amp; Backup funkcióhoz.</string>
+
 </resources>

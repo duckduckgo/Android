@@ -407,6 +407,7 @@ class RealDuckChat @Inject constructor(
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
+    private val _nativeInputNavBarEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
@@ -538,6 +539,8 @@ class RealDuckChat @Inject constructor(
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = _nativeChatInputEnabled.asStateFlow()
+
+    override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = _nativeInputNavBarEnabled.asStateFlow()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -937,6 +940,7 @@ class RealDuckChat @Inject constructor(
             isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
             isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
             _nativeChatInputEnabled.value = isNativeChatInputEnabled
+            _nativeInputNavBarEnabled.value = duckChatFeature.nativeInputNavBar().isEnabled()
             val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
 
             // Mirrors NativeInputModeWidgetViewModel.getInputMode: the address bar offers the

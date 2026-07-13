@@ -27,6 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class DuckAiOnboardingDemoTest {
@@ -57,6 +58,7 @@ class DuckAiOnboardingDemoTest {
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
+        verifyNoMoreInteractions(dismissedCtaDao)
     }
 
     @Test

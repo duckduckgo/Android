@@ -121,7 +121,6 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -178,6 +177,10 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -207,6 +210,8 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -217,6 +222,11 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -287,6 +297,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -378,6 +389,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
@@ -592,6 +604,8 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
+    private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
+
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
@@ -701,7 +715,7 @@ class BrowserTabViewModelTest {
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
-    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val mockNewDownloadState: NewDownloadState = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
@@ -850,6 +864,8 @@ class BrowserTabViewModelTest {
                         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
                     },
                     duckAiFeatureState = mockDuckAiFeatureState,
+                    onboardingPixelSender = mockOnboardingPixelSender,
+                    contextualCtaSuppressorPlugins = mock(),
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -1028,7 +1044,7 @@ class BrowserTabViewModelTest {
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
-                downloadMenuStateProvider = mockDownloadMenuStateProvider,
+                newDownloadState = mockNewDownloadState,
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
@@ -3383,10 +3399,79 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenNewTabOpenedAndPixelFired() {
+        setBrowserShowing(true)
+
         testee.onNewTabMenuItemClicked(longPress = true)
 
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenNoNewTabOpenedAndNoPixelFired() {
+        setBrowserShowing(false)
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandNotIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandNotIssued<Command.LaunchNewTab>()
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenReturnsTrue() {
+        setBrowserShowing(true)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertTrue(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenReturnsFalse() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertFalse(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndMaliciousSiteBlockedThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                maliciousSiteBlocked = true,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndSslWarningShowingThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                sslError = EXPIRED,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByNormalClickAndAlreadyOnNewTabPageThenReturnsTrue() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = false)
+
+        assertTrue(handled)
     }
 
     @Test
@@ -3756,6 +3841,7 @@ class BrowserTabViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            onboardingImprovementsV2Enabled = true,
         )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
@@ -9276,6 +9362,83 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCustomQuerySubmittedWithBrandDesignSearchBubbleThenSuggestionCustomFired() = runTest {
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
+        whenever(mockOmnibarConverter.convertQueryToUrl("my own search", null)).thenReturn("https://duckduckgo.com/?q=my+own+search")
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserSubmittedQuery("my own search")
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenFireMenuSelectedWithBrandDesignFireCtaThenFireButtonEngageFired() = runTest {
+        val cta =
+            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenBrandDesignSerpOkClickedThenEngageFiredButNotDismiss() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender, never()).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun whenShouldOverrideWithSiteSuggestionsContextualCtaThenSuggestionClickedCustomFired() = runTest {
+        val cta =
+            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            )
+        setCta(cta)
+
+        testee.onShouldOverride()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_VISIT_SITE, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithBrandDesignTrackersBlockedCtaThenClickedEngageFired() = runTest {
+        val cta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            emptyList(),
+            mockSettingsDataStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithUnrelatedCtaThenNoPixelFired() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    @Test
     fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() =
         runTest {
             val initialTabId = "initial-tab"
@@ -11551,7 +11714,7 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockCachedFileDownloader, never()).saveToDownloads(any(), any(), any())
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test
@@ -11567,7 +11730,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider).onDownloadComplete()
+        verify(mockNewDownloadState).onDownloadComplete()
     }
 
     @Test
@@ -11581,7 +11744,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test
