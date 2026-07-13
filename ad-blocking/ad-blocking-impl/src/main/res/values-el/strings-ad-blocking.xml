@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Ο αποκλεισμός διαφημίσεων έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σου</string>
     <string name="contingencyMessagePrimaryButton">Κατάλαβα</string>
     <string name="contingencyMessageCloseContentDescription">Κλείσιμο</string>
+    <string name="ad_blocking_menu_disable">Απενεργοποίηση αποκλεισμού διαφημίσεων στο YouTube</string>
+    <string name="ad_blocking_menu_enable">Ενεργοποίηση αποκλεισμού διαφημίσεων στο YouTube</string>
+    <string name="ad_blocking_menu_title">Αποκλεισμός διαφημίσεων στο YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Κλείσιμο</string>
+    <string name="ad_blocking_menu_always_on">Πάντα ενεργός</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Απενεργοποίηση μέχρι την επανεκκίνηση</string>
+    <string name="ad_blocking_menu_always_off">Πάντα ανενεργός</string>
+    <string name="ad_blocking_disabled_popup_title">Ο αποκλεισμός διαφημίσεων στο YouTube δεν λειτουργεί;</string>
+    <string name="ad_blocking_disabled_popup_description">Στείλε μια ανώνυμη αναφορά βλάβης στο DuckDuckGo. Βοήθησε να κάνουμε τον αποκλεισμό διαφημίσεων καλύτερο για όλους!</string>
+    <string name="ad_blocking_disabled_primary_action">Αποστολή Αναφοράς βλάβης</string>
+    <string name="ad_blocking_disabled_secondary_action">Ακύρωση</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Απενεργοποιήθηκε μέχρι την επανεκκίνηση</string>
 </resources>
