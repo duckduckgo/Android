@@ -236,8 +236,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
         isAdBlockingAnimationRunning = true
 
-        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.cookie_scene_1, context)
-        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.cookie_scene_2, context)
+        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, context)
+        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, context)
 
         hasAdBlockingAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
@@ -326,7 +326,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     adBlockingScene.show()
                     adBlockingScene.alpha = 1F
                     TransitionManager.go(adBlockingSecondScene, slideInTransition)
-                    adBlockingScene.findViewById<DaxTextView>(R.id.cookiesManagedText)?.setText(textRes)
+                    adBlockingScene.findViewById<DaxTextView>(R.id.adBlockingText)?.setText(textRes)
                 },
             )
             start()
