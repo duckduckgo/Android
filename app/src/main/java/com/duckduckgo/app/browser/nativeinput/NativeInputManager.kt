@@ -235,11 +235,19 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        // Re-evaluate an already-attached nav bar when the mode/flag change: switching to Search-only
+        // (or turning the flag off) while the input is open must hide it, not leave it up until teardown.
         duckChatInputModeState.inputModeCapability
-            .onEach { inputModeCapability = it }
+            .onEach {
+                inputModeCapability = it
+                refreshNavBarVisibility()
+            }
             .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeNativeInputNavBarEnabled()
-            .onEach { isNavBarFeatureEnabled = it }
+            .onEach {
+                isNavBarFeatureEnabled = it
+                refreshNavBarVisibility()
+            }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -531,7 +539,7 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
         applyNavBarVisibility(
-            show = shouldShowNavBar(isBrowserContext = navBarView != null, isInputEmpty = prefillText.isEmpty()),
+            show = navBarShouldBeVisible(isInputEmpty = prefillText.isEmpty()),
             animate = false,
         )
         lifecycleOwner.lifecycleScope.launch {
@@ -618,7 +626,7 @@ class RealNativeInputManager @Inject constructor(
             },
             onInputTextEmptyChanged = { isEmpty ->
                 applyNavBarVisibility(
-                    show = shouldShowNavBar(isBrowserContext = navBarRoot != null, isInputEmpty = isEmpty),
+                    show = navBarShouldBeVisible(isInputEmpty = isEmpty),
                     animate = true,
                 )
             },
@@ -866,6 +874,23 @@ class RealNativeInputManager @Inject constructor(
             autoCompleteList.gone()
             focusedView?.gone()
         }
+    }
+
+    /** Current on-screen visibility the nav bar should have, combining the create-time gate with the
+     *  empty-field rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
+    private fun navBarShouldBeVisible(isInputEmpty: Boolean): Boolean =
+        shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
+            shouldShowNavBar(isBrowserContext = navBarRoot != null, isInputEmpty = isInputEmpty)
+
+    /** Re-applies the nav bar visibility for the current input state; no-op when no bar is attached. */
+    private fun refreshNavBarVisibility() {
+        if (navBarRoot == null) return
+        applyNavBarVisibility(show = navBarShouldBeVisible(isInputEmpty = currentInputEmpty()), animate = true)
+    }
+
+    private fun currentInputEmpty(): Boolean {
+        val widget = widgetRoot?.let { widgetFrom(it) } ?: return true
+        return widget.text.isNullOrEmpty()
     }
 
     /**
