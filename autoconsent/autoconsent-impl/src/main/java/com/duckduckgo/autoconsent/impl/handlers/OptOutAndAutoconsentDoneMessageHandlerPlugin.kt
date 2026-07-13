@@ -88,7 +88,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
 
             when {
-                message.cmp == HEURISTIC_CMP -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_HEURISTIC_DAILY)
+                message.cmp.startsWith(HEURISTIC_CMP) -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_HEURISTIC_DAILY)
                 message.isCosmetic -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
                 else -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
             }
