@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/keyline_6"
+    android:paddingBottom="@dimen/keyline_5">
+
+    <ImageButton
+        android:id="@+id/adBlockingDisabledCloseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:background="?actionBarItemBackground"
+        android:contentDescription="@string/ad_blocking_menu_close_content_description"
+        android:src="@drawable/ic_close_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/adBlockingDisabledIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="96dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:src="@drawable/youtube_warning_96"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/adBlockingDisabledTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="@string/ad_blocking_disabled_popup_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/adBlockingDisabledIcon"
+        app:typography="h2" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/adBlockingDisabledContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="56dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="@string/ad_blocking_disabled_popup_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/adBlockingDisabledTitle"
+        app:textType="secondary"
+        app:typography="body2" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/adBlockingDisabledPrimaryButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:text="@string/ad_blocking_disabled_primary_action"
+        app:daxButtonSize="large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/adBlockingDisabledContent"
+        tools:text="Send Breakage Report" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+        android:id="@+id/adBlockingDisabledSecondaryButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:text="@string/ad_blocking_disabled_secondary_action"
+        app:daxButtonSize="large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/adBlockingDisabledPrimaryButton"
+        tools:text="Cancel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
