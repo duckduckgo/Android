@@ -71,6 +71,15 @@ class AutoconsentHeuristicModeProviderTest {
     }
 
     @Test
+    fun whenClickAcceptEnabledButSettingFlagDisabledThenHeuristicModeIsReject() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
+        settingsRepository.userSetting = true
+        settingsRepository.clickAcceptEnabled = true
+
+        assertEquals("reject", provider.getHeuristicMode())
+    }
+
+    @Test
     fun whenUserSettingDisabledThenHeuristicModeIsOff() {
         settingsRepository.userSetting = false
         settingsRepository.clickAcceptEnabled = true

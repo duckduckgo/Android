@@ -40,6 +40,7 @@ class RealAutoconsentSettingsDataStore constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
     private var cachedUserSetting: Boolean? = null
+    private var cachedClickAcceptEnabled: Boolean? = null
 
     private var _defaultValue: Boolean? = null
     private val defaultValue: Boolean
@@ -53,6 +54,7 @@ class RealAutoconsentSettingsDataStore constructor(
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cachedUserSetting = readUserSetting()
+            cachedClickAcceptEnabled = readClickAcceptEnabled()
         }
     }
 
@@ -71,10 +73,16 @@ class RealAutoconsentSettingsDataStore constructor(
         }
 
     override var clickAcceptEnabled: Boolean
-        get() = preferences.getBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, false)
+        get() {
+            return cachedClickAcceptEnabled ?: readClickAcceptEnabled().also {
+                cachedClickAcceptEnabled = it
+            }
+        }
         set(value) {
             preferences.edit(commit = true) {
                 putBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, value)
+            }.also {
+                cachedClickAcceptEnabled = value
             }
         }
 
@@ -90,11 +98,16 @@ class RealAutoconsentSettingsDataStore constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
             cachedUserSetting = null
+            cachedClickAcceptEnabled = null
         }
     }
 
     private fun readUserSetting(): Boolean {
         return preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
+    }
+
+    private fun readClickAcceptEnabled(): Boolean {
+        return preferences.getBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, false)
     }
 
     companion object {

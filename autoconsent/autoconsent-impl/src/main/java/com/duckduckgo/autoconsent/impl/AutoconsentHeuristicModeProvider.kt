@@ -43,11 +43,12 @@ class RealAutoconsentHeuristicModeProvider @Inject constructor(
             return "off"
         }
 
-        if (settingsRepository.clickAcceptEnabled) {
+        val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+
+        if (cookiePopUpPreferenceSettingEnabled && settingsRepository.clickAcceptEnabled) {
             return "tier2"
         }
 
-        val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
         return if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
     }
 }

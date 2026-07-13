@@ -114,6 +114,22 @@ class RealAutoconsentSettingsDataStoreTest {
         assertTrue(preferences().getBoolean(CLICK_ACCEPT_ENABLED_KEY, false))
     }
 
+    @Test
+    fun whenClickAcceptEnabledAlreadyStoredThenCachedValueIsReturned() = runTest {
+        preferences().edit().putBoolean(CLICK_ACCEPT_ENABLED_KEY, true).commit()
+
+        assertTrue(createDataStore().clickAcceptEnabled)
+    }
+
+    @Test
+    fun whenClickAcceptEnabledSetThenCachedValueIsReturnedWithoutReadingPreferences() {
+        val dataStore = createDataStore()
+        dataStore.clickAcceptEnabled = true
+        preferences().edit().remove(CLICK_ACCEPT_ENABLED_KEY).commit()
+
+        assertTrue(dataStore.clickAcceptEnabled)
+    }
+
     private fun preferences() = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
 
     private fun createDataStore(): RealAutoconsentSettingsDataStore {
