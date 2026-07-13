@@ -50,6 +50,7 @@ class NativeInputLayoutCoordinator(
 
     private var navBarInsetPx: Int = 0
     private var reapplyContentOffset: (() -> Unit)? = null
+    private var reapplyAutocompleteOffset: (() -> Unit)? = null
 
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
@@ -135,11 +136,16 @@ class NativeInputLayoutCoordinator(
         }
 
         fun applyForWidgetPosition() {
-            val topOffset = if (isBottom) 0 else maxOf(0, widgetView.bottom - autoCompleteList.top)
-            val bottomOffset = if (isBottom) maxOf(0, autoCompleteList.bottom - widgetView.top) else 0
+            // Top mode uses the widget's on-screen bottom (layout bottom + translationY): the nav bar hide
+            // rides the widget up via translationY (a render transform, not a layout change), so .bottom
+            // alone would offset for the old nav-bar-shown position and leave a gap the size of the nav bar.
+            // Bottom mode's nav bar doesn't ride the widget, so its offset stays layout-based.
+            val topOffset = autocompleteTopOffset(isBottom, widgetView.bottom + widgetView.translationY.toInt(), autoCompleteList.top)
+            val bottomOffset = autocompleteBottomOffset(isBottom, autoCompleteList.bottom, widgetView.top)
             applyPadding(deltaTop = topOffset, deltaBottom = bottomOffset)
         }
 
+        reapplyAutocompleteOffset = { applyForWidgetPosition() }
         widgetView.post { applyForWidgetPosition() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -154,6 +160,7 @@ class NativeInputLayoutCoordinator(
 
                 override fun onViewDetachedFromWindow(v: View) {
                     applyPadding(deltaTop = 0, deltaBottom = 0)
+                    reapplyAutocompleteOffset = null
                     restoreFloats.forEach { it() }
                     v.removeOnLayoutChangeListener(layoutListener)
                     autoCompleteList.removeOnLayoutChangeListener(layoutListener)
@@ -355,6 +362,9 @@ class NativeInputLayoutCoordinator(
     fun updateNavBarInset(px: Int) {
         navBarInsetPx = px
         reapplyContentOffset?.invoke()
+        // Recompute the autocomplete offset too: the nav bar toggle rides the widget via translationY,
+        // which fires no layout listener, so this is the only signal that the widget's screen edges moved.
+        reapplyAutocompleteOffset?.invoke()
     }
 
     fun onWidgetAnimationFrame(card: View) {
@@ -429,3 +439,19 @@ internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInset
         isBottom -> navBarInsetPx
         else -> maxOf(0, widgetTopOffsetPx)
     }
+
+/**
+ * Top padding the autocomplete list needs to sit below the input widget (top mode only; bottom mode
+ * clears the widget from below). [widgetVisualBottomPx] must be the widget's on-screen bottom — its layout
+ * bottom plus translationY — because the nav bar hide slides the widget up via translationY, and a
+ * layout-only bottom would leave a gap the size of the nav bar once the bar is gone.
+ */
+internal fun autocompleteTopOffset(isBottom: Boolean, widgetVisualBottomPx: Int, autoCompleteListTopPx: Int): Int =
+    if (isBottom) 0 else maxOf(0, widgetVisualBottomPx - autoCompleteListTopPx)
+
+/**
+ * Bottom counterpart of [autocompleteTopOffset]: in bottom mode the list clears the widget from below.
+ * Layout-based [widgetTopPx] is fine here — the bottom-mode nav bar doesn't ride the widget.
+ */
+internal fun autocompleteBottomOffset(isBottom: Boolean, autoCompleteListBottomPx: Int, widgetTopPx: Int): Int =
+    if (isBottom) maxOf(0, autoCompleteListBottomPx - widgetTopPx) else 0
