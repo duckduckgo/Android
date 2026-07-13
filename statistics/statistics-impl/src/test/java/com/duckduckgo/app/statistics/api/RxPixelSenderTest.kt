@@ -42,6 +42,10 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import io.reactivex.Completable
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -82,6 +86,12 @@ class RxPixelSenderTest {
     private lateinit var testee: RxPixelSender
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val pixelFiredRepository = FakePixelFiredRepository()
+    private val pixelSenderFeature = FakeFeatureToggleFactory.create(PixelSenderFeature::class.java)
+    private var pixelsRequiringAtb: List<String> = emptyList()
+    private val pixelRequiringAtbPlugins = object : PluginPoint<PixelRequiringAtbPlugin> {
+        override fun getPlugins(): Collection<PixelRequiringAtbPlugin> =
+            listOf(object : PixelRequiringAtbPlugin { override fun names() = pixelsRequiringAtb })
+    }
 
     @Before
     fun before() {
@@ -89,6 +99,9 @@ class RxPixelSenderTest {
             .allowMainThreadQueries()
             .build()
         pendingPixelDao = db.pixelDao()
+
+        // Disabled by default so existing tests exercise the legacy (ATB-always) path.
+        pixelSenderFeature.self().setRawStoredState(State(enable = false))
 
         testee = RxPixelSender(
             api,
@@ -99,6 +112,8 @@ class RxPixelSenderTest {
                 override fun shouldFirePixelsAsDev() = true
             },
             pixelFiredRepository,
+            pixelSenderFeature,
+            pixelRequiringAtbPlugins,
         )
     }
 
@@ -541,6 +556,69 @@ class RxPixelSenderTest {
         assertEquals(0, pixels.size)
     }
 
+    @Test
+    fun whenAtbOptInEnabledAndPixelNotOptedInThenFiredWithoutAtb() {
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = emptyList()
+        givenFireWithoutAtbSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fireWithoutAtb(eq("test"), eq("phone"), any(), any(), any())
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndPixelOptedInThenFiredWithAtb() {
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = listOf("test")
+        givenApiSendPixelSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInDisabledThenAlwaysFiredWithAtb() {
+        pixelSenderFeature.self().setRawStoredState(State(enable = false))
+        pixelsRequiringAtb = emptyList()
+        givenApiSendPixelSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndEnqueuedPixelNotOptedInThenSentWithoutAtb() {
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = emptyList()
+        givenFireWithoutAtbSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fireWithoutAtb(eq("test"), eq("phone"), any(), any(), any())
+    }
+
     private fun assertPixelEntity(
         expectedEntity: PixelEntity,
         pixelEntity: PixelEntity,
@@ -558,6 +636,10 @@ class RxPixelSenderTest {
 
     private fun givenApiSendPixelSucceeds() {
         whenever(api.fire(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete())
+    }
+
+    private fun givenFireWithoutAtbSucceeds() {
+        whenever(api.fireWithoutAtb(any(), any(), any(), any(), any())).thenReturn(Completable.complete())
     }
 
     private fun givenVariant(variantKey: String) {

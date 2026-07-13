@@ -28,6 +28,8 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -60,6 +62,8 @@ class RxPixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
+    private val pixelSenderFeature: PixelSenderFeature,
+    private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
@@ -108,14 +112,25 @@ class RxPixelSender @Inject constructor(
     ): Single<PixelSender.SendPixelResult> = Single.fromCallable {
         runBlocking {
             if (shouldFirePixel(pixelName, type)) {
-                api.fire(
-                    pixelName,
-                    getDeviceFactor(),
-                    getAtbInfo(),
-                    addDeviceParametersTo(parameters),
-                    encodedParameters,
-                    devMode = shouldFirePixelsAsDev,
-                ).blockingAwait()
+                val completable = if (shouldSendAtb(pixelName)) {
+                    api.fire(
+                        pixelName,
+                        getDeviceFactor(),
+                        getAtbInfo(),
+                        addDeviceParametersTo(parameters),
+                        encodedParameters,
+                        devMode = shouldFirePixelsAsDev,
+                    )
+                } else {
+                    api.fireWithoutAtb(
+                        pixelName,
+                        getDeviceFactor(),
+                        addDeviceParametersTo(parameters),
+                        encodedParameters,
+                        devMode = shouldFirePixelsAsDev,
+                    )
+                }
+                completable.blockingAwait()
                 storePixelFired(pixelName, type)
                 PixelSender.SendPixelResult.PIXEL_SENT
             } else {
@@ -151,14 +166,24 @@ class RxPixelSender @Inject constructor(
 
     private fun sendPixel(pixelEntity: PixelEntity): Completable {
         with(pixelEntity) {
-            return api.fire(
-                this.pixelName,
-                getDeviceFactor(),
-                this.atb,
-                this.additionalQueryParams,
-                this.encodedQueryParams,
-                devMode = shouldFirePixelsAsDev,
-            )
+            return if (shouldSendAtb(this.pixelName)) {
+                api.fire(
+                    this.pixelName,
+                    getDeviceFactor(),
+                    this.atb,
+                    this.additionalQueryParams,
+                    this.encodedQueryParams,
+                    devMode = shouldFirePixelsAsDev,
+                )
+            } else {
+                api.fireWithoutAtb(
+                    this.pixelName,
+                    getDeviceFactor(),
+                    this.additionalQueryParams,
+                    this.encodedQueryParams,
+                    devMode = shouldFirePixelsAsDev,
+                )
+            }
         }
     }
 
@@ -174,6 +199,13 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(statisticsDataStore.variant) ?: ""
+
+    private fun shouldSendAtb(pixelName: String): Boolean {
+        if (!pixelSenderFeature.self().isEnabled()) return true
+        return pixelRequiringAtbPlugins.getPlugins().any { plugin ->
+            plugin.names().any { pixelName.startsWith(it) }
+        }
+    }
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 
