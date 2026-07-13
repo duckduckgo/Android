@@ -23,14 +23,26 @@ import android.view.LayoutInflater
 import androidx.core.graphics.drawable.toDrawable
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingMenuBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class AdBlockingMenuBottomSheetDialog(
     builderContext: Context,
     private val selectedChoice: AdBlockingChoice,
-) : BottomSheetDialog(builderContext) {
+    private val edgeToEdgeProvider: EdgeToEdgeProvider,
+) : BottomSheetDialog(
+    builderContext,
+    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    } else {
+        0
+    },
+) {
 
     interface EventListener {
         fun onChoiceSelected(choice: AdBlockingChoice)
@@ -43,6 +55,10 @@ class AdBlockingMenuBottomSheetDialog(
 
     init {
         setContentView(binding.root)
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         binding.adBlockingMenuAlwaysOn.setChecked(selectedChoice == AdBlockingChoice.ALWAYS_ON)
         binding.adBlockingMenuDisableUntilRelaunch.setChecked(selectedChoice == AdBlockingChoice.DISABLE_UNTIL_RELAUNCH)
