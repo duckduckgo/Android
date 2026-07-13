@@ -40,4 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">DuckDuckGo\'ya anonim bir hata raporu gönderin. Reklam engellemeyi herkes için daha iyi hale getirmemize yardımcı olun!</string>
     <string name="ad_blocking_disabled_primary_action">Hata Raporu Gönder</string>
     <string name="ad_blocking_disabled_secondary_action">İptal</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Yeniden başlatılana kadar devre dışı bırakıldı</string>
 </resources>
