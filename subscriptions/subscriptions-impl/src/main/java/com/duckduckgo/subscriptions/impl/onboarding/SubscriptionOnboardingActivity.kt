@@ -98,16 +98,22 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.ShowStep -> showStep(command.stepPlugin)
+            is Command.ShowStep -> showStep(command)
             is Command.FinishToSettings -> finishToSettings()
             is Command.Finish -> finish()
         }
     }
 
-    private fun showStep(stepPlugin: SubscriptionOnboardingStepPlugin) {
-        supportActionBar?.setTitle(stepPlugin.titleResId)
+    private fun showStep(command: Command.ShowStep) {
+        val navIcon = if (command.canGoBack) {
+            com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_close_24
+        }
+        binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
+        supportActionBar?.setTitle(command.stepPlugin.titleResId)
         supportFragmentManager.commit {
-            replace(binding.subscriptionOnboardingContainer.id, stepPlugin.createFragment(), stepPlugin.stepId)
+            replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
         }
     }
 

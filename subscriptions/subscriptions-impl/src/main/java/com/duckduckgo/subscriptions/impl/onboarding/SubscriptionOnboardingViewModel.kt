@@ -52,7 +52,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed interface Command {
-        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin) : Command
+        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin, val canGoBack: Boolean) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
@@ -83,11 +83,11 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack
-                    _commands.send(Command.ShowStep(step.stepPlugin))
+                    _commands.send(Command.ShowStep(step.stepPlugin, state.canGoBack))
                 }
             }
             is LinearOnboardingState.Completed -> _commands.send(Command.FinishToSettings)
-            is LinearOnboardingState.Skipped -> _commands.send(Command.Finish)
+            is LinearOnboardingState.Skipped -> _commands.send(Command.FinishToSettings)
         }
     }
 
@@ -103,8 +103,9 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             if (canGoBack) {
                 orchestrator.onEvent(BackPressed)
             } else {
-                // Nothing earlier in the flow: back on the first step leaves onboarding.
-                _commands.send(Command.Finish)
+                // First step: exit onboarding. Launched standalone after purchase, so land on app settings.
+                // TODO when a subscription-settings entry point is added, exit should return there instead.
+                _commands.send(Command.FinishToSettings)
             }
         }
     }
