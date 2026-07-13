@@ -27,6 +27,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -108,5 +110,12 @@ class RealAdBlockingOmnibarAnimationTest {
 
         // ...so returning to the same video animates again.
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = false) is AdBlockingAnimation.Show)
+    }
+
+    @Test
+    fun whenNonVideoUrlThenCanInjectNotChecked() = runTest {
+        // The cheap video check gates the expensive feature-toggle read: non-YouTube urls must skip it.
+        testee.getAnimation("https://www.example.com/watch?v=abc123", pageChanged = true)
+        verify(statusChecker, never()).canInject()
     }
 }

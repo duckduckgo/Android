@@ -35,29 +35,23 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
     private var lastAnimatedVideoId: String? = null
 
     override suspend fun getAnimation(url: String, pageChanged: Boolean): AdBlockingAnimation {
-        if (!statusChecker.canInject()) return AdBlockingAnimation.Skip
         val videoId = videoIdOrNull(url)
+        if (videoId == null) {
+            lastAnimatedVideoId = null
+            return AdBlockingAnimation.Skip
+        }
+        if (!statusChecker.canInject()) return AdBlockingAnimation.Skip
         return if (pageChanged) {
             // A load/reload is an "actual page change": a video page always animates (reload re-animates).
-            if (videoId != null) {
-                lastAnimatedVideoId = videoId
-                showBadge()
-            } else {
-                lastAnimatedVideoId = null
-                AdBlockingAnimation.Skip
-            }
+            lastAnimatedVideoId = videoId
+            showBadge()
         } else {
             // In-page SPA change: animate only when moving to a different video than the last animated one.
-            when (videoId) {
-                null -> {
-                    lastAnimatedVideoId = null
-                    AdBlockingAnimation.Skip
-                }
-                lastAnimatedVideoId -> AdBlockingAnimation.Retain
-                else -> {
-                    lastAnimatedVideoId = videoId
-                    showBadge()
-                }
+            if (videoId == lastAnimatedVideoId) {
+                AdBlockingAnimation.Retain
+            } else {
+                lastAnimatedVideoId = videoId
+                showBadge()
             }
         }
     }
