@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +50,13 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     lateinit var menuStateProvider: AdBlockingMenuStateProvider
 
     @Inject
+    lateinit var menuController: AdBlockingMenuController
+
+    @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     private val menuItem: MenuItemView by lazy {
         MenuItemView(context).apply {
@@ -61,9 +68,11 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     private var url: Uri? = null
     private var onHostClick: (() -> Unit)? = null
     private var scope: CoroutineScope? = null
+    private var menuState: AdBlockingMenuState = AdBlockingMenuState.Hidden
 
     init {
         orientation = VERTICAL
+        isGone = true
         addView(menuItem)
     }
 
@@ -77,7 +86,13 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         val url = this.url ?: return
-        menuItem.setOnClickListener { onHostClick?.invoke() }
+        menuItem.setOnClickListener {
+            when (menuState) {
+                AdBlockingMenuState.Disabled -> menuController.enable()
+                else -> showMenuBottomSheet()
+            }
+            onHostClick?.invoke()
+        }
 
         scope?.cancel()
         scope = CoroutineScope(SupervisorJob() + dispatcherProvider.main()).also { scope ->
@@ -94,7 +109,18 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
+    private fun showMenuBottomSheet() {
+        AdBlockingMenuBottomSheetDialog(context, menuController.currentChoice(), edgeToEdgeProvider).apply {
+            eventListener = object : AdBlockingMenuBottomSheetDialog.EventListener {
+                override fun onChoiceSelected(choice: AdBlockingChoice) {
+                    menuController.onChoiceSelected(choice)
+                }
+            }
+        }.show()
+    }
+
     private fun render(state: AdBlockingMenuState) {
+        this.menuState = state
         when (state) {
             AdBlockingMenuState.Hidden -> isGone = true
             AdBlockingMenuState.Enabled -> {

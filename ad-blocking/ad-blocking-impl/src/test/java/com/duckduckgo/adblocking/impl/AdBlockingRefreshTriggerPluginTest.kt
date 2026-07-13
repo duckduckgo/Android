@@ -46,7 +46,7 @@ class AdBlockingRefreshTriggerPluginTest {
     @Test
     fun whenStateChangesThenEmits() = runTest {
         plugin.observeRefreshRequests().test {
-            stateFlow.value = AdBlockingState.Disabled
+            stateFlow.value = AdBlockingState.Disabled.Permanent
 
             awaitItem()
             cancelAndConsumeRemainingEvents()
@@ -56,7 +56,7 @@ class AdBlockingRefreshTriggerPluginTest {
     @Test
     fun whenStateChangesMultipleTimesThenEmitsForEachChange() = runTest {
         plugin.observeRefreshRequests().test {
-            stateFlow.value = AdBlockingState.Disabled
+            stateFlow.value = AdBlockingState.Disabled.UntilRelaunch
             awaitItem()
 
             stateFlow.value = AdBlockingState.Enabled.UserEnabled
