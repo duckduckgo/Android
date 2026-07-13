@@ -880,6 +880,9 @@
     <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
     <string name="preOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="preOnboardingComparisonChartItem5">Стирает данные браузера одним нажатием</string>
+    <string name="preOnboardingComparisonChartDuckAi">Встроенный Duck.ai и приватные беседы с ChatGPT</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Блокировка таргетированной рекламы и всплывающих окон с настройками файлов cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Смотрите видео на YouTube без рекламы</string>
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
@@ -942,6 +945,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Нужен доступ к приватным чатам с ИИ прямо из адресной строки?</string>
     <string name="preOnboardingInputScreenButton">Далее</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
 
