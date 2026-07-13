@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -377,3 +378,6 @@ private interface DuckAiChatDeletionListenerPluginPoint
 
 @ContributesPluginPoint(scope = AppScope::class, boundType = BrowserMenuHighlightPlugin::class)
 private interface BrowserMenuHighlightPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = TopInContextSection::class)
+private interface TopInContextSectionPluginPoint

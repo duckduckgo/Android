@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Niedawne zmiany na YouTube wpłynęły na blokowanie reklam. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie.</string>
     <string name="contingencyMessagePrimaryButton">Rozumiem</string>
     <string name="contingencyMessageCloseContentDescription">Zamknij</string>
+    <string name="ad_blocking_menu_disable">Wyłącz blokowanie reklam na YouTube</string>
+    <string name="ad_blocking_menu_enable">Włącz blokowanie reklam na YouTube</string>
+    <string name="ad_blocking_menu_title">Blokowanie reklam w serwisie YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Zamknij</string>
+    <string name="ad_blocking_menu_always_on">Zawsze włączone</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Wyłącz do czasu ponownego uruchomienia</string>
+    <string name="ad_blocking_menu_always_off">Zawsze wyłączone</string>
+    <string name="ad_blocking_disabled_popup_title">Blokowanie reklam w serwisie YouTube nie działa?</string>
+    <string name="ad_blocking_disabled_popup_description">Wyślij anonimowy raport o awarii do DuckDuckGo. Pomóż usprawnić blokowanie reklam u wszystkich użytkowników!</string>
+    <string name="ad_blocking_disabled_primary_action">Wyślij raport o awarii</string>
+    <string name="ad_blocking_disabled_secondary_action">Anuluj</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Wyłączono do czasu ponownego uruchomienia</string>
 </resources>

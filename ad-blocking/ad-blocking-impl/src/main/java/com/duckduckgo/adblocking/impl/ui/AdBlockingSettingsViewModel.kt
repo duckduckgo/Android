@@ -31,6 +31,7 @@ import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -52,6 +53,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
     statusChecker: AdBlockingStatusChecker,
     feature: AdBlockingExtensionFeature,
     private val repository: AdBlockingSettingsRepository,
+    private val sessionStore: AdBlockingSessionStore,
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
 ) : ViewModel() {
@@ -63,6 +65,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val isEnabled: Boolean = false,
+        val disabledUntilRelaunch: Boolean = false,
         val showConsentDescription: Boolean? = null,
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
@@ -83,7 +86,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val isEnabled = state is AdBlockingState.Enabled
         val isContingencyMode = uxImprovements && contingencyModeOn
         ViewState(
-            isEnabled = isEnabled,
+            isEnabled = state is AdBlockingState.Enabled,
+            disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
             showConsentDescription = state !is AdBlockingState.Enabled.Default,
             isContingencyMode = isContingencyMode,
             isStatusIndicatorOn = isEnabled && !isContingencyMode,
@@ -103,6 +107,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
     fun onBlockAdsToggled(enabled: Boolean) {
         viewModelScope.launch {
             repository.setEnabled(enabled)
+            sessionStore.clear()
             if (enabled) {
                 pixel.fire(AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
                 pixel.fire(AD_BLOCKING_ENABLED_COUNT)

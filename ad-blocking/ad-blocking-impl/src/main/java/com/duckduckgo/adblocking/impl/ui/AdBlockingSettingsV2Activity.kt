@@ -18,7 +18,9 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
@@ -51,6 +53,10 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
     override val appBarLayout: View get() = binding.includeToolbar.appBarLayout
     override val contentScrollView: View get() = binding.contentScrollView
 
+    private val untilRelaunchToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onBlockAdsToggled(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         maybeEnableEdgeToEdge()
@@ -62,6 +68,11 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
     override fun render(state: AdBlockingSettingsViewModel.ViewState) {
         super.render(state)
         binding.adBlockingStatusIndicator.setStatus(state.isStatusIndicatorOn)
+        binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
+        binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
+        if (state.disabledUntilRelaunch) {
+            binding.blockAdsToggleUntilRelaunch.quietlySetIsChecked(state.isEnabled, untilRelaunchToggleListener)
+        }
         binding.duckPlayerEntry.setSecondaryText(
             when (state.duckPlayerMode) {
                 Enabled -> getString(R.string.duck_player_mode_always)
@@ -70,12 +81,10 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
             },
         )
         if (state.isContingencyMode) {
-            binding.blockAdsToggle.gone()
             binding.adBlockingDescription.gone()
             binding.contingencyModeItem.show()
         } else {
             binding.contingencyModeItem.gone()
-            binding.blockAdsToggle.show()
         }
     }
 }

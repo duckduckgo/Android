@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Naujausi „YouTube“ pakeitimai paveikė reklamų blokavimą. Sprendžiame šias problemas ir dėkojame už supratingumą</string>
     <string name="contingencyMessagePrimaryButton">Supratau</string>
     <string name="contingencyMessageCloseContentDescription">Uždaryti</string>
+    <string name="ad_blocking_menu_disable">Išjungti „YouTube“ reklamų blokavimą</string>
+    <string name="ad_blocking_menu_enable">Įjungti „YouTube“ reklamų blokavimą</string>
+    <string name="ad_blocking_menu_title">„YouTube“ reklamų blokavimas</string>
+    <string name="ad_blocking_menu_close_content_description">Uždaryti</string>
+    <string name="ad_blocking_menu_always_on">Visada įjungta</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Išjungti iki paleidimo iš naujo</string>
+    <string name="ad_blocking_menu_always_off">Visada išjungta</string>
+    <string name="ad_blocking_disabled_popup_title">Neveikia „YouTube“ reklamų blokavimas?</string>
+    <string name="ad_blocking_disabled_popup_description">Siųsk anoniminį pranešimą apie triktį „DuckDuckGo“. Padėk patobulinti reklamų blokavimą visiems!</string>
+    <string name="ad_blocking_disabled_primary_action">Siųsti pranešimą apie triktį</string>
+    <string name="ad_blocking_disabled_secondary_action">Atšaukti</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Išjungta iki paleidimo iš naujo</string>
 </resources>

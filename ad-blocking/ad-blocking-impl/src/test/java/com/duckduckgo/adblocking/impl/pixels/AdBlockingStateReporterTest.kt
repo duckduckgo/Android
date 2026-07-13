@@ -87,7 +87,7 @@ class AdBlockingStateReporterTest {
     @Test
     fun whenDisabledThenBothParamsFalse() {
         whenever(statusChecker.observeCanInject()).thenReturn(flowOf(false))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         reporter.onResume(owner)
 

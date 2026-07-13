@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Il blocco degli annunci è stato influenzato dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Grazie per la comprensione</string>
     <string name="contingencyMessagePrimaryButton">Ho capito</string>
     <string name="contingencyMessageCloseContentDescription">Chiudi</string>
+    <string name="ad_blocking_menu_disable">Disattiva il blocco annunci su YouTube</string>
+    <string name="ad_blocking_menu_enable">Abilita il blocco degli annunci su YouTube</string>
+    <string name="ad_blocking_menu_title">Blocco degli annunci su YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Chiudi</string>
+    <string name="ad_blocking_menu_always_on">Sempre attiva</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Disattiva fino al rilancio</string>
+    <string name="ad_blocking_menu_always_off">Sempre disattivato</string>
+    <string name="ad_blocking_disabled_popup_title">Il blocco degli annunci di YouTube non funziona?</string>
+    <string name="ad_blocking_disabled_popup_description">Invia una segnalazione anonima di malfunzionamento a DuckDuckGo. Aiuta a migliorare il blocco degli annunci per tutti!</string>
+    <string name="ad_blocking_disabled_primary_action">Invia la segnalazione di malfunzionamento</string>
+    <string name="ad_blocking_disabled_secondary_action">Annulla</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Disattivato fino al rilancio</string>
 </resources>
