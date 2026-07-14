@@ -22,7 +22,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
