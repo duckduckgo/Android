@@ -39,6 +39,9 @@ safe-outputs:
     base-branch: develop
     draft: true
     github-token: ${{ secrets.GT_DAXMOBILE }}
+    allowed-files:
+      - ".github/workflows/**"
+      - ".github/actions/**"
 mcp-scripts:
   asana_get_section_tasks:
     description: "List tasks in a given section of an Asana project. Returns task GIDs, names, and URLs."
