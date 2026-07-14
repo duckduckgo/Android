@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_CON
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_LOADED
@@ -417,6 +418,12 @@ interface PirPixelSender {
      * Emits a pixel when an opt-out is unconfirmed within 42 days.
      */
     fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
+
+    /**
+     * Fired when a previously-removed profile reappears in a later scan, causing its opt-out job
+     * record to be reverted from REMOVED back to REQUESTED.
+     */
+    fun reportBrokerOptOutProfileReappeared(brokerUrl: String)
 
     /**
      * Emits a daily pixel to report that the user is eligible to run PIR.
@@ -1053,6 +1060,14 @@ class RealPirPixelSender @Inject constructor(
         )
 
         enqueueFire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutProfileReappeared(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED, params)
     }
 
     override fun reportCanRunPir() {
