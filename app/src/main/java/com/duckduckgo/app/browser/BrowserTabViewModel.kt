@@ -1139,7 +1139,7 @@ class BrowserTabViewModel @Inject constructor(
             .merge()
             // The trigger flow fires in every tab's ViewModel; only the visible tab should report.
             .filter { refreshOnViewVisible.value }
-            .onEach { onBrokenSiteSelected() }
+            .onEach { reportFlow -> onBrokenSiteSelected(reportFlow) }
             .launchIn(viewModelScope)
     }
 
@@ -3301,8 +3301,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = MENU))
+    fun onBrokenSiteSelected(reportFlow: BrokenSiteData.ReportFlow = MENU) {
+        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = reportFlow))
     }
 
     fun onPrivacyProtectionMenuClicked(clickedFromCustomTab: Boolean = false) {
