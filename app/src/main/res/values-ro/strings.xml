@@ -846,7 +846,9 @@
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Folosește ChatGPT în privat cu Duck.ai încorporat</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blochează reclamele direcționate și ferestrele pop-up pentru module cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Redă videoclipuri YouTube fără reclame</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
@@ -907,7 +909,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vrei acces rapid la chat privat cu AI în bara de adrese?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 
@@ -1033,7 +1035,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
     <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
     <string name="preOnboardingWelcomeDialogBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d din %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d din %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
 

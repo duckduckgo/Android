@@ -828,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Utilisez ChatGPT en toute confidentialité grâce à l\'intégration de Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloquez les publicités ciblées et les fenêtres contextuelles de cookies</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Lecture de vidéos YouTube sans publicités</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
     <string name="preOnboardingAddressBarTitle">Où dois-je placer votre barre d\'adresse ?</string>
     <string name="preOnboardingAddressBarOkButton">Suivant</string>
@@ -887,7 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vous voulez accéder facilement au chat IA privé ?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vous souhaitez accéder facilement à un chat privé alimenté par l\'IA depuis la barre d\'adresse ?</string>
     <string name="preOnboardingInputScreenButton">Suivant</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Les fonctionnalités d\'IA sont privées et facultatives. Vous pouvez apporter des modifications dans <b>Paramètres > Fonctionnalités d\'IA</b>.]]></string>
 
@@ -1013,7 +1015,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Bonjour.</string>
     <string name="preOnboardingWelcomeDialogBody1">Envie de profiter d\'un navigateur plus rapide qui vous donne le contrôle ?</string>
     <string name="preOnboardingWelcomeDialogBody2">L\'IA reste une option et la protection de la confidentialité reste activée.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d sur %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d sur %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">comment dire « canard » en anglais</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">comment dire « canard » en espagnol</string>
 

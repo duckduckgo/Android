@@ -827,7 +827,9 @@
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Block targeted ads &amp; cookie pop-ups</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Play YouTube videos without ads</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
     <string name="preOnboardingAddressBarTitle">Where should I put your address bar?</string>
     <string name="preOnboardingAddressBarOkButton">Next</string>
@@ -886,7 +888,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Want easy access to private AI chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Next</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
@@ -1012,7 +1014,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hi there.</string>
     <string name="preOnboardingWelcomeDialogBody1">Ready for a faster browser that puts you in control?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI is always optional, and privacy protection is always on.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d of %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d of %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate 'duck' too.">how to say \"duck\" in english</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate 'duck' too. Don't add question mark">how to say \"duck\" in spanish</string>
 
