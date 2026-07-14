@@ -378,22 +378,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenInstallAgeIsNullBecauseInFutureThenInstallAgeIsOmitted() = runTest {
-        whenever(mockAppInstall.getInstallAge()).thenReturn(null)
-
-        val result = testee.processJsCallbackMessage(
-            featureName = "aiChat",
-            method = "getAIChatNativeConfigValues",
-            id = "123",
-            data = null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        assertFalse(result!!.params.has("installAge"))
-    }
-
-    @Test
-    fun whenInstallAgeIsNullBecauseNotRecordedThenInstallAgeIsOmitted() = runTest {
+    fun whenInstallAgeIsNullThenInstallAgeIsOmitted() = runTest {
         whenever(mockAppInstall.getInstallAge()).thenReturn(null)
 
         val result = testee.processJsCallbackMessage(
