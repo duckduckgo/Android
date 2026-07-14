@@ -26,6 +26,7 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugi
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.JsErrorDetails
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
@@ -96,6 +97,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                                 it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
                                     isUrlAllowed(it.allowedDomains, domain)
                             }?.process(jsMessage, this, jsMessageCallback) ?: run {
+                            jsMessage.id?.let { id -> sendMethodNotFoundError(jsMessage, id) }
                         }
                     }
                 }
@@ -148,5 +150,31 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         val host = url ?: return false
         val eTld = host.toTldPlusOne()
         return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
+    }
+
+    private fun sendMethodNotFoundError(
+        jsMessage: JsMessage,
+        id: String,
+    ) {
+        jsMessageHelper.sendJsResponse(
+            JsRequestResponse.Error(
+                context = context,
+                featureName = jsMessage.featureName,
+                method = jsMessage.method,
+                id = id,
+                error = JsErrorDetails(
+                    code = METHOD_NOT_FOUND_ERROR_CODE,
+                    message = METHOD_NOT_FOUND_ERROR_MESSAGE,
+                ),
+            ),
+            callbackName,
+            secret,
+            webView,
+        )
+    }
+
+    companion object {
+        private const val METHOD_NOT_FOUND_ERROR_CODE = -32601
+        private const val METHOD_NOT_FOUND_ERROR_MESSAGE = "Method not found"
     }
 }

@@ -135,9 +135,14 @@ sealed class JsRequestResponse {
         val featureName: String,
         val method: String,
         val id: String,
-        val error: String,
+        val error: JsErrorDetails,
     ) : JsRequestResponse()
 }
+
+data class JsErrorDetails(
+    val code: Int,
+    val message: String,
+)
 
 data class SubscriptionEventData(val featureName: String, val subscriptionName: String, val params: JSONObject)
 data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject)
