@@ -4,6 +4,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.js.messaging.api.JsErrorDetails
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import kotlinx.coroutines.test.TestScope
@@ -71,7 +72,7 @@ class RealJsMessageHelperTest {
     fun whenSendJsResponseAsErrorThenResponseMatches() = runTest {
         val expected = """
             javascript:(function() {
-                window['callbackName']('secret', {"context":"myContext","error":"this is an error","featureName":"myFeature","id":"myId","method":"myMethod"});
+                window['callbackName']('secret', {"context":"myContext","error":{"code":-32601,"message":"Method not found"},"featureName":"myFeature","id":"myId","method":"myMethod"});
             })();
         """.trimIndent()
         val response = JsRequestResponse.Error(
@@ -79,7 +80,7 @@ class RealJsMessageHelperTest {
             featureName = "myFeature",
             method = "myMethod",
             id = "myId",
-            error = "this is an error",
+            error = JsErrorDetails(code = -32601, message = "Method not found"),
         )
 
         jsMessageHelper.sendJsResponse(response, "callbackName", "secret", webView)
