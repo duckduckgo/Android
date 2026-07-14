@@ -16,7 +16,8 @@
 
 package com.duckduckgo.adblocking.impl.menu
 
-import com.duckduckgo.browser.api.BrokenSiteReportTriggerPlugin
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,11 +37,11 @@ class AdBlockingBrokenSiteReportTrigger @Inject constructor() :
     BrokenSiteReportTriggerPlugin,
     BrokenSiteReportRequester {
 
-    private val reportRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val reportRequests = MutableSharedFlow<BrokenSiteData.ReportFlow>(extraBufferCapacity = 1)
 
-    override fun observeReportRequests(): Flow<Unit> = reportRequests
+    override fun observeReportRequests(): Flow<BrokenSiteData.ReportFlow> = reportRequests
 
     override fun requestReport() {
-        reportRequests.tryEmit(Unit)
+        reportRequests.tryEmit(BrokenSiteData.ReportFlow.MENU)
     }
 }

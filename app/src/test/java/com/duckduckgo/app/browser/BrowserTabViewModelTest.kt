@@ -266,7 +266,6 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
-import com.duckduckgo.browser.api.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -277,6 +276,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
@@ -650,7 +651,7 @@ class BrowserTabViewModelTest {
     private val mockAdBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider = mock {
         onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
     }
-    private val brokenSiteReportTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val brokenSiteReportTriggerFlow = MutableSharedFlow<BrokenSiteData.ReportFlow>(extraBufferCapacity = 1)
     private val brokenSiteReportTriggerPlugin: BrokenSiteReportTriggerPlugin = mock {
         on { observeReportRequests() } doReturn brokenSiteReportTriggerFlow
     }
@@ -3086,7 +3087,7 @@ class BrowserTabViewModelTest {
     fun whenBrokenSiteReportTriggerPluginEmitsThenBrokenSiteFeedbackCommandIssued() = runTest {
         loadUrl("foo.com", isBrowserShowing = true)
 
-        brokenSiteReportTriggerFlow.emit(Unit)
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
         advanceUntilIdle()
 
         val command = captureCommands().lastValue as Command.BrokenSiteFeedback
@@ -3099,7 +3100,7 @@ class BrowserTabViewModelTest {
         testee.onViewHidden()
         advanceUntilIdle()
 
-        brokenSiteReportTriggerFlow.emit(Unit)
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
         advanceUntilIdle()
 
         assertCommandNotIssued<Command.BrokenSiteFeedback>()

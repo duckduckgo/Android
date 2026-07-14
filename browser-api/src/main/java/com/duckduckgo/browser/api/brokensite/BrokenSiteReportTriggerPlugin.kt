@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api
+package com.duckduckgo.browser.api.brokensite
 
 import kotlinx.coroutines.flow.Flow
 
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface BrokenSiteReportTriggerPlugin {
     /**
-     * Emits when the user requested a broken-site report.
+     * Emits the report flow to use when the user requested a broken-site report.
      */
-    fun observeReportRequests(): Flow<Unit>
+    fun observeReportRequests(): Flow<BrokenSiteData.ReportFlow>
 }

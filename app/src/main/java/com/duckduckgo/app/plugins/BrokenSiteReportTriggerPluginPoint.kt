@@ -17,7 +17,7 @@
 package com.duckduckgo.app.plugins
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.browser.api.BrokenSiteReportTriggerPlugin
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
