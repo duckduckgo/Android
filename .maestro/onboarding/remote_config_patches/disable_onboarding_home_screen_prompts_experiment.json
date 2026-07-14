@@ -1,7 +1,0 @@
-[
-  { "op": "replace", "path": "/features/onboardingPrompts/features/addToDockAndWidgetExperimentJul25/state", "value": "disabled" },
-  { "op": "replace", "path": "/features/onboardingPrompts/features/addToDockAndWidgetExperimentJul25/cohorts/0/weight", "value": 1 },
-  { "op": "replace", "path": "/features/onboardingPrompts/features/addToDockAndWidgetExperimentJul25/cohorts/1/weight", "value": 0 },
-  { "op": "replace", "path": "/features/onboardingPrompts/features/addToDockAndWidgetExperimentJul25/cohorts/2/weight", "value": 0 },
-  { "op": "replace", "path": "/features/onboardingPrompts/features/addToDockAndWidgetExperimentJul25/cohorts/3/weight", "value": 0 }
-]
