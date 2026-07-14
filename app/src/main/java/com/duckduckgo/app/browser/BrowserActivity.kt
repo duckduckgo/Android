@@ -503,7 +503,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.refreshAutoComplete()
                     }
                 }
-                FireDialog.EVENT_ON_FIRE_TABS_CLEARED -> {
+                FireDialog.EVENT_ON_FIRE_TABS_CLEARING_COMPLETE -> {
                     // All Fire tabs were burned; land the user on the (now empty) Fire tab switcher
                     globalActivityStarter.start(this, TabSwitcherScreenWithParams(BrowserMode.FIRE))
                 }

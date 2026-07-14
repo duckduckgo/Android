@@ -245,7 +245,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 }
             }
             is Command.OnFireTabsClearComplete -> {
-                pendingFragmentResultEvent = FireDialog.EVENT_ON_FIRE_TABS_CLEARED
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_FIRE_TABS_CLEARING_COMPLETE
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearComplete -> {
