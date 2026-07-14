@@ -28,6 +28,7 @@ import com.duckduckgo.networkprotection.impl.subscription.onboarding.Subscriptio
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
+import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
 
 /**
  * VPN step of the native subscription onboarding: a placeholder screen with a primary button that completes
@@ -39,13 +40,16 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
+    private val stepHost: SubscriptionOnboardingStepHost
+        get() = requireSubscriptionOnboardingStepHost()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
-            (requireActivity() as SubscriptionOnboardingStepHost).onStepFinished(VPN_STEP_ID, COMPLETED)
+            stepHost.onStepFinished(VPN_STEP_ID, COMPLETED)
         }
         binding.subscriptionOnboardingVpnSkipButton.setOnClickListener {
-            (requireActivity() as SubscriptionOnboardingStepHost).onStepFinished(VPN_STEP_ID, SKIPPED)
+            stepHost.onStepFinished(VPN_STEP_ID, SKIPPED)
         }
     }
 }

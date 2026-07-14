@@ -24,6 +24,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingWelcomeBinding
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
@@ -38,10 +39,13 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
 
+    private val stepHost: SubscriptionOnboardingStepHost
+        get() = requireSubscriptionOnboardingStepHost()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingWelcomeContinueButton.setOnClickListener {
-            (requireActivity() as SubscriptionOnboardingStepHost).onStepFinished(WELCOME_STEP_ID, COMPLETED)
+            stepHost.onStepFinished(WELCOME_STEP_ID, COMPLETED)
         }
     }
 }

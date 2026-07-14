@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.databinding.FragmentSubscriptionOnboardingDu
 import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
 
 /**
  * Duck.ai step of the native subscription onboarding: a placeholder screen with a primary button that
@@ -38,10 +39,13 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
 
     private val binding: FragmentSubscriptionOnboardingDuckAiBinding by viewBinding()
 
+    private val stepHost: SubscriptionOnboardingStepHost
+        get() = requireSubscriptionOnboardingStepHost()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingDuckAiNextButton.setOnClickListener {
-            (requireActivity() as SubscriptionOnboardingStepHost).onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
+            stepHost.onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
         }
     }
 }

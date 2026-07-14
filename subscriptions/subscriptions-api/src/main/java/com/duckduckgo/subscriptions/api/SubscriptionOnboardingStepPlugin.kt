@@ -61,3 +61,12 @@ enum class SubscriptionOnboardingStepOutcome {
     COMPLETED,
     SKIPPED,
 }
+
+/**
+ * Resolves the [SubscriptionOnboardingStepHost] for a step fragment without assuming it is hosted directly by
+ * an Activity: prefers a parent fragment, then the hosting context. Errors if neither implements the contract.
+ */
+fun Fragment.requireSubscriptionOnboardingStepHost(): SubscriptionOnboardingStepHost =
+    (parentFragment as? SubscriptionOnboardingStepHost)
+        ?: (activity as? SubscriptionOnboardingStepHost)
+        ?: error("Host must implement SubscriptionOnboardingStepHost")
