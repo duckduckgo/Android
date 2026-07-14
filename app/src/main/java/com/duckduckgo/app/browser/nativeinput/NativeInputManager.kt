@@ -42,6 +42,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -179,6 +180,7 @@ class RealNativeInputManager @Inject constructor(
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val nativeInputEventListener: NativeInputEventListener,
+    private val fireModeAvailability: FireModeAvailability,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -650,7 +652,10 @@ class RealNativeInputManager @Inject constructor(
         val previousOnChatSelected = widget.onChatSelected
         widget.onChatSelected = { animate ->
             callbacks.onClearAutocomplete()
-            rootView.findViewById<View?>(R.id.focusedView)?.gone()
+            // Hides the focused NTP UI that onClearAutocomplete can surface; only relevant when Fire tabs is available.
+            if (fireModeAvailability.isAvailable()) {
+                rootView.findViewById<View?>(R.id.focusedView)?.gone()
+            }
             previousOnChatSelected?.invoke(animate)
         }
         widget.onClearTextTapped = {

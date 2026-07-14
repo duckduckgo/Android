@@ -1448,7 +1448,9 @@ class BrowserTabFragment :
                     if (binding.autoCompleteSuggestionsList.isVisible) {
                         viewModel.autoCompleteSuggestionsGone()
                     }
-                    viewModel.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
+                    // Only relevant when Fire tabs is available
+                    val hasFocus = fireModeAvailability.isAvailable()
+                    viewModel.triggerAutocomplete("", hasFocus = hasFocus, hasQueryChanged = true)
                     binding.autoCompleteSuggestionsList.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },

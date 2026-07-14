@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -76,6 +77,7 @@ class RealNativeInputManagerTest {
     private val duckChatInputModeState: DuckChatInputModeState = mock()
     private val pixel: Pixel = mock()
     private val nativeInputEventListener: NativeInputEventListener = mock()
+    private val fireModeAvailability: FireModeAvailability = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -91,6 +93,7 @@ class RealNativeInputManagerTest {
     fun setUp() {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -102,6 +105,7 @@ class RealNativeInputManagerTest {
             pixel,
             nativeInputStateBugKillSwitch,
             nativeInputEventListener,
+            fireModeAvailability,
         )
     }
 
