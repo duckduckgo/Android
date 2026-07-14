@@ -88,14 +88,16 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                             id = jsMessage.id,
                             data = jsMessage.params,
                         )
+                    } else {
+                        handlers
+                            .getPlugins()
+                            .map { it.getJsMessageHandler() }
+                            .firstOrNull {
+                                it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
+                                    isUrlAllowed(it.allowedDomains, domain)
+                            }?.process(jsMessage, this, jsMessageCallback) ?: run {
+                        }
                     }
-                    handlers
-                        .getPlugins()
-                        .map { it.getJsMessageHandler() }
-                        .firstOrNull {
-                            it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
-                                isUrlAllowed(it.allowedDomains, domain)
-                        }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
