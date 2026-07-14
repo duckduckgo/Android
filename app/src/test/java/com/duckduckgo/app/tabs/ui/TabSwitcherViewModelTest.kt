@@ -22,10 +22,15 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.fire.ManualDataClearing
+import com.duckduckgo.app.fire.promo.FireTabsPromos
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -67,8 +72,13 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +105,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -138,6 +149,10 @@ class TabSwitcherViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
+    private val fireTabsPromos: FireTabsPromos = mock()
+
+    private val remoteMessageModel: RemoteMessageModel = mock()
+
     private val statisticsDataStore: StatisticsDataStore = mock()
 
     private val duckChatMock: DuckChat = mock()
@@ -157,6 +172,10 @@ class TabSwitcherViewModelTest {
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
     private val mockTabTitleResolver: TabTitleResolver = mock()
+
+    private val mockDataClearing: ManualDataClearing = mock()
+
+    private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
 
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -198,6 +217,8 @@ class TabSwitcherViewModelTest {
         whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
         whenever(mockTabTitleResolver.resolveTitle(any(), any())).thenReturn("")
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
 
         initializeMockTabEntitesData()
         initializeViewModel()
@@ -211,7 +232,13 @@ class TabSwitcherViewModelTest {
     }
 
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
-        testee = TabSwitcherViewModel(
+        testee = createViewModel(tabSwitcherDataStore)
+        testee.command.observeForever(mockCommandObserver)
+        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
+    }
+
+    private fun createViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore): TabSwitcherViewModel {
+        return TabSwitcherViewModel(
             mockTabRepositoryProvider,
             mockBrowserModeStateHolder,
             mockFireModeAvailability,
@@ -227,11 +254,29 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
         )
-        testee.command.observeForever(mockCommandObserver)
-        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
+
+    private fun fireTabsRemoteMessage(): RemoteMessage = RemoteMessage(
+        id = FireTabsPromos.FIRE_TABS_PROMO_MESSAGE_ID,
+        content = Content.BigTwoActions(
+            titleText = "",
+            descriptionText = "",
+            placeholder = Content.Placeholder.ANNOUNCE,
+            primaryActionText = "",
+            primaryAction = Action.Dismiss,
+            secondaryActionText = "",
+            secondaryAction = Action.Dismiss,
+        ),
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
+        surfaces = emptyList(),
+    )
 
     @After
     fun after() {
@@ -697,6 +742,54 @@ class TabSwitcherViewModelTest {
         testee.onBackButtonPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+    }
+
+    @Test
+    fun `when back pressed in regular mode then close`() {
+        testee.onBackButtonPressed()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when back pressed in fire mode with no fire tabs then switch to regular mode`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBackButtonPressed()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when up pressed in fire mode with no fire tabs then switch to regular mode`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onUpButtonPressed()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
     }
 
     @Test
@@ -1997,6 +2090,15 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTab)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+            clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+        )
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
     }
 
     @Test
@@ -2023,6 +2125,39 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+            clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+        )
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun `when toggling to regular mode with fire tabs present then does not clear fire data`() = runTest {
+        val fireTabs = listOf(
+            TabEntity("fire-1", url = "https://fire.example/1", position = 1),
+            TabEntity("fire-2", url = "https://fire.example/2", position = 2),
+        )
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabs))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabs.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
     @Test
@@ -2052,7 +2187,11 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2095,7 +2234,11 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2162,7 +2305,11 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE)
@@ -2179,6 +2326,147 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         assertEquals(tabList.size, testee.viewState.value.regularTabCount)
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveAndCanShowPromoThenVisibleAndShownPixelAndMarkedShown() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertTrue(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos).onTabSwitcherPromoShown()
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
+    }
+
+    @Test
+    fun whenNoActiveMessageThenFireTabsPromoNotVisible() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenActiveMessageHasNonFireTabsPlaceholderThenFireTabsPromoNotVisible() = runTest {
+        val nonFireTabsMessage = RemoteMessage(
+            id = "other-promo",
+            content = Content.BigTwoActions(
+                titleText = "",
+                descriptionText = "",
+                placeholder = Content.Placeholder.ANNOUNCE,
+                primaryActionText = "",
+                primaryAction = Action.Dismiss,
+                secondaryActionText = "",
+                secondaryAction = Action.Dismiss,
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = emptyList(),
+        )
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(nonFireTabsMessage)
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveButPromoAlreadyDismissedThenNotVisible() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveButInFireModeThenNotVisible() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+        currentModeFlow.value = BrowserMode.FIRE
+
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.isFireTabsPromoVisible)
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsPromoDismissedThenHiddenAndPixelFired() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        advanceUntilIdle() // ensure init coroutine sets isFireTabsPromoVisible = true
+        testee.onFireTabsPromoDismissed()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
+    }
+
+    @Test
+    fun whenBrowserModeToggledThenFireTabsPromoBannerDismissed() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        advanceUntilIdle() // init sets isFireTabsPromoVisible = true
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE)
+
+        // The ViewModel survives the toggle-triggered recreate, so the banner must be dismissed here,
+        // otherwise it reappears when the user returns to regular mode.
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+    }
+
+    @Test
+    fun whenModeToggledBeforePromoEligibilityResolvesThenBannerNotShown() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        // Suspend the eligibility read so we can toggle modes while it is still in flight.
+        val eligibility = CompletableDeferred<Boolean>()
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).doSuspendableAnswer { eligibility.await() }
+
+        val testee = createViewModel() // init starts the eligibility read and suspends on it
+        testee.onBrowserModeToggled(BrowserMode.FIRE) // user dismisses the banner before it resolves
+        eligibility.complete(true) // resolves true, but the promo was already handled by the toggle
+        advanceUntilIdle()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {

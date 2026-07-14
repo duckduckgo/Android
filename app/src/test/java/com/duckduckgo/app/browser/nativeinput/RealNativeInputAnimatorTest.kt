@@ -102,4 +102,52 @@ class RealNativeInputAnimatorTest {
 
         assertNotNull(margins)
     }
+
+    @Test
+    fun whenSnapShowInTopModeThenBarVisibleAndWidgetAtRest() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context)
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = false, heightPx = 56, show = true, animate = false)
+
+        assertEquals(View.VISIBLE, navBar.visibility)
+        assertEquals(0f, navBar.translationY, 0f)
+        assertEquals(0f, widget.translationY, 0f)
+    }
+
+    @Test
+    fun whenSnapHideInTopModeThenBarGoneAndWidgetRidesUp() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context)
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = false, heightPx = 56, show = false, animate = false)
+
+        assertEquals(View.GONE, navBar.visibility)
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(-56f, widget.translationY, 0f)
+    }
+
+    @Test
+    fun whenSnapHideInBottomModeThenBarGoneAndWidgetUntouched() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context).apply { translationY = 99f }
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = true, heightPx = 56, show = false, animate = false)
+
+        assertEquals(View.GONE, navBar.visibility)
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(99f, widget.translationY, 0f)
+    }
+
+    @Test
+    fun whenSnapShowInBottomModeThenBarVisibleAndWidgetUntouched() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context).apply { translationY = 99f }
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = true, heightPx = 56, show = true, animate = false)
+
+        assertEquals(View.VISIBLE, navBar.visibility)
+        assertEquals(0f, navBar.translationY, 0f)
+        assertEquals(99f, widget.translationY, 0f)
+    }
 }

@@ -27,6 +27,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.feedback.impl.R
@@ -40,6 +43,7 @@ import com.duckduckgo.feedback.impl.ui.negative.subreason.SubReasonNegativeFeedb
 import com.duckduckgo.feedback.impl.ui.positive.initial.PositiveFeedbackLandingFragment
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(FeedbackScreenNoParams::class, screenName = "feedback")
@@ -59,10 +63,23 @@ class FeedbackActivity :
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         setupToolbar(toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
         configureObservers()
         onBackPressedDispatcher.addCallback(
             this,
@@ -72,6 +89,12 @@ class FeedbackActivity :
                 }
             },
         )
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainer, drawBehindGestureNav = false)
     }
 
     private fun configureObservers() {

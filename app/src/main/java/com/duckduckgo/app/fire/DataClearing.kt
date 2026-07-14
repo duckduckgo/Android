@@ -167,18 +167,17 @@ class DataClearing @Inject constructor(
             BrowserMode.REGULAR -> {
                 performFireModeClear()
                 clearRegularDataUsingManualFireOptions(shouldRestartIfRequired)
+                clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
             }
             BrowserMode.FIRE -> {
                 performFireModeClear()
 
                 if (shouldRestartIfRequired) {
-                    dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
+                    dataClearingWideEvent.finishSuccess()
                     clearDataAction.killAndRestartProcess(notifyDataCleared = false)
                 }
             }
         }
-
-        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
     }
 
     private suspend fun clearRegularDataUsingManualFireOptions(
@@ -213,7 +212,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (killProcessIfNeeded && wasDataCleared) {
-            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
+            dataClearingWideEvent.finishSuccess()
             clearDataAction.killProcess()
             return false
         } else {

@@ -222,6 +222,28 @@ class ReasoningResolverTest {
     }
 
     @Test
+    fun whenNotEligibleThenGatedModesAreHiddenAndAccessibleModesRemain() {
+        // FAST (free) stays; EXTENDED (gated) is dropped because the user can't purchase → no inert upsell row.
+        val access = listOf(
+            ReasoningEffortAccess(NONE, listOf("free", "plus", "pro"), isAccessible = true),
+            ReasoningEffortAccess(HIGH, listOf("pro"), isAccessible = false),
+        )
+        val result = ReasoningResolver.availableModes(listOf(NONE, HIGH), access, isEligible = false)
+        assertEquals(listOf(FAST), result.map { it.mode })
+    }
+
+    @Test
+    fun whenEligibleThenGatedModesAreRetainedForUpsell() {
+        val access = listOf(
+            ReasoningEffortAccess(NONE, listOf("free", "plus", "pro"), isAccessible = true),
+            ReasoningEffortAccess(HIGH, listOf("pro"), isAccessible = false),
+        )
+        val result = ReasoningResolver.availableModes(listOf(NONE, HIGH), access, isEligible = true)
+        assertEquals(listOf(FAST, EXTENDED_REASONING), result.map { it.mode })
+        assertEquals(false, result.single { it.mode == EXTENDED_REASONING }.isAccessible)
+    }
+
+    @Test
     fun whenAllAvailableModesGatedThenResolveReturnsNull() {
         // Model is accessible but every reasoning effort is gated to a higher tier → no fallback mode to auto-select.
         val available = listOf(

@@ -608,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
-    <string name="downloadsActivityTitle">Letöltések</string>
-    <string name="downloadsActivityNoItemsDescription">Még nincsenek letöltött fájlok</string>
-    <string name="downloadsShareTitle">Megosztás vele…</string>
     <string name="downloadsDownloadFinishedActionName">Megnyitás</string>
-    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
-    <string name="downloadsFileNotFoundErrorMessage">A fájl már nem létezik</string>
-    <string name="downloadsItemMenuShare">Megosztás</string>
-    <string name="downloadsItemMenuDelete">Törlés</string>
-    <string name="downloadsItemMenuCancel">Mégsem</string>
-    <string name="downloadsActivityMenuDeleteAll">Összes törlése</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Törölve: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Összes fájl törölve</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">További lehetőségek a következőhöz: %1$s</string>
-    <string name="downloadsUndoActionName">Visszavonás</string>
-    <string name="downloadsStateInProgress">Folyamatban…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Alkalmazáskövetés elleni védelem</string>
@@ -644,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Kezelt sütik</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
-    <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
 
@@ -1003,5 +987,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Megerősítés</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Köszönjük a visszajelzést!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Megnyitás Fire-lapon</string>
+    <string name="openInBackgroundTab">Megnyitás a háttérben</string>
+    <string name="browserModeToggleFireDescription">Váltás Fire-lapokra</string>
+    <string name="browserModeToggleRegularDescription">Váltás normál lapokra</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-lap</string>
+    <string name="fireTabNewTabPageTitle">Fire-lap</string>
+    <string name="fireTabsEmptyStateTitle">Fire-lapoka</string>
+    <string name="fireTabsFeatureNoHistory">Böngéssz helyi előzmények mentése nélkül</string>
+    <string name="fireTabsFeatureDifferentAccount">Jelentkezz be egy webhelyre másik fiókkal</string>
+    <string name="fireTabsFeatureTroubleshoot">Oldd meg a webhelyekkel kapcsolatos problémákat</string>
+    <string name="fireTabsExplainer">A Fire-lapok elkülönülnek a többi böngészőadattól. Az összes bezárásakor a hozzájuk tartozó adatok törlésre kerülnek. Ugyanazt a követés elleni védelmet nyújtják, mint a többi lap.</string>
+    <string name="fireTabsNewTabButton">Új Fire-lap</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ÚJ! </b> Próbáld ki a Fire-lapokat, és böngéssz helyi előzmények mentése nélkül.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 </resources>

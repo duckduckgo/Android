@@ -83,7 +83,6 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,
     private val dispatcherProvider: DispatcherProvider,
     private val customAiOnboardingFeature: CustomAiOnboardingFeature,
-    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
 
@@ -107,10 +106,9 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
             val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()
-            val orchestratorEnabled = orchestratorFeature.self().isEnabled()
             val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
 
-            val resolution = referrerExists && customAiOnboardingEnabled && orchestratorEnabled && brandDesignEnabled
+            val resolution = referrerExists && customAiOnboardingEnabled && brandDesignEnabled
             preferences.edit { putBoolean(PREFS_KEY_ENABLED, resolution) }
 
             return@withContext resolution

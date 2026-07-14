@@ -199,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Mostrar</string>
     <string name="duck_ai_chat_history_download_error">Não foi possível exportar a conversa</string>
     <string name="duck_ai_chat_history_bulk_download_error">Não foi possível exportar as conversas</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Pesquisar no DuckDuckGo</string>
+    <string name="native_input_chat_hint">Pergunta o que quiseres em privado…</string>
+    <string name="native_input_chat_duck_mode_hint">Responder…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Modo de raciocínio</string>
+    <string name="duckChatReasoningModeFastTitle">Rápido</string>
+    <string name="duckChatReasoningModeFastSubtitle">Responde rapidamente</string>
+    <string name="duckChatReasoningModeReasoningTitle">Raciocínio</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Para tarefas complexas</string>
+    <string name="duckChatReasoningModeExtendedTitle">Raciocínio alargado</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Para tarefas analíticas</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Iniciar chat</string>
+    <string name="duckChatStopStreamingContentDescription">Parar de gerar</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Remover imagem</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Só podes anexar %1$d imagens de cada vez.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Só podes anexar %1$d imagens por conversa.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Tirar fotografia</string>
+    <string name="attachmentAttachPhoto">Adicionar imagem</string>
+    <string name="attachmentAttachFile">Adicionar ficheiro</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Remover ficheiro</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Só podes anexar %1$d ficheiros por conversa.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">O ficheiro excede o tamanho máximo de %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Um dos ficheiros anexados tem mais páginas do que suportamos. Carrega ficheiros com %1$d páginas ou menos.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Os ficheiros anexados excedem o limite total de tamanho de %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Carregar um ficheiro</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Opções do Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Remover %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Criar imagem</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Transformar texto em imagens</string>
+    <string name="duckChatOptionsMenuWebSearch">Pesquisa na Web</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Respostas da web</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Personalizar respostas</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Define o tom, a duração e o comportamento</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Abrir menu do Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Definições do Duck.ai</string>
 </resources>

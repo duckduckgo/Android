@@ -42,3 +42,9 @@ interface ProSettingsPlugin : SettingsPlugin
 interface OtherSettingsPlugin : SettingsPlugin
 
 interface ThreatProtectionSettingsPlugin : SettingsPlugin
+
+/**
+ * This is the plugin for the protections settings section.
+ * The returned view is responsible for managing its own visibility reactively.
+ */
+interface ProtectionsSettingsPlugin : SettingsPlugin

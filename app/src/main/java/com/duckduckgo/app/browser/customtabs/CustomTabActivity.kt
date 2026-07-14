@@ -71,7 +71,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
@@ -101,7 +101,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ) {
         val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
-        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal)
+        val clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA)
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage)
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
@@ -127,6 +128,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             skipHome = true,
             toolbarColor = viewState.toolbarColor,
             isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
+            clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA),
         )
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
@@ -140,6 +142,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             text: String?,
             toolbarColor: Int?,
             isExternal: Boolean,
+            clientPackage: String? = null,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
@@ -148,9 +151,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (toolbarColor != null) {
                     putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 }
+                if (clientPackage != null) {
+                    putExtra(CLIENT_PACKAGE_EXTRA, clientPackage)
+                }
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

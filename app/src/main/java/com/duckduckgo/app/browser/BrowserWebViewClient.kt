@@ -222,7 +222,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
     }
 
     /**
@@ -233,6 +233,7 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
         isRedirect: Boolean,
+        hasGesture: Boolean,
     ): Boolean {
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
@@ -276,7 +277,7 @@ class BrowserWebViewClient @Inject constructor(
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     logcat(INFO) { "Found app link for ${urlType.uriString}" }
                     webViewClientListener?.let { listener ->
-                        return listener.handleAppLink(urlType, isForMainFrame)
+                        return listener.handleAppLink(urlType, isForMainFrame, hasGesture)
                     }
                     false
                 }
@@ -371,7 +372,7 @@ class BrowserWebViewClient @Inject constructor(
                             ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
-                                    listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGesture)
                                 }
 
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -605,7 +606,7 @@ class BrowserWebViewClient @Inject constructor(
         logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
 
         webView.stopLoading()
-        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false, hasGesture = false)
         return true
     }
 

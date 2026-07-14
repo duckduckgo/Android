@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -312,6 +313,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
@@ -515,6 +517,7 @@ class BrowserTabFragment :
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
+    private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -541,6 +544,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var topInContextSections: PluginPoint<TopInContextSection>
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -734,7 +740,7 @@ class BrowserTabFragment :
                 newState: Int,
             ) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    if (nativeInputManager.isNativeInputEnabled()) {
+                    if (nativeInputManager.isNativeInputActive()) {
                         hideKeyboardImmediatelyRetainFocus()
                     } else {
                         hideKeyboardRetainFocus()
@@ -1227,10 +1233,12 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        val omnibarType = settingsDataStore.omnibarType
         omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
+            omnibarType = omnibarType,
             binding = binding,
         )
+
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
@@ -1255,7 +1263,7 @@ class BrowserTabFragment :
         }
 
         if (savedInstanceState == null) {
-            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
+            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -1486,6 +1494,7 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                     viewModel.openDuckChatHistory()
                 },
+                onChatSuggestionDelete = { chatUrl -> showChatSuggestionFireDialog(chatUrl) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1509,6 +1518,8 @@ class BrowserTabFragment :
                 },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
+                onTabSwitcherPressed = { onTabsButtonPressed() },
+                onBrowserMenuPressed = { onBrowserMenuButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
@@ -1619,8 +1630,8 @@ class BrowserTabFragment :
         launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
-    private fun onTabsButtonLongPressed() {
-        launch { viewModel.onNewTabMenuItemClicked(longPress = true) }
+    private fun onTabsButtonLongPressed(): Boolean {
+        return viewModel.onNewTabMenuItemClicked(longPress = true)
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -1644,6 +1655,17 @@ class BrowserTabFragment :
 
     private fun onOmnibarCustomTabClosed() {
         requireActivity().finish()
+    }
+
+    private fun showChatSuggestionFireDialog(chatUrl: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            parentFragmentManager.findFragmentByTag(CHAT_DELETE_DIALOG_TAG)?.let { existing ->
+                parentFragmentManager.commitNow(allowStateLoss = true) { remove(existing) }
+            }
+
+            val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatAutocomplete(chatUrl))
+            dialog.show(parentFragmentManager, CHAT_DELETE_DIALOG_TAG)
+        }
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
@@ -1681,6 +1703,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onPrivacyShieldSelected()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1805,12 +1828,16 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
+            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
+            topInContextSections = topInContextSections.getPlugins(),
+            currentUrl = viewModel.url?.toUri(),
         )
 
         when (browserMode) {
             BrowserMode.FIRE -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.fireTabsNewTabButton))
             }
+
             BrowserMode.REGULAR -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.newTabMenuItem))
             }
@@ -2837,7 +2864,7 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     // Surface the native input widget so its onEnterComplete focuses the input
                     // and brings up the keyboard via the same path as a manual omnibar tap.
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
@@ -2856,7 +2883,7 @@ class BrowserTabFragment :
             }
 
             is Command.DropAddressBarFocus -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     nativeInputManager.hideNativeInput()
                 } else {
                     hideKeyboard()
@@ -2969,7 +2996,7 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     nativeInputManager.setText(it.query)
                 } else {
                     omnibar.setText(it.query)
@@ -3051,7 +3078,7 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> {
-                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground)
+                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground, it.fillHeightDp, it.fillMaxHeightFraction)
                 if (it.backgroundColorAttr != 0) {
                     setNewTabBackgroundColor(it.backgroundColorAttr)
                 }
@@ -3172,6 +3199,8 @@ class BrowserTabFragment :
     private fun setBrowserBackgroundRes(
         @DrawableRes backgroundRes: Int,
         useRebrandBackground: Boolean,
+        fillHeightDp: Float = 0f,
+        fillMaxHeightFraction: Float = 1f,
     ) {
         if (useRebrandBackground) {
             newBrowserTab.browserBackground.apply {
@@ -3181,6 +3210,11 @@ class BrowserTabFragment :
             newBrowserTab.rebrandBrowserBackground.apply {
                 setImageResource(backgroundRes)
                 isVisible = true
+                if (fillHeightDp > 0f) {
+                    setFillHeight(fillHeightDp.toPx(context).toInt(), fillMaxHeightFraction)
+                } else {
+                    clearFill()
+                }
             }
         } else {
             newBrowserTab.rebrandBrowserBackground.gone()
@@ -3912,8 +3946,8 @@ class BrowserTabFragment :
                     this@BrowserTabFragment.onTabsButtonPressed()
                 }
 
-                override fun onTabsButtonLongPressed() {
-                    this@BrowserTabFragment.onTabsButtonLongPressed()
+                override fun onTabsButtonLongPressed(): Boolean {
+                    return this@BrowserTabFragment.onTabsButtonLongPressed()
                 }
 
                 override fun onFireButtonPressed() {
@@ -4070,7 +4104,7 @@ class BrowserTabFragment :
                     hasFocus: Boolean,
                     query: String,
                 ) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
@@ -4086,12 +4120,12 @@ class BrowserTabFragment :
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     onUserEnteredText(state.text, state.hasFocus)
                 }
 
                 override fun onShowSuggestions(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     viewModel.triggerAutocomplete(
                         state.text,
                         state.hasFocus,
@@ -4175,8 +4209,7 @@ class BrowserTabFragment :
             val bindResult = webViewModeInitializer.bind(it, browserMode)
             if (bindResult.isFailure) {
                 if (browserMode != BrowserMode.REGULAR) {
-                    bindResult.exceptionOrNull()?.message?.let {
-                            message ->
+                    bindResult.exceptionOrNull()?.message?.let { message ->
                         logcat(ERROR) { message }
                     }
                     this.closeCurrentTab()
@@ -4836,11 +4869,13 @@ class BrowserTabFragment :
         override fun onOpenInFireTab(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_NEW_FIRE_TAB, RequiredAction.OpenInFireTab(url))
         override fun onOpenInBackgroundTab(url: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(url))
+
         override fun onCopyLinkAddress(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_COPY_URL, RequiredAction.CopyLink(url))
         override fun onShareLink(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_SHARE, RequiredAction.ShareLink(url))
         override fun onDownloadImage(
             imageUrl: String,
         ) = dispatchLongPress(AppPixelName.LONG_PRESS_DOWNLOAD_IMAGE, RequiredAction.DownloadFile(imageUrl))
+
         override fun onOpenImageInNewTab(imageUrl: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(imageUrl))
 
@@ -5432,6 +5467,7 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -5506,6 +5542,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5522,6 +5559,7 @@ class BrowserTabFragment :
 
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
+        private const val CHAT_DELETE_DIALOG_TAG = "CHAT_DELETE_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
@@ -5917,6 +5955,7 @@ class BrowserTabFragment :
             skipHome: Boolean,
             toolbarColor: Int,
             isExternal: Boolean,
+            clientPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -5925,6 +5964,9 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            clientPackage?.let {
+                args.putString(CLIENT_PACKAGE_ARG, it)
+            }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -6259,13 +6301,17 @@ class BrowserTabFragment :
             showCta(cta, instantShow = true)
         }
 
-        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
+        private fun showCta(
+            configuration: Cta,
+            instantShow: Boolean = false,
+        ) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
+
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
@@ -6306,7 +6352,12 @@ class BrowserTabFragment :
             }
 
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                setBrowserBackgroundRes(
+                    configuration.backgroundRes,
+                    useRebrandBackground = true,
+                    fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
+                    fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
+                )
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
                 configureBrandDesignFitListener()
                 brandDesignDialogScrollView.post { configuration.applyFit() }
@@ -6343,6 +6394,7 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {
@@ -6470,6 +6522,7 @@ class BrowserTabFragment :
                     HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
+                        edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
                     object : HomeScreenWidgetBottomSheetDialog.EventListener {
@@ -6772,6 +6825,18 @@ class BrowserTabFragment :
 
     fun dismissDuckAiFireOnboardingCta() {
         viewModel.dismissDuckAiFireOnboardingCta()
+    }
+
+    fun refreshAutoComplete() {
+        nativeInputManager.refreshChatSuggestions()
+    }
+
+    fun onChatDeleteConfirmed() {
+        nativeInputManager.onChatDeleteConfirmed()
+    }
+
+    fun onChatDeleteCancelled() {
+        nativeInputManager.onChatDeleteCancelled()
     }
 }
 

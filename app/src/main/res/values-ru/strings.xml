@@ -618,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Загрузки</string>
-    <string name="downloadsActivityTitle">Загрузки</string>
-    <string name="downloadsActivityNoItemsDescription">Пока ничего не загружено</string>
-    <string name="downloadsShareTitle">Поделиться с…</string>
     <string name="downloadsDownloadFinishedActionName">Открыть</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Файл больше не существует</string>
-    <string name="downloadsItemMenuShare">Поделиться</string>
-    <string name="downloadsItemMenuDelete">Удалить</string>
-    <string name="downloadsItemMenuCancel">Отменить</string>
-    <string name="downloadsActivityMenuDeleteAll">Удалить все</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Удален %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Все файлы удалены</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Другие опции для %1$s</string>
-    <string name="downloadsUndoActionName">Отменить</string>
-    <string name="downloadsStateInProgress">Выполняется…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Блокировка отслеживания приложениями</string>
@@ -654,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
-    <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
 
     <!-- Windows Settings -->
 
@@ -1043,5 +1027,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Подтвердить</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Спасибо за отзыв!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Открыть в Fire-вкладке</string>
+    <string name="openInBackgroundTab">Открыть в фоновом режиме</string>
+    <string name="browserModeToggleFireDescription">Переключиться на Fire-вкладки</string>
+    <string name="browserModeToggleRegularDescription">Перейти на обычные вкладки</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-вкладка</string>
+    <string name="fireTabNewTabPageTitle">Fire-вкладка</string>
+    <string name="fireTabsEmptyStateTitle">Fire-вкладки</string>
+    <string name="fireTabsFeatureNoHistory">Просмотр сайтов без сохранения локальной истории</string>
+    <string name="fireTabsFeatureDifferentAccount">Вход на сайт через другую учетную запись</string>
+    <string name="fireTabsFeatureTroubleshoot">Устранение неполадок с сайтами</string>
+    <string name="fireTabsExplainer">Данные Fire-вкладок изолированы от прочих данных браузера. При закрытии их данные будут уничтожены. Защита от отслеживания в таких вкладках не отличается от стандартной.</string>
+    <string name="fireTabsNewTabButton">Новая Fire-вкладка</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>Новинка!</b> Используйте Fire-вкладки, чтобы просматривать веб-страницы без сохранения локальной истории.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
 </resources>

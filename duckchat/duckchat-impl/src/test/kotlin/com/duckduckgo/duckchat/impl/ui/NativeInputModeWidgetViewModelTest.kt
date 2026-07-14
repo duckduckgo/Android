@@ -62,6 +62,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CompletableDeferred
@@ -87,6 +88,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -116,6 +118,7 @@ class NativeInputModeWidgetViewModelTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
     private val duckAiChatStore: DuckAiChatStore = mock()
+    private val history: NavigationHistory = mock()
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
@@ -140,6 +143,7 @@ class NativeInputModeWidgetViewModelTest {
     private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
+    private val modelStateFlow = MutableStateFlow(ModelState())
     private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
@@ -158,6 +162,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
@@ -186,6 +191,7 @@ class NativeInputModeWidgetViewModelTest {
             nativeInputStateProvider = nativeInputStateProvider,
             modelManager = modelManager,
             duckAiChatStore = duckAiChatStore,
+            history = history,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -561,6 +567,20 @@ class NativeInputModeWidgetViewModelTest {
         entitlementsFlow.value = emptyList()
 
         assertFalse(testee.isPaidTier.firstOrNull()!!)
+    }
+
+    @Test
+    fun whenModelStateSubscriptionEligibleThenIsSubscriptionEligibleTrue() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = true)
+
+        assertTrue(testee.isSubscriptionEligible.firstOrNull()!!)
+    }
+
+    @Test
+    fun whenModelStateNotSubscriptionEligibleThenIsSubscriptionEligibleFalse() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = false)
+
+        assertFalse(testee.isSubscriptionEligible.firstOrNull()!!)
     }
 
     @Test
@@ -1470,6 +1490,31 @@ class NativeInputModeWidgetViewModelTest {
 
     // endregion
 
+    // region fireRecentChatDeleteButtonTappedPixel
+
+    @Test
+    fun whenFireRecentChatDeleteButtonTappedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteButtonTappedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteButtonTapped()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteConfirmedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteConfirmedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteConfirmed()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteCancelledPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteCancelledPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteCancelled()
+    }
+
+    // endregion
+
     // region duckai autocomplete-family pixels
 
     @Test
@@ -1592,6 +1637,58 @@ class NativeInputModeWidgetViewModelTest {
     fun whenStopGenerationTappedThenStopPixel() {
         testee.fireStopGenerationTapped()
         verify(duckChatPixels).fireStopGenerationTapped()
+    }
+
+    // endregion
+
+    // region search-history delete
+
+    @Test
+    fun whenDeleteHistorySuggestionThenRemovesByUrl() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySuggestion(phrase = "q", title = "T", url = "https://example.com", isAllowedInTopHits = true),
+        )
+        advanceUntilIdle()
+
+        verify(history).removeHistoryEntryByUrl("https://example.com")
+    }
+
+    @Test
+    fun whenDeleteHistorySearchSuggestionThenRemovesByQuery() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySearchSuggestion(phrase = "cats", isAllowedInTopHits = true),
+        )
+        advanceUntilIdle()
+
+        verify(history).removeHistoryEntryByQuery("cats")
+    }
+
+    @Test
+    fun whenDeleteNonHistorySuggestionThenNoHistoryRemoval() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteBookmarkSuggestion(phrase = "b", title = "B", url = "https://b"),
+        )
+        advanceUntilIdle()
+
+        verify(history, never()).removeHistoryEntryByUrl(any())
+        verify(history, never()).removeHistoryEntryByQuery(any())
+    }
+
+    @Test
+    fun whenDeleteHistorySuggestionThenOnDeletedInvokedAfterRemoval() = runTest {
+        val onDeleted: () -> Unit = mock()
+
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySuggestion(phrase = "q", title = "T", url = "https://example.com", isAllowedInTopHits = true),
+            onDeleted,
+        )
+        advanceUntilIdle()
+
+        // Refresh callback must fire only after the removal commits, else the re-fetch races the delete.
+        inOrder(history, onDeleted) {
+            verify(history).removeHistoryEntryByUrl("https://example.com")
+            verify(onDeleted).invoke()
+        }
     }
 
     // endregion

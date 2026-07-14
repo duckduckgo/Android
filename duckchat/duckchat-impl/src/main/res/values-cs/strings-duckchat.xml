@@ -201,4 +201,68 @@
     <string name="duck_ai_chat_history_download_view">Zobrazit</string>
     <string name="duck_ai_chat_history_download_error">Nepodařilo se exportovat chat</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nepodařilo se exportovat chaty</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Hledat DuckDuckGo</string>
+    <string name="native_input_chat_hint">Zeptej se soukromě na cokoli…</string>
+    <string name="native_input_chat_duck_mode_hint">Odpovědět…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Režim uvažování</string>
+    <string name="duckChatReasoningModeFastTitle">Rychle</string>
+    <string name="duckChatReasoningModeFastSubtitle">Rychlé odpovědi</string>
+    <string name="duckChatReasoningModeReasoningTitle">Uvažování</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Pro složité úlohy</string>
+    <string name="duckChatReasoningModeExtendedTitle">Rozšířené uvažování</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Pro analytické úlohy</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Zahájit chat</string>
+    <string name="duckChatStopStreamingContentDescription">Přestat generovat</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Odstranit obrázek</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Maximum obrázků, které jde přiložit najednou: %1$d.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Počet obrázků, které můžeš přiložit v jedné konverzaci: %1$d</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Pořídit fotku</string>
+    <string name="attachmentAttachPhoto">Přidat obrázek</string>
+    <string name="attachmentAttachFile">Přidat soubor</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Odstranit soubor</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Počet souborů, které můžeš v jedné konverzaci přiložit: %1$d</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Soubor překračuje maximální velikost %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Jeden z přiložených souborů má více stránek, než kolik podporujeme. Maximální počet stránek v souboru: %1$d.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Přiložené soubory překračují celkovou hranici velikosti %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Nahraj soubor</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Možnosti Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Odstranit %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Vytvořit obrázek</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Převést text na obrázky</string>
+    <string name="duckChatOptionsMenuWebSearch">Webové vyhledávání</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Vyhledávat odpovědi na webu</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Přizpůsobit odpovědi</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Nastavení tónu, délky a chování</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Otevřít nabídku Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Nastavení Duck.ai</string>
 </resources>

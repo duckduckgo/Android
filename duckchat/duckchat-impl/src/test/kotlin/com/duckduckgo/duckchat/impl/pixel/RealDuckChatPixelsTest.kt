@@ -421,6 +421,36 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun whenFireRecentChatDeleteButtonTappedThenCountAndDailyFired() = runTest {
+        testee.fireRecentChatDeleteButtonTapped()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_BUTTON_TAPPED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_BUTTON_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteConfirmedThenCountAndDailyFired() = runTest {
+        testee.fireRecentChatDeleteConfirmed()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_CONFIRMED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_CONFIRMED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteCancelledThenCountAndDailyFired() = runTest {
+        testee.fireRecentChatDeleteCancelled()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_CANCELLED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_CANCELLED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun whenFireSentPromptInChatThenCountAndDailyFired() = runTest {
         testee.fireSentPromptInChat()
 

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -24,10 +25,10 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DownloadMenuHighlightPlugin @Inject constructor(
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
 ) : BrowserMenuHighlightPlugin {
     override fun isHighlighted(mode: BrowserViewMode): Flow<Boolean> {
         if (mode == BrowserViewMode.CustomTab) return flowOf(false)
-        return downloadMenuStateProvider.hasNewDownloadFlow
+        return newDownloadState.hasNewDownloadFlow
     }
 }

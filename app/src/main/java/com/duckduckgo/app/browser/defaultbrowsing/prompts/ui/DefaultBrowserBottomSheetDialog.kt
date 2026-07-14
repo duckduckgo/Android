@@ -23,6 +23,9 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -33,7 +36,17 @@ import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
-class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomSheetDialog(context) {
+class DefaultBrowserBottomSheetDialog(
+    private val context: Context,
+    edgeToEdgeProvider: EdgeToEdgeProvider,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    } else {
+        0
+    },
+) {
 
     private val binding: BottomSheetDefaultBrowserBinding = BottomSheetDefaultBrowserBinding.inflate(LayoutInflater.from(context))
 
@@ -45,6 +58,10 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
         // especially in landscape aspect-ratios. If the dialog started as collapsed, the drag would interfere with internal scroll.
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.dialogRootView.applyBottomSystemBarInsetPadding()
+        }
 
         binding.defaultBrowserBottomSheetDialogTitle.text =
             getString(context, BrowserR.string.defaultBrowserBottomSheetDialogTitle).preventWidows()

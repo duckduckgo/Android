@@ -82,8 +82,15 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
     ) { result ->
-        if (result != EnterCodeContractOutput.Error) {
-            viewModel.onLoginSuccess()
+        when (result) {
+            EnterCodeContractOutput.LoginSuccess,
+            EnterCodeContractOutput.SwitchAccountSuccess,
+            -> viewModel.onLoginSuccess()
+            EnterCodeContractOutput.Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            EnterCodeContractOutput.Cancelled -> {}
         }
     }
 
@@ -132,7 +139,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = false)
     }
 
     override fun onResume() {

@@ -618,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
-    <string name="downloadsActivityTitle">Preuzimanja</string>
-    <string name="downloadsActivityNoItemsDescription">Još nema preuzetih datoteka</string>
-    <string name="downloadsShareTitle">Podijeli s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvori</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datoteka više ne postoji</string>
-    <string name="downloadsItemMenuShare">Podijeli</string>
-    <string name="downloadsItemMenuDelete">Izbriši</string>
-    <string name="downloadsItemMenuCancel">Otkaži</string>
-    <string name="downloadsActivityMenuDeleteAll">Izbriši sve</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="downloadsAllFilesDeletedMessage">Sve su datoteke izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Više opcija za %1$s</string>
-    <string name="downloadsUndoActionName">Poništi</string>
-    <string name="downloadsStateInProgress">U tijeku...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Zaštita od praćenja aplikacija</string>
@@ -654,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
-    <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
     <!-- Windows Settings -->
 
@@ -1043,5 +1027,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potvrdi</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Hvala na povratnim informacijama!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otvori na Fire kartici</string>
+    <string name="openInBackgroundTab">Otvori u pozadini</string>
+    <string name="browserModeToggleFireDescription">Prebaci se na kartice u načinu rada Fire</string>
+    <string name="browserModeToggleRegularDescription">Prebaci se na obične kartice</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire kartica</string>
+    <string name="fireTabNewTabPageTitle">Fire kartica</string>
+    <string name="fireTabsEmptyStateTitle">Fire kartice</string>
+    <string name="fireTabsFeatureNoHistory">Pregledavanje bez spremanja lokalne povijesti</string>
+    <string name="fireTabsFeatureDifferentAccount">Prijavi se na web-mjesto drugim računom</string>
+    <string name="fireTabsFeatureTroubleshoot">Rješavanje problema s web-mjestima</string>
+    <string name="fireTabsExplainer">Fire kartice izolirane su od ostalih podataka preglednika. Njihovi se podaci brišu kada ih sve zatvoriš. Daju ti istu zaštitu od praćenja kao i ostale kartice.</string>
+    <string name="fireTabsNewTabButton">Nova Fire kartica</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Isprobaj Fire kartice za pregledavanje bez spremanja lokalne povijesti.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Želiš li izbrisati Fire kartice i njihove podatke?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
 </resources>

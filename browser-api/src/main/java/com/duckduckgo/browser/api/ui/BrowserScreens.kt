@@ -16,6 +16,7 @@
 
 package com.duckduckgo.browser.api.ui
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
@@ -56,4 +57,11 @@ sealed class BrowserScreens {
      * Use this model to launch the Tab Switcher screen
      */
     data object TabSwitcherScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the Tab Switcher screen in a specific [browserMode]. When [browserMode]
+     * differs from the active mode, the Tab Switcher switches to it on open. Use [TabSwitcherScreenNoParams]
+     * to open in the current mode.
+     */
+    data class TabSwitcherScreenWithParams(val browserMode: BrowserMode) : GlobalActivityStarter.ActivityParams
 }

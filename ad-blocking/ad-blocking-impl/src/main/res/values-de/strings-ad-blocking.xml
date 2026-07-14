@@ -23,4 +23,22 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blockiert Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Öffnet Videos in einem ablenkungsfreien Theatermodus, der verhindert, dass das, was du ansiehst, deinen YouTube-Feed beeinflusst.</string>
+    <string name="ad_blocking_settings_title_v2">Werbeblockierung</string>
+    <string name="ad_blocking_settings_header_description">Blockiert invasive Tracker, bevor sie geladen werden, und eliminiert so effektiv Werbung, die auf Tracking basiert.</string>
+    <string name="contingencyMessageTitle">YouTube-Werbeblocker nicht verfügbar</string>
+    <string name="contingencyMessageContent">Die Werbeblockierung wurde durch die jüngsten Änderungen bei YouTube beeinträchtigt. Vielen Dank für dein Verständnis, während wir daran arbeiten, diese Probleme zu beheben.</string>
+    <string name="contingencyMessagePrimaryButton">Verstanden</string>
+    <string name="contingencyMessageCloseContentDescription">Schließen</string>
+    <string name="ad_blocking_menu_disable">YouTube-Werbeblocker deaktivieren</string>
+    <string name="ad_blocking_menu_enable">YouTube-Werbeblockierung aktivieren</string>
+    <string name="ad_blocking_menu_title">YouTube-Werbeblockierung</string>
+    <string name="ad_blocking_menu_close_content_description">Schließen</string>
+    <string name="ad_blocking_menu_always_on">Immer aktiviert</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Deaktivieren bis zum Neustart</string>
+    <string name="ad_blocking_menu_always_off">Immer aus</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube-Werbeblockierung funktioniert nicht?</string>
+    <string name="ad_blocking_disabled_popup_description">Sende einen anonymen Störungsbericht an DuckDuckGo. Hilf mit, den Werbeblocker für alle zu verbessern!</string>
+    <string name="ad_blocking_disabled_primary_action">Störungsbericht senden</string>
+    <string name="ad_blocking_disabled_secondary_action">Abbrechen</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiviert bis zum Neustart</string>
 </resources>

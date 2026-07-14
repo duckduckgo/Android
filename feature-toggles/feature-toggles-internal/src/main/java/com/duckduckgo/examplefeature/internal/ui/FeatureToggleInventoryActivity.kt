@@ -31,6 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
@@ -68,6 +69,9 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var moshi: Moshi
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val featureNameFilter = MutableStateFlow("")
     private val allToggles = MutableStateFlow<List<Toggle>?>(null)
 
@@ -92,7 +96,9 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
         setupRecyclerView()
         binding.searchName.addTextChangedListener(searchTextWatcher)
@@ -103,6 +109,12 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                 launch { observeFilteredToggles() }
             }
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.recyclerView)
     }
 
     private fun setupRecyclerView() {

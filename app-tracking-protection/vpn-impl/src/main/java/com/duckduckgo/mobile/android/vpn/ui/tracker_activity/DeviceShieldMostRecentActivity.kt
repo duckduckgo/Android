@@ -57,7 +57,6 @@ class DeviceShieldMostRecentActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.activityList, drawBehindGestureNav = true)
     }
 
     override fun onBackPressed() {

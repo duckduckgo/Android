@@ -194,7 +194,6 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -349,6 +348,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -363,6 +363,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -573,7 +574,7 @@ class BrowserTabViewModel @Inject constructor(
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
@@ -755,7 +756,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
-    private var isCustomTabScreen: Boolean = false
+
+    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
+     * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
+    private data class CustomTabContext(val clientPackage: String?)
+    private var customTab: CustomTabContext? = null
+
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
@@ -1020,8 +1026,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun setIsCustomTab(isCustomTab: Boolean) {
-        this.isCustomTabScreen = isCustomTab
+    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null) {
+        this.customTab = if (isCustomTab) CustomTabContext(clientPackage) else null
     }
 
     fun onViewReady() {
@@ -1508,6 +1514,10 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
+        if (cta != null) {
+            ctaViewModel.onContextualSearchSubmitted(cta, query)
+        }
+
         command.value = HideKeyboard
         val trimmedInput = query.trim()
 
@@ -1739,7 +1749,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     override fun closeCurrentTab() {
-        if (isCustomTabScreen) {
+        if (customTab != null) {
             command.value = Command.NavigateBackInCustomTab
         } else {
             viewModelScope.launch {
@@ -3583,7 +3593,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+    fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
+        val state = currentBrowserViewState()
+        val isOnNewTabPage = !state.browserShowing && !state.maliciousSiteBlocked && state.sslError == NONE
+        if (longPress && isOnNewTabPage) {
+            return false
+        }
+
         openNewTab()
 
         if (longPress) {
@@ -3598,6 +3614,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+
+        return true
     }
 
     fun onNavigationBarNewTabButtonClicked() {
@@ -3796,13 +3814,17 @@ class BrowserTabViewModel @Inject constructor(
     override fun handleAppLink(
         appLink: AppLink,
         isForMainFrame: Boolean,
-    ): Boolean =
-        appLinksHandler.handleAppLink(
+        hasGesture: Boolean,
+    ): Boolean {
+        return appLinksHandler.handleAppLink(
             isForMainFrame,
-            appLink.uriString,
+            appLink,
+            hasGesture,
+            customTab?.clientPackage,
             appSettingsPreferencesStore.appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
         ) { appLinkClicked(appLink) }
+    }
 
     fun openAppLink() {
         browserViewState.value?.previousAppLink?.let { appLink ->
@@ -3831,7 +3853,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun appLinkClicked(appLink: AppLink) {
         command.value = when {
             // When in custom tab, always open the app link directly, without prompting.
-            isCustomTabScreen -> OpenAppLink(appLink)
+            customTab != null -> OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
             else -> OpenAppLink(appLink)
         }
@@ -3879,7 +3901,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun handleDuckChatUrlInCustomTab(uri: Uri): Boolean {
-        if (!isCustomTabScreen) return false
+        if (customTab == null) return false
         if (!androidBrowserConfig.redirectDuckAiLinksFromCustomTab().isEnabled()) return false
 
         openDuckChatForUrl(uri)
@@ -4095,7 +4117,7 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfFileName = pdfTitle,
                     )
                     command.value = ShowPdfInTab(url, result.uri)
-                    if (!isCustomTabScreen && pdfDownloadTooltipDataStore.canShow()) {
+                    if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
                         pdfDownloadTooltipDataStore.incrementShownCount()
                         command.value = Command.ShowPdfDownloadTooltip
                     }
@@ -4181,7 +4203,7 @@ class BrowserTabViewModel @Inject constructor(
                         filePath = savedFilePath,
                     ),
                 )
-                downloadMenuStateProvider.onDownloadComplete()
+                newDownloadState.onDownloadComplete()
                 pdfDownloadCommandFlow.emit(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadFinishedMessage,
@@ -4707,7 +4729,7 @@ class BrowserTabViewModel @Inject constructor(
     fun handleNewTabIfEmptyUrl() {
         val shouldDisplayAboutBlank = webNavigationState == null
         if (shouldDisplayAboutBlank) {
-            if (isCustomTabScreen) {
+            if (customTab != null) {
                 handleNewTabForEmptyUrlOnCustomTab()
             }
             omnibarViewState.value = currentOmnibarViewState().copy(
@@ -5279,6 +5301,10 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
 
+        if (cta != null) {
+            ctaViewModel.onContextualFireButtonEngaged(cta)
+        }
+
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             return
@@ -5303,8 +5329,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPrivacyShieldSelected() {
+        currentCtaViewState().cta?.let { ctaViewModel.onContextualTrackersBlockedShieldEngaged(it) }
+    }
+
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
+        if (cta != null) {
+            ctaViewModel.onContextualSiteLinkTapped(cta)
+        }
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
@@ -5412,6 +5445,8 @@ class BrowserTabViewModel @Inject constructor(
                 cta.backgroundRes,
                 useRebrandBackground = true,
                 backgroundColorAttr = com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop,
+                fillHeightDp = cta.backgroundFillSpec?.heightDpFor(cta.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = cta.backgroundFillSpec?.maxHeightFraction ?: 1f,
             )
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
@@ -5581,7 +5616,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when {
-            duckAiFeatureState.showContextualMode.value && !isNtp -> {
+            // Contextual chat is about the page you're viewing, so it's only offered from the
+            // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
+            // Duck.ai.
+            duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
                 command.value = Command.ShowDuckAIContextualMode(tabId)
             }
 

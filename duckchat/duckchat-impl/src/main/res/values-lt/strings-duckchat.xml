@@ -201,4 +201,68 @@
     <string name="duck_ai_chat_history_download_view">Rodyti</string>
     <string name="duck_ai_chat_history_download_error">Nepavyko eksportuoti pokalbio</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nepavyko eksportuoti pokalbių</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Ieškoti sistemoje „DuckDuckGo“</string>
+    <string name="native_input_chat_hint">Klausk bet ko privačiai…</string>
+    <string name="native_input_chat_duck_mode_hint">Atsakyk…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Samprotavimo režimas</string>
+    <string name="duckChatReasoningModeFastTitle">Greitas</string>
+    <string name="duckChatReasoningModeFastSubtitle">Atsako greitai</string>
+    <string name="duckChatReasoningModeReasoningTitle">Samprotavimas</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Sudėtingoms užduotims</string>
+    <string name="duckChatReasoningModeExtendedTitle">Išplėstinis samprotavimas</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Analitinėms užduotims</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Pradėti pokalbį</string>
+    <string name="duckChatStopStreamingContentDescription">Stabdyti generavimą</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Pašalinti vaizdą</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Vienu metu gali pridėti tik %1$d vaizdus (-ų).</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Viename pokalbyje galima pridėti tik %1$d vaizdus (-ų).</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Nufotografuoti</string>
+    <string name="attachmentAttachPhoto">Pridėti vaizdą</string>
+    <string name="attachmentAttachFile">Pridėti failą</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Pašalinti failą</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Viename pokalbyje gali pridėti tik %1$d failus (-ų)</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Failas viršija didžiausią leistiną %1$d MB dydį.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Vienas iš pridėtų failų turi daugiau puslapių, nei palaikoma. Įkelk failus, turinčius %1$d ar mažiau puslapių.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Pridėti failai viršija bendrą %1$d MB dydžio ribą.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Įkelti failą</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">„Duck.ai“ parinktys</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Pašalinti %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Kurti vaizdą</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Paversti tekstą vaizdais</string>
+    <string name="duckChatOptionsMenuWebSearch">Paieška internete</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Rasti atsakymus internete</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Tinkinti atsakymus</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Nustatyti toną, ilgį ir elgseną</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Atidaryti „Duck.ai“ meniu</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">„Duck.ai“ nuostatos</string>
 </resources>

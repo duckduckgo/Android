@@ -33,7 +33,7 @@
         android:scaleType="centerCrop"
         tools:srcCompat="@drawable/onboarding_background_bitmap_light" />
 
-    <ImageView
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
         android:id="@+id/rebrandBrowserBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

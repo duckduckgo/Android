@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -51,6 +52,7 @@ class FakeDuckChatInternal(
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val nativeChatInputEnabled = MutableStateFlow(false)
+    private val nativeInputNavBarEnabled = MutableStateFlow(false)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
     private val areMultipleContentAttachmentsEnabled = MutableStateFlow<Boolean>(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
@@ -96,6 +98,7 @@ class FakeDuckChatInternal(
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
+    override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = nativeInputNavBarEnabled
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean = standaloneMigrationCompleted.value
 
@@ -242,6 +245,9 @@ class FakeDuckChatInternal(
     private val _inputQuery = MutableStateFlow("")
 
     override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
+
+    val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
+    override val inputModeCapability: StateFlow<NativeInputState.InputMode> = inputModeCapabilityFlow.asStateFlow()
 
     override fun setInputQuery(query: String) {
         _inputQuery.value = query

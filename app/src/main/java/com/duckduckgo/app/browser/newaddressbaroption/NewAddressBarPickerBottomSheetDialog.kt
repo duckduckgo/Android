@@ -35,6 +35,7 @@ import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBinding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.utils.extensions.html
@@ -58,7 +59,15 @@ class NewAddressBarPickerBottomSheetDialog(
     private val context: Context,
     private val isLightMode: Boolean,
     private val callback: NewAddressBarCallback?,
-) : BottomSheetDialog(onboardingThemedContext(context), R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker) {
+    private val edgeToEdgeEnabled: Boolean,
+) : BottomSheetDialog(
+    onboardingThemedContext(context),
+    if (edgeToEdgeEnabled) {
+        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge
+    } else {
+        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker
+    },
+) {
 
     private val binding: BottomSheetNewAddressBarPickerBinding =
         BottomSheetNewAddressBarPickerBinding.inflate(LayoutInflater.from(context))
@@ -70,6 +79,9 @@ class NewAddressBarPickerBottomSheetDialog(
 
     init {
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         this.behavior.isDraggable = false
         this.behavior.isHideable = false

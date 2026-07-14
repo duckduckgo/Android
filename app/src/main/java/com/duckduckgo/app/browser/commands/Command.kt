@@ -466,6 +466,8 @@ sealed class Command {
         @DrawableRes val backgroundRes: Int,
         val useRebrandBackground: Boolean = false,
         @AttrRes val backgroundColorAttr: Int = 0,
+        val fillHeightDp: Float = 0f,
+        val fillMaxHeightFraction: Float = 1f,
     ) : Command()
 
     class SetOnboardingDialogBackground(

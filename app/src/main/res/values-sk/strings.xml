@@ -618,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stiahnuté</string>
-    <string name="downloadsActivityTitle">Stiahnuté</string>
-    <string name="downloadsActivityNoItemsDescription">Zatiaľ žiadne stiahnuté súbory</string>
-    <string name="downloadsShareTitle">Zdieľať s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvorené</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Súbor už neexistuje</string>
-    <string name="downloadsItemMenuShare">Zdieľať</string>
-    <string name="downloadsItemMenuDelete">Vymazať</string>
-    <string name="downloadsItemMenuCancel">Zrušiť</string>
-    <string name="downloadsActivityMenuDeleteAll">Odstrániť všetko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Zmazané: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Všetky súbory sa odstránili</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Viac možností pre %1$s</string>
-    <string name="downloadsUndoActionName">Vrátenie späť</string>
-    <string name="downloadsStateInProgress">Prebieha…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
@@ -654,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
-    <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
 
     <!-- Windows Settings -->
 
@@ -1043,5 +1027,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potvrdiť</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Ďakujeme za spätnú väzbu!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otvoriť na karte Fire</string>
+    <string name="openInBackgroundTab">Otvoriť na pozadí</string>
+    <string name="browserModeToggleFireDescription">Prejdi na karty v režime Fire</string>
+    <string name="browserModeToggleRegularDescription">Prepnúť na bežné karty</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Karta Fire</string>
+    <string name="fireTabNewTabPageTitle">Karta Fire</string>
+    <string name="fireTabsEmptyStateTitle">Karty Fire</string>
+    <string name="fireTabsFeatureNoHistory">Prehliadaj bez lokálneho ukladania histórie</string>
+    <string name="fireTabsFeatureDifferentAccount">Prihlás sa na stránku s iným účtom</string>
+    <string name="fireTabsFeatureTroubleshoot">Riešenie problémov s webovými stránkami</string>
+    <string name="fireTabsExplainer">Karty Fire sú izolované od ostatných údajov prehliadača. Keď ich všetky zatvoríš, ich údaje sa vymažú. Poskytujú ti rovnakú ochranu proti sledovaniu ako ostatné karty.</string>
+    <string name="fireTabsNewTabButton">Nová karta Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyskúšaj karty Fire na prehliadanie bez ukladania do lokálnej histórie.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Chceš vymazať karty Fire a ich údaje?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
 </resources>

@@ -608,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">Noch keine Dateien heruntergeladen</string>
-    <string name="downloadsShareTitle">Teilen mit …</string>
     <string name="downloadsDownloadFinishedActionName">Öffnen</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datei existiert nicht mehr</string>
-    <string name="downloadsItemMenuShare">Teilen</string>
-    <string name="downloadsItemMenuDelete">Löschen</string>
-    <string name="downloadsItemMenuCancel">Abbrechen</string>
-    <string name="downloadsActivityMenuDeleteAll">Alle löschen</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s gelöscht</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle Dateien gelöscht</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mehr Optionen für %1$s</string>
-    <string name="downloadsUndoActionName">Rückgängig machen</string>
-    <string name="downloadsStateInProgress">In Bearbeitung …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Schutz gegen App-Tracking</string>
@@ -644,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies verwaltet</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Erfahre, wann Downloads bereit sind</string>
-    <string name="downloadsNotifyMeSubtitle">Erhalte eine Benachrichtigung, wenn Downloads abgeschlossen sind.</string>
 
     <!-- Windows Settings -->
 
@@ -1003,5 +987,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bestätigen</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Vielen Dank für dein Feedback!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">In einem Fire-Tab öffnen</string>
+    <string name="openInBackgroundTab">Im Hintergrund öffnen</string>
+    <string name="browserModeToggleFireDescription">Zu Fire-Modus-Tabs wechseln</string>
+    <string name="browserModeToggleRegularDescription">Zu regulären Tabs wechseln</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-Tab</string>
+    <string name="fireTabNewTabPageTitle">Fire-Tab</string>
+    <string name="fireTabsEmptyStateTitle">Fire-Tabs</string>
+    <string name="fireTabsFeatureNoHistory">Durchsuchen ohne Speichern des lokalen Verlaufs</string>
+    <string name="fireTabsFeatureDifferentAccount">Melde dich mit einem anderen Konto bei einer Website an</string>
+    <string name="fireTabsFeatureTroubleshoot">Website-Fehlerbehebung</string>
+    <string name="fireTabsExplainer">Fire Tabs sind von anderen Browserdaten isoliert. Ihre Daten werden gelöscht, wenn du alle Fenster schließt. Sie haben den gleichen Tracking-Schutz wie andere Tabs.</string>
+    <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
 </resources>

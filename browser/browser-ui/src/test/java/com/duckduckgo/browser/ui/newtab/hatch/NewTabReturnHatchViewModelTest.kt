@@ -29,6 +29,8 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -57,6 +59,8 @@ class NewTabReturnHatchViewModelTest {
 
     private val mockTabRepository: TabRepository = mock()
     private val mockDuckChat: DuckChat = mock()
+    private val mockDuckChatInputModeState: DuckChatInputModeState = mock()
+    private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockPixel: Pixel = mock()
@@ -72,6 +76,7 @@ class NewTabReturnHatchViewModelTest {
     // Starts false so each test controls the idle-return rising edge that captures the snapshot.
     private val afterIdleReturnFlow = MutableStateFlow(false)
     private val nativeInputEnabledFlow = MutableStateFlow(true)
+    private val navBarEnabledFlow = MutableStateFlow(false)
     private val returnToLastTabEnabledFlow = MutableStateFlow(true)
 
     private lateinit var testee: NewTabReturnHatchViewModel
@@ -83,12 +88,15 @@ class NewTabReturnHatchViewModelTest {
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
         whenever(mockNtpAfterIdleManager.returnToLastTabEnabled).thenReturn(returnToLastTabEnabledFlow)
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
+        whenever(mockDuckChat.observeNativeInputNavBarEnabled()).thenReturn(navBarEnabledFlow)
+        whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
 
         testee = NewTabReturnHatchViewModel(
             currentTabRepository = mockTabRepository,
             tabRepositoryProvider = tabRepositoryProvider,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             duckChat = mockDuckChat,
+            duckChatInputModeState = mockDuckChatInputModeState,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             escapeHatchTargetResolver = mockResolver,
@@ -305,6 +313,31 @@ class NewTabReturnHatchViewModelTest {
     @Test
     fun whenNativeInputDisabledThenShowTabsButtonIsFalse() = runTest {
         nativeInputEnabledFlow.value = false
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().showTabsButton)
+        }
+    }
+
+    @Test
+    fun whenNavBarFeatureEnabledInSearchAndDuckAiThenShowTabsButtonIsFalse() = runTest {
+        nativeInputEnabledFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        navBarEnabledFlow.value = true
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().showTabsButton)
+        }
+    }
+
+    @Test
+    fun whenNativeInputEnabledButSearchOnlyThenShowTabsButtonIsFalse() = runTest {
+        nativeInputEnabledFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         testee.viewState.test {

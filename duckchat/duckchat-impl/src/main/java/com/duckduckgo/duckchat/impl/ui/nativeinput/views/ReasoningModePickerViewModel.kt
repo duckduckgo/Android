@@ -151,7 +151,7 @@ class ReasoningModePickerViewModel @Inject constructor(
             logcat { "Duck.ai reasoning picker: gated mode $mode has no public required tier, ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin)?.let { upsell ->
+        routeUpsell(userTier, requiredTier, surface.origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
                 source = "reasoning_picker",
                 currentTier = userTier.toParam(),

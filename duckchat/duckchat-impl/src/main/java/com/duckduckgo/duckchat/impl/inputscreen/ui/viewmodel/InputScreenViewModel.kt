@@ -331,7 +331,7 @@ class InputScreenViewModel @AssistedInject constructor(
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
-        combine(
+        combine<Any, Unit>(
             voiceServiceAvailable,
             voiceInputAllowed,
             isSearchModeFlow,

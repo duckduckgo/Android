@@ -25,4 +25,8 @@ enum class EdgeToEdgeBucket {
     AUTOFILL,
     SYNC,
     VPN,
+    WEBVIEW,
+    ONBOARDING,
+    MISC,
+    BOTTOM_SHEETS,
 }

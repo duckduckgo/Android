@@ -130,7 +130,6 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = true)
     }
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {

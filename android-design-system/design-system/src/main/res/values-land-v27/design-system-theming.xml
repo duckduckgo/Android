@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!--
+      Landscape override: reserve the display cutout as a dark letterbox for edge-to-edge splash-themed
+      screens. The base splash theme (AndroidX Theme.SplashScreen) forces "shortEdges", which persists over
+      the runtime cutout handling, so we set "never" declaratively here where there is no timing race.
+
+      Lives in values-land-v27 because android:windowLayoutInDisplayCutoutMode requires API 27 (module minSdk
+      is 26). Devices below API 27 have no display cutout, so they correctly fall back to the empty base
+      subclass in values/.
+    -->
+    <style name="Theme.DuckDuckGo.SplashScreen.EdgeToEdge" parent="Theme.DuckDuckGo.SplashScreen">
+        <item name="android:windowLayoutInDisplayCutoutMode">never</item>
+    </style>
+
+</resources>

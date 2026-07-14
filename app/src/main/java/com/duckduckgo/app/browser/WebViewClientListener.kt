@@ -81,6 +81,7 @@ interface WebViewClientListener {
     fun handleAppLink(
         appLink: SpecialUrlDetector.UrlType.AppLink,
         isForMainFrame: Boolean,
+        hasGesture: Boolean,
     ): Boolean
 
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean

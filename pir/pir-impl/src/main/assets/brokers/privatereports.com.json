@@ -1,7 +1,7 @@
 {
   "name": "PrivateReports",
   "url": "privatereports.com",
-  "version": "0.996.1",
+  "version": "0.997.0",
   "optOutUrl": "https://www.privatereports.com/api/helper/optOutLight/search",
   "steps": [
     {
@@ -73,72 +73,79 @@
           "expectations": [
             {
               "type": "element",
-              "selector": ".header"
-            }
-          ],
-          "id": "99db0f13-8684-4e59-ba7a-56d994f3e37e"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
             }
           ],
           "id": "6d9a398c-b73d-496a-bd2d-38d725f89b5e"
         },
         {
-          "actionType": "condition",
-          "_comment": "captcha is not always present at this stage",
-          "expectations": [
+          "actionType": "getCaptchaInfo",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+          "id": "1f123c7a-aef4-ae11-bccc-0a11b2c3d4e5"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+          "id": "8793bcd5-e0a6-4c23-a202-26441c35ff6a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
             {
-              "type": "element",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]",
-              "failSilently": true
+              "type": "button",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
             }
           ],
-          "actions": [
-            {
-              "actionType": "getCaptchaInfo",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
-              "id": "1f123c7a-aef4-ae11-bccc-0a11b2c3d4e5"
-            },
-            {
-              "actionType": "solveCaptcha",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
-              "id": "8793bcd5-e0a6-4c23-a202-26441c35ff6a"
-            },
-            {
-              "actionType": "click",
-              "failSilently": true,
-              "elements": [
-                {
-                  "type": "button",
-                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
-                }
-              ],
-              "id": "b12b0603-0ef9-4de6-97e9-0fd426b7cae1"
-            }
-          ],
-          "id": "9b7a7b96-9ef5-470d-8479-1bedca58b188"
+          "id": "b12b0603-0ef9-4de6-97e9-0fd426b7cae1"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": ".header"
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]"
             }
           ],
-          "id": "cc46f244-d6c8-421b-8e94-02bcde556f5b"
+          "id": "b8755244-76cc-467b-90e6-d545d3f985b6"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//img[starts-with(@src, 'data:')]",
+          "id": "a2d1b8a4-2973-40d3-820f-1451daff0d5d"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//input",
+          "id": "9cb73518-0935-4325-9031-a04d8dc2fb3b"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//button"
+            }
+          ],
+          "id": "bd23fa8a-7ab8-4a5a-a076-112666f3e2e1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(text(), 'Select the person')]"
+            }
+          ],
+          "id": "e8630131-ee9f-4100-a691-2d9de7aefaba"
         },
         {
           "actionType": "extract",
           "selector": "//h2[contains(text(), 'Select the person')]/following-sibling::div/div",
-          "noResultsSelector": "//p[contains(text(), 'unable to find')]|//p[contains(text(), 'Too many')]",
+          "noResultsSelector": "//h1[contains(text(), 'unable to find')]",
           "profile": {
             "name": {
               "selector": ".//span[contains(text(), 'Name')]/following-sibling::span[1]"
@@ -165,7 +172,7 @@
         {
           "actionType": "navigate",
           "url": "https://www.privatereports.com/api/helper/optOutLight/search",
-          "id": "14fbe352-5ff1-4b48-a50a-454aa1c8aec4"
+          "id": "ee6bd15e-5721-45d3-a832-8068744d612d"
         },
         {
           "actionType": "expectation",
@@ -175,7 +182,7 @@
               "selector": "#pageForm"
             }
           ],
-          "id": "75f9fc71-1f4d-495a-b0c8-5b8df0f24e98"
+          "id": "3ba9becd-8619-4dfa-9d07-c69c1e2237e5"
         },
         {
           "actionType": "fillForm",
@@ -199,7 +206,7 @@
               "selector": "select[name='state']"
             }
           ],
-          "id": "a541b4f0-1d03-40f4-8bef-dd6edba7e0c3"
+          "id": "39d9bb44-d7f5-4e98-ad96-d98bbc1f6f76"
         },
         {
           "actionType": "click",
@@ -209,7 +216,7 @@
               "selector": "#pageFormSubmitBtn"
             }
           ],
-          "id": "c91a389d-3079-4537-9d39-f7b8a49ebec4"
+          "id": "d66f174b-d372-4084-80e0-05a3a2970361"
         },
         {
           "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
@@ -220,17 +227,7 @@
               "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "cft-44601f5a-1243-434b-b1ef-974254ccb679"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": ".header"
-            }
-          ],
-          "id": "0af33833-87a8-40d8-835e-347bcf1d0f00"
+          "id": "cft-239f0d73-9586-466b-a0ba-ded853a52f9c"
         },
         {
           "actionType": "expectation",
@@ -240,54 +237,71 @@
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
             }
           ],
-          "id": "d059eb01-9fda-46d2-8759-50370c724392"
+          "id": "4661fde9-a2b3-4737-a6e8-04abcd52dd9d"
         },
         {
-          "actionType": "condition",
-          "_comment": "captcha is not always present at this stage",
-          "expectations": [
+          "actionType": "getCaptchaInfo",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+          "id": "28daef47-0f65-470d-842a-a24f4bc7f450"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+          "id": "fdee849f-750d-4c38-bb2e-1c9d1323a370"
+        },
+        {
+          "actionType": "click",
+          "elements": [
             {
-              "type": "element",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]",
-              "failSilently": true
+              "type": "button",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
             }
           ],
-          "actions": [
-            {
-              "actionType": "getCaptchaInfo",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
-              "id": "8fcffef9-0af4-47b4-9fee-55f7c7ca0079"
-            },
-            {
-              "actionType": "solveCaptcha",
-              "captchaType": "image",
-              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
-              "id": "a1978d37-638a-4917-b7b6-39504adcb803"
-            },
-            {
-              "actionType": "click",
-              "failSilently": true,
-              "elements": [
-                {
-                  "type": "button",
-                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
-                }
-              ],
-              "id": "e94074e2-930a-442f-970e-10e088a9002f"
-            }
-          ],
-          "id": "35643322-f1fd-45fd-83e6-9b7c63d62053"
+          "id": "ee7cd4ca-07b6-4490-8112-cd6582723469"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": ".header"
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]"
             }
           ],
-          "id": "4d557643-bf75-4fdc-9f1d-1f47723293bd"
+          "id": "7b081c3a-cc08-4922-b849-ffefc3b721d1"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//img[starts-with(@src, 'data:')]",
+          "id": "110404fa-06c3-4c69-b85e-57e0dd5e2303"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//input",
+          "id": "e532f947-c6cf-470f-b4fb-9dfc648b2184"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//button"
+            }
+          ],
+          "id": "5cf2cbdf-0e25-49af-89e0-7b5497c1e482"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(text(), 'Select the person')]"
+            }
+          ],
+          "id": "2a4c2673-8e72-4e8c-95ab-481a86421dfb"
         },
         {
           "actionType": "click",
@@ -368,6 +382,81 @@
           "id": "d9a240ff-2e91-4232-b247-6764d5b7db8f"
         },
         {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-a4a2d933-1880-4e4d-9b72-8e34c429ba53"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "id": "ad035257-2b44-4c48-a012-1ac20bb54659"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+          "id": "f09c5855-e04e-42cf-9a49-4a8c6f8ae058"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+          "id": "a60b20ce-0b68-41ec-bbd5-beaaf3b1c8e8"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
+            }
+          ],
+          "id": "12517d5c-a7f7-4a38-bb6b-b9ed3bf5408c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]"
+            }
+          ],
+          "id": "316a7e0a-af1f-4c5e-8614-f4d326fa3dd9"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//img[starts-with(@src, 'data:')]",
+          "id": "8477f1e0-1bc7-4cc5-9894-b7e2681b90b9"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "basic-math",
+          "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//input",
+          "id": "04440dfa-863f-4d9a-89ba-28b2282a41bb"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//img[starts-with(@src, 'data:')] and .//input and .//button]//button"
+            }
+          ],
+          "id": "b4e41f44-b879-42aa-846d-a02f870ea65b"
+        },
+        {
           "actionType": "expectation",
           "expectations": [
             {
@@ -383,14 +472,47 @@
           "id": "d0cf178e-ffb5-4966-9312-25eef0f78731"
         },
         {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": ".header"
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "7e8a82ae-d3b9-4c29-999a-1e2c25a04416"
+          "id": "cft-203fd0d5-805e-40a0-9478-0e793fdc0a8f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "id": "8d6e9ab4-579a-4875-841f-b5f888093f37"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+          "id": "0906664c-099e-46bc-b8aa-62bda03c6273"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "image",
+          "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+          "id": "ea4bded6-af20-4f67-85b9-2e402980f06f"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
+            }
+          ],
+          "id": "00731d9d-3da4-4b54-8601-6d50a343cc8f"
         },
         {
           "actionType": "expectation",

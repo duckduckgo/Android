@@ -608,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Téléchargements</string>
-    <string name="downloadsActivityTitle">Téléchargements</string>
-    <string name="downloadsActivityNoItemsDescription">Aucun fichier n\'a encore été téléchargé</string>
-    <string name="downloadsShareTitle">Partager avec…</string>
     <string name="downloadsDownloadFinishedActionName">Ouvrir</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Le fichier n\'existe plus</string>
-    <string name="downloadsItemMenuShare">Partager</string>
-    <string name="downloadsItemMenuDelete">Supprimer</string>
-    <string name="downloadsItemMenuCancel">Annuler</string>
-    <string name="downloadsActivityMenuDeleteAll">Tout supprimer</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
-    <string name="downloadsAllFilesDeletedMessage">Tous les fichiers sont supprimés.</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Plus d\'options pour %1$s</string>
-    <string name="downloadsUndoActionName">Annuler</string>
-    <string name="downloadsStateInProgress">En cours...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Protection contre le suivi des applications</string>
@@ -644,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies gérés</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Sachez quand les téléchargements sont prêts</string>
-    <string name="downloadsNotifyMeSubtitle">Recevez une notification lorsque les téléchargements sont terminés.</string>
 
     <!-- Windows Settings -->
 
@@ -1003,5 +987,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Confirmer</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Merci pour vos commentaires !</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Ouvrir dans l\'onglet Fire</string>
+    <string name="openInBackgroundTab">Ouvrir en arrière-plan</string>
+    <string name="browserModeToggleFireDescription">Passer aux onglets en mode Fire</string>
+    <string name="browserModeToggleRegularDescription">Passer aux onglets classiques</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Onglet Fire</string>
+    <string name="fireTabNewTabPageTitle">Onglet Fire</string>
+    <string name="fireTabsEmptyStateTitle">Onglets Fire</string>
+    <string name="fireTabsFeatureNoHistory">Parcourir sans enregistrer l\'historique local</string>
+    <string name="fireTabsFeatureDifferentAccount">Se connecter à un site avec un autre compte</string>
+    <string name="fireTabsFeatureTroubleshoot">Résoudre les problèmes des sites Web</string>
+    <string name="fireTabsExplainer">Les onglets Fire sont isolés des autres données du navigateur. Leurs données sont supprimées lorsque vous les fermez tous. Ils sont dotés de la même protection contre le pistage que les autres onglets.</string>
+    <string name="fireTabsNewTabButton">Nouvel onglet Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOUVEAU !</b> Essayez les onglets Fire pour naviguer sans enregistrer l\'historique local.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Supprimer les onglets Fire et leurs données ?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
 </resources>

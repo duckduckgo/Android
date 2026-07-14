@@ -28,13 +28,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         layout="@layout/include_default_toolbar" />
 
-    <WebView
-        android:id="@+id/web_view"
-        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
+    <FrameLayout
+        android:id="@+id/webViewContainer"
         android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_height="0dp" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <WebView
+            android:id="@+id/web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

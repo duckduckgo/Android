@@ -344,19 +344,15 @@ class ModelPickerView @JvmOverloads constructor(
         addView(item)
     }
 
-    private fun PopupMenuItemView.setLeadingIcon(@DrawableRes iconRes: Int?) {
+    private fun PopupMenuItemView.setLeadingIcon(@DrawableRes iconRes: Int) {
         val label = findViewById<DaxTextView>(com.duckduckgo.mobile.android.R.id.label) ?: return
         label.maxLines = 1
         label.isSingleLine = true
         label.ellipsize = TextUtils.TruncateAt.END
         label.setPaddingRelative(label.paddingStart, label.paddingTop, 0, label.paddingBottom)
-        val drawable = iconRes?.let { AppCompatResources.getDrawable(context, it) }
+        val drawable = AppCompatResources.getDrawable(context, iconRes)
         label.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
-        label.compoundDrawablePadding = if (drawable != null) {
-            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        } else {
-            0
-        }
+        label.compoundDrawablePadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
     }
 
     private fun PopupMenuItemView.configureTrailingIcon() {

@@ -14,7 +14,7 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
 
             - tapOn:
-                id: "inputField"
+                id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site"
             - pressKey: Enter
             - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
@@ -24,7 +24,7 @@ tags:
                 text: "Privacy Test Pages - Home"
             - tapOn: "New Tab"
             - assertVisible:
-                id: "inputField"
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site"
             - pressKey: Enter
             - assertVisible:

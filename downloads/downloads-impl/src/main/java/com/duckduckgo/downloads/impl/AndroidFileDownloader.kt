@@ -21,13 +21,17 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AndroidFileDownloader constructor(
+@ContributesBinding(AppScope::class)
+class AndroidFileDownloader @Inject constructor(
     private val dataUriDownloader: DataUriDownloader,
     private val callback: FileDownloadCallback,
     private val workManager: WorkManager,

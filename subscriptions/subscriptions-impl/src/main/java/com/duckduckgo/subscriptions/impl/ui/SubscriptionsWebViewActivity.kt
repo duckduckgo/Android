@@ -57,6 +57,9 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -202,6 +205,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -230,12 +239,21 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             logcat { "Subscription Flow: entering with params $it" }
         }
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         if (savedInstanceState == null) {
             params.launchPixel?.let { pixel.fire(it) }
         }
 
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -490,6 +508,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun requestWriteStoragePermission() {
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = true)
     }
 
     private fun setupInternalToolbar(toolbar: Toolbar) {
@@ -770,7 +794,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         binding.webview.stopLoading()
         binding.webview.removeJavascriptInterface(subscriptionJsMessaging.context)
         binding.webview.removeJavascriptInterface(itrJsMessaging.context)
-        binding.root.removeView(binding.webview)
+        binding.webViewContainer.removeView(binding.webview)
         binding.webview.destroy()
     }
 

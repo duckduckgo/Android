@@ -608,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Transferências</string>
-    <string name="downloadsActivityTitle">Transferências</string>
-    <string name="downloadsActivityNoItemsDescription">Ainda não foram transferidos ficheiros</string>
-    <string name="downloadsShareTitle">Partilhar com...</string>
     <string name="downloadsDownloadFinishedActionName">Abrir</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
-    <string name="downloadsFileNotFoundErrorMessage">O ficheiro já não existe</string>
-    <string name="downloadsItemMenuShare">Partilhar</string>
-    <string name="downloadsItemMenuDelete">Eliminar</string>
-    <string name="downloadsItemMenuCancel">Cancelar</string>
-    <string name="downloadsActivityMenuDeleteAll">Eliminar tudo</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Eliminar %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Todos os ficheiros eliminados</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mais opções para %1$s</string>
-    <string name="downloadsUndoActionName">Anular</string>
-    <string name="downloadsStateInProgress">Em curso…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Proteção contra o rastreamento por aplicações</string>
@@ -644,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies geridos</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>
-    <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>
 
     <!-- Windows Settings -->
 
@@ -1003,5 +987,25 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Confirmar</string>
+
+    <!-- App feedback -->
     <string name="thanksForTheFeedback">Obrigado pelos comentários!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Abrir num separador Fire</string>
+    <string name="openInBackgroundTab">Abrir em segundo plano</string>
+    <string name="browserModeToggleFireDescription">Mudar para separadores do modo Fire</string>
+    <string name="browserModeToggleRegularDescription">Mudar para separadores normais</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Separador Fire</string>
+    <string name="fireTabNewTabPageTitle">Separador Fire</string>
+    <string name="fireTabsEmptyStateTitle">Separadores Fire</string>
+    <string name="fireTabsFeatureNoHistory">Navegar sem guardar o histórico local</string>
+    <string name="fireTabsFeatureDifferentAccount">Iniciar sessão num site com uma conta diferente</string>
+    <string name="fireTabsFeatureTroubleshoot">Resolver problemas de sites</string>
+    <string name="fireTabsExplainer">Os separadores Fire estão isolados de outros dados do navegador. Os dados deles são queimados quando fechas o separador. Têm a mesma proteção contra rastreio que os outros separadores.</string>
+    <string name="fireTabsNewTabButton">Novo separador Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Experimenta os separadores Fire para navegar sem guardar o histórico local.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Eliminar separadores Fire e respetivos dados?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
 </resources>
