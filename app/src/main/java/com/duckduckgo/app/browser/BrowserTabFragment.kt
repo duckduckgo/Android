@@ -5997,9 +5997,11 @@ class BrowserTabFragment :
         }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
-            // Chat tab owns rendering its autoCompleteSuggestionsList.
+            // Chat tab owns rendering its autoCompleteSuggestionsList, and never shows the focused NTP
+            // overlay, so hide any overlay that was visible before the chat tab was selected.
             if (nativeInputManager.isChatTabSelected()) {
                 lastSeenAutoCompleteViewState = null
+                hideFocusedView()
                 return
             }
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
