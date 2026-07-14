@@ -46,6 +46,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -68,15 +71,30 @@ class FireButtonActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: FireButtonViewModel by bindViewModel()
     private val binding: ActivityDataClearingBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         configureUiEventHandlers()
         observeViewModel()
@@ -84,6 +102,12 @@ class FireButtonActivity : DuckDuckGoActivity() {
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     private fun configureUiEventHandlers() {

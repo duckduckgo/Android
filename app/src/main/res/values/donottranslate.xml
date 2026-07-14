@@ -43,7 +43,6 @@
     <string name="appearanceNightModeDialogSecondaryCTA">Dismiss</string>
 
     <!-- New Tab -->
-    <string name="newTabPageShortcutDownloads">Downloads</string>
     <string name="newTabPageShortcutSettings">Settings</string>
 
     <!-- Indonesia message -->
@@ -84,19 +83,6 @@
     <string name="quickSetupRemoveHomeScreenWidgetStep2Number" translatable="false">2</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep3Number" translatable="false">3</string>
 
-    <!-- Input Mode Demo Onboarding step -->
-    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try a search or AI chat!</string>
-    <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
-    <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion2">Plan a perfect day in London</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
-
-    <!-- Duck.ai onboarding CTAs (do not translate) -->
-    <string name="onboardingDuckAiFireButtonDaxDialogTitle">That\'s Duck.ai!</string>
-    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>. Give it a try! 🔥]]></string>
-
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
@@ -107,26 +93,7 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
-    <!-- Fire mode -->
-    <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
-    <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
-    <string name="browserModeToggleTabCountInfinite">∞</string>
-
-    <!-- Custom AI onboarding flow -->
-    <!-- Pre-onboarding: AI comparison chart screen. -->
-    <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
-    <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
-    <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
-    <string name="preOnboardingAiComparisonChartItem2">No account needed to access all AI features</string>
-    <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
-    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place.</string>
-    <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
-    <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT, Claude, and Llama, a secure VPN, and more.</string>
-    <!-- Pre-onboarding: initial screens -->
-    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
-    <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
-    <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
+    <!-- After Inactivity: return-to-last-tab hatch setting -->
+    <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
+    <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
 </resources>

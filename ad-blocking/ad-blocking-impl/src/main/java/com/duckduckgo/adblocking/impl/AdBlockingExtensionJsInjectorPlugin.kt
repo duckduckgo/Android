@@ -18,10 +18,7 @@ package com.duckduckgo.adblocking.impl
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
-import androidx.core.net.toUri
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.app.browser.Domain
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
@@ -42,6 +39,8 @@ import javax.inject.Inject
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     repository: AdBlockingExtensionRepository,
+    private val domainMatcher: AdBlockingExtensionDomainMatcher,
+    private val contingencyMessageHandler: ContingencyMessageHandler,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
 
@@ -57,12 +56,12 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
+        contingencyMessageHandler.cancelPendingShow()
         if (!statusChecker.canInject()) {
             logcat { "Status checker rejected injection, skipping" }
             return
         }
-        val uri = url?.toUri() ?: return
-        if (domains.none { UriString.sameOrSubdomain(uri, it) }) {
+        if (!domainMatcher.matches(url)) {
             logcat { "No domains matching, skipping" }
             return
         }
@@ -75,16 +74,14 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         webView.evaluateJavascript("javascript:$script", null)
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) = Unit
+    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        contingencyMessageHandler.onPageLoaded(webView, url)
+    }
 
     private fun buildScript(scriptlets: List<Scriptlet>): String? =
         scriptlets
+            .filter { it.name in ALLOWED_SCRIPTLET_NAMES }
             .takeUnless { it.isEmpty() }
             ?.sortedBy { it.name }
             ?.joinToString(separator = "\n") { it.content }
-
-    private val domains = listOf(
-        Domain("youtube.com"),
-        Domain("youtube-nocookie.com"),
-    )
 }

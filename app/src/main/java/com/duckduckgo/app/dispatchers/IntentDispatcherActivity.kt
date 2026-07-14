@@ -19,6 +19,7 @@ package com.duckduckgo.app.dispatchers
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +33,7 @@ import com.duckduckgo.app.browser.pdf.PdfViewerActivity
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.collectLatest
@@ -46,6 +48,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var customTabsSessionRegistry: CustomTabsSessionRegistry
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
@@ -89,6 +94,12 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+        // The verified calling package (non-null only when the launcher bound the
+        // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
+        // apply the trusted-caller carve-out in handleAppLink.
+        val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
+            ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
@@ -97,6 +108,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
+                clientPackage = clientPackage,
             ),
         )
 

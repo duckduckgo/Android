@@ -25,6 +25,7 @@
         layout="@layout/include_default_toolbar" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

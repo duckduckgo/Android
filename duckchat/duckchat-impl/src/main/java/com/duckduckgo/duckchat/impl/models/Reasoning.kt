@@ -70,10 +70,14 @@ object ReasoningResolver {
      * for upsell routing. If no candidate is supported, the mode is omitted.
      *
      * When [effortAccess] does not contain an entry for a chosen effort, the mode is treated as accessible.
+     *
+     * When [isEligible] is false the user can't purchase a subscription, so inaccessible (gated) modes
+     * are dropped rather than shown as inert upsell rows. Mirrors the model filtering in the model manager.
      */
     fun availableModes(
         supported: List<ReasoningEffort>,
         effortAccess: List<ReasoningEffortAccess> = emptyList(),
+        isEligible: Boolean = true,
     ): List<AvailableReasoningMode> {
         val accessByEffort = effortAccess.associateBy { it.effort }
         return ReasoningMode.entries.mapNotNull { mode ->
@@ -84,7 +88,7 @@ object ReasoningResolver {
                 access == null || access.isAccessible
             } ?: supportedCandidates.first()
             AvailableReasoningMode(mode, chosen, accessByEffort[chosen])
-        }
+        }.filterNot { !it.isAccessible && !isEligible }
     }
 
     fun resolveMode(
@@ -110,6 +114,7 @@ object ReasoningResolver {
         val available = availableModes(
             supported = chatModel.supportedReasoningEfforts,
             effortAccess = chatModel.reasoningEffortAccess,
+            isEligible = modelState.isSubscriptionEligible,
         )
         val mode = modelState.chatScopedReasoningMode
             ?: ReasoningMode.from(chat.reasoningMode)

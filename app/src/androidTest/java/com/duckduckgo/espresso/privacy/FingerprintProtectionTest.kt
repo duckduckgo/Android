@@ -17,12 +17,8 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.action.ViewActions.pressImeActionButton
-import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -55,7 +51,7 @@ class FingerprintProtectionTest {
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
             launchSource = InAppNavigation,
-            "https://privacy-test-pages.site/privacy-protections",
+            "https://privacy-test-pages.site/privacy-protections/fingerprinting/?disable_tests=navigator.requestMediaKeySystemAccess",
         ),
     )
 
@@ -70,11 +66,6 @@ class FingerprintProtectionTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        WebViewIdlingResource(webView!!).track()
-        onView(withId(R.id.omnibarTextInput)).perform(
-            typeText("https://privacy-test-pages.site/privacy-protections/fingerprinting/?disable_tests=navigator.requestMediaKeySystemAccess"),
-            pressImeActionButton(),
-        )
         WebViewIdlingResource(webView!!).track()
 
         // asserts we have injected css by querying the duckduckgo object

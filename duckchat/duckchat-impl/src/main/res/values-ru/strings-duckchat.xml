@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скрыть ИИ-картинки</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Никогда</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">По запросу</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Иногда</string>
+    <string name="duckAiSearchAssistVisibilityOften">Часто</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Использовать DuckDuckGo без ИИ</string>
+    <string name="duckAiUseWithoutAiDescription">Отключает Duck.ai, скрывает ответы с использованием ИИ в поиске и фильтрует известные сайты с ИИ-спамом в результатах поиска изображений.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">ИИ сейчас отключен в браузере, поэтому ответы с использованием ИИ больше не будут отображаться, а в результатах поиска изображений будет меньше изображений, созданных ИИ.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Переключайтесь между обычным поиском и Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Скрыть изображения, сгенерированные ИИ</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Исключает из результатов поиска изображений известные сайты с ИИ-спамом. <annotation link="learn_more">Подробнее</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Посетить «Настройки функций ИИ»</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Автоматически отправлять содержимое страницы</string>
     <string name="duckAIContextualAutomaticContextMessage">Автоматически отправлять содержимое страницы в Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Добавить содержимое страницы</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Задайте вопрос о странице</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Задавайте любые вопросы, сохраняя конфиденциальность</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Последние чаты</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Стереть чат</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Показать все чаты</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Проще некуда!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Ищите и открывайте сайты в адресной строке или переключитесь на приватный чат с ИИ.<br/><br/>Duck.ai можно использовать везде, где есть значок чата]]></string>
+    <string name="duckAiEndCtaButton">Дай пять!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать везде, где есть значок чата]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Чаты</string>
@@ -171,4 +201,68 @@
     <string name="duck_ai_chat_history_download_view">Показать</string>
     <string name="duck_ai_chat_history_download_error">Не удалось экспортировать чат</string>
     <string name="duck_ai_chat_history_bulk_download_error">Не удалось экспортировать чаты</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Поиск в DuckDuckGo</string>
+    <string name="native_input_chat_hint">Задайте любой вопрос, сохраняя конфиденциальность…</string>
+    <string name="native_input_chat_duck_mode_hint">Ответить…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Режим рассуждения</string>
+    <string name="duckChatReasoningModeFastTitle">Быстрый</string>
+    <string name="duckChatReasoningModeFastSubtitle">Быстрые ответы</string>
+    <string name="duckChatReasoningModeReasoningTitle">Рассуждения</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Для сложных задач</string>
+    <string name="duckChatReasoningModeExtendedTitle">Углубленные рассуждения</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Для аналитических задач</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Начать чат</string>
+    <string name="duckChatStopStreamingContentDescription">Остановить генерацию</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Удалить изображение</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Число изображений, прикрепляемых за один раз, ограничено: максимум %1$d.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Число изображений, прикрепляемых к одной беседе, ограничено: максимум %1$d.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Сделать фото</string>
+    <string name="attachmentAttachPhoto">Добавить изображение</string>
+    <string name="attachmentAttachFile">Добавить файл</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Удалить файл</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Число файлов, прикрепляемых к одной беседе, ограничено: максимум %1$d.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Максимальный размер файла составляет %1$d МБ.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Один из прикрепленных файлов содержит больше страниц, чем поддерживает наш сервис. Не загружайте файлы объемом более %1$d стр.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Размер файлов превышает лимит в %1$dМБ.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Загрузить файл</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Настройки Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Удалить %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Создать изображение</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Создавайте изображения по текстовому описанию</string>
+    <string name="duckChatOptionsMenuWebSearch">Веб-поиск</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Получать ответы из Интернета</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Настройка ответов</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Задайте тон, длину ответа и поведение</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Открыть меню Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Настройки Duck.ai</string>
 </resources>

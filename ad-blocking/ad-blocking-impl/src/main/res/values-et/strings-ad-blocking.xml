@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_settings_toggle_title">Reklaamide blokeerimine YouTube\'is</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. \n\nKui DuckDuckGo on sisse lülitatud, tuvastab see anonüümselt reklaamiblokeerimise häireid või YouTube\'i vigu, et parandada kõigi kasutuskogemust. DuckDuckGo ei näe kunagi, milliseid videoid sa vaatad, ega mingeid isikuandmeid. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Avab videod segajatevabas kinorežiimis, mis hoiab ära selle, et vaadatav sisu mõjutaks sinu YouTube’i voogu.</string>
+    <string name="ad_blocking_settings_title_v2">Reklaamide blokeerimine</string>
+    <string name="ad_blocking_settings_header_description">Blokeerib invasiivsed jälgijad enne nende laadimist, kõrvaldades tõhusalt reklaamid, mis tuginevad jälgimisele</string>
+    <string name="contingencyMessageTitle">YouTube\'i reklaamiblokeerija pole saadaval</string>
+    <string name="contingencyMessageContent">YouTube\'i hiljutised muudatused on mõjutanud reklaamide blokeerimist. Töötame nende probleemide lahendamise nimel ja täname sind mõistva suhtumise eest</string>
+    <string name="contingencyMessagePrimaryButton">Sain aru</string>
+    <string name="contingencyMessageCloseContentDescription">Sulge</string>
+    <string name="ad_blocking_menu_disable">Keela YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_enable">Luba YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_title">YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_close_content_description">Sulge</string>
+    <string name="ad_blocking_menu_always_on">Alati sisse lülitatud</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Inaktiveeri kuni taaskäivitamiseni</string>
+    <string name="ad_blocking_menu_always_off">Alati välja lülitatud</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube\'i reklaamiblokeerija ei tööta?</string>
+    <string name="ad_blocking_disabled_popup_description">Saada DuckDuckGo-le anonüümne rikketeade. Aita muuta reklaamide blokeerimine kõigi jaoks paremaks!</string>
+    <string name="ad_blocking_disabled_primary_action">Saada rikketeade</string>
+    <string name="ad_blocking_disabled_secondary_action">Tühista</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Inaktiveeritud kuni taaskäivitamiseni</string>
+</resources>

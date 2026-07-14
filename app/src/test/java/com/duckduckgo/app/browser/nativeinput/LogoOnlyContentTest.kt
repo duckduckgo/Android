@@ -23,20 +23,31 @@ import org.junit.Test
 class LogoOnlyContentTest {
 
     @Test
-    fun `logo-only when the logo is visible and no hatch occupies space`() {
+    fun `logo-only when the logo is visible and no hatch, CTA or sections occupy space`() {
         // The NewTabReturnHatchView container is always VISIBLE and collapses to zero height when no
         // hatch is shown. A height of 0 must NOT count as a hatch - otherwise the logo would be
         // pinned below the input widget and shift vertically between the Search and Duck.ai tabs.
-        assertTrue(isLogoOnly(logoVisible = true, hatchHeightPx = 0))
+        assertTrue(isLogoOnly(logoVisible = true, hatchHeightPx = 0, onboardingCtaVisible = false, sectionsVisible = false))
     }
 
     @Test
     fun `not logo-only when the logo is not visible`() {
-        assertFalse(isLogoOnly(logoVisible = false, hatchHeightPx = 0))
+        assertFalse(isLogoOnly(logoVisible = false, hatchHeightPx = 0, onboardingCtaVisible = false, sectionsVisible = false))
     }
 
     @Test
     fun `not logo-only when a real hatch occupies space`() {
-        assertFalse(isLogoOnly(logoVisible = true, hatchHeightPx = 120))
+        assertFalse(isLogoOnly(logoVisible = true, hatchHeightPx = 120, onboardingCtaVisible = false, sectionsVisible = false))
+    }
+
+    @Test
+    fun `not logo-only when an onboarding CTA is visible`() {
+        assertFalse(isLogoOnly(logoVisible = true, hatchHeightPx = 0, onboardingCtaVisible = true, sectionsVisible = false))
+    }
+
+    @Test
+    fun `not logo-only when new tab sections are visible`() {
+        // A section above the logo (e.g. AppTP banner) must clear the widget, so it is not logo-only.
+        assertFalse(isLogoOnly(logoVisible = true, hatchHeightPx = 0, onboardingCtaVisible = false, sectionsVisible = true))
     }
 }

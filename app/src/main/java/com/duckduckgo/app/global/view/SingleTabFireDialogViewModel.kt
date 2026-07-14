@@ -41,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
@@ -87,7 +88,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val duckChat: DuckChat,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
+
+    private val isFireMode: Boolean get() = browserMode == BrowserMode.FIRE
 
     var shouldRestartAfterClearing: Boolean = true
         private set
@@ -123,6 +127,14 @@ class SingleTabFireDialogViewModel @Inject constructor(
     }
 
     fun onDeleteAllClicked() {
+        if (isFireMode) {
+            onDeleteAllClickedInFireMode()
+        } else {
+            onDeleteAllClickedInRegularMode()
+        }
+    }
+
+    private fun onDeleteAllClickedInRegularMode() {
         viewModelScope.launch {
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
@@ -152,7 +164,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
@@ -164,8 +176,36 @@ class SingleTabFireDialogViewModel @Inject constructor(
         }
     }
 
+    private fun onDeleteAllClickedInFireMode() {
+        viewModelScope.launch {
+            command.send(Command.OnClearStarted)
+
+            val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
+                settingsDataStore.fireAnimationEnabled
+            }
+            if (fireAnimationEnabled) {
+                command.send(Command.PlayAnimation)
+            }
+
+            withContext(dispatcherProvider.io()) {
+                dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
+            }
+
+            command.send(Command.ClearingComplete)
+        }
+    }
+
     fun onDeleteSelectedChatsClicked() {
         val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls ?: return
+        clearDuckAiChats(selectedChatUrls)
+    }
+
+    fun onDeleteSingleChatClicked() {
+        val chatUrl = (origin.value as? FireDialogOrigin.ChatAutocomplete)?.chatUrl ?: return
+        clearDuckAiChats(setOf(chatUrl))
+    }
+
+    private fun clearDuckAiChats(chatUrls: Set<String>) {
         viewModelScope.launch {
             shouldRestartAfterClearing = false
             command.send(Command.OnClearStarted)
@@ -178,10 +218,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
+                dataClearing.clearSelectedDuckAiChats(chatUrls, browserMode)
             }
 
-            command.send(Command.ClearingComplete)
+            // Distinct from ClearingComplete (which the restart paths use): this carries the origin
+            // out to listeners once the chats are actually gone from the store, so callers can
+            // reconcile UI (e.g. re-fetch the omnibar chat suggestions) against real state.
+            command.send(Command.OnChatClearComplete)
         }
     }
 
@@ -214,11 +257,12 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
                     if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(originalTabId)
+                        dataClearing.clearTabContextualChat(originalTabId, browserMode)
                     } else {
                         dataClearing.clearSingleTabData(
                             tabId = originalTabId,
                             replaceCurrentTab = origin.value !is Hatch,
+                            browserMode = browserMode,
                         )
                     }
                 } else {
@@ -253,7 +297,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun mapToViewState(dialogOrigin: FireDialogOrigin): ViewState.Loaded {
         // Non-tab origins skip the tab/download/WebView probes — there's no tab to reason about.
-        val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory
+        val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory &&
+            dialogOrigin !is FireDialogOrigin.ChatAutocomplete
 
         val isDuckAiChatsSelected =
             isTabAware && fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
@@ -276,9 +321,11 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 pluralsId = R.plurals.fireDialogDeleteCountTitle,
                 count = dialogOrigin.count,
             )
+            is FireDialogOrigin.ChatAutocomplete -> TitleSource.Static(R.string.singleTabFireDialogTitleDuckAi)
             else -> {
                 val titleResId = when {
                     isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
+                    isFireMode -> R.string.singleTabFireDialogTitleFireMode
                     isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
                     else -> R.string.singleTabFireDialogTitle
                 }
@@ -345,6 +392,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val isInChatSelectionMode: Boolean
                 get() = origin is FireDialogOrigin.ChatHistory
 
+            val isSingleChatDeletion: Boolean
+                get() = origin is FireDialogOrigin.ChatAutocomplete
+
             val isDeleteThisTabButtonVisible: Boolean
                 get() = (stateData.isSingleTabEnabled && origin == Browser) ||
                     origin == DuckAiContextualChat ||
@@ -387,6 +437,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         data object OnCancel : Command()
         data object OnClearStarted : Command()
         data object OnSingleTabClearComplete : Command()
+        data object OnChatClearComplete : Command()
         data object OnSingleTabClearFeatureNotSupported : Command()
         data object OnSingleTabClearError : Command()
     }

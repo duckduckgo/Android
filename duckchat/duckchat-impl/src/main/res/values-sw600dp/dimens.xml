@@ -16,4 +16,5 @@
 
 <resources>
     <dimen name="inputScreenUserPrefToggleSpacing">160dp</dimen>
+    <dimen name="onboardingBackgroundMaxHeight">252dp</dimen>
 </resources>

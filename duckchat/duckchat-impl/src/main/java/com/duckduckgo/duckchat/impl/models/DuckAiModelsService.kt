@@ -16,12 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.models
 
-import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
+import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-@ContributesNonCachingServiceApi(AppScope::class)
+@ContributesServiceApi(AppScope::class)
 interface DuckAiModelsService {
     @GET
     suspend fun getModels(@Url url: String): AIChatModelsResponse

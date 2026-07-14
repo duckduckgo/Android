@@ -136,10 +136,21 @@
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
+        <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
+        <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
+        <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
+        <item name="daxColorFireModeAccentDarkTranslucent">@color/mandarin40_translucent</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorAccentBlue</item>
+        <item name="daxColorOmnibarAccentContent">@color/white</item>
+        <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
+        <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.None</item>
+        <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.None</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
@@ -465,6 +476,15 @@
         <item name="windowSplashScreenBackground">@color/gray0</item>
         <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Light</item>
     </style>
+
+    <!--
+      Splash-screen theme variant for edge-to-edge screens (e.g. SystemSearchActivity,
+      WidgetThemeConfiguration). Portrait keeps the splash defaults; the values-land override sets
+      layoutInDisplayCutoutMode to "never" so in landscape the cutout renders as a dark letterbox
+      instead of the window background bleeding into it (the base splash theme forces "shortEdges",
+      which otherwise overrides the runtime cutout handling).
+    -->
+    <style name="Theme.DuckDuckGo.SplashScreen.EdgeToEdge" parent="Theme.DuckDuckGo.SplashScreen" />
 
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>

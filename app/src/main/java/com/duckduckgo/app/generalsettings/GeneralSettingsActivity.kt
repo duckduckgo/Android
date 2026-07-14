@@ -44,6 +44,9 @@ import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
@@ -51,11 +54,17 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(GeneralSettingsScreenNoParams::class)
+@ContributeToActivityStarter(GeneralSettingsScreenNoParams::class, screenName = "settingsGeneral")
 class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: GeneralSettingsViewModel by bindViewModel()
     private val binding: ActivityGeneralSettingsBinding by viewBinding()
@@ -87,8 +96,17 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         binding.maliciousLearnMore.addClickableSpan(
             textSequence = getText(R.string.maliciousSiteSettingLearnMore),
@@ -107,6 +125,12 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     private fun observeViewModel() {

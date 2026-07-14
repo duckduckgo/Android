@@ -31,6 +31,13 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "next"
 - assertVisible:
     text: ".*want easy access to private AI chat?.*"
+# Tapping next opens the new Duck.ai onboarding preview. Search is the default mode, so tap a
+# search suggestion to run a demo search — this completes onboarding and lands in the browser
+# on the in-context "That's DuckDuckGo Search!" CTA.
 - tapOn: "next"
 - assertVisible:
-    text: ".*Try a search!.*"
+    id: "suggestion1"
+- tapOn:
+    id: "suggestion1"
+- assertVisible:
+    text: ".*That's DuckDuckGo Search!.*"

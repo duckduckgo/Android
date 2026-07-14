@@ -23,6 +23,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -33,6 +36,7 @@ import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -54,6 +58,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.UUID
 
@@ -93,11 +99,22 @@ class AttachmentViewModelTest {
             .thenReturn("Total file size limit exceeded")
     }
 
+    private val duckChatPixels: DuckChatPixels = mock()
+
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val nativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val nativeInputStateStore = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
 
     private lateinit var viewModel: AttachmentViewModel
 
@@ -112,6 +129,7 @@ class AttachmentViewModelTest {
             context = context,
             appBuildConfig = appBuildConfig,
             nativeInputStateProvider = nativeInputStateStore,
+            duckChatPixels = duckChatPixels,
         )
     }
 
@@ -622,7 +640,7 @@ class AttachmentViewModelTest {
         whenever(contentResolver.openInputStream(any())).thenReturn(null)
         val uri: Uri = mock()
 
-        viewModel.onImagesPicked(listOf(uri))
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
         advanceUntilIdle()
 
         assertTrue(viewModel.attachmentState.value.images.isEmpty())
@@ -701,6 +719,160 @@ class AttachmentViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenImagePickedFromPhotoLibraryThenImageAttachedPixelFiredWithPhotoLibrarySource() = runTest {
+        val uri = givenImageDecodes()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageAttached("photo_library")
+    }
+
+    @Test
+    fun whenImageCapturedFromCameraThenImageAttachedPixelFiredWithCameraSource() = runTest {
+        val uri = givenImageDecodes()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.CAMERA)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageAttached("camera")
+    }
+
+    @Test
+    fun whenImageDecodeFailsThenImageAttachedPixelNotFired() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(contentResolver.openInputStream(any())).thenReturn(null)
+        val uri: Uri = mock()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels, never()).fireImageAttached(any())
+    }
+
+    @Test
+    fun whenImageExceedsPerTurnLimitThenImageValidationFailedCountExceeded() = runTest {
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = ImageLimits(maxPerTurn = 1, maxPerConversation = 10)))
+        addImages(1)
+        val uri = givenImageDecodes()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageValidationFailed("count_exceeded")
+        verify(duckChatPixels, never()).fireImageAttached(any())
+    }
+
+    @Test
+    fun whenImageDecodeFailsThenImageValidationFailedOther() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(contentResolver.openInputStream(any())).thenReturn(null)
+        val uri: Uri = mock()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageValidationFailed("other")
+        verify(duckChatPixels, never()).fireImageAttached(any())
+    }
+
+    @Test
+    fun whenImageRemovedThenImageRemovedPixelFired() = runTest {
+        addImages(1)
+        val id = viewModel.attachmentState.value.images[0].id
+
+        viewModel.removeImageAttachment(id)
+
+        verify(duckChatPixels).fireImageRemoved()
+    }
+
+    @Test
+    fun whenFileRemovedThenFileRemovedPixelFired() = runTest {
+        addFiles(aFileAttachment(id = "file-1"))
+
+        viewModel.removeFileAttachment("file-1")
+
+        verify(duckChatPixels).fireFileRemoved()
+    }
+
+    @Test
+    fun whenFileAddedWithinLimitsThenFileAttachedPixelFired() = runTest {
+        addFiles(aFileAttachment())
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileAttached()
+    }
+
+    @Test
+    fun whenFileAddedWithinLimitsThenValidationFailedPixelNotFired() = runTest {
+        addFiles(aFileAttachment())
+        advanceUntilIdle()
+
+        verify(duckChatPixels, never()).fireFileValidationFailed(any())
+    }
+
+    @Test
+    fun whenFileExceedsSizeLimitThenValidationFailedPixelFiredWithSizeExceeded() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        val limits = FileLimits(maxFileSizeBytes = maxBytes, maxTotalFileSizeBytes = 100L * 1024 * 1024)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxBytes + 1))
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed("size_exceeded")
+        verify(duckChatPixels, never()).fireFileAttached()
+    }
+
+    @Test
+    fun whenFileExceedsConversationLimitThenValidationFailedPixelFiredWithCountExceeded() = runTest {
+        val limits = FileLimits(maxPerConversation = 2)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        selectDuckAiTab()
+        advanceUntilIdle()
+        limitsHandler.addConversationFilesSent(2)
+
+        addFiles(aFileAttachment())
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed("count_exceeded")
+        verify(duckChatPixels, never()).fireFileAttached()
+    }
+
+    @Test
+    fun whenFileExceedsPageCountThenValidationFailedPixelFiredWithPageCountExceeded() = runTest {
+        val limits = FileLimits(maxPagesPerFile = 10)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(pageCount = 11))
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed("page_count_exceeded")
+        verify(duckChatPixels, never()).fireFileAttached()
+    }
+
+    @Test
+    fun whenProcessFileReturnsNullThenValidationFailedPixelFiredWithOther() = runTest {
+        val uri: Uri = mock()
+
+        viewModel.onFilesPicked(listOf(uri))
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed("other")
+        verify(duckChatPixels, never()).fireFileAttached()
+    }
+
+    private fun givenImageDecodes(): Uri {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val uri: Uri = mock()
+        whenever(contentResolver.openInputStream(uri))
+            .thenReturn(java.io.ByteArrayInputStream(ByteArray(8)))
+        whenever(contentResolver.getType(uri)).thenReturn("image/png")
+        return uri
     }
 
     private fun addImages(

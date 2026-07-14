@@ -96,9 +96,15 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(ViewActions.click())
-        clickMenuItem(withText("Disable Privacy Protection"))
+        // Protections may already be disabled for privacy-test-pages.site if a previous test in
+        // the same run left that state behind — the user allowlist persists across tests and is
+        // only cleared between orchestrated (CI) runs, not local connectedAndroidTest runs. When
+        // already disabled, the menu shows "Enable Privacy Protection" instead, and we're already
+        // in the state under test, so skip the disable click rather than failing to find it.
+        runCatching { clickMenuItem(withText("Disable Privacy Protection")) }
 
-        // handle the privacy protection toggle check screen showing
+        // Dismiss the privacy protection toggle check screen (if we disabled) or the menu (if it
+        // was already disabled).
         onView(isRoot()).perform(ViewActions.pressBack())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)

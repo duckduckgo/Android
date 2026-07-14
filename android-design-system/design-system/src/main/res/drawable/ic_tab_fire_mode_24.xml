@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (C) 2026 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="30dp"
+    android:viewportWidth="24"
+    android:viewportHeight="30">
+    <path
+        android:pathData="M13.5,6.75C13.5,7.164 13.164,7.5 12.75,7.5H8C6.067,7.5 4.5,9.067 4.5,11V19C4.5,20.933 6.067,22.5 8,22.5H16C17.933,22.5 19.5,20.933 19.5,19V14.25C19.5,13.836 19.836,13.5 20.25,13.5C20.664,13.5 21,13.836 21,14.25V19C21,21.762 18.761,24 16,24H8C5.239,24 3,21.762 3,19V11C3,8.239 5.239,6 8,6H12.75C13.164,6 13.5,6.336 13.5,6.75Z"
+        android:fillColor="?attr/daxColorPrimaryIcon" />
+    <path
+        android:pathData="M24,7.722C24,10 22.125,11.994 19.825,11.994C15.875,11.994 13.75,8.875 15.75,4.25C15.991,4.621 16.223,5.039 16.553,5.332C16.814,5.563 17.212,5.362 17.203,5.006C17.149,2.958 18.2,0.829 20.124,0C20.272,1.215 20.704,2.363 21.5,3.298C22.802,4.667 24,5.5 24,7.722Z"
+        android:fillColor="?attr/daxColorOmnibarAccent"/>
+</vector>
+

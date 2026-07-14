@@ -236,12 +236,6 @@ class FakeSettingsDataStore :
             store["showTrackersCountInAddressBar"] = value
         }
 
-    override var hasNewDownload: Boolean
-        get() = store["hasNewDownload"] as Boolean? ?: false
-        set(value) {
-            store["hasNewDownload"] = value
-        }
-
     override var singleTabFireDialogShownCount: Int
         get() = store["singleTabFireDialogShownCount"] as Int? ?: 0
         set(value) {

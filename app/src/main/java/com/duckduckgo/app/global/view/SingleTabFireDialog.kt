@@ -74,12 +74,14 @@ private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
 private const val ARG_TAB_ID = "tabId"
 private const val ARG_SELECTED_CHAT_URLS = "selectedChatUrls"
+private const val ARG_CHAT_URL = "chatUrl"
 internal const val ORIGIN_BROWSER = "Browser"
 internal const val ORIGIN_SETTINGS = "Settings"
 internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
 internal const val ORIGIN_DUCK_AI_CONTEXTUAL_CHAT = "DuckAiContextualChat"
 internal const val ORIGIN_HATCH = "Hatch"
 internal const val ORIGIN_CHAT_HISTORY = "ChatHistory"
+internal const val ORIGIN_CHAT_AUTOCOMPLETE = "ChatAutocomplete"
 
 @InjectWith(FragmentScope::class)
 class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
@@ -190,10 +192,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun dispatchDeleteAll() {
-        if (arguments?.getString(ARG_ORIGIN) == ORIGIN_CHAT_HISTORY) {
-            viewModel.onDeleteSelectedChatsClicked()
-        } else {
-            viewModel.onDeleteAllClicked()
+        when (arguments?.getString(ARG_ORIGIN)) {
+            ORIGIN_CHAT_HISTORY -> viewModel.onDeleteSelectedChatsClicked()
+            ORIGIN_CHAT_AUTOCOMPLETE -> viewModel.onDeleteSingleChatClicked()
+            else -> viewModel.onDeleteAllClicked()
         }
     }
 
@@ -232,7 +234,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             is Command.ClearingComplete -> onClearAllEvent(ClearAllEvent.ClearingFinished)
             is Command.OnShow -> sendFragmentResult(FireDialog.EVENT_ON_SHOW)
             is Command.OnCancel -> {
-                sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
+                sendFragmentResult(FireDialog.EVENT_ON_CANCEL, arguments?.getString(ARG_ORIGIN))
                 dismiss()
             }
             is Command.OnClearStarted -> {
@@ -244,6 +246,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             }
             is Command.OnSingleTabClearComplete -> {
                 pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE
+                onClearAllEvent(ClearAllEvent.ClearingFinished)
+            }
+            is Command.OnChatClearComplete -> {
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_CHAT_CLEAR_COMPLETE
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearFeatureNotSupported -> {
@@ -308,6 +314,9 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             if (state.isInChatSelectionMode) {
                 binding.deleteAllPrimaryButton.text =
                     requireContext().getString(R.string.singleTabFireDialogDeleteChats)
+            } else if (state.isSingleChatDeletion) {
+                binding.deleteAllPrimaryButton.text =
+                    requireContext().getString(R.string.singleTabFireDialogDeleteChat)
             }
         } else {
             binding.deleteAllPrimaryButton.gone()
@@ -398,6 +407,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             canFinish = true
             if (event is ClearAllEvent.ClearingFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+            } else {
+                binding.clearingProgressIndicator.show()
             }
         } else {
             if (viewModel.shouldRestartAfterClearing) {
@@ -455,6 +466,14 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 val urls = arguments?.getStringArrayList(ARG_SELECTED_CHAT_URLS)?.toSet().orEmpty()
                 FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = urls)
             }
+            ORIGIN_CHAT_AUTOCOMPLETE -> {
+                val chatUrl = arguments?.getString(ARG_CHAT_URL)
+                if (chatUrl != null) {
+                    FireDialogProvider.FireDialogOrigin.ChatAutocomplete(chatUrl)
+                } else {
+                    FireDialogProvider.FireDialogOrigin.Browser
+                }
+            }
             else -> FireDialogProvider.FireDialogOrigin.Browser
         }
     }
@@ -467,6 +486,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                     ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
                     ARG_SELECTED_CHAT_URLS to (origin as? FireDialogProvider.FireDialogOrigin.ChatHistory)
                         ?.selectedChatUrls?.let { ArrayList(it) },
+                    ARG_CHAT_URL to (origin as? FireDialogProvider.FireDialogOrigin.ChatAutocomplete)?.chatUrl,
                 )
             }
         }
@@ -478,6 +498,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             FireDialogProvider.FireDialogOrigin.DuckAiContextualChat -> ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
             is FireDialogProvider.FireDialogOrigin.Hatch -> ORIGIN_HATCH
             is FireDialogProvider.FireDialogOrigin.ChatHistory -> ORIGIN_CHAT_HISTORY
+            is FireDialogProvider.FireDialogOrigin.ChatAutocomplete -> ORIGIN_CHAT_AUTOCOMPLETE
         }
     }
 }

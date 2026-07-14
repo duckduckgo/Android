@@ -229,7 +229,7 @@
             android:exported="true"
             android:label="@string/appName"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen.EdgeToEdge"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
@@ -424,6 +424,12 @@
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
         <activity
+            android:name="com.duckduckgo.app.global.shortcut.FireShortcutTrampolineActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
             android:exported="false"
             android:label="@string/changeIconActivityTitle"
@@ -509,7 +515,7 @@
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen.EdgeToEdge">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -520,11 +526,6 @@
             android:label="@string/voiceSearchTitle"
             android:parentActivityName=".BrowserActivity" />
 
-        <activity
-            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
-            android:exported="false"
-            android:label="@string/downloadsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
             android:exported="false"

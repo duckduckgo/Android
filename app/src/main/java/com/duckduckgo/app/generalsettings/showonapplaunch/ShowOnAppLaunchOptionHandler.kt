@@ -27,7 +27,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
-import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -53,11 +55,12 @@ interface ShowOnAppLaunchOptionHandler {
 class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
-    @RegularMode private val tabRepository: TabRepository,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
@@ -73,26 +76,31 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
 
+        val currentMode = browserModeStateHolder.currentMode.value
+
         when (option) {
             LastOpenedTab -> {
+                if (currentMode != BrowserMode.REGULAR) return
                 if (fromInactivity) {
                     // Skip when the visible tab is a blank NTP — the NTP path classifies that case.
-                    val selectedTab = tabRepository.getSelectedTab()
+                    val selectedTab = tabRepositoryProvider.forMode(BrowserMode.REGULAR).getSelectedTab()
                     if (selectedTab != null && !selectedTab.url.isNullOrBlank()) {
                         browserInteractionsPlugins.getPlugins().forEach { it.onLutShownAfterIdle() }
                     }
                 }
             }
             NewTabPage -> {
-                val selectedTab = tabRepository.getSelectedTab()
+                val repo = tabRepositoryProvider.forMode(currentMode)
+                val selectedTab = repo.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
-                    if (fromInactivity) {
+                    // The hatch (after-idle classification) only ever applies in Regular mode.
+                    if (fromInactivity && currentMode == BrowserMode.REGULAR) {
                         // Set pendingAfterIdle BEFORE adding the tab so BrowserViewModel's
                         // flowSelectedTab emit consumes it via onNtpShown for the new NTP.
                         ntpAfterIdleManager.onIdleReturnTriggered()
                         notifyAutofillIdleReturn("new_tab_page")
                     }
-                    tabRepository.add()
+                    repo.add()
                 }
                 // When the user is already on an NTP we deliberately don't trigger here:
                 // - If the prior session classified this NTP as auto-initiated, NtpAfterIdleManager
@@ -101,6 +109,8 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
                 //   manually-opened new tab), incorrectly classifying it as auto-initiated.
             }
             is SpecificPage -> {
+                // Normal-mode launch preference — never navigate the Fire session.
+                if (currentMode != BrowserMode.REGULAR) return
                 if (fromInactivity) {
                     notifyAutofillIdleReturn("specific_page")
                 }
@@ -132,6 +142,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     }
 
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
+        val tabRepository = tabRepositoryProvider.forMode(BrowserMode.REGULAR)
         val userUri = option.url.toUri()
         val resolvedUri = option.resolvedUrl?.toUri()
 

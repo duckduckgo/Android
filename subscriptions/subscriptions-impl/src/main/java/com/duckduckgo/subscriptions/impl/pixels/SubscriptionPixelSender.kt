@@ -58,6 +58,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILU
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_STORE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RECOVER_SUBSCRIPTION_NO_ACTIVE_PURCHASE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_EMAIL_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_OTHER
@@ -66,6 +67,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
@@ -101,6 +106,7 @@ interface SubscriptionPixelSender {
     fun reportRestoreUsingStoreSuccess()
     fun reportRestoreUsingStoreFailureSubscriptionNotFound()
     fun reportRestoreUsingStoreFailureOther()
+    fun reportRecoverSubscriptionNoActivePurchase()
     fun reportRestoreAfterPurchaseAttemptSuccess()
     fun reportSubscriptionActivated()
     fun reportOnboardingAddDeviceClick()
@@ -134,6 +140,10 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
     fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
+    fun reportExpirationReminderScheduled()
+    fun reportExpirationReminderSchedulingError()
+    fun reportExpirationReminderNotFiredInactiveSubscription()
+    fun reportExpirationReminderNotFiredPermissionsRejected()
 }
 
 @ContributesBinding(AppScope::class)
@@ -223,6 +233,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportRestoreUsingStoreFailureOther() =
         fire(RESTORE_USING_STORE_FAILURE_OTHER)
+
+    override fun reportRecoverSubscriptionNoActivePurchase() =
+        fire(RECOVER_SUBSCRIPTION_NO_ACTIVE_PURCHASE)
 
     override fun reportRestoreAfterPurchaseAttemptSuccess() =
         fire(RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS)
@@ -356,6 +369,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             ),
         )
     }
+
+    override fun reportExpirationReminderScheduled() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED)
+
+    override fun reportExpirationReminderSchedulingError() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR)
+
+    override fun reportExpirationReminderNotFiredInactiveSubscription() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION)
+
+    override fun reportExpirationReminderNotFiredPermissionsRejected() =
+        fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED)
 
     private fun fire(
         pixel: SubscriptionPixel,

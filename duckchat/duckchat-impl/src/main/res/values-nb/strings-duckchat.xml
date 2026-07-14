@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererte bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer ut AI-genererte bilder fra bildesøkresultater</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Aldri</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">På forespørsel</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Noen ganger</string>
+    <string name="duckAiSearchAssistVisibilityOften">Ofte</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Bruk DuckDuckGo uten AI</string>
+    <string name="duckAiUseWithoutAiDescription">Deaktiverer Duck.ai, skjuler AI-assisterte svar i søk og filtrerer ut kjente AI-søppelnettsteder i bildesøkresultatene.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI er deaktivert i nettleseren, så du ser ikke lenger AI-assisterte svar, og du ser færre AI-genererte bilder i bildesøkresultatene.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Bytt mellom søk og Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Skjul AI-genererte bilder</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrerer ut kjente AI-søppelnettsteder fra bildesøkresultater. <annotation link="learn_more">Finn ut mer</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Aktiver i innstillingene for AI-funksjoner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Administrer i innstillingene for AI-funksjoner</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Send sideinnhold automatisk</string>
     <string name="duckAIContextualAutomaticContextMessage">Send sideinnhold automatisk til Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Legg ved sideinnhold</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Spør om siden</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Spør om hva som helst, privat</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Nylige chatter</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Fjern chat</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Vis alle chatter</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Dette går bra!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Bruk adressefeltet til å søke etter og gå til nettsteder, eller bytt til Duck.ai for privat AI-chat.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
+    <string name="duckAiEndCtaButton">High five!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chatter</string>
@@ -169,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Vis</string>
     <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chatten</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chattene</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Søk med DuckDuckGo</string>
+    <string name="native_input_chat_hint">Spør om hva som helst, privat …</string>
+    <string name="native_input_chat_duck_mode_hint">Svar …</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Resonneringsmodus</string>
+    <string name="duckChatReasoningModeFastTitle">Rask</string>
+    <string name="duckChatReasoningModeFastSubtitle">Svarer raskt</string>
+    <string name="duckChatReasoningModeReasoningTitle">Resonnement</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Til komplekse oppgaver</string>
+    <string name="duckChatReasoningModeExtendedTitle">Utvidet resonnering</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Til analytiske oppgaver</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Start chat</string>
+    <string name="duckChatStopStreamingContentDescription">Slutt å generere</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Fjern bilde</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Du kan bare legge ved %1$d bilder av gangen.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Du kan bare legge ved %1$d bilder per samtale.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Ta bilde</string>
+    <string name="attachmentAttachPhoto">Legg til bilde</string>
+    <string name="attachmentAttachFile">Legg til fil</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Fjern fil</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Du kan bare legge ved %1$d filer per samtale.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Filen overskrider maksimal størrelse på %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">En av de vedlagte filene har flere sider enn vi støtter. Last opp filer med maksimalt %1$d sider.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">De vedlagte filene overskrider den totale størrelsesgrensen på %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Last opp en fil</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai-valg</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Fjern %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Lag et bilde</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Gjør om tekst til bilder</string>
+    <string name="duckChatOptionsMenuWebSearch">Nettsøk</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Finn svar på nettet</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Tilpass svar</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Angi tone, lengde og atferd</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Åpne Duck.ai-menyen</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Innstillinger for Duck.ai</string>
 </resources>

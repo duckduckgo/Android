@@ -77,6 +77,7 @@
     <string name="options">Параметры</string>
     <string name="shareLink">Поделиться ссылкой</string>
     <string name="copyUrl">Скопировать ссылку</string>
+    <string name="urlCopiedToClipboard">URL скопирован в буфер обмена</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Найти следующий</string>
@@ -689,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Загрузки</string>
-    <string name="downloadsActivityTitle">Загрузки</string>
-    <string name="downloadsActivityNoItemsDescription">Пока ничего не загружено</string>
-    <string name="downloadsShareTitle">Поделиться с…</string>
     <string name="downloadsDownloadFinishedActionName">Открыть</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Файл больше не существует</string>
-    <string name="downloadsItemMenuShare">Поделиться</string>
-    <string name="downloadsItemMenuDelete">Удалить</string>
-    <string name="downloadsItemMenuCancel">Отменить</string>
-    <string name="downloadsActivityMenuDeleteAll">Удалить все</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Удален %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Все файлы удалены</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Другие опции для %1$s</string>
-    <string name="downloadsUndoActionName">Отменить</string>
-    <string name="downloadsStateInProgress">Выполняется…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Блокировка отслеживания приложениями</string>
@@ -725,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
-    <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
 
     <!-- Windows Settings -->
 
@@ -867,6 +852,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Поехали!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Итак, начнем!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Мы уже это проходили</string>
     <string name="preOnboardingDaxDialog2Title">Защита включена</string>
     <string name="preOnboardingDaxDialog2Button">Выбрать браузер</string>
@@ -878,7 +864,9 @@
     <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
     <string name="preOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="preOnboardingComparisonChartItem5">Стирает данные браузера одним нажатием</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Встроенный Duck.ai и приватные беседы с ChatGPT</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Блокировка таргетированной рекламы и всплывающих окон с настройками файлов cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Смотрите видео на YouTube без рекламы</string>
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
@@ -935,12 +923,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo также предлагает <b>платную подписку</b> с надежной службой <b>VPN</b> и <b>современными приватными ИИ-моделями</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ознакомление бесплатное!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Попробуйте бесплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли вы?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Нужен доступ к приватным чатам с ИИ прямо из адресной строки?</string>
     <string name="preOnboardingInputScreenButton">Далее</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
 
@@ -1066,10 +1055,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Привет!</string>
     <string name="preOnboardingWelcomeDialogBody1">Готовы перейти на быстрый браузер, где все под вашим контролем?</string>
     <string name="preOnboardingWelcomeDialogBody2">Здесь ИИ — всегда лишь дополнительная опция, а защита конфиденциальности всегда включена.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d из %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d из %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как сказать «утка» по-английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как сказать «утка» по-испански</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Это Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Приватные чаты с ИИ всегда можно стереть с помощью кнопки <b>Fire Button</b>. Убедитесь сами! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Проще некуда!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Ищите и открывайте сайты в адресной строке или переключитесь на приватный чат с ИИ.<br/><br/>Duck.ai можно использовать везде, где есть значок чата]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Дай пять!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ну что, приступим?&lt;br/&gt;Попробуйте поиск или чат с ИИ</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Конфиденциальный поиск</string>
+    <string name="preOnboardingInputModeDemoChatHint">Задавайте любые вопросы, сохраняя конфиденциальность</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Объясни, как работает фондовый рынок, так, чтобы понял 10-летний ребенок</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Спланируйте идеальный день в Лондоне</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Удиви меня!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Приведи 10 любопытных фактов о науке, природе и истории</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Бесплатно общайтесь с ChatGPT, Claude и другими ИИ-моделями в браузере с активной защитой.</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Помните: Duck.ai можно использовать в любом месте, где вы видите значок чата.</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Запустить чат с ИИ</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">ИИ-защита активирована!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Популярные ИИ</string>
+    <string name="preOnboardingAiComparisonChartItem1">Все чаты анонимны</string>
+    <string name="preOnboardingAiComparisonChartItem2">Для доступа ко всем функциям ИИ не требуется регистрация</string>
+    <string name="preOnboardingAiComparisonChartItem3">Никогда не использует ваши чаты для обучения ИИ-моделей</string>
+    <string name="preOnboardingAiComparisonChartItem4">Получите доступ к ChatGPT, Claude и другим моделям в одном месте</string>
+    <string name="preOnboardingAiComparisonChartButton">Попробуйте Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Попробуйте создать приватный чат с ИИ!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Хотите сделать DuckDuckGo браузером по умолчанию?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Мы также предлагаем платную подписку, включающую расширенные ИИ-модели с более высокими лимитами чатов с GPT и Claude, безопасный VPN и многое другое.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Только поиск</string>
     <string name="input_screen_user_pref_with_ai_updated">Переключайтесь между\nПоиском и Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Подтвердить</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Открыть в Fire-вкладке</string>
+    <string name="openInBackgroundTab">Открыть в фоновом режиме</string>
+    <string name="browserModeToggleFireDescription">Переключиться на Fire-вкладки</string>
+    <string name="browserModeToggleRegularDescription">Перейти на обычные вкладки</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-вкладка</string>
+    <string name="fireTabNewTabPageTitle">Fire-вкладка</string>
+    <string name="fireTabsEmptyStateTitle">Fire-вкладки</string>
+    <string name="fireTabsFeatureNoHistory">Просмотр сайтов без сохранения локальной истории</string>
+    <string name="fireTabsFeatureDifferentAccount">Вход на сайт через другую учетную запись</string>
+    <string name="fireTabsFeatureTroubleshoot">Устранение неполадок с сайтами</string>
+    <string name="fireTabsExplainer">Данные Fire-вкладок изолированы от прочих данных браузера. При закрытии их данные будут уничтожены. Защита от отслеживания в таких вкладках не отличается от стандартной.</string>
+    <string name="fireTabsNewTabButton">Новая Fire-вкладка</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>Новинка!</b> Используйте Fire-вкладки, чтобы просматривать веб-страницы без сохранения локальной истории.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
 </resources>

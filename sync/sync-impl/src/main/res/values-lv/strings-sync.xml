@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Lejupielādēt PDF formātā</string>
     <string name="sync_restore_on_reinstall_title">Atjauno, atkārtoti instalējot lietotni</string>
     <string name="sync_restore_on_reinstall_description">Ja atkārtoti instalēsi lietotni DuckDuckGo, mēs jautāsim, vai vēlies atjaunot datus šajā ierīcē.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Piekļūsti savām tērzēšanas sarunām visās savās ierīcēs, izmantojot Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sinhronizēt ar citu ierīci</string>
+    <string name="sync_chat_bottom_sheet_title">Sinhronizēsim tērzēšanas sarunas visās tavās ierīcēs!</string>
+    <string name="sync_chat_bottom_sheet_description">Atrodi QR kodu DuckDuckGo lietotnē savā otrā ierīcē, dodoties uz Iestatījumi › Sync &amp; Backup › Sinhronizēt ar citu ierīci.</string>
+    <string name="sync_chat_bottom_sheet_positive">Kvadrātkoda skenēšana</string>
+    <string name="sync_chat_bottom_sheet_negative">Ne tagad</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Vai sinhronizēt datus?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sinhronizēt tagad</string>
+    <string name="sync_v2_joiner_confirmation_negative">Atcelt</string>
+
+    <string name="sync_v2_host_confirmation_title">Vai sinhronizēt datus?</string>
+    <string name="sync_v2_host_confirmation_positive">Sinhronizēt tagad</string>
+    <string name="sync_v2_host_confirmation_negative">Atcelt</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">“%1$s” varēs piekļūt tavām sinhronizētajām DuckDuckGo parolēm, automātiskās aizpildīšanas datiem un Duck.ai tērzēšanām.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">“%1$s” varēs piekļūt tavām sinhronizētajām Duck.ai tērzēšanām.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Otra ierīce varēs piekļūt tavām sinhronizētajām DuckDuckGo parolēm, automātiskās aizpildīšanas datiem un Duck.ai tērzēšanām.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Otra ierīce varēs piekļūt tavām sinhronizētajām Duck.ai tērzēšanām.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sinhronizācija neizdevās.</string>
+    <string name="sync_v2_error_pairing_rejected">Sinhronizācija atcelta otrā ierīcē.</string>
+    <string name="sync_v2_error_pairing_canceled">Sinhronizācija atcelta.</string>
+    <string name="sync_v2_error_upgrade_required">Atjaunini DuckDuckGo pārlūkprogrammu un mēģini vēlreiz.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Lūdzu, sinhronizē šo ierīci no jau pievienotas DuckDuckGo pārlūkprogrammas citā ierīcē</string>
+    <string name="sync_v2_error_try_again">Lūdzu, mēģini vēlreiz.</string>
+    <string name="sync_v2_error_got_it">Sapratu</string>
+    <string name="sync_v2_already_paired_title">Jau sinhronizēts.</string>
+    <string name="sync_v2_already_paired_message">Šīs ierīces jau ir savienotas ar Sync &amp; Backup.</string>
+
 </resources>

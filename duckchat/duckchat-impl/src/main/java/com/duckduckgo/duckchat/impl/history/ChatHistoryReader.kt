@@ -23,7 +23,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import com.duckduckgo.app.di.ActivityContext
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
@@ -37,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
@@ -57,8 +61,11 @@ class RealChatHistoryReader @Inject constructor(
     @Named("ContentScopeScripts") private val contentScopeScripts: JsMessaging,
     private val duckChatWebViewClient: DuckChatWebViewClient,
     private val duckChatJSHelper: DuckChatJSHelper,
+    private val cookieManagerProvider: CookieManagerProvider,
+    private val webViewModeInitializer: WebViewModeInitializer,
+    private val browserMode: BrowserMode,
 ) : ChatHistoryReader {
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.forMode(browserMode) }
 
     private var webView: WebView? = null
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
@@ -95,7 +102,11 @@ class RealChatHistoryReader @Inject constructor(
     private fun getOrCreateWebView(): WebView {
         webView?.let { return it }
 
-        val wv = WebView(context).apply {
+        val wv = WebView(context)
+        webViewModeInitializer.bind(wv, browserMode).onFailure {
+            logcat(WARN) { "ChatHistoryReader: WebView profile bind failed for $browserMode: ${it.message}" }
+        }
+        wv.apply {
             settings.apply {
                 userAgentString = CUSTOM_UA
                 javaScriptEnabled = true
@@ -105,9 +116,6 @@ class RealChatHistoryReader @Inject constructor(
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 cacheMode = WebSettings.LOAD_DEFAULT
             }
-
-            cookieManager.setAcceptCookie(true)
-            cookieManager.setAcceptThirdPartyCookies(this, true)
 
             duckChatWebViewClient.onPageFinishedListener = { url ->
                 logcat { "ChatHistoryReader: onPageFinished $url" }
@@ -131,6 +139,10 @@ class RealChatHistoryReader @Inject constructor(
                 },
             )
         }
+        cookieManager?.apply {
+            setAcceptCookie(true)
+            setAcceptThirdPartyCookies(wv, true)
+        }
 
         webView = wv
         return wv
@@ -138,7 +150,7 @@ class RealChatHistoryReader @Inject constructor(
 
     private fun handleDuckChatMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         appCoroutineScope.launch(dispatchers.io()) {
-            duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+            duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data, browserMode = browserMode)?.let { response ->
                 withContext(dispatchers.main()) {
                     contentScopeScripts.onResponse(response)
                 }

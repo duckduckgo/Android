@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Descarcă ca PDF</string>
     <string name="sync_restore_on_reinstall_title">Restaurează la reinstalarea aplicației</string>
     <string name="sync_restore_on_reinstall_description">Dacă reinstalezi aplicația DuckDuckGo, te vom întreba dacă dorești să restaurezi datele pe acest dispozitiv.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Accesează-ți chaturile pe toate dispozitivele folosind Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_chat_bottom_sheet_title">Haide să-ți sincronizăm chaturile pe toate dispozitivele!</string>
+    <string name="sync_chat_bottom_sheet_description">Găsește codul QR în aplicația DuckDuckGo de pe celălalt dispozitiv, accesând Setări › Sync &amp; Backup › Sincronizează cu un alt dispozitiv.</string>
+    <string name="sync_chat_bottom_sheet_positive">Scanează codul QR</string>
+    <string name="sync_chat_bottom_sheet_negative">Nu acum</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_joiner_confirmation_negative">Anulează</string>
+
+    <string name="sync_v2_host_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_host_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_host_confirmation_negative">Anulează</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa parolele tale sincronizate din DuckDuckGo, datele de completare automată și conversațiile din Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa chaturile tale Duck.ai sincronizate.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Celălalt dispozitiv va avea acces la parolele tale sincronizate din DuckDuckGo, la datele de completare automată și la chaturile Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Celălalt dispozitiv va putea accesa chaturile tale Duck.ai sincronizate.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sincronizarea nu a reușit.</string>
+    <string name="sync_v2_error_pairing_rejected">Sincronizarea a fost anulată de pe celălalt dispozitiv.</string>
+    <string name="sync_v2_error_pairing_canceled">Sincronizare anulată.</string>
+    <string name="sync_v2_error_upgrade_required">Actualizează browserul DuckDuckGo și încearcă din nou.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sincronizează acest dispozitiv dintr-un browser DuckDuckGo deja conectat pe un alt dispozitiv</string>
+    <string name="sync_v2_error_try_again">Încearcă din nou.</string>
+    <string name="sync_v2_error_got_it">Am înțeles</string>
+    <string name="sync_v2_already_paired_title">Deja sincronizat.</string>
+    <string name="sync_v2_already_paired_message">Aceste dispozitive sunt deja conectate la Sync &amp; Backup.</string>
+
 </resources>

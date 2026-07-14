@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Als PDF herunterladen</string>
     <string name="sync_restore_on_reinstall_title">Bei App-Neuinstallation wiederherstellen</string>
     <string name="sync_restore_on_reinstall_description">Wenn du die DuckDuckGo-App neu installierst, werden wir dich fragen, ob du deine Daten auf diesem Gerät wiederherstellen möchtest.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Mit Sync &amp; Backup kannst du geräteübergreifend auf deine Chats zugreifen.</string>
+    <string name="sync_chat_promo_banner_cta_title">Mit anderem Gerät synchronisieren</string>
+    <string name="sync_chat_bottom_sheet_title">Lass uns deine Chats auf deinen Geräten synchronisieren!</string>
+    <string name="sync_chat_bottom_sheet_description">Finde den QR-Code in der DuckDuckGo-App auf deinem anderen Gerät unter Einstellungen › Sync &amp; Backup › Mit anderem Gerät synchronisieren.</string>
+    <string name="sync_chat_bottom_sheet_positive">QR-Code scannen</string>
+    <string name="sync_chat_bottom_sheet_negative">Jetzt nicht</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Deine Daten synchronisieren?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Jetzt synchronisieren</string>
+    <string name="sync_v2_joiner_confirmation_negative">Abbrechen</string>
+
+    <string name="sync_v2_host_confirmation_title">Deine Daten synchronisieren?</string>
+    <string name="sync_v2_host_confirmation_positive">Jetzt synchronisieren</string>
+    <string name="sync_v2_host_confirmation_negative">Abbrechen</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ kann auf deine synchronisierten DuckDuckGo-Passwörter, Autofill-Daten und Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ kann auf deine synchronisierten Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Das andere Gerät kann auf deine synchronisierten DuckDuckGo-Passwörter, Autofill-Daten und Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Das andere Gerät kann auf deine synchronisierten Duck.ai-Chats zugreifen.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synchronisation fehlgeschlagen.</string>
+    <string name="sync_v2_error_pairing_rejected">Die Synchronisierung auf deinem anderen Gerät wurde abgebrochen.</string>
+    <string name="sync_v2_error_pairing_canceled">Die Synchronisierung wurde abgebrochen.</string>
+    <string name="sync_v2_error_upgrade_required">Aktualisiere den DuckDuckGo-Browser und versuche es erneut.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Bitte synchronisiere dieses Gerät mit einem bereits verbundenen DuckDuckGo-Browser auf einem anderen Gerät</string>
+    <string name="sync_v2_error_try_again">Bitte versuche es noch einmal.</string>
+    <string name="sync_v2_error_got_it">Verstanden</string>
+    <string name="sync_v2_already_paired_title">Bereits synchronisiert.</string>
+    <string name="sync_v2_already_paired_message">Diese Geräte sind bereits mit Sync &amp; Backup verbunden.</string>
+
 </resources>

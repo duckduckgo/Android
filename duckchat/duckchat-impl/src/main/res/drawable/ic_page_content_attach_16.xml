@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M10.0872,9.9103C10.2824,9.7151 10.5989,9.7151 10.7942,9.9103L14.7501,13.8662L14.7502,11.4999C14.7502,11.2237 14.974,10.9999 15.2501,10.9999L15.5002,10.9998C15.7763,10.9998 16.0001,11.2237 16.0001,11.4998V15.4999C16.0001,15.776 15.7762,15.9999 15.5001,15.9999L11.5001,15.9998C11.224,15.9997 11.0002,15.776 11.0001,15.4999V15.2499C11.0001,14.9737 11.2241,14.7499 11.5002,14.7499L13.8658,14.7498L9.9104,10.7942C9.7151,10.5989 9.7151,10.2823 9.9104,10.087L10.0872,9.9103ZM12,1C14.2091,1 16,2.7909 16,5V7.8764C16,8.3779 15.3381,8.658 14.906,8.4036C14.8546,8.3733 14.8026,8.344 14.75,8.3157V6.3125C14.75,5.7257 14.2743,5.25 13.6875,5.25H10.427C9.1625,5.25 8.0066,4.5355 7.441,3.4045C7.0873,2.697 6.3641,2.25 5.573,2.25H4C2.4812,2.25 1.25,3.4812 1.25,5V11C1.25,12.5188 2.4812,13.75 4,13.75H7.9165C7.9499,13.8727 7.9881,13.9935 8.0309,14.112C8.1772,14.5176 7.9035,15 7.4724,15H4C1.7909,15 0,13.2091 0,11V5C0,2.7909 1.7909,1 4,1H12ZM7.375,10C7.7202,10 8,10.2798 8,10.625C8,10.9702 7.7202,11.25 7.375,11.25H3.625C3.2798,11.25 3,10.9702 3,10.625C3,10.2798 3.2798,10 3.625,10H7.375ZM9.375,7C9.7202,7 10,7.2798 10,7.625C10,7.9702 9.7202,8.25 9.375,8.25H3.625C3.2798,8.25 3,7.9702 3,7.625C3,7.2798 3.2798,7 3.625,7H9.375ZM8.1776,2.25C8.3237,2.4322 8.4519,2.6314 8.559,2.8455C8.9127,3.553 9.636,4 10.427,4H13.6875C14.0239,4 14.3435,4.0719 14.6318,4.201C14.2895,3.072 13.2409,2.25 12,2.25H8.1776Z"
+      android:fillColor="?daxColorPrimaryIcon" />
+</vector>

@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.card.MaterialCardView
@@ -41,20 +42,34 @@ class NativeInputLayoutCoordinator(
     private var widgetAnimationFrameHandler: ((card: View) -> Unit)? = null
 
     /**
-     * While true, the [configureContentOffset] layout listener no-ops. Set by the manager
-     * around `animateEnter` / `animateExit` so the snapshot/setup phases of those animators
-     * (which briefly mutate the card's layoutParams before translation is applied) don't
-     * cause the content offset to snap to an intermediate state. During the actual animation,
-     * [onWidgetAnimationFrame] drives the offset from the animator's `onUpdate`.
+     * While true the [configureContentOffset] layout listener no-ops. Set by the manager around
+     * animateEnter/animateExit so their setup phase doesn't snap the offset to an intermediate state;
+     * [onWidgetAnimationFrame] drives the offset during the animation instead.
      */
     private var isWidgetAnimating: Boolean = false
 
-    fun buildWidgetLayoutParams(isBottom: Boolean): ViewGroup.LayoutParams {
+    private var navBarInsetPx: Int = 0
+    private var reapplyContentOffset: (() -> Unit)? = null
+    private var reapplyAutocompleteOffset: (() -> Unit)? = null
+
+    fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         ).apply {
             gravity = if (isBottom) Gravity.BOTTOM else Gravity.TOP
+            // In top mode the persistent nav bar occupies the top strip, so offset the widget below it
+            // instead of overlapping. Bottom mode sits at the bottom and needs no offset.
+            topMargin = if (isBottom) 0 else topInsetPx
+        }
+    }
+
+    fun buildNavBarLayoutParams(heightPx: Int): ViewGroup.LayoutParams {
+        return CoordinatorLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            heightPx,
+        ).apply {
+            gravity = Gravity.TOP
         }
     }
 
@@ -121,11 +136,16 @@ class NativeInputLayoutCoordinator(
         }
 
         fun applyForWidgetPosition() {
-            val topOffset = if (isBottom) 0 else maxOf(0, widgetView.bottom - autoCompleteList.top)
-            val bottomOffset = if (isBottom) maxOf(0, autoCompleteList.bottom - widgetView.top) else 0
+            // Top mode uses the widget's on-screen bottom (layout bottom + translationY): the nav bar hide
+            // rides the widget up via translationY (a render transform, not a layout change), so .bottom
+            // alone would offset for the old nav-bar-shown position and leave a gap the size of the nav bar.
+            // Bottom mode's nav bar doesn't ride the widget, so its offset stays layout-based.
+            val topOffset = autocompleteTopOffset(isBottom, widgetView.bottom + widgetView.translationY.toInt(), autoCompleteList.top, navBarInsetPx)
+            val bottomOffset = autocompleteBottomOffset(isBottom, autoCompleteList.bottom, widgetView.top)
             applyPadding(deltaTop = topOffset, deltaBottom = bottomOffset)
         }
 
+        reapplyAutocompleteOffset = { applyForWidgetPosition() }
         widgetView.post { applyForWidgetPosition() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -140,6 +160,7 @@ class NativeInputLayoutCoordinator(
 
                 override fun onViewDetachedFromWindow(v: View) {
                     applyPadding(deltaTop = 0, deltaBottom = 0)
+                    reapplyAutocompleteOffset = null
                     restoreFloats.forEach { it() }
                     v.removeOnLayoutChangeListener(layoutListener)
                     autoCompleteList.removeOnLayoutChangeListener(layoutListener)
@@ -164,8 +185,10 @@ class NativeInputLayoutCoordinator(
         }
     }
 
-    fun configureContentOffset(widgetView: View, isBottom: Boolean) {
+    fun configureContentOffset(widgetView: View, isBottom: Boolean, navBarInsetPx: Int = 0) {
+        this.navBarInsetPx = navBarInsetPx
         data class Target(val view: View, val basePadding: Padding)
+
         val newTabContent =
             rootView.findViewById<View?>(R.id.newTabPage)
                 ?: rootView.findViewById(R.id.includeNewBrowserTab)
@@ -177,18 +200,27 @@ class NativeInputLayoutCoordinator(
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
 
-        // Resolved once here instead of per call inside isLogoOnlyContent: that runs from the global
-        // layout listener below on every window layout pass, and findViewById walks the tree each
-        // time. These views inflate alongside newTabContent, so caching the references is safe;
-        // their live visibility/height are still read on each pass.
+        // Cached once: isLogoOnlyContent runs on every layout pass and findViewById walks the tree.
+        // Safe to cache (they inflate with newTabContent); live visibility/height are read each pass.
         val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
         val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
+        // NTP content that renders above the logo and must clear the widget. Checked by height, not
+        // visibility: these containers stay attached and collapse to zero height when empty.
+        val nonLogoContentViews = listOfNotNull(
+            rootView.findViewById(R.id.appTrackingProtectionStateView),
+            rootView.findViewById(R.id.indonesiaNewTabSectionView),
+            rootView.findViewById(R.id.messageCta),
+        )
+        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
+        // one overrides the logo-only suppression below.
+        val onboardingCtaViews = listOfNotNull(
+            rootView.findViewById(R.id.brandDesignDialogScrollView),
+            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
+        )
 
-        // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
-        // The transition is staged here but only assigned to the parent once the enter animation
-        // completes (see enableContentLayoutTransition). Otherwise the per-frame setPadding
-        // calls during the enter animation would each spawn a fresh CHANGING animator and the
-        // content would visibly lag behind the widget growth.
+        // Animate content reflow when the widget toggles Search ↔ DuckAI. Staged here but only assigned
+        // once the enter animation completes (enableContentLayoutTransition); otherwise per-frame
+        // setPadding during the enter would spawn CHANGING animators and the content would lag the widget.
         val ntpGroup = newTabContent as? ViewGroup
         val previousNtpTransition = ntpGroup?.layoutTransition
         if (ntpGroup != null) {
@@ -219,24 +251,33 @@ class NativeInputLayoutCoordinator(
             if (view != newTabContent) return false
             val logoVisible = ddgLogoView?.visibility == View.VISIBLE
             val hatchHeightPx = returnHatchView?.height ?: 0
-            return isLogoOnly(logoVisible, hatchHeightPx)
+            val onboardingCtaVisible = onboardingCtaViews.any { it.isVisible }
+            val sectionsVisible = nonLogoContentViews.any { it.isVisible && it.height > 0 }
+            return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible, sectionsVisible)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
-            if (isBottom || isLogoOnlyContent(view)) return 0
-            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
-            return maxOf(0, anchorBottomInWindow - viewLocation[1])
+            val logoOnly = isLogoOnlyContent(view)
+            val widgetTopOffsetPx = if (!logoOnly && !isBottom) {
+                val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+                anchorBottomInWindow - viewLocation[1]
+            } else {
+                0
+            }
+            return contentTopInset(isBottom, logoOnly, this@NativeInputLayoutCoordinator.navBarInsetPx, widgetTopOffsetPx)
         }
 
-        fun computeDeltaBottom(): Int {
+        fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
             if (!isBottom) return 0
-            return maxOf(0, widgetView.height)
+            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+            val viewBottomInWindow = viewLocation[1] + view.height
+            return maxOf(0, viewBottomInWindow - anchorTopInWindow)
         }
 
-        fun applyOffsetWithBottom(anchorBottomInWindow: Int) {
-            val deltaBottom = computeDeltaBottom()
+        fun applyOffsetWithBottom(anchorTopInWindow: Int, anchorBottomInWindow: Int) {
             targets.forEach { target ->
                 val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
+                val deltaBottom = computeDeltaBottom(target.view, anchorTopInWindow)
                 applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
@@ -248,15 +289,12 @@ class NativeInputLayoutCoordinator(
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
-            applyOffsetWithBottom(anchorBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
-        // Called from the enter/exit animators' onUpdate, BEFORE the layout pass that
-        // processes the new card layoutParams. We project the card's current visual bottom
-        // from the values the animator has just written (layoutParams + translation), so the
-        // setPadding here and the card's own requestLayout coalesce into the same
-        // measure/layout pass — content tracks the widget's growth/shrinkage in the same
-        // frame instead of lagging by one.
+        // Called from the animators' onUpdate before the layout pass. Projects the card's visual bottom
+        // from the values the animator just wrote (layoutParams + translation) so this setPadding and the
+        // card's requestLayout coalesce into one pass — content tracks the widget in the same frame.
         widgetAnimationFrameHandler = lambda@{ card ->
             if (!widgetView.isShown) return@lambda
             val parent = card.parent as? View ?: return@lambda
@@ -270,9 +308,10 @@ class NativeInputLayoutCoordinator(
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
             val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
-            applyOffsetWithBottom(cardVisualBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
+        reapplyContentOffset = { applyOffset() }
         widgetView.post { applyOffset() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -282,16 +321,12 @@ class NativeInputLayoutCoordinator(
         widgetView.addOnLayoutChangeListener(layoutListener)
         rootView.addOnLayoutChangeListener(layoutListener)
 
-        // Several inputs to the offset change asynchronously without moving rootView/widgetView —
-        // the return hatch showing/hiding (its height feeds isLogoOnlyContent), the logo's
-        // visibility, and NTP content reflow shifting the content's window position. The per-view
-        // OnLayoutChange listeners above don't fire for those, so we need a post-layout signal that
-        // covers the whole NTP. viewTreeObserver is the window-shared one, so this fires on every
-        // global layout pass (keyboard, scroll, etc.); that breadth is deliberate — a listener
-        // scoped to just the hatch misses the logo/content cases and fires mid-layout with stale
-        // sibling positions. Kept cheap: skipped while animating (isWidgetAnimating), a no-op when
-        // padding is unchanged (applyPadding), and the lookups it needs are cached above.
-        val ntpContentView = newTabContent?.takeIf { !isBottom }
+        // Some offset inputs change without moving rootView/widgetView (hatch height, logo visibility,
+        // NTP reflow), which the per-view listeners miss. The window-shared viewTreeObserver fires on
+        // every global layout pass — broad by design; kept cheap via the isWidgetAnimating skip and
+        // no-op applyPadding. Needed in both modes: bottom mode's nav bar top inset also flips with
+        // logo-only transitions (hatch/RMF/AppTP banner appearing).
+        val ntpContentView = newTabContent
         val globalLayoutListener =
             ViewTreeObserver.OnGlobalLayoutListener {
                 if (isWidgetAnimating) return@OnGlobalLayoutListener
@@ -306,6 +341,7 @@ class NativeInputLayoutCoordinator(
                     ntpGroup?.layoutTransition = previousNtpTransition
                     pendingContentLayoutTransition = null
                     widgetAnimationFrameHandler = null
+                    reapplyContentOffset = null
                     isWidgetAnimating = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
@@ -317,6 +353,18 @@ class NativeInputLayoutCoordinator(
                 }
             },
         )
+    }
+
+    /**
+     * Updates the nav bar top-inset used by the (already-registered) content-offset listeners and
+     * re-applies immediately. Cheap: no new listeners — unlike re-calling [configureContentOffset].
+     */
+    fun updateNavBarInset(px: Int) {
+        navBarInsetPx = px
+        reapplyContentOffset?.invoke()
+        // Recompute the autocomplete offset too: the nav bar toggle rides the widget via translationY,
+        // which fires no layout listener, so this is the only signal that the widget's screen edges moved.
+        reapplyAutocompleteOffset?.invoke()
     }
 
     fun onWidgetAnimationFrame(card: View) {
@@ -336,7 +384,11 @@ class NativeInputLayoutCoordinator(
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
         val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
-            widgetView.translationY = 0f
+            // Only reset bottom-anchored widgets. A top-anchored widget's translationY is owned by the
+            // nav bar visibility — the widget rides up by the nav bar height when the bar hides — so
+            // zeroing it here (this runs a frame after attach) would clobber that ride-up and leave a
+            // gap under the top chrome when reopening with prefilled text.
+            if (isBottom) widgetView.translationY = 0f
             return
         }
         fun applyOffset() {
@@ -365,15 +417,47 @@ class NativeInputLayoutCoordinator(
 }
 
 /**
- * Whether the new-tab page's only content is the dax logo. When true the content is NOT offset below
- * the input widget (it stays centered), so the logo keeps a fixed vertical position regardless of the
- * widget's height — otherwise it would sit lower on the Duck.ai tab (whose widget is taller than
- * Search's) and appear to shift when switching tabs.
+ * Whether the new-tab page shows only the dax logo. When true the content is NOT offset below the widget
+ * so the logo stays centered (otherwise it shifts between Search and the taller Duck.ai tab).
  *
- * A real return-hatch is detected via [hatchHeightPx] rather than visibility: the NewTabReturnHatchView
- * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
- * content is what's toggled), so a visibility check would always report "hatch present" and defeat
- * this guard.
+ * [hatchHeightPx] is used instead of hatch visibility: the container is always VISIBLE and only collapses
+ * to zero height when no hatch is shown. [onboardingCtaVisible]/[sectionsVisible] force a non-logo-only
+ * result — a CTA bubble or a section above the logo (AppTP banner, RMF, Indonesia message) must clear the widget.
  */
-internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int): Boolean =
-    logoVisible && hatchHeightPx <= 0
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean, sectionsVisible: Boolean): Boolean =
+    logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible && !sectionsVisible
+
+/**
+ * The top padding the NTP/browser content needs to clear the input-mode chrome.
+ *
+ * - Logo-only content is never inset, so the centered logo doesn't shift between Search and the taller
+ *   Duck.ai tab (and it can't collide with the short top nav bar anyway).
+ * - Bottom mode: the widget sits at the bottom, so the only top chrome is the persistent nav bar — inset by
+ *   [navBarInsetPx] so the content isn't drawn under it.
+ * - Top mode: the widget sits below the nav bar, so [widgetTopOffsetPx] (content top → widget bottom) already
+ *   accounts for the nav bar; clamp negatives to zero.
+ */
+internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInsetPx: Int, widgetTopOffsetPx: Int): Int =
+    when {
+        isLogoOnly -> 0
+        isBottom -> navBarInsetPx
+        else -> maxOf(0, widgetTopOffsetPx)
+    }
+
+/**
+ * Top padding the autocomplete list needs to clear the top chrome.
+ * - Top mode: sit below the input widget. [widgetVisualBottomPx] must be the widget's on-screen bottom —
+ *   its layout bottom plus translationY — because the nav bar hide slides the widget up via translationY,
+ *   and a layout-only bottom would leave a gap the size of the nav bar once the bar is gone.
+ * - Bottom mode: the widget is at the bottom, so the only top chrome is the nav bar — inset by
+ *   [navBarInsetPx] (zero when the bar is hidden) so the suggestions aren't drawn under it.
+ */
+internal fun autocompleteTopOffset(isBottom: Boolean, widgetVisualBottomPx: Int, autoCompleteListTopPx: Int, navBarInsetPx: Int): Int =
+    if (isBottom) navBarInsetPx else maxOf(0, widgetVisualBottomPx - autoCompleteListTopPx)
+
+/**
+ * Bottom counterpart of [autocompleteTopOffset]: in bottom mode the list clears the widget from below.
+ * Layout-based [widgetTopPx] is fine here — the bottom-mode nav bar doesn't ride the widget.
+ */
+internal fun autocompleteBottomOffset(isBottom: Boolean, autoCompleteListBottomPx: Int, widgetTopPx: Int): Int =
+    if (isBottom) maxOf(0, autoCompleteListBottomPx - widgetTopPx) else 0

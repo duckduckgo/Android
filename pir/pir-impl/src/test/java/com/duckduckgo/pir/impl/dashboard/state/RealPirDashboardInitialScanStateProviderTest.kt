@@ -16,7 +16,6 @@
 
 package com.duckduckgo.pir.impl.dashboard.state
 
-import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
@@ -32,8 +31,11 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,7 +61,8 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockPirRepository: PirRepository = mock()
     private val mockPirSchedulingRepository: PirSchedulingRepository = mock()
     private val mockBrokerStepsParser: BrokerStepsParser = mock()
-    private val mockContext: Context = mock()
+    private val mockForegroundScanServiceMonitor: PirForegroundScanServiceMonitor = mock()
+    private val mockPirScanScheduler: PirScanScheduler = mock()
 
     private val currentTime = 1640995200000L
 
@@ -71,10 +74,12 @@ class RealPirDashboardInitialScanStateProviderTest {
             pirRepository = mockPirRepository,
             pirSchedulingRepository = mockPirSchedulingRepository,
             brokerStepsParser = mockBrokerStepsParser,
-            context = mockContext,
+            pirForegroundScanServiceMonitor = mockForegroundScanServiceMonitor,
+            pirScanScheduler = mockPirScanScheduler,
         )
-
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
+        whenever(mockForegroundScanServiceMonitor.isRunning()).thenReturn(false)
+        runBlocking { whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(false) }
     }
 
     private suspend fun setupBrokersWithScannableSteps(brokers: List<Broker>) {
@@ -913,6 +918,28 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // Then
         assertFalse("Should not restart scan when all jobs are in ERROR state", result)
+    }
+
+    @Test
+    fun whenForegroundServiceRunningThenShouldNotRestartScan() = runTest {
+        // Given - unscanned jobs exist (would otherwise restart) but the foreground scan is running
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+        whenever(mockForegroundScanServiceMonitor.isRunning()).thenReturn(true)
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenScheduledScanWorkerIsRunningThenShouldNotRestartScan() = runTest {
+        // Given - unscanned jobs exist but a scheduled background scan is running
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+        whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(true)
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
     }
 
     private suspend fun setupForEmptyBrokersAndJobs() {

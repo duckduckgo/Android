@@ -8,7 +8,6 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
@@ -19,7 +18,6 @@ import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
-import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
@@ -74,7 +72,6 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyConnectInvoked()
         billingClientAdapter.verifyGetSubscriptionsInvoked(productIds = LIST_OF_PRODUCTS)
-        billingClientAdapter.verifyGetSubscriptionPurchaseHistoryInvoked()
     }
 
     @Test
@@ -85,7 +82,6 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyConnectInvoked()
         billingClientAdapter.verifyGetSubscriptionsInvoked(times = 0)
-        billingClientAdapter.verifyGetSubscriptionPurchaseHistoryInvoked(times = 0)
     }
 
     @Test
@@ -288,16 +284,8 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when launchSubscriptionUpdate called with valid parameters then launches subscription update flow`() = runTest {
-        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
-        val mockPurchase: PurchaseHistoryRecord = mock {
-            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("old_purchase_token")
-        }
-        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
-
         processLifecycleOwner.currentState = RESUMED
-        runCurrent() // Ensure purchase history is loaded
+        runCurrent() // Ensure products are loaded
 
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
 
@@ -333,16 +321,8 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when launchSubscriptionUpdate called with invalid plan then emits failure state`() = runTest {
-        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
-        val mockPurchase: PurchaseHistoryRecord = mock {
-            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("old_purchase_token")
-        }
-        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
-
         processLifecycleOwner.currentState = RESUMED
-        runCurrent() // Ensure purchase history is loaded
+        runCurrent() // Ensure products are loaded
 
         val externalId = "test_external_id"
         val oldPurchaseToken = "old_purchase_token"
@@ -367,16 +347,8 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when launchSubscriptionUpdate fails then emits failure state`() = runTest {
-        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
-        val mockPurchase: PurchaseHistoryRecord = mock {
-            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
-            whenever(it.purchaseTime).thenReturn(1000L)
-            whenever(it.purchaseToken).thenReturn("old_purchase_token")
-        }
-        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
-
         processLifecycleOwner.currentState = RESUMED
-        runCurrent() // Ensure purchase history is loaded
+        runCurrent() // Ensure products are loaded
 
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
 
@@ -412,11 +384,8 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when launchSubscriptionUpdate called with empty purchase token then emits failure state`() = runTest {
-        // Test with empty purchase token to simulate no valid token scenario
-        billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
-
         processLifecycleOwner.currentState = RESUMED
-        runCurrent() // Ensure purchase history is loaded
+        runCurrent() // Ensure products are loaded
 
         val externalId = "test_external_id"
         val oldPurchaseToken = "" // Empty token to simulate no valid purchase token
@@ -532,7 +501,7 @@ class RealPlayBillingManagerTest {
         // do not connect the billing client (no lifecycle transition to CREATED/RESUMED)
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown, result)
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
     }
 }
 
@@ -559,7 +528,6 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         },
     )
 
-    var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
     var activePurchases: List<Purchase> = emptyList()
     var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
     var billingInitResult: BillingInitResult = BillingInitResult.Success
@@ -598,15 +566,6 @@ class FakeBillingClientAdapter : BillingClientAdapter {
             SubscriptionsResult.Success(subscriptions)
         } else {
             SubscriptionsResult.Failure()
-        }
-    }
-
-    override suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult {
-        methodInvocations.add(GetSubscriptionsPurchaseHistory)
-        return if (ready) {
-            SubscriptionsPurchaseHistoryResult.Success(subscriptionsPurchaseHistory)
-        } else {
-            SubscriptionsPurchaseHistoryResult.Failure
         }
     }
 
@@ -650,11 +609,6 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         val invocations = methodInvocations
             .filterIsInstance<GetSubscriptions>()
             .filter { productIds == null || it.productIds == productIds }
-        assertEquals(times, invocations.count())
-    }
-
-    fun verifyGetSubscriptionPurchaseHistoryInvoked(times: Int = 1) {
-        val invocations = methodInvocations.filterIsInstance<GetSubscriptionsPurchaseHistory>()
         assertEquals(times, invocations.count())
     }
 
@@ -705,7 +659,6 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     sealed class FakeMethodInvocation {
         data object Connect : FakeMethodInvocation()
         data class GetSubscriptions(val productIds: List<String>) : FakeMethodInvocation()
-        data object GetSubscriptionsPurchaseHistory : FakeMethodInvocation()
         data object QueryPurchases : FakeMethodInvocation()
 
         data class LaunchBillingFlow(

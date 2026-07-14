@@ -87,6 +87,7 @@ class InputScreenButtons @JvmOverloads constructor(
 
     fun showStopButton() {
         actionSend.isEnabled = true
+        actionSend.alpha = ENABLED_ALPHA
         actionSend.setImageResource(R.drawable.ic_stop_16)
         actionSend.setOnClickListener { onStopClick?.invoke() }
     }
@@ -102,6 +103,7 @@ class InputScreenButtons @JvmOverloads constructor(
 
     fun setSendButtonEnabled(enabled: Boolean) {
         actionSend.isEnabled = enabled
+        actionSend.alpha = if (enabled) ENABLED_ALPHA else DISABLED_ALPHA
     }
 
     fun setSendButtonVisible(visible: Boolean) {
@@ -156,5 +158,10 @@ class InputScreenButtons @JvmOverloads constructor(
         actionNewLine.foreground = circularRippleDrawable
         actionVoiceSearch?.foreground = circularRippleDrawable
         actionVoiceChat?.foreground = circularRippleDrawable
+    }
+
+    companion object {
+        private const val ENABLED_ALPHA = 1f
+        private const val DISABLED_ALPHA = 0.4f
     }
 }

@@ -27,6 +27,7 @@
         layout="@layout/include_default_toolbar" />
 
     <LinearLayout
+        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

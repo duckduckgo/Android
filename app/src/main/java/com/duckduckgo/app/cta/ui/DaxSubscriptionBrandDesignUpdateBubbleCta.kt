@@ -36,12 +36,14 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
+    val isCustomAiOnboardingFlow: Boolean,
     val isFreeTrialCopy: Boolean,
     override val onboardingImprovementsEnabled: Boolean,
+    override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+    description = if (isCustomAiOnboardingFlow) {
         R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
     } else {
         R.string.onboardingPrivacyProDaxDialogDescription
@@ -55,8 +57,10 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
     onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
+    override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 190f, tabletFillHeightDp = 280f, maxHeightFraction = 0.4f)
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
     override val restartWavingDax: Boolean = true
@@ -65,7 +69,8 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         rotationDegrees = 22.62f,
         translationXDp = -114f,
         translationYDp = -288f,
-        heightDp = 267f,
+        minHeightDp = 178f,
+        maxHeightDp = 267f,
         anchorToCardOnTablet = false,
     )
 
@@ -73,7 +78,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
 
         val buttonTextRes = if (isFreeTrialCopy) {
-            R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            R.string.onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign
         } else {
             R.string.onboardingPrivacyProDaxDialogOkButton
         }

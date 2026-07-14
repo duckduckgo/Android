@@ -33,6 +33,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -76,6 +79,10 @@ class ManageRecentAppsProtectionActivity :
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -88,6 +95,10 @@ class ManageRecentAppsProtectionActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -102,7 +113,17 @@ class ManageRecentAppsProtectionActivity :
         bindViews()
         observeViewModel()
 
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootContainer)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onDestroy() {

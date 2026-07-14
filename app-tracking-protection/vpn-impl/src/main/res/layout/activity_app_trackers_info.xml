@@ -31,6 +31,7 @@
         layout="@layout/include_default_toolbar"/>
 
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">

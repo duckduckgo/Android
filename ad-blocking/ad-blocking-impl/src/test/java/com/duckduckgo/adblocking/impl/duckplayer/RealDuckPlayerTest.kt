@@ -24,6 +24,7 @@ import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.core.net.toUri
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED
@@ -42,17 +43,24 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -62,9 +70,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 import java.io.InputStream
@@ -83,6 +92,19 @@ class RealDuckPlayerTest {
     private val mockDuckPlayerLocalFilesPath: DuckPlayerLocalFilesPath = mock()
     private val mimeType: MimeTypeMap = mock()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
+    private val adBlockingExtensionFeature = FeatureToggles.Builder()
+        .store(FakeToggleStore())
+        .appVersionProvider { Int.MAX_VALUE }
+        .featureName("adBlockingExtension")
+        .ioDispatcher(coroutineRule.testDispatcher)
+        .build()
+        .create(AdBlockingExtensionFeature::class.java)
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val storedUserPreferencesFlow = MutableStateFlow(StoredUserPreferences(false, null))
+
+    init {
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(storedUserPreferencesFlow)
+    }
 
     private val testee = RealDuckPlayer(
         mockDuckPlayerFeatureRepository,
@@ -91,6 +113,8 @@ class RealDuckPlayerTest {
         mockDuckPlayerLocalFilesPath,
         mimeType,
         dispatcherProvider,
+        adBlockingExtensionFeature,
+        mockAppBuildConfig,
         true,
         coroutineRule.testScope,
     )
@@ -98,6 +122,9 @@ class RealDuckPlayerTest {
     @Before
     fun setup() = runTest {
         setFeatureToggle(true)
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences())
+            .thenReturn(StoredUserPreferences(false, null))
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink())
             .thenReturn(null)
         whenever(mockDuckPlayerFeatureRepository.getVideoIDQueryParam()).thenReturn("v")
@@ -140,6 +167,41 @@ class RealDuckPlayerTest {
 
     // endregion
 
+    // region observeDuckPlayerState
+
+    @Test
+    fun observeDuckPlayerState_emitsEnabledWhenFeatureEnabled() = runTest {
+        setFeatureToggle(true)
+
+        assertEquals(ENABLED, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_emitsDisabledWhenFeatureDisabled() = runTest {
+        setFeatureToggle(false)
+
+        assertEquals(DISABLED, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_emitsDisabledWithHelpLinkWhenDisabledAndHelpLinkPresent() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()).thenReturn("help_link")
+        setFeatureToggle(false)
+
+        assertEquals(DISABLED_WIH_HELP_LINK, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_reflectsToggleChanges() = runTest {
+        setFeatureToggle(false)
+        assertEquals(DISABLED, testee.observeDuckPlayerState().first())
+
+        setFeatureToggle(true)
+        assertEquals(ENABLED, testee.observeDuckPlayerState().first())
+    }
+
+    // endregion
+
     // region setUserPreferences
     @Test
     fun whenOverlayInteracted_setUserPreferencesUpdatesOverlayInteracted() = runTest {
@@ -164,21 +226,85 @@ class RealDuckPlayerTest {
 
     //endregion
 
+    // region ad-blocking rollout default (driven by combine() started in onCreate)
+    @Test
+    fun whenNotNewInstall_combineDoesNotPersistRolloutDefault() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+        adBlockingExtensionFeature.self().setRawStoredState(State(true))
+        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
+        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
+    }
+
+    @Test
+    fun whenNewInstallAndEnabledByDefaultOff_combineDoesNotPersistRolloutDefault() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        adBlockingExtensionFeature.self().setRawStoredState(State(true))
+        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(false))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
+        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
+    }
+
+    @Test
+    fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistRolloutDefault() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        adBlockingExtensionFeature.self().setRawStoredState(State(false))
+        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
+        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
+    }
+
+    // Runs on the rule's dispatcher so advanceUntilIdle() drives the onCreate combine collector (which lives on
+    // coroutineRule.testScope); the fresh runTest scope keeps its own Job so the collector isn't policed for completion.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenNewInstallAndRolloutOnAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        storedUserPreferencesFlow.value = StoredUserPreferences(true, null)
+        adBlockingExtensionFeature.self().setRawStoredState(State(true))
+        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
+        advanceUntilIdle()
+
+        // atLeastOnce because the mocked repo doesn't propagate the write back through
+        // observeUserPreferences(); in prod the datastore re-emission flips the null-guard.
+        verify(mockDuckPlayerFeatureRepository, atLeastOnce()).setUserPreferences(UserPreferences(true, Disabled))
+    }
+
+    @Test
+    fun whenNewInstallAndRolloutOnButStoredModeAlreadySet_combineDoesNotOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        storedUserPreferencesFlow.value = StoredUserPreferences(false, AlwaysAsk)
+        adBlockingExtensionFeature.self().setRawStoredState(State(true))
+        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
+        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
+    }
+    //endregion
+
     //region getUserPreferences
 
     @Test
     fun whenGetUserPreferencesCalled_returnsUserPreferencesFromRepository() = runTest {
-        val expectedUserPreferences = UserPreferences(true, Enabled)
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(expectedUserPreferences)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
 
         val actualUserPreferences = testee.getUserPreferences()
 
-        assertEquals(expectedUserPreferences, actualUserPreferences)
+        assertEquals(UserPreferences(true, Enabled), actualUserPreferences)
     }
 
     @Test
     fun whenGetUserPreferencesCalled_returnsUserPreferencesWithOverlayInteracted() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Disabled))
 
         val result = testee.getUserPreferences()
 
@@ -187,7 +313,25 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenGetUserPreferencesCalled_returnsUserPreferencesWithPrivatePlayerMode() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, AlwaysAsk))
+
+        val result = testee.getUserPreferences()
+
+        assertEquals(AlwaysAsk, result.privatePlayerMode)
+    }
+
+    @Test
+    fun whenStoredPlayerModeSetThenGetUserPreferencesKeepsItOverDefault() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, Enabled))
+
+        val result = testee.getUserPreferences()
+
+        assertEquals(Enabled, result.privatePlayerMode)
+    }
+
+    @Test
+    fun whenNoStoredModeThenGetUserPreferencesDefaultsToAlwaysAsk() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
 
         val result = testee.getUserPreferences()
 
@@ -215,24 +359,41 @@ class RealDuckPlayerTest {
     // region observeUserPreferences
     @Test
     fun observeUserPreferences_emitsUserPreferencesFromRepository() = runTest {
-        val expectedUserPreferences = UserPreferences(true, Enabled)
-        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(expectedUserPreferences))
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(true, Enabled)))
 
         val result = testee.observeUserPreferences().first()
 
-        assertEquals(expectedUserPreferences, result)
+        assertEquals(UserPreferences(true, Enabled), result)
     }
 
     @Test
     fun observeUserPreferences_emitsMultipleUserPreferencesFromRepository() = runTest {
-        val userPreferences1 = UserPreferences(true, Enabled)
-        val userPreferences2 = UserPreferences(false, Disabled)
-        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(userPreferences1, userPreferences2))
+        val stored1 = StoredUserPreferences(true, Enabled)
+        val stored2 = StoredUserPreferences(false, Disabled)
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(stored1, stored2))
 
         val results = testee.observeUserPreferences().take(2).toList()
 
-        assertEquals(userPreferences1, results[0])
-        assertEquals(userPreferences2, results[1])
+        assertEquals(UserPreferences(true, Enabled), results[0])
+        assertEquals(UserPreferences(false, Disabled), results[1])
+    }
+
+    @Test
+    fun whenStoredPlayerModeSetThenObserveUserPreferencesKeepsItOverDefault() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, Enabled)))
+
+        val result = testee.observeUserPreferences().first()
+
+        assertEquals(Enabled, result.privatePlayerMode)
+    }
+
+    @Test
+    fun whenNoStoredModeThenObserveUserPreferencesDefaultsToAlwaysAsk() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, null)))
+
+        val result = testee.observeUserPreferences().first()
+
+        assertEquals(AlwaysAsk, result.privatePlayerMode)
     }
 
     // endregion
@@ -550,7 +711,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -565,7 +726,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         testee.setDuckPlayerOrigin(AUTO)
         whenever(request.isForMainFrame).thenReturn(true)
 
@@ -581,7 +742,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/openInYouTube?v=12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -597,7 +758,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
 
         val result = testee.intercept(request, url, webView)
 
@@ -612,7 +773,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Disabled))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -632,7 +793,7 @@ class RealDuckPlayerTest {
         whenever(webView.context).thenReturn(context)
         whenever(context.assets).thenReturn(mockAssets)
         whenever(mockAssets.open(any())).thenReturn(mock())
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -665,7 +826,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -679,7 +840,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(request.isForMainFrame).thenReturn(false)
 
         val result = testee.intercept(request, url, webView)
@@ -692,7 +853,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
         whenever(request.isForMainFrame).thenReturn(true)
 
@@ -708,7 +869,7 @@ class RealDuckPlayerTest {
         whenever(request.requestHeaders).thenReturn(mapOf("Referer" to "https://www.youtube-nocookie.com?videoID=12345"))
         whenever(mockDuckPlayerFeatureRepository.getYouTubeReferrerHeaders()).thenReturn(listOf("Referer"))
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
         whenever(request.isForMainFrame).thenReturn(true)
 
@@ -722,7 +883,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=123456")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
         whenever(request.isForMainFrame).thenReturn(true)
 
@@ -737,7 +898,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=123456")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
         whenever(request.isForMainFrame).thenReturn(false)
 
@@ -751,7 +912,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, AlwaysAsk))
         whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
@@ -772,7 +933,7 @@ class RealDuckPlayerTest {
         duckPlayerFeature.addCustomEmbedReferer().setRawStoredState(State(true))
         val webView: WebView = mock()
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, AlwaysAsk))
         val mockInputStream: InputStream = mock()
         whenever(mockDuckPlayerFeatureRepository.requestEmbed(url.toString(), expectedHeaders)).thenReturn(mockInputStream)
 
@@ -794,7 +955,7 @@ class RealDuckPlayerTest {
         duckPlayerFeature.addCustomEmbedReferer().setRawStoredState(State(true))
         val webView: WebView = mock()
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, AlwaysAsk))
         whenever(mockDuckPlayerFeatureRepository.requestEmbed(url.toString(), expectedHeaders)).thenReturn(null)
 
         val result = testee.intercept(mockRequest, url, webView)
@@ -815,7 +976,7 @@ class RealDuckPlayerTest {
         duckPlayerFeature.addCustomEmbedReferer().setRawStoredState(State(false))
         val webView: WebView = mock()
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, AlwaysAsk))
         val mockInputStream: InputStream = mock()
         whenever(mockDuckPlayerFeatureRepository.requestEmbed(url.toString(), expectedHeaders)).thenReturn(mockInputStream)
 
@@ -837,7 +998,7 @@ class RealDuckPlayerTest {
         duckPlayerFeature.addCustomEmbedReferer().setRawStoredState(State(true))
         val webView: WebView = mock()
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, AlwaysAsk))
         val mockInputStream: InputStream = mock()
         whenever(mockDuckPlayerFeatureRepository.requestEmbed(url.toString(), expectedHeaders)).thenReturn(mockInputStream)
 
@@ -854,7 +1015,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenWillNavigateToDuckPlayerWithYouTubeWatchUrlSettingEnabledAndFeatureEnabled_returnTrue() = runTest {
         val uri = "https://www.youtube.com/watch?v=12345".toUri()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
 
         val result = testee.willNavigateToDuckPlayer(uri)
 
@@ -864,7 +1025,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenWillNavigateToDuckPlayerWithYouTubeWatchUrlSettingDisabledAndFeatureEnabled_returnFalse() = runTest {
         val uri = "https://www.youtube.com/watch?v=12345".toUri()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Disabled))
 
         val result = testee.willNavigateToDuckPlayer(uri)
 
@@ -874,7 +1035,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenWillNavigateToDuckPlayerWithYouTubeRootUrlSettingEnableddAndFeatureEnabled_returnFalse() = runTest {
         val uri = "https://www.youtube.com".toUri()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
 
         val result = testee.willNavigateToDuckPlayer(uri)
 
@@ -884,7 +1045,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenWillNavigateToDuckPlayerWithNonYouTubeUrlSettingEnabledAndFeatureEnabled_returnFalse() = runTest {
         val uri = "https://example.com".toUri()
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(true, Enabled))
 
         val result = testee.willNavigateToDuckPlayer(uri)
 

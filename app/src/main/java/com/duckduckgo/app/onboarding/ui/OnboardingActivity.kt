@@ -96,6 +96,11 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun handOffToBrowserActivity() {
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+        finish()
+    }
+
     fun finishAndSubmitChatPrompt(prompt: String) {
         lifecycleScope.launch {
             viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
@@ -147,9 +152,11 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun configureSkipButton() {
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
-                viewModel.devOnlyFullyCompleteAllOnboarding()
-                startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
-                finish()
+                val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()
+                if (shouldNavigate) {
+                    startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+                    finish()
+                }
             }
         }
         viewModel.initializeOnboardingSkipper()

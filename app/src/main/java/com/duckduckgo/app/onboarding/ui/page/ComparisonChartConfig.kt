@@ -48,8 +48,8 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.ic_vpn_color_24_rebrand, R.string.preOnboardingComparisonChartItem1),
             Row(CommonR.drawable.ic_duck_ai_color_24_rebrand, R.string.preOnboardingComparisonChartDuckAi),
             Row(CommonR.drawable.ic_shield_color_24_rebrand, R.string.preOnboardingComparisonChartItem2),
-            Row(CommonR.drawable.ic_cookies_color_24_rebrand, R.string.preOnboardingComparisonChartItem3),
-            Row(CommonR.drawable.ic_profile_blocker_color_24_rebrand, R.string.preOnboardingComparisonChartItem4),
+            Row(CommonR.drawable.ic_profile_blocker_color_24_rebrand, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
+            Row(CommonR.drawable.ic_video_player_color_24, R.string.preOnboardingComparisonChartYoutubeAdBlocker),
         ),
     )
 
@@ -63,7 +63,7 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.ic_shield_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem1),
             Row(CommonR.drawable.ic_duck_ai_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem2),
             Row(CommonR.drawable.ic_lock_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem3),
-            Row(CommonR.drawable.ic_ai_general_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem4),
+            Row(CommonR.drawable.ic_ai_general_color_24, R.string.preOnboardingAiComparisonChartItem4),
         ),
     )
 }

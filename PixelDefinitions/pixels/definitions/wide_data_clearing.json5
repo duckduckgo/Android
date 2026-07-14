@@ -27,6 +27,7 @@
                     "nongranular_fire_dialog",
                     "single_tab_fire_dialog",
                     "app_shortcut",
+                    "fire_tabs_emptied",
                     "auto_foreground",
                     "auto_background",
                     "legacy_fire_dialog",

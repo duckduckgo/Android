@@ -28,6 +28,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
@@ -51,6 +54,10 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
 
+    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
     private val viewModel: ReportBreakageCategorySingleChoiceViewModel by bindViewModel()
 
@@ -61,6 +68,10 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
 
         // The value should never be "unknown" we just do this because getParcelableExtra returns
         // nullable
@@ -76,6 +87,16 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         configureObservers()
         setupToolbar(toolbar)
         setupViews()
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootContainer)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.ctaNextFormSubmit)
     }
 
     override fun onStart() {

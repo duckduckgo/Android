@@ -14,23 +14,24 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fadeScrollbars="false"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:scrollbars="vertical">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar" />
+        android:layout_height="match_parent"
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbars="vertical">
 
         <ViewSwitcher
             android:id="@+id/viewSwitcher"
@@ -47,5 +48,5 @@
                 layout="@layout/view_sync_enabled" />
 
         </ViewSwitcher>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

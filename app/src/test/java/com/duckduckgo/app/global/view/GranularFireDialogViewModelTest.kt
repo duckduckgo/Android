@@ -39,6 +39,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -113,6 +114,7 @@ class GranularFireDialogViewModelTest {
         navigationHistory = mockNavigationHistory,
         dateProvider = mockDateProvider,
         dataClearingWideEvent = dataClearingWideEvent,
+        browserMode = BrowserMode.REGULAR,
     )
 
     @Test
@@ -464,7 +466,7 @@ class GranularFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -529,7 +531,7 @@ class GranularFireDialogViewModelTest {
 
             verify(mockFireButtonStore).incrementFireButtonUseCount()
             verify(mockUserEventsStore).registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-            verify(mockDataClearing).clearDataUsingManualFireOptions()
+            verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
 
             assertEquals(Command.ClearingComplete, awaitItem())
 

@@ -67,8 +67,8 @@ class EnqueuedPixelWorkerTest {
             androidBrowserConfigFeature,
             isVerifiedPlayStoreInstall,
             appBuildConfig,
-            appCoroutineScope = coroutineRule.testScope,
             dispatchers = coroutineRule.testDispatcherProvider,
+            appCoroutineScope = coroutineRule.testScope,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
     }

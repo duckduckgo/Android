@@ -75,6 +75,7 @@
     <string name="options">Optionen</string>
     <string name="shareLink">Link teilen</string>
     <string name="copyUrl">Link-Adresse kopieren</string>
+    <string name="urlCopiedToClipboard">URL in Zwischenablage kopiert</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Nächstes Ergebnis</string>
@@ -679,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">Noch keine Dateien heruntergeladen</string>
-    <string name="downloadsShareTitle">Teilen mit …</string>
     <string name="downloadsDownloadFinishedActionName">Öffnen</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datei existiert nicht mehr</string>
-    <string name="downloadsItemMenuShare">Teilen</string>
-    <string name="downloadsItemMenuDelete">Löschen</string>
-    <string name="downloadsItemMenuCancel">Abbrechen</string>
-    <string name="downloadsActivityMenuDeleteAll">Alle löschen</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s gelöscht</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle Dateien gelöscht</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mehr Optionen für %1$s</string>
-    <string name="downloadsUndoActionName">Rückgängig machen</string>
-    <string name="downloadsStateInProgress">In Bearbeitung …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Schutz gegen App-Tracking</string>
@@ -715,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies verwaltet</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Erfahre, wann Downloads bereit sind</string>
-    <string name="downloadsNotifyMeSubtitle">Erhalte eine Benachrichtigung, wenn Downloads abgeschlossen sind.</string>
 
     <!-- Windows Settings -->
 
@@ -831,6 +816,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Los geht\'s!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="preOnboardingDaxDialog2Button">Wähle deinen Browser</string>
@@ -842,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
     <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Nutze ChatGPT privat mit integriertem Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Gezielte Werbung und Cookie-Pop-ups blockieren</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube-Videos ohne Werbung abspielen</string>
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
     <string name="preOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
     <string name="preOnboardingAddressBarOkButton">Weiter</string>
@@ -895,12 +883,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo bietet auch ein <b>optionales kostenpflichtiges Abonnement</b> mit einem sicheren <b>VPN</b> und <b>fortschrittlicher, privater KI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Probiere es kostenlos aus!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wusstest du das?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Möchtest du über die Adressleiste einfach auf den privaten KI-Chat zugreifen?</string>
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 
@@ -1026,10 +1015,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Hallo.</string>
     <string name="preOnboardingWelcomeDialogBody1">Bereit für einen schnelleren Browser, \nder dir die Kontrolle gibt?</string>
     <string name="preOnboardingWelcomeDialogBody2">KI ist immer optional, und der Datenschutz ist immer aktiviert.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d von %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d von %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Wie sagt man „Ente“ auf Englisch?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Wie sagt man „Ente“ auf Spanisch?</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Das ist Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private KI-Chats, die du jederzeit mit dem <b>Fire Button</b> löschen kannst. Probier’s doch mal aus! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Du schaffst das!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Verwende die Adressleiste, um zu suchen und Websites zu besuchen oder für private KI-Chats zu Duck.ai zu wechseln.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Schlag ein!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Bereit anzufangen?&lt;br/&gt;Probier die Suchfunktion oder den KI-Chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privat suchen</string>
+    <string name="preOnboardingInputModeDemoChatHint">Alles privat fragen</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Erkläre den Aktienmarkt, als wäre ich 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plane einen perfekten Tag in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Überrasche mich!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Was sind 10 faszinierende Fakten aus Wissenschaft, Natur und Geschichte?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Bereit, privat und kostenlos mit ChatGPT, Claude und anderen KIs zu chatten, in einem Browser, der dich aktiv schützt?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Zur Erinnerung: Du kannst Duck.ai überall dort nutzen, wo du das Chat-Symbol siehst</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">KI-Chat starten</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">KI-Schutz aktiviert!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Beliebte KIs</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alle Chats werden anonymisiert</string>
+    <string name="preOnboardingAiComparisonChartItem2">Kein Konto erforderlich, um auf alle KI-Funktionen zuzugreifen</string>
+    <string name="preOnboardingAiComparisonChartItem3">Verwendet deine Chats niemals zum Trainieren von KI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Zugriff auf ChatGPT, Claude und mehr, alles an einem Ort</string>
+    <string name="preOnboardingAiComparisonChartButton">Probiere Duck.ai aus!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Probiere jetzt einen privaten KI-Chat aus!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Möchtest du DuckDuckGo zu deinem Standardbrowser machen?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Wir bieten auch ein kostenpflichtiges Abonnement für fortschrittliche KI-Modelle mit höheren Chat-Limits von GPT und Claude, einem sicheren VPN und mehr.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Nur Suchen</string>
     <string name="input_screen_user_pref_with_ai_updated">Wechseln zwischen\nSuche und Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Bestätigen</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">In einem Fire-Tab öffnen</string>
+    <string name="openInBackgroundTab">Im Hintergrund öffnen</string>
+    <string name="browserModeToggleFireDescription">Zu Fire-Modus-Tabs wechseln</string>
+    <string name="browserModeToggleRegularDescription">Zu regulären Tabs wechseln</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-Tab</string>
+    <string name="fireTabNewTabPageTitle">Fire-Tab</string>
+    <string name="fireTabsEmptyStateTitle">Fire-Tabs</string>
+    <string name="fireTabsFeatureNoHistory">Durchsuchen ohne Speichern des lokalen Verlaufs</string>
+    <string name="fireTabsFeatureDifferentAccount">Melde dich mit einem anderen Konto bei einer Website an</string>
+    <string name="fireTabsFeatureTroubleshoot">Website-Fehlerbehebung</string>
+    <string name="fireTabsExplainer">Fire Tabs sind von anderen Browserdaten isoliert. Ihre Daten werden gelöscht, wenn du alle Fenster schließt. Sie haben den gleichen Tracking-Schutz wie andere Tabs.</string>
+    <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
 </resources>

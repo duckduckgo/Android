@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.mobile.android.R as CommonR
 
 data class DaxEndBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -45,8 +46,9 @@ data class DaxEndBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    backgroundRes = R.drawable.bg_onboarding_end,
+    backgroundRes = CommonR.drawable.bg_onboarding_end,
 ) {
+    override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 160f, tabletFillHeightDp = 240f, maxHeightFraction = 0.4f)
     override val markAsReadOnShow: Boolean = true
 
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent

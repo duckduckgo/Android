@@ -197,6 +197,8 @@ android {
         animationsDisabled = true
         unitTests.all {
             jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
+            maxHeapSize = "2g"
+            forkEvery = 100
         }
     }
 
@@ -265,7 +267,10 @@ def privacyTestDefaults = { config ->
     config.environmentVariables.set(["clearPackageData": "true"])
     config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
     config.localResultsDir.set("fladleResults")
-    config.flakyTestAttempts.set(2)
+    config.flakyTestAttempts.set(1)
+    // Emit the full merged JUnit report so it retains every execution,
+    // including the failed attempt + passed rerun of a flaky test.
+    config.fullJunitResult.set(true)
     config.testShards.set(1)
 }
 
@@ -292,6 +297,8 @@ dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
+	implementation project(":onboarding-api")
+	implementation project(":onboarding-impl")
 	implementation project(":test-seeder-api")
 	internalImplementation project(":test-seeder-internal")
 	implementation project(":data-clearing-api")
@@ -314,6 +321,9 @@ dependencies {
 
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
+
+	implementation project(':referral-api')
+	implementation project(':referral-impl')
 
 	implementation project(":modal-coordinator-impl")
 	implementation project(":modal-coordinator-api")
@@ -398,6 +408,9 @@ dependencies {
 
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
+
+    implementation project(':site-preferences-api')
+    implementation project(':site-preferences-impl')
 
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
@@ -597,6 +610,9 @@ dependencies {
 
     // Dagger
     kapt Google.dagger.compiler
+    // Dagger 2.57+ reads Kotlin @Metadata via an external kotlin-metadata-jvm; it must track the
+    // project Kotlin version so it understands the current metadata format.
+    kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:_"
     implementation Google.dagger
 
     // Glide
@@ -609,9 +625,6 @@ dependencies {
 
     // Security crypto
     implementation AndroidX.security.crypto
-
-    // Play Store referrer library
-    playImplementation("com.android.installreferrer:installreferrer:_")
 
     // HTML
     implementation 'org.jsoup:jsoup:_'
@@ -690,6 +703,7 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
+    dependsOn rootProject.tasks.named('aiConfigCheck')
 }
 
 tasks.register('lint_check') {

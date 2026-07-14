@@ -205,10 +205,10 @@ subprojects {
                     .because("Use guava's bundled ListenableFuture to avoid duplicate classes")
         }
         resolutionStrategy.eachDependency { details ->
-            // kotlinx-serialization runtime must match Kotlin 2.2.x compiler plugin output
+            // kotlinx-serialization runtime must match Kotlin 2.3.x compiler plugin output
             if (details.requested.group == 'org.jetbrains.kotlinx' && details.requested.name.startsWith('kotlinx-serialization')) {
                 details.useVersion '1.8.1'
-                details.because 'Kotlin 2.2.21 serialization compiler plugin requires runtime >= 1.8.x'
+                details.because 'Kotlin 2.3.20 serialization compiler plugin requires runtime >= 1.8.x'
             }
         }
     }
@@ -280,8 +280,8 @@ if (diFramework == 'Metro') {
                 afterEvaluate {
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                         compilerOptions {
-                            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
-                            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
+                            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
                         }
                         // Remove Anvil from the compiler plugin classpath so it can't
                         // override language version or run its K1 compiler plugin
@@ -345,6 +345,9 @@ fladle {
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test
             flakyTestAttempts.set(1)
+            // Emit the full merged JUnit report so it retains every execution,
+            // including the failed attempt + passed rerun of a flaky test.
+            fullJunitResult.set(true)
         }
     }
 }
@@ -357,8 +360,28 @@ afterEvaluate {
                 tasks.named(it),
                 ANDROID_FIREBASE
         ).configure {
-            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+            // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
+            // Flank emit this extra report carrying the flaky markers (failure nodes on
+            // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
+            // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
+            // always reports 0 flaky).
+            reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
         }
+    }
+}
+
+tasks.register('aiConfigCheck') {
+    group = 'verification'
+    description = 'Validates AI config (.cursor/rules, .claude/skills) against AGENTS.md and checks for dangling references.'
+    def repoRoot = layout.projectDirectory.asFile
+    doLast {
+        def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)
+        def violations = checker.check()
+        if (!violations.isEmpty()) {
+            violations.each { v -> logger.error("AI config: " + v.format()) }
+            throw new GradleException("AI config check failed with ${violations.size()} violation(s). See messages above.")
+        }
+        logger.lifecycle("AI config check passed: ${violations.size()} violations.")
     }
 }
 

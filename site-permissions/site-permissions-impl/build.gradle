@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':statistics-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':browser-mode-api')
     implementation project(path: ':site-permissions-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')

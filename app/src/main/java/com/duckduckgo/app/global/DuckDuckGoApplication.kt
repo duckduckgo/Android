@@ -27,9 +27,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import dagger.android.getFactory

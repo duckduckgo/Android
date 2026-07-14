@@ -56,6 +56,7 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
+    implementation Google.android.material
     implementation KotlinX.coroutines.android
     implementation AndroidX.dataStore.preferences
 

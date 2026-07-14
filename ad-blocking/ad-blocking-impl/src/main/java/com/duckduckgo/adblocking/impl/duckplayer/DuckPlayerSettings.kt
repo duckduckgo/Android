@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,44 +18,15 @@ package com.duckduckgo.adblocking.impl.duckplayer
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
-import com.duckduckgo.adblocking.impl.R
-import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(ActivityScope::class)
-@PriorityKey(100)
-class DuckPlayerSettingsTitle @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
-    private val pixel: Pixel,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val duckPlayer: DuckPlayer,
-) : DuckPlayerSettingsPlugin {
-    override fun getView(context: Context): View {
-        return OneLineListItem(context).apply {
-            setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
+@PriorityKey(200)
+class DuckPlayerSettingsEntry @Inject constructor() : OtherSettingsPlugin {
 
-            setPrimaryText(context.getString(R.string.duck_player_setting_title))
-            setOnClickListener {
-                globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
-                appCoroutineScope.launch {
-                    val wasUsedBefore = duckPlayer.wasUsedBefore()
-                    pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to wasUsedBefore.toBinaryString()))
-                }
-            }
-        }
-    }
+    override fun getView(context: Context): View = DuckPlayerSettingsEntryView(context)
 }

@@ -234,6 +234,61 @@
 
     <issue
         id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelOrchestratorTest.kt"
+            line="43"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProvider.kt"
+            line="51"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProviderTest.kt"
+            line="45"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProviderTest.kt"
+            line="50"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
+            line="59"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
         message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
         errorLine1="import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -3731,17 +3786,6 @@
     <issue
         id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
-        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/referral/AppReferrerDataStore.kt"
-            line="78"
-            column="58"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="        whenever(context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)).thenReturn(fakePreferences)"
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3937,38 +3981,6 @@
             column="58"/>
     </issue>
 
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {"
-        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsFileActions.kt"
-            line="94"
-            column="46"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
-            line="64"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
-            line="66"
-            column="13"/>
-    </issue>
 
     <issue
         id="DenyListedApi"
@@ -4078,17 +4090,6 @@
             file="src/test/java/com/duckduckgo/app/browser/omnibar/OmnibarLayoutViewModelTest.kt"
             line="952"
             column="39"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
-        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt"
-            line="32"
-            column="58"/>
     </issue>
 
     <issue

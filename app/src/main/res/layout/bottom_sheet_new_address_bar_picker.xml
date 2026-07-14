@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
+
+    <ImageView
+        android:id="@+id/duckAiLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="48dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_duckduckgo_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/eyebrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:text="@string/newAddressBarPickerDuckDuckGo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/duckAiLogo"
+        app:textType="secondary"
+        app:typography="caption_allCaps" />
+
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+        android:id="@+id/daxBubble"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:showArrow="false"
+        app:arrowOffsetStart="96dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eyebrow"
+        app:layout_constraintWidth_max="600dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/keyline_5">
+
+            <include
+                android:id="@+id/inputScreen"
+                layout="@layout/include_brand_design_input_screen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/confirmButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:alpha="0"
+                android:text="@string/newAddressBarPickerConfirm" />
+
+        </LinearLayout>
+
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+
+    <ImageView
+        android:id="@+id/backgroundIllustration"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/onboarding_input_type_background" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/leftWing"
+        android:layout_width="wrap_content"
+        android:layout_height="160dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/backgroundIllustration"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_wing_left" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

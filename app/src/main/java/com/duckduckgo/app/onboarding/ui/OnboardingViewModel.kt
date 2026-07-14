@@ -19,12 +19,12 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
@@ -33,6 +33,7 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -46,10 +47,10 @@ class OnboardingViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val onboardingStore: OnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -76,7 +77,13 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
         withContext(dispatchers.io()) {
-            userStageStore.stageCompleted(AppStage.NEW)
+            // The orchestrator owns the terminal AppStage write when it drives the run (BrandDesignUpdate
+            // page). The legacy WelcomePage path (brand design update off) does not touch the orchestrator,
+            // so it writes the terminal state here. The extended-flow CTA seeding below always runs (it is
+            // driven by the chosen demo query, not the orchestrator).
+            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+                userStageStore.stageCompleted(AppStage.NEW)
+            }
 
             when (extendedOnboardingFlow) {
                 DEFAULT -> {
@@ -84,17 +91,9 @@ class OnboardingViewModel @Inject constructor(
                 }
 
                 DUCK_AI_FOCUSED -> {
-                    // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
-                    onboardingStore.setDuckAiOnboardingFlow()
-
-                    // Silence all standard DAX CTAs so they don't appear in the browser
-                    listOf(
-                        CtaId.DAX_INTRO,
-                        CtaId.DAX_DIALOG_SERP,
-                        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                        CtaId.DAX_FIRE_BUTTON,
-                        CtaId.DAX_END,
-                    ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
+                    // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
+                    // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
+                    duckAiOnboardingDemo.arm()
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {
@@ -106,7 +105,12 @@ class OnboardingViewModel @Inject constructor(
 
     fun onOnboardingSkipped() {
         viewModelScope.launch(dispatchers.io()) {
-            onboardingSkipper.markOnboardingAsCompleted()
+            // The orchestrator owns the skip terminal write when it drives the run (BrandDesignUpdate
+            // page): its onSkipped runs markOnboardingAsCompleted before it emits Skipped. The legacy
+            // WelcomePage path (brand design update off) does not touch the orchestrator, so it writes here.
+            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+                onboardingSkipper.markOnboardingAsCompleted()
+            }
         }
     }
 
@@ -121,9 +125,24 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    suspend fun devOnlyFullyCompleteAllOnboarding() {
-        onboardingSkipper.markOnboardingAsCompleted()
-        newAddressBarOptionManager.setAsShown()
+    /**
+     * Dev-only "skip all onboarding" shortcut. Returns true when the caller must navigate away itself.
+     *
+     * In the BrandDesignUpdate (orchestrator) path the orchestrator owns the skip: AbortPlan -> Skipped
+     * runs onSkipped and the active page navigates off Skipped, so the caller must not also navigate
+     * (returns false). In the legacy WelcomePage path this writes the terminal state directly and nothing
+     * navigates automatically, so the caller still owns navigation (returns true).
+     */
+    suspend fun devOnlyFullyCompleteAllOnboarding(): Boolean {
+        val brandDesignUpdateEnabled = withContext(dispatchers.io()) {
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        }
+        if (brandDesignUpdateEnabled) {
+            linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+        } else {
+            onboardingSkipper.markOnboardingAsCompleted()
+        }
+        return !brandDesignUpdateEnabled
     }
 
     companion object {

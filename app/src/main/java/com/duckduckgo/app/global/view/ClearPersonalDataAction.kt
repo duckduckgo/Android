@@ -34,12 +34,13 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -136,6 +137,7 @@ class ClearPersonalDataAction(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
     private val siteDataCleaner: SiteDataCleaner,
+    private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -153,10 +155,7 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean,
     ) {
         withContext(dispatchers.io()) {
-            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-            cookieManager.flush()
-            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
-            thirdPartyCookieManager.clearAllData()
+            clearFireproofExemptData()
 
             // https://app.asana.com/0/69071770703008/1204375817149200/f
             if (!deviceSyncState.isUserSignedInOnDevice()) {
@@ -193,10 +192,7 @@ class ClearPersonalDataAction(
 
     override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.io()) {
-            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-            cookieManager.flush()
-            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
-            thirdPartyCookieManager.clearAllData()
+            clearFireproofExemptData()
 
             // https://app.asana.com/0/69071770703008/1204375817149200/f
             if (!deviceSyncState.isUserSignedInOnDevice()) {
@@ -238,21 +234,27 @@ class ClearPersonalDataAction(
         }
 
         return try {
+            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too.
             val fireproofDomains = withContext(dispatchers.io()) {
                 fireproofWebsiteRepository.fireproofWebsitesSync()
-                    .mapNotNull { it.domain.toTldPlusOne() }
+                    .map { it.domain.toTldPlusOneOrSelf() }
                     .toSet()
             }
 
+            val domainsToClear = domains
+                .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
+                .toSet()
+
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
-                domains
-                    .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
-                    .forEach { domain ->
-                        siteDataCleaner.deleteSiteData(webStorage, domain)
-                    }
+                domainsToClear.forEach { domain ->
+                    siteDataCleaner.deleteSiteData(webStorage, domain)
+                }
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
+
+            sitePreferencesDataClearer.clear(domainsToClear)
+
             ClearDataResult.Success
         } catch (e: CancellationException) {
             throw e
@@ -260,6 +262,17 @@ class ClearPersonalDataAction(
             logcat(WARN) { "Failed to clear site data: ${e.message}" }
             ClearDataResult.Error(e)
         }
+    }
+
+    // Shared preamble for full-fire paths: clears cookies and the per-site stores that must keep
+    // fireproofed domains. Both take raw fireproof hosts; site permissions match on raw host, while
+    // the site-preferences store normalises each to its site key (eTLD+1, host fallback) internally.
+    private suspend fun clearFireproofExemptData() {
+        val fireproofEntities = fireproofWebsiteRepository.fireproofWebsitesSync()
+        cookieManager.flush()
+        sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
+        sitePreferencesDataClearer.clearAllButFireproofed(fireproofEntities.map { it.domain }.toSet())
+        thirdPartyCookieManager.clearAllData()
     }
 
     private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {

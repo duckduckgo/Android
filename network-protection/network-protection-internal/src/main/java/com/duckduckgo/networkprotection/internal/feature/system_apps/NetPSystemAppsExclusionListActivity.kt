@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -48,13 +49,18 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
     @Inject
     lateinit var networkProtectionState: NetworkProtectionState
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private var initialExclusionList: Int? = null
 
     private val binding: ActivityNetpInternalSystemAppsExclusionBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
 
         binding.progress.isVisible = true
 
@@ -92,6 +98,10 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
         if (initialExclusionList != exclusionListProvider.getExclusionList().hashCode()) {
             networkProtectionState.restart()
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applySystemBarInsets(binding.root)
     }
 
     companion object {

@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -16,6 +17,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">

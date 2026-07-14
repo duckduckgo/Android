@@ -48,7 +48,7 @@ class BrowserMenuBottomSheetTest {
     fun setUp() {
         val appContext = ApplicationProvider.getApplicationContext<Application>()
         appContext.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
-        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {})
+        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {}, edgeToEdgeEnabled = false)
         dialog.show()
     }
 
@@ -290,7 +290,7 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
         assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
         assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
-        assertFalse(dialog.duckChatSettingsMenuItem.isVisible)
+        assertTrue(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test
@@ -300,6 +300,7 @@ class BrowserMenuBottomSheetTest {
         dialog.render(BrowserMenuViewState.Browser(showDuckAiSection = false))
 
         assertFalse(duckAiSection.isVisible)
+        assertFalse(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test

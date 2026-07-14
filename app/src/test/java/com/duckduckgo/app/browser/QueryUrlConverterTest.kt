@@ -23,13 +23,13 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.urlpredictor.Decision
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +56,7 @@ class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
-    private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val mockAppReferrer: AppReferrer = mock()
     private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
@@ -66,7 +66,7 @@ class QueryUrlConverterTest {
             DuckDuckGoUrlDetectorImpl(),
             mockStatisticsStore,
             variantManager,
-            mockAppReferrerDataStore,
+            mockAppReferrer,
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,

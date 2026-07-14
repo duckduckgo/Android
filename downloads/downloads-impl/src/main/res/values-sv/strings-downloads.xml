@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Spara till Nerladdningar</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Från: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Radera allt</string>
+    <string name="downloadsActivityNoItemsDescription">Inga filer har laddats ner ännu</string>
+    <string name="downloadsActivityTitle">Nerladdningar</string>
+    <string name="downloadsAllFilesDeletedMessage">Alla filer raderade</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Raderade %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Filen finns inte längre</string>
+    <string name="downloadsItemMenuCancel">Avbryt</string>
+    <string name="downloadsItemMenuDelete">Ta bort</string>
+    <string name="downloadsItemMenuShare">Dela</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Fler alternativ för %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
+    <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
+    <string name="downloadsShareTitle">Dela med …</string>
+    <string name="downloadsStateInProgress">Pågår …</string>
+    <string name="downloadsUndoActionName">Återställ</string>
 </resources>

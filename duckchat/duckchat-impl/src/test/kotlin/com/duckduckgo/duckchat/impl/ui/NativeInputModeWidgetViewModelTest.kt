@@ -32,6 +32,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -51,16 +54,20 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -81,6 +88,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -107,14 +115,25 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
     private val duckAiChatStore: DuckAiChatStore = mock()
+    private val history: NavigationHistory = mock()
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val realNativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val realNativeInputStateStore = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
@@ -124,6 +143,8 @@ class NativeInputModeWidgetViewModelTest {
     private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
+    private val modelStateFlow = MutableStateFlow(ModelState())
+    private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
@@ -139,7 +160,9 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
+        whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
@@ -163,10 +186,12 @@ class NativeInputModeWidgetViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
+            duckChatPixels = duckChatPixels,
             nativeInputStatePublisher = nativeInputStatePublisher,
             nativeInputStateProvider = nativeInputStateProvider,
             modelManager = modelManager,
             duckAiChatStore = duckAiChatStore,
+            history = history,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -545,6 +570,20 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenModelStateSubscriptionEligibleThenIsSubscriptionEligibleTrue() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = true)
+
+        assertTrue(testee.isSubscriptionEligible.firstOrNull()!!)
+    }
+
+    @Test
+    fun whenModelStateNotSubscriptionEligibleThenIsSubscriptionEligibleFalse() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = false)
+
+        assertFalse(testee.isSubscriptionEligible.firstOrNull()!!)
+    }
+
+    @Test
     fun whenEntitlementsContainOnlyOtherProductsThenIsPaidTierFalse() = runTest {
         entitlementsFlow.value = listOf(Product.NetP, Product.ITR, Product.PIR)
 
@@ -717,6 +756,174 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenSetInteractionLockThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.LockedExceptDuckAiFireButton)
+        advanceUntilIdle()
+        assertEquals(
+            NativeInputState.InteractionLock.LockedExceptDuckAiFireButton,
+            viewModel.state.firstOrNull()!!.interactionLock,
+        )
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Unlocked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Unlocked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
+    fun whenSetDuckAiFireButtonHighlightedThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setDuckAiFireButtonHighlighted(true)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+
+        viewModel.setDuckAiFireButtonHighlighted(false)
+        advanceUntilIdle()
+        assertFalse(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+    }
+
+    @Test
+    fun whenSetInteractionLockBeforeConfigureThenAppliedOnConfigure() = runTest {
+        val viewModel = createViewModel()
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
+    fun whenShowModelPickerEventThenModelChangeModeSetTrueOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenShowModelPickerEventForOtherTabThenModelChangeModeNotSet() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        showModelPickerEvents.tryEmit("tab-B")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenChatIdChangesThenModelChangeModeCleared() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+
+        viewModel.setActiveChatId("new-chat")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedThenModelChangeModeClearedOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenExitModelChangeModeThenModelChangeModeClearedOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.exitModelChangeMode()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedDuringRecoveryThenSubmitChangeModelPromptSentPixelFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels).fireSubmitChangeModelPromptSent()
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideRecoveryThenSubmitChangeModelPromptSentPixelNotFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels, never()).fireSubmitChangeModelPromptSent()
+    }
+
+    @Test
+    fun whenChatIdChangesThenSubmitEnabledResetsToTrue() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // Simulate the FE having disabled submit for the previous (unsupported-model) chat.
+        nativeInputStatePublisher.update("tab-A") { it.copy(submitEnabled = false) }
+
+        viewModel.setActiveChatId("new-chat")
+        advanceUntilIdle()
+
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.submitEnabled)
+    }
+
+    @Test
+    fun whenSameChatIdReappliedThenSubmitEnabledPreserved() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // FE disabled submit for chat-X (unsupported model).
+        nativeInputStatePublisher.update("tab-A") { it.copy(submitEnabled = false) }
+
+        // Re-applying the same chatId (e.g. tab re-selection / widget re-attach) must not re-enable.
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.submitEnabled)
     }
 
     @Test
@@ -1102,7 +1309,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1111,7 +1318,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1125,7 +1332,7 @@ class NativeInputModeWidgetViewModelTest {
         testee.cancelChatSuggestions()
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     // endregion
@@ -1278,6 +1485,43 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        verify(duckChatPixels).fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    // endregion
+
+    // region fireRecentChatDeleteButtonTappedPixel
+
+    @Test
+    fun whenFireRecentChatDeleteButtonTappedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteButtonTappedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteButtonTapped()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteConfirmedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteConfirmedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteConfirmed()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteCancelledPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteCancelledPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteCancelled()
+    }
+
+    // endregion
+
+    // region duckai autocomplete-family pixels
+
+    @Test
+    fun whenFireDuckAiSearchForQuerySubmittedPixelThenFiresSearchDuckDuckGoPixel() {
+        testee.fireDuckAiSearchForQuerySubmittedPixel()
+
+        verify(duckChatPixels).fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
     // endregion
@@ -1302,6 +1546,149 @@ class NativeInputModeWidgetViewModelTest {
 
         val emitted = testee.state.first()
         assertEquals(NativeInputState.ToggleSelection.SEARCH, emitted.toggleSelection)
+    }
+
+    // endregion
+
+    // region fireSubmissionPixels
+
+    @Test
+    fun whenImageGenerationToolSelectedThenFiresPromptSubmittedAndImageGenerationSubmitted() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = true, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "image_generation",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels).fireImageGenerationSubmitted()
+        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+    }
+
+    @Test
+    fun whenNoToolSelectedThenFiresPromptSubmittedWithNoneAndNoPerToolPixel() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
+        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+    }
+
+    @Test
+    fun whenWebSearchToolSelectedThenFiresPromptSubmittedAndWebSearchSubmitted() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.WEB_SEARCH.rawValue)
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "web_search",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels).fireWebSearchSubmitted()
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
+    }
+
+    // endregion
+
+    // region voice / stop pixels
+
+    @Test
+    fun whenVoiceTappedThenVoicePixel() {
+        testee.fireVoiceTapped()
+        verify(duckChatPixels).fireVoiceTapped()
+    }
+
+    @Test
+    fun whenStopGenerationTappedThenStopPixel() {
+        testee.fireStopGenerationTapped()
+        verify(duckChatPixels).fireStopGenerationTapped()
+    }
+
+    // endregion
+
+    // region search-history delete
+
+    @Test
+    fun whenDeleteHistorySuggestionThenRemovesByUrl() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySuggestion(phrase = "q", title = "T", url = "https://example.com", isAllowedInTopHits = true),
+        )
+        advanceUntilIdle()
+
+        verify(history).removeHistoryEntryByUrl("https://example.com")
+    }
+
+    @Test
+    fun whenDeleteHistorySearchSuggestionThenRemovesByQuery() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySearchSuggestion(phrase = "cats", isAllowedInTopHits = true),
+        )
+        advanceUntilIdle()
+
+        verify(history).removeHistoryEntryByQuery("cats")
+    }
+
+    @Test
+    fun whenDeleteNonHistorySuggestionThenNoHistoryRemoval() = runTest {
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteBookmarkSuggestion(phrase = "b", title = "B", url = "https://b"),
+        )
+        advanceUntilIdle()
+
+        verify(history, never()).removeHistoryEntryByUrl(any())
+        verify(history, never()).removeHistoryEntryByQuery(any())
+    }
+
+    @Test
+    fun whenDeleteHistorySuggestionThenOnDeletedInvokedAfterRemoval() = runTest {
+        val onDeleted: () -> Unit = mock()
+
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySuggestion(phrase = "q", title = "T", url = "https://example.com", isAllowedInTopHits = true),
+            onDeleted,
+        )
+        advanceUntilIdle()
+
+        // Refresh callback must fire only after the removal commits, else the re-fetch races the delete.
+        inOrder(history, onDeleted) {
+            verify(history).removeHistoryEntryByUrl("https://example.com")
+            verify(onDeleted).invoke()
+        }
     }
 
     // endregion

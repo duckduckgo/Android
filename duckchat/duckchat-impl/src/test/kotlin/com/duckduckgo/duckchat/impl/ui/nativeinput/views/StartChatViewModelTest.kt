@@ -44,6 +44,7 @@ class StartChatViewModelTest {
 
     private val featureShowSettingsFlow = MutableStateFlow(true)
     private val enableDuckChatFlow = MutableStateFlow(true)
+    private val showInAddressBarFlow = MutableStateFlow(true)
     private val providerStateFlow = MutableSharedFlow<NativeInputState>(replay = 1)
 
     private val duckAiFeatureState: DuckAiFeatureState = mock<DuckAiFeatureState>().also {
@@ -51,6 +52,7 @@ class StartChatViewModelTest {
     }
     private val duckChatInternal: DuckChatInternal = mock<DuckChatInternal>().also {
         whenever(it.observeEnableDuckChatUserSetting()).thenReturn(enableDuckChatFlow)
+        whenever(it.observeShowInAddressBarUserSetting()).thenReturn(showInAddressBarFlow)
     }
     private val nativeInputStateProvider: NativeInputStateProvider = mock<NativeInputStateProvider>().also {
         whenever(it.state).thenReturn(providerStateFlow)
@@ -86,6 +88,19 @@ class StartChatViewModelTest {
     fun whenUserSettingDisabledThenNotVisible() = runTest {
         featureShowSettingsFlow.value = true
         enableDuckChatFlow.value = false
+        providerStateFlow.emit(stateOf(InputMode.SEARCH_ONLY, ToggleSelection.SEARCH))
+
+        testee.isVisible.test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAddressBarShortcutDisabledThenNotVisible() = runTest {
+        featureShowSettingsFlow.value = true
+        enableDuckChatFlow.value = true
+        showInAddressBarFlow.value = false
         providerStateFlow.emit(stateOf(InputMode.SEARCH_ONLY, ToggleSelection.SEARCH))
 
         testee.isVisible.test {

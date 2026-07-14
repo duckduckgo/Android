@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.EnabledState
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -35,6 +36,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -89,12 +91,45 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when Tabs button long clicked, then send view command`() = runTest {
+    fun `when Tabs button long clicked in Browser mode, then send view command`() = runTest {
+        testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
+
         testee.onTabsButtonLongClicked()
 
         testee.commands.test {
             val command = awaitItem()
             Assert.assertEquals(Command.NotifyTabsButtonLongClicked, command)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when Tabs button long clicked in Browser mode, then returns true and fires pixel`() = runTest {
+        testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
+
+        val handled = testee.onTabsButtonLongClicked()
+
+        Assert.assertTrue(handled)
+        verify(pixelMock).fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
+    }
+
+    @Test
+    fun `when Tabs button long clicked in NewTab mode, then returns false and does not fire pixel`() = runTest {
+        testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+
+        val handled = testee.onTabsButtonLongClicked()
+
+        Assert.assertFalse(handled)
+        verify(pixelMock, never()).fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
+    }
+
+    @Test
+    fun `when Tabs button long clicked in NewTab mode, then does not send view command`() = runTest {
+        testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+
+        testee.commands.test {
+            testee.onTabsButtonLongClicked()
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }

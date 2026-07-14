@@ -20,10 +20,10 @@ import com.duckduckgo.duckchat.impl.models.UserTier
 import logcat.logcat
 
 enum class PickerSurface(val origin: String) {
-    MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
-    MODEL_PICKER_DUCK_AI_TAB("funnel_duckai_androidapp__modelpicker"),
-    REASONING_PICKER_ADDRESS_BAR("funnel_nativeinput_androidapp__reasoningpicker"),
-    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_androidapp__reasoningpicker"),
+    MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_android__modelpicker"),
+    MODEL_PICKER_DUCK_AI_TAB("funnel_duckai_android__modelpicker"),
+    REASONING_PICKER_ADDRESS_BAR("funnel_nativeinput_android__reasoningpicker"),
+    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_android__reasoningpicker"),
 }
 
 sealed class UpsellCommand {
@@ -31,15 +31,29 @@ sealed class UpsellCommand {
     data class LaunchUpgrade(val origin: String) : UpsellCommand()
 }
 
+internal fun UserTier.toParam(): String = when (this) {
+    UserTier.FREE -> "free"
+    UserTier.PLUS -> "plus"
+    UserTier.PRO -> "pro"
+}
+
+internal fun UpsellCommand.toFlowTypeParam(): String = when (this) {
+    is UpsellCommand.LaunchPurchase -> "purchase"
+    is UpsellCommand.LaunchUpgrade -> "upgrade"
+}
+
 /**
  * Maps a (userTier, requiredTier) pair to the upsell flow that should fire, or `null` when no
- * native subscription flow applies (FREE-required gating, or a tier transition we don't route).
+ * native subscription flow applies: the user can't purchase a subscription ([isEligible] is false),
+ * FREE-required gating, or a tier transition we don't route.
  */
 internal fun routeUpsell(
     userTier: UserTier,
     requiredTier: UserTier,
     origin: String,
+    isEligible: Boolean,
 ): UpsellCommand? = when {
+    !isEligible -> null
     requiredTier == UserTier.FREE -> null
     userTier == UserTier.FREE -> UpsellCommand.LaunchPurchase(origin)
     userTier == UserTier.PLUS && requiredTier == UserTier.PRO -> UpsellCommand.LaunchUpgrade(origin)

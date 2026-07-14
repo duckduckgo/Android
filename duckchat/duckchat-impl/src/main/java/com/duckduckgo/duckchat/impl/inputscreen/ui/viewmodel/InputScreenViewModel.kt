@@ -40,6 +40,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -156,6 +157,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val tabRepository: TabRepository,
     private val tabPageContextRepository: TabPageContextRepository,
     private val duckChatJSHelper: DuckChatJSHelper,
+    private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -193,6 +195,13 @@ class InputScreenViewModel @AssistedInject constructor(
     private val searchInputTextState = MutableStateFlow(initialSearchInputText)
     private val chatInputTextState = MutableStateFlow("")
     val chatInputText: StateFlow<String> = chatInputTextState.asStateFlow()
+
+    // Live tab count for the input screen's tab switcher button. Driven off flowTabs so it tracks
+    // tab changes while the input screen is open (e.g. burning the hatch's tab); the launch-time
+    // snapshot passed in InputScreenActivityParams would otherwise go stale.
+    val tabCount: Flow<Int> = tabRepository.flowTabs
+        .map { it.size }
+        .distinctUntilChanged()
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
@@ -322,7 +331,7 @@ class InputScreenViewModel @AssistedInject constructor(
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
-        combine(
+        combine<Any, Unit>(
             voiceServiceAvailable,
             voiceInputAllowed,
             isSearchModeFlow,
@@ -491,9 +500,24 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    suspend fun isAutocompleteHistoryDeleteButtonEnabled(): Boolean =
+        withContext(dispatchers.io()) { autocompleteHistoryDeleteFeature.self().isEnabled() }
+
+    fun onUserRequestedToDeleteAutocompleteItem(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
-            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> {
+                appCoroutineScope.launch(dispatchers.io()) {
+                    if (autocompleteHistoryDeleteFeature.self().isEnabled()) {
+                        // Explicit delete button: remove immediately, no confirmation dialog.
+                        withContext(dispatchers.main()) {
+                            onRemoveSearchSuggestionConfirmed(suggestion)
+                        }
+                    } else {
+                        // Legacy hidden long-press: confirm before removing.
+                        showRemoveSearchSuggestionDialog(suggestion)
+                    }
+                }
+            }
             else -> return
         }
     }

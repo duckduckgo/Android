@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -64,15 +65,26 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirDashboardUrlProvider: PirDashboardUrlProvider
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         setupViews()
         bindViews()
         pirNotificationManager.createNotificationChannel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun setupViews() {

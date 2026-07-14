@@ -11,7 +11,7 @@ tags:
           stopApp: true
       - runFlow: ../shared/skip_all_onboarding.yaml
 
-      - doubleTapOn:
+      - tapOn:
           id: "omnibarTextInput"
       - inputText: "http://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-emptyaddress.html"
       - pressKey: Enter

@@ -24,8 +24,8 @@ import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.browser.api.install.AppInstall
-import com.duckduckgo.browser.api.referrer.AppReferrer
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.referral.api.AppReferrer
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before

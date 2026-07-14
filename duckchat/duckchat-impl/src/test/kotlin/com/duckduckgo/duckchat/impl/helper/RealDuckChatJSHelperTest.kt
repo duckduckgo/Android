@@ -19,7 +19,13 @@ package com.duckduckgo.duckchat.impl.helper
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -37,7 +43,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -52,6 +57,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -77,6 +84,16 @@ class RealDuckChatJSHelperTest {
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val mockLimitsHandler: LimitsHandler = mock()
+    private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
+    private val mockAppInstall: AppInstall = mock {
+        on { getInstallationTimestamp() } doReturn DEFAULT_INSTALL_TIMESTAMP
+    }
+    private val mockAppBuildConfig: AppBuildConfig = mock {
+        onBlocking { isAppReinstall() } doReturn false
+    }
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock {
+        on { currentTimeMillis() } doReturn DEFAULT_INSTALL_TIMESTAMP
+    }
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -89,6 +106,10 @@ class RealDuckChatJSHelperTest {
         duckChatFeature = mockDuckChatFeature,
         voiceSessionStateManager = mockVoiceSessionStateManager,
         limitsHandler = mockLimitsHandler,
+        nativeInputStatePublisher = mockNativeInputStatePublisher,
+        appInstall = mockAppInstall,
+        appBuildConfig = mockAppBuildConfig,
+        currentTimeProvider = mockCurrentTimeProvider,
     )
     private val viewModel =
         object {
@@ -283,6 +304,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -291,6 +314,105 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndAppReinstallThenInstallTypeIsReturning() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "getAIChatNativeConfigValues",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertEquals("returning", result!!.params.getString("installType"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNotReinstallThenInstallTypeIsNew() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "getAIChatNativeConfigValues",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertEquals("new", result!!.params.getString("installType"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesThenInstallAgeIsBucketedByDaysSinceInstall() = runTest {
+        val now = 1_700_000_000_000L
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+
+        val daysToExpectedBucket = mapOf(
+            0L to 0,
+            1L to 1,
+            7L to 1,
+            8L to 2,
+            14L to 2,
+            15L to 3,
+            21L to 3,
+            22L to 4,
+            28L to 4,
+            29L to 5,
+        )
+
+        daysToExpectedBucket.forEach { (days, expectedBucket) ->
+            whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(now - days * DAY_MILLIS)
+
+            val result = testee.processJsCallbackMessage(
+                featureName = "aiChat",
+                method = "getAIChatNativeConfigValues",
+                id = "123",
+                data = null,
+                pageContext = viewModel.updatedPageContext,
+            )
+
+            assertEquals(
+                "days=$days should map to bucket $expectedBucket",
+                expectedBucket,
+                result!!.params.getInt("installAge"),
+            )
+        }
+    }
+
+    @Test
+    fun whenInstallTimestampIsInFutureThenInstallAgeIsOmitted() = runTest {
+        val now = 1_700_000_000_000L
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+        whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(now + 5 * DAY_MILLIS)
+
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "getAIChatNativeConfigValues",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.has("installAge"))
+    }
+
+    @Test
+    fun whenInstallTimestampNotRecordedThenInstallAgeIsOmitted() = runTest {
+        whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(0L)
+
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "getAIChatNativeConfigValues",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.has("installAge"))
     }
 
     @Test
@@ -542,6 +664,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -585,6 +709,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -741,6 +867,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -786,6 +914,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", true)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -828,6 +958,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -870,6 +1002,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -1101,6 +1235,51 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenDisableChatInputThenSubmitDisabledForTab() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "disableChatInput", "123", null, tabId = "tab-1"),
+        )
+
+        val captor = argumentCaptor<(NativeInputState) -> NativeInputState>()
+        verify(mockNativeInputStatePublisher).update(eq("tab-1"), captor.capture())
+        assertFalse(captor.firstValue.invoke(NativeInputState.zero()).submitEnabled)
+    }
+
+    @Test
+    fun whenEnableChatInputThenSubmitEnabledForTab() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "enableChatInput", "123", null, tabId = "tab-1"),
+        )
+
+        val captor = argumentCaptor<(NativeInputState) -> NativeInputState>()
+        verify(mockNativeInputStatePublisher).update(eq("tab-1"), captor.capture())
+        assertTrue(captor.firstValue.invoke(NativeInputState.zero().copy(submitEnabled = false)).submitEnabled)
+    }
+
+    @Test
+    fun whenShowModelPickerThenRequestShowModelPickerForTab() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "tab-1"),
+        )
+
+        verify(mockDuckChat).requestShowModelPicker("tab-1")
+    }
+
+    @Test
+    fun whenShowModelPickerThenShowModelPickerPixelFired() = runTest {
+        testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "tab-1")
+
+        verify(mockDuckChatPixels).fireShowModelPicker()
+    }
+
+    @Test
+    fun whenShowModelPickerWithEmptyTabIdThenShowModelPickerPixelNotFired() = runTest {
+        testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "")
+
+        verify(mockDuckChatPixels, never()).fireShowModelPicker()
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
@@ -1134,6 +1313,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1147,7 +1328,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1173,6 +1354,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1212,6 +1395,50 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndChatSyncEnabledButFireModeThenSupportsAIChatSyncDisabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            pageContext = viewModel.updatedPageContext,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
+            put("supportsAIChatSync", false)
+            put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
+            put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1409,6 +1636,14 @@ class RealDuckChatJSHelperTest {
         val result = testee.onNativeAction(NativeAction.END_VOICE_SESSION)
 
         assertEquals("endVoiceSession", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenNativeActionCustomizeResponsesRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+
+        assertEquals("submitCustomizeResponsesAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 
@@ -1920,5 +2155,10 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
+    }
+
+    companion object {
+        private const val DAY_MILLIS = 24L * 60 * 60 * 1000
+        private const val DEFAULT_INSTALL_TIMESTAMP = 1_700_000_000_000L
     }
 }

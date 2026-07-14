@@ -77,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Daj povezavo v skupno rabo</string>
     <string name="copyUrl">Kopiraj naslov povezave</string>
+    <string name="urlCopiedToClipboard">URL je kopiran v odložišče</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najdi naslednje</string>
@@ -689,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
-    <string name="downloadsActivityTitle">Prenosi</string>
-    <string name="downloadsActivityNoItemsDescription">Nobena datoteka še ni bila prenesena</string>
-    <string name="downloadsShareTitle">Deli s/z …</string>
     <string name="downloadsDownloadFinishedActionName">Odpri</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datoteka ne obstaja več</string>
-    <string name="downloadsItemMenuShare">Deli</string>
-    <string name="downloadsItemMenuDelete">Izbriši</string>
-    <string name="downloadsItemMenuCancel">Preklic</string>
-    <string name="downloadsActivityMenuDeleteAll">Izbriši vse</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Vse datoteke so bile izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Več možnosti za: %1$s</string>
-    <string name="downloadsUndoActionName">Prekliči spremembe</string>
-    <string name="downloadsStateInProgress">Poteka …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Zaščita pred sledenjem aplikacij</string>
@@ -725,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
-    <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
 
@@ -867,6 +852,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Začnimo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tukaj sem že bil/-a</string>
     <string name="preOnboardingDaxDialog2Title">Zaščite so aktivirane!</string>
     <string name="preOnboardingDaxDialog2Button">Izberite brskalnik</string>
@@ -878,7 +864,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
     <string name="preOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Zasebno uporabljajte ChatGPT z vgrajenim Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokirajte ciljane oglase in pojavna okna za piškotke</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Predvajajte videoposnetke na YouTubu brez oglasov</string>
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
     <string name="preOnboardingAddressBarTitle">Kam naj postavim vašo naslovno vrstico?</string>
     <string name="preOnboardingAddressBarOkButton">Naslednji</string>
@@ -935,12 +923,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi <b>izbirno plačljivo naročnino</b> z varnim omrežjem <b>VPN</b> in <b>napredno, zasebno umetno inteligenco</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Poskusite brezplačno!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Preizkusite brezplačno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Ste vedeli?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želite preprost dostop do zasebnega klepeta z umetno inteligenco?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Želite preprost dostop do zasebnega klepeta z umetno inteligenco v naslovni vrstici?</string>
     <string name="preOnboardingInputScreenButton">Naslednji</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcije umetne inteligence so zasebne in izbirne. Spremembe lahko opravite v meniju <b>Nastavitve > Funkcije UI</b>.]]></string>
 
@@ -1066,10 +1055,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Pozdravljeni.</string>
     <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik, ki daje nadzor vam?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna, zaščita zasebnosti pa je vedno vklopljena.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Zasebni klepeti z umetno inteligenco, ki jih lahko kadar koli izbrišete z gumbom <b>Fire Button</b>. Preizkusite! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Uspelo vam bo!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Za iskanje in obisk spletnih mest uporabite naslovno vrstico ali preklopite na Duck.ai za zasebni klepet z umetno inteligenco.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Petka!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ste pripravljeni začeti?&lt;br/&gt;Preizkusite iskanje ali klepet z umetno inteligenco!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Iščite zasebno</string>
+    <string name="preOnboardingInputModeDemoChatHint">Vprašajte kar koli zasebno</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Razloži mi borzo, kot da sem star 10 let</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Načrtuj popoln dan v Londonu</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Preseneti me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Katerih je 10 zanimivih dejstev o znanosti, naravi in zgodovini?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ste pripravljeni na brezplačen zasebni klepet z orodjem umetne inteligence ChatGPT, Claude in drugimi v brskalniku, ki vas aktivno ščiti?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Ne pozabite: Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Začni klepet z umetno inteligenco</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Zaščite UI so aktivirane!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Priljubljena orodja umetne inteligence</string>
+    <string name="preOnboardingAiComparisonChartItem1">Vsi klepeti so anonimizirani</string>
+    <string name="preOnboardingAiComparisonChartItem2">Za dostop do vseh funkcij umetne inteligence ne potrebujete računa</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nikoli ne uporablja vaših klepetov za učenje umetne inteligence</string>
+    <string name="preOnboardingAiComparisonChartItem4">Dostopajte do orodja ChatGPT, Claude in drugih na enem mestu</string>
+    <string name="preOnboardingAiComparisonChartButton">Preizkusite Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Zdaj pa preizkusite zasebni klepet z umetno inteligenco!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Želite DuckDuckGo nastaviti kot privzeti brskalnik?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponujamo tudi plačljivo naročnino z naprednimi modeli umetne inteligence z višjimi omejitvami klepeta GPT in Claude, varnim VPN in še več.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potrdi</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Odpri v zavihku Fire</string>
+    <string name="openInBackgroundTab">Odpri v ozadju</string>
+    <string name="browserModeToggleFireDescription">Preklopi na zavihke v načinu Fire</string>
+    <string name="browserModeToggleRegularDescription">Preklopi na običajne zavihke</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Zavihek Fire</string>
+    <string name="fireTabNewTabPageTitle">Zavihek Fire</string>
+    <string name="fireTabsEmptyStateTitle">Zavihki Fire</string>
+    <string name="fireTabsFeatureNoHistory">Brskaj brez shranjevanja lokalne zgodovine</string>
+    <string name="fireTabsFeatureDifferentAccount">Prijava v spletno mesto z drugim računom</string>
+    <string name="fireTabsFeatureTroubleshoot">Odpravljanje težav s spletnimi mesti</string>
+    <string name="fireTabsExplainer">Zavihki Fire so ločeni od drugih podatkov brskanja. Njihovi podatki se izbrišejo, ko jih vse zaprete. Imajo enako zaščito pred sledenjem kot drugi zavihki.</string>
+    <string name="fireTabsNewTabButton">Nov zavihek Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Preizkusite zavihke Fire za brskanje brez shranjevanja lokalne zgodovine.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Želite izbrisati zavihke Fire in njihove podatke?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
 </resources>

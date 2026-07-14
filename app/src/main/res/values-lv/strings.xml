@@ -76,6 +76,7 @@
     <string name="options">Opcijas</string>
     <string name="shareLink">Kopīgot saiti</string>
     <string name="copyUrl">Kopēt saites adresi</string>
+    <string name="urlCopiedToClipboard">URL ir nokopēts starpliktuvē</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Atrast nākamo</string>
@@ -684,21 +685,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
-    <string name="downloadsActivityTitle">Lejupielādes</string>
-    <string name="downloadsActivityNoItemsDescription">Vēl nav lejupielādēts neviens fails</string>
-    <string name="downloadsShareTitle">Kopīgot ar…</string>
     <string name="downloadsDownloadFinishedActionName">Atvērt</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Fails vairs nepastāv</string>
-    <string name="downloadsItemMenuShare">Kopīgot</string>
-    <string name="downloadsItemMenuDelete">Dzēst</string>
-    <string name="downloadsItemMenuCancel">Atcelt</string>
-    <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izdzēsts %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Citas iespējas %1$s</string>
-    <string name="downloadsUndoActionName">Atsaukt</string>
-    <string name="downloadsStateInProgress">Notiek...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
@@ -720,8 +707,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
-    <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
 
@@ -849,6 +834,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aiziet!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Sāksim!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
     <string name="preOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
     <string name="preOnboardingDaxDialog2Button">Izvēlies pārlūku</string>
@@ -860,7 +846,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Izmanto ChatGPT privāti ar iebūvēto Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloķē mērķētās reklāmas un sīkfailu uznirstošos logus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Atskaņo YouTube videoklipus bez reklāmām</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
@@ -915,12 +903,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vai zināji?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vai vēlies ērti piekļūt privātai mākslīgā intelekta tērzēšanai adreses joslā?</string>
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
@@ -1046,10 +1035,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
     <string name="preOnboardingWelcomeDialogBody1">Vai esi gatavs ātrākai pārlūkprogrammai, kas tev sniedz kontroli?</string>
     <string name="preOnboardingWelcomeDialogBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr darbojas.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d no %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Tas ir Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privātas MI tērzēšanas, ko vari jebkurā laikā izdzēst, izmantojot <b>Fire Button</b>. Izmēģini! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Izdevās!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Izmanto adreses joslu, lai meklētu un apmeklētu vietnes, vai pārslēdzies uz Duck.ai privātai MI tērzēšanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Dod pieci!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Esi gatavs sākt?&lt;br/&gt;Izmēģini meklēšanu vai MI tērzēšanu!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Meklē privāti</string>
+    <string name="preOnboardingInputModeDemoChatHint">Jautā jebko privāti</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Izskaidro akciju tirgu tā, it kā man būtu 10 gadi</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Saplāno ideālu dienu Londonā</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Pārsteidz mani!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Pastāsti 10 interesantus faktus par zinātni, dabu un vēsturi</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Vai esi gatavs bez maksas tērzēt privāti ar ChatGPT, Claude un citiem MI pārlūkprogrammā, kas tevi aktīvi aizsargā?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Atceries: Duck.ai vari izmantot no jebkuras vietas, kur redzi tērzēšanas ikonu</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Sākt MI tērzēšanu</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">MI aizsardzība ir aktivizēta!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populāri MI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Visas tērzēšanas sarunas ir anonimizētas</string>
+    <string name="preOnboardingAiComparisonChartItem2">Lai piekļūtu visām MI funkcijām, nav nepieciešams konts</string>
+    <string name="preOnboardingAiComparisonChartItem3">Tavas tērzēšanas sarunas nekad netiek izmantotas MI apmācībai</string>
+    <string name="preOnboardingAiComparisonChartItem4">Piekļūsti ChatGPT, Claude un citiem pakalpojumiem vienuviet</string>
+    <string name="preOnboardingAiComparisonChartButton">Izmēģini Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Tagad izmēģini privātu tērzēšanu ar mākslīgo intelektu!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vai vēlies padarīt DuckDuckGo par savu noklusējuma pārlūku?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Sāc privātu MI tērzēšanu ar Duck.ai vai pārslēdzies uz meklēšanu aizsargātai pārlūkošanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Mēs piedāvājam arī maksas abonementu ar uzlabotiem MI modeļiem ar augstākiem tērzēšanas ierobežojumiem no GPT un Claude, ar drošu VPN un citiem pakalpojumiem.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
     <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Apstiprināt</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Atvērt Fire cilnē</string>
+    <string name="openInBackgroundTab">Atvērt fonā</string>
+    <string name="browserModeToggleFireDescription">Pārslēdzies uz Fire režīma cilnēm</string>
+    <string name="browserModeToggleRegularDescription">Pārslēgties uz parastajām cilnēm</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire cilne</string>
+    <string name="fireTabNewTabPageTitle">Fire cilne</string>
+    <string name="fireTabsEmptyStateTitle">Fire cilnes</string>
+    <string name="fireTabsFeatureNoHistory">Pārlūkot, nesaglabājot vietējo vēsturi</string>
+    <string name="fireTabsFeatureDifferentAccount">Pierakstīties vietnē ar citu kontu</string>
+    <string name="fireTabsFeatureTroubleshoot">Tīmekļa vietņu problēmu novēršana</string>
+    <string name="fireTabsExplainer">Fire cilnes ir izolētas no citiem pārlūkprogrammas datiem. Tās visas aizverot, to dati tiek iznīcināti. Tām ir tāda pati izsekošanas aizsardzība kā citām cilnēm.</string>
+    <string name="fireTabsNewTabButton">Jauna Fire cilne</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>JAUNUMS!</b> Izmēģini Fire Tabs, lai pārlūkotu, nesaglabājot vietējo vēsturi.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

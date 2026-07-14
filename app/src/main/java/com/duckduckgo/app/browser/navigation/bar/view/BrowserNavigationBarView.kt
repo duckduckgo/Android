@@ -34,7 +34,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -49,6 +48,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -182,7 +182,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         binding.tabsButton.setOnLongClickListener {
             viewModel.onTabsButtonLongClicked()
-            true
         }
 
         binding.menuButton.setOnClickListener {

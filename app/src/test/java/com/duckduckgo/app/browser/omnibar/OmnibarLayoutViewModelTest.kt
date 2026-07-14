@@ -8,6 +8,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -41,6 +42,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -51,6 +54,7 @@ import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -94,10 +98,13 @@ class OmnibarLayoutViewModelTest {
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckChatInputModeState: DuckChatInputModeState = mock()
+    private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
+    private val nativeChatInputEnabledFlow = MutableStateFlow(false)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
     private val activeVoiceSessionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
@@ -137,12 +144,15 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(tabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(emptyFlow())
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
+        whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
@@ -194,6 +204,7 @@ class OmnibarLayoutViewModelTest {
             browserMenuHighlight = browserMenuHighlight,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
+            duckChatInputModeState = duckChatInputModeState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
             urlDisplayRepository = urlDisplayRepository,
@@ -394,6 +405,25 @@ class OmnibarLayoutViewModelTest {
             assertEquals(expectedTitle, customTabMode.title)
             assertEquals(expectedDomain, customTabMode.domain) // Empty string because no URL is set
             assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun whenVoiceSearchAvailabilityEmitsWhileInCustomTabThenVoiceSearchStaysHidden() = runTest {
+        val voiceSearchAvailabilityFlow = MutableStateFlow(false)
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailabilityFlow)
+        initializeViewModel()
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+
+        // User toggles "Private Voice Search" on while a custom tab is active.
+        voiceSearchAvailabilityFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            assertFalse(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -1595,6 +1625,43 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputFieldEnabledButSearchOnlyThenShowClickCatcherFalse() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSearchOnlyButInDuckAiViewModeThenShowClickCatcherTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+        testee.onViewModeChanged(ViewMode.DuckAI)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSearchOnlyThenShowContextualSheetIconFalse() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showContextualSheetIcon)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -2879,6 +2946,64 @@ class OmnibarLayoutViewModelTest {
                 "Expected PrivacyShield after feature re-enabled on non-SERP site, but got ${viewState.leadingIconState}",
                 viewState.leadingIconState is LeadingIconState.PrivacyShield,
             )
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlToClipboardCommandSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(RANDOM_URL, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlPixelFired() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenNoCommandSent() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenCopyUrlPixelNotFired() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel, never()).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedThenCommandContainsCurrentViewStateUrl() = runTest {
+        val expectedUrl = "https://example.com/test"
+        givenSiteLoaded(expectedUrl)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(expectedUrl, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

@@ -71,5 +71,14 @@ interface FireDialogProvider {
         data class ChatHistory(val selectedChatUrls: Set<String>) : FireDialogOrigin() {
             val count: Int get() = selectedChatUrls.size
         }
+
+        /**
+         * Per-row delete on a single Duck.ai chat-history suggestion (e.g. the omnibar autocomplete).
+         * Always a single chat — unlike [ChatHistory], which is the multi-select history screen.
+         * Scopes the clear to [chatUrl] and renders the singular "Delete this chat?" title.
+         *
+         * @property chatUrl The chat URL to clear on confirm.
+         */
+        data class ChatAutocomplete(val chatUrl: String) : FireDialogOrigin()
     }
 }

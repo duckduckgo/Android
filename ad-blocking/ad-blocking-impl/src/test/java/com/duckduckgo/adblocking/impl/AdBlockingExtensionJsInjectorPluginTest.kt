@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.net.Uri
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
@@ -35,6 +36,7 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -50,18 +52,30 @@ class AdBlockingExtensionJsInjectorPluginTest {
         on { scriptletsFlow() } doReturn scriptletsFlow
     }
     private val webView: WebView = mock()
+    private val contingencyMessageHandler: ContingencyMessageHandler = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
-    private val singleScriptlet = listOf(Scriptlet(name = "a.js", content = "console.log('a')"))
+    private val isolatedName = "scriptlets/isolated/ublock-filters.js"
+    private val mainName = "scriptlets/main/ublock-filters.js"
+    private val singleScriptlet = listOf(Scriptlet(name = isolatedName, content = "console.log('a')"))
     private val twoScriptlets = listOf(
-        Scriptlet(name = "b.js", content = "console.log('b')"),
-        Scriptlet(name = "a.js", content = "console.log('a')"),
+        Scriptlet(name = mainName, content = "console.log('b')"),
+        Scriptlet(name = isolatedName, content = "console.log('a')"),
     )
+
+    private val mockDomainMatcher: AdBlockingExtensionDomainMatcher = mock() {
+        on {
+            matches(any<Uri>())
+        } doReturn true
+        on { matches(any<String>()) } doReturn true
+    }
 
     private val plugin by lazy {
         AdBlockingExtensionJsInjectorPlugin(
             statusChecker = statusChecker,
             repository = repository,
+            domainMatcher = mockDomainMatcher,
+            contingencyMessageHandler = contingencyMessageHandler,
             appScope = testScope,
         )
     }
@@ -125,6 +139,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
     @Test
     fun whenUrlHostNotInConfiguredDomainsThenScriptIsNotInjected() {
         scriptletsFlow.value = singleScriptlet
+        whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         plugin.onPageStarted(webView, url = "https://example.com/page", isDesktopMode = null)
 
@@ -162,6 +177,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
     @Test
     fun whenUrlHasNoHostThenScriptIsNotInjected() {
         scriptletsFlow.value = singleScriptlet
+        whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         plugin.onPageStarted(webView, url = "data:text/html,<p>hi</p>", isDesktopMode = null)
 
@@ -173,7 +189,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
         scriptletsFlow.value = singleScriptlet
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
-        scriptletsFlow.value = listOf(Scriptlet(name = "a.js", content = "console.log('updated')"))
+        scriptletsFlow.value = listOf(Scriptlet(name = isolatedName, content = "console.log('updated')"))
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
         verify(webView).evaluateJavascript(
@@ -194,11 +210,49 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
+    fun whenScriptletsIncludeNamesNotInAllowlistThenOnlyAllowlistedScriptletsAreInjected() {
+        scriptletsFlow.value = listOf(
+            Scriptlet(name = isolatedName, content = "console.log('a')"),
+            Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
+            Scriptlet(name = "scriptlets/other/something.js", content = "console.log('other')"),
+            Scriptlet(name = mainName, content = "console.log('b')"),
+        )
+
+        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
+
+        verify(webView).evaluateJavascript(
+            eq("javascript:console.log('a')\nconsole.log('b')"),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun whenAllScriptletNamesAreNotInAllowlistThenNoInjection() {
+        scriptletsFlow.value = listOf(
+            Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
+            Scriptlet(name = "scriptlets/other/something.js", content = "console.log('other')"),
+        )
+
+        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
     fun whenOnPageFinishedCalledThenNoInjection() {
         scriptletsFlow.value = singleScriptlet
 
         plugin.onPageFinished(webView, url = "https://youtube.com/page", site = null)
 
         verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenContingencyMessageHandlerIsNotified() {
+        val url = "https://youtube.com/page"
+
+        plugin.onPageFinished(webView, url = url, site = null)
+
+        verify(contingencyMessageHandler).onPageLoaded(webView, url)
     }
 }

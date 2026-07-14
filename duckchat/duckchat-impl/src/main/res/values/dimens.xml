@@ -27,6 +27,7 @@
     <dimen name="inputScreenLogoTopBarTopMargin">180dp</dimen>
     <dimen name="inputScreenLogoTopBarWithHatchTopMargin">260dp</dimen>
     <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
+    <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
 
     <!-- Model Picker -->
     <dimen name="modelPickerChipHeight">36dp</dimen>
@@ -35,6 +36,10 @@
 
     <!-- Shared width for the native input widget popup menus (options, model picker, attachment) -->
     <dimen name="nativeInputMenuWidth">260dp</dimen>
+    <dimen name="nativeInputButtonSize">36dp</dimen>
+
+    <!-- Width of the contextual sheet "recent chats" popup menu. Wider than the default popupMenuWidth (200dp) to fit chat titles. -->
+    <dimen name="contextualChatsPopupMenuWidth">280dp</dimen>
 
     <!-- Reasoning Mode Picker -->
     <dimen name="reasoningModePickerMenuWidth">220dp</dimen>

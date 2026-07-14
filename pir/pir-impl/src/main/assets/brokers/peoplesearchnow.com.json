@@ -1,7 +1,7 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
   "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
@@ -16,6 +16,17 @@
           "url": "https://peoplesearchnow.com/person/${firstName}-${lastName}_${city}_${state}/"
         },
         {
+          "actionType": "expectation",
+          "_comment": "detect Cloudflare verification UI - challenge pages expose Cloudflare challenge scripts (the _cf_chl_opt inline script is present in the static HTML before the challenge-platform script is injected), Turnstile controls, or captcha response fields, and hard block pages render div#cf-error-details",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "b00ba411-0253-42ad-bbc4-b4b0940df3a7"
+        },
+        {
           "actionType": "extract",
           "id": "79098855-0459-4f26-877b-039700e098b3",
           "selector": ".result-search-block",
@@ -28,12 +39,12 @@
               "selector": ".//div[contains(@class, 'result-search-block-desc')]/p[span[text()='Approximate Age:']]/span[2]"
             },
             "addressCityState": {
-              "selector": ".//p[span[text()='Current Address:']]/span[@itemprop='address']",
+              "selector": "(.//div[contains(@class, 'result-search-block-desc')]//span[@itemprop='address'])[1]",
               "beforeText": "*",
               "afterText": ";"
             },
             "addressCityStateList": {
-              "selector": ".//p[span[text()='Used to Live:']]/span[@itemprop='address']/a",
+              "selector": "(.//div[contains(@class, 'result-search-block-desc')]//span[@itemprop='address'])[position() > 1]",
               "findElements": true,
               "beforeText": "*",
               "afterText": ";"

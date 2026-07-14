@@ -14,7 +14,6 @@ tags:
 
         - tapOn:
             id: "omnibarTextInput"
-        - eraseText
         - inputText: "fill.dev/form/login-simple"
         - pressKey: enter
 

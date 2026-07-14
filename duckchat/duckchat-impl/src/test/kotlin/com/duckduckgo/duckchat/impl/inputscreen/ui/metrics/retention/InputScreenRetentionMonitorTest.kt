@@ -59,12 +59,14 @@ class InputScreenRetentionMonitorTest {
     private val mockTimeProvider: TimeProvider = mock()
 
     private val showInputScreenFlow = MutableStateFlow(true)
+    private val nativeInputFlow = MutableStateFlow(true)
 
     private lateinit var testee: InputScreenRetentionMonitor
 
     @Before
     fun setup() {
         whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
+        whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(nativeInputFlow)
 
         testee = InputScreenRetentionMonitor(
             coroutineScope = coroutineTestRule.testScope,
@@ -82,7 +84,7 @@ class InputScreenRetentionMonitorTest {
 
         // First call - feature was enabled in a previous session
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(initialTime)
-        showInputScreenFlow.value = true
+        nativeInputFlow.value = true
         testee.onResume(mockLifecycleOwner)
 
         // Second call - feature is still enabled after 24+ hours (mock time has advanced)
@@ -104,12 +106,12 @@ class InputScreenRetentionMonitorTest {
 
         // First call - feature was enabled in a previous session
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(initialTime)
-        showInputScreenFlow.value = true
+        nativeInputFlow.value = true
         testee.onResume(mockLifecycleOwner)
 
         // Second call - feature is now disabled after 24+ hours (mock time has advanced)
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(laterTime)
-        showInputScreenFlow.value = false
+        nativeInputFlow.value = false
         testee.onResume(mockLifecycleOwner)
 
         verify(mockPixel).fire(
@@ -127,12 +129,12 @@ class InputScreenRetentionMonitorTest {
         // First call - feature was disabled in a previous session
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(initialTime)
         val laterTime = initialTime.plusHours(25)
-        showInputScreenFlow.value = false
+        nativeInputFlow.value = false
         testee.onResume(mockLifecycleOwner)
 
         // Second call - feature is now enabled after 24+ hours, but was disabled initially
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(laterTime)
-        showInputScreenFlow.value = true
+        nativeInputFlow.value = true
         testee.onResume(mockLifecycleOwner)
 
         // Third call - feature is now enabled for more than 24+ hours
@@ -155,7 +157,7 @@ class InputScreenRetentionMonitorTest {
 
         // First call - feature was enabled in a previous session
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(initialTime)
-        showInputScreenFlow.value = true
+        nativeInputFlow.value = true
         testee.onResume(mockLifecycleOwner)
 
         // Second call - still enabled but less than 24 hours have passed
@@ -166,7 +168,7 @@ class InputScreenRetentionMonitorTest {
 
         // Third call - feature is still enabled after 24+ hours, send the pixel
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(laterTime)
-        showInputScreenFlow.value = true
+        nativeInputFlow.value = true
         testee.onResume(mockLifecycleOwner)
 
         verify(mockPixel).fire(
@@ -194,7 +196,7 @@ class InputScreenRetentionMonitorTest {
 
         // Second call - feature is now disabled
         whenever(mockTimeProvider.nowInEasternTime()).thenReturn(laterTime)
-        showInputScreenFlow.value = false
+        nativeInputFlow.value = false
         testee.onResume(mockLifecycleOwner)
 
         // No pixel should be fired due to parsing error

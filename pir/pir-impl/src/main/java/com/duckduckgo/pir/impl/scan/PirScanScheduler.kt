@@ -25,6 +25,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.multiprocess.RemoteListenableWorker
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -48,6 +49,7 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
@@ -56,7 +58,19 @@ import javax.inject.Inject
 interface PirScanScheduler {
     fun scheduleScans()
 
+    /**
+     * Re-applies the scheduled scan work spec (interval / constraints) to the already-enqueued
+     * periodic scan so that changes are picked up by already-enrolled users after an app update.
+     */
+    fun reschedulePirScans()
+
     fun cancelScheduledScans(context: Context)
+
+    /**
+     * @return true if the periodic scheduled-scan worker ([PirScheduledScanRemoteWorker]) is currently
+     * in [WorkInfo.State.RUNNING].
+     */
+    suspend fun isScheduledScanRunning(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -77,12 +91,31 @@ class RealPirScanScheduler @Inject constructor(
         scheduleBackgroundScanStats()
     }
 
+    override fun reschedulePirScans() {
+        logcat { "PIR-SCHEDULED: Re-applying scheduled scan work spec appId: ${appBuildConfig.applicationId}" }
+        enqueueScheduledScanWork()
+    }
+
     private fun schedulePirScans() {
+        pirPixelSender.reportScheduledScanScheduled()
+        coroutineScope.launch {
+            eventsRepository.saveEventLog(
+                PirEventLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = EventType.SCHEDULED_SCAN_SCHEDULED,
+                ),
+            )
+        }
+
+        enqueueScheduledScanWork()
+    }
+
+    private fun enqueueScheduledScanWork() {
         val constraints =
             Constraints
                 .Builder()
-                .setRequiresCharging(true)
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresCharging(true)
                 .build()
 
         val periodicWorkRequest =
@@ -95,16 +128,6 @@ class RealPirScanScheduler @Inject constructor(
                 .setConstraints(constraints)
                 .setInitialDelay(SCHEDULED_SCAN_INTERVAL_HOURS, TimeUnit.HOURS)
                 .build()
-
-        pirPixelSender.reportScheduledScanScheduled()
-        coroutineScope.launch {
-            eventsRepository.saveEventLog(
-                PirEventLog(
-                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = EventType.SCHEDULED_SCAN_SCHEDULED,
-                ),
-            )
-        }
 
         workManager.enqueueUniquePeriodicWork(
             TAG_SCHEDULED_SCAN,
@@ -162,6 +185,17 @@ class RealPirScanScheduler @Inject constructor(
             ExistingPeriodicWorkPolicy.UPDATE,
             periodicWorkRequest,
         )
+    }
+
+    override suspend fun isScheduledScanRunning(): Boolean {
+        return runCatching {
+            workManager.getWorkInfosForUniqueWorkFlow(TAG_SCHEDULED_SCAN)
+                .firstOrNull()
+                ?.any { it.state == WorkInfo.State.RUNNING } ?: false
+        }.getOrElse {
+            logcat { "PIR-SCHEDULED: Failed to read scheduled scan work info: $it" }
+            false
+        }
     }
 
     override fun cancelScheduledScans(context: Context) {

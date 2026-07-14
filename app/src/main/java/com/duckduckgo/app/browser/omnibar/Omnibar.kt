@@ -65,7 +65,7 @@ class Omnibar(
     interface ItemPressedListener {
         fun onTabsButtonPressed()
 
-        fun onTabsButtonLongPressed()
+        fun onTabsButtonLongPressed(): Boolean
 
         fun onFireButtonPressed()
 

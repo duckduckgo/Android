@@ -35,6 +35,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
@@ -82,6 +85,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
 
@@ -90,8 +99,17 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         lifecycle.addObserver(viewModel)
 
@@ -143,6 +161,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     private fun goToFeedback() {
@@ -358,6 +382,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.buyUrl,
+                origin = PURCHASE_VIEW_PLANS_ORIGIN,
             ),
         )
     }
@@ -446,5 +471,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         // const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
+
+        private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
 }

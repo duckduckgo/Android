@@ -98,9 +98,11 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private fun configureChatSuggestions() {
         val parentFragment = requireParentFragment() as InputScreenFragment
 
-        chatSuggestionsAdapter = ChatSuggestionsAdapter { suggestion ->
-            viewModel.onChatSuggestionSelected(suggestion.chatId, suggestion.pinned)
-        }
+        chatSuggestionsAdapter = ChatSuggestionsAdapter(
+            onChatClicked = { suggestion ->
+                viewModel.onChatSuggestionSelected(suggestion.chatId, suggestion.pinned)
+            },
+        )
 
         chatSuggestionsRecyclerView = parentFragment.getChatSuggestionsRecyclerView().apply {
             setViewPager(parentFragment.getViewPager())
@@ -187,10 +189,11 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         chatUrlSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { viewModel.userSelectedAutocomplete(it, fromChatUrlSuggestions = true) },
             editableSearchClickListener = { },
-            autoCompleteLongPressClickListener = { },
+            autoCompleteDeleteClickListener = { },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
+            isDeleteButtonVisible = false,
         )
         chatSearchSuggestionAdapter = ChatSearchSuggestionAdapter { query ->
             viewModel.onSearchSubmitted(query)

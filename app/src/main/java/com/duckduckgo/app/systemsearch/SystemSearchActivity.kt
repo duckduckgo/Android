@@ -83,6 +83,9 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -134,6 +137,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -202,13 +211,41 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
     }
 
+    /**
+     * One inset listener per view (each apply* replaces any prior listener on that view), and only on
+     * the views that survive [configureOmnibar] (which removes the unused omnibar app bar):
+     * - top omnibar: sides -> rootView, status -> appBarLayout, nav + IME -> content (scrolling list)
+     * - bottom omnibar: status -> content; sides + nav + IME -> rootView bottom margin (single combined
+     *   listener - rootView can't take both [EdgeToEdgeHandler.applyHorizontalSystemBarInsets] and
+     *   [EdgeToEdgeHandler.applyNavigationBarInsetsAsMargin] separately, the second would drop the first),
+     *   so the whole root (including the fixed-height appBarLayoutBottom) rises above the keyboard/gesture
+     *   nav - padding the fixed-height bar directly would just squeeze its content instead of moving it
+     */
+    private fun configureEdgeToEdgeInsets(isOmnibarAtTop: Boolean) {
+        if (isOmnibarAtTop) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.content)
+        } else {
+            edgeToEdgeHandler.applyStatusBarInsets(binding.content)
+            edgeToEdgeHandler.applyHorizontalInsetsAndNavigationBarMargin(binding.rootView)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
 
         configureViewReferences(viewModel.isOmnibarAtTop)
         configureOmnibar(viewModel.isOmnibarAtTop)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
+        }
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()
@@ -373,12 +410,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+        lifecycleScope.launch {
+            autocompleteSuggestionsAdapter.setDeleteButtonVisible(viewModel.isAutocompleteHistoryDeleteButtonEnabled())
+        }
 
         binding.content.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->

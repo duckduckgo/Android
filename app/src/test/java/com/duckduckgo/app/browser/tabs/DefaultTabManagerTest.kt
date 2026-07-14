@@ -6,6 +6,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -36,15 +37,17 @@ class DefaultTabManagerTest {
     fun setup() {
         skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = false))
 
-        testee = DefaultTabManager(
-            tabRepository = tabRepository,
-            dispatchers = coroutineTestRule.testDispatcherProvider,
-            queryUrlConverter = omnibarEntryConverter,
-            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-        )
-
+        testee = createTabManager(BrowserMode.REGULAR)
         testee.registerCallbacks({})
     }
+
+    private fun createTabManager(browserMode: BrowserMode) = DefaultTabManager(
+        tabRepository = tabRepository,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        queryUrlConverter = omnibarEntryConverter,
+        skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+        browserMode = browserMode,
+    )
 
     @Test
     fun whenOnSelectedTabChangedThenSelectedTabIdIsUpdated() = runTest {
@@ -73,6 +76,16 @@ class DefaultTabManagerTest {
         testee.onTabsChanged(emptyList())
 
         verify(tabRepository).addDefaultTab()
+    }
+
+    @Test
+    fun whenOnTabsChangedAndNoTabsInFireModeThenDefaultTabNotAdded() = runTest {
+        // Fire mode never seeds a tab implicitly — fire tabs are only ever created by an explicit user action.
+        val fireManager = createTabManager(BrowserMode.FIRE).also { it.registerCallbacks({}) }
+
+        fireManager.onTabsChanged(emptyList())
+
+        verify(tabRepository, never()).addDefaultTab()
     }
 
     @Test

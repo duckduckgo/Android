@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.duckplayer
 
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
@@ -45,9 +46,9 @@ interface DuckPlayerFeatureRepository {
 
     fun setDuckPlayerRemoteConfigJson(jsonString: String)
 
-    fun getUserPreferences(): UserPreferences
+    fun getUserPreferences(): StoredUserPreferences
 
-    fun observeUserPreferences(): Flow<UserPreferences>
+    fun observeUserPreferences(): Flow<StoredUserPreferences>
 
     suspend fun setUserPreferences(userPreferences: UserPreferences)
 
@@ -88,6 +89,16 @@ interface DuckPlayerFeatureRepository {
     ): InputStream?
 }
 
+/**
+ * Stored Duck Player preferences as read from disk, before any default is applied.
+ * [privatePlayerMode] is `null` when the user has not set an explicit mode, leaving the
+ * caller to resolve the appropriate default.
+ */
+data class StoredUserPreferences(
+    val overlayInteracted: Boolean,
+    val privatePlayerMode: PrivatePlayerMode?,
+)
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckPlayerFeatureRepository @Inject constructor(
@@ -116,29 +127,28 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         }
     }
 
-    override fun observeUserPreferences(): Flow<UserPreferences> {
+    override fun observeUserPreferences(): Flow<StoredUserPreferences> {
         return duckPlayerDataStore.observePrivatePlayerMode()
             .combine(duckPlayerDataStore.observeOverlayInteracted()) { privatePlayerMode, overlayInteracted ->
-                UserPreferences(
+                StoredUserPreferences(
                     overlayInteracted = overlayInteracted,
-                    privatePlayerMode = when (privatePlayerMode) {
-                        Enabled.value -> Enabled
-                        Disabled.value -> Disabled
-                        else -> AlwaysAsk
-                    },
+                    privatePlayerMode = privatePlayerMode.toPrivatePlayerMode(),
                 )
             }
     }
 
-    override fun getUserPreferences(): UserPreferences {
-        return UserPreferences(
+    override fun getUserPreferences(): StoredUserPreferences {
+        return StoredUserPreferences(
             overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
-            privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {
-                Enabled.value -> Enabled
-                Disabled.value -> Disabled
-                else -> AlwaysAsk
-            },
+            privatePlayerMode = duckPlayerDataStore.getPrivatePlayerMode().toPrivatePlayerMode(),
         )
+    }
+
+    private fun String?.toPrivatePlayerMode(): PrivatePlayerMode? = when (this) {
+        Enabled.value -> Enabled
+        Disabled.value -> Disabled
+        AlwaysAsk.value -> AlwaysAsk
+        else -> null
     }
 
     override suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?) {

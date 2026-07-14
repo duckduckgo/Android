@@ -14,21 +14,27 @@
   ~ limitations under the License.
   -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".AutofillInternalSettingsActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/accessAutofillSystemSettingsButton"
@@ -348,4 +354,5 @@
             app:secondaryText="@string/autofillDevSettingsDeclineCounterResetInstruction" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

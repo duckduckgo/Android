@@ -24,6 +24,7 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 interface WebViewSessionStorage {
     fun saveSession(
@@ -31,16 +32,16 @@ interface WebViewSessionStorage {
         tabId: String,
     )
 
-    fun restoreSession(
+    suspend fun restoreSession(
         webView: WebView?,
         tabId: String,
     ): Boolean
 
     fun deleteSession(tabId: String)
-    fun deleteAllSessions()
+    suspend fun deleteAllSessions()
 }
 
-class WebViewSessionInMemoryStorage : WebViewSessionStorage {
+class WebViewSessionInMemoryStorage @Inject constructor() : WebViewSessionStorage {
 
     private val cache = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
 
@@ -93,7 +94,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         }
     }
 
-    override fun restoreSession(
+    override suspend fun restoreSession(
         webView: WebView?,
         tabId: String,
     ): Boolean {
@@ -128,7 +129,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         logCacheSize()
     }
 
-    override fun deleteAllSessions() {
+    override suspend fun deleteAllSessions() {
         cache.evictAll()
         logCacheSize()
     }

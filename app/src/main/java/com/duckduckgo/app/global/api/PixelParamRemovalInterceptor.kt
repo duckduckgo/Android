@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
@@ -24,7 +25,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -49,7 +49,6 @@ import javax.inject.Inject
 )
 class PixelParamRemovalInterceptor @Inject constructor(
     private val pixelsPlugin: PluginPoint<PixelParamRemovalPlugin>,
-    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, PixelInterceptorPlugin {
 
     val pixels by lazy {
@@ -57,9 +56,6 @@ class PixelParamRemovalInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
-            return interceptLegacy(chain)
-        }
         val originalRequest = chain.request()
         val pixel = originalRequest.url.pathSegments.last()
 
@@ -84,23 +80,6 @@ class PixelParamRemovalInterceptor @Inject constructor(
         return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
-    private fun interceptLegacy(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
-        val url = chain.request().url.newBuilder().apply {
-            val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
-            val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
-            if (atbs.any { pixel.startsWith(it) }) {
-                removeAllQueryParameters(AppUrl.ParamKey.ATB)
-            }
-            if (versions.any { pixel.startsWith(it) }) {
-                removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
-            }
-        }.build()
-
-        return chain.proceed(request.url(url).build())
-    }
-
     override fun getInterceptor(): Interceptor {
         return this
     }
@@ -114,8 +93,10 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
+            AppPixelName.WEBVIEW_SESSION_LARGE_BYTES.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_PAINTED.pixelName to PixelParameter.removeAll(),
+            WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN.pixelName to PixelParameter.removeAtb(),
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY.pixelName to PixelParameter.removeAtb(),
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY.pixelName to PixelParameter.removeAtb(),
@@ -164,7 +145,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.ONBOARDING_QUICK_SETUP.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
@@ -256,6 +236,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.DUCKAI_ONLY_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_ONLY_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_ONLY_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_COPY_URL.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

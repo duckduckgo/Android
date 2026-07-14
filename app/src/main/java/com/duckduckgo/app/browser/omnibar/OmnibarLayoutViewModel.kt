@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -67,6 +68,8 @@ import com.duckduckgo.common.utils.isLocalUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
@@ -109,6 +112,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val browserMenuHighlight: BrowserMenuHighlight,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
@@ -251,11 +255,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
-        val showTextInputClickCatcher: Boolean = false,
+        val inputScreenEnabled: Boolean = false,
+        val isSearchOnly: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
+        val isNativeChatInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
@@ -263,13 +269,23 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
-         * input field setting is enabled and we're not on the new-tab page — tapping it then opens
-         * the contextual sheet. In every other case it falls back to the standard chat icon, whose
-         * tap opens Duck.ai in full screen. Derived from the flag + viewMode rather than a stored
-         * flag so it can't drift out of sync with other state-update paths.
+         * input field setting is enabled, we're not on the new-tab page, and Duck.ai is available in
+         * the address bar (not search-only) — tapping it then opens the contextual sheet. In every
+         * other case (including search-only) it falls back to the standard chat icon. Derived from
+         * flags + viewMode rather than a stored flag so it can't drift out of sync.
          */
         val showContextualSheetIcon: Boolean
-            get() = isNativeInputEnabled && viewMode !is NewTab
+            get() = isNativeInputEnabled && viewMode !is NewTab && !isSearchOnly
+
+        /**
+         * The click catcher routes an omnibar tap to the native input overlay. Shown when the
+         * input-screen feature is on, or the native field is on and we should use it for the current
+         * context — i.e. we're in Duck.ai (always UTI) or not in search-only. In search-only the
+         * browser omnibar keeps the catcher hidden so its text input stays focusable and a tap
+         * focuses it directly. Derived from flags + viewMode so it can't drift out of sync.
+         */
+        val showTextInputClickCatcher: Boolean
+            get() = inputScreenEnabled || (isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly))
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -302,6 +318,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
+        data class CopyUrlToClipboard(val url: String) : Command()
         data object CancelEasterEggLogoAnimation : Command()
     }
 
@@ -323,11 +340,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled ->
+            duckChat.observeNativeChatInputEnabled(),
+            duckChatInputModeState.inputModeCapability,
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, inputModeCapability ->
             _viewState.update {
                 it.copy(
-                    showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
+                    inputScreenEnabled = inputScreenEnabled,
+                    isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
                     isNativeInputEnabled = nativeInputEnabled,
+                    isNativeChatInputEnabled = nativeChatInputEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -337,6 +358,25 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(showChatMenu = showDuckAiButton)
             }
         }.launchIn(viewModelScope)
+
+        // Re-evaluate the voice-search icon reactively when the user toggles "Private Voice Search",
+        // so it appears/disappears immediately even while the omnibar is unfocused, rather than only
+        // on the next focus or page-load event.
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach {
+                _viewState.update { state ->
+                    state.copy(
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            viewMode = state.viewMode,
+                            hasFocus = state.hasFocus,
+                            query = state.omnibarText,
+                            hasQueryChanged = false,
+                            urlLoaded = state.url,
+                        ),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
 
         voiceActiveOnSelectedTab.onEach { voiceActive ->
             _viewState.update {
@@ -580,7 +620,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
     ): Boolean {
-        return if (viewMode == ViewMode.DuckAI) {
+        return if (viewMode == ViewMode.DuckAI || viewMode is CustomTab) {
             false
         } else {
             voiceSearchAvailability.shouldShowVoiceSearch(
@@ -1211,6 +1251,16 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onCancelAddressBarAnimations() {
         viewModelScope.launch {
             command.send(Command.CancelEasterEggLogoAnimation)
+        }
+    }
+
+    fun onCustomTabUrlLongClicked() {
+        viewModelScope.launch {
+            val url = _viewState.value.url
+            if (url.isNotEmpty()) {
+                command.send(Command.CopyUrlToClipboard(url))
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+            }
         }
     }
 

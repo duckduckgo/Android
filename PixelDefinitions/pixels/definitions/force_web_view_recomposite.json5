@@ -1,0 +1,8 @@
+{
+    "m_web_view_forced_recomposite": {
+        "description": "A recycled WebView finished loading but onPageCommitVisible never fired, so a re-composite (onPause/onResume) was forced to present the new content and clear the stale frame. Fired once per day.",
+        "owners": ["laghee"],
+        "triggers": ["page_load"],
+        "suffixes": ["first_daily_count"]
+    }
+}

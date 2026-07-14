@@ -75,6 +75,7 @@
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
+    <string name="urlCopiedToClipboard">URL kopeeriti lõikelauale</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Otsi järgmine</string>
@@ -679,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Allalaadimised</string>
-    <string name="downloadsActivityTitle">Allalaadimised</string>
-    <string name="downloadsActivityNoItemsDescription">Ühtegi faili pole veel alla laaditud</string>
-    <string name="downloadsShareTitle">Jaga…</string>
     <string name="downloadsDownloadFinishedActionName">Avatud</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Faili pole enam olemas</string>
-    <string name="downloadsItemMenuShare">Jaga</string>
-    <string name="downloadsItemMenuDelete">Kustuta</string>
-    <string name="downloadsItemMenuCancel">Tühista</string>
-    <string name="downloadsActivityMenuDeleteAll">Kustuta kõik</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Kustutatud %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Kõik failid kustutatud</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Lisavalikud %1$s jaoks</string>
-    <string name="downloadsUndoActionName">Võta tagasi</string>
-    <string name="downloadsStateInProgress">Pooleli…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Rakenduse jälgimise kaitse</string>
@@ -715,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>
-    <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
 
     <!-- Windows Settings -->
 
@@ -831,6 +816,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Teeme ära!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Alustame!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
     <string name="preOnboardingDaxDialog2Title">Kaitsed aktiveeritud!</string>
     <string name="preOnboardingDaxDialog2Button">Vali oma brauser</string>
@@ -842,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
     <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Kasuta ChatGPT-d privaatselt sisseehitatud Duck.ai abil</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokeeri sihitud reklaamid ja küpsiste hüpikaknad</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Esita YouTube\'i videoid ilma reklaamideta</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
     <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
     <string name="preOnboardingAddressBarOkButton">Järgmine</string>
@@ -895,12 +883,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Kas teadsid?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Kas soovite lihtsat juurdepääsu privaatsele AI-vestlusele?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Kas soovid aadressiribal hõlpsat juurdepääsu privaatsele tehisintellekti vestlusele?</string>
     <string name="preOnboardingInputScreenButton">Järgmine</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tehisintellekti funktsioonid on privaatsed ja valikulised. Saate muudatusi teha suvandis <b>Seaded > Tehisintellekti funktsioonid</b>.]]></string>
 
@@ -1026,10 +1015,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Tere!</string>
     <string name="preOnboardingWelcomeDialogBody1">Kas oled valmis kasutama kiiremat brauserit, mis annab sulle kontrolli?</string>
     <string name="preOnboardingWelcomeDialogBody2">Tehisintellekt on alati valikuline ja privaatsuskaitse on alati sisse lülitatud.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kuidas öelda „part“ inglise keeles</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">See on Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privaatseid AI-vestlusi saad igal ajal kustutada <b>Fire Buttoni</b> abil. Proovi seda! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Said selle!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Kasuta aadressiriba, et otsida ja külastada saite või alusta privaatset AI-vestlust Duck.ai abil.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Viska viis!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Kas oled valmis alustama?&lt;br/&gt;Proovi otsingut või tehisintellekti vestlust!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Otsi privaatselt</string>
+    <string name="preOnboardingInputModeDemoChatHint">Küsi ükskõik mida privaatselt</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Selgita aktsiaturgu nagu ma oleksin 10-aastane</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planeeri ideaalne päev Londonis</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Üllata mind!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Millised on 10 põnevat fakti teaduse, looduse ja ajaloo kohta?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Kas oled valmis privaatselt ChatGPT, Claude\'i ja teiste tehisintellektidega tasuta vestlema brauseris, mis sind aktiivselt kaitseb?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Pea meeles: saad Duck.ai-d kasutada kõikjal, kus näed vestluse ikooni</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Alusta AI-vestlust</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI-kaitsed aktiveeritud!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populaarsed AI-d</string>
+    <string name="preOnboardingAiComparisonChartItem1">Kõik vestlused on anonüümsed</string>
+    <string name="preOnboardingAiComparisonChartItem2">Kõigi AI funktsioonide kasutamiseks pole vaja kontot</string>
+    <string name="preOnboardingAiComparisonChartItem3">Ei kasuta kunagi sinu vestlusi tehisintellekti treenimiseks</string>
+    <string name="preOnboardingAiComparisonChartItem4">Juurdepääs ChatGPT-le, Claude\'ile ja teistele – kõik ühes kohas</string>
+    <string name="preOnboardingAiComparisonChartButton">Proovi Duck.ai-d!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Proovi nüüd privaatset AI-vestlust!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Kas sa soovid DuckDuckGo oma vaikebrauseriks muuta?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Pakume ka tasulist tellimust, mis sisaldab täiustatud tehisintellekti mudeleid, millel on GPT ja Claude kõrgemad vestluspiirangud, turvaline VPN ja palju muud.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Kinnita</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Ava Fire vahekaardil</string>
+    <string name="openInBackgroundTab">Ava taustal</string>
+    <string name="browserModeToggleFireDescription">Lülitu Fire-režiimi vahekaartidele</string>
+    <string name="browserModeToggleRegularDescription">Lülitu tavalistele vahekaartidele</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire vahekaart</string>
+    <string name="fireTabNewTabPageTitle">Fire vahekaart</string>
+    <string name="fireTabsEmptyStateTitle">Fire vahekaardid</string>
+    <string name="fireTabsFeatureNoHistory">Sirvi kohalikku ajalugu salvestamata</string>
+    <string name="fireTabsFeatureDifferentAccount">Logi saidile sisse teise kontoga</string>
+    <string name="fireTabsFeatureTroubleshoot">Tõrkeotsing veebilehtedel</string>
+    <string name="fireTabsExplainer">Fire vahekaardid on teistest brauseriandmetest isoleeritud. Nende andmed põletatakse, kui sa need kõik sulged. Need pakuvad sulle sama jälgimiskaitset kui teisedki vahekaardid.</string>
+    <string name="fireTabsNewTabButton">Uus Fire vahekaart</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUS!</b> Proovi Fire vahekaarte, et sirvida ilma kohalikku ajalugu salvestamata.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Kas kustutada Fire vahekaardid ja nende andmed?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
 </resources>

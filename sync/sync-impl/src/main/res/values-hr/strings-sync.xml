@@ -241,4 +241,39 @@
     <string name="sync_recover_data_download_pdf">Preuzmi kao PDF</string>
     <string name="sync_restore_on_reinstall_title">Vraćanje prilikom ponovne instalacije aplikacije</string>
     <string name="sync_restore_on_reinstall_description">Ako ponovno instaliraš aplikaciju DuckDuckGo, pitat ćemo te želiš li vratiti podatke na ovom uređaju.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Pristupi svojim čavrljanjima na svim uređajima pomoću opcije Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_chat_bottom_sheet_title">Sinkroniziraj svoje razgovore na\nsvim svojim uređajima!</string>
+    <string name="sync_chat_bottom_sheet_description">Pronađi QR kôd u aplikaciji DuckDuckGo na drugom uređaju tako da odeš na Postavke › Sync &amp; Backup › Sinkroniziraj s drugim uređajem.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skeniraj QR kôd</string>
+    <string name="sync_chat_bottom_sheet_negative">Ne sada</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sinkroniziraj svoje podatke?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sinkroniziraj</string>
+    <string name="sync_v2_joiner_confirmation_negative">Otkaži</string>
+
+    <string name="sync_v2_host_confirmation_title">Sinkroniziraj svoje podatke?</string>
+    <string name="sync_v2_host_confirmation_positive">Sinkroniziraj</string>
+    <string name="sync_v2_host_confirmation_negative">Otkaži</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" će moći pristupiti tvojim sinkroniziranim DuckDuckGo lozinkama, podacima za automatsko popunjavanje i Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" će moći pristupiti tvojim sinkroniziranim Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Drugi uređaj će moći pristupiti tvojim sinkroniziranim DuckDuckGo lozinkama, podacima za automatsko popunjavanje i Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Drugi uređaj će moći pristupiti tvojim sinkroniziranim Duck.ai čavrljanjima.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sinkronizacija nije uspjela.</string>
+    <string name="sync_v2_error_pairing_rejected">Sinkronizacija je otkazana s tvog drugog uređaja.</string>
+    <string name="sync_v2_error_pairing_canceled">Sinkronizacija je otkazana.</string>
+    <string name="sync_v2_error_upgrade_required">Ažuriraj DuckDuckGo preglednik i pokušaj ponovno.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sinkroniziraj ovaj uređaj s već povezanog DuckDuckGo preglednika na drugom uređaju</string>
+    <string name="sync_v2_error_try_again">Pokušaj ponovno.</string>
+    <string name="sync_v2_error_got_it">Shvatio/la sam</string>
+    <string name="sync_v2_already_paired_title">Već sinkronizirano.</string>
+    <string name="sync_v2_already_paired_message">Ovi su uređaji već povezani s uslugom Sync &amp; Backup.</string>
+
 </resources>

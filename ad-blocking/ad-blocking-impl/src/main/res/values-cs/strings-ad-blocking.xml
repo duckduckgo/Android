@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">Blokování reklam na YouTube</string>
+    <string name="ad_blocking_settings_toggle_title">Blokovat reklamy na YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení.\n\nKdyž je tato funkce zapnutá, DuckDuckGo anonymně detekuje rušení blokováním reklam nebo chyby YouTube a vylepšuje zážitek pro všechny. DuckDuckGo nikdy nevidí, která videa si prohlížíš ani žádné osobní údaje. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Otevírá videa v režimu kina, který brání tomu, aby sledovaná videa ovlivňovala tvůj feed na YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Blokování reklam</string>
+    <string name="ad_blocking_settings_header_description">Zablokuje invazivní trackery ještě před jejich načtením, čímž účinně eliminuje reklamy, které spoléhají na sledování.</string>
+    <string name="contingencyMessageTitle">Blokování reklam na YouTube není k dispozici</string>
+    <string name="contingencyMessageContent">Blokování reklam bylo ovlivněno nedávnými změnami na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
+    <string name="contingencyMessagePrimaryButton">Rozumím</string>
+    <string name="contingencyMessageCloseContentDescription">Zavřít</string>
+    <string name="ad_blocking_menu_disable">Vypnout blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_enable">Povolit blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_title">Blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Zavřít</string>
+    <string name="ad_blocking_menu_always_on">Vždycky zapnuté</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Vypnout až do opětovného spuštění</string>
+    <string name="ad_blocking_menu_always_off">Vždycky vypnuté</string>
+    <string name="ad_blocking_disabled_popup_title">Nefunguje blokování reklam na YouTube?</string>
+    <string name="ad_blocking_disabled_popup_description">Odeslat anonymní hlášení o chybě službě DuckDuckGo. Pomoz vylepšit blokování reklam pro všechny!</string>
+    <string name="ad_blocking_disabled_primary_action">Poslat zprávu o chybě</string>
+    <string name="ad_blocking_disabled_secondary_action">Zrušit</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Vypnuto do opětovného spuštění</string>
+</resources>

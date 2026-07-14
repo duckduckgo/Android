@@ -24,6 +24,7 @@ import androidx.work.Data
 import androidx.work.Data.MAX_DATA_BYTES
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadFailReason
@@ -67,6 +68,7 @@ private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
+private const val BROWSER_MODE = "BROWSER_MODE"
 
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
@@ -82,6 +84,7 @@ fun FileDownloader.PendingFileDownload.toInputData(): Data {
         .putString(SUBFOLDER, subfolder)
         .putString(DIRECTORY, directory.absolutePath)
         .putBoolean(IS_URL_COMPRESSED, urlTooLarge)
+        .putString(BROWSER_MODE, browserMode.name)
         .build()
 }
 
@@ -95,6 +98,7 @@ fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
         subfolder = getString(SUBFOLDER)!!,
         directory = File(getString(DIRECTORY)!!),
         isUrlCompressed = false,
+        browserMode = getString(BROWSER_MODE)?.let { BrowserMode.valueOf(it) } ?: BrowserMode.REGULAR,
     )
 }
 

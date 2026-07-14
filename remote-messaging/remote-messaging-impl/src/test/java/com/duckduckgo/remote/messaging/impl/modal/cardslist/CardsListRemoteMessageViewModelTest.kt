@@ -475,6 +475,50 @@ class CardsListRemoteMessageViewModelTest {
     }
 
     @Test
+    fun whenOnItemClickedWithNullPrimaryActionThenNoCommandEmittedAndNoPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardItem = CardItem.ListItem(
+            id = "item1",
+            titleText = "Test Card",
+            descriptionText = "Description",
+            primaryAction = null,
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem),
+            primaryActionText = "Action",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+
+        viewModel.commands.test {
+            viewModel.onItemClicked(cardItem)
+
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(commandActionMapper, never()).asCommand(any())
+        verify(cardsListPixelHelper, never()).fireCardItemClickedPixel(any(), any())
+    }
+
+    @Test
     fun whenOnItemClickedMultipleTimesThenMultipleCommandsEmittedAndPixelsFired() = runTest {
         val messageId = "message-123"
         val itemAction1 = Action.Url("https://example1.com")

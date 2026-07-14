@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.view
 
+import android.webkit.WebStorage
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,6 +38,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -69,6 +71,7 @@ class ClearPersonalDataActionTest {
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val mockSitePreferencesDataClearer: SitePreferencesDataClearer = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -83,7 +86,10 @@ class ClearPersonalDataActionTest {
     }
 
     private fun createTestee(
-        siteDataCleaner: SiteDataCleaner = SiteDataCleaner { _, _ -> },
+        siteDataCleaner: SiteDataCleaner = object : SiteDataCleaner {
+            override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {}
+            override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+        },
     ) = ClearPersonalDataAction(
         context = InstrumentationRegistry.getInstrumentation().targetContext,
         dataManager = mockDataManager,
@@ -103,6 +109,7 @@ class ClearPersonalDataActionTest {
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         duckAiHostProvider = mockDuckAiHostProvider,
         siteDataCleaner = siteDataCleaner,
+        sitePreferencesDataClearer = mockSitePreferencesDataClearer,
     )
 
     @Test
@@ -139,6 +146,18 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockSitePermissionsManager).clearAllButFireproof(any())
+    }
+
+    @Test
+    fun whenClearTabsAndAllDataThenDesktopPreferencesClearedExceptFireproofed() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
+    }
+
+    @Test
+    fun whenClearBrowserDataOnlyThenDesktopPreferencesClearedExceptFireproofed() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
     }
 
     @Test
@@ -383,11 +402,48 @@ class ClearPersonalDataActionTest {
         )
         val clearedDomains = mutableListOf<String>()
         val testeeWithCapture = createTestee(
-            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
         )
         val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
         assertTrue(result is ClearDataResult.Success)
         assertEquals(listOf("clearable.com"), clearedDomains)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsWithFireproofedIpOrLocalhostThenThoseAreRetained() = runTest {
+        // A fireproofed IP / localhost must survive a burn (the keep-list uses the host-fallback key).
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("192.168.1.1"), FireproofWebsiteEntity("localhost")),
+        )
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("192.168.1.1", "localhost", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsThenDesktopPreferencesForgottenForNonFireproofDomains() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
     }
 
     @Test
@@ -396,7 +452,12 @@ class ClearPersonalDataActionTest {
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val clearedDomains = mutableListOf<String>()
         val testeeWithCapture = createTestee(
-            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
         )
         val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai", "clearable.com"))
         assertTrue(result is ClearDataResult.Success)
@@ -408,7 +469,12 @@ class ClearPersonalDataActionTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val testeeWithError = createTestee(
-            siteDataCleaner = { _, _ -> throw RuntimeException("WebView error") },
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    throw RuntimeException("WebView error")
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
         )
         val result = testeeWithError.clearDataForSpecificDomains(domains = setOf("example.com"))
         assertTrue(result is ClearDataResult.Error)

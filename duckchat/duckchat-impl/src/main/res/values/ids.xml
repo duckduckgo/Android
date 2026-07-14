@@ -21,4 +21,7 @@
          sibling of the NativeInputModeWidget. Declaring the id in duckchat-impl lets the
          widget bind its visibility and click via R.id. -->
     <item name="inputFieldFireIconMenu" type="id"/>
+    <!-- The fire icon ImageView inside inputFieldFireIconMenu (same host layout). Declared here so the
+         widget can pulse it during the Duck.ai onboarding fire CTA. -->
+    <item name="inputFieldFireIconImageview" type="id"/>
 </resources>

@@ -17,7 +17,6 @@
 package com.duckduckgo.installation.impl.installer.com.duckduckgo.installation.impl.installer.aura
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.browser.api.referrer.AppReferrer
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
@@ -25,6 +24,7 @@ import com.duckduckgo.installation.impl.installer.aura.AuraExperimentFeature
 import com.duckduckgo.installation.impl.installer.aura.AuraExperimentListJsonParser
 import com.duckduckgo.installation.impl.installer.aura.AuraExperimentManager
 import com.duckduckgo.installation.impl.installer.aura.Packages
+import com.duckduckgo.referral.api.AppReferrer
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

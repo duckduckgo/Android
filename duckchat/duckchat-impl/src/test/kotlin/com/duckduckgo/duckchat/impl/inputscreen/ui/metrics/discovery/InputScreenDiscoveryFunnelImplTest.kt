@@ -329,6 +329,23 @@ class InputScreenDiscoveryFunnelImplTest {
     }
 
     @Test
+    fun `when native active then interaction and submissions then full conversion fires`() = runTest {
+        testee.onNativeInputActive()
+        advanceUntilIdle()
+        testee.onInputScreenOpened()
+        advanceUntilIdle()
+        testee.onSearchSubmitted()
+        advanceUntilIdle()
+        testee.onPromptSubmitted()
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FIRST_INTERACTION)
+        verify(mockPixel).fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FIRST_SEARCH_SUBMISSION)
+        verify(mockPixel).fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FIRST_PROMPT_SUBMISSION)
+        verify(mockPixel).fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FULL_CONVERSION_USER)
+    }
+
+    @Test
     fun `when complete funnel flow is executed then all individual step pixels are fired in correct order`() = runTest {
         // Set input screen as disabled initially
         showInputScreenFlow.value = false

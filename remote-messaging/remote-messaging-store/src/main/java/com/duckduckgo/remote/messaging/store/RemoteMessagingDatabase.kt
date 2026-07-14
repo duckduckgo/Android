@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
         RemoteMessagingConfig::class,
         RemoteMessageEntity::class,
@@ -48,7 +48,12 @@ abstract class RemoteMessagingDatabase : RoomDatabase() {
                 }
             }
         }
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `remote_message` ADD COLUMN `firstShownDate` INTEGER")
+            }
+        }
         val ALL_MIGRATIONS: Array<Migration>
-            get() = arrayOf(MIGRATION_1_2)
+            get() = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
     }
 }

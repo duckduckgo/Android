@@ -22,810 +22,239 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityAction
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.sync.api.SyncAutoRestore
+import com.duckduckgo.onboarding.api.LinearOnboardingEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingPlan
+import com.duckduckgo.onboarding.api.LinearOnboardingResult
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition
+import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class BrandDesignUpdatePageViewModelTest {
+
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
     private val mockContext: Context = mock()
-    private val mockPixel: Pixel = mock()
+    private val pixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
-    private val mockOnboardingStore: OnboardingStore = mock()
-    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
-        AndroidBrowserConfigFeature::class.java,
-    )
-    private val mockCustomDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = FakeFeatureToggleFactory.create(
-        CustomDuckAiOnboardingFeature::class.java,
-    )
-    private val mockDuckChat: DuckChat = mock()
-    private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
-    private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
-    private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
+    private val onboardingStore: OnboardingStore = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
-    private val mockSyncAutoRestore: SyncAutoRestore = mock()
-    private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
+    private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
+    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
+    private val fakeOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(
+        OnboardingBrandDesignUpdateToggles::class.java,
+    )
 
-    private fun createViewModel(): BrandDesignUpdatePageViewModel {
-        return BrandDesignUpdatePageViewModel(
-            mockDefaultRoleBrowserDialog,
-            mockContext,
-            mockPixel,
-            mockAppInstallStore,
-            mockSettingsDataStore,
-            coroutineRule.testDispatcherProvider,
-            mockAppBuildConfig,
-            mockOnboardingStore,
-            mockAndroidBrowserConfigFeature,
-            mockDuckChat,
-            mockInputScreenOnboardingWideEvent,
-            mockDuckAiOnboardingExperimentManager,
-            mockOnboardingQuickSetupExperimentManager,
-            mockDefaultBrowserDetector,
-            mockWidgetCapabilities,
-            mockSyncAutoRestore,
-            mockQuickSetupPixelSender,
-            mockCustomDuckAiOnboardingFeature,
-        )
+    // Default harness: mock orchestrator left NotStarted, so the view model renders no dialog and emits no
+    // commands on its own — the shared interaction tests drive a single method and assert exactly what it emits.
+    private val orchestratorState = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
+    private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
+        on { state } doReturn orchestratorState
     }
 
-    // region hasPlayedIntroAnimation
+    // Real orchestrator, used by the orchestrator-flow tests that need an actual plan/step rendered.
+    private val realOrchestrator = LinearOnboardingOrchestratorImpl()
+
+    private val recordedEvents = mutableListOf<LinearOnboardingEvent>()
+
+    // Default step transition: record the event the view model emitted and stay on the same dialog.
+    // Presented is the VM's "step rendered" signal (fires shown pixels); these tests assert the
+    // action events the VM emits in response to CTAs, so Presented is filtered out as noise.
+    private val recordAndStay: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
+        if (event !is NewUserOnboardingEvent.Presented) {
+            recordedEvents.add(event)
+        }
+        LinearOnboardingTransition.Stay
+    }
+
+    @Before
+    fun setUp() {
+        whenever(onboardingStore.getSearchOptions()).thenReturn(emptyList())
+        whenever(onboardingStore.getChatSuggestions()).thenReturn(emptyList())
+        runBlocking { whenever(customAiOnboardingStore.isEnabled()).thenReturn(false) }
+    }
+
+    private fun createViewModel(orchestrator: LinearOnboardingOrchestrator = mockOrchestrator): BrandDesignUpdatePageViewModel =
+        BrandDesignUpdatePageViewModel(
+            defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
+            context = mockContext,
+            pixel = pixel,
+            appInstallStore = mockAppInstallStore,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            onboardingStore = onboardingStore,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            widgetCapabilities = mockWidgetCapabilities,
+            orchestrator = orchestrator,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            customAiOnboardingStore = customAiOnboardingStore,
+            onboardingBrandDesignUpdateToggles = fakeOnboardingBrandDesignUpdateToggles,
+        )
+
+    // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,
+    // so the view model keeps showing [dialog] across callbacks and the test can assert what it emitted. Override
+    // [transition] (and [result]) to drive the run to a terminal state instead.
+    private fun planAt(
+        dialog: NewUserOnboardingActivityDialog,
+        id: String = "step",
+        transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = recordAndStay,
+        result: suspend () -> LinearOnboardingResult? = { null },
+    ): LinearOnboardingPlan =
+        LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(NewUserOnboardingActivityStep(id = id, pixelName = null, transition = transition, resolveDialog = { dialog })),
+            result = result,
+        )
+
+    // Starts the real orchestrator on [planAt] and builds the view model, which enters orchestrator mode because
+    // a run is already in progress and immediately renders the started step.
+    private suspend fun startAt(
+        dialog: NewUserOnboardingActivityDialog,
+        id: String = "step",
+        transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = recordAndStay,
+        result: suspend () -> LinearOnboardingResult? = { null },
+    ): BrandDesignUpdatePageViewModel {
+        realOrchestrator.startPlan(planAt(dialog, id, transition, result))
+        return createViewModel(realOrchestrator)
+    }
+
+    // Starts the real orchestrator on a single QUICK_SETUP step so the view model actually renders QUICK_SETUP.
+    private suspend fun createViewModelAtQuickSetup(): BrandDesignUpdatePageViewModel {
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(
+                NewUserOnboardingActivityStep(
+                    id = "quick_setup",
+                    pixelName = null,
+                    transition = { LinearOnboardingTransition.Stay },
+                    resolveDialog = {
+                        NewUserOnboardingActivityDialog.QuickSetup(
+                            showSplitOption = false,
+                            hideSetDefaultBrowserRow = false,
+                            hideAddWidgetRow = false,
+                            isReinstallUser = false,
+                        )
+                    },
+                ),
+            ),
+        )
+        realOrchestrator.startPlan(plan)
+        return createViewModel(realOrchestrator)
+    }
+
+    // Starts the real orchestrator on a single BrowserActivity-hosted step and builds the view model, which enters
+    // orchestrator mode and immediately hands off because the current step is hosted by the browser, not the activity.
+    private suspend fun startAtBrowserStep(): BrandDesignUpdatePageViewModel {
+        val browserStep = NewUserBrowserActivityStep(
+            id = "duck_ai_demo",
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
+        )
+        realOrchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(browserStep)))
+        return createViewModel(realOrchestrator)
+    }
+
+    // region Intro animation state
 
     @Test
     fun whenViewModelCreatedThenHasPlayedIntroAnimationIsFalse() = runTest {
         val testee = createViewModel()
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.hasPlayedIntroAnimation)
-            cancelAndConsumeRemainingEvents()
-        }
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.hasPlayedIntroAnimation)
     }
 
     @Test
     fun whenOnIntroAnimationStartedThenHasPlayedIntroAnimationIsTrue() = runTest {
         val testee = createViewModel()
-        testee.viewState.test {
-            val initialState = awaitItem()
-            assertFalse(initialState.hasPlayedIntroAnimation)
 
-            testee.onIntroAnimationStarted()
+        testee.onIntroAnimationStarted()
 
-            val updatedState = awaitItem()
-            assertTrue(updatedState.hasPlayedIntroAnimation)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnIntroAnimationFinishedIsCalledOnceThenRequestNotificationPermissionsIsSent() = runTest {
-        val testee = createViewModel()
-        testee.commands.test {
-            // drain the initial Play command
-            awaitItem()
-
-            testee.onIntroAnimationFinished()
-            advanceUntilIdle()
-
-            val command = awaitItem()
-            assertTrue(command is Command.RequestNotificationPermissions)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnIntroAnimationFinishedIsCalledMultipleTimesThenRequestNotificationPermissionsIsSentOnlyOnce() = runTest {
-        val testee = createViewModel()
-        testee.commands.test {
-            awaitItem() // drain initial Play
-
-            testee.onIntroAnimationFinished()
-            testee.onIntroAnimationFinished()
-            testee.onIntroAnimationFinished()
-            advanceUntilIdle()
-
-            val first = awaitItem()
-            assertTrue(first is Command.RequestNotificationPermissions)
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.viewState.value.hasPlayedIntroAnimation)
     }
 
     // endregion
 
-    // region Initial state
+    // region Initial view state
 
     @Test
-    fun whenViewModelCreatedThenInitialViewStateHasNullDialog() = runTest {
+    fun whenViewModelCreatedThenInitialViewStateHasNullDialogAndDefaults() = runTest {
         val testee = createViewModel()
-        testee.viewState.test {
-            val state = awaitItem()
-            assertNull(state.currentDialog)
-            assertEquals(OmnibarType.SINGLE_TOP, state.selectedAddressBarPosition)
-            assertTrue(state.inputScreenSelected)
-            assertEquals(false, state.showSplitOption)
-            assertEquals(false, state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenIntroAnimationFlagEnabledThenViewStateIsDuckAiIntroAnimationEnabledIsTrue() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
-
-        val testee = createViewModel()
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(true, state.isDuckAiIntroAnimationEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenIntroAnimationFlagDisabledThenViewStateIsDuckAiIntroAnimationEnabledIsFalse() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
-
-        val testee = createViewModel()
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(false, state.isDuckAiIntroAnimationEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModelCreatedAndFlagEnabledThenPlayIntroAnimationCommandWithDuckAiTrueIsEmitted() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
-
-        val testee = createViewModel()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.PlayIntroAnimation)
-            assertEquals(true, (command as Command.PlayIntroAnimation).withDuckAi)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModelCreatedAndFlagDisabledThenPlayIntroAnimationCommandWithDuckAiFalseIsEmitted() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
-
-        val testee = createViewModel()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.PlayIntroAnimation)
-            assertEquals(false, (command as Command.PlayIntroAnimation).withDuckAi)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    // endregion
-
-    // region loadDaxDialog
-
-    @Test
-    fun whenLoadDaxDialogAndNotReinstallThenViewStateShowsInitialDialog() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INITIAL, state.currentDialog)
-            assertEquals(false, state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLoadDaxDialogAndReinstallThenViewStateShowsReinstallDialog() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INITIAL_REINSTALL_USER, state.currentDialog)
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLoadDaxDialogNotReinstallThenFiresInitialShownPixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        verify(mockPixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenLoadDaxDialogReinstallThenFiresReinstallShownPixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        verify(mockPixel).fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - initial/reinstall -> comparison chart
-
-    @Test
-    fun whenPrimaryCtaFromInitialThenShowComparisonChart() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL
-            testee.onPrimaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInitialThenFiresComparisonChartShownPixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked()
-        verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenPrimaryCtaFromReinstallUserThenShowComparisonChart() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onPrimaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - comparison chart
-
-    @Test
-    fun whenPrimaryCtaFromComparisonChartAndDefaultBrowserDialogAvailableThenSendShowDefaultBrowserCommand() = runTest {
-        val mockIntent: Intent = mock()
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // COMPARISON_CHART -> ShowDefaultBrowserDialog
-            val command = awaitItem()
-            assertTrue(command is Command.ShowDefaultBrowserDialog)
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromComparisonChartAndAlreadyDefaultBrowserThenSendFinishCommand() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // COMPARISON_CHART -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromComparisonChartThenFiresChooseBrowserPressedPixel() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked() // -> COMPARISON_CHART
-        testee.onPrimaryCtaClicked() // triggers pixel
-        verify(mockPixel).fire(
-            PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-            mapOf(PixelParameter.DEFAULT_BROWSER to "true"),
-        )
-    }
-
-    @Test
-    fun whenPrimaryCtaFromComparisonChartAndDialogIntentNullThenFiresDialogNotShownPixel() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
-        testee.onPrimaryCtaClicked() // COMPARISON_CHART with null intent
-        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - skip onboarding
-
-    @Test
-    fun whenPrimaryCtaFromSkipOnboardingThenSendOnboardingSkippedCommand() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> SKIP_ONBOARDING_OPTION
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.OnboardingSkipped)
-        }
-        verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - address bar position
-
-    @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithTopThenSaveTopAndAdvanceToInputScreen() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onPrimaryCtaClicked()
         advanceUntilIdle()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
+
+        val state = testee.viewState.value
+        assertNull(state.currentDialog)
+        assertEquals(OmnibarType.SINGLE_TOP, state.selectedAddressBarPosition)
+        assertTrue(state.inputScreenSelected)
+        assertFalse(state.showSplitOption)
+        assertFalse(state.isReinstallUser)
     }
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithBottomThenSaveBottomAndFirePixelAndAdvanceToInputScreen() = runTest {
+    fun whenViewModelCreatedThenHasAnimatedCurrentDialogIsFalse() = runTest {
         val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-        testee.onPrimaryCtaClicked()
         advanceUntilIdle()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
+        assertFalse(testee.viewState.value.hasAnimatedCurrentDialog)
     }
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithSplitAndFeatureEnabledThenSaveSplitAndFirePixel() = runTest {
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
-        mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
+    fun whenOnDialogAnimationStartedThenHasAnimatedCurrentDialogIsTrue() = runTest {
         val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-        testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SPLIT
-        verify(mockPixel).fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
-    }
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.hasAnimatedCurrentDialog)
 
-    @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithSplitAndFeatureDisabledThenFallbackToTop() = runTest {
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = false))
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-        testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        verify(mockSettingsDataStore, never()).omnibarType = OmnibarType.SPLIT
-    }
+        testee.onDialogAnimationStarted()
 
-    @Test
-    fun whenPrimaryCtaFromAddressBarPositionThenFiresAddressBarPositionShownPixel() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        verify(mockPixel).fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - input screen
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedThenFireAiPixelAndStoreAndFinish() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN (no command)
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-        verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
-        verify(mockOnboardingStore).storeInputScreenSelection(true)
-        verify(mockDuckChat).setCosmeticInputScreenUserSetting(true)
-        verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = false)
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenFireSearchOnlyPixelAndStoreAndFinish() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(false)
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-        verify(mockPixel).fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
-        verify(mockOnboardingStore).storeInputScreenSelection(false)
-        verify(mockDuckChat).setCosmeticInputScreenUserSetting(false)
-        verify(mockInputScreenOnboardingWideEvent, never()).onInputScreenEnabledDuringOnboarding(reinstallUser = false)
-        verify(mockInputScreenOnboardingWideEvent, never()).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithReinstallUserTrueAndAiSelectedThenCallWideEventWithReinstallTrue() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog() // sets isReinstallUser = true
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-        verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
-    }
-
-    // endregion
-
-    // region onSecondaryCtaClicked
-
-    @Test
-    fun whenSecondaryCtaFromReinstallUserThenShowSkipOnboardingAndFirePixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, state.currentDialog)
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSkipOnboardingThenShowComparisonChartAndFirePixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> SKIP_ONBOARDING_OPTION
-        testee.viewState.test {
-            val currentState = awaitItem()
-            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, currentState.currentDialog)
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-    }
-
-    // endregion
-
-    // region Sync Restore
-
-    @Test
-    fun whenLoadDaxDialogAndCanRestoreThenViewStateShowsSyncRestoreDialog() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SYNC_RESTORE, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLoadDaxDialogAndCanRestoreAndReinstallThenSyncRestoreTakesPriority() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SYNC_RESTORE, state.currentDialog)
-            // isAppReinstall() side effect still runs, so the flag is captured
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenCanRestoreThrowsThenLoadDaxDialogFallsBackToInitialDialog() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenThrow(RuntimeException("Block Store error"))
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INITIAL, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLoadDaxDialogAndCanRestoreThenFiresSyncRestoreShownPixel() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        verify(mockPixel).fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenPrimaryCtaFromSyncRestoreThenRestoreAccountAndShowComparisonChart() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // SYNC_RESTORE
-            testee.onPrimaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockSyncAutoRestore).restoreSyncAccount()
-    }
-
-    @Test
-    fun whenPrimaryCtaFromSyncRestoreThenFiresSyncRestoreTappedPixel() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onPrimaryCtaClicked()
-        verify(mockPixel).fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreThenShowSkipOnboardingOption() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // SYNC_RESTORE
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockSyncAutoRestore, never()).restoreSyncAccount()
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreThenFiresSkipRestoreTappedPixel() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        verify(mockPixel).fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentThenShowQuickSetupDialog() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            awaitItem() // SYNC_RESTORE
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertFalse(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockSyncAutoRestore, never()).restoreSyncAccount()
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentThenFiresSkipRestoreTappedPixel() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        verify(mockPixel).fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentAndIsDefaultBrowserThenHideSetDefaultBrowserRow() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem()
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertTrue(state.hideSetDefaultBrowserRow)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentAndHasInstalledWidgetsThenHideAddWidgetRow() = runTest {
-        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem()
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertTrue(state.hideAddWidgetRow)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    // endregion
-
-    // region onDefaultBrowserSet / onDefaultBrowserNotSet
-
-    @Test
-    fun whenDefaultBrowserSetThenViewStateShowsAddressBarPositionAndStoresTrue() = runTest {
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.onDefaultBrowserSet()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.ADDRESS_BAR_POSITION, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockAppInstallStore).defaultBrowser = true
-    }
-
-    @Test
-    fun whenDefaultBrowserNotSetThenViewStateShowsAddressBarPositionAndStoresFalse() = runTest {
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.onDefaultBrowserNotSet()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.ADDRESS_BAR_POSITION, state.currentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockAppInstallStore).defaultBrowser = false
-    }
-
-    @Test
-    fun whenSplitOmnibarEnabledThenOnDefaultBrowserSetShowsSplitOptionTrue() = runTest {
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
-        mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.onDefaultBrowserSet()
-            val state = awaitItem()
-            assertTrue(state.showSplitOption)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDefaultBrowserSetThenFiresDefaultBrowserSetPixel() {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        verify(mockPixel).fire(
-            AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
-        )
-    }
-
-    @Test
-    fun whenDefaultBrowserNotSetThenFiresDefaultBrowserNotSetPixel() {
-        val testee = createViewModel()
-        testee.onDefaultBrowserNotSet()
-        verify(mockPixel).fire(
-            AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
-        )
+        assertTrue(testee.viewState.value.hasAnimatedCurrentDialog)
     }
 
     // endregion
@@ -835,117 +264,19 @@ class BrandDesignUpdatePageViewModelTest {
     @Test
     fun whenAddressBarPositionSelectedThenViewStateUpdates() = runTest {
         val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-            val state = awaitItem()
-            assertEquals(OmnibarType.SINGLE_BOTTOM, state.selectedAddressBarPosition)
-            cancelAndConsumeRemainingEvents()
-        }
+
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+
+        assertEquals(OmnibarType.SINGLE_BOTTOM, testee.viewState.value.selectedAddressBarPosition)
     }
 
     @Test
     fun whenInputScreenOptionSelectedThenViewStateUpdates() = runTest {
         val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.onInputScreenOptionSelected(false)
-            val state = awaitItem()
-            assertEquals(false, state.inputScreenSelected)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
 
-    // endregion
+        testee.onInputScreenOptionSelected(withAi = false)
 
-    // region maxPageCount
-
-    @Test
-    fun whenViewModelCreatedThenMaxPageCountIs3() = runTest {
-        val testee = createViewModel()
-        advanceUntilIdle()
-        assertEquals(3, testee.viewState.value.maxPageCount)
-    }
-
-    // endregion
-
-    // region Notification permissions
-
-    @Test
-    fun whenNotificationPermissionRequestedThenPixelFired() {
-        val testee = createViewModel()
-        testee.notificationRuntimePermissionRequested()
-        verify(mockPixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
-    }
-
-    @Test
-    fun whenNotificationPermissionGrantedThenPixelFired() {
-        val testee = createViewModel()
-        testee.notificationRuntimePermissionGranted()
-        verify(mockPixel).fire(
-            AppPixelName.NOTIFICATIONS_ENABLED,
-            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
-        )
-    }
-
-    // endregion
-
-    // region hasAnimatedCurrentDialog
-
-    @Test
-    fun whenViewModelCreatedThenHasAnimatedCurrentDialogIsFalse() = runTest {
-        val testee = createViewModel()
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.hasAnimatedCurrentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnDialogAnimationStartedThenHasAnimatedCurrentDialogIsTrue() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL with hasAnimatedCurrentDialog = false
-            testee.onDialogAnimationStarted()
-            val state = awaitItem()
-            assertTrue(state.hasAnimatedCurrentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenCurrentDialogChangesViaSetCurrentDialogThenHasAnimatedCurrentDialogResets() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL
-            testee.onDialogAnimationStarted()
-            awaitItem() // hasAnimatedCurrentDialog = true
-            testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART via setCurrentDialog
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
-            assertFalse(state.hasAnimatedCurrentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenLoadDaxDialogCalledThenHasAnimatedCurrentDialogIsFalse() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            val state = awaitItem()
-            assertFalse(state.hasAnimatedCurrentDialog)
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.viewState.value.inputScreenSelected)
     }
 
     // endregion
@@ -956,10 +287,9 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenOnDialogTappedThenSkipDialogAnimationCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onDialogTapped()
-            val command = awaitItem()
-            assertTrue(command is Command.SkipDialogAnimation)
+            assertTrue(awaitItem() is Command.SkipDialogAnimation)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -967,307 +297,84 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenOnBackgroundTappedThenSkipDialogAnimationCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onBackgroundTapped()
-            val command = awaitItem()
-            assertTrue(command is Command.SkipDialogAnimation)
-        }
-    }
-
-    // endregion
-
-    // region Skip onboarding impression pixel
-
-    @Test
-    fun whenSkipOnboardingDialogShownThenFiresSkipOnboardingShownPixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // navigate to SKIP_ONBOARDING_OPTION
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenInputScreenDialogShownThenFiresChooseSearchExperiencePixel() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        verify(mockPixel).fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-    }
-
-    // endregion
-
-    // region onPrimaryCtaClicked - input screen enrollment
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsNullThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsControlThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentDuckAiThenShowInputScreenPreview() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
-        val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
-        val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
-        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
-        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(chatSuggestions)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.viewState.test {
-            val preInputScreen = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN, preInputScreen.currentDialog)
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, state.currentDialog)
-            assertFalse(state.inputScreenPreviewIsSearchSelected)
-            assertEquals(searchOptions, state.inputScreenPreviewSearchSuggestions)
-            assertEquals(chatSuggestions, state.inputScreenPreviewChatSuggestions)
+            assertTrue(awaitItem() is Command.SkipDialogAnimation)
             cancelAndConsumeRemainingEvents()
         }
     }
 
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentSearchThenShowInputScreenPreviewWithSearchDefault() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
-        val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
-        val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
-        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
-        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(chatSuggestions)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.viewState.test {
-            val preInputScreen = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN, preInputScreen.currentDialog)
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, state.currentDialog)
-            assertTrue(state.inputScreenPreviewIsSearchSelected)
-            assertEquals(searchOptions, state.inputScreenPreviewSearchSuggestions)
-            assertEquals(chatSuggestions, state.inputScreenPreviewChatSuggestions)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenDoNotEnrollAndFinish() = runTest {
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(false)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-        verify(mockDuckAiOnboardingExperimentManager, never()).enroll()
-    }
-
     // endregion
 
-    // region onPrimaryCtaClicked - input screen preview
+    // region Notification permissions
 
     @Test
-    fun whenPrimaryCtaFromInputScreenPreviewThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
-        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
-        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(emptyList())
+    fun whenNotificationPermissionRequestedThenPixelFired() = runTest {
         val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN_PREVIEW -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-    }
-
-    // endregion
-
-    // region onInputModeDemoQuerySubmitted
-
-    @Test
-    fun whenInputModeDemoQuerySubmittedWithChatThenSendFinishAndSubmitChatPromptCommand() = runTest {
-        val testee = createViewModel()
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true)
-            val command = awaitItem()
-            assertTrue(command is Command.FinishAndSubmitChatPrompt)
-            assertEquals("hello world", (command as Command.FinishAndSubmitChatPrompt).prompt)
-        }
-    }
-
-    @Test
-    fun whenInputModeDemoQuerySubmittedWithSearchThenSendFinishAndSubmitSearchQueryCommand() = runTest {
-        val testee = createViewModel()
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("search query", isChat = false)
-            val command = awaitItem()
-            assertTrue(command is Command.FinishAndSubmitSearchQuery)
-            assertEquals("search query", (command as Command.FinishAndSubmitSearchQuery).query)
-        }
-    }
-
-    // endregion
-
-    // region Quick setup experiment - onSecondaryCtaClicked
-
-    @Test
-    fun whenSecondaryCtaFromReinstallUserAndQuickSetupTreatmentThenShowQuickSetupDialog() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallUserAndQuickSetupTreatmentThenFireSkipOnboardingPixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallUserAndQuickSetupControlThenShowSkipOnboardingAndFirePixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, state.currentDialog)
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallUserAndQuickSetupNotEnrolledThenShowSkipOnboardingAndFirePixel() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(null)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, state.currentDialog)
-            assertTrue(state.isReinstallUser)
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-    }
-
-    // endregion
-
-    // region Quick setup experiment - onPrimaryCtaClicked
-
-    @Test
-    fun whenPrimaryCtaFromQuickSetupThenSendFinishThenOnboardingSkippedCommands() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked()
-            assertTrue(awaitItem() is Command.OnboardingSkipped)
-        }
-    }
-
-    // endregion
-
-    // region Quick setup pixels
-
-    @Test
-    fun whenQuickSetupShownThenSenderFiresShownWithReinstallState() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
+        testee.notificationRuntimePermissionRequested()
         advanceUntilIdle()
-
-        verify(mockQuickSetupPixelSender).fireShown(isReinstallUser = true)
+        verify(pixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
     }
 
     @Test
-    fun whenQuickSetupClickedThenSenderFiresClickedWithCurrentSelections() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-
+    fun whenNotificationPermissionRequestedThenPresentedEventSentToOrchestrator() = runTest {
         val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-        testee.onInputScreenOptionSelected(withAi = false)
-        testee.onPrimaryCtaClicked()
+        testee.notificationRuntimePermissionRequested()
         advanceUntilIdle()
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.Presented)
+    }
 
-        verify(mockQuickSetupPixelSender).fireClicked(
-            isReinstallUser = true,
-            addressBarPosition = OmnibarType.SINGLE_BOTTOM,
-            inputScreenSelected = false,
+    @Test
+    fun whenNotificationPermissionGrantedThenPixelFired() = runTest {
+        val testee = createViewModel()
+        testee.notificationRuntimePermissionGranted()
+        advanceUntilIdle()
+        verify(pixel).fire(
+            AppPixelName.NOTIFICATIONS_ENABLED,
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    // endregion
+
+    // region onboardingImprovementsV2Enabled
+
+    @Test
+    fun whenOnboardingImprovementsV2DisabledThenViewStateReflectsFalse() = runTest {
+        fakeOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2().setRawStoredState(Toggle.State(remoteEnableState = false))
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.onboardingImprovementsV2Enabled)
+    }
+
+    // endregion
+
+    // region onDefaultBrowserSet / onDefaultBrowserNotSet
+
+    @Test
+    fun whenDefaultBrowserSetThenRecordsResultAndFiresSetPixel() = runTest {
+        val testee = createViewModel()
+
+        testee.onDefaultBrowserSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+        verify(mockAppInstallStore).defaultBrowser = true
+        verify(pixel).fire(
+            AppPixelName.DEFAULT_BROWSER_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    @Test
+    fun whenDefaultBrowserNotSetThenRecordsResultAndFiresNotSetPixel() = runTest {
+        val testee = createViewModel()
+
+        testee.onDefaultBrowserNotSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(pixel).fire(
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
         )
     }
 
@@ -1279,7 +386,6 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupAddressBarPositionEditClickedThenSendShowAddressBarPositionBottomSheetCommandWithDefaults() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddressBarPositionEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
@@ -1295,7 +401,6 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddressBarPositionEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
@@ -1311,7 +416,6 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupSearchOptionsEditClickedThenSendShowSearchOptionsBottomSheetCommandWithDefaultWithAiTrue() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSearchOptionsEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
@@ -1325,7 +429,6 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.onInputScreenOptionSelected(withAi = false)
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSearchOptionsEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
@@ -1344,7 +447,6 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupDefaultBrowserDialog)
@@ -1358,7 +460,6 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked()
             val command = awaitItem()
             assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
@@ -1372,7 +473,6 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked() // first time: dialog
             assertTrue(awaitItem() is Command.ShowQuickSetupDefaultBrowserDialog)
             testee.onQuickSetupSetAsDefaultClicked() // second time: settings
@@ -1390,7 +490,6 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupSetAsDefaultUncheckedThenSendOpenDefaultBrowserSystemSettings() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultUnchecked()
             val command = awaitItem()
             assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
@@ -1403,99 +502,23 @@ class BrandDesignUpdatePageViewModelTest {
     // region onQuickSetupDefaultBrowserSet / onQuickSetupDefaultBrowserNotSet
 
     @Test
-    fun whenQuickSetupDefaultBrowserSetThenRecordResultAndDoNotAdvanceDialog() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+    fun whenQuickSetupDefaultBrowserSetThenRecordsResultWithoutTelemetry() = runTest {
         val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.viewState.test {
-            val before = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, before.currentDialog)
-            testee.onQuickSetupDefaultBrowserSet()
-            // No state change expected; ensure no new emission switches dialog
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+
+        testee.onQuickSetupDefaultBrowserSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
         verify(mockAppInstallStore).defaultBrowser = true
-        verify(mockDefaultRoleBrowserDialog).dialogShown()
     }
 
     @Test
-    fun whenQuickSetupDefaultBrowserNotSetThenRecordResultAndDoNotAdvanceDialog() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+    fun whenQuickSetupDefaultBrowserNotSetThenRecordsResultWithoutTelemetry() = runTest {
         val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.viewState.test {
-            val before = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, before.currentDialog)
-            testee.onQuickSetupDefaultBrowserNotSet()
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+
+        testee.onQuickSetupDefaultBrowserNotSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
         verify(mockAppInstallStore).defaultBrowser = false
-        verify(mockDefaultRoleBrowserDialog).dialogShown()
-    }
-
-    // endregion
-
-    // region checkQuickSetupSwitchesState
-
-    @Test
-    fun whenCheckQuickSetupSwitchesStateInQuickSetupThenSendCombinedSyncWithBothStates() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.checkQuickSetupSwitchesState()
-            val command = awaitItem()
-            assertTrue(command is Command.SyncQuickSetupSwitches)
-            command as Command.SyncQuickSetupSwitches
-            assertTrue(command.defaultBrowserChecked)
-            assertFalse(command.widgetChecked)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenCheckQuickSetupSwitchesStateInQuickSetupWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.checkQuickSetupSwitchesState()
-            val command = awaitItem()
-            assertTrue(command is Command.SyncQuickSetupSwitches)
-            command as Command.SyncQuickSetupSwitches
-            assertFalse(command.defaultBrowserChecked)
-            assertTrue(command.widgetChecked)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenCheckQuickSetupSwitchesStateNotInQuickSetupThenNoCommandSent() = runTest {
-        val testee = createViewModel()
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.checkQuickSetupSwitchesState()
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
-        verifyNoInteractions(mockDefaultBrowserDetector)
-        verifyNoInteractions(mockWidgetCapabilities)
     }
 
     // endregion
@@ -1506,7 +529,6 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupAddHomescreenWidgetClickedThenSendLaunchAddWidgetPrompt() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddHomescreenWidgetClicked()
             val command = awaitItem()
             assertTrue(command is Command.LaunchAddWidgetPrompt)
@@ -1518,7 +540,6 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupRemoveHomescreenWidgetClickedThenSendShowRemoveWidgetBottomSheet() = runTest {
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupRemoveHomescreenWidgetClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowRemoveWidgetBottomSheet)
@@ -1535,7 +556,6 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.checkWidgetAddedState()
             val command = awaitItem()
             assertTrue(command is Command.SyncAddWidgetSwitch)
@@ -1549,7 +569,6 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         val testee = createViewModel()
         testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
             testee.checkWidgetAddedState()
             val command = awaitItem()
             assertTrue(command is Command.SyncAddWidgetSwitch)
@@ -1560,159 +579,347 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region QUICK_SETUP entry row visibility
+    // region checkQuickSetupSwitchesState
 
     @Test
-    fun whenSecondaryCtaFromReinstallTreatmentAndIsDefaultBrowserThenHideSetDefaultBrowserRow() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupThenSendCombinedSyncWithBothStates() = runTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem() // initial
-            testee.loadDaxDialog()
-            awaitItem() // INITIAL_REINSTALL_USER
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertTrue(state.hideSetDefaultBrowserRow)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallTreatmentAndNotDefaultBrowserThenShowSetDefaultBrowserRow() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem()
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertFalse(state.hideSetDefaultBrowserRow)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallTreatmentAndHasInstalledWidgetsThenHideAddWidgetRow() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem()
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertTrue(state.hideAddWidgetRow)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSecondaryCtaFromReinstallTreatmentAndNoInstalledWidgetsThenShowAddWidgetRow() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        val testee = createViewModel()
-        testee.viewState.test {
-            awaitItem()
-            testee.loadDaxDialog()
-            awaitItem()
-            testee.onSecondaryCtaClicked()
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
-            assertFalse(state.hideAddWidgetRow)
+        val testee = createViewModelAtQuickSetup()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.QUICK_SETUP, testee.viewState.value.currentDialog)
+
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertTrue(command.defaultBrowserChecked)
+            assertFalse(command.widgetChecked)
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = createViewModelAtQuickSetup()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.QUICK_SETUP, testee.viewState.value.currentDialog)
+
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertFalse(command.defaultBrowserChecked)
+            assertTrue(command.widgetChecked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateNotInQuickSetupThenNoCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(mockDefaultBrowserDetector)
+        verifyNoInteractions(mockWidgetCapabilities)
+    }
+
+    // endregion
+
+    // region Orchestrator flow - step rendering
+
+    @Test
+    fun `when intro animation step then plays intro animation`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = false),
+            id = NewUserOnboardingStepIds.INTRO_ANIMATION,
+        )
+        testee.commands.test {
+            advanceUntilIdle()
+            assertEquals(
+                Command.PlayIntroAnimation(withDuckAi = false),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `when state is initial then view state shows initial and fires shown pixel`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.INITIAL, testee.viewState.value.currentDialog)
+        verify(pixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun `when state is comparison chart then view state shows comparison chart and fires shown pixel`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.COMPARISON_CHART, testee.viewState.value.currentDialog)
+        verify(pixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun `when ai comparison chart then view state shows ai comparison chart and fires shown pixel`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.AiComparisonChart, id = "ai_comparison_chart")
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.AI_COMPARISON_CHART, testee.viewState.value.currentDialog)
+        verify(pixel).fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
+    }
+
+    @Test
+    fun `when input screen preview then view state derives its step number from plan position`() = runTest {
+        // Two indicator steps with the preview 2nd. The run starts on the AI comparison chart and advances to the
+        // preview, so the VM derives "2 of 2" from plan position (not the dialog).
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(
+                NewUserOnboardingActivityStep(
+                    id = "ai_comparison_chart",
+                    pixelName = null,
+                    showsStepIndicator = true,
+                    transition = { LinearOnboardingTransition.Advance },
+                    resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
+                ),
+                NewUserOnboardingActivityStep(
+                    id = "input_screen_preview",
+                    pixelName = null,
+                    showsStepIndicator = true,
+                    transition = recordAndStay,
+                    resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
+                ),
+            ),
+        )
+        realOrchestrator.startPlan(plan)
+        val testee = createViewModel(realOrchestrator)
+        advanceUntilIdle()
+        realOrchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // advance to the preview step
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, testee.viewState.value.currentDialog)
+        assertEquals(StepProgress(current = 2, total = 2), testee.viewState.value.stepIndicator)
+    }
+
+    @Test
+    fun `when custom ai onboarding flow then view state enables custom ai flow`() = runTest {
+        whenever(customAiOnboardingStore.isEnabled()).thenReturn(true)
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.isCustomAiOnboardingFlow)
+    }
+
+    @Test
+    fun `when current step hosted by browser activity then hands off to browser`() = runTest {
+        val testee = startAtBrowserStep()
+
+        testee.commands.test {
+            assertEquals(Command.HandOffToBrowserActivity, awaitItem())
         }
     }
 
     // endregion
 
-    // region QUICK_SETUP primary CTA persistence
+    // region Orchestrator flow - CTA event translation
 
     @Test
-    fun whenPrimaryCtaFromQuickSetupWithBottomThenPersistBottom() = runTest {
-        enterQuickSetupTreatment()
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+    fun `when continue clicked on initial then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
+    }
+
+    @Test
+    fun `when continue clicked on comparison chart then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
+    }
+
+    @Test
+    fun `when ai comparison chart continue then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.AiComparisonChart, id = "ai_comparison_chart")
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
+    }
+
+    @Test
+    fun `when address bar confirmed then emits with selected type`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = false))
+        advanceUntilIdle()
+
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
         testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_BOTTOM)), recordedEvents)
     }
 
     @Test
-    fun whenPrimaryCtaFromQuickSetupWithSplitAndFeatureEnabledThenPersistSplit() = runTest {
-        enterQuickSetupTreatment()
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
-        mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-        testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SPLIT
-    }
+    fun `when input mode confirmed then emits with selection`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen)
+        advanceUntilIdle()
 
-    @Test
-    fun whenPrimaryCtaFromQuickSetupWithSplitAndFeatureDisabledThenFallbackToTop() = runTest {
-        enterQuickSetupTreatment()
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = false))
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-        testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        verify(mockSettingsDataStore, never()).omnibarType = OmnibarType.SPLIT
-    }
-
-    @Test
-    fun whenPrimaryCtaFromQuickSetupWithTopThenPersistTop() = runTest {
-        enterQuickSetupTreatment()
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onPrimaryCtaClicked()
-        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-    }
-
-    @Test
-    fun whenPrimaryCtaFromQuickSetupWithAiSelectedThenPersist() = runTest {
-        enterQuickSetupTreatment()
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        testee.onInputScreenOptionSelected(withAi = true)
-        testee.onPrimaryCtaClicked()
-        verify(mockDuckChat).setCosmeticInputScreenUserSetting(true)
-        verify(mockOnboardingStore).storeInputScreenSelection(true)
-    }
-
-    @Test
-    fun whenPrimaryCtaFromQuickSetupWithSearchOnlyThenPersist() = runTest {
-        enterQuickSetupTreatment()
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
         testee.onInputScreenOptionSelected(withAi = false)
         testee.onPrimaryCtaClicked()
-        verify(mockDuckChat).setCosmeticInputScreenUserSetting(false)
-        verify(mockOnboardingStore).storeInputScreenSelection(false)
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.InputModeConfirmed(withAi = false)), recordedEvents)
     }
 
-    private suspend fun enterQuickSetupTreatment() {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+    @Test
+    fun `when restore then skip on sync restore then emits restore requested then skip requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SyncRestore)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.RestoreRequested, NewUserOnboardingEvent.SkipRequested),
+            recordedEvents,
+        )
+    }
+
+    @Test
+    fun `when skip on reinstall user then emits skip requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.InitialReinstallUser)
+        advanceUntilIdle()
+
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.SkipRequested), recordedEvents)
+    }
+
+    @Test
+    fun `when skip confirmed then resume on skip option then emits skip confirmed then resume requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.SkipConfirmed, NewUserOnboardingEvent.ResumeRequested),
+            recordedEvents,
+        )
+    }
+
+    @Test
+    fun `when demo query submitted then forwards event`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
+        advanceUntilIdle()
+
+        testee.onInputModeDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false)
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false)), recordedEvents)
+    }
+
+    // endregion
+
+    // region Orchestrator flow - run completion
+
+    @Test
+    fun `when run completes with no result then sends plain finish`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial, transition = { LinearOnboardingTransition.Advance })
+        testee.commands.test {
+            advanceUntilIdle()
+            realOrchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // -> Advance -> run completes
+            advanceUntilIdle()
+            assertEquals(Command.Finish, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when run completes with launch search result then submits search query`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.Initial,
+            transition = { LinearOnboardingTransition.Advance },
+            result = { NewUserOnboardingResult.LaunchSearch(query = "weather") },
+        )
+        testee.commands.test {
+            advanceUntilIdle()
+            realOrchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+            advanceUntilIdle()
+            assertEquals(Command.FinishAndSubmitSearchQuery(query = "weather"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when run completes with launch chat result then submits chat prompt`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false),
+            transition = { LinearOnboardingTransition.Advance },
+            result = { NewUserOnboardingResult.LaunchChat(prompt = "cats") },
+        )
+        testee.commands.test {
+            advanceUntilIdle()
+            realOrchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false))
+            advanceUntilIdle()
+            assertEquals(Command.FinishAndSubmitChatPrompt(prompt = "cats"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when run aborted then sends onboarding skipped`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption,
+            transition = { LinearOnboardingTransition.AbortPlan },
+        )
+        testee.commands.test {
+            advanceUntilIdle()
+            realOrchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
+            advanceUntilIdle()
+            assertEquals(Command.OnboardingSkipped, awaitItem())
+        }
+    }
+
+    // endregion
+
+    // region Orchestrator flow - re-bootstrap on process-death restore
+
+    @Test
+    fun `when orchestrator not started then re-bootstraps the plan`() = runTest {
+        // The orchestrator is left NotStarted, mimicking a process-death restore where the
+        // OnboardingActivity is recreated without routing through LaunchViewModel.
+        createViewModel(realOrchestrator)
+        advanceUntilIdle()
+
+        verifyBlocking(newUserOnboardingPlanBootstrapper) { startNewUserOnboardingPlan() }
+    }
+
+    @Test
+    fun `when orchestrator already in progress then does not re-bootstrap`() = runTest {
+        startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        verifyNoInteractions(newUserOnboardingPlanBootstrapper)
     }
 
     // endregion

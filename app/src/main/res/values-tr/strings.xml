@@ -75,6 +75,7 @@
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
+    <string name="urlCopiedToClipboard">URL panoya kopyalandı</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Sonrakini bul</string>
@@ -679,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
-    <string name="downloadsActivityTitle">İndirilenler</string>
-    <string name="downloadsActivityNoItemsDescription">Henüz indirilen dosya yok</string>
-    <string name="downloadsShareTitle">Paylaş…</string>
     <string name="downloadsDownloadFinishedActionName">Aç</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Dosya artık mevcut değil</string>
-    <string name="downloadsItemMenuShare">Paylaş</string>
-    <string name="downloadsItemMenuDelete">Sil</string>
-    <string name="downloadsItemMenuCancel">İptal</string>
-    <string name="downloadsActivityMenuDeleteAll">Tümünü Sil</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s silindi</string>
-    <string name="downloadsAllFilesDeletedMessage">Tüm dosyalar silindi</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s için daha fazla seçenek</string>
-    <string name="downloadsUndoActionName">Geri al</string>
-    <string name="downloadsStateInProgress">Devam ediyor…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Uygulama İzleme Koruması</string>
@@ -715,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
-    <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
 
@@ -831,6 +816,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Başlayalım!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
     <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
     <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
@@ -842,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
     <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Duck.ai entegrasyonu ile ChatGPT\'yi özel olarak kullanın.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Hedefli reklamları ve çerez açılır pencerelerini engelleyin</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube videolarını reklamsız oynatın</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
@@ -895,12 +883,13 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Ücretsiz dene!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Biliyor muydunuz?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Adres çubuğundaki özel AI sohbetine kolay erişim ister misiniz?</string>
     <string name="preOnboardingInputScreenButton">Sonraki</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI özellikleri gizli ve isteğe bağlıdır. Değişiklikleri <b>Ayarlar > AI Özellikleri</b> bölümünden yapabilirsiniz.]]></string>
 
@@ -1026,10 +1015,68 @@
     <string name="preOnboardingWelcomeDialogTitle">Merhaba.</string>
     <string name="preOnboardingWelcomeDialogBody1">Kontrolü size verecek daha hızlı bir tarayıcıya hazır mısınız?</string>
     <string name="preOnboardingWelcomeDialogBody2">Yapay zekâ her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d / %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d / %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">İşte Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile istediğiniz zaman silebileceğiniz gizli AI sohbetleri. Hemen deneyin! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">İşte bu kadar!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Tebrikler!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Başlamaya hazır mısınız?&lt;br/&gt;Arama yapmayı veya yapay zekâ sohbetini deneyin!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Gizli olarak arama yapın</string>
+    <string name="preOnboardingInputModeDemoChatHint">Gizli bir şekilde her şeyi sorabilirsiniz</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Borsa piyasasını 10 yaşında bir çocuğa anlatır gibi açıkla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Londra\'da mükemmel bir gün planla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Şaşırt beni!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Bilim, doğa ve tarihle ilgili 10 büyüleyici gerçek nedir?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Sizi aktif olarak koruyan bir tarayıcıda ChatGPT, Claude ve diğer AI\'larla ücretsiz olarak gizlice sohbet etmeye hazır mısınız?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Unutmayın: sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Yapay Zekâ Sohbeti Başlat</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI korumaları etkinleştirildi!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popüler AI\'lar</string>
+    <string name="preOnboardingAiComparisonChartItem1">Tüm sohbetler anonimleştirilir</string>
+    <string name="preOnboardingAiComparisonChartItem2">Tüm yapay zekâ özelliklerine erişmek için hesap gerekmez</string>
+    <string name="preOnboardingAiComparisonChartItem3">Sohbetlerinizi asla yapay zekâyı eğitmek için kullanmaz</string>
+    <string name="preOnboardingAiComparisonChartItem4">ChatGPT, Claude ve daha fazlasına tek noktadan erişin</string>
+    <string name="preOnboardingAiComparisonChartButton">Duck.ai\'ı hemen deneyin!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Şimdi, gizli yapay zekâ sohbetini deneyin!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Onayla</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Fire Sekmesinde Aç</string>
+    <string name="openInBackgroundTab">Arka Planda Aç</string>
+    <string name="browserModeToggleFireDescription">Fire modu sekmelerine geçin</string>
+    <string name="browserModeToggleRegularDescription">Normal sekmelere geç</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire Sekmesi</string>
+    <string name="fireTabNewTabPageTitle">Fire Sekmesi</string>
+    <string name="fireTabsEmptyStateTitle">Fire Sekmeleri</string>
+    <string name="fireTabsFeatureNoHistory">Yerel geçmişi kaydetmeden göz atın</string>
+    <string name="fireTabsFeatureDifferentAccount">Bir sitede farklı bir hesapla oturum açın</string>
+    <string name="fireTabsFeatureTroubleshoot">Web sitelerindeki sorunları giderin</string>
+    <string name="fireTabsExplainer">Fire Sekmeleri diğer tarayıcı verilerinden izole edilmiştir. Tüm pencereleri kapattığınızda veriler imha edilir. Diğer sekmelerle aynı izleme korumasını sunarlar.</string>
+    <string name="fireTabsNewTabButton">Yeni Fire Sekmesi</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>YENİ!</b> Yerel geçmişi kaydetmeden göz atmak için Fire Sekmelerini deneyin.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 </resources>

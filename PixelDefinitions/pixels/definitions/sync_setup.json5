@@ -1,0 +1,363 @@
+{
+    "sync_setup_barcode_screen_shown": {
+        "description": "The sync setup barcode (QR) screen was shown to the user",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the screen belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_manual_code_entry_screen_shown": {
+        "description": "The sync setup manual code entry screen was shown to the user",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the screen belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_barcode_scanner_success": {
+        "description": "A scanned sync code was recognized successfully",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the scan belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "code_version",
+                "type": "string",
+                "description": "Protocol version of the code that was scanned",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "code_type",
+                "type": "string",
+                "description": "Kind of recognized code. Sent on the v2 path only",
+                "enum": ["recovery", "linking"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_manual_code_entered_success": {
+        "description": "A manually entered/pasted sync code was recognized successfully",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the code entry belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "code_version",
+                "type": "string",
+                "description": "Protocol version of the code that was entered",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "code_type",
+                "type": "string",
+                "description": "Kind of recognized code. Sent on the v2 path only",
+                "enum": ["recovery", "linking"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_barcode_scanner_failed": {
+        "description": "A scanned sync code could not be parsed/recognized",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the scan belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the scanned code failed parsing/recognition. Emitted from v2 call sites when the parser rejects the code.",
+                "enum": ["unrecognized_code", "needs_upgrade", "incompatible_code"]
+            }
+        ]
+    },
+    "sync_setup_manual_code_entered_failed": {
+        "description": "A manually entered/pasted sync code could not be parsed/recognized",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the code entry belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the pasted code failed parsing/recognition. Emitted from v2 call sites when the parser rejects the code.",
+                "enum": ["unrecognized_code", "needs_upgrade", "incompatible_code"]
+            }
+        ]
+    },
+    "sync_setup_ended_successful": {
+        "description": "Sync setup completed successfully (recovery-code login or device pairing). For a v2 pairing the host reports it after sending the recovery code, the joiner after login",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow completed",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "path",
+                "type": "string",
+                "description": "Whether the v2 setup was a recovery-code login or a device pairing. Sent on the v2 path only",
+                "enum": ["recovery", "pairing"]
+            },
+            {
+                "key": "my_role",
+                "type": "string",
+                "description": "This device's elected role in a v2 pairing. Sent for v2 pairings only",
+                "enum": ["host", "joiner"]
+            },
+            {
+                "key": "peer_kind",
+                "type": "string",
+                "description": "The peer device's credential kind in a v2 pairing. Sent for v2 pairings only",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_ended_failed": {
+        "description": "A v2 sync setup that started (code recognized) failed with an error, not a user cancellation",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow failed",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the v2 setup failed, per the canonical reason vocabulary in the v2 sync pixels spec (Exchange V2 Unified Algorithm)",
+                "enum": [
+                    "session_timeout",
+                    "transport_failure",
+                    "needs_upgrade",
+                    "invalid_credentials",
+                    "account_creation_failed",
+                    "account_upgrade_failed",
+                    "already_upgraded",
+                    "already_paired",
+                    "recovery_code_preparation_failed",
+                    "missing_3party_credential",
+                    "undecryptable_3party_credential",
+                    "account_extend_failed",
+                    "missing_3party_key",
+                    "local_storage_failed",
+                    "peer_recovery_code_unavailable",
+                    "unexpected_second_hello",
+                    "unexpected_event",
+                    "pairing_session_not_ready",
+                    "relay_channel_unavailable",
+                    "protocol_error",
+                    "unexpected_failure"
+                ]
+            },
+            {
+                "key": "timeout_stage",
+                "type": "string",
+                "description": "Which phase of the v2 setup was in progress when reason=session_timeout. Emitted only when reason is session_timeout; omitted otherwise",
+                "enum": [
+                    "waiting_for_peer_hello",
+                    "waiting_for_peer_status",
+                    "waiting_for_confirmation",
+                    "waiting_for_recovery_code",
+                    "logging_in"
+                ]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on. Always v2 for this pixel",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "path",
+                "type": "string",
+                "description": "Whether the failed setup was a recovery-code login or a device pairing. Best-effort, omitted when unknown",
+                "enum": ["recovery", "pairing"]
+            },
+            {
+                "key": "my_role",
+                "type": "string",
+                "description": "This device's elected role in a v2 pairing. Best-effort, omitted when unknown",
+                "enum": ["host", "joiner"]
+            },
+            {
+                "key": "peer_kind",
+                "type": "string",
+                "description": "The peer device's credential kind in a v2 pairing. Best-effort, omitted when unknown",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_ended_abandoned": {
+        "description": "Sync setup was cancelled by the user (back navigation or denying the sync confirmation prompt)",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow was cancelled",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the setup was cancelled, based on the v2 protocol state at cancellation",
+                "enum": ["scanning_cancelled", "sync_confirmation_denied", "cancelled_before_finished"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    }
+}

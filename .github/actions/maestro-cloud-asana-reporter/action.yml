@@ -108,7 +108,7 @@ runs:
       run: echo "flow_summary_status=${{ steps.analyze-maestro.outputs.flow_summary_status }}"
 
     - name: Create Asana task when Maestro tests failed
-      if: always() && inputs.create_asana_error_task == 'true' && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
+      if: always() && inputs.create_asana_error_task == 'true' && steps.analyze-maestro.outputs.flow_summary_status == 'failure' && github.event_name != 'workflow_dispatch'
       id: create-maestro-failure-task
       uses: duckduckgo/native-github-asana-sync@v2.0
       with:

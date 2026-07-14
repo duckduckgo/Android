@@ -157,12 +157,13 @@ enum class ModelProvider {
 
     companion object {
         fun from(id: String, providerString: String?): ModelProvider {
+            val provider = providerString?.lowercase()
             return when {
-                id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
-                id.startsWith("mistralai/") || id.startsWith("mistralai_") || providerString == "mistral" -> MISTRAL
-                id.contains("gpt-oss") -> OSS
-                providerString == "anthropic" -> ANTHROPIC
-                providerString == "openai" -> OPENAI
+                id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || provider == "azure" -> META
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") || provider == "mistral" -> MISTRAL
+                id.contains("gpt-oss") || id.startsWith("tinfoil/") || provider == "tinfoil" -> OSS
+                provider == "anthropic" -> ANTHROPIC
+                provider == "openai" -> OPENAI
                 else -> UNKNOWN
             }
         }

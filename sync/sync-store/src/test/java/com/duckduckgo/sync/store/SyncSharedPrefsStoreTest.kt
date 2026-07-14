@@ -112,4 +112,35 @@ class SyncSharedPrefsStoreTest {
         assertNull(store.secretKey)
         assertNull(store.token)
     }
+
+    @Test
+    fun whenCredentialIdStoredThenValueUpdatedInPrefsStore() {
+        assertNull(store.credentialId)
+        store.credentialId = "ddg"
+        assertEquals("ddg", store.credentialId)
+        store.credentialId = "3party"
+        assertEquals("3party", store.credentialId)
+        store.credentialId = null
+        assertNull(store.credentialId)
+    }
+
+    @Test
+    fun whenScopedPasswordStoredThenValueUpdatedInPrefsStore() {
+        assertNull(store.scopedPassword)
+        store.scopedPassword = ScopedPassword("encrypted_sp_value")
+        assertEquals(ScopedPassword("encrypted_sp_value"), store.scopedPassword)
+        store.scopedPassword = null
+        assertNull(store.scopedPassword)
+    }
+
+    @Test
+    fun whenClearAllThenV2FieldsAlsoCleared() {
+        store.credentialId = "ddg"
+        store.scopedPassword = ScopedPassword("encrypted_sp")
+
+        store.clearAll()
+
+        assertNull(store.credentialId)
+        assertNull(store.scopedPassword)
+    }
 }

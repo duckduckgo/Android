@@ -21,7 +21,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -70,7 +69,6 @@ import kotlin.time.Duration.Companion.seconds
 interface PlayBillingManager {
     val products: List<ProductDetails>
     val productsFlow: Flow<List<ProductDetails>>
-    val purchaseHistory: List<PurchaseHistoryRecord>
     val purchases: List<Purchase>
     val purchaseState: Flow<PurchaseState>
 
@@ -145,13 +143,6 @@ class RealPlayBillingManager @Inject constructor(
     override val productsFlow: Flow<List<ProductDetails>>
         get() = _products.asStateFlow()
 
-    // Purchase History
-    @Deprecated(
-        message = "purchaseHistory is deprecated",
-        replaceWith = ReplaceWith("purchases"),
-    )
-    override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
-
     // Active Purchases
     override var purchases = emptyList<Purchase>()
 
@@ -165,7 +156,6 @@ class RealPlayBillingManager @Inject constructor(
             if (billingClient.ready) {
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     loadProducts()
-                    loadPurchaseHistory()
                     loadPurchases()
                 }
             }
@@ -199,7 +189,6 @@ class RealPlayBillingManager @Inject constructor(
             when (result) {
                 Success -> {
                     loadProducts()
-                    loadPurchaseHistory()
                     loadPurchases()
                     true // success, don't retry
                 }
@@ -395,16 +384,6 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    private suspend fun loadPurchaseHistory() {
-        when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
-            is SubscriptionsPurchaseHistoryResult.Success -> {
-                purchaseHistory = result.history
-            }
-            SubscriptionsPurchaseHistoryResult.Failure -> {
-            }
-        }
-    }
-
     private suspend fun loadPurchases() {
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
@@ -436,7 +415,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
-        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown
+        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
 
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
@@ -450,7 +429,7 @@ class RealPlayBillingManager @Inject constructor(
             }
             is QueryPurchasesResult.Failure -> {
                 logcat { "Billing: getLatestPurchase query failed: ${result.billingError} - ${result.debugMessage}" }
-                LatestPurchaseResult.Unknown
+                LatestPurchaseResult.Unknown(cause = "query_purchases_failed:${result.billingError?.name ?: "unknown"}")
             }
         }
     }
@@ -466,8 +445,9 @@ sealed class LatestPurchaseResult {
     /**
      * No confirmed answer yet — either we have not queried Play Billing yet,
      * or the last query failed (connection error, service unavailable, etc.).
+     * [cause] is a low-cardinality tag identifying which path produced the Unknown result.
      */
-    data object Unknown : LatestPurchaseResult()
+    data class Unknown(val cause: String) : LatestPurchaseResult()
 }
 
 sealed class PurchaseState {

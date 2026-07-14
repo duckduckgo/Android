@@ -18,10 +18,14 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -29,10 +33,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,12 +52,22 @@ class OptionsViewModelTest {
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val store = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val store = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
+    private val duckChatPixels: DuckChatPixels = mock()
     private lateinit var testee: OptionsViewModel
 
     @Before
     fun setUp() {
-        testee = OptionsViewModel(store)
+        testee = OptionsViewModel(store, duckChatPixels)
     }
 
     @Test
@@ -94,6 +111,52 @@ class OptionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(Tool.IMAGE_GENERATION, testee.selectedTool.value)
+    }
+
+    @Test
+    fun whenImageGenSelectedByUserThenSelectedPixel() {
+        testee.onToolSelectedByUser(Tool.IMAGE_GENERATION)
+        verify(duckChatPixels).fireImageGenerationSelected()
+    }
+
+    @Test
+    fun whenWebSearchDeselectedByUserThenDeselectedPixel() {
+        testee.onToolDeselectedByUser(Tool.WEB_SEARCH)
+        verify(duckChatPixels).fireWebSearchDeselected()
+    }
+
+    @Test
+    fun whenWebSearchSelectedByUserThenSelectedPixel() {
+        testee.onToolSelectedByUser(Tool.WEB_SEARCH)
+        verify(duckChatPixels).fireWebSearchSelected()
+    }
+
+    @Test
+    fun whenImageGenDeselectedByUserThenDeselectedPixel() {
+        testee.onToolDeselectedByUser(Tool.IMAGE_GENERATION)
+        verify(duckChatPixels).fireImageGenerationDeselected()
+    }
+
+    @Test
+    fun whenCustomizeResponsesClickedThenFireCustomizeResponsesPixel() {
+        testee.onCustomizeResponsesClicked()
+        verify(duckChatPixels).fireCustomizeResponsesSelected()
+    }
+
+    @Test
+    fun whenVisibleToolsAutoClearsSelectedToolThenNoPixel() = runTest {
+        val tabId = "tab-E"
+        store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity(tabId)
+        advanceUntilIdle()
+        assertEquals(Tool.WEB_SEARCH, testee.selectedTool.value)
+
+        // A model-capability change that removes the selected tool must auto-clear it
+        // (updateVisibleTools returns true) WITHOUT firing a deselect pixel.
+        val selectionCleared = testee.updateVisibleTools(emptySet())
+
+        assertTrue(selectionCleared)
+        verifyNoInteractions(duckChatPixels)
     }
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)

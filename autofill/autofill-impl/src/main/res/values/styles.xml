@@ -14,10 +14,24 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AutofillBottomSheetDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AutofillBottomSheetStyle</item>
+    </style>
+
+    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draws the sheet behind the
+         transparent system bars (edge-to-edge, Android 15+); content clears the nav bar via
+         View.applyBottomSystemBarInsetPadding() and Material adds the top status-bar inset. -->
+    <style name="AutofillBottomSheetDialogThemeEdgeToEdge" parent="AutofillBottomSheetDialogTheme">
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <!-- Material's own bottom auto-padding (default true) would double up with our manual,
+             toggle-gated View.applyBottomSystemBarInsetPadding() now that the window is genuinely
+             edge-to-edge. Disable it; top/left/right auto-padding stay on (nothing manual replaces them). -->
+        <item name="paddingBottomSystemWindowInsets">false</item>
     </style>
 
     <style name="AutofillBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
