@@ -48,6 +48,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
+    data object AddWidget : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_browser_comparison_background,
+        maxHeightDp = 216,
+    )
     data object QuickSetup : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,

@@ -123,7 +123,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             buildDefaultPlan(onCompleted, onSkipped, variant)
         }
 
-    private fun buildDefaultPlan(
+    private suspend fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
         onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant?,
@@ -137,9 +137,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val skipPlan = skipPlan()
         val quickSetupPlan = quickSetupPlan(ctx)
 
-        val showWidget = onboardingPromptExperimentVariant ==
+        val variantAllowsWidget = onboardingPromptExperimentVariant ==
             OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
             onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+        val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
 
         return rootPlan(
             ctx = ctx,

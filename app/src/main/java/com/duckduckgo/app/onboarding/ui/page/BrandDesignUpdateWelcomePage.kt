@@ -1041,18 +1041,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
-                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        verticalBias = 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                    }
-
-                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        verticalBias = 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                    }
-
                     binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
 
                     val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
@@ -1075,9 +1063,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
                     binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.ComparisonChart)
+                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddWidget)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(currentPageNumber, maxPageCount)
+
+                    val leftWingView = binding.leftWingAnimation
+                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = leftWingView,
+                    )
+                    if (!showLeftWingAnimation) {
+                        binding.leftWingAnimation.isVisible = false
+                    } else {
+                        playLeftWingAnimation()
+                    }
 
                     val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -1116,7 +1116,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
                     binding.daxDialogCta.root.translationZ = 1f.toPx()
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        if (showLeftWingAnimation && deviceInfo.isTablet()) {
+                            verticalBias = 0.5f
+                            bottomToTop = binding.leftWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
@@ -1193,6 +1205,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
+                    dismissLeftWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = false
                     binding.daxDialogCta.secondaryCta.isVisible = false
@@ -1755,7 +1768,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddWidget)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1768,13 +1781,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
-                // No bobbing dax/bottom wing decoration on this dialog — always pin to the top,
-                // otherwise a fresh view (e.g. after a rotation-triggered recreation) falls back
-                // to the top-level layout's default bottom-anchored bias.
+                val leftWingView = binding.leftWingAnimation
+                val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = leftWingView,
+                )
+                binding.leftWingAnimation.apply {
+                    cancelAnimation()
+                    isVisible = showLeftWing
+                    alpha = 1f
+                    setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                    progress = WING_STOP_PROGRESS
+                }
+                if (showLeftWing) {
+                    (binding.leftWingAnimation.parent as? View)?.requestLayout()
+                }
+
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    verticalBias = 0f
-                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    if (showLeftWing && deviceInfo.isTablet()) {
+                        verticalBias = 0.5f
+                        bottomToTop = binding.leftWingAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
                 }
 
                 val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
@@ -1869,6 +1902,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     return
                 }
 
+                binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
@@ -2642,7 +2676,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.leftWingAnimation?.apply {
             isVisible = true
             alpha = 0f
-            setMaxProgress(WING_STOP_PROGRESS)
+            setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
             leftWingDelayedRunnable = postDelayed(WING_START_DELAY) {
                 animate()
                     .alpha(1f)

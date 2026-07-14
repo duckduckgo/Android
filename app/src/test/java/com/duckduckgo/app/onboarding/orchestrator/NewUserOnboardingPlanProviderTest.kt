@@ -1010,6 +1010,14 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenWidgetVariantButUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
+    @Test
     fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }

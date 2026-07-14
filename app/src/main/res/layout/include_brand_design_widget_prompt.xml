@@ -18,8 +18,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipChildren="false"
-    android:clipToPadding="false"
     android:orientation="vertical">
 
     <FrameLayout
@@ -67,6 +65,7 @@
         android:id="@+id/widgetPromptMedia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_1"
         android:layout_marginTop="@dimen/keyline_6"
         android:alpha="0"
         android:orientation="vertical"
@@ -74,16 +73,14 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/preOnboardingWidgetPromptMediaHeight"
             android:layout_marginHorizontal="@dimen/keyline_1"
-            android:adjustViewBounds="true"
             android:background="@drawable/onboarding_widget_prompt_sketch_frame"
             android:importantForAccessibility="no"
             android:paddingHorizontal="@dimen/keyline_1"
             android:paddingTop="@dimen/keyline_1"
             android:scaleType="fitXY"
-            android:src="@drawable/onboarding_widget_prompt_preview"
-            tools:visibility="gone" />
+            android:src="@drawable/onboarding_widget_prompt_preview" />
 
         <ImageView
             android:layout_width="match_parent"
