@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -65,9 +66,7 @@ class IntentDispatcherViewModel @Inject constructor(
         val activityParams: ActivityParams? = null,
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
-        val openLocalPdf: Boolean = false,
         val localPdfError: Boolean = false,
-        val localPdfName: String? = null,
     )
 
     fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
@@ -79,11 +78,9 @@ class IntentDispatcherViewModel @Inject constructor(
                         is LocalPdfResult.Success -> {
                             _viewState.emit(
                                 viewState.value.copy(
-                                    intentText = result.uri.toString(),
-                                    openLocalPdf = true,
+                                    activityParams = PdfViewerActivityParams(result.uri.toString(), result.displayName),
                                     localPdfError = false,
                                     isExternal = isExternal,
-                                    localPdfName = result.displayName,
                                 ),
                             )
                         }
@@ -137,7 +134,9 @@ class IntentDispatcherViewModel @Inject constructor(
 
     private fun localPdfUriOrNull(intent: Intent?): Uri? {
         if (intent?.action != Intent.ACTION_VIEW) return null
+        if (appBuildConfig.sdkInt < 31) return null
         if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return null
+        if (!androidBrowserConfigFeature.externalPdfHandler().isEnabled()) return null
         val data = intent.data ?: return null
         val scheme = data.scheme?.lowercase()
         if (scheme != "content" && scheme != "file") return null

@@ -99,8 +99,9 @@ interface InlinePdfHandler {
     fun extractFileName(url: String): String
 
     /**
-     * Copies an already-local PDF at [uri] (a content:// or file:// URI delivered by an
-     * external "Open with" intent) into the internal pdf_cache for inline rendering.
+     * Copies an already-local PDF at [uri] (a content:// URI delivered by an external "Open with"
+     * intent) into the internal pdf_cache for inline rendering. The PdfViewerHandler activity-alias
+     * only declares scheme="content", so file:// URIs never reach this method in practice.
      *
      * Must be called while the caller still holds the intent's read-URI grant. Validates the
      * copied file starts with %PDF- magic bytes and enforces the same LRU cache budget as
@@ -355,15 +356,7 @@ class RealInlinePdfHandler @Inject constructor(
         }
     }
 
-    override fun extractFileName(url: String): String {
-        val path = url.toUri().lastPathSegment ?: "document.pdf"
-        val sanitized = path.replace(Regex("[^a-zA-Z0-9._-]"), "_")
-        return if (sanitized.endsWith(".pdf", ignoreCase = true)) {
-            sanitized
-        } else {
-            "$sanitized.pdf"
-        }
-    }
+    override fun extractFileName(url: String): String = sanitizeToPdfFileName(url.toUri().lastPathSegment)
 
     override suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult = withContext(dispatcherProvider.io()) {
         val displayName = resolveDisplayName(uri)
@@ -386,6 +379,10 @@ class RealInlinePdfHandler @Inject constructor(
 
             enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
             LocalPdfResult.Success(Uri.fromFile(targetFile), displayName)
+        } catch (e: CancellationException) {
+            logcat { "Local PDF copy cancelled, cleaning up partial file" }
+            targetFile.delete()
+            throw e
         } catch (e: IOException) {
             logcat { "Local PDF copy failed: ${e.message}" }
             targetFile.delete()
@@ -401,8 +398,12 @@ class RealInlinePdfHandler @Inject constructor(
         val raw = when (uri.scheme?.lowercase()) {
             "content" -> queryContentDisplayName(uri) ?: uri.lastPathSegment
             else -> uri.lastPathSegment
-        } ?: "document.pdf"
-        val sanitized = raw.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        }
+        return sanitizeToPdfFileName(raw)
+    }
+
+    private fun sanitizeToPdfFileName(rawName: String?): String {
+        val sanitized = (rawName ?: "document.pdf").replace(Regex("[^a-zA-Z0-9._-]"), "_")
         return if (sanitized.endsWith(".pdf", ignoreCase = true)) sanitized else "$sanitized.pdf"
     }
 

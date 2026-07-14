@@ -2399,7 +2399,7 @@ class BrowserTabFragment :
 
         binding.pdfViewerContainer.show()
         val pdfFragment = DdgPdfViewerFragment()
-        pdfFragment.errorListener = object : DdgPdfViewerFragment.ErrorListener {
+        pdfFragment.listener = object : DdgPdfViewerFragment.Listener {
             override fun onLoadDocumentError(throwable: Throwable) {
                 viewModel.onPdfRenderFailure(throwable)
             }

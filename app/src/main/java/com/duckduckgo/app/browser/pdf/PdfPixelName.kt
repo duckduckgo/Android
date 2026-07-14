@@ -28,4 +28,5 @@ enum class PdfPixelName(override val pixelName: String) : Pixel.PixelName {
     PDF_EXTERNAL_OPENED("m_pdf_external_opened"),
     PDF_EXTERNAL_OPENED_DAILY("m_pdf_external_opened_daily"),
     PDF_EXTERNAL_OPENED_UNIQUE("m_pdf_external_opened_unique"),
+    PDF_EXTERNAL_RENDERED("m_pdf_external_rendered"),
 }

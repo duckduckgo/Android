@@ -29,6 +29,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.pdf.PdfViewerAvailability
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
@@ -51,6 +53,7 @@ import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.downloads.impl.DownloadsViewModel.ViewState
 import com.duckduckgo.downloads.impl.databinding.ActivityDownloadsBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
@@ -70,6 +73,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
+    lateinit var pdfViewerAvailability: PdfViewerAvailability
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
@@ -164,13 +173,20 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun showOpen(command: OpenFile) {
         val file = File(command.item.filePath)
-        if (file.exists()) {
-            val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
-            if (!result) {
-                showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
-            }
-        } else {
+        if (!file.exists()) {
             viewModel.delete(command.item)
+            return
+        }
+
+        if (command.item.fileName.endsWith(".pdf", ignoreCase = true) && pdfViewerAvailability.isAvailable()) {
+            val cachedFileUri = downloadsFileActions.getShareableUri(this@DownloadsActivity, file)
+            globalActivityStarter.start(this, PdfViewerActivityParams(cachedFileUri.toString(), command.item.fileName))
+            return
+        }
+
+        val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
+        if (!result) {
+            showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
         }
     }
 

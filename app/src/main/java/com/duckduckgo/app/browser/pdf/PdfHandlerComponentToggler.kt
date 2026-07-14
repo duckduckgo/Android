@@ -59,7 +59,9 @@ class PdfHandlerComponentToggler @Inject constructor(
     }
 
     internal fun sync() {
-        val shouldEnable = appBuildConfig.sdkInt >= 31 && androidBrowserConfigFeature.pdfViewer().isEnabled()
+        val shouldEnable = appBuildConfig.sdkInt >= 31 &&
+            androidBrowserConfigFeature.pdfViewer().isEnabled() &&
+            androidBrowserConfigFeature.externalPdfHandler().isEnabled()
         context.packageManager.setComponentEnabledSetting(
             ComponentName(appBuildConfig.applicationId, PDF_HANDLER_ALIAS),
             if (shouldEnable) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,

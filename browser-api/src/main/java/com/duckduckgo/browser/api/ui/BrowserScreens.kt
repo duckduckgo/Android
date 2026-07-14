@@ -69,4 +69,10 @@ sealed class BrowserScreens {
      * to open in the current mode.
      */
     data class TabSwitcherScreenWithParams(val browserMode: BrowserMode) : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the standalone PDF viewer for a PDF at [cachedFileUri], displaying [fileName]
+     * in the toolbar. Check [com.duckduckgo.browser.api.pdf.PdfViewerAvailability] before launching this screen.
+     */
+    data class PdfViewerActivityParams(val cachedFileUri: String, val fileName: String) : GlobalActivityStarter.ActivityParams
 }

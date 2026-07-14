@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -46,6 +47,7 @@ class PdfHandlerComponentTogglerTest {
     private val packageManager: PackageManager = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val pdfViewerToggle: Toggle = mock()
+    private val externalPdfHandlerToggle: Toggle = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val appId = "com.duckduckgo.mobile.android"
@@ -57,6 +59,8 @@ class PdfHandlerComponentTogglerTest {
         whenever(context.packageManager).thenReturn(packageManager)
         whenever(appBuildConfig.applicationId).thenReturn(appId)
         whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(pdfViewerToggle)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(externalPdfHandlerToggle)
+        whenever(externalPdfHandlerToggle.isEnabled()).thenReturn(true)
 
         testee = PdfHandlerComponentToggler(
             context = context,
@@ -116,5 +120,18 @@ class PdfHandlerComponentTogglerTest {
         assertEquals("com.duckduckgo.app.dispatchers.PdfViewerHandler", componentCaptor.firstValue.className)
         assertEquals(PackageManager.COMPONENT_ENABLED_STATE_DISABLED, stateCaptor.firstValue)
         assertEquals(PackageManager.DONT_KILL_APP, flagsCaptor.firstValue)
+    }
+
+    @Test
+    fun `when sdk is 33 and pdfViewer is on but externalPdfHandler is off then disables alias`() {
+        whenever(appBuildConfig.sdkInt).thenReturn(33)
+        whenever(pdfViewerToggle.isEnabled()).thenReturn(true)
+        whenever(externalPdfHandlerToggle.isEnabled()).thenReturn(false)
+
+        testee.sync()
+
+        val stateCaptor = argumentCaptor<Int>()
+        verify(packageManager).setComponentEnabledSetting(any(), stateCaptor.capture(), any())
+        assertEquals(PackageManager.COMPONENT_ENABLED_STATE_DISABLED, stateCaptor.firstValue)
     }
 }

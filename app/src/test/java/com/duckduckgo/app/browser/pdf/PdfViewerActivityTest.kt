@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.browser.pdf
 
-import androidx.test.core.app.ApplicationProvider
+import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.navigation.api.getActivityParams
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,27 +28,14 @@ import org.junit.runner.RunWith
 class PdfViewerActivityTest {
 
     @Test
-    fun `intent builder puts cached URI as extra`() {
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+    fun `activity params round-trip through the intent`() {
         val uri = "file:///data/user/0/com.example/cache/pdf_cache/doc.pdf"
-        val intent = PdfViewerActivity.intent(context, uri, "doc.pdf")
+        val params = PdfViewerActivityParams(uri, "doc.pdf")
+        val intent = intentWithParams(params)
 
-        assertEquals(uri, intent.getStringExtra("extra_cached_uri"))
+        assertEquals(params, intent.getActivityParams(PdfViewerActivityParams::class.java))
     }
 
-    @Test
-    fun `intent builder puts file name as extra`() {
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val intent = PdfViewerActivity.intent(context, "file:///cache/test.pdf", "report.pdf")
-
-        assertEquals("report.pdf", intent.getStringExtra("extra_file_name"))
-    }
-
-    @Test
-    fun `intent targets PdfViewerActivity class`() {
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val intent = PdfViewerActivity.intent(context, "file:///cache/test.pdf", "test.pdf")
-
-        assertEquals(PdfViewerActivity::class.java.name, intent.component?.className)
-    }
+    private fun intentWithParams(params: PdfViewerActivityParams): Intent =
+        Intent().putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", params)
 }

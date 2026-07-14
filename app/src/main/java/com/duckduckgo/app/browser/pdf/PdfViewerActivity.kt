@@ -16,12 +16,16 @@
 
 package com.duckduckgo.app.browser.pdf
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
+import androidx.core.view.children
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityPdfViewerBinding
@@ -29,12 +33,15 @@ import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(PdfViewerActivityParams::class)
 class PdfViewerActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -46,15 +53,25 @@ class PdfViewerActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        // Default inset is too wide between the back arrow and title on this screen.
+        binding.includeToolbar.toolbar.contentInsetStartWithNavigation =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()
 
-        val cachedFileUri = intent.getStringExtra(EXTRA_CACHED_URI).orEmpty()
-        val fileName = intent.getStringExtra(EXTRA_FILE_NAME).orEmpty()
+        val params = intent.getActivityParams(PdfViewerActivityParams::class.java)
+        val cachedFileUri = params?.cachedFileUri.orEmpty()
+        val fileName = params?.fileName.orEmpty()
 
         supportActionBar?.title = fileName
+        // Toolbar title is ellipsized; tapping it reveals the full file name.
+        showFullFileNameOnTitleTap(binding.includeToolbar.toolbar, fileName)
 
         if (savedInstanceState == null) {
             val pdfFragment = DdgPdfViewerFragment()
-            pdfFragment.errorListener = object : DdgPdfViewerFragment.ErrorListener {
+            pdfFragment.listener = object : DdgPdfViewerFragment.Listener {
+                override fun onLoadDocumentSuccess() {
+                    pixel.fire(PdfPixelName.PDF_EXTERNAL_RENDERED)
+                }
+
                 override fun onLoadDocumentError(throwable: Throwable) {
                     pixel.fire(
                         PdfPixelName.PDF_RENDER_FAILURE,
@@ -82,6 +99,15 @@ class PdfViewerActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun showFullFileNameOnTitleTap(toolbar: Toolbar, fileName: String) {
+        if (fileName.isEmpty()) return
+        toolbar.children.filterIsInstance<TextView>()
+            .firstOrNull { it.text == fileName }
+            ?.setOnClickListener {
+                Toast.makeText(this, fileName, Toast.LENGTH_LONG).show()
+            }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         navigateToBrowser()
         return true
@@ -99,19 +125,6 @@ class PdfViewerActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val EXTRA_CACHED_URI = "extra_cached_uri"
-        private const val EXTRA_FILE_NAME = "extra_file_name"
         private const val PDF_VIEWER_FRAGMENT_TAG = "pdf_viewer_fragment"
-
-        fun intent(
-            context: Context,
-            cachedFileUri: String,
-            fileName: String,
-        ): Intent {
-            return Intent(context, PdfViewerActivity::class.java).apply {
-                putExtra(EXTRA_CACHED_URI, cachedFileUri)
-                putExtra(EXTRA_FILE_NAME, fileName)
-            }
-        }
     }
 }
