@@ -140,6 +140,14 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun finish() {
+        super.finish()
+        if (SDK_INT < 34) {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, R.anim.slide_to_bottom)
+        }
+    }
+
     private fun setupListeners() {
         binding.daxPromptBrowserComparisonCloseButton.setOnClickListener {
             viewModel.onCloseButtonClicked()
@@ -172,10 +180,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
                     setResult(RESULT_OK, resultIntent)
                 }
                 finish()
-                if (SDK_INT < 34) {
-                    @Suppress("DEPRECATION")
-                    overridePendingTransition(0, R.anim.slide_to_bottom)
-                }
             }
 
             is Command.BrowserComparisonChart -> {
