@@ -551,7 +551,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                 BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
             )
             is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
-            is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
+            is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType, launchedFromSettings = true))
         }
     }
 
