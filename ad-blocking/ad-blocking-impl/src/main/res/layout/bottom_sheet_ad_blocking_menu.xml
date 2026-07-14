@@ -14,67 +14,73 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_4">
+    android:layout_height="wrap_content">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/adBlockingMenuTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/bottomSheetTitleVerticalPadding"
-        android:text="@string/ad_blocking_menu_title"
-        app:layout_constraintEnd_toStartOf="@id/adBlockingMenuCloseButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="h2" />
-
-    <ImageButton
-        android:id="@+id/adBlockingMenuCloseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:background="?attr/actionBarItemBackground"
-        android:contentDescription="@string/ad_blocking_menu_close_content_description"
-        android:src="@drawable/ic_close_24"
-        app:layout_constraintBottom_toBottomOf="@id/adBlockingMenuTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/adBlockingMenuTitle" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/adBlockingMenuDivider"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
-        app:defaultPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/adBlockingMenuTitle" />
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4">
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/adBlockingMenuAlwaysOn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/adBlockingMenuDivider"
-        app:leadingIcon="@drawable/check"
-        app:primaryText="@string/ad_blocking_menu_always_on" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/adBlockingMenuTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/bottomSheetTitleVerticalPadding"
+            android:text="@string/ad_blocking_menu_title"
+            app:layout_constraintEnd_toStartOf="@id/adBlockingMenuCloseButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:typography="h2" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/adBlockingMenuDisableUntilRelaunch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/adBlockingMenuAlwaysOn"
-        app:leadingIcon="@drawable/check"
-        app:primaryText="@string/ad_blocking_menu_disable_until_relaunch" />
+        <ImageButton
+            android:id="@+id/adBlockingMenuCloseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:background="?attr/actionBarItemBackground"
+            android:contentDescription="@string/ad_blocking_menu_close_content_description"
+            android:src="@drawable/ic_close_24"
+            app:layout_constraintBottom_toBottomOf="@id/adBlockingMenuTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/adBlockingMenuTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/adBlockingMenuAlwaysOff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/adBlockingMenuDisableUntilRelaunch"
-        app:leadingIcon="@drawable/check"
-        app:primaryText="@string/ad_blocking_menu_always_off" />
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/adBlockingMenuDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            app:defaultPadding="false"
+            app:layout_constraintTop_toBottomOf="@id/adBlockingMenuTitle" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/adBlockingMenuAlwaysOn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/adBlockingMenuDivider"
+            app:leadingIcon="@drawable/check"
+            app:primaryText="@string/ad_blocking_menu_always_on" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/adBlockingMenuDisableUntilRelaunch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/adBlockingMenuAlwaysOn"
+            app:leadingIcon="@drawable/check"
+            app:primaryText="@string/ad_blocking_menu_disable_until_relaunch" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/adBlockingMenuAlwaysOff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/adBlockingMenuDisableUntilRelaunch"
+            app:leadingIcon="@drawable/check"
+            app:primaryText="@string/ad_blocking_menu_always_off" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
