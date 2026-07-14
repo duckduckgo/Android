@@ -45,6 +45,14 @@
             android:layout_margin="10dp"
             android:text="Launch Sync Settings" />
 
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/launchSimplifiedSyncSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Launch Sync Settings V2" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
