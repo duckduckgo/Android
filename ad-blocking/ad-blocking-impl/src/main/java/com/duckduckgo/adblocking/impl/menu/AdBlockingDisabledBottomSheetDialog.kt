@@ -53,12 +53,10 @@ class AdBlockingDisabledBottomSheetDialog(
         }
 
         behavior.skipCollapsed = true
-        // Wrap to content when it fits, but cap the height so the sheet can never grow into the
-        // status bar in landscape; the NestedScrollView content scrolls once it hits this ceiling.
+        behavior.isDraggable = false
         behavior.maxHeight = context.resources.displayMetrics.heightPixels * MAX_HEIGHT_PERCENT / 100
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        // Expanding the sheet squares its top corners by default; restore the rounded corners.
         setOnShowListener { setRoundCorners() }
 
         binding.adBlockingDisabledCloseButton.setOnClickListener { dismiss() }
