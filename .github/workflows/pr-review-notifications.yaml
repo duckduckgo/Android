@@ -5,11 +5,16 @@ on:
     types: [submitted]
   pull_request_review_comment:
     types: [created]
+  issue_comment:
+    types: [created]
 
 jobs:
   sync:
     name: Sync PR review/mentions with Asana
     runs-on: ubuntu-latest
+    # issue_comment fires on both issues and PRs; only run it for PR comments.
+    # The review events always run (github.event.issue is absent for them).
+    if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     steps:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
@@ -19,8 +24,8 @@ jobs:
           path: native-github-asana-sync
           repository: duckduckgo/native-github-asana-sync
 
-      # Posts canned review-event notes, and forwards review summaries and
-      # inline comments @-mentioning a user.
+      # Posts canned review-event notes, and forwards review summaries,
+      # inline comments, and PR conversation comments @-mentioning a user.
       - name: Sync PR review/mentions with Asana
         uses: ./native-github-asana-sync/.github/actions/pr-review-notifications
         with:
