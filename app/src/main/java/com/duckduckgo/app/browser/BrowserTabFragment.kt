@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -543,6 +544,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var topInContextSections: PluginPoint<TopInContextSection>
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -1229,10 +1233,12 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        val omnibarType = settingsDataStore.omnibarType
         omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
+            omnibarType = omnibarType,
             binding = binding,
         )
+
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
@@ -1511,6 +1517,8 @@ class BrowserTabFragment :
                 },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
+                onTabSwitcherPressed = { onTabsButtonPressed() },
+                onBrowserMenuPressed = { onBrowserMenuButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
@@ -1819,6 +1827,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
+            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
+            topInContextSections = topInContextSections.getPlugins(),
+            currentUrl = viewModel.url?.toUri(),
         )
 
         when (browserMode) {
@@ -5455,6 +5466,7 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -6380,6 +6392,7 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {

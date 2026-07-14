@@ -124,6 +124,22 @@
                 app:defaultPadding="false"
                 app:fullWidth="false" />
 
+            <LinearLayout
+                android:id="@+id/topInContextSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/topInContextSectionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:visibility="gone"
+                app:defaultPadding="false"
+                app:fullWidth="false"
+                tools:visibility="visible" />
+
             <include
                 android:id="@+id/includeDefaultBrowserMenuItem"
                 layout="@layout/view_menu_item_default_browser_medium" />

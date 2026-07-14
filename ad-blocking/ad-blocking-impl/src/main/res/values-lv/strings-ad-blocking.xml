@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Reklāmu bloķēšanu ir ietekmējušas nesenās izmaiņas pakalpojumā YouTube. Mēs jau strādājam pie šo problēmu novēršanas un novērtējam tavu sapratni.</string>
     <string name="contingencyMessagePrimaryButton">Sapratu</string>
     <string name="contingencyMessageCloseContentDescription">Aizvērt</string>
+    <string name="ad_blocking_menu_disable">Atspējot YouTube reklāmu bloķēšanu</string>
+    <string name="ad_blocking_menu_enable">Iespējot YouTube reklāmu bloķēšanu</string>
+    <string name="ad_blocking_menu_title">YouTube reklāmu bloķēšana</string>
+    <string name="ad_blocking_menu_close_content_description">Aizvērt</string>
+    <string name="ad_blocking_menu_always_on">Vienmēr ieslēgts</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Atspējot līdz atkārtotai palaišanai</string>
+    <string name="ad_blocking_menu_always_off">Vienmēr izslēgts</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube reklāmu bloķēšana nedarbojas?</string>
+    <string name="ad_blocking_disabled_popup_description">Nosūti DuckDuckGo anonīmu ziņojumu par traucējumiem. Palīdzi uzlabot reklāmu bloķēšanu visiem!</string>
+    <string name="ad_blocking_disabled_primary_action">Nosūtīt ziņojumu par traucējumiem</string>
+    <string name="ad_blocking_disabled_secondary_action">Atcelt</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Atspējots līdz atkārtotai palaišanai</string>
 </resources>

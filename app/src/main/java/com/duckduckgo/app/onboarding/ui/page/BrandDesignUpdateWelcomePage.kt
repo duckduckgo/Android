@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdate
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
@@ -195,7 +196,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             viewModel.notificationRuntimePermissionDenied()
         }
         if (view?.windowVisibility == View.VISIBLE) {
-            viewModel.loadDaxDialog()
+            viewModel.notificationPermissionFlowFinished()
         }
     }
 
@@ -571,8 +572,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
-                                maxPageCount = state.maxPageCount,
-                                currentPageNumber = state.currentPageNumber,
+                                stepIndicator = state.stepIndicator,
                                 comparisonChartConfig = state.currentComparisonChartConfig(),
                                 isCustomAiOnboardingFlow = state.isCustomAiOnboardingFlow,
                             )
@@ -589,8 +589,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
-                                maxPageCount = state.maxPageCount,
-                                currentPageNumber = state.currentPageNumber,
+                                stepIndicator = state.stepIndicator,
                                 comparisonChartConfig = state.currentComparisonChartConfig(),
                                 isCustomAiOnboardingFlow = state.isCustomAiOnboardingFlow,
                             )
@@ -605,8 +604,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     selectedAddressBarPosition = state.selectedAddressBarPosition,
                                     showSplitOption = state.showSplitOption,
                                     inputScreenSelected = state.inputScreenSelected,
-                                    maxPageCount = state.maxPageCount,
-                                    currentPageNumber = state.currentPageNumber,
+                                    stepIndicator = state.stepIndicator,
                                     comparisonChartConfig = state.currentComparisonChartConfig(),
                                     isCustomAiOnboardingFlow = state.isCustomAiOnboardingFlow,
                                 )
@@ -620,8 +618,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             selectedAddressBarPosition = state.selectedAddressBarPosition,
                             showSplitOption = state.showSplitOption,
                             inputScreenSelected = state.inputScreenSelected,
-                            maxPageCount = state.maxPageCount,
-                            currentPageNumber = state.currentPageNumber,
+                            stepIndicator = state.stepIndicator,
                             comparisonChartConfig = state.currentComparisonChartConfig(),
                             isCustomAiOnboardingFlow = state.isCustomAiOnboardingFlow,
                         )
@@ -812,7 +809,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            viewModel.loadDaxDialog()
+            viewModel.notificationPermissionFlowFinished()
         }
     }
 
@@ -821,8 +818,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
-        maxPageCount: Int,
-        currentPageNumber: Int?,
+        stepIndicator: StepProgress?,
         comparisonChartConfig: ComparisonChartConfig,
         isCustomAiOnboardingFlow: Boolean,
     ) {
@@ -1029,10 +1025,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     // out so the wing measurement is correct; the morph runs immediately over the predecessor.
                     if (freshEntry) {
                         binding.root.doOnLayout {
-                            revealComparisonChart(comparisonChartConfig, currentPageNumber, maxPageCount, freshEntry = true)
+                            revealComparisonChart(comparisonChartConfig, stepIndicator, freshEntry = true)
                         }
                     } else {
-                        revealComparisonChart(comparisonChartConfig, currentPageNumber, maxPageCount, freshEntry = false)
+                        revealComparisonChart(comparisonChartConfig, stepIndicator, freshEntry = false)
                     }
                 }
 
@@ -1146,7 +1142,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
 
-                    binding.daxDialogCta.stepIndicator.animateToStep(currentPageNumber, maxPageCount)
+                    binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
                     val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -1257,7 +1253,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
 
-                    binding.daxDialogCta.stepIndicator.animateToStep(currentPageNumber, maxPageCount)
+                    binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
 
@@ -1295,8 +1291,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitleHidden.text = title
 
-                    if (currentPageNumber != null) {
-                        binding.daxDialogCta.stepIndicator.animateToStep(currentPageNumber, maxPageCount)
+                    if (stepIndicator != null) {
+                        binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
                     } else {
                         stepIndicatorFadeOutAnimator = ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f)
                             .apply {
@@ -1432,8 +1428,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     // same playComparisonChartContentIntro.
     private fun revealComparisonChart(
         comparisonChartConfig: ComparisonChartConfig,
-        currentPageNumber: Int?,
-        maxPageCount: Int,
+        stepIndicator: StepProgress?,
         freshEntry: Boolean,
     ) {
         populateComparisonChart(comparisonChartConfig)
@@ -1469,7 +1464,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
         binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBottomWingAnimation) 1f else 0f)
 
-        binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+        binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
         binding.daxDialogCta.stepIndicator.alpha = 0f
 
         // Reveal the card, then play the content intro (which fades the table/CTA in, types the title and
@@ -1534,8 +1529,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
-        maxPageCount: Int,
-        currentPageNumber: Int?,
+        stepIndicator: StepProgress?,
         comparisonChartConfig: ComparisonChartConfig,
         isCustomAiOnboardingFlow: Boolean,
     ) {
@@ -1657,7 +1651,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+                binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1767,7 +1761,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.addressBarContent.addressBarPicker.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+                binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1867,7 +1861,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+                binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
@@ -2004,7 +1998,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
+                binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
 
                 binding.daxDialogCta.inputScreenPreviewContent.inputText.apply {
                     isFocusable = true
@@ -2730,16 +2724,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    /** Show the step indicator at [currentPageNumber] (1-based), or hide it when null. */
-    private fun OnboardingStepIndicatorView.showStep(currentPageNumber: Int?, totalSteps: Int) {
-        isVisible = currentPageNumber != null
-        currentPageNumber?.let { setSteps(totalSteps = totalSteps, currentStep = it) }
+    /** Show the step indicator at [stepIndicator] (1-based current), or hide it when null. */
+    private fun OnboardingStepIndicatorView.showStep(stepIndicator: StepProgress?) {
+        isVisible = stepIndicator != null
+        stepIndicator?.let { setSteps(totalSteps = it.total, currentStep = it.current) }
     }
 
-    /** Animate the step indicator into [currentPageNumber] (1-based) from the previous step; no-op when null. */
-    private fun OnboardingStepIndicatorView.animateToStep(currentPageNumber: Int?, totalSteps: Int) {
-        currentPageNumber?.let {
-            setSteps(totalSteps = totalSteps, currentStep = it - 1)
+    /** Animate the step indicator into [stepIndicator] (1-based current) from the previous step; no-op when null. */
+    private fun OnboardingStepIndicatorView.animateToStep(stepIndicator: StepProgress?) {
+        stepIndicator?.let {
+            setSteps(totalSteps = it.total, currentStep = it.current - 1)
             animateToNextStep()
         }
     }

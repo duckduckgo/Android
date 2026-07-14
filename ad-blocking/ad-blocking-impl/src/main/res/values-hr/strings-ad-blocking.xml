@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Blokiranje oglasa pogođeno je nedavnim promjenama na YouTubeu. Radimo na rješavanju tih problema i cijenimo tvoje razumijevanje</string>
     <string name="contingencyMessagePrimaryButton">Shvaćam</string>
     <string name="contingencyMessageCloseContentDescription">Zatvori</string>
+    <string name="ad_blocking_menu_disable">Onemogući blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_enable">Omogući blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_title">Blokiranje oglasa na YouTubeu</string>
+    <string name="ad_blocking_menu_close_content_description">Zatvori</string>
+    <string name="ad_blocking_menu_always_on">Uvijek uključeno</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Onemogući do ponovnog pokretanja</string>
+    <string name="ad_blocking_menu_always_off">Uvijek isključeno</string>
+    <string name="ad_blocking_disabled_popup_title">Blokiranje oglasa na YouTubeu ne funkcionira?</string>
+    <string name="ad_blocking_disabled_popup_description">Pošalji anonimnu prijavu kvara DuckDuckGou. Pomozi nam da poboljšamo blokiranje oglasa za sve!</string>
+    <string name="ad_blocking_disabled_primary_action">Pošalji izvješće o problemu</string>
+    <string name="ad_blocking_disabled_secondary_action">Otkaži</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Onemogućeno do ponovnog pokretanja</string>
 </resources>

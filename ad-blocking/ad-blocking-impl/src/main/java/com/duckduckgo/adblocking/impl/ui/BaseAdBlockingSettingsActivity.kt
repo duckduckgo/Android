@@ -33,6 +33,9 @@ import com.duckduckgo.common.ui.view.listitem.DaxListItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.flow.launchIn
@@ -50,16 +53,34 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     protected abstract val toolbar: Toolbar
     protected abstract val blockAdsToggle: OneLineListItem
     protected abstract val adBlockingDescription: DaxTextView
     protected abstract val duckPlayerEntry: DaxListItem
     protected abstract val duckPlayerDescription: DaxTextView
 
+    protected abstract val rootView: View
+    protected abstract val appBarLayout: View
+    protected abstract val contentScrollView: View
+
     protected open val learnMoreScreenTitle: Int = R.string.ad_blocking_settings_title
+
+    private val edgeToEdgeEnabled: Boolean by lazy { edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS) }
 
     private val blockAdsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onBlockAdsToggled(isChecked)
+    }
+
+    protected fun maybeEnableEdgeToEdge() {
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
     }
 
     protected fun configure() {
@@ -68,7 +89,17 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
         duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
 
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         observeViewModel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(rootView)
+        edgeToEdgeHandler.applyStatusBarInsets(appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(contentScrollView, drawBehindGestureNav = true)
     }
 
     protected open fun render(state: AdBlockingSettingsViewModel.ViewState) {

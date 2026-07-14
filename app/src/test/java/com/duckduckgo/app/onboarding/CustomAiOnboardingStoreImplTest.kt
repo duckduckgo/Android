@@ -49,7 +49,6 @@ class CustomAiOnboardingStoreImplTest {
     private val enabledToggle: Toggle = mock { on { isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { isEnabled() } doReturn false }
     private val customAiOnboardingFeature: CustomAiOnboardingFeature = mock()
-    private val orchestratorFeature: LinearOnboardingOrchestratorFeature = mock()
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
 
     private val resolvedListener = object : AppInstallationReferrerStateListener {
@@ -67,14 +66,12 @@ class CustomAiOnboardingStoreImplTest {
             referrerStateListener = Lazy { listener },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             customAiOnboardingFeature = customAiOnboardingFeature,
-            orchestratorFeature = orchestratorFeature,
             brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
 
     @Before
     fun setup() {
         whenever(customAiOnboardingFeature.self()).thenReturn(enabledToggle)
-        whenever(orchestratorFeature.self()).thenReturn(enabledToggle)
         whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
     }
 
@@ -88,14 +85,6 @@ class CustomAiOnboardingStoreImplTest {
     @Test
     fun `when referrer ai but custom ai feature disabled then resolves false`() = runTest {
         whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.resolve())
-    }
-
-    @Test
-    fun `when referrer ai but orchestrator disabled then resolves false`() = runTest {
-        whenever(orchestratorFeature.self()).thenReturn(disabledToggle)
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
         assertFalse(store.resolve())

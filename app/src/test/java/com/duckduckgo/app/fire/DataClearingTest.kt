@@ -1236,7 +1236,7 @@ class DataClearingTest {
 
         verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
-        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
     }
 
     @Test
@@ -1247,7 +1247,7 @@ class DataClearingTest {
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
 
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
-        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+        verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
     }
 
     @Test

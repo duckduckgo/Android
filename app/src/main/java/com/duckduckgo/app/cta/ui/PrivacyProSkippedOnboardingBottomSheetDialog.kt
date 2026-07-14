@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetPrivacyProSkippedOnboardingBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,7 +38,11 @@ import com.google.android.material.R as MaterialR
 class PrivacyProSkippedOnboardingBottomSheetDialog(
     private val context: Context,
     private val isFreeTrialCopy: Boolean,
-) : BottomSheetDialog(context) {
+    private val edgeToEdgeEnabled: Boolean,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeEnabled) CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
 
     private val binding: BottomSheetPrivacyProSkippedOnboardingBinding =
         BottomSheetPrivacyProSkippedOnboardingBinding.inflate(LayoutInflater.from(context))
@@ -46,6 +51,9 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
 
     init {
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 

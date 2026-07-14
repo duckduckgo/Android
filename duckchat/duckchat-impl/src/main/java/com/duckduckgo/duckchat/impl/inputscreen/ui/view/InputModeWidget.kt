@@ -122,6 +122,7 @@ open class InputModeWidget @JvmOverloads constructor(
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
+    var onInputTextEmptyChanged: ((isEmpty: Boolean) -> Unit)? = null
     var tabAttachmentsEnabled: Boolean = false
     var onChatTagTextChanged: ((String, Int) -> Unit)? = null
     var onTabAttachmentRemoved: ((String) -> Unit)? = null
@@ -364,6 +365,7 @@ open class InputModeWidget @JvmOverloads constructor(
 
                 val isNullOrEmpty = text.isNullOrEmpty()
                 inputFieldClearText.isVisible = !isNullOrEmpty
+                onInputTextEmptyChanged?.invoke(isNullOrEmpty)
             }
 
             doAfterTextChanged { text ->

@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">A hirdetésblokkolást érintették a YouTube legutóbbi módosításai. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
     <string name="contingencyMessagePrimaryButton">Értem</string>
     <string name="contingencyMessageCloseContentDescription">Bezárás</string>
+    <string name="ad_blocking_menu_disable">YouTube-hirdetésblokkolás letiltása</string>
+    <string name="ad_blocking_menu_enable">YouTube hirdetésblokkolás engedélyezése</string>
+    <string name="ad_blocking_menu_title">YouTube-hirdetésblokkolás</string>
+    <string name="ad_blocking_menu_close_content_description">Bezárás</string>
+    <string name="ad_blocking_menu_always_on">Mindig be van kapcsolva</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Letiltás újraindításig</string>
+    <string name="ad_blocking_menu_always_off">Mindig ki van kapcsolva</string>
+    <string name="ad_blocking_disabled_popup_title">Nem működik a YouTube-hirdetésblokkolás?</string>
+    <string name="ad_blocking_disabled_popup_description">Küldj névtelen hibajelentést a DuckDuckGónak. Segíts, hogy mindenkinek jobb legyen a hirdetésblokkolás.</string>
+    <string name="ad_blocking_disabled_primary_action">Hibás működésre vonatkozó jelentés küldése</string>
+    <string name="ad_blocking_disabled_secondary_action">Mégsem</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Letiltva az újraindításig</string>
 </resources>

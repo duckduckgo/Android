@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Nedavne spremembe na YouTubu so vplivale na delovanje funkcije blokiranja oglasov. Prizadevamo si za odpravljanje teh težav in cenimo vaše razumevanje.</string>
     <string name="contingencyMessagePrimaryButton">Razumem</string>
     <string name="contingencyMessageCloseContentDescription">Zapri</string>
+    <string name="ad_blocking_menu_disable">Onemogoči blokiranje oglasov na YouTubu</string>
+    <string name="ad_blocking_menu_enable">Omogoči blokiranje oglasov na YouTubu</string>
+    <string name="ad_blocking_menu_title">Blokiranje oglasov na YouTubu</string>
+    <string name="ad_blocking_menu_close_content_description">Zapri</string>
+    <string name="ad_blocking_menu_always_on">Vedno vklopljeno</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Onemogoči do vnovičnega zagona</string>
+    <string name="ad_blocking_menu_always_off">Vedno izklopljeno</string>
+    <string name="ad_blocking_disabled_popup_title">Ali blokiranje oglasov na YouTubu ne deluje?</string>
+    <string name="ad_blocking_disabled_popup_description">DuckDuckGo pošljite anonimno poročilo o prekinitvi delovanja. Pomagajte izboljšati blokiranje oglasov za vse uporabnike.</string>
+    <string name="ad_blocking_disabled_primary_action">Pošlji poročilo o prekinitvi delovanja</string>
+    <string name="ad_blocking_disabled_secondary_action">Prekliči</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Onemogočeno do vnovičnega zagona</string>
 </resources>

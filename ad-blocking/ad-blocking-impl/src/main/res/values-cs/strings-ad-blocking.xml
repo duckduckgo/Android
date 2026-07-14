@@ -29,4 +29,16 @@
     <string name="contingencyMessageContent">Blokování reklam bylo ovlivněno nedávnými změnami na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
     <string name="contingencyMessagePrimaryButton">Rozumím</string>
     <string name="contingencyMessageCloseContentDescription">Zavřít</string>
+    <string name="ad_blocking_menu_disable">Vypnout blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_enable">Povolit blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_title">Blokování reklam na YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Zavřít</string>
+    <string name="ad_blocking_menu_always_on">Vždycky zapnuté</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Vypnout až do opětovného spuštění</string>
+    <string name="ad_blocking_menu_always_off">Vždycky vypnuté</string>
+    <string name="ad_blocking_disabled_popup_title">Nefunguje blokování reklam na YouTube?</string>
+    <string name="ad_blocking_disabled_popup_description">Odeslat anonymní hlášení o chybě službě DuckDuckGo. Pomoz vylepšit blokování reklam pro všechny!</string>
+    <string name="ad_blocking_disabled_primary_action">Poslat zprávu o chybě</string>
+    <string name="ad_blocking_disabled_secondary_action">Zrušit</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Vypnuto do opětovného spuštění</string>
 </resources>
