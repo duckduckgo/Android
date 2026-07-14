@@ -16,6 +16,14 @@
 
 package com.duckduckgo.browser.api.install
 
+import kotlin.time.Duration
+
 interface AppInstall {
     fun getInstallationTimestamp(): Long
+
+    /**
+     * Elapsed time since installation. Can be null in rare edge cases (install timestamp not recorded
+     * or in the future due to clock skew).
+     */
+    suspend fun getInstallAge(): Duration?
 }
