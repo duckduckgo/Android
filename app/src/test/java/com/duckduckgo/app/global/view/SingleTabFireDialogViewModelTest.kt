@@ -1222,7 +1222,7 @@ class SingleTabFireDialogViewModelTest {
 
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
-            assertEquals(Command.ClearingComplete, awaitItem())
+            assertEquals(Command.OnFireTabsClearComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
