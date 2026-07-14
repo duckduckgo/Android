@@ -220,11 +220,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         return inflater.cloneInContext(contextThemeWrapper)
     }
 
-    private fun updateAddressBarPositionOptions(
-        selectedOption: OmnibarType,
-        showSplitOption: Boolean = false,
-        animate: Boolean = true,
-    ) {
+    private fun updateAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
         with(binding.daxDialogCta.addressBarContent.addressBarPicker) {
             setLightMode(appTheme.isLightModeEnabled())
             isSplitOptionVisible = showSplitOption
@@ -368,50 +364,44 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     backgroundIntroAnimatorSet?.start()
                 }
             }
-            addAnimatorListener(
-                object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        if (!isDuckAiIntroAnimationEnabled) {
-                            introInProgress.value = false
-                            viewModel.onIntroAnimationFinished()
-                        }
+            addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    if (!isDuckAiIntroAnimationEnabled) {
+                        introInProgress.value = false
+                        viewModel.onIntroAnimationFinished()
                     }
-                },
-            )
+                }
+            })
             playAnimation()
         }
         introAnimatorSet = buildIntroAnimatorSet().apply {
-            addListener(
-                object : AnimatorListenerAdapter() {
-                    private var cancelled = false
+            addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
 
-                    override fun onAnimationCancel(animation: Animator) {
-                        cancelled = true
-                    }
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
 
-                    override fun onAnimationEnd(animation: Animator) {
-                        if (cancelled) {
-                            if (isDuckAiIntroAnimationEnabled) {
-                                introInProgress.value = false
-                                viewModel.onIntroAnimationFinished()
-                            }
-                            return
+                override fun onAnimationEnd(animation: Animator) {
+                    if (cancelled) {
+                        if (isDuckAiIntroAnimationEnabled) {
+                            introInProgress.value = false
+                            viewModel.onIntroAnimationFinished()
                         }
-                        if (!isDuckAiIntroAnimationEnabled) return
-                        prepareDuckAiIntroAnimation()
-                        binding.duckAiIntroAnimation.isVisible = true
-                        binding.duckAiIntroAnimation.addAnimatorListener(
-                            object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    introInProgress.value = false
-                                    viewModel.onIntroAnimationFinished()
-                                }
-                            },
-                        )
-                        binding.duckAiIntroAnimation.playAnimation()
+                        return
                     }
-                },
-            )
+                    if (!isDuckAiIntroAnimationEnabled) return
+                    prepareDuckAiIntroAnimation()
+                    binding.duckAiIntroAnimation.isVisible = true
+                    binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            introInProgress.value = false
+                            viewModel.onIntroAnimationFinished()
+                        }
+                    })
+                    binding.duckAiIntroAnimation.playAnimation()
+                }
+            })
             start()
         }
     }
@@ -429,14 +419,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 height = viewHeightPx
             }
 
-            setFontAssetDelegate(
-                object : FontAssetDelegate() {
-                    override fun fetchFont(fontFamily: String): Typeface {
-                        return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
-                            ?: Typeface.DEFAULT
-                    }
-                },
-            )
+            setFontAssetDelegate(object : FontAssetDelegate() {
+                override fun fetchFont(fontFamily: String): Typeface {
+                    return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
+                        ?: Typeface.DEFAULT
+                }
+            })
 
             val textColor = resolveOnboardingTextPrimary(context)
             addValueCallback(KeyPath("**", "Duck.ai"), LottieProperty.COLOR) { textColor }
@@ -2303,10 +2291,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun bindQuickSetupSelection(
-        position: OmnibarType,
-        withAi: Boolean,
-    ) {
+    private fun bindQuickSetupSelection(position: OmnibarType, withAi: Boolean) {
         with(binding.daxDialogCta.reinstallerQuickSetupContent) {
             addressBarPositionItem.setIcon(addressBarPositionIconRes(position))
             addressBarPositionItem.setSecondaryText(addressBarPositionLabelRes(position))
