@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
-    <string name="downloadsActivityTitle">Letöltések</string>
-    <string name="downloadsActivityNoItemsDescription">Még nincsenek letöltött fájlok</string>
-    <string name="downloadsShareTitle">Megosztás vele…</string>
     <string name="downloadsDownloadFinishedActionName">Megnyitás</string>
-    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
-    <string name="downloadsFileNotFoundErrorMessage">A fájl már nem létezik</string>
-    <string name="downloadsItemMenuShare">Megosztás</string>
-    <string name="downloadsItemMenuDelete">Törlés</string>
-    <string name="downloadsItemMenuCancel">Mégsem</string>
-    <string name="downloadsActivityMenuDeleteAll">Összes törlése</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Törölve: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Összes fájl törölve</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">További lehetőségek a következőhöz: %1$s</string>
-    <string name="downloadsUndoActionName">Visszavonás</string>
-    <string name="downloadsStateInProgress">Folyamatban…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Alkalmazáskövetés elleni védelem</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Kezelt sütik</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
-    <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
 
@@ -1092,4 +1076,5 @@
     <string name="fireTabsNewTabButton">Új Fire-lap</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ÚJ! </b> Próbáld ki a Fire-lapokat, és böngéssz helyi előzmények mentése nélkül.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 </resources>

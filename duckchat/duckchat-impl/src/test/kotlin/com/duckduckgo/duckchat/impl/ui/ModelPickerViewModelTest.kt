@@ -259,7 +259,7 @@ class ModelPickerViewModelTest {
 
     @Test
     fun whenFreeUserTapsGatedPlusModelThenUpsellPixelFiredAndModelSelectedNotFired() = runTest {
-        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = true)
         val model = plusModel("p")
 
         testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
@@ -324,7 +324,7 @@ class ModelPickerViewModelTest {
 
     @Test
     fun whenFreeUserTapsPlusModelFromAddressBarThenLaunchPurchaseCommandEmittedWithAddressBarOrigin() = runTest {
-        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = true)
         val model = plusModel("p")
 
         testee.commands.test {
@@ -340,7 +340,7 @@ class ModelPickerViewModelTest {
 
     @Test
     fun whenFreeUserTapsProModelFromDuckAiTabThenLaunchPurchaseCommandEmittedWithDuckAiOrigin() = runTest {
-        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = true)
         val model = proModel("pr")
 
         testee.commands.test {
@@ -356,7 +356,7 @@ class ModelPickerViewModelTest {
 
     @Test
     fun whenPlusUserTapsProModelFromAddressBarThenLaunchUpgradeCommandEmittedWithAddressBarOrigin() = runTest {
-        stateFlow.value = ModelState(userTier = UserTier.PLUS)
+        stateFlow.value = ModelState(userTier = UserTier.PLUS, isSubscriptionEligible = true)
         val model = proModel("pr")
 
         testee.commands.test {
@@ -372,7 +372,7 @@ class ModelPickerViewModelTest {
 
     @Test
     fun whenPlusUserTapsProModelFromDuckAiTabThenLaunchUpgradeCommandEmittedWithDuckAiOrigin() = runTest {
-        stateFlow.value = ModelState(userTier = UserTier.PLUS)
+        stateFlow.value = ModelState(userTier = UserTier.PLUS, isSubscriptionEligible = true)
         val model = proModel("pr")
 
         testee.commands.test {
@@ -384,6 +384,20 @@ class ModelPickerViewModelTest {
             )
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNotEligibleUserTapsPlusModelThenNoCommandEmittedAndNoUpsellPixel() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = false)
+        val model = plusModel("p")
+
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any())
     }
 
     @Test

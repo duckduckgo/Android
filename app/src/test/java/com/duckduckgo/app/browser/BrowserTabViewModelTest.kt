@@ -121,7 +121,6 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -298,6 +297,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -715,7 +715,7 @@ class BrowserTabViewModelTest {
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
-    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val mockNewDownloadState: NewDownloadState = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
@@ -865,6 +865,7 @@ class BrowserTabViewModelTest {
                     },
                     duckAiFeatureState = mockDuckAiFeatureState,
                     onboardingPixelSender = mockOnboardingPixelSender,
+                    contextualCtaSuppressorPlugins = mock(),
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -1043,7 +1044,7 @@ class BrowserTabViewModelTest {
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
-                downloadMenuStateProvider = mockDownloadMenuStateProvider,
+                newDownloadState = mockNewDownloadState,
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
@@ -3398,10 +3399,79 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenNewTabOpenedAndPixelFired() {
+        setBrowserShowing(true)
+
         testee.onNewTabMenuItemClicked(longPress = true)
 
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenNoNewTabOpenedAndNoPixelFired() {
+        setBrowserShowing(false)
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandNotIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandNotIssued<Command.LaunchNewTab>()
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenReturnsTrue() {
+        setBrowserShowing(true)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertTrue(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenReturnsFalse() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertFalse(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndMaliciousSiteBlockedThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                maliciousSiteBlocked = true,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndSslWarningShowingThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                sslError = EXPIRED,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByNormalClickAndAlreadyOnNewTabPageThenReturnsTrue() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = false)
+
+        assertTrue(handled)
     }
 
     @Test
@@ -3771,6 +3841,7 @@ class BrowserTabViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            onboardingImprovementsV2Enabled = true,
         )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
@@ -11643,7 +11714,7 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockCachedFileDownloader, never()).saveToDownloads(any(), any(), any())
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test
@@ -11659,7 +11730,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider).onDownloadComplete()
+        verify(mockNewDownloadState).onDownloadComplete()
     }
 
     @Test
@@ -11673,7 +11744,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test

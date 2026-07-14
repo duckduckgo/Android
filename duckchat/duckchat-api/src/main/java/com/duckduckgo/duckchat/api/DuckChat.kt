@@ -117,6 +117,12 @@ interface DuckChat {
      */
     fun observeNativeChatInputEnabled(): Flow<Boolean>
 
+    /**
+     * Observes whether the native input top nav bar feature flag is enabled.
+     * This is only the flag; callers still gate on the input mode (Search & Duck.ai).
+     */
+    fun observeNativeInputNavBarEnabled(): Flow<Boolean>
+
     suspend fun isStandaloneMigrationCompleted(): Boolean
 
     /**

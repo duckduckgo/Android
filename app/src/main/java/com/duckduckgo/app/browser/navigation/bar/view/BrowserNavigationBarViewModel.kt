@@ -107,9 +107,13 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _commands.trySend(NotifyTabsButtonClicked)
     }
 
-    fun onTabsButtonLongClicked() {
+    fun onTabsButtonLongClicked(): Boolean {
+        if (_viewState.value.viewMode != Browser) {
+            return false
+        }
         pixel.fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
         _commands.trySend(NotifyTabsButtonLongClicked)
+        return true
     }
 
     fun onMenuButtonClicked() {

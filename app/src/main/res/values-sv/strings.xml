@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nerladdningar</string>
-    <string name="downloadsActivityTitle">Nerladdningar</string>
-    <string name="downloadsActivityNoItemsDescription">Inga filer har laddats ner ännu</string>
-    <string name="downloadsShareTitle">Dela med …</string>
     <string name="downloadsDownloadFinishedActionName">Öppna</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Filen finns inte längre</string>
-    <string name="downloadsItemMenuShare">Dela</string>
-    <string name="downloadsItemMenuDelete">Ta bort</string>
-    <string name="downloadsItemMenuCancel">Avbryt</string>
-    <string name="downloadsActivityMenuDeleteAll">Radera allt</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Raderade %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Alla filer raderade</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Fler alternativ för %1$s</string>
-    <string name="downloadsUndoActionName">Återställ</string>
-    <string name="downloadsStateInProgress">Pågår …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Skydd mot appspårning</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
-    <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
 
@@ -1092,4 +1076,5 @@
     <string name="fireTabsNewTabButton">Ny Fire-flik</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYTT!</b> Prova Fire-flikar för att surfa utan att spara lokal historik.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 </resources>

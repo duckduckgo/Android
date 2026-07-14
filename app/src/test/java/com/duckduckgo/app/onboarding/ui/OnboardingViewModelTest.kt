@@ -33,10 +33,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
-import com.duckduckgo.onboarding.api.LinearOnboardingPlan
-import com.duckduckgo.onboarding.api.LinearOnboardingState
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -62,7 +59,7 @@ class OnboardingViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private var userStageStore: UserStageStore = mock()
+    private val userStageStore: UserStageStore = mock()
 
     private val pageLayout: OnboardingPageManager = mock()
 
@@ -72,14 +69,15 @@ class OnboardingViewModelTest {
 
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
-    private val orchestratorState = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
-    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock {
-        on { state } doReturn orchestratorState
+    // Brand design update off by default -> legacy WelcomePage path (orchestrator does not drive the run).
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock {
+        on { brandDesignUpdate() } doReturn disabledToggle
     }
+
+    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock()
 
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
 
@@ -98,9 +96,23 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenOnboardingDoneThenCompleteStage() = runTest {
+    fun whenOnboardingDoneAndBrandDesignUpdateDisabledThenCompleteStage() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.onOnboardingDone()
+
         verify(userStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
+    fun whenOnboardingDoneAndBrandDesignUpdateEnabledThenAppStageNotWrittenButExtendedFlowStillApplied() = runTest {
+        // The orchestrator owns the terminal AppStage write on the BrandDesignUpdate page.
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        testee.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+
+        verify(userStageStore, never()).stageCompleted(any())
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
@@ -143,25 +155,18 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenOnOnboardingSkippedCalledThenMarkOnboardingAsCompleted() = runTest {
+    fun whenOnOnboardingSkippedAndBrandDesignUpdateDisabledThenMarkOnboardingAsCompleted() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.onOnboardingSkipped()
+
         verify(onboardingSkipper).markOnboardingAsCompleted()
     }
 
     @Test
-    fun whenOnboardingDoneAndOrchestratorDroveRunThenAppStageNotWrittenButExtendedFlowStillApplied() = runTest {
-        // At terminal time an orchestrator-driven run is Completed/Skipped, never NotStarted.
-        orchestratorState.value = LinearOnboardingState.Completed(rootPlanId = "test_plan")
-
-        testee.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
-
-        verify(userStageStore, never()).stageCompleted(any())
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
-    }
-
-    @Test
-    fun whenOnOnboardingSkippedAndOrchestratorDroveRunThenSkipperNotInvoked() = runTest {
-        orchestratorState.value = LinearOnboardingState.Skipped(rootPlanId = "test_plan")
+    fun whenOnOnboardingSkippedAndBrandDesignUpdateEnabledThenSkipperNotInvoked() = runTest {
+        // The orchestrator owns the skip terminal write on the BrandDesignUpdate page.
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
 
         testee.onOnboardingSkipped()
 
@@ -169,27 +174,23 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenDevSkipAndOrchestratorNotEngagedThenMarkOnboardingAsCompletedAndNotDriven() = runTest {
-        orchestratorState.value = LinearOnboardingState.NotStarted
+    fun whenDevSkipAndBrandDesignUpdateDisabledThenMarkOnboardingAsCompletedAndCallerNavigates() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
 
-        testee.devOnlyFullyCompleteAllOnboarding()
+        val callerNavigates = testee.devOnlyFullyCompleteAllOnboarding()
 
-        assertFalse(testee.orchestratorDriven)
+        assertTrue(callerNavigates)
         verify(onboardingSkipper).markOnboardingAsCompleted()
         verify(linearOnboardingOrchestrator, never()).onEvent(any())
     }
 
     @Test
-    fun whenDevSkipAndOrchestratorEngagedThenAbortsOrchestratorAndDriven() = runTest {
-        orchestratorState.value = LinearOnboardingState.InProgress(
-            rootPlanId = "test_plan",
-            currentPlan = LinearOnboardingPlan(id = "test_plan", steps = emptyList()),
-            currentStepIndex = 0,
-        )
+    fun whenDevSkipAndBrandDesignUpdateEnabledThenAbortsOrchestratorAndCallerDoesNotNavigate() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
 
-        testee.devOnlyFullyCompleteAllOnboarding()
+        val callerNavigates = testee.devOnlyFullyCompleteAllOnboarding()
 
-        assertTrue(testee.orchestratorDriven)
+        assertFalse(callerNavigates)
         verify(linearOnboardingOrchestrator).onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
         verify(onboardingSkipper, never()).markOnboardingAsCompleted()
     }

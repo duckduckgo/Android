@@ -478,6 +478,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 FireDialog.EVENT_ON_CANCEL -> {
                     pendingDuckAiOnboardingFire = false
                     pixel.fire(FIRE_DIALOG_CANCEL)
+                    if (bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_CHAT_AUTOCOMPLETE) {
+                        currentTab?.onChatDeleteCancelled()
+                    }
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
                 }
@@ -495,6 +498,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 FireDialog.EVENT_ON_CHAT_CLEAR_COMPLETE -> {
                     if (bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_CHAT_AUTOCOMPLETE) {
+                        currentTab?.onChatDeleteConfirmed()
                         currentTab?.refreshAutoComplete()
                     }
                 }
@@ -911,6 +915,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
     }

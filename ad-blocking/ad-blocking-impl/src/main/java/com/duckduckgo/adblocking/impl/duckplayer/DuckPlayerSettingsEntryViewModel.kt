@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -73,9 +74,9 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
 
         viewStateJob += combine(
             duckPlayer.observeDuckPlayerState(),
-            statusChecker.isShownInSettingsFlow(),
-        ) { duckPlayerState, adBlockingShownInSettings ->
-            val isVisible = !adBlockingShownInSettings &&
+            statusChecker.settingsPlacementFlow(),
+        ) { duckPlayerState, adBlockingPlacement ->
+            val isVisible = adBlockingPlacement == SettingsPlacement.Hidden &&
                 (duckPlayerState == ENABLED || duckPlayerState == DISABLED_WIH_HELP_LINK)
             _viewState.update { it.copy(isVisible = isVisible) }
         }

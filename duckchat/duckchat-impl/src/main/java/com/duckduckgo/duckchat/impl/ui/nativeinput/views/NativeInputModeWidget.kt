@@ -97,7 +97,7 @@ interface NativeInputWidget {
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
-    var onPaidTierChanged: ((Boolean) -> Unit)?
+    var onPaidTierChanged: ((isPaid: Boolean, isSubscriptionEligible: Boolean) -> Unit)?
     var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
@@ -169,6 +169,7 @@ interface NativeInputWidget {
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
+        onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit = {},
     )
 
     fun bindTabCount(
@@ -192,6 +193,12 @@ interface NativeInputWidget {
      * No-op when the chat suggestions aren't currently active (binding not created / chat tab not selected).
      */
     fun refreshChatSuggestions()
+
+    /** The user confirmed deleting a recent chat from the chat-autocomplete fire dialog. */
+    fun onChatDeleteConfirmed()
+
+    /** The user cancelled deleting a recent chat from the chat-autocomplete fire dialog. */
+    fun onChatDeleteCancelled()
 
     fun asView(): View
 }
@@ -301,7 +308,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         onVoiceSearchClick?.invoke()
     }
-    override var onPaidTierChanged: ((Boolean) -> Unit)? = null
+    override var onPaidTierChanged: ((isPaid: Boolean, isSubscriptionEligible: Boolean) -> Unit)? = null
         set(value) {
             field = value
             if (value != null && isAttachedToWindow) observeTier()
@@ -520,6 +527,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
+            // The toggle-row back arrow flips with text presence (inverse of the nav bar).
+            nativeInputState?.let { updateBackButtons(it) }
         }
     }
 
@@ -573,7 +582,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // setToggleVisible — e.g. re-show the toggle after the keyboard has been dismissed.
             // Only animate on focus-gain — focus-loss pairs with an instant setToggleVisible hide,
             // and animating the padding shrink afterwards looks like a two-step collapse.
-            if (hasFocus) beginFocusTransition()
+            if (hasFocus) {
+                beginFocusTransition()
+            } else if (isDuckAiPageContext()) {
+                hideKeyboard()
+            }
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             nativeInputState?.let { updateFireButtonVisibility(it) }
@@ -728,8 +741,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateBackButtons(state: NativeInputState) {
+        val hasText = !inputField.text.isNullOrEmpty()
         findViewById<View?>(R.id.inputModeWidgetBack)?.visibility =
-            if (state.shouldShowToggleRowBack()) VISIBLE else GONE
+            if (state.shouldShowToggleRowBack(hasText)) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
             if (state.shouldShowCardRowBack()) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
@@ -1216,6 +1230,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
+        onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit,
     ) {
         this.onSearchTextChanged = onSearchTextChanged
         this.onSearchSelected = { _ ->
@@ -1223,6 +1238,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         this.onSearchSent = onSearchSubmitted
         this.onChatSent = onChatSubmitted
+        this.onInputTextEmptyChanged = onInputTextEmptyChanged
     }
 
     override fun bindTabCount(
@@ -1264,6 +1280,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
                 },
                 onChatSuggestionDeleteClicked = { suggestion ->
+                    viewModel.fireRecentChatDeleteButtonTappedPixel()
                     onChatSuggestionDelete(viewModel.buildChatSuggestionUrl(suggestion))
                 },
                 onChatUrlSuggestionClicked = { suggestion ->
@@ -1345,6 +1362,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         refreshChatSuggestionsAction?.invoke()
     }
 
+    override fun onChatDeleteConfirmed() {
+        viewModel.fireRecentChatDeleteConfirmedPixel()
+    }
+
+    override fun onChatDeleteCancelled() {
+        viewModel.fireRecentChatDeleteCancelledPixel()
+    }
+
     override fun asView(): View = this
 
     fun setTabCount(count: Int) {
@@ -1402,8 +1427,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeTier() {
         tierJob?.cancel()
-        tierJob = viewModel.isPaidTier
-            .onEach { hasDuckAiPlus -> onPaidTierChanged?.invoke(hasDuckAiPlus) }
+        tierJob = combine(viewModel.isPaidTier, viewModel.isSubscriptionEligible) { isPaid, isEligible ->
+            isPaid to isEligible
+        }
+            .onEach { (isPaid, isEligible) -> onPaidTierChanged?.invoke(isPaid, isEligible) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
@@ -1599,8 +1626,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 internal fun NativeInputState.chatHintRes(): Int =
     if (chatId != null) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint
 
-internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
-    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+// Inverse of the top nav bar: the nav bar shows its own back arrow while the field is empty, so this
+// one shows only once there is text — the two are never visible at the same time (browser only; this
+// arrow never renders in Duck.ai / contextual, where toggleVisible is false).
+internal fun NativeInputState.shouldShowToggleRowBack(hasText: Boolean): Boolean =
+    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && hasText
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER

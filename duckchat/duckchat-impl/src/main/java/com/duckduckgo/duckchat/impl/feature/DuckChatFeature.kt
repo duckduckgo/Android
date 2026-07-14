@@ -155,6 +155,15 @@ interface DuckChatFeature {
     fun nativeChatInput(): Toggle
 
     /**
+     * @return `true` when the native input top nav bar (fire / tabs / menu) may be shown. This is a
+     * guardrail on top of the input mode: the bar shows only when this is enabled AND the address bar
+     * is in Search & Duck.ai mode. Search-only users, or users with this disabled, never see it.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputNavBar(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */

@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
-    <string name="downloadsActivityTitle">Λήψεις</string>
-    <string name="downloadsActivityNoItemsDescription">Δεν έχει γίνει ακόμα λήψη αρχείων</string>
-    <string name="downloadsShareTitle">Κοινή χρήση με...</string>
     <string name="downloadsDownloadFinishedActionName">Άνοιγμα</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Το αρχείο δεν υπάρχει πλέον</string>
-    <string name="downloadsItemMenuShare">Κοινή χρήση</string>
-    <string name="downloadsItemMenuDelete">Διαγραφή</string>
-    <string name="downloadsItemMenuCancel">Ακύρωση</string>
-    <string name="downloadsActivityMenuDeleteAll">Διαγραφή όλων</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Διαγράφηκε %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Διαγράφηκαν όλα τα αρχεία</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Περισσότερες επιλογές για %1$s</string>
-    <string name="downloadsUndoActionName">Αναίρεση</string>
-    <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Προστασία παρακολούθησης από εφαρμογές</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
-    <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
 
@@ -1092,4 +1076,5 @@
     <string name="fireTabsNewTabButton">Νέα καρτέλα Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ΝΕΟ!</b> Δοκιμάστε τις καρτέλες Fire για περιήγηση χωρίς να αποθηκεύετε το τοπικό ιστορικό.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
 </resources>

@@ -143,6 +143,7 @@ class NativeInputModeWidgetViewModelTest {
     private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
+    private val modelStateFlow = MutableStateFlow(ModelState())
     private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
@@ -161,6 +162,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
@@ -565,6 +567,20 @@ class NativeInputModeWidgetViewModelTest {
         entitlementsFlow.value = emptyList()
 
         assertFalse(testee.isPaidTier.firstOrNull()!!)
+    }
+
+    @Test
+    fun whenModelStateSubscriptionEligibleThenIsSubscriptionEligibleTrue() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = true)
+
+        assertTrue(testee.isSubscriptionEligible.firstOrNull()!!)
+    }
+
+    @Test
+    fun whenModelStateNotSubscriptionEligibleThenIsSubscriptionEligibleFalse() = runTest {
+        modelStateFlow.value = ModelState(isSubscriptionEligible = false)
+
+        assertFalse(testee.isSubscriptionEligible.firstOrNull()!!)
     }
 
     @Test
@@ -1470,6 +1486,31 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
         verify(duckChatPixels).fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    // endregion
+
+    // region fireRecentChatDeleteButtonTappedPixel
+
+    @Test
+    fun whenFireRecentChatDeleteButtonTappedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteButtonTappedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteButtonTapped()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteConfirmedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteConfirmedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteConfirmed()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteCancelledPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteCancelledPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteCancelled()
     }
 
     // endregion

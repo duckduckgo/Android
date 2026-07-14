@@ -44,6 +44,7 @@ data class ModelState(
     val selectedModelId: String? = null,
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
+    val isSubscriptionEligible: Boolean = false,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
     /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
@@ -134,9 +135,18 @@ class RealDuckAiModelManager @Inject constructor(
             try {
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
+                val isSubscriptionEligible = runCatching {
+                    subscriptions.isEligible()
+                }.getOrElse {
+                    logcat { "Duck.ai Model Manager: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
+                    false
+                }
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
+                    .filterNot {
+                        !it.isAccessible && !isSubscriptionEligible
+                    }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
                     val selectedModelId = validateAndPersistSelection(models)
@@ -144,6 +154,7 @@ class RealDuckAiModelManager @Inject constructor(
                     val available = ReasoningResolver.availableModes(
                         supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                        isEligible = isSubscriptionEligible,
                     )
                     val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
@@ -152,6 +163,7 @@ class RealDuckAiModelManager @Inject constructor(
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
                         userTier = userTier,
+                        isSubscriptionEligible = isSubscriptionEligible,
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
@@ -191,6 +203,7 @@ class RealDuckAiModelManager @Inject constructor(
                 val available = ReasoningResolver.availableModes(
                     supported = model.supportedReasoningEfforts,
                     effortAccess = model.reasoningEffortAccess,
+                    isEligible = _modelState.value.isSubscriptionEligible,
                 )
                 val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
                 _modelState.value = _modelState.value.copy(
@@ -283,7 +296,10 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
-    private fun resolveModel(remote: RemoteAIChatModel, userTier: UserTier): AIChatModel {
+    private fun resolveModel(
+        remote: RemoteAIChatModel,
+        userTier: UserTier,
+    ): AIChatModel {
         val accessTier = remote.accessTier.orEmpty()
         val isAccessible = if (accessTier.isEmpty()) {
             remote.entityHasAccess

@@ -1,7 +1,7 @@
 {
   "name": "TruePeopleSearch",
   "url": "truepeoplesearch.com",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703138400000,
   "optOutUrl": "https://www.truepeoplesearch.com/removal",
@@ -28,11 +28,11 @@
         },
         {
           "actionType": "expectation",
-          "_comment": "detect Cloudflare verification UI - older blocks use form#captchaForm, newer blocks keep the page shell but show a Turnstile widget instead of results",
+          "_comment": "detect Cloudflare verification UI - older blocks use form#captchaForm, newer blocks keep the page shell but show a Turnstile widget instead of results (the _cf_chl_opt inline script is present in the static HTML before the challenge-platform script is injected), and hard block pages render div#cf-error-details",
           "expectations": [
             {
               "type": "element",
-              "selector": "//body[not(.//form[@id='captchaForm'] or .//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'])]"
+              "selector": "//body[not(.//form[@id='captchaForm'] or .//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//div[@id='cf-error-details'])]"
             }
           ],
           "id": "9ea1684f-1953-45b7-954e-d1597a0c5063"

@@ -23,4 +23,22 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokkeert videoadvertenties op YouTube, zodat je video\'s zonder onderbreking kunt bekijken. <annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opent video\'s in een afleidingsvrije theatermodus die voorkomt dat wat je bekijkt je YouTube-feed beïnvloedt.</string>
+    <string name="ad_blocking_settings_title_v2">Advertentieblokkering</string>
+    <string name="ad_blocking_settings_header_description">Blokkeert invasieve trackers voordat ze worden geladen, waardoor advertenties die afhankelijk zijn van tracking effectief worden geëlimineerd</string>
+    <string name="contingencyMessageTitle">YouTube-advertentieblokkering niet beschikbaar</string>
+    <string name="contingencyMessageContent">Door recente wijzigingen in YouTube werkt advertentieblokkering niet meer naar behoren. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip.</string>
+    <string name="contingencyMessagePrimaryButton">Ik snap het</string>
+    <string name="contingencyMessageCloseContentDescription">Sluiten</string>
+    <string name="ad_blocking_menu_disable">YouTube-advertentieblokkering uitschakelen</string>
+    <string name="ad_blocking_menu_enable">YouTube-advertentieblokkering inschakelen</string>
+    <string name="ad_blocking_menu_title">Blokkering van YouTube-advertenties</string>
+    <string name="ad_blocking_menu_close_content_description">Sluiten</string>
+    <string name="ad_blocking_menu_always_on">Altijd aan</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Uitschakelen tot opnieuw opstarten</string>
+    <string name="ad_blocking_menu_always_off">Altijd uit</string>
+    <string name="ad_blocking_disabled_popup_title">Werkt de blokkering van YouTube-advertenties niet?</string>
+    <string name="ad_blocking_disabled_popup_description">Stuur een anoniem functioneringsrapport naar DuckDuckGo. Help mee om advertentieblokkering voor iedereen te verbeteren!</string>
+    <string name="ad_blocking_disabled_primary_action">Functioneringsrapport verzenden</string>
+    <string name="ad_blocking_disabled_secondary_action">Annuleren</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Uitgeschakeld tot opnieuw starten</string>
 </resources>

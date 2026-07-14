@@ -20,12 +20,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
-class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
+class PromoBottomSheetDialog(builder: Builder) :
+    BottomSheetDialog(builder.context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge) {
 
     abstract class EventListener {
         /** Sets a listener to be invoked when the bottom sheet is shown */
@@ -47,6 +49,7 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
 
     init {
         setContentView(binding.root)
+        binding.root.applyBottomSystemBarInsetPadding()
 
         setOnDismissListener { builder.listener.onBottomSheetDismissed() }
         setOnShowListener { builder.listener.onBottomSheetShown() }

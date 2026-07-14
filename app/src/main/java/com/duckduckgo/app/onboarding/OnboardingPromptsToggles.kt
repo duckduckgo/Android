@@ -39,8 +39,8 @@ interface OnboardingPromptsToggles {
 
     enum class OnboardingPromptsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
-        TREATMENT_DOCK_ONLY("treatment_dock_only"),
-        TREATMENT_WIDGET_ONLY("treatment_widget_only"),
-        TREATMENT_DOCK_AND_WIDGET("treatment_dock_and_widget"),
+        TREATMENT_DOCK_ONLY("treatmentDockOnly"),
+        TREATMENT_WIDGET_ONLY("treatmentWidgetOnly"),
+        TREATMENT_DOCK_AND_WIDGET("treatmentDockAndWidget"),
     }
 }

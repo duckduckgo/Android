@@ -234,7 +234,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             is Command.ClearingComplete -> onClearAllEvent(ClearAllEvent.ClearingFinished)
             is Command.OnShow -> sendFragmentResult(FireDialog.EVENT_ON_SHOW)
             is Command.OnCancel -> {
-                sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
+                sendFragmentResult(FireDialog.EVENT_ON_CANCEL, arguments?.getString(ARG_ORIGIN))
                 dismiss()
             }
             is Command.OnClearStarted -> {

@@ -22,6 +22,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISAB
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -56,9 +57,9 @@ class DuckPlayerSettingsEntryViewModelTest {
     )
 
     @Test
-    fun whenAdBlockingNotShownAndDuckPlayerEnabledThenVisible() = runTest {
+    fun whenAdBlockingHiddenAndDuckPlayerEnabledThenVisible() = runTest {
         whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(ENABLED))
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -69,9 +70,9 @@ class DuckPlayerSettingsEntryViewModelTest {
     }
 
     @Test
-    fun whenAdBlockingNotShownAndDuckPlayerDisabledWithHelpLinkThenVisible() = runTest {
+    fun whenAdBlockingHiddenAndDuckPlayerDisabledWithHelpLinkThenVisible() = runTest {
         whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(DISABLED_WIH_HELP_LINK))
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -82,9 +83,22 @@ class DuckPlayerSettingsEntryViewModelTest {
     }
 
     @Test
-    fun whenAdBlockingShownThenNotVisible() = runTest {
+    fun whenAdBlockingPlacementIsOtherThenNotVisible() = runTest {
         whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(ENABLED))
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
+
+        val viewModel = createViewModel()
+        viewModel.onStart(lifecycleOwner)
+
+        viewModel.viewState.test {
+            assertFalse(awaitItem().isVisible)
+        }
+    }
+
+    @Test
+    fun whenAdBlockingPlacementIsProtectionsThenNotVisible() = runTest {
+        whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(ENABLED))
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -97,7 +111,7 @@ class DuckPlayerSettingsEntryViewModelTest {
     @Test
     fun whenDuckPlayerDisabledThenNotVisible() = runTest {
         whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(DISABLED))
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -109,16 +123,16 @@ class DuckPlayerSettingsEntryViewModelTest {
 
     @Test
     fun whenStoppedThenStopsObservingVisibilityChanges() = runTest {
-        val shownInSettings = MutableStateFlow(false)
+        val placement = MutableStateFlow<SettingsPlacement>(SettingsPlacement.Hidden)
         whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(ENABLED))
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(shownInSettings)
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(placement)
         val viewModel = createViewModel()
 
         viewModel.onStart(lifecycleOwner)
         assertTrue(viewModel.viewState.value.isVisible)
 
         viewModel.onStop(lifecycleOwner)
-        shownInSettings.value = true
+        placement.value = SettingsPlacement.Other
 
         // collection was cancelled on stop, so the change is not observed
         assertTrue(viewModel.viewState.value.isVisible)

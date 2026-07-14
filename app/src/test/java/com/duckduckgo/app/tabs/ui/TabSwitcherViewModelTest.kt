@@ -26,8 +26,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.promo.FireTabsPromos
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -170,6 +173,10 @@ class TabSwitcherViewModelTest {
 
     private val mockTabTitleResolver: TabTitleResolver = mock()
 
+    private val mockDataClearing: ManualDataClearing = mock()
+
+    private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -247,6 +254,8 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2081,6 +2090,15 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTab)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+            clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+        )
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
     }
 
     @Test
@@ -2107,6 +2125,39 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+            clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+        )
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun `when toggling to regular mode with fire tabs present then does not clear fire data`() = runTest {
+        val fireTabs = listOf(
+            TabEntity("fire-1", url = "https://fire.example/1", position = 1),
+            TabEntity("fire-2", url = "https://fire.example/2", position = 2),
+        )
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabs))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabs.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
     @Test
@@ -2136,6 +2187,8 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2181,6 +2234,8 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2250,6 +2305,8 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,

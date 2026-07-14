@@ -171,8 +171,16 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                     item.placeholder,
                     createGlideListener(imageLoadListener, ImageLoadSource.CardItem(item.id)),
                 )
-                binding.listItemContainer.setOnClickListener {
-                    listener.onItemClicked(item)
+                if (item.primaryAction != null) {
+                    binding.endImage.show()
+                    binding.listItemContainer.isClickable = true
+                    binding.listItemContainer.setOnClickListener {
+                        listener.onItemClicked(item)
+                    }
+                } else {
+                    binding.endImage.gone()
+                    binding.listItemContainer.setOnClickListener(null)
+                    binding.listItemContainer.isClickable = false
                 }
             }
         }
@@ -206,8 +214,15 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                     item.placeholder,
                     createGlideListener(imageLoadListener, ImageLoadSource.CardItem(item.id)),
                 )
-                binding.action.setOnClickListener {
-                    listener.onItemClicked(item)
+                if (item.primaryAction != null) {
+                    binding.endImage.show()
+                    binding.action.setOnClickListener {
+                        listener.onItemClicked(item)
+                    }
+                } else {
+                    binding.endImage.gone()
+                    binding.action.setOnClickListener(null)
+                    binding.action.isClickable = false
                 }
             }
         }

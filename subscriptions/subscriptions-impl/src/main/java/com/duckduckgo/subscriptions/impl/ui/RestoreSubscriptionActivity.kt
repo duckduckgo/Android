@@ -154,17 +154,20 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToSubscriptions() {
-        startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.buyUrl)
+        startSubscriptionsWebViewActivity(
+            url = subscriptionsUrlProvider.buyUrl,
+            origin = PURCHASE_VIEW_PLANS_ORIGIN,
+        )
     }
 
     private fun goToSubscriptionsWelcomePage() {
         startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.welcomeUrl)
     }
 
-    private fun startSubscriptionsWebViewActivity(url: String) {
+    private fun startSubscriptionsWebViewActivity(url: String, origin: String? = null) {
         globalActivityStarter.start(
             context = this,
-            params = SubscriptionsWebViewActivityWithParams(url),
+            params = SubscriptionsWebViewActivityWithParams(url = url, origin = origin),
         )
     }
 
@@ -218,5 +221,9 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             is FinishAndGoToOnboarding -> finishAndGoToOnboarding()
             is FinishAndGoToSubscriptionSettings -> finishAndGoToSubscriptionSettings()
         }
+    }
+
+    companion object {
+        private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_restore_android__viewplans"
     }
 }

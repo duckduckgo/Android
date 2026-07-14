@@ -23,7 +23,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -48,8 +48,7 @@ class OnboardingPromptsExperimentManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : OnboardingPromptsExperimentManager, PrivacyConfigCallbackPlugin {
 
-    @Volatile
-    private var privacyPersisted: Boolean = false
+    private val privacyPersisted = CompletableDeferred<Unit>()
 
     override suspend fun enroll(): OnboardingPromptExperimentVariant? = withContext(dispatcherProvider.io()) {
         if (waitForPrivacyConfig()) {
@@ -81,14 +80,12 @@ class OnboardingPromptsExperimentManagerImpl @Inject constructor(
 
     private suspend fun waitForPrivacyConfig(): Boolean =
         withTimeoutOrNull(PRIVACY_CONFIG_WAIT_TIMEOUT_MS) {
-            while (!privacyPersisted) {
-                delay(10)
-            }
+            privacyPersisted.await()
         } != null
 
     override fun onPrivacyConfigPersisted() {
         super.onPrivacyConfigPersisted()
-        privacyPersisted = true
+        privacyPersisted.complete(Unit)
     }
 
     override fun onPrivacyConfigDownloaded() = Unit

@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.browsermenu
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -26,15 +27,19 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
 import com.duckduckgo.browser.ui.databinding.ViewBrowserMenuDuckaiSectionBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.MenuActionButtonView
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.ui.view.StatusIndicatorView
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.mobile.android.R.drawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -46,7 +51,13 @@ class BrowserMenuBottomSheet(
     private val faviconManager: FaviconManager,
     private val onDismissListener: () -> Unit,
     private val onMenuItemClickListener: () -> Unit,
-) : BottomSheetDialog(context) {
+    private val edgeToEdgeEnabled: Boolean,
+    private val topInContextSections: Collection<TopInContextSection> = emptyList(),
+    private val currentUrl: Uri? = null,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
 
     // Duck.ai menu section, inflated once and inserted at the position decided on open (see placeDuckAiSection).
@@ -54,16 +65,30 @@ class BrowserMenuBottomSheet(
         ViewBrowserMenuDuckaiSectionBinding.inflate(LayoutInflater.from(context), binding.menuItemsContainer, false)
     }
 
+    // No-dep helper; instantiated directly (matches non-DI edge-to-edge call sites like AppComponentsActivity).
+    private val edgeToEdgeHandler = EdgeToEdgeHandler()
+
     init {
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         // Set VPN menu item size to medium like other menu items
         binding.includeVpnMenuItem.vpnMenuItem
             .findViewById<MenuItemView>(R.id.menuItemView)
             .setSize(MenuItemViewSize.MEDIUM)
 
+        addTopInContextSections()
+
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()
+            if (edgeToEdgeEnabled) {
+                edgeToEdgeHandler.applyNavigationBarScrim(
+                    binding.root,
+                    context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+                )
+            }
 
             behavior.apply {
                 isDraggable = true
@@ -199,6 +224,28 @@ class BrowserMenuBottomSheet(
         menuItemsContainer.addView(duckAiSectionBinding.root, menuItemsContainer.indexOfChild(anchor))
     }
 
+    /**
+     * Adds the contributed top-of-menu sections (if any) into their container, and keeps the single
+     * trailing divider shown only while at least one section is visible.
+     */
+    private fun addTopInContextSections() {
+        val url = currentUrl ?: return
+        topInContextSections.forEach { section ->
+            binding.topInContextSection.addView(section.getView(url, context) { onContributedItemClicked() })
+        }
+        binding.topInContextSection.viewTreeObserver.addOnGlobalLayoutListener {
+            val shouldShow = binding.topInContextSection.isVisible && binding.topInContextSection.children.any { it.isVisible }
+            if (binding.topInContextSectionDivider.isVisible != shouldShow) {
+                binding.topInContextSectionDivider.isVisible = shouldShow
+            }
+        }
+    }
+
+    private fun onContributedItemClicked() {
+        onMenuItemClickListener()
+        dismiss()
+    }
+
     fun onMenuItemClicked(view: View, onClick: () -> Unit) {
         view.setOnClickListener {
             onMenuItemClickListener()
@@ -232,6 +279,7 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
+        binding.topInContextSection.isVisible = true
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
@@ -348,6 +396,7 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
+        binding.topInContextSection.isVisible = true
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isVisible = false

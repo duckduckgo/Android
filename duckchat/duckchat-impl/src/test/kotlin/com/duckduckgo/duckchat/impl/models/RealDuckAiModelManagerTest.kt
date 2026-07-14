@@ -37,6 +37,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -60,6 +61,7 @@ class RealDuckAiModelManagerTest {
     fun setUp() {
         whenever(subscriptions.getEntitlements()).thenReturn(entitlementFlow)
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
+        subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
     }
 
     private fun createManager(): RealDuckAiModelManager {
@@ -373,6 +375,94 @@ class RealDuckAiModelManagerTest {
 
         val ids = testee.modelState.value.models.map { it.id }
         assertEquals(listOf("visible"), ids)
+    }
+
+    @Test
+    fun whenUserNotEligibleToPurchaseThenInaccessiblePaidModelsFilteredOut() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("plus", accessTier = listOf("plus", "pro"), entityHasAccess = false),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val ids = testee.modelState.value.models.map { it.id }
+        assertEquals(listOf("free"), ids)
+    }
+
+    @Test
+    fun whenUserEligibleToPurchaseThenInaccessiblePaidModelsRetainedForUpsell() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(subscriptions.isEligible()).thenReturn(true)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("plus", accessTier = listOf("plus", "pro"), entityHasAccess = false),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val ids = testee.modelState.value.models.map { it.id }
+        assertEquals(listOf("free", "plus"), ids)
+    }
+
+    @Test
+    fun whenUserNotEligibleToPurchaseThenAccessibleModelsStillShown() = runTest {
+        // A subscribed user is "eligible" (isEligible() covers active subs), but even if eligibility
+        // resolved false, models the user already has access to must never be filtered out.
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
+        whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("free", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                    remoteModel("plus", accessTier = listOf("plus", "pro"), entityHasAccess = true),
+                    remoteModel("pro", accessTier = listOf("pro"), entityHasAccess = false),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val ids = testee.modelState.value.models.map { it.id }
+        assertEquals(listOf("free", "plus"), ids)
+    }
+
+    @Test
+    fun whenEligibilityCheckThrowsThenFailsClosedAndInaccessiblePaidModelsFilteredOut() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(subscriptions.isEligible()).thenThrow(RuntimeException("Error"))
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("plus", accessTier = listOf("plus", "pro"), entityHasAccess = false),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val ids = testee.modelState.value.models.map { it.id }
+        assertEquals(listOf("free"), ids)
     }
 
     @Test

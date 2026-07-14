@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -28,7 +29,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -51,13 +51,12 @@ class AdBlockingSettingsEntryViewModelTest {
         return AdBlockingSettingsEntryViewModel(
             statusChecker,
             coroutineRule.testDispatcherProvider,
-            feature,
         )
     }
 
     @Test
-    fun whenShownInSettingsThenVisible() = runTest {
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
+    fun whenPlacementIsOtherThenVisible() = runTest {
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -68,8 +67,20 @@ class AdBlockingSettingsEntryViewModelTest {
     }
 
     @Test
-    fun whenNotShownInSettingsThenNotVisible() = runTest {
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+    fun whenPlacementIsProtectionsThenNotVisible() = runTest {
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
+
+        val viewModel = createViewModel()
+        viewModel.onStart(lifecycleOwner)
+
+        viewModel.viewState.test {
+            assertFalse(awaitItem().isVisible)
+        }
+    }
+
+    @Test
+    fun whenPlacementIsHiddenThenNotVisible() = runTest {
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -81,15 +92,15 @@ class AdBlockingSettingsEntryViewModelTest {
 
     @Test
     fun whenStoppedThenStopsObservingVisibilityChanges() = runTest {
-        val shownInSettings = MutableStateFlow(true)
-        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(shownInSettings)
+        val placement = MutableStateFlow<SettingsPlacement>(SettingsPlacement.Other)
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(placement)
         val viewModel = createViewModel()
 
         viewModel.onStart(lifecycleOwner)
         assertTrue(viewModel.viewState.value.isVisible)
 
         viewModel.onStop(lifecycleOwner)
-        shownInSettings.value = false
+        placement.value = SettingsPlacement.Protections
 
         // collection was cancelled on stop, so the change is not observed
         assertTrue(viewModel.viewState.value.isVisible)
@@ -103,28 +114,6 @@ class AdBlockingSettingsEntryViewModelTest {
             viewModel.onSettingClicked()
 
             assertTrue(awaitItem() is OpenSettings)
-        }
-    }
-
-    @Test
-    fun whenSettingClickedAndUxImprovementsDisabledThenOpensLegacyScreen() = runTest {
-        val viewModel = createViewModel(uxImprovements = false)
-
-        viewModel.commands().test {
-            viewModel.onSettingClicked()
-
-            assertEquals(AdBlockingSettingsNoParams, (awaitItem() as OpenSettings).params)
-        }
-    }
-
-    @Test
-    fun whenSettingClickedAndUxImprovementsEnabledThenOpensV2Screen() = runTest {
-        val viewModel = createViewModel(uxImprovements = true)
-
-        viewModel.commands().test {
-            viewModel.onSettingClicked()
-
-            assertEquals(AdBlockingSettingsV2NoParams, (awaitItem() as OpenSettings).params)
         }
     }
 }

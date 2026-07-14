@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Από: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Διαγραφή όλων</string>
+    <string name="downloadsActivityNoItemsDescription">Δεν έχει γίνει ακόμα λήψη αρχείων</string>
+    <string name="downloadsActivityTitle">Λήψεις</string>
+    <string name="downloadsAllFilesDeletedMessage">Διαγράφηκαν όλα τα αρχεία</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Διαγράφηκε %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Το αρχείο δεν υπάρχει πλέον</string>
+    <string name="downloadsItemMenuCancel">Ακύρωση</string>
+    <string name="downloadsItemMenuDelete">Διαγραφή</string>
+    <string name="downloadsItemMenuShare">Κοινή χρήση</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Περισσότερες επιλογές για %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
+    <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
+    <string name="downloadsShareTitle">Κοινή χρήση με...</string>
+    <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
+    <string name="downloadsUndoActionName">Αναίρεση</string>
 </resources>

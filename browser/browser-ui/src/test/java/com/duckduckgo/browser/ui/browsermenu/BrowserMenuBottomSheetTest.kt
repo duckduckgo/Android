@@ -48,7 +48,7 @@ class BrowserMenuBottomSheetTest {
     fun setUp() {
         val appContext = ApplicationProvider.getApplicationContext<Application>()
         appContext.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
-        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {})
+        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {}, edgeToEdgeEnabled = false)
         dialog.show()
     }
 

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.net.toUri
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -29,15 +31,20 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_FIRE_BUTTON
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
+import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -49,6 +56,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -56,14 +64,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class OnboardingDaxDialogTests {
 
     private lateinit var testee: CtaViewModel
@@ -94,6 +107,14 @@ class OnboardingDaxDialogTests {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = org.mockito.kotlin.mock { on { isLightModeEnabled() } doReturn true }
     private val mockDeviceInfo: DeviceInfo = mock()
+
+    private var canShowContextualCta = true
+    private val contextualCtaSuppressorPlugin: ContextualCtaSuppressorPlugin = org.mockito.kotlin.mock {
+        onBlocking { canShowCta(any()) } doAnswer { canShowContextualCta }
+    }
+    private val contextualCtaSuppressorPlugins = object : PluginPoint<ContextualCtaSuppressorPlugin> {
+        override fun getPlugins() = listOf(contextualCtaSuppressorPlugin)
+    }
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -128,6 +149,7 @@ class OnboardingDaxDialogTests {
             object : PluginPoint<SubscriptionPromoCtaShownPlugin> {
                 override fun getPlugins() = emptyList<SubscriptionPromoCtaShownPlugin>()
             },
+            contextualCtaSuppressorPlugins,
             mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
             mockDeviceInfo,
@@ -345,5 +367,58 @@ class OnboardingDaxDialogTests {
         )
 
         assertFalse(result is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun whenContextualCtaSuppressorPluginSuppressesThenRefreshCtaReturnsNull() = runTest {
+        canShowContextualCta = false
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenContextualCtaSuppressorPluginDoesNotSuppressThenRefreshCtaReturnsCta() = runTest {
+        canShowContextualCta = true
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertTrue(result is OnboardingDaxDialogCta.DaxMainNetworkCta)
+    }
+
+    private fun site(
+        url: String = "http://www.test.com",
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        events: List<TrackingEvent> = emptyList(),
+        majorNetworkCount: Int = 0,
+        allTrackersBlocked: Boolean = true,
+        entity: Entity? = null,
+    ): Site {
+        val site: Site = mock()
+        whenever(site.url).thenReturn(url)
+        whenever(site.uri).thenReturn(url.toUri())
+        whenever(site.https).thenReturn(https)
+        whenever(site.entity).thenReturn(entity)
+        whenever(site.trackingEvents).thenReturn(events)
+        whenever(site.trackerCount).thenReturn(trackerCount)
+        whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
+        whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
+        return site
     }
 }

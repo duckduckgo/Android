@@ -572,8 +572,8 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onTabsButtonPressed()
         }
         tabsMenu.setOnLongClickListener {
-            omnibarItemPressedListener?.onTabsButtonLongPressed()
-            return@setOnLongClickListener true
+            val longPressHandled = omnibarItemPressedListener?.onTabsButtonLongPressed() ?: false
+            return@setOnLongClickListener longPressHandled
         }
         fireIconMenu.setOnClickListener {
             if (isAttachedToWindow) {

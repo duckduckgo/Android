@@ -182,7 +182,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         binding.tabsButton.setOnLongClickListener {
             viewModel.onTabsButtonLongClicked()
-            true
         }
 
         binding.menuButton.setOnClickListener {

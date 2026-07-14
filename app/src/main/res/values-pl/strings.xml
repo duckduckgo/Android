@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
-    <string name="downloadsActivityTitle">Pobrane</string>
-    <string name="downloadsActivityNoItemsDescription">Nie pobrano jeszcze żadnych plików</string>
-    <string name="downloadsShareTitle">Udostępnij…</string>
     <string name="downloadsDownloadFinishedActionName">Otwórz</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Plik już nie istnieje</string>
-    <string name="downloadsItemMenuShare">Udostępnij</string>
-    <string name="downloadsItemMenuDelete">Usuń</string>
-    <string name="downloadsItemMenuCancel">Anuluj</string>
-    <string name="downloadsActivityMenuDeleteAll">Usuń wszystko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Usunięto %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Wszystkie pliki usunięte</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Więcej opcji dla %1$s</string>
-    <string name="downloadsUndoActionName">Cofnij</string>
-    <string name="downloadsStateInProgress">W trakcie…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
-    <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
     <!-- Windows Settings -->
 
@@ -1132,4 +1116,5 @@
     <string name="fireTabsNewTabButton">Nowa karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOWOŚĆ!</b> Wypróbuj karty Fire, aby przeglądać bez lokalnego zapisywania historii.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
 </resources>

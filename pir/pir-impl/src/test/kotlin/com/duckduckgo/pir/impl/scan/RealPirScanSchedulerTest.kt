@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.scan
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -140,6 +141,33 @@ class RealPirScanSchedulerTest {
             any(),
             any<PeriodicWorkRequest>(),
         )
+    }
+
+    @Test
+    fun whenScheduleScansThenScheduledScanWorkRequiresCharging() {
+        testee.scheduleScans()
+
+        val scheduledScan = capturePeriodicWorkRequests().getValue(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+
+        assertTrue(scheduledScan.workSpec.constraints.requiresCharging())
+    }
+
+    @Test
+    fun whenScheduleScansThenScheduledScanWorkStillRequiresConnectedNetwork() {
+        testee.scheduleScans()
+
+        val scheduledScan = capturePeriodicWorkRequests().getValue(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+
+        assertEquals(NetworkType.CONNECTED, scheduledScan.workSpec.constraints.requiredNetworkType)
+    }
+
+    @Test
+    fun whenScheduleScansThenEmailConfirmationWorkDoesNotRequireCharging() {
+        testee.scheduleScans()
+
+        val emailConfirmation = capturePeriodicWorkRequests().getValue(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION)
+
+        assertFalse(emailConfirmation.workSpec.constraints.requiresCharging())
     }
 
     @Test
@@ -378,5 +406,16 @@ class RealPirScanSchedulerTest {
             .thenReturn(flowOf(emptyList()))
 
         assertFalse(testee.isScheduledScanRunning())
+    }
+
+    private fun capturePeriodicWorkRequests(): Map<String, PeriodicWorkRequest> {
+        val tagCaptor = argumentCaptor<String>()
+        val requestCaptor = argumentCaptor<PeriodicWorkRequest>()
+        verify(mockWorkManager, times(4)).enqueueUniquePeriodicWork(
+            tagCaptor.capture(),
+            any(),
+            requestCaptor.capture(),
+        )
+        return tagCaptor.allValues.zip(requestCaptor.allValues).toMap()
     }
 }
