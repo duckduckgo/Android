@@ -400,7 +400,14 @@ class RealDuckChatJSHelper @Inject constructor(
         mode: Mode,
         browserMode: BrowserMode,
     ): JsCallbackData {
-        val supportsSubscription = withContext(dispatcherProvider.io()) { subscriptions.isEligible() }
+        val supportsSubscription = withContext(dispatcherProvider.io()) {
+            runCatching {
+                subscriptions.isEligible()
+            }.getOrElse {
+                logcat { "DuckChat-Sync: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
+                false
+            }
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
