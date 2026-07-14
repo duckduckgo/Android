@@ -21,8 +21,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingDisabledBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -50,11 +52,24 @@ class AdBlockingDisabledBottomSheetDialog(
             binding.root.applyBottomSystemBarInsetPadding()
         }
 
+        behavior.skipCollapsed = true
+        // Wrap to content when it fits, but cap the height so the sheet can never grow into the
+        // status bar in landscape; the NestedScrollView content scrolls once it hits this ceiling.
+        behavior.maxHeight = context.resources.displayMetrics.heightPixels * MAX_HEIGHT_PERCENT / 100
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        // Expanding the sheet squares its top corners by default; restore the rounded corners.
+        setOnShowListener { setRoundCorners() }
+
         binding.adBlockingDisabledCloseButton.setOnClickListener { dismiss() }
         binding.adBlockingDisabledPrimaryButton.setOnClickListener {
             brokenSiteReportRequester.requestReport()
             dismiss()
         }
         binding.adBlockingDisabledSecondaryButton.setOnClickListener { dismiss() }
+    }
+
+    private companion object {
+        private const val MAX_HEIGHT_PERCENT = 90
     }
 }
