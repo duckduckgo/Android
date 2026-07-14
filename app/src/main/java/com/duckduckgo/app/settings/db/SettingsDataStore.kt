@@ -109,7 +109,6 @@ interface SettingsDataStore {
     var urlPreferenceSetByUser: Boolean
     var clearDuckAiData: Boolean
     var showTrackersCountInAddressBar: Boolean
-    var hasNewDownload: Boolean
     var singleTabFireDialogShownCount: Int
     var getDesktopBrowserSettingDismissed: Boolean
     var nextStepsAddressBarDismissed: Boolean
@@ -299,10 +298,6 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, enabled) }
 
-    override var hasNewDownload: Boolean
-        get() = preferences.getBoolean(KEY_HAS_NEW_DOWNLOAD, false)
-        set(value) = preferences.edit { putBoolean(KEY_HAS_NEW_DOWNLOAD, value) }
-
     override var singleTabFireDialogShownCount: Int
         get() = preferences.getInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, 0)
         set(value) = preferences.edit { putInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, value) }
@@ -414,7 +409,6 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR = "KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR"
         const val KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT = "KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT"
         const val KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED = "KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED"
-        const val KEY_HAS_NEW_DOWNLOAD = "KEY_HAS_NEW_DOWNLOAD"
         const val KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED = "KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED"
         const val KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED = "KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED"
         const val KEY_NEXT_STEPS_SECTION_HIDDEN = "KEY_NEXT_STEPS_SECTION_HIDDEN"

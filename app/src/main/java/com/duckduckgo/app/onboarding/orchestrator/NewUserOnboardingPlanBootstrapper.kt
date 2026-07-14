@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import com.duckduckgo.app.onboarding.LinearOnboardingOrchestratorFeature
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
@@ -29,7 +27,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -43,46 +40,25 @@ import javax.inject.Inject
 class NewUserOnboardingPlanBootstrapper @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val planProvider: NewUserOnboardingPlanProvider,
-    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     private val userStageStore: UserStageStore,
     private val onboardingSkipper: OnboardingSkipper,
-    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     private val mutex = Mutex()
 
     /**
-     * Starts the orchestrator-driven onboarding plan when the feature flag is enabled, returning the
-     * resulting [OnboardingPlanStartResult]. The caller is responsible for only invoking this for a new
-     * user. The root plan always has an eligible first step, so a started run is
-     * [LinearOnboardingState.InProgress]; a non-InProgress result (a misconfigured plan with no eligible
-     * steps) is treated as [OnboardingPlanStartResult.Disabled].
+     * Starts the orchestrator-driven onboarding plan and returns the resulting [LinearOnboardingState].
+     * The caller is responsible for only invoking this for a new user.
      */
-    suspend fun startNewUserOnboardingPlanIfEnabled(): OnboardingPlanStartResult = mutex.withLock {
-        val orchestratorEnabled = withContext(dispatcherProvider.io()) { orchestratorFeature.self().isEnabled() }
-        if (!orchestratorEnabled) return@withLock OnboardingPlanStartResult.Disabled
-
+    suspend fun startNewUserOnboardingPlan(): LinearOnboardingState.InProgress = mutex.withLock {
         orchestrator.startPlan(
             planProvider.buildRootPlan(
                 onCompleted = { userStageStore.stageCompleted(AppStage.NEW) },
                 onSkipped = { onboardingSkipper.markOnboardingAsCompleted() },
             ),
         )
-        when (val startState = orchestrator.state.value) {
-            is LinearOnboardingState.InProgress -> OnboardingPlanStartResult.Enabled(currentState = startState)
-            else -> OnboardingPlanStartResult.Disabled
+        requireNotNull(orchestrator.state.value as? LinearOnboardingState.InProgress) {
+            "New user onboarding plan needs to have at least one valid step"
         }
-    }
-
-    sealed interface OnboardingPlanStartResult {
-        /**
-         * Use legacy linear onboarding controller.
-         */
-        data object Disabled : OnboardingPlanStartResult
-
-        /**
-         * Use the [LinearOnboardingOrchestrator].
-         */
-        data class Enabled(val currentState: LinearOnboardingState.InProgress) : OnboardingPlanStartResult
     }
 }

@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">Nog geen bestanden gedownload</string>
-    <string name="downloadsShareTitle">Delen met...</string>
     <string name="downloadsDownloadFinishedActionName">Openen</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Bestand bestaat niet meer</string>
-    <string name="downloadsItemMenuShare">Delen</string>
-    <string name="downloadsItemMenuDelete">Verwijderen</string>
-    <string name="downloadsItemMenuCancel">Annuleren</string>
-    <string name="downloadsActivityMenuDeleteAll">Alles verwijderen</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s verwijderd</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle bestanden verwijderd</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Meer opties voor %1$s</string>
-    <string name="downloadsUndoActionName">Ongedaan maken</string>
-    <string name="downloadsStateInProgress">Bezig...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Bescherming tegen app-tracking</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>
-    <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Gebruik ChatGPT privé met Duck.ai ingebouwd</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Gerichte advertenties en cookiepop-ups blokkeren</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube-video\'s afspelen zonder advertenties</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
@@ -903,7 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Wil je eenvoudig toegang tot privé AI-chat in de adresbalk?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 
@@ -1029,7 +1015,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hoi.</string>
     <string name="preOnboardingWelcomeDialogBody1">Ben je klaar voor een snellere browser waarmee jij de controle hebt?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI is altijd optioneel en privacybescherming staat altijd aan.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d van %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d van %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Nederlands</string>
 
@@ -1092,4 +1078,5 @@
     <string name="fireTabsNewTabButton">Nieuw Fire-tabblad</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NIEUW!</b> Probeer Fire Tabs om te browsen zonder de lokale geschiedenis op te slaan.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Fire-tabbladen en hun gegevens verwijderen?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
 </resources>

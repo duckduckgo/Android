@@ -685,21 +685,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
-    <string name="downloadsActivityTitle">Descărcări</string>
-    <string name="downloadsActivityNoItemsDescription">Nu a fost descărcat încă niciun fișier</string>
-    <string name="downloadsShareTitle">Distribuie către...</string>
     <string name="downloadsDownloadFinishedActionName">Deschide</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Fișierul nu mai există</string>
-    <string name="downloadsItemMenuShare">Trimite…</string>
-    <string name="downloadsItemMenuDelete">Ștergere</string>
-    <string name="downloadsItemMenuCancel">Anulează</string>
-    <string name="downloadsActivityMenuDeleteAll">Șterge toate</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">S-a șters %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Toate fișierele au fost șterse</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mai multe opțiuni pentru %1$s</string>
-    <string name="downloadsUndoActionName">Anulează</string>
-    <string name="downloadsStateInProgress">În curs...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Protecția la urmărirea aplicațiilor</string>
@@ -721,8 +707,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
-    <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
 
@@ -862,7 +846,9 @@
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Folosește ChatGPT în privat cu Duck.ai încorporat</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blochează reclamele direcționate și ferestrele pop-up pentru module cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Redă videoclipuri YouTube fără reclame</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
@@ -923,7 +909,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vrei acces rapid la chat privat cu AI în bara de adrese?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 
@@ -1049,7 +1035,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
     <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
     <string name="preOnboardingWelcomeDialogBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d din %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d din %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
 
@@ -1112,4 +1098,5 @@
     <string name="fireTabsNewTabButton">Noua filă Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOU!</b> Încearcă filele Fire pentru a naviga fără a salva istoricul local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 </resources>

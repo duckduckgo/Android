@@ -47,6 +47,7 @@ interface DataClearingWideEvent {
         NONGRANULAR_FIRE_DIALOG("nongranular_fire_dialog"),
         SINGLE_TAB_FIRE_DIALOG("single_tab_fire_dialog"),
         APP_SHORTCUT("app_shortcut"),
+        FIRE_TABS_EMPTIED("fire_tabs_emptied"),
         AUTO_FOREGROUND("auto_foreground"),
         AUTO_BACKGROUND("auto_background"),
         LEGACY_FIRE_DIALOG("legacy_fire_dialog"),

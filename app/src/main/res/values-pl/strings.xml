@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
-    <string name="downloadsActivityTitle">Pobrane</string>
-    <string name="downloadsActivityNoItemsDescription">Nie pobrano jeszcze żadnych plików</string>
-    <string name="downloadsShareTitle">Udostępnij…</string>
     <string name="downloadsDownloadFinishedActionName">Otwórz</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Plik już nie istnieje</string>
-    <string name="downloadsItemMenuShare">Udostępnij</string>
-    <string name="downloadsItemMenuDelete">Usuń</string>
-    <string name="downloadsItemMenuCancel">Anuluj</string>
-    <string name="downloadsActivityMenuDeleteAll">Usuń wszystko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Usunięto %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Wszystkie pliki usunięte</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Więcej opcji dla %1$s</string>
-    <string name="downloadsUndoActionName">Cofnij</string>
-    <string name="downloadsStateInProgress">W trakcie…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
-    <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
     <!-- Windows Settings -->
 
@@ -880,7 +864,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Używaj ChatGPT prywatnie z wbudowanym Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj ukierunkowane reklamy i wyskakujące okienka dotyczące plików cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Odtwarzaj filmy na YouTube bez reklam</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
@@ -943,7 +929,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chcesz mieć łatwy dostęp do prywatnego czatu AI na pasku adresu?</string>
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
 
@@ -1069,7 +1055,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Cześć!</string>
     <string name="preOnboardingWelcomeDialogBody1">Chcesz skorzystać z szybszej przeglądarki, która daje Ci kontrolę?</string>
     <string name="preOnboardingWelcomeDialogBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
 
@@ -1132,4 +1118,5 @@
     <string name="fireTabsNewTabButton">Nowa karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOWOŚĆ!</b> Wypróbuj karty Fire, aby przeglądać bez lokalnego zapisywania historii.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
 </resources>

@@ -55,6 +55,15 @@ interface NativeInputAnimator {
         onCancel: () -> Unit = {},
         onComplete: () -> Unit,
     )
+    fun animateNavBarVisibility(
+        navBarView: View,
+        widgetView: View,
+        isBottom: Boolean,
+        heightPx: Int,
+        show: Boolean,
+        animate: Boolean,
+        onComplete: () -> Unit = {},
+    )
     fun cancelAnimation()
     fun applyLayoutTransitions(widgetView: View)
     fun applyLayoutTransitions(widgetView: View, isBottom: Boolean)
@@ -65,6 +74,7 @@ interface NativeInputAnimator {
 class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private var transitionAnimator: ValueAnimator? = null
+    private var navBarAnimator: ValueAnimator? = null
     private var animationCleanup: (() -> Unit)? = null
     private var pendingPreDraw: Pair<View, ViewTreeObserver.OnPreDrawListener>? = null
 
@@ -157,6 +167,61 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         }
     }
 
+    override fun animateNavBarVisibility(
+        navBarView: View,
+        widgetView: View,
+        isBottom: Boolean,
+        heightPx: Int,
+        show: Boolean,
+        animate: Boolean,
+        onComplete: () -> Unit,
+    ) {
+        navBarAnimator?.cancel()
+        navBarAnimator = null
+
+        val hiddenY = -heightPx.toFloat()
+        val ridesWidget = !isBottom
+        val endBar = if (show) 0f else hiddenY
+
+        if (!animate) {
+            navBarView.translationY = endBar
+            navBarView.visibility = if (show) View.VISIBLE else View.GONE
+            if (ridesWidget) widgetView.translationY = endBar
+            onComplete()
+            return
+        }
+
+        navBarView.visibility = View.VISIBLE
+        val startBar = navBarView.translationY
+        val startWidget = if (ridesWidget) widgetView.translationY else 0f
+        val endWidget = if (ridesWidget) endBar else 0f
+
+        navBarAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = ANIMATION_DURATION_MS
+            interpolator = FastOutSlowInInterpolator()
+            addUpdateListener { anim ->
+                val f = anim.animatedFraction
+                navBarView.translationY = lerpF(startBar, endBar, f)
+                if (ridesWidget) widgetView.translationY = lerpF(startWidget, endWidget, f)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+                override fun onAnimationEnd(animation: Animator) {
+                    navBarAnimator = null
+                    if (cancelled) return
+                    navBarView.translationY = endBar
+                    if (ridesWidget) widgetView.translationY = endWidget
+                    if (!show) navBarView.visibility = View.GONE
+                    onComplete()
+                }
+            })
+            start()
+        }
+    }
+
     private fun snapshotBeforeExit(widgetCard: View, omnibarCard: View, isBottom: Boolean): ExitSnapshot {
         val preSurface = visibleSurfacePosition(widgetCard)
         val omnibarPosition = visibleSurfacePosition(omnibarCard)
@@ -236,6 +301,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         animationCleanup = null
         transitionAnimator?.cancel()
         transitionAnimator = null
+        navBarAnimator?.cancel()
+        navBarAnimator = null
     }
 
     override fun applyLayoutTransitions(widgetView: View) {

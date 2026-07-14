@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
@@ -57,6 +58,9 @@ class PirResultsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
     private val binding: ActivityPirInternalResultsBinding by viewBinding()
 
@@ -67,9 +71,17 @@ class PirResultsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         bindViews()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.scanLogList)
     }
 
     private fun bindViews() {

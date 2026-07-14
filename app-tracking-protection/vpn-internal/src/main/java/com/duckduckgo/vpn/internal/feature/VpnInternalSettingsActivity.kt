@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.isDdgApp
 import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
@@ -76,6 +77,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
@@ -91,7 +95,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
 
         setupAppTrackerExceptionRules()
@@ -101,6 +107,12 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupForceUpdateBlocklist()
         setupUiElementsState()
         setupAppProtectionSection()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onDestroy() {

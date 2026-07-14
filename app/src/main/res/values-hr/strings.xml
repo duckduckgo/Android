@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
-    <string name="downloadsActivityTitle">Preuzimanja</string>
-    <string name="downloadsActivityNoItemsDescription">Još nema preuzetih datoteka</string>
-    <string name="downloadsShareTitle">Podijeli s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvori</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datoteka više ne postoji</string>
-    <string name="downloadsItemMenuShare">Podijeli</string>
-    <string name="downloadsItemMenuDelete">Izbriši</string>
-    <string name="downloadsItemMenuCancel">Otkaži</string>
-    <string name="downloadsActivityMenuDeleteAll">Izbriši sve</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="downloadsAllFilesDeletedMessage">Sve su datoteke izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Više opcija za %1$s</string>
-    <string name="downloadsUndoActionName">Poništi</string>
-    <string name="downloadsStateInProgress">U tijeku...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Zaštita od praćenja aplikacija</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
-    <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
     <!-- Windows Settings -->
 
@@ -880,7 +864,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Koristi ChatGPT privatno s ugrađenim Duck.ai-jem</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokiraj ciljane oglase i skočne prozore kolačića</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Reproduciraj YouTube videozapise bez oglasa</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
@@ -943,7 +929,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Želiš li jednostavan pristup privatnom AI čavrljanju u adresnoj traci?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 
@@ -1069,7 +1055,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Pozdrav!</string>
     <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji te stavlja za upravljač?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
 
@@ -1132,4 +1118,5 @@
     <string name="fireTabsNewTabButton">Nova Fire kartica</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Isprobaj Fire kartice za pregledavanje bez spremanja lokalne povijesti.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Želiš li izbrisati Fire kartice i njihove podatke?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
 </resources>

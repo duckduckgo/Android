@@ -680,21 +680,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
-    <string name="downloadsActivityTitle">Λήψεις</string>
-    <string name="downloadsActivityNoItemsDescription">Δεν έχει γίνει ακόμα λήψη αρχείων</string>
-    <string name="downloadsShareTitle">Κοινή χρήση με...</string>
     <string name="downloadsDownloadFinishedActionName">Άνοιγμα</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Το αρχείο δεν υπάρχει πλέον</string>
-    <string name="downloadsItemMenuShare">Κοινή χρήση</string>
-    <string name="downloadsItemMenuDelete">Διαγραφή</string>
-    <string name="downloadsItemMenuCancel">Ακύρωση</string>
-    <string name="downloadsActivityMenuDeleteAll">Διαγραφή όλων</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Διαγράφηκε %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Διαγράφηκαν όλα τα αρχεία</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Περισσότερες επιλογές για %1$s</string>
-    <string name="downloadsUndoActionName">Αναίρεση</string>
-    <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Προστασία παρακολούθησης από εφαρμογές</string>
@@ -716,8 +702,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
-    <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +828,9 @@
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
     <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Χρησιμοποιήστε το ChatGPT ιδιωτικά με ενσωματωμένο το Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Αποκλείστε στοχευμένες διαφημίσεις και αναδυόμενα παράθυρα cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Δείτε βίντεο στο YouTube χωρίς διαφημίσεις</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
     <string name="preOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
     <string name="preOnboardingAddressBarOkButton">Επόμενο</string>
@@ -903,7 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Θέλετε εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Θέλετε εύκολη πρόσβαση σε ιδιωτική συνομιλία με τεχνητή νοημοσύνη στη γραμμή διευθύνσεων;</string>
     <string name="preOnboardingInputScreenButton">Επόμενο</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Οι λειτουργίες τεχνητής νοημοσύνης είναι ιδιωτικές και προαιρετικές. Μπορείτε να κάνετε αλλαγές στις <b>Ρυθμίσεις > Λειτουργίες τεχνητής νοημοσύνης</b>.]]></string>
 
@@ -1029,7 +1015,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Γεια σας.</string>
     <string name="preOnboardingWelcomeDialogBody1">Είσαι έτοιμος για ένα ταχύτερο πρόγραμμα περιήγησης που σου δίνει τον έλεγχο;\n\n</string>
     <string name="preOnboardingWelcomeDialogBody2">Η τεχνητή νοημοσύνη είναι πάντα προαιρετική και η προστασία προσωπικών δεδομένων είναι πάντα ενεργοποιημένη.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d από %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d από %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς να πείτε «πάπια» στα ισπανικά</string>
 
@@ -1092,4 +1078,5 @@
     <string name="fireTabsNewTabButton">Νέα καρτέλα Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ΝΕΟ!</b> Δοκιμάστε τις καρτέλες Fire για περιήγηση χωρίς να αποθηκεύετε το τοπικό ιστορικό.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
 </resources>

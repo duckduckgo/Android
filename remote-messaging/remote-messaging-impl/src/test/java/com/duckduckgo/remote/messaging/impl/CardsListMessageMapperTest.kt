@@ -208,7 +208,7 @@ class CardsListMessageMapperTest {
     }
 
     @Test
-    fun whenCardsListMessageWithListItemMissingActionThenMessageIsFiltered() {
+    fun whenCardsListMessageWithListItemMissingActionThenListItemActionIsNull() {
         val listItemsWithNullAction = listOf(
             JsonListItem(
                 id = "item1",
@@ -216,7 +216,7 @@ class CardsListMessageMapperTest {
                 titleText = "Feature",
                 descriptionText = "Description",
                 placeholder = "ImageAI",
-                primaryAction = null, // Null action should cause failure
+                primaryAction = null,
             ),
         )
 
@@ -229,8 +229,12 @@ class CardsListMessageMapperTest {
 
         val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
 
-        // Message should be filtered out due to null action in list item
-        assertEquals(0, remoteMessages.size)
+        // Message is kept; the list item is kept with a null action instead
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(1, content.listItems.size)
+        val listItem = content.listItems.first() as CardItem.ListItem
+        assertNull(listItem.primaryAction)
     }
 
     @Test

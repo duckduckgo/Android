@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Zoek de QR-code in de DuckDuckGo-app op je andere apparaat door op dat apparaat naar \'Instellingen\' › \'Sync &amp; Backup\' › \'Synchroniseren\' te gaan.</string>
     <string name="sync_chat_bottom_sheet_positive">QR-code scannen</string>
     <string name="sync_chat_bottom_sheet_negative">Niet nu</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Je gegevens synchroniseren?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Nu synchroniseren</string>
+    <string name="sync_v2_joiner_confirmation_negative">Annuleren</string>
+
+    <string name="sync_v2_host_confirmation_title">Je gegevens synchroniseren?</string>
+    <string name="sync_v2_host_confirmation_positive">Nu synchroniseren</string>
+    <string name="sync_v2_host_confirmation_negative">Annuleren</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">“%1$s” kan je gesynchroniseerde DuckDuckGo-wachtwoorden, autofill-gegevens en Duck.ai-chats openen.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" heeft toegang tot je gesynchroniseerde Duck.ai-chats.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Het andere apparaat krijgt toegang tot je gesynchroniseerde DuckDuckGo-wachtwoorden, autofill-gegevens en Duck.ai-chats.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Het andere apparaat krijgt toegang tot je gesynchroniseerde Duck.ai-chats.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synchronisatie is mislukt.</string>
+    <string name="sync_v2_error_pairing_rejected">Synchronisatie geannuleerd vanaf je andere apparaat.</string>
+    <string name="sync_v2_error_pairing_canceled">Synchronisatie geannuleerd.</string>
+    <string name="sync_v2_error_upgrade_required">Werk de DuckDuckGo-browser bij en probeer het opnieuw.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Synchroniseer dit apparaat via een DuckDuckGo-browser die al op een ander apparaat is verbonden</string>
+    <string name="sync_v2_error_try_again">Probeer het opnieuw.</string>
+    <string name="sync_v2_error_got_it">Ik snap het</string>
+    <string name="sync_v2_already_paired_title">Al gesynchroniseerd.</string>
+    <string name="sync_v2_already_paired_message">Deze apparaten zijn al verbonden met Sync &amp; Backup.</string>
+
 </resources>

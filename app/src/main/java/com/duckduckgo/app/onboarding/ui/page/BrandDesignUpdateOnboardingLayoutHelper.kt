@@ -23,19 +23,55 @@ import androidx.core.widget.NestedScrollView
 
 object BrandDesignUpdateOnboardingLayoutHelper {
 
-    /**
-     * Returns whether there is enough vertical space within [rootView] to display both
-     * the [dialogView] and the [decorationView] without overlap.
-     *
-     * With edge-to-edge enabled, the root view spans the full screen including system
-     * bar areas. Both the dialog margins (from parent top) and the decoration margins
-     * (from parent bottom) are defined relative to the parent edges, so the check
-     * compares against [rootView.height] directly — no inset subtraction is needed.
-     *
-     * @param rootView the root view used to determine available height
-     * @param dialogView the dialog whose measured height is checked
-     * @param decorationView the optional decoration (e.g. walking Dax animation)
-     */
+    fun computeDecorationHeight(
+        availableContentHeight: Int,
+        dialogSpace: Int,
+        decorationBottomMargin: Int,
+        maxHeightPx: Int,
+        minHeightPx: Int,
+        bottomOverlapPx: Int = 0,
+    ): Int? = OnboardingDecorationSizing.fitHeight(
+        availablePx = availableContentHeight - dialogSpace - decorationBottomMargin + bottomOverlapPx,
+        minHeightPx = minHeightPx,
+        maxHeightPx = maxHeightPx,
+    )
+
+    fun calculateDecorationHeight(
+        rootView: View,
+        dialogView: View,
+        decorationView: View,
+        maxHeightPx: Int,
+        minHeightPx: Int,
+        bottomOverlapPx: Int = 0,
+    ): Int? {
+        if (rootView.height == 0) return null
+        if (isInScrollableContainer(dialogView, rootView)) return maxHeightPx
+
+        val dialogWidthSpec = if (dialogView.width > 0) {
+            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
+        } else {
+            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        }
+        val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        dialogView.measure(dialogWidthSpec, dialogHeightSpec)
+
+        val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
+        val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
+
+        val decorationParams = decorationView.layoutParams as ViewGroup.MarginLayoutParams
+        val availableContentHeight = rootView.height - rootView.paddingTop - rootView.paddingBottom
+
+        return computeDecorationHeight(
+            availableContentHeight = availableContentHeight,
+            dialogSpace = dialogSpace,
+            decorationBottomMargin = decorationParams.bottomMargin,
+            maxHeightPx = maxHeightPx,
+            minHeightPx = minHeightPx,
+            bottomOverlapPx = bottomOverlapPx,
+        )
+    }
+
+    // TODO: remove when onboardingImprovementsV2 flag is removed
     fun hasSpaceForAnimation(
         rootView: View,
         dialogView: View,
@@ -44,8 +80,6 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         if (rootView.height == 0) return false
         if (isInScrollableContainer(dialogView, rootView)) return true
 
-        // Measure at the dialog's actual width when available; AT_MOST can let inner
-        // ConstraintLayouts collapse and reflow text tall, inflating measuredHeight.
         val dialogWidthSpec = if (dialogView.width > 0) {
             View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
         } else {
@@ -63,18 +97,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         return rootView.height >= dialogSpace + decorationSpace
     }
 
-    /**
-     * Calculates the height to use for the walking Dax animation based on available space.
-     *
-     * Returns the height in pixels to apply (clamped between [minHeightPx] and [maxHeightPx]),
-     * or null if Dax should be hidden because there is not enough room even at the minimum height.
-     *
-     * @param rootView the root view used to determine available height
-     * @param dialogView the dialog whose measured height is checked
-     * @param daxView the walking Dax animation view
-     * @param maxHeightPx the maximum allowed height for Dax in pixels
-     * @param minHeightPx the minimum required height for Dax in pixels; below this Dax is hidden
-     */
+    // TODO: remove when onboardingImprovementsV2 flag is removed
     fun calculateWalkingDaxHeight(
         rootView: View,
         dialogView: View,
@@ -105,7 +128,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         }
     }
 
-    private fun isInScrollableContainer(view: View, stopAt: View): Boolean {
+    fun isInScrollableContainer(view: View, stopAt: View): Boolean {
         var parent = view.parent
         while (parent != null && parent != stopAt) {
             if (parent is ScrollView || parent is NestedScrollView) return true

@@ -690,21 +690,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stiahnuté</string>
-    <string name="downloadsActivityTitle">Stiahnuté</string>
-    <string name="downloadsActivityNoItemsDescription">Zatiaľ žiadne stiahnuté súbory</string>
-    <string name="downloadsShareTitle">Zdieľať s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvorené</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Súbor už neexistuje</string>
-    <string name="downloadsItemMenuShare">Zdieľať</string>
-    <string name="downloadsItemMenuDelete">Vymazať</string>
-    <string name="downloadsItemMenuCancel">Zrušiť</string>
-    <string name="downloadsActivityMenuDeleteAll">Odstrániť všetko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Zmazané: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Všetky súbory sa odstránili</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Viac možností pre %1$s</string>
-    <string name="downloadsUndoActionName">Vrátenie späť</string>
-    <string name="downloadsStateInProgress">Prebieha…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
@@ -726,8 +712,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
-    <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
 
     <!-- Windows Settings -->
 
@@ -880,7 +864,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Používaj ChatGPT súkromne s integrovaným Duck.ai.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj cielené reklamy a vyskakovacie okná o súboroch cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Prehrávaj videá z YouTube bez reklám</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
@@ -943,7 +929,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chceš mať jednoduchý prístup k súkromnému AI chatu v adresnom riadku?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
 
@@ -1069,7 +1055,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
     <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
 
@@ -1132,4 +1118,5 @@
     <string name="fireTabsNewTabButton">Nová karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyskúšaj karty Fire na prehliadanie bez ukladania do lokálnej histórie.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Chceš vymazať karty Fire a ich údaje?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
 </resources>

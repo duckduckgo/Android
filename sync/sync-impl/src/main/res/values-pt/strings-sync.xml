@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Encontra o código QR na aplicação DuckDuckGo no teu outro dispositivo, indo a Definições › Sync &amp; Backup › Sincronizar com outro dispositivo.</string>
     <string name="sync_chat_bottom_sheet_positive">Ler código QR</string>
     <string name="sync_chat_bottom_sheet_negative">Agora não</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sincronizar os teus dados?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sincronizar agora</string>
+    <string name="sync_v2_joiner_confirmation_negative">Cancelar</string>
+
+    <string name="sync_v2_host_confirmation_title">Sincronizar os teus dados?</string>
+    <string name="sync_v2_host_confirmation_positive">Sincronizar agora</string>
+    <string name="sync_v2_host_confirmation_negative">Cancelar</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" poderá aceder às tuas palavras-passe sincronizadas do DuckDuckGo, aos dados de preenchimento automático e aos chats do Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" poderá aceder aos teus chats sincronizados no Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">O outro dispositivo poderá aceder às tuas palavras-passe sincronizadas do DuckDuckGo, aos dados de preenchimento automático e aos chats do Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">O outro dispositivo poderá aceder aos teus chats sincronizados no Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">A sincronização falhou.</string>
+    <string name="sync_v2_error_pairing_rejected">A sincronização foi cancelada no teu outro dispositivo.</string>
+    <string name="sync_v2_error_pairing_canceled">Sincronização cancelada.</string>
+    <string name="sync_v2_error_upgrade_required">Atualiza o navegador DuckDuckGo e tenta novamente.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sincroniza este dispositivo a partir de um navegador DuckDuckGo já ligado noutro dispositivo</string>
+    <string name="sync_v2_error_try_again">Tenta novamente.</string>
+    <string name="sync_v2_error_got_it">Entendido</string>
+    <string name="sync_v2_already_paired_title">Já está sincronizado.</string>
+    <string name="sync_v2_already_paired_message">Estes dispositivos já estão ligados ao Sync &amp; Backup.</string>
+
 </resources>

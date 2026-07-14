@@ -120,7 +120,6 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Inset the scrolling content directly (the ViewSwitcher's "available" child), not the ViewSwitcher container.
         edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.autofillAvailable.root)
     }
 

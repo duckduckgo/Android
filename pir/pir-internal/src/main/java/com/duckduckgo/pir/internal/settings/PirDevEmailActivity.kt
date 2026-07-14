@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -59,6 +60,9 @@ class PirDevEmailActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityPirInternalEmailBinding by viewBinding()
 
     private lateinit var spinnerAdapter: ArrayAdapter<String>
@@ -67,10 +71,18 @@ class PirDevEmailActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         setupViews()
         loadEmailJobs()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.viewEmailResults, drawBehindGestureNav = false)
     }
 
     private fun setupViews() {

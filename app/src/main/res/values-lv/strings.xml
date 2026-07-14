@@ -685,21 +685,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
-    <string name="downloadsActivityTitle">Lejupielādes</string>
-    <string name="downloadsActivityNoItemsDescription">Vēl nav lejupielādēts neviens fails</string>
-    <string name="downloadsShareTitle">Kopīgot ar…</string>
     <string name="downloadsDownloadFinishedActionName">Atvērt</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Fails vairs nepastāv</string>
-    <string name="downloadsItemMenuShare">Kopīgot</string>
-    <string name="downloadsItemMenuDelete">Dzēst</string>
-    <string name="downloadsItemMenuCancel">Atcelt</string>
-    <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izdzēsts %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Citas iespējas %1$s</string>
-    <string name="downloadsUndoActionName">Atsaukt</string>
-    <string name="downloadsStateInProgress">Notiek...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
@@ -721,8 +707,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
-    <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
 
@@ -862,7 +846,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Izmanto ChatGPT privāti ar iebūvēto Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloķē mērķētās reklāmas un sīkfailu uznirstošos logus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Atskaņo YouTube videoklipus bez reklāmām</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
@@ -923,7 +909,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vai vēlies ērti piekļūt privātai mākslīgā intelekta tērzēšanai adreses joslā?</string>
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
@@ -1049,7 +1035,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
     <string name="preOnboardingWelcomeDialogBody1">Vai esi gatavs ātrākai pārlūkprogrammai, kas tev sniedz kontroli?</string>
     <string name="preOnboardingWelcomeDialogBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr darbojas.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d no %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
 
@@ -1112,4 +1098,5 @@
     <string name="fireTabsNewTabButton">Jauna Fire cilne</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>JAUNUMS!</b> Izmēģini Fire Tabs, lai pārlūkotu, nesaglabājot vietējo vēsturi.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

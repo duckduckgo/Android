@@ -115,6 +115,7 @@ class RealPirScanScheduler @Inject constructor(
             Constraints
                 .Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresCharging(true)
                 .build()
 
         val periodicWorkRequest =

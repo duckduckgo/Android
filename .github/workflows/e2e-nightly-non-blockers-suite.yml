@@ -29,9 +29,7 @@ jobs:
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          # Disable the 50/50 onboardingQuickSetupExperimentJun3 A/B experiment so the
-          # preonboarding tests don't randomly fail when enrolled in the TREATMENT cohort
-          gradle_flags: '-Pconfig_patches=.maestro/onboarding/remote_config_patches/disable_onboarding_quick_setup_experiment.json,.maestro/duckplayer/patches/ad_blocking_enabled_patch.json'
+          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -69,6 +67,25 @@ jobs:
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Release Binary Upload
+
+      - name: Autofill Web Flows
+        id: maestro-autofill-web
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: autofill_secondary_functionality_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 34
+          maestro_include_tags: autofillBackfillingUsername,autofillPasswordGeneration
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Autofill Web Flows
 
       - name: Run Duck Player Maestro Tests
         id: maestro-cloud-asana
@@ -108,8 +125,8 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Android Design System (Nightly)
 
-      - name: Internal Onboarding Flows
-        id: maestro-onboarding-internal
+      - name: SERP Flows
+        id: maestro-serp-flows
         # Run regardless of earlier suite failures, but only if the internal binary uploaded.
         if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
@@ -117,15 +134,15 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: onboarding-internal_${{ github.sha }}
+          maestro_test_name: serp_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_include_tags: onboardingInternalTest
-          maestro_api_level: 36
+          maestro_api_level: 34
+          maestro_include_tags: serpFlows
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Onboarding Internal (Nightly)
+          test_suite_name: SERP Flows
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}

@@ -85,10 +85,12 @@ class RealNativeInputManagerTest {
 
     private lateinit var testee: RealNativeInputManager
 
+    private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
+
     @Before
     fun setUp() {
-        whenever(duckChatInputModeState.inputModeCapability)
-            .thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI))
+        whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
+        whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -129,6 +131,18 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenInputModeBecomesSearchOnlyWhileWidgetShownThenWidgetRemoved() {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+    }
+
+    @Test
     fun whenNativeChatInputFlipsOffInDuckAiModeThenWidgetRemoved() {
         val nativeChatInputEnabled = MutableStateFlow(true)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
@@ -140,6 +154,20 @@ class RealNativeInputManagerTest {
         nativeChatInputEnabled.value = false
 
         assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+    }
+
+    @Test
+    fun whenWidgetRemovedThenNavBarAlsoRemoved() {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeWidgetNavLayout })
+
+        showNativeInput()
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout))
     }
 
     private fun showNativeInput() {

@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
@@ -54,13 +55,18 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirSchedulingRepository: PirSchedulingRepository
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityPirInternalWebviewBinding by viewBinding()
     private val params: PirDevWebViewScreenParams?
         get() = intent.getActivityParams(PirDevWebViewScreenParams::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
 
         when (val screenParams = params) {
             is PirDevWebViewScreenParams.PirDevEmailWebViewScreenParams -> runDebugEmail(screenParams)
@@ -120,6 +126,11 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
                 finish()
             }
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.pirDevWebView, drawBehindGestureNav = true)
     }
 }
 

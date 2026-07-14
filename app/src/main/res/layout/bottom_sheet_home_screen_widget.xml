@@ -27,6 +27,7 @@
     and the rest is added to the layout below.-->
 
     <LinearLayout
+        android:id="@+id/dialogRootView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"

@@ -23,6 +23,7 @@ import com.duckduckgo.app.anr.internal.databinding.ActivityCrashAnrInternalSetti
 import com.duckduckgo.app.anr.internal.feature.CrashANRsInternalScreens.InternalCrashSettings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -35,14 +36,25 @@ class CrashANRsInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settings: PluginPoint<CrashANRsSettingPlugin>
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityCrashAnrInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
 
         setupUiElementState()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun setupUiElementState() {

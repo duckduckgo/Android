@@ -1429,5 +1429,26 @@
             { "key": "hide_ai_images", "type": "string", "description": "Whether AI-generated images are hidden", "enum": ["on", "off"] },
             { "key": "no_ai", "type": "boolean", "description": "Derived: duck_ai=false AND search_assist=0 AND hide_ai_images=on" }
         ]
+    },
+    "m_aichat_recent_chat_delete_button_tapped": {
+        "description": "Fired when user taps the delete (fire) icon on a recent chat row in the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_delete_confirmed": {
+        "description": "Fired when user confirms deletion of a recent chat from the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_delete_cancelled": {
+        "description": "Fired when user cancels deletion of a recent chat from the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

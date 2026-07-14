@@ -15,6 +15,4 @@
   -->
 
 <resources>
-    <string name="ad_blocking_settings_title_v2">Ad Blocking</string>
-    <string name="ad_blocking_settings_header_description">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking</string>
 </resources>
