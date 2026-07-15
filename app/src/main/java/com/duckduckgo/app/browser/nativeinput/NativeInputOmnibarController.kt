@@ -258,6 +258,7 @@ class RealNativeInputOmnibarController(
         } else {
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.show()
         }
+        rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.show()
         omnibar.isScrollingEnabled = true
     }
 

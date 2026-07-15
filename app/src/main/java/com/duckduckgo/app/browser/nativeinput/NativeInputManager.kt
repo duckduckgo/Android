@@ -200,6 +200,10 @@ class RealNativeInputManager @Inject constructor(
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
 
+    // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
+    // on detach rather than re-showing unconditionally (which would show it with no favorites present).
+    private var savedTopNtpStrokeVisibility: Int? = null
+
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
 
@@ -690,6 +694,10 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        savedTopNtpStrokeVisibility?.let { vis ->
+            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.visibility = vis
+            savedTopNtpStrokeVisibility = null
+        }
         duckAiToolbarHidden = false
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
@@ -978,6 +986,13 @@ class RealNativeInputManager @Inject constructor(
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
+            // The top outline strokes separate a top omnibar from content; with the input's nav bar at
+            // the top they just draw a hairline under the bar. Hide them, restored on close.
+            rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.gone()
+            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
+                if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
+                it.gone()
+            }
             if (omnibarController.isBrowserMode()) {
                 widgetView.setBackgroundColor(
                     widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
