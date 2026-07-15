@@ -91,8 +91,11 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
         val url = this.url ?: return
         menuItem.setOnClickListener {
             when (menuState) {
-                AdBlockingMenuState.Disabled -> menuController.enable()
-                else -> showMenuBottomSheet()
+                AdBlockingMenuState.Disabled -> menuController.onEnableTapped()
+                else -> {
+                    menuController.onDisableTapped()
+                    showMenuBottomSheet()
+                }
             }
             onHostClick?.invoke()
         }

@@ -16,6 +16,9 @@
 
 package com.duckduckgo.adblocking.impl.menu
 
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_BREAKAGE_REPORT_ENTERED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_BREAKAGE_REPORT_ENTERED_DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -33,8 +36,9 @@ interface BrokenSiteReportRequester {
 @ContributesBinding(AppScope::class, boundType = BrokenSiteReportRequester::class)
 @ContributesMultibinding(AppScope::class, boundType = BrokenSiteReportTriggerPlugin::class)
 @SingleInstanceIn(AppScope::class)
-class AdBlockingBrokenSiteReportTrigger @Inject constructor() :
-    BrokenSiteReportTriggerPlugin,
+class AdBlockingBrokenSiteReportTrigger @Inject constructor(
+    private val pixel: Pixel,
+) : BrokenSiteReportTriggerPlugin,
     BrokenSiteReportRequester {
 
     private val reportRequests = MutableSharedFlow<BrokenSiteData.ReportFlow>(extraBufferCapacity = 1)
@@ -42,6 +46,8 @@ class AdBlockingBrokenSiteReportTrigger @Inject constructor() :
     override fun observeReportRequests(): Flow<BrokenSiteData.ReportFlow> = reportRequests
 
     override fun requestReport() {
+        pixel.fire(AD_BLOCKING_BREAKAGE_REPORT_ENTERED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(AD_BLOCKING_BREAKAGE_REPORT_ENTERED_COUNT)
         reportRequests.tryEmit(BrokenSiteData.ReportFlow.AD_BLOCKING)
     }
 }
