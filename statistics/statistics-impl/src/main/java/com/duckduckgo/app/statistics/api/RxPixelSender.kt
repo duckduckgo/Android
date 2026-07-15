@@ -201,11 +201,13 @@ class RxPixelSender @Inject constructor(
 
     private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(statisticsDataStore.variant) ?: ""
 
+    private val pixelsRequiringAtb: Set<String> by lazy {
+        pixelRequiringAtbPlugins.getPlugins().flatMap { it.names() }.toSet()
+    }
+
     private fun shouldSendAtb(pixelName: String): Boolean {
         if (!pixelSenderFeature.get().self().isEnabled()) return true
-        return pixelRequiringAtbPlugins.getPlugins().any { plugin ->
-            plugin.names().any { pixelName.startsWith(it) }
-        }
+        return pixelsRequiringAtb.any { pixelName.startsWith(it) }
     }
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
