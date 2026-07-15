@@ -4,20 +4,41 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ts",
+                "type": "string",
+                "description": "Eastern Time (America/New_York) timestamp of when the event occurred, in yyyy-MM-dd'T'HH:mm:ss format. Added automatically to enqueued pixels."
+            }
+        ]
     },
     "m_netp_ev_vpn_access_revoked_dialog_subscribe_clicked": {
         "description": "Fired when the user taps the 'Subscribe' button on the VPN access revoked dialog",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ts",
+                "type": "string",
+                "description": "Eastern Time (America/New_York) timestamp of when the event occurred, in yyyy-MM-dd'T'HH:mm:ss format. Added automatically to enqueued pixels."
+            }
+        ]
     },
     "m_netp_ev_vpn_access_revoked_dialog_dismiss_clicked": {
         "description": "Fired when the user taps the 'Dismiss' button on the VPN access revoked dialog",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ts",
+                "type": "string",
+                "description": "Eastern Time (America/New_York) timestamp of when the event occurred, in yyyy-MM-dd'T'HH:mm:ss format. Added automatically to enqueued pixels."
+            }
+        ]
     }
 }
