@@ -63,8 +63,6 @@ class RxPixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
-    // Lazy breaks a Dagger dependency cycle: the remote-feature proxy depends on VariantManager,
-    // which transitively depends on this PixelSender.
     private val pixelSenderFeature: Lazy<PixelSenderFeature>,
     private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
 ) : PixelSender, MainProcessLifecycleObserver {

@@ -23,6 +23,5 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin {
-    // m_anr* covers ANR pixels (e.g. m_anr_exception); m_d_ac* covers crash pixels (e.g. m_d_ac_g).
     override fun names(): List<String> = listOf("m_anr", "m_d_ac")
 }
