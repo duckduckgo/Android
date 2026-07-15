@@ -92,15 +92,24 @@ class SyncActivity : DuckDuckGoActivity() {
         )
 
         binding.includeDisabledView.root.isGone = viewState.showAccount
-        binding.includeDisabledView.synOnOtherPlatformsItem.setState(
+        binding.includeDisabledView.syncOnOtherPlatformsItem.setState(
             isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
         )
 
         binding.includeEnabledView.root.isVisible = viewState.showAccount
-        binding.includeEnabledView.synOnOtherPlatformsItem.setState(
+        syncedDeviceAdapter.submitList(viewState.syncedDevices)
+
+        binding.includeEnabledView.syncOnOtherPlatformsItem.setState(
             isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
         )
-        syncedDeviceAdapter.submitList(viewState.syncedDevices)
+
+        binding.includeEnabledView.restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
+        if (viewState.showAutoRestoreToggle) {
+            binding.includeEnabledView.restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, changeListener = null)
+            binding.includeEnabledView.restoreOnReinstallItem.setLeadingIconResource(
+                if (viewState.autoRestoreEnabled) R.drawable.device_default_24 else R.drawable.device_soft_alert_24,
+            )
+        }
     }
 
     private fun configureEdgeToEdgeInsets() {
