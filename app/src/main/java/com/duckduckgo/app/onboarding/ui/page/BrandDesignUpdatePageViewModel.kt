@@ -130,8 +130,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private var notificationPermissionGranted: Boolean? = null
 
-    // Set when the add-widget system prompt has been launched from the add_widget step. The next
-    // onResume re-checks hasInstalledWidgets, fires the confirmed pixel (in the step), and advances.
     private var addWidgetPromptFlowStarted = false
 
     init {

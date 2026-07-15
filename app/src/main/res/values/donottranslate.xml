@@ -98,8 +98,8 @@
     <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
 
     <!-- Widget prompt (onboarding) -->
-    <string name="preOnboardingWidgetPromptTitle">Try our Home screen widget!</string>
-    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home screen for quick and easy access.</string>
+    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget!</string>
+    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
 </resources>
