@@ -139,7 +139,14 @@ class RmfConfigSourceSettingView @JvmOverloads constructor(
 
     private fun downloadNow() {
         binding.downloadNowButton.isEnabled = false
+        val mode = this.mode
+        val prNumber = this.prNumber
+        val customUrl = this.customUrl
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            // Flush the current selection to the store first, so the resolver reads it during this download.
+            rmfConfigSourceStore.mode = mode
+            rmfConfigSourceStore.prNumber = prNumber
+            rmfConfigSourceStore.customUrl = customUrl
             val success = remoteMessagingConfigDownloader.download()
             withContext(dispatcherProvider.main()) {
                 binding.downloadNowButton.isEnabled = true
