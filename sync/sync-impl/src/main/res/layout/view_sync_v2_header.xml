@@ -37,7 +37,7 @@
         android:layout_marginTop="@dimen/keyline_4"
         android:gravity="center_horizontal"
         app:typography="h2"
-        tools:text="@string/sync_v2_header_headline_disabled" />
+        tools:text="@string/sync_settings_v2_header_headline_disabled" />
 
     <com.duckduckgo.common.ui.view.StatusIndicatorView
         android:id="@+id/statusIndicator"
@@ -55,5 +55,5 @@
         android:gravity="center_horizontal"
         app:textType="secondary"
         app:typography="body2"
-        tools:text="@string/sync_v2_header_body_disabled" />
+        tools:text="@string/sync_settings_v2_header_body_disabled" />
 </merge>

@@ -39,14 +39,16 @@ internal class SyncHeaderView @JvmOverloads constructor(
         isDuckAiAvailable: Boolean,
     ) {
         binding.image.setImageResource(if (isSyncEnabled) R.drawable.ic_sync_enabled_header else R.drawable.ic_sync_disabled_header)
-        binding.headlineText.setText(if (isSyncEnabled) R.string.sync_v2_header_headline_enabled else R.string.sync_v2_header_headline_disabled)
+        binding.headlineText.setText(
+            if (isSyncEnabled) R.string.sync_settings_v2_header_headline_enabled else R.string.sync_settings_v2_header_headline_disabled,
+        )
         binding.statusIndicator.setStatus(isOn = isSyncEnabled)
         binding.bodyText.setText(
             when {
-                isSyncEnabled && isDuckAiAvailable -> R.string.sync_v2_header_body_enabled_with_duck_ai
-                isSyncEnabled && !isDuckAiAvailable -> R.string.sync_v2_header_body_enabled
-                !isSyncEnabled && isDuckAiAvailable -> R.string.sync_v2_header_body_disabled_with_duck_ai
-                else -> R.string.sync_v2_header_body_disabled
+                isSyncEnabled && isDuckAiAvailable -> R.string.sync_settings_v2_header_body_enabled_with_duck_ai
+                isSyncEnabled && !isDuckAiAvailable -> R.string.sync_settings_v2_header_body_enabled
+                !isSyncEnabled && isDuckAiAvailable -> R.string.sync_settings_v2_header_body_disabled_with_duck_ai
+                else -> R.string.sync_settings_v2_header_body_disabled
             },
         )
     }
