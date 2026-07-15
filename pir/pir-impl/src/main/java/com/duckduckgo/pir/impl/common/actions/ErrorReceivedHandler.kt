@@ -16,16 +16,22 @@
 
 package com.duckduckgo.pir.impl.common.actions
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.Broker
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -36,6 +42,7 @@ import kotlin.reflect.KClass
 )
 class ErrorReceivedHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : EventHandler {
     override val event: KClass<out Event> = ErrorReceived::class
 
@@ -69,11 +76,46 @@ class ErrorReceivedHandler @Inject constructor(
             return Next(nextState = state)
         }
 
+        // A condition action reports a JS error when its expectation is not met. That is expected rather than
+        // fatal: treat it as "condition not met" and skip to the next action instead of failing the whole
+        // broker step. Mirrors SubJobWebRunner.onError on Apple.
+        val currentAction = state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions[state.currentActionIndex]
+        if (currentAction is BrokerAction.Condition) {
+            return handleConditionNotMet(state)
+        }
+
         return Next(
             nextState = state,
             nextEvent = BrokerActionFailed(
                 error = (event as ErrorReceived).error,
                 allowRetry = false,
+            ),
+        )
+    }
+
+    private suspend fun handleConditionNotMet(state: State): Next {
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        if (currentBrokerStep is OptOutStep) {
+            pirRunStateHandler.handleState(
+                BrokerOptOutConditionNotFound(
+                    broker = currentBrokerStep.broker,
+                    actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                    attemptId = state.attemptId,
+                    durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                    currentActionAttemptCount = state.actionRetryCount + 1,
+                ),
+            )
+        }
+
+        return Next(
+            nextState = state.copy(
+                currentActionIndex = state.currentActionIndex + 1,
+                actionRetryCount = 0,
+            ),
+            nextEvent = ExecuteBrokerStepAction(
+                UserProfile(
+                    userProfile = state.profileQuery,
+                ),
             ),
         )
     }
