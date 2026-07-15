@@ -43,6 +43,8 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.AdBlockingAnimation
+import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -644,6 +646,9 @@ class BrowserTabViewModelTest {
     private val mockBrowserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin> = mock {
         on { getPlugins() } doReturn listOf(browserRefreshTriggerPlugin)
     }
+    private val mockAdBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider = mock {
+        onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+    }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -1053,6 +1058,7 @@ class BrowserTabViewModelTest {
                 browserMode = browserMode,
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
+                adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
             )
 
         testee.loadData("abc", null, false, false)
@@ -9942,6 +9948,189 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSpaNavigationAndOmnibarNotFocusedThenAdBlockingBadgeShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle() // let the launched decision coroutine run
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenAdBlockingAnimationSuppressedThenClaimReleasedAndTrackersCanAnimate() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        // Ad-blocking claims exclusivity for the page...
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle() // let the launched decision coroutine run
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+
+        // ...but if the omnibar reports the badge was suppressed (focused), the claim is released.
+        testee.onAdBlockingAnimationSuppressed()
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenSameVideoRepeatEventReturnsRetainThenClaimKeptAndTrackersStaySuppressed() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Retain
+        }
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenSpaNavigationsFireRapidlyThenBadgeStillShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=a")
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=b")
+        advanceTimeBy(1L)
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenNavigatingAwayBeforeDeferredBadgeShownThenStaleBadgeNotShownOnNewPage() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val nonVideo = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video)
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // Navigate to a non-video page (NewPage); its load completing must not flush the stale video badge.
+        testee.navigationStateChanged(buildWebNavigation(currentUrl = nonVideo, originalUrl = nonVideo))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndSameVideoRepeatEventThenBadgeStillShownAndTrackersSuppressed() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // YouTube fires a repeat same-video url event during the same load (returns Retain); it must not
+        // drop the deferred badge.
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Retain
+        }
+        testee.onHistoryUrlChanged(video)
+        advanceUntilIdle()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+
+        // Claim is held for the shown badge, so trackers stay suppressed.
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndNewNonVideoPageThenBadgeNotShownAndTrackersCanAnimate() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val nonVideo = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // A new (non-video) page load supersedes the deferred badge; its completion must not flush it.
+        loadUrl(nonVideo)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // The new page returned Skip, so the claim is released and trackers can animate.
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndSpaNavigationAwayThenBadgeNotShownAndClaimReleased() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val search = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // SPA away to a non-video url (returns Skip): the deferred badge is dropped and the claim released.
+        testee.onHistoryUrlChanged(search)
+        advanceUntilIdle()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadInProgressAndOmnibarNotFocusedThenAdBlockingBadgeDeferredUntilProgressReaches100() = runTest {
+        givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadNavigationButNotLoadingThenAdBlockingBadgeShownImmediately() = runTest {
+        givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = false)
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadCompletesBeforePageChangedThenAdBlockingBadgeStillShown() = runTest {
+        givenAdBlockingBadgeWillShow()
+        setBrowserShowing(true)
+
+        // Simulate the race: progress reaches 100 before the (async) pageChanged runs.
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
@@ -10325,6 +10514,12 @@ class BrowserTabViewModelTest {
     )
 
     private fun omnibarViewState() = testee.omnibarViewState.value!!
+
+    private fun givenAdBlockingBadgeWillShow() {
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+    }
 
     private fun loadingViewState() = testee.loadingViewState.value!!
 

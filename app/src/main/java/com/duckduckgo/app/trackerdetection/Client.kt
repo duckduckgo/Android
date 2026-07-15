@@ -41,7 +41,11 @@ interface Client {
         val categories: List<String>? = null,
         val surrogate: String? = null,
         val isATracker: Boolean,
-    )
+    ) {
+        companion object {
+            val NO_MATCH = Result(matches = false, isATracker = false)
+        }
+    }
 
     val name: ClientName
 

@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Zaščita pred pojavnimi okni piškotkov</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo bo poskusil izbrati najbolj zasebne nastavitve, ki so na voljo, in skriti ta pojavna okna za vas.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="autoconsentToggle">Naj DuckDuckGo poskrbi za pojavna okna piškotkov</string>
+    <string name="autoconsentAutoManageToggle">Samodejno upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentAutoManageDescription">Poskušali bomo izbrati le najbolj zasebne možnosti piškotkov, ki so na voljo za vas, nato pa zapreti ta pojavna okna.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo lahko samodejno upravlja nastavitve piškotkov za povečanje zasebnosti, zmanjšanje števila piškotkov in zapiranje teh pojavnih oken.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pojavna okna brez možnosti zavrnitve</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Prav tako vam DuckDuckGo prihrani klik tako, da namesto vas sprejme piškotke za zapiranje pojavnih oken, ki vam ne omogočajo zavrnitve.</string>
 </resources>

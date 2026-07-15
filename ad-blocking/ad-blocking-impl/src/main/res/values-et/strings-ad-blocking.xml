@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Saada rikketeade</string>
     <string name="ad_blocking_disabled_secondary_action">Tühista</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Inaktiveeritud kuni taaskäivitamiseni</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube’i reklaamiblokeerija on sees</string>
 </resources>

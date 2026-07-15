@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Cookie-Pop-up-Schutz</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo wird versuchen, die privatesten Einstellungen zu wählen und Pop-ups für dich auszublenden.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="autoconsentToggle">Lass Cookie-Pop-ups von DuckDuckGo verwalten</string>
+    <string name="autoconsentAutoManageToggle">Cookie-Pop-ups automatisch verwalten</string>
+    <string name="autoconsentAutoManageDescription">Wir werden versuchen, nur die privatesten verfügbaren Cookie-Optionen für dich auszuwählen und diese Pop-ups dann zu schließen.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kann Cookie-Einstellungen automatisch verwalten, um die Privatsphäre zu maximieren, Cookies zu minimieren und diese Pop-ups zu schließen.\n<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pop-ups ohne Abmeldemöglichkeit</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Lass DuckDuckGo dir außerdem einen Klick ersparen, indem Cookies in deinem Namen akzeptiert werden, um Pop-ups zu schließen, bei denen du dich nicht abmelden kannst.</string>
 </resources>

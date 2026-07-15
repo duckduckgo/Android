@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo prøver å velge de mest private innstillingene som er tilgjengelige, og skjule disse popup-vinduene for deg.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="autoconsentToggle">La DuckDuckGo håndtere popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentAutoManageToggle">Administrer popup-vinduer om informasjonskapsler automatisk</string>
+    <string name="autoconsentAutoManageDescription">Vi prøver å velge de mest private alternativene for informasjonskapsler som er tilgjengelige, og så lukker vi disse popup-vinduene.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan administrere innstillinger for informasjonskapsler automatisk for å maksimere personvernet, minimere informasjonskapsler og lukke disse popup-vinduene.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Popup-vinduer uten mulighet til å reservere seg</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Du kan også la DuckDuckGo spare deg for et klikk ved å godta informasjonskapsler på dine vegne, og dermed lukke popup-vinduer som ikke gir deg muligheten til å reservere deg.</string>
 </resources>

@@ -37,7 +37,6 @@ import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
@@ -105,7 +104,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val resourceSurrogates = ResourceSurrogatesImpl()
 
     private var webView: WebView = mock()
-    private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockRequestBlocklist: RequestBlocklist = mock()
@@ -241,7 +239,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         val trackerDetectorImpl = TrackerDetectorImpl(
             entityLookup,
-            mockUserAllowListDao,
+            mockUserAllowListRepository,
             mockContentBlocking,
             mockTrackerAllowlist,
             mockAdClickManager,
