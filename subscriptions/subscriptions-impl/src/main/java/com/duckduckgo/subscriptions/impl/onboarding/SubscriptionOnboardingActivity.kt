@@ -31,8 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
@@ -44,15 +43,18 @@ import javax.inject.Inject
 /**
  * Hosts the native subscription onboarding flow. It observes the orchestrator-driven state exposed by
  * [SubscriptionOnboardingViewModel] and swaps the current step's Fragment (supplied by the step's
- * [SubscriptionOnboardingStepPlugin], which may live in another module) into the container. Step
- * Fragments report back through [SubscriptionOnboardingStepHost].
+ * [SubscriptionOnboardingStepPlugin], which may live in another module) into the container. Steps report
+ * back through [SubscriptionOnboardingController].
  */
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingScreenWithEmptyParams::class, screenName = "subscriptions.onboarding")
-class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboardingStepHost {
+class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var controller: SubscriptionOnboardingController
 
     private val viewModel: SubscriptionOnboardingViewModel by bindViewModel()
     private val binding: ActivitySubscriptionOnboardingBinding by viewBinding()
@@ -62,12 +64,12 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        // Route the system back gesture (and the toolbar up arrow, via onOptionsItemSelected) through the ViewModel.
+        // System back and the toolbar up arrow both go through the controller.
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    viewModel.onBack()
+                    controller.onBack()
                 }
             },
         )
@@ -86,14 +88,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
-        viewModel.onStepFinished(stepId, outcome)
-    }
-
-    override fun exitOnboarding() {
-        viewModel.onExit()
     }
 
     private fun processCommand(command: Command) {

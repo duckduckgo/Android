@@ -20,8 +20,8 @@ import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 
 /**
- * Events fed into the subscription onboarding orchestrator. A step's Fragment reports completion through
- * [com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost]; the host translates that into
+ * Events fed into the subscription onboarding orchestrator. Steps report through
+ * [com.duckduckgo.subscriptions.api.SubscriptionOnboardingController]; the host ViewModel translates those into
  * [StepFinished] for the current step, which advances the plan. The toolbar / system back becomes [BackPressed].
  */
 sealed interface SubscriptionOnboardingEvent : LinearOnboardingEvent {

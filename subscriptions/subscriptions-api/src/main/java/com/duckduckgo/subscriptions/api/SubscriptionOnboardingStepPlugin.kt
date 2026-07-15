@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.api
 
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A single step in the native subscription onboarding flow, contributed from the feature module that owns
@@ -43,19 +44,6 @@ interface SubscriptionOnboardingStepPlugin {
     fun createFragment(): Fragment
 }
 
-/**
- * Implemented by the host activity (`SubscriptionOnboardingActivity`). A step's Fragment obtains it via
- * `requireActivity() as SubscriptionOnboardingStepHost` and calls back to drive the flow, so the Fragment
- * never depends on `subscriptions-impl` or the onboarding framework.
- */
-interface SubscriptionOnboardingStepHost {
-    /** The current step is done: advance to the next one, recording [outcome] for completion tracking. */
-    fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome)
-
-    /** Leave the onboarding entirely (e.g. the Duck.ai step hands off to the chat). */
-    fun exitOnboarding()
-}
-
 /** How a step ended. Only [COMPLETED] is persisted as a completed step. */
 enum class SubscriptionOnboardingStepOutcome {
     COMPLETED,
@@ -63,10 +51,25 @@ enum class SubscriptionOnboardingStepOutcome {
 }
 
 /**
- * Resolves the [SubscriptionOnboardingStepHost] for a step fragment without assuming it is hosted directly by
- * an Activity: prefers a parent fragment, then the hosting context. Errors if neither implements the contract.
+ * Injected into each step so it can talk to its host without knowing what renders it: steps call the methods,
+ * the host observes [events].
  */
-fun Fragment.requireSubscriptionOnboardingStepHost(): SubscriptionOnboardingStepHost =
-    (parentFragment as? SubscriptionOnboardingStepHost)
-        ?: (activity as? SubscriptionOnboardingStepHost)
-        ?: error("Host must implement SubscriptionOnboardingStepHost")
+interface SubscriptionOnboardingController {
+    /** Events for the host to react to. */
+    val events: Flow<Event>
+
+    /** The current step finished with [outcome]. */
+    fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome)
+
+    /** Go back to the previous step. */
+    fun onBack()
+
+    /** Leave onboarding entirely. */
+    fun exitOnboarding()
+
+    sealed interface Event {
+        data class StepFinished(val stepId: String, val outcome: SubscriptionOnboardingStepOutcome) : Event
+        data object Back : Event
+        data object Exit : Event
+    }
+}

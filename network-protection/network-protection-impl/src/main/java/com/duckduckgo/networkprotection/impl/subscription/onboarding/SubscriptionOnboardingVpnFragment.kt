@@ -25,31 +25,31 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
-import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
+import javax.inject.Inject
 
 /**
  * VPN step of the native subscription onboarding: a placeholder screen with a primary button that completes
- * the step and a secondary button that skips it. Reports back through [SubscriptionOnboardingStepHost] so it
+ * the step and a secondary button that skips it. Reports back through [SubscriptionOnboardingController] so it
  * stays decoupled from the host activity and the onboarding framework.
  */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_vpn) {
 
-    private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
+    @Inject
+    lateinit var controller: SubscriptionOnboardingController
 
-    private val stepHost: SubscriptionOnboardingStepHost
-        get() = requireSubscriptionOnboardingStepHost()
+    private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
-            stepHost.onStepFinished(VPN_STEP_ID, COMPLETED)
+            controller.onStepFinished(VPN_STEP_ID, COMPLETED)
         }
         binding.subscriptionOnboardingVpnSkipButton.setOnClickListener {
-            stepHost.onStepFinished(VPN_STEP_ID, SKIPPED)
+            controller.onStepFinished(VPN_STEP_ID, SKIPPED)
         }
     }
 }

@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.forPlan
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
@@ -41,14 +42,15 @@ import javax.inject.Inject
 /**
  * Drives the native subscription onboarding: starts the plugin-built plan on the shared
  * [LinearOnboardingOrchestrator] and translates its state (scoped to [SUBSCRIPTION_ONBOARDING_PLAN_ID]) into
- * [Command]s the activity renders. Step Fragments report back through the host, which calls [onStepFinished]
- * / [onExit].
+ * [Command]s the activity renders. Steps report back through [SubscriptionOnboardingController], whose events
+ * this ViewModel observes and turns into orchestrator events / store writes.
  */
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionOnboardingViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val planProvider: SubscriptionOnboardingPlanProvider,
     private val stepStore: SubscriptionOnboardingStepStore,
+    private val controller: SubscriptionOnboardingController,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -62,7 +64,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 
     private var started = false
 
-    // Mirrors the current step's InProgress.canGoBack, so onBack() knows whether to go back or exit.
+    // Mirrors the current step's InProgress.canGoBack; decides back vs exit on a Back event.
     private var canGoBack = false
 
     fun start() {
@@ -74,6 +76,10 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         orchestrator.state
             .forPlan(SUBSCRIPTION_ONBOARDING_PLAN_ID)
             .onEach { handleState(it) }
+            .launchIn(viewModelScope)
+
+        controller.events
+            .onEach { handleControllerEvent(it) }
             .launchIn(viewModelScope)
     }
 
@@ -91,26 +97,24 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         }
     }
 
-    fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
-        if (outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
-            stepStore.setCompleted(stepId)
-        }
-        viewModelScope.launch { orchestrator.onEvent(StepFinished(stepId, outcome)) }
-    }
-
-    fun onBack() {
-        viewModelScope.launch {
-            if (canGoBack) {
-                orchestrator.onEvent(BackPressed)
-            } else {
-                // First step: exit onboarding. Launched standalone after purchase, so land on app settings.
-                // TODO when a subscription-settings entry point is added, exit should return there instead.
-                _commands.send(Command.FinishToSettings)
+    private suspend fun handleControllerEvent(event: SubscriptionOnboardingController.Event) {
+        when (event) {
+            is SubscriptionOnboardingController.Event.StepFinished -> {
+                if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
+                    stepStore.setCompleted(event.stepId)
+                }
+                orchestrator.onEvent(StepFinished(event.stepId, event.outcome))
             }
+            SubscriptionOnboardingController.Event.Back -> {
+                if (canGoBack) {
+                    orchestrator.onEvent(BackPressed)
+                } else {
+                    // First step: nothing to go back to, so exit to app settings.
+                    // TODO: return to the launch source once a subscription-settings entry point exists.
+                    _commands.send(Command.FinishToSettings)
+                }
+            }
+            SubscriptionOnboardingController.Event.Exit -> _commands.send(Command.Finish)
         }
-    }
-
-    fun onExit() {
-        viewModelScope.launch { _commands.send(Command.Finish) }
     }
 }

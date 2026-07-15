@@ -22,30 +22,30 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
-import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingWelcomeBinding
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
+import javax.inject.Inject
 
 /**
  * Step 1 of the native subscription onboarding: a placeholder welcome screen with a primary button that
- * completes the step. Reports back through [SubscriptionOnboardingStepHost] so it stays decoupled from the
+ * completes the step. Reports back through [SubscriptionOnboardingController] so it stays decoupled from the
  * host activity and the onboarding framework.
  */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_welcome) {
 
-    private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
+    @Inject
+    lateinit var controller: SubscriptionOnboardingController
 
-    private val stepHost: SubscriptionOnboardingStepHost
-        get() = requireSubscriptionOnboardingStepHost()
+    private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingWelcomeContinueButton.setOnClickListener {
-            stepHost.onStepFinished(WELCOME_STEP_ID, COMPLETED)
+            controller.onStepFinished(WELCOME_STEP_ID, COMPLETED)
         }
     }
 }

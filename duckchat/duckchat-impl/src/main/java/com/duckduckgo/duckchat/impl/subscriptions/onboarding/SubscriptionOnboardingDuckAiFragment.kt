@@ -25,27 +25,27 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSubscriptionOnboardingDuckAiBinding
 import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepHost
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
-import com.duckduckgo.subscriptions.api.requireSubscriptionOnboardingStepHost
+import javax.inject.Inject
 
 /**
  * Duck.ai step of the native subscription onboarding: a placeholder screen with a primary button that
  * completes the step. As the last step, completing it finishes the onboarding. Reports back through
- * [SubscriptionOnboardingStepHost] so it stays decoupled from the host activity and the onboarding framework.
+ * [SubscriptionOnboardingController] so it stays decoupled from the host activity and the onboarding framework.
  */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_duck_ai) {
 
-    private val binding: FragmentSubscriptionOnboardingDuckAiBinding by viewBinding()
+    @Inject
+    lateinit var controller: SubscriptionOnboardingController
 
-    private val stepHost: SubscriptionOnboardingStepHost
-        get() = requireSubscriptionOnboardingStepHost()
+    private val binding: FragmentSubscriptionOnboardingDuckAiBinding by viewBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingDuckAiNextButton.setOnClickListener {
-            stepHost.onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
+            controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
         }
     }
 }
