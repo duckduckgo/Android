@@ -650,11 +650,10 @@ class RealNativeInputManager @Inject constructor(
             callbacks.onClearAutocomplete()
             previousOnChatSelected?.invoke(animate)
         }
-        widget.onClearTextTapped = {
-            if (!widget.isChatTabSelected()) {
-                callbacks.onClearAutocomplete()
-            }
-        }
+        // Clearing the field must not dismiss the focused view: onClearAutocomplete re-triggers
+        // autocomplete with hasFocus=false and hides the focused view, so on a browser tab it would
+        // wipe the favourites the empty+focused state should show. The clear's own text change already
+        // re-renders the correct empty state (favourites), so no extra handling is needed here.
     }
 
     private fun showNtp() {
