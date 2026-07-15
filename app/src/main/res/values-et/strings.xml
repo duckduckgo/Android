@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">DuckDuckGo otsing</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Jaga tagasisidet</string>
-    <string name="missingBrowserFeaturesTitleLong">Brauseri funktsioonid puuduvad või on pettumust valmistavad</string>
-    <string name="missingBrowserFeaturesTitleShort">Brauseri funktsioonide probleemid</string>
-    <string name="missingBrowserFeaturesSubtitle">Millist brauseri funktsiooni saame lisada või täiustada?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Edasi, tagasi liikumine ja/või värskendamine</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Vahelehtede loomine ja haldamine</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklaami ja hüpikakende blokeerimine</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Videote vaatamine</string>
-    <string name="missingBrowserFeatureSubReasonImages">Piltidega suhtlemine</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Järjehoidjate loomine ja haldamine</string>
-    <string name="missingBrowserFeatureSubReasonOther">Mitte ükski neist</string>
-
-    <string name="websiteNotLoadingTitleLong">Veebisaidi laadimisega seotud probleemid</string>
-    <string name="websiteNotLoadingTitleShort">Veebisaidi laadimisega seotud probleemid</string>
-    <string name="websiteNotLoadingSubtitle">Milline veebisait on katki?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo otsing pole piisavalt hea</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo otsingu probleemid</string>
-    <string name="searchNotGoodEnoughSubtitle">Millist otsingufunktsiooni saame lisada või täiustada?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmeerimine / tehniline otsing</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Paigutus peaks olema rohkem nagu Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Kiirem laadimisaeg</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Otsimine konkreetses keeles või piirkonnas</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Parem automaatne täitmine</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Mitte ükski neist</string>
-
-    <string name="needMoreCustomizationTitleLong">Rakenduse kohandamiseks pole piisavalt võimalusi</string>
-    <string name="needMoreCustomizationTitleShort">Kohandamise probleemid</string>
-    <string name="needMoreCustomizationSubtitle">Millist kohandamise valikut saame lisada või täiustada?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Avaekraani konfiguratsioon</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Kuidas vahekaarte kuvatakse</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Kuidas rakendus välja näeb</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Millised andmed kustutatakse</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Andmete kustutamise aeg</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kuidas järjehoidjaid kuvatakse</string>
-    <string name="needMoreCustomizationSubReasonOther">Mitte ükski neist</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Rakendus on aeglane, vigane või jookseb kokku</string>
-    <string name="appIsSlowOrBuggyTitleShort">Toimivusega seotud probleemid</string>
-    <string name="appIsSlowOrBuggySubtitle">Milline probleem teil on?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Veebilehed või otsingutulemid laaditakse aeglaselt</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Rakendus jookseb kokku või külmub</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video või meedia taasesituse vead</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Mitte ükski neist</string>
-
-    <string name="otherMainReasonTitleLong">Mitte ükski neist</string>
-    <string name="otherMainReasonTitleShort">Teised probleemid</string>
-
-    <string name="openEndedInputHint">Palun ole võimalikult konkreetne</string>
-    <string name="submitFeedback">Esita</string>
-
-    <string name="tellUsHowToImprove">Palun öelge meile, mida saaksime täiustada.</string>
-    <string name="thanksForTheFeedback">Aitäh tagasiside eest!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Mis on teie pettumusega kõige rohkem seotud?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Meil on kahju seda kuulda</string>
-    <string name="feedbackShareDetails">Jaga üksikasju</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Kas on mingeid üksikasju, mida soovite meeskonnaga jagada?</string>
-    <string name="whatHaveYouBeenEnjoying">Mida olete nautinud?</string>
-    <string name="awesomeToHear">Vinge kuulda!</string>
-    <string name="shareTheLoveWithARating">Jagage armastust Play Store\'i hinnanguga.</string>
-    <string name="rateTheApp">Hinda rakendust</string>
-    <string name="declineFurtherFeedback">Ei, aitäh. Olen valmis</string>
-    <string name="whichBrokenSites">Kus te neid probleeme näete?</string>
-    <string name="whichBrokenSitesHint">Millisel veebisaidil on probleeme?</string>
-    <string name="feedbackSpecificAsPossible">Palun olge võimalikult konkreetne</string>
-    <string name="feedbackInitialDisambiguationTitle">Alustame!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Kuidas liigitate oma tagasiside?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positiivse tagasiside nupp</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatiivse tagasiside nupp</string>
-    <string name="feedbackIsImportantToUs">Teie anonüümne tagasiside on meile oluline.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Veebilehte ei saanud kuvada."</string>
     <string name="crashedWebViewErrorAction">"Laadige uuesti"</string>
@@ -1061,6 +989,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Kinnita</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Aitäh tagasiside eest!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Ava Fire vahekaardil</string>

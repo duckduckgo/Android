@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Zoek in DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Feedback delen</string>
-    <string name="missingBrowserFeaturesTitleLong">Browserfuncties ontbreken of zijn frustrerend</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemen met browserfuncties</string>
-    <string name="missingBrowserFeaturesSubtitle">Welke browserfunctie kunnen we toevoegen of verbeteren?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Vooruit en achteruit navigeren en/of opnieuw laden</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tabbladen maken en beheren</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Advertentie- en pop-upblokkering</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Video\'s bekijken</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interactie met afbeeldingen</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Bladwijzers maken en beheren</string>
-    <string name="missingBrowserFeatureSubReasonOther">Geen van deze</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemen met laden van website</string>
-    <string name="websiteNotLoadingTitleShort">Problemen met laden van website</string>
-    <string name="websiteNotLoadingSubtitle">Welke website is defect?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-zoekfunctie is niet goed genoeg</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-zoekproblemen</string>
-    <string name="searchNotGoodEnoughSubtitle">Welke zoekfunctie kunnen we toevoegen of verbeteren?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmeren/technisch zoeken</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">De lay-out zou meer op Google moeten lijken</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Snellere laadtijd</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Zoeken in een specifieke taal of regio</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Betere automatische aanvulling</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Geen van deze</string>
-
-    <string name="needMoreCustomizationTitleLong">Er zijn niet genoeg manieren om de app aan te passen</string>
-    <string name="needMoreCustomizationTitleShort">Problemen met aanpassen</string>
-    <string name="needMoreCustomizationSubtitle">Welke aanpassingsoptie kunnen we toevoegen of verbeteren?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">De configuratie van het startscherm</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Hoe tabbladen worden weergegeven</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Hoe de app eruitziet</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Welke gegevens worden gewist</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Wanneer gegevens worden gewist</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hoe bladwijzers worden weergegeven</string>
-    <string name="needMoreCustomizationSubReasonOther">Geen van deze</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">De app is traag, heeft veel bugs of crasht</string>
-    <string name="appIsSlowOrBuggyTitleShort">Prestatieproblemen</string>
-    <string name="appIsSlowOrBuggySubtitle">Welk probleem ervaar je?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Webpagina\'s of zoekresultaten worden langzaam geladen</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">De app crasht of blokkeert</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Bugs bij afspelen van video\'s of media</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Geen van deze</string>
-
-    <string name="otherMainReasonTitleLong">Geen van deze</string>
-    <string name="otherMainReasonTitleShort">Andere problemen</string>
-
-    <string name="openEndedInputHint">Wees zo specifiek mogelijk</string>
-    <string name="submitFeedback">Verzend</string>
-
-    <string name="tellUsHowToImprove">Vertel ons wat we kunnen verbeteren.</string>
-    <string name="thanksForTheFeedback">Bedankt voor de feedback!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Waarmee heeft je frustratie het meest te maken?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Dat vinden we jammer om te horen</string>
-    <string name="feedbackShareDetails">Details delen</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Zijn er details die je met het team wilt delen?</string>
-    <string name="whatHaveYouBeenEnjoying">Wat vond je goed?</string>
-    <string name="awesomeToHear">Super om te horen!</string>
-    <string name="shareTheLoveWithARating">Laat zien hoe blij je ermee bent door ons te beoordelen in de Play Store.</string>
-    <string name="rateTheApp">Beoordeel app</string>
-    <string name="declineFurtherFeedback">Nee bedankt, ik ben klaar</string>
-    <string name="whichBrokenSites">Waar zie je deze problemen?</string>
-    <string name="whichBrokenSitesHint">Welke website heeft problemen?</string>
-    <string name="feedbackSpecificAsPossible">Wees zo specifiek mogelijk</string>
-    <string name="feedbackInitialDisambiguationTitle">Laten we beginnen!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hoe zou je jouw feedback categoriseren?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knop positieve feedback</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knop negatieve feedback</string>
-    <string name="feedbackIsImportantToUs">Jouw anonieme feedback is belangrijk voor ons.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"De webpagina kon niet worden weergegeven."</string>
     <string name="crashedWebViewErrorAction">"Opnieuw laden"</string>
@@ -1061,6 +989,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bevestigen</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Bedankt voor de feedback!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Openen in Fire-tabblad</string>

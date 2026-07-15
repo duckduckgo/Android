@@ -20,7 +20,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ class AppFeedbackContract @Inject constructor(
         context: Context,
         input: Void?,
     ): Intent {
-        return globalActivityStarter.startIntent(context, FeedbackActivityWithEmptyParams)!!
+        return globalActivityStarter.startIntent(context, FeedbackScreenNoParams)!!
     }
 
     override fun parseResult(

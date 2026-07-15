@@ -743,7 +743,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun restoreSubscription() {
-        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true)))
+        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true))!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

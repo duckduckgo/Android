@@ -368,11 +368,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:exported="false"
-            android:label="@string/feedbackActivityTitle"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false"

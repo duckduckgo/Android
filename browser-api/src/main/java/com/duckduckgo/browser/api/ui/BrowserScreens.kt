@@ -34,11 +34,6 @@ sealed class BrowserScreens {
     ) : GlobalActivityStarter.ActivityParams
 
     /**
-     * Use this model to launch the Feedback screen
-     */
-    data object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
-
-    /**
      * Use this model to launch the Bookmarks screen
      */
     data object BookmarksScreenNoParams : GlobalActivityStarter.ActivityParams
