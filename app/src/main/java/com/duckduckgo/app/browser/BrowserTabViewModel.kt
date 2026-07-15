@@ -46,6 +46,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
+import com.duckduckgo.adblocking.api.AdBlockingAnimation
+import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
@@ -583,6 +585,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
+    private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -743,6 +746,11 @@ class BrowserTabViewModel @Inject constructor(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private var adBlockingAnimationClaimed = false
+    private var pendingAdBlockingAnimation: PendingAdBlockingBadge? = null
+    private var adBlockingAnimationJob: Job? = null
+
+    private var adBlockingNavToken = 0
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var faviconRequestedForDomain: String? = null
@@ -2034,6 +2042,7 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 logcat { "WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
+                adBlockingNavToken++
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2116,11 +2125,63 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
+    private data class PendingAdBlockingBadge(
+        val command: Command.StartAdBlockingAnimation,
+        val token: Int,
+    )
+
+    private fun handleAdBlockingAnimation(
+        animation: AdBlockingAnimation,
+        isPageLoad: Boolean,
+    ) {
+        when (animation) {
+            is AdBlockingAnimation.Show -> {
+                adBlockingAnimationClaimed = true
+                val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
+                if (isPageLoad && currentLoadingViewState().isLoading) {
+                    pendingAdBlockingAnimation = PendingAdBlockingBadge(badge, adBlockingNavToken)
+                } else {
+                    command.value = badge
+                    pendingAdBlockingAnimation = null
+                }
+            }
+            is AdBlockingAnimation.Skip -> {
+                adBlockingAnimationClaimed = false
+                pendingAdBlockingAnimation = null
+            }
+            is AdBlockingAnimation.Retain -> Unit
+        }
+    }
+
+    private fun resetAdBlockingAnimationState() {
+        adBlockingAnimationJob?.cancel()
+    }
+
+    private fun flushPendingAdBlockingAnimation() {
+        pendingAdBlockingAnimation?.let {
+            if (it.token == adBlockingNavToken) {
+                command.value = it.command
+            }
+        }
+        pendingAdBlockingAnimation = null
+    }
+
+    fun onAdBlockingAnimationSuppressed() {
+        adBlockingAnimationClaimed = false
+    }
+
     private fun pageChanged(
         url: String,
         title: String?,
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
+        resetAdBlockingAnimationState()
+        adBlockingAnimationJob = viewModelScope.launch {
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true),
+                isPageLoad = true,
+            )
+        }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -2366,6 +2427,14 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
+        // SPA url change: the page is already loaded, so decide and show immediately
+        resetAdBlockingAnimationState()
+        adBlockingAnimationJob = viewModelScope.launch {
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
+                isPageLoad = false,
+            )
+        }
         site?.url = url
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -2469,6 +2538,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) return
+
+        if (newProgress == 100) {
+            flushPendingAdBlockingAnimation()
+        }
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
@@ -5664,6 +5737,7 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
+            if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
             // TODO remove launch once address bar trackers animation is enabled permanently
             viewModelScope.launch {
                 if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
@@ -5735,6 +5809,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStartTrackersAnimation() {
+        if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive for this page
         val site = siteLiveData.value
         val trackerEvents = site?.orderedTrackerBlockedEntities()
         command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)

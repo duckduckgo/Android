@@ -3145,6 +3145,11 @@ class BrowserTabFragment :
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
 
+            is Command.StartAdBlockingAnimation -> {
+                omnibar.cancelTrackersAnimation()
+                omnibar.createAdBlockingAnimation(it.icon, it.text)
+            }
+
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
@@ -4135,6 +4140,10 @@ class BrowserTabFragment :
 
                 override fun onTrackersCountFinished() {
                     // no-op
+                }
+
+                override fun onAdBlockingAnimationSuppressed() {
+                    viewModel.onAdBlockingAnimationSuppressed()
                 }
             },
         )

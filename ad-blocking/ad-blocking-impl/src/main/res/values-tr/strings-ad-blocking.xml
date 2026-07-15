@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Hata Raporu Gönder</string>
     <string name="ad_blocking_disabled_secondary_action">İptal</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Yeniden başlatılana kadar devre dışı bırakıldı</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube\'da Reklam Engelleme Açık</string>
 </resources>

@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Изпращане на сигнал за повреда</string>
     <string name="ad_blocking_disabled_secondary_action">Отмяна</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Деактивирано до рестартиране</string>
+    <string name="ad_blocking_omnibar_badge_text">Блокирането на рекламите в YouTube е включено</string>
 </resources>
