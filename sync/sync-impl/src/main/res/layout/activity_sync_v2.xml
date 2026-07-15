@@ -40,9 +40,9 @@
                 android:id="@+id/syncHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:layout_marginHorizontal="@dimen/keyline_5" />
+                android:layout_marginBottom="@dimen/keyline_6" />
 
             <include
                 android:id="@+id/include_disabled_view"
