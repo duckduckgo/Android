@@ -44,7 +44,7 @@ class TdsEntityLookup @Inject constructor(
     override fun entityForUrl(url: Uri): Entity? = entityForUri(url) { it.host }
 
     @WorkerThread
-    private fun entityForUri(uri: Uri, hostSelector: (Uri) -> String?): Entity? {
+    private tailrec fun entityForUri(uri: Uri, hostSelector: (Uri) -> String?): Entity? {
         val host = hostSelector(uri) ?: return null
 
         // try searching for exact domain

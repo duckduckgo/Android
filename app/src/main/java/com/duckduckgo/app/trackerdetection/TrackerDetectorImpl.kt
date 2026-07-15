@@ -173,11 +173,6 @@ class TrackerDetectorImpl @Inject constructor(
     ): Boolean =
         sameOrSubdomainPair(firstUrl, secondUrl)
 
-    /**
-     * Whether the request URL and the document belong to the same entity. The request URL's entity
-     * ([urlNetwork]) is resolved once by the caller and passed in, so it is not looked up again here;
-     * the document's entity is only resolved when the request URL actually maps to an entity.
-     */
     private fun sameNetwork(
         urlNetwork: Entity?,
         documentUrl: Uri,

@@ -57,10 +57,6 @@ class UriString {
         /**
          * Strips the port from [url], leaving the rest of the URL (scheme, host, path, query and
          * fragment) intact.
-         *
-         * The reconstruction is only performed when a port is actually present; URLs without a
-         * port (the common case) are returned unchanged, avoiding unnecessary allocations.
-         * On any parsing failure the original [url] is returned.
          */
         fun removePort(url: String): String {
             return try {

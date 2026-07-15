@@ -446,8 +446,6 @@ class WebViewRequestInterceptor(
             return null
         }
 
-        // When a CNAME-cloaked host has been uncloaked, evaluate that host (String overload);
-        // otherwise evaluate the request URL directly (Uri overload).
         val trackingEvent = if (uncloakedHost != null) {
             trackerDetector.evaluate(uncloakedHost, documentUrl, checkFirstParty, request.requestHeaders)
         } else {
