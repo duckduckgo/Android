@@ -545,7 +545,7 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
         applyNavBarVisibility(
-            show = navBarShouldBeVisible(isInputEmpty = prefillText.isEmpty()),
+            show = navBarShouldBeVisible(),
             animate = false,
         )
         lifecycleOwner.lifecycleScope.launch {
@@ -629,12 +629,6 @@ class RealNativeInputManager @Inject constructor(
                     nativeInputEventListener.onChatPromptSubmitted()
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
-            },
-            onInputTextEmptyChanged = { isEmpty ->
-                applyNavBarVisibility(
-                    show = navBarShouldBeVisible(isInputEmpty = isEmpty),
-                    animate = true,
-                )
             },
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
@@ -887,20 +881,15 @@ class RealNativeInputManager @Inject constructor(
     }
 
     /** Current on-screen visibility the nav bar should have, combining the create-time gate with the
-     *  empty-field rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
-    private fun navBarShouldBeVisible(isInputEmpty: Boolean): Boolean =
+     *  browser-context rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
+    private fun navBarShouldBeVisible(): Boolean =
         shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
-            shouldShowNavBar(isBrowserContext = navBarRoot != null, isInputEmpty = isInputEmpty)
+            shouldShowNavBar(isBrowserContext = navBarRoot != null)
 
     /** Re-applies the nav bar visibility for the current input state; no-op when no bar is attached. */
     private fun refreshNavBarVisibility() {
         if (navBarRoot == null) return
-        applyNavBarVisibility(show = navBarShouldBeVisible(isInputEmpty = currentInputEmpty()), animate = true)
-    }
-
-    private fun currentInputEmpty(): Boolean {
-        val widget = widgetRoot?.let { widgetFrom(it) } ?: return true
-        return widget.text.isNullOrEmpty()
+        applyNavBarVisibility(show = navBarShouldBeVisible(), animate = true)
     }
 
     /**
@@ -1236,11 +1225,10 @@ internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, 
     featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
 /**
- * The persistent input-mode nav bar is shown only for browser input and only while the input field
- * is empty (whitespace counts as text). Duck.ai and contextual input never show it.
+ * The persistent input-mode nav bar is shown for the whole browser-input session, regardless of
+ * whether the field has text. Duck.ai and contextual input never show it.
  */
-internal fun shouldShowNavBar(isBrowserContext: Boolean, isInputEmpty: Boolean): Boolean =
-    isBrowserContext && isInputEmpty
+internal fun shouldShowNavBar(isBrowserContext: Boolean): Boolean = isBrowserContext
 
 /**
  * Whether a visibility change is needed. [currentShown] is null before the first apply, which always
