@@ -28,13 +28,9 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
@@ -45,7 +41,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -89,7 +84,6 @@ class NewUserOnboardingPlanProviderTest {
     private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val duckAiAvailability: DuckAiOnboardingAvailability = mock()
-    private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
     private val onboardingPixelSender: OnboardingPixelSender = mock()
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
@@ -121,7 +115,6 @@ class NewUserOnboardingPlanProviderTest {
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
-            whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
         }
         provider = NewUserOnboardingPlanProvider(
@@ -133,7 +126,6 @@ class NewUserOnboardingPlanProviderTest {
             duckChat = duckChat,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             duckAiOnboardingAvailability = duckAiAvailability,
-            onboardingQuickSetupExperimentManager = quickSetupExperiment,
             onboardingPixelSender = onboardingPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
             defaultBrowserDetector = defaultBrowserDetector,
@@ -214,9 +206,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when skip from reinstall and quick setup treatment then switches to quick setup`() = runTest {
+    fun `when skip from reinstall then switches to quick setup`() = runTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
@@ -233,43 +224,6 @@ class NewUserOnboardingPlanProviderTest {
             ),
         )
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-    }
-
-    @Test
-    fun `when skip from reinstall and quick setup control then shows skip option`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
-    }
-
-    @Test
-    fun `when skip confirmed then skipped and input screen user setting enabled`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
-        verify(pixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-        verify(duckChat).setInputScreenUserSetting(true)
-        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-    }
-
-    @Test
-    fun `when resume from skip option then returns to comparison chart`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        orchestrator.onEvent(NewUserOnboardingEvent.ResumeRequested)
-        verify(pixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
     }
 
     @Test
@@ -406,7 +360,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
@@ -504,8 +458,8 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
 
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
         verify(customAiOnboardingStore).setOpenInputOnDuckAiTab()
@@ -674,21 +628,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when skip onboarding option step presented then fires SkipOnboardingShown pixel`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
-        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Shown)
-    }
-
-    @Test
     fun `when quick setup step presented then fires QuickSetupShown pixel`() = runTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
@@ -900,28 +841,6 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
         verify(onboardingPixelSender).chatBranchSelected()
-    }
-
-    @Test
-    fun `when skip onboarding confirmed then fires SkipOnboardingClicked with engaged true`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
-        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = true))
-    }
-
-    @Test
-    fun `when skip onboarding resumed then fires SkipOnboardingClicked with engaged false`() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        orchestrator.onEvent(NewUserOnboardingEvent.ResumeRequested)
-        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
