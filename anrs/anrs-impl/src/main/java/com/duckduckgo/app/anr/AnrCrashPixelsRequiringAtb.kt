@@ -23,5 +23,9 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin {
-    override fun names(): List<String> = listOf("m_anr", "m_d_ac", "m_app_crashed_on_verified_play_store_install")
+    override fun names(): List<String> = listOf(
+        AnrPixelName.ANR_PIXEL.pixelName,
+        CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName,
+        CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
+    )
 }
