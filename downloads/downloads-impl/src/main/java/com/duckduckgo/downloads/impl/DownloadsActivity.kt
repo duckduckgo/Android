@@ -31,6 +31,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.pdf.PdfViewerAvailability
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
@@ -180,7 +181,10 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
         if (command.item.fileName.endsWith(".pdf", ignoreCase = true) && pdfViewerAvailability.isAvailable()) {
             val cachedFileUri = downloadsFileActions.getShareableUri(this@DownloadsActivity, file)
-            globalActivityStarter.start(this, PdfViewerActivityParams(cachedFileUri.toString(), command.item.fileName))
+            globalActivityStarter.start(
+                this,
+                PdfViewerActivityParams(cachedFileUri.toString(), command.item.fileName, PdfViewerSource.DOWNLOADS),
+            )
             return
         }
 

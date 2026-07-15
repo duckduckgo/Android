@@ -34,6 +34,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -49,6 +50,8 @@ class PdfViewerActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityPdfViewerBinding by viewBinding()
 
+    private lateinit var source: PdfViewerSource
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -60,6 +63,10 @@ class PdfViewerActivity : DuckDuckGoActivity() {
         val params = intent.getActivityParams(PdfViewerActivityParams::class.java)
         val cachedFileUri = params?.cachedFileUri.orEmpty()
         val fileName = params?.fileName.orEmpty()
+        source = params?.source ?: PdfViewerSource.EXTERNAL_INTENT
+        // External-open pixels measure the system "Open with" handler only. In-app opens (Downloads)
+        // reuse this screen but must not inflate those counts.
+        val isExternalOpen = source == PdfViewerSource.EXTERNAL_INTENT
 
         supportActionBar?.title = fileName
         // Toolbar title is ellipsized; tapping it reveals the full file name.
@@ -69,7 +76,7 @@ class PdfViewerActivity : DuckDuckGoActivity() {
             val pdfFragment = DdgPdfViewerFragment()
             pdfFragment.listener = object : DdgPdfViewerFragment.Listener {
                 override fun onLoadDocumentSuccess() {
-                    pixel.fire(PdfPixelName.PDF_EXTERNAL_RENDERED)
+                    if (isExternalOpen) pixel.fire(PdfPixelName.PDF_EXTERNAL_RENDERED)
                 }
 
                 override fun onLoadDocumentError(throwable: Throwable) {
@@ -84,16 +91,18 @@ class PdfViewerActivity : DuckDuckGoActivity() {
                 .commitNow()
             pdfFragment.documentUri(cachedFileUri.toUri())
 
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+            if (isExternalOpen) {
+                pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
+                pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
+                pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+            }
         }
 
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    navigateToBrowser()
+                    navigateUp()
                 }
             },
         )
@@ -109,18 +118,22 @@ class PdfViewerActivity : DuckDuckGoActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        navigateToBrowser()
+        navigateUp()
         return true
     }
 
-    private fun navigateToBrowser() {
-        val browserIntent = BrowserActivity.intent(
-            context = this,
-            launchSource = InAppNavigation,
-        )
-        TaskStackBuilder.create(this)
-            .addNextIntentWithParentStack(browserIntent)
-            .startActivities()
+    // External opens have no in-app back stack, so synthesize the browser as parent. In-app opens
+    // (Downloads) already have their launching screen beneath, so just finish() back to it.
+    private fun navigateUp() {
+        if (source == PdfViewerSource.EXTERNAL_INTENT) {
+            val browserIntent = BrowserActivity.intent(
+                context = this,
+                launchSource = InAppNavigation,
+            )
+            TaskStackBuilder.create(this)
+                .addNextIntentWithParentStack(browserIntent)
+                .startActivities()
+        }
         finish()
     }
 

@@ -33,6 +33,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -61,6 +62,10 @@ class IntentDispatcherViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     data class ViewState(
+        // false until onIntentReceived has computed a real routing decision. The initial default state
+        // must not be dispatched (it would otherwise fall through to the browser and finish the dispatcher
+        // before a slower path — e.g. cacheLocalPdf — emits its result).
+        val resolved: Boolean = false,
         val customTabRequested: Boolean = false,
         val intentText: String? = null,
         val activityParams: ActivityParams? = null,
@@ -78,14 +83,19 @@ class IntentDispatcherViewModel @Inject constructor(
                         is LocalPdfResult.Success -> {
                             _viewState.emit(
                                 viewState.value.copy(
-                                    activityParams = PdfViewerActivityParams(result.uri.toString(), result.displayName),
+                                    resolved = true,
+                                    activityParams = PdfViewerActivityParams(
+                                        result.uri.toString(),
+                                        result.displayName,
+                                        PdfViewerSource.EXTERNAL_INTENT,
+                                    ),
                                     localPdfError = false,
                                     isExternal = isExternal,
                                 ),
                             )
                         }
                         is LocalPdfResult.Failure -> {
-                            _viewState.emit(viewState.value.copy(localPdfError = true, isExternal = isExternal))
+                            _viewState.emit(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
                         }
                     }
                     return@launch
@@ -119,6 +129,7 @@ class IntentDispatcherViewModel @Inject constructor(
 
                 _viewState.emit(
                     viewState.value.copy(
+                        resolved = true,
                         customTabRequested = customTabRequested,
                         intentText = if (customTabRequested) intentText?.sanitize() else intentText,
                         activityParams = activityParams,

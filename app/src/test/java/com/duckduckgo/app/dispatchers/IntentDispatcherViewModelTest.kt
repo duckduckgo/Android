@@ -33,6 +33,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -335,7 +336,7 @@ class IntentDispatcherViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "doc.pdf"), state.activityParams)
+            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "doc.pdf", PdfViewerSource.EXTERNAL_INTENT), state.activityParams)
             assertFalse(state.localPdfError)
         }
     }
@@ -356,7 +357,7 @@ class IntentDispatcherViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "report.pdf"), state.activityParams)
+            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "report.pdf", PdfViewerSource.EXTERNAL_INTENT), state.activityParams)
         }
     }
 

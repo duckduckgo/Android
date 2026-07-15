@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.pdf
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.navigation.api.getActivityParams
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -30,7 +31,7 @@ class PdfViewerActivityTest {
     @Test
     fun `activity params round-trip through the intent`() {
         val uri = "file:///data/user/0/com.example/cache/pdf_cache/doc.pdf"
-        val params = PdfViewerActivityParams(uri, "doc.pdf")
+        val params = PdfViewerActivityParams(uri, "doc.pdf", PdfViewerSource.EXTERNAL_INTENT)
         val intent = intentWithParams(params)
 
         assertEquals(params, intent.getActivityParams(PdfViewerActivityParams::class.java))

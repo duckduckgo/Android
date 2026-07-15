@@ -69,11 +69,17 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun dispatch(viewState: ViewState) {
+        // Ignore the initial default state: routing hasn't been computed yet. Acting on it would
+        // start the browser and finish() this activity before the real decision (e.g. a cached local
+        // PDF) is emitted from the background dispatcher.
+        if (!viewState.resolved) return
+
         if (viewState.localPdfError) {
             Toast.makeText(this, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_LONG).show()
             finish()
         } else if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
+            finish()
         } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {

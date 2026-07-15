@@ -73,6 +73,23 @@ sealed class BrowserScreens {
     /**
      * Use this model to launch the standalone PDF viewer for a PDF at [cachedFileUri], displaying [fileName]
      * in the toolbar. Check [com.duckduckgo.browser.api.pdf.PdfViewerAvailability] before launching this screen.
+     *
+     * [source] identifies where the open came from: it gates the external-open pixels (fired only for
+     * [PdfViewerSource.EXTERNAL_INTENT]) and the back-navigation target (external opens land in the browser,
+     * in-app opens return to the launching screen).
      */
-    data class PdfViewerActivityParams(val cachedFileUri: String, val fileName: String) : GlobalActivityStarter.ActivityParams
+    data class PdfViewerActivityParams(
+        val cachedFileUri: String,
+        val fileName: String,
+        val source: PdfViewerSource,
+    ) : GlobalActivityStarter.ActivityParams
+
+    /** Where a [PdfViewerActivityParams] open originated. */
+    enum class PdfViewerSource {
+        /** Opened from another app via the system "Open with" handler. */
+        EXTERNAL_INTENT,
+
+        /** Opened in-app from the Downloads screen. */
+        DOWNLOADS,
+    }
 }
