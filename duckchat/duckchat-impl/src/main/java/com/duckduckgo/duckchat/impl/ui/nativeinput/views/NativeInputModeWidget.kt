@@ -332,6 +332,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingAskAboutTab: (() -> Unit)? = null
     private var pendingAskAboutPage: (() -> Unit)? = null
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
+    private var pendingPageContext: PageContextAttachment? = null
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -443,6 +444,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
+            pendingPageContext?.let { pluginView.setPageContext(it) }
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -1212,10 +1214,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
 
     override fun setPageContext(title: String, url: String, faviconUrl: String?) {
-        attachmentView?.setPageContext(PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl))
+        val attachment = PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl)
+        pendingPageContext = attachment
+        attachmentView?.setPageContext(attachment)
     }
 
     override fun clearPageContext() {
+        pendingPageContext = null
         attachmentView?.clearPageContext()
     }
 

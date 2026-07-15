@@ -624,21 +624,19 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun removePageContext() {
         logcat { "Duck.ai Contextual: removePageContext" }
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(
-                    showContext = false,
-                    userRemovedContext = true,
-                    quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
-                        QuickActionState.ASK_ABOUT_PAGE
-                    } else {
-                        current.quickActionState
-                    },
-                )
-            }
-            if (_viewState.value.showsAttachContextPlaceholder()) {
-                duckChatPixels.reportContextualPlaceholderContextShown()
-            }
+        _viewState.update { current ->
+            current.copy(
+                showContext = false,
+                userRemovedContext = true,
+                quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                    QuickActionState.ASK_ABOUT_PAGE
+                } else {
+                    current.quickActionState
+                },
+            )
+        }
+        if (_viewState.value.showsAttachContextPlaceholder()) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
