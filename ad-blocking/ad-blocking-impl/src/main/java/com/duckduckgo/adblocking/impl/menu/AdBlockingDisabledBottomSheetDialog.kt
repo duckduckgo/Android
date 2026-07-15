@@ -19,6 +19,8 @@ package com.duckduckgo.adblocking.impl.menu
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingDisabledBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
@@ -45,6 +47,8 @@ class AdBlockingDisabledBottomSheetDialog(
     private val binding: BottomSheetAdBlockingDisabledBinding =
         BottomSheetAdBlockingDisabledBinding.inflate(LayoutInflater.from(context))
 
+    private var defaultSheetHeight: Int? = null
+
     init {
         setContentView(binding.root)
 
@@ -54,10 +58,14 @@ class AdBlockingDisabledBottomSheetDialog(
 
         behavior.skipCollapsed = true
         behavior.isDraggable = false
-        behavior.maxHeight = context.resources.displayMetrics.heightPixels * MAX_HEIGHT_PERCENT / 100
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        setOnShowListener { setRoundCorners() }
+        setOnShowListener {
+            setRoundCorners()
+            val bottomSheet = findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) ?: return@setOnShowListener
+            bottomSheet.viewTreeObserver.addOnGlobalLayoutListener { capHeightInLandscape(bottomSheet) }
+            capHeightInLandscape(bottomSheet)
+        }
 
         binding.adBlockingDisabledCloseButton.setOnClickListener { dismiss() }
         binding.adBlockingDisabledPrimaryButton.setOnClickListener {
@@ -67,7 +75,23 @@ class AdBlockingDisabledBottomSheetDialog(
         binding.adBlockingDisabledSecondaryButton.setOnClickListener { dismiss() }
     }
 
+    private fun capHeightInLandscape(bottomSheet: View) {
+        val parent = bottomSheet.parent as? View ?: return
+        if (defaultSheetHeight == null) {
+            defaultSheetHeight = bottomSheet.layoutParams.height
+        }
+        val isLandscape = parent.width > parent.height
+        val targetHeight = if (isLandscape && parent.height > 0) {
+            parent.height * LANDSCAPE_MAX_HEIGHT_PERCENT / 100
+        } else {
+            defaultSheetHeight ?: return
+        }
+        if (bottomSheet.layoutParams.height != targetHeight) {
+            bottomSheet.updateLayoutParams { height = targetHeight }
+        }
+    }
+
     private companion object {
-        private const val MAX_HEIGHT_PERCENT = 90
+        private const val LANDSCAPE_MAX_HEIGHT_PERCENT = 90
     }
 }
