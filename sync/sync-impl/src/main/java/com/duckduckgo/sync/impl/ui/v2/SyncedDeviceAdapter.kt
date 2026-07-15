@@ -70,7 +70,6 @@ class SyncedDeviceAdapter : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCall
         when (holder) {
             is LocalDeviceViewHolder -> holder.bind((getItem(position) as SyncedDevice).device)
             is RemoteDeviceViewHolder -> holder.bind((getItem(position) as SyncedDevice).device)
-            is LoadingDeviceViewHolder -> Unit
         }
     }
 }
