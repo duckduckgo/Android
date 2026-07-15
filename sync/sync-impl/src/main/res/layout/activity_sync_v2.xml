@@ -44,6 +44,12 @@
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:layout_marginHorizontal="@dimen/keyline_5" />
 
+            <include
+                android:id="@+id/include_disabled_view"
+                layout="@layout/view_sync_v2_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
