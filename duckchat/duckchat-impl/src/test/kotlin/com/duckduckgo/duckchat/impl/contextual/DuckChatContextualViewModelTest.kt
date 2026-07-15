@@ -2444,6 +2444,51 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when ask about tab clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text..."
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.onAskAboutTabClicked()
+
+            assertEquals(
+                DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+                testee.viewState.value.quickActionState,
+            )
+        }
+
+    @Test
+    fun `when ask about tab clicked with valid context then focus input command emitted`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text..."
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.commands.test {
+                testee.onAskAboutTabClicked()
+                assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when ask about page clicked with context then submits ask about page prompt with pageContext`() =
         runTest {
             val tabId = "tab-1"

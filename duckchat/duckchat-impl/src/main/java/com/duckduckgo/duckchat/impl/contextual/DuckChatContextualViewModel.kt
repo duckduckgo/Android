@@ -759,6 +759,8 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
         addPageContext()
+        commandChannel.trySend(Command.FocusInput)
+        _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
     }
 
     fun onAskAboutPageClicked() {
@@ -766,6 +768,7 @@ class DuckChatContextualViewModel @Inject constructor(
             // Context not attached; nothing to ask about.
             return
         }
+        commandChannel.trySend(Command.FocusInput)
         onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
     }
 
