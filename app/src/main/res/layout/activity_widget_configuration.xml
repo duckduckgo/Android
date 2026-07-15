@@ -18,72 +18,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/widgetConfigPanel"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?attr/daxColorSurface"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:clipToPadding="false">
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
+        <LinearLayout
+            android:id="@+id/widgetConfigPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/widgetConfigurationTitleText"
-            app:typography="h2" />
+            android:background="?attr/daxColorSurface"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/widgetConfigPreview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:src="@drawable/image_preview_search_favorites_widget_light" />
-
-        <RadioGroup
-            android:id="@+id/widgetConfigThemeRadioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
-            <RadioButton
-                android:id="@+id/widgetConfigThemeSystem"
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/widgetConfigurationSystemThemeOption"
-                android:textColor="?attr/daxColorPrimaryText"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:layout_height="wrap_content"
+                android:text="@string/widgetConfigurationTitleText"
+                app:typography="h2" />
 
-            <RadioButton
-                android:id="@+id/widgetConfigThemeLight"
+            <ImageView
+                android:id="@+id/widgetConfigPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:src="@drawable/image_preview_search_favorites_widget_light" />
+
+            <RadioGroup
+                android:id="@+id/widgetConfigThemeRadioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:checked="true"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/widgetConfigurationLightThemeOption"
-                android:textColor="?attr/daxColorPrimaryText" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
 
-            <RadioButton
-                android:id="@+id/widgetConfigThemeDark"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/widgetConfigurationDarkThemeOption"
-                android:textColor="?attr/daxColorPrimaryText" />
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/widgetConfigThemeSystem"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/widgetConfigurationSystemThemeOption"
+                    android:textColor="?attr/daxColorPrimaryText"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/widgetConfigAddWidgetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="@string/widgetConfigurationAddWidgetOption" />
-    </LinearLayout>
+                <RadioButton
+                    android:id="@+id/widgetConfigThemeLight"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:checked="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/widgetConfigurationLightThemeOption"
+                    android:textColor="?attr/daxColorPrimaryText" />
+
+                <RadioButton
+                    android:id="@+id/widgetConfigThemeDark"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/widgetConfigurationDarkThemeOption"
+                    android:textColor="?attr/daxColorPrimaryText" />
+            </RadioGroup>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/widgetConfigAddWidgetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/widgetConfigurationAddWidgetOption" />
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>
