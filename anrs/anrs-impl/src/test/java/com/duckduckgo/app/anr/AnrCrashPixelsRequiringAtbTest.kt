@@ -16,15 +16,29 @@
 
 package com.duckduckgo.app.anr
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AnrCrashPixelsRequiringAtbTest {
 
     private val testee = AnrCrashPixelsRequiringAtb()
 
+    // Mirrors the production matching in RxPixelSender.shouldSendAtb.
+    private fun isCovered(pixelName: String): Boolean = testee.names().any { pixelName.startsWith(it) }
+
     @Test
-    fun namesReturnsAnrAndCrashPrefixes() {
-        assertEquals(listOf("m_anr", "m_d_ac"), testee.names())
+    fun anrPixelIsCovered() {
+        assertTrue(isCovered(AnrPixelName.ANR_PIXEL.pixelName))
+    }
+
+    @Test
+    fun globalCrashPixelIsCovered() {
+        assertTrue(isCovered(CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName))
+    }
+
+    @Test
+    fun unrelatedPixelIsNotCovered() {
+        assertFalse(isCovered("m_search"))
     }
 }

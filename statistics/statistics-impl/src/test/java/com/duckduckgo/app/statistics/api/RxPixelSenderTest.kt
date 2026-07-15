@@ -88,9 +88,13 @@ class RxPixelSenderTest {
     private val pixelFiredRepository = FakePixelFiredRepository()
     private val pixelSenderFeature = FakeFeatureToggleFactory.create(PixelSenderFeature::class.java)
     private var pixelsRequiringAtb: List<String> = emptyList()
+    private var pixelsRequiringAtbSecondPlugin: List<String> = emptyList()
     private val pixelRequiringAtbPlugins = object : PluginPoint<PixelRequiringAtbPlugin> {
         override fun getPlugins(): Collection<PixelRequiringAtbPlugin> =
-            listOf(object : PixelRequiringAtbPlugin { override fun names() = pixelsRequiringAtb })
+            listOf(
+                object : PixelRequiringAtbPlugin { override fun names() = pixelsRequiringAtb },
+                object : PixelRequiringAtbPlugin { override fun names() = pixelsRequiringAtbSecondPlugin },
+            )
     }
 
     @Before
@@ -617,6 +621,75 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verify(api).fireWithoutAtb(eq("test"), eq("phone"), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndEnqueuedPixelOptedInThenSentWithAtb() {
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = listOf("test")
+        givenApiSendPixelSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndPixelNameStartsWithOptedInPrefixThenFiredWithAtb() {
+        // The opt-in list holds prefixes: a longer pixel name that starts with the prefix must still match.
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = listOf("m_anr")
+        givenApiSendPixelSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel("m_anr_exception", emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq("m_anr_exception"), eq("phone"), eq("atbvariant"), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndPixelNameOnlyContainsPrefixThenFiredWithoutAtb() {
+        // Matching is startsWith, not contains: a prefix appearing mid-name must not opt the pixel in.
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = listOf("anr")
+        givenFireWithoutAtbSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel("m_anr_exception", emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fireWithoutAtb(eq("m_anr_exception"), eq("phone"), any(), any(), any())
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenAtbOptInEnabledAndPixelOptedInBySecondPluginThenFiredWithAtb() {
+        // The opt-in decision must span every contributed plugin, not just the first.
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = listOf("other")
+        pixelsRequiringAtbSecondPlugin = listOf("test")
+        givenApiSendPixelSucceeds()
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
     }
 
     private fun assertPixelEntity(
