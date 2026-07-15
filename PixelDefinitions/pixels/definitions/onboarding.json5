@@ -173,7 +173,7 @@
         ]
     },
     "onboarding_widget-prompt": {
-        "description": "Widget-prompt onboarding page. shown when the page is displayed; clicked engage/dismiss on the Add widget / Maybe later CTAs; confirmed added/not_added after the system add-widget prompt returns. Unique once per user per (event, value).",
+        "description": "Widget-prompt onboarding page. shown when the page is displayed; clicked engage/dismiss on the Add widget / Skip CTAs; confirmed added/not_added after the system add-widget prompt returns. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
