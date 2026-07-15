@@ -19,5 +19,4 @@
     <dimen name="toolbar_horizontal_margin">0dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">252dp</dimen>
     <dimen name="preOnboardingDaxCtaPaddingTop">24dp</dimen>
-    <dimen name="preOnboardingWidgetPromptMediaHeight">240dp</dimen>
 </resources>
