@@ -385,6 +385,18 @@ interface AndroidBrowserConfigFeature {
     fun pdfViewer(): Toggle
 
     /**
+     * Controls whether DuckDuckGo registers as a system handler for already-downloaded PDFs
+     * (system "Open with" sheet). Independent of [pdfViewer] so the external-handler rollout
+     * can be staged separately from the inline PDF viewer rollout; both must be enabled for
+     * DuckDuckGo to open an externally-delivered PDF.
+     * @return `true` when the remote config has the global "externalPdfHandler" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun externalPdfHandler(): Toggle
+
+    /**
      * Controls whether duck.ai links tapped inside a custom tab are redirected out of the custom
      * tab into the Duck Chat experience (closing the custom tab) instead of loading in the custom tab.
      * @return `true` when the remote config has the global "redirectDuckAiLinksFromCustomTab" androidBrowserConfig

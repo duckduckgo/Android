@@ -18,12 +18,14 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
@@ -67,8 +69,17 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun dispatch(viewState: ViewState) {
-        if (viewState.activityParams != null) {
+        // Ignore the initial default state: routing hasn't been computed yet. Acting on it would
+        // start the browser and finish() this activity before the real decision (e.g. a cached local
+        // PDF) is emitted from the background dispatcher.
+        if (!viewState.resolved) return
+
+        if (viewState.localPdfError) {
+            Toast.makeText(this, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_LONG).show()
+            finish()
+        } else if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
+            finish()
         } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {

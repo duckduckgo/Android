@@ -329,6 +329,25 @@
 
         </activity>
 
+        <!--
+          Registers DuckDuckGo as a PDF handler so already-downloaded PDFs can be opened in the
+          browser. Disabled by default; PdfHandlerComponentToggler enables it at runtime only on
+          Android 12+ (androidx.pdf requirement) when the pdfViewer remote flag is on.
+        -->
+        <activity-alias
+            android:name="com.duckduckgo.app.dispatchers.PdfViewerHandler"
+            android:enabled="false"
+            android:exported="true"
+            android:targetActivity="com.duckduckgo.app.dispatchers.IntentDispatcherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
@@ -503,6 +522,10 @@
             android:label="@string/voiceSearchTitle"
             android:parentActivityName=".BrowserActivity" />
 
+        <activity
+            android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
+            android:exported="false"
+            android:parentActivityName=".BrowserActivity" />
         <activity
             android:name=".threatprotection.ThreatProtectionSettingsActivity"
             android:exported="false"
