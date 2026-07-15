@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui.v2
 
 import android.os.Bundle
+import androidx.core.view.isGone
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -74,6 +75,10 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
+        )
+        binding.includeDisabledView.root.isGone = viewState.showAccount
+        binding.includeDisabledView.synOnOtherPlatformsItem.setState(
+            isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
         )
     }
 

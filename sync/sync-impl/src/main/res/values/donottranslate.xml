@@ -22,4 +22,5 @@
     <string name="sync_settings_v2_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai chats, end-to-end encrypted across your DuckDuckGo apps.</string>
     <string name="sync_settings_v2_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
     <string name="sync_settings_v2_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai chats, are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_this_device_cta_title">Sync &amp; Backup this device</string>
 </resources>
