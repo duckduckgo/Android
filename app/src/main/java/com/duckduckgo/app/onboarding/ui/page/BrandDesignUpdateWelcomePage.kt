@@ -1105,11 +1105,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val titleView = binding.daxDialogCta.addToDockContent.addToDockTitle
                     val bodyView = binding.daxDialogCta.addToDockContent.addToDockBody
                     val mediaView = binding.daxDialogCta.addToDockContent.addToDockMedia
-                    val sketchLine = binding.daxDialogCta.addToDockContent.addToDockSketchLine
                     bodyView.text = getString(R.string.preOnboardingAddToDockBody).preventWidows()
                     bodyView.alpha = 0f
                     mediaView.alpha = 0f
-                    sketchLine.alpha = 0f
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddToDockPrimaryCta)
                     binding.daxDialogCta.primaryCta.alpha = 0f
@@ -1137,8 +1135,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 homeScreenPromptFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
                                         ObjectAnimator.ofFloat(bodyView, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(sketchLine, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                         ObjectAnimator.ofFloat(mediaView, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -1863,7 +1859,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     getString(R.string.preOnboardingAddToDockBody).preventWidows()
                 binding.daxDialogCta.addToDockContent.addToDockBody.alpha = 1f
                 binding.daxDialogCta.addToDockContent.addToDockMedia.alpha = 1f
-                binding.daxDialogCta.addToDockContent.addToDockSketchLine.alpha = 1f
 
                 binding.daxDialogCta.cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)

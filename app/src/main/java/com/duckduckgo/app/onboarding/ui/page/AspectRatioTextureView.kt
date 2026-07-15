@@ -22,6 +22,8 @@ import android.util.AttributeSet
 import android.view.TextureView
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.core.content.res.use
+import com.duckduckgo.app.browser.R
 
 class AspectRatioTextureView @JvmOverloads constructor(
     context: Context,
@@ -31,6 +33,7 @@ class AspectRatioTextureView @JvmOverloads constructor(
     private var videoWidth = 0
     private var videoHeight = 0
     private var bottomCornerRadiusPx = 0f
+    private var maxWidthPx = NO_MAX_WIDTH
 
     init {
         clipToOutline = true
@@ -39,6 +42,9 @@ class AspectRatioTextureView @JvmOverloads constructor(
                 // Push the rect's top above the view so only the bottom corners end up rounded.
                 outline.setRoundRect(0, -bottomCornerRadiusPx.toInt(), view.width, view.height, bottomCornerRadiusPx)
             }
+        }
+        context.obtainStyledAttributes(attrs, R.styleable.AspectRatioTextureView).use {
+            maxWidthPx = it.getDimensionPixelSize(R.styleable.AspectRatioTextureView_android_maxWidth, NO_MAX_WIDTH)
         }
     }
 
@@ -55,7 +61,7 @@ class AspectRatioTextureView @JvmOverloads constructor(
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             return
         }
-        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec).let { if (maxWidthPx == NO_MAX_WIDTH) it else minOf(it, maxWidthPx) }
         val height = width * videoHeight / videoWidth
         setMeasuredDimension(width, height)
     }
@@ -75,5 +81,7 @@ class AspectRatioTextureView @JvmOverloads constructor(
         private const val FRAME_CORNER_RADIUS_UNITS = (34.67f + 34.54f) / 2f
         private const val FRAME_VIEWPORT_WIDTH_UNITS = 281f
         private const val BOTTOM_CORNER_RADIUS_FRACTION = FRAME_CORNER_RADIUS_UNITS / FRAME_VIEWPORT_WIDTH_UNITS
+
+        private const val NO_MAX_WIDTH = -1
     }
 }

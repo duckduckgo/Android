@@ -63,36 +63,45 @@
         app:typography="onboarding_body"
         tools:alpha="1" />
 
-    <ImageView
-        android:id="@+id/addToDockSketchLine"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginTop="20dp"
-        android:alpha="0"
-        android:importantForAccessibility="no"
-        android:scaleType="fitXY"
-        app:srcCompat="@drawable/onboarding_phone_sketch_line"
-        tools:alpha="1" />
-
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/addToDockMedia"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_1"
+        android:layout_gravity="center_horizontal"
         android:alpha="0"
-        android:background="@drawable/onboarding_add_to_dock_sketch_frame"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         tools:alpha="1">
 
-        <com.duckduckgo.app.onboarding.ui.page.AspectRatioTextureView
-            android:id="@+id/addToDockPreviewVideo"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="6dp"
-            android:importantForAccessibility="no" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/onboarding_phone_sketch_line" />
 
-    </FrameLayout>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="@dimen/keyline_1"
+            android:background="@drawable/onboarding_add_to_dock_sketch_frame">
+
+            <com.duckduckgo.app.onboarding.ui.page.AspectRatioTextureView
+                android:id="@+id/addToDockPreviewVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginBottom="6dp"
+                android:importantForAccessibility="no"
+                android:maxWidth="@dimen/preOnboardingAddToDockVideoMaxWidth" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

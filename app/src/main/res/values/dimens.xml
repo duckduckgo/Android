@@ -25,6 +25,7 @@
     <dimen name="preOnboardingDaxCtaPaddingTop">40dp</dimen>
     <dimen name="preOnboardingWidgetPromptMediaMaxHeight">120dp</dimen>
     <dimen name="preOnboardingWidgetPromptMediaMaxWidth">280dp</dimen>
+    <dimen name="preOnboardingAddToDockVideoMaxWidth">360dp</dimen>
     <dimen name="onboardingContextualBackgroundOverlap">90dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
     <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
