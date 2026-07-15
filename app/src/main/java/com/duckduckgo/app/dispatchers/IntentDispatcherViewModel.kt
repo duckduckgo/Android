@@ -140,8 +140,14 @@ class IntentDispatcherViewModel @Inject constructor(
             }.onFailure {
                 logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
                 // Resolve to a routable state so the dispatcher doesn't hang on the unresolved default;
-                // fall back to the browser.
-                _viewState.emit(viewState.value.copy(resolved = true, isExternal = isExternal))
+                // fall back to opening the intent's URL in the browser.
+                _viewState.emit(
+                    viewState.value.copy(
+                        resolved = true,
+                        intentText = runCatching { intent?.intentText }.getOrNull(),
+                        isExternal = isExternal,
+                    ),
+                )
             }
         }
     }
