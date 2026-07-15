@@ -42,6 +42,6 @@ class AdBlockingBrokenSiteReportTrigger @Inject constructor() :
     override fun observeReportRequests(): Flow<BrokenSiteData.ReportFlow> = reportRequests
 
     override fun requestReport() {
-        reportRequests.tryEmit(BrokenSiteData.ReportFlow.MENU)
+        reportRequests.tryEmit(BrokenSiteData.ReportFlow.AD_BLOCKING)
     }
 }
