@@ -44,11 +44,9 @@ class NavBarVisibilityDecisionTest {
     }
 
     @Test
-    fun `nav bar shows only in browser context with an empty field`() {
-        assertTrue(shouldShowNavBar(isBrowserContext = true, isInputEmpty = true))
-        assertFalse(shouldShowNavBar(isBrowserContext = true, isInputEmpty = false))
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isInputEmpty = true))
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isInputEmpty = false))
+    fun `nav bar shows for the whole browser-input session regardless of field content`() {
+        assertTrue(shouldShowNavBar(isBrowserContext = true))
+        assertFalse(shouldShowNavBar(isBrowserContext = false))
     }
 
     @Test
