@@ -276,6 +276,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
@@ -648,6 +650,13 @@ class BrowserTabViewModelTest {
     }
     private val mockAdBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider = mock {
         onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+    }
+    private val brokenSiteReportTriggerFlow = MutableSharedFlow<BrokenSiteData.ReportFlow>(extraBufferCapacity = 1)
+    private val brokenSiteReportTriggerPlugin: BrokenSiteReportTriggerPlugin = mock {
+        on { observeReportRequests() } doReturn brokenSiteReportTriggerFlow
+    }
+    private val mockBrokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin> = mock {
+        on { getPlugins() } doReturn listOf(brokenSiteReportTriggerPlugin)
     }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
@@ -1046,6 +1055,7 @@ class BrowserTabViewModelTest {
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
+                brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
@@ -3071,6 +3081,29 @@ class BrowserTabViewModelTest {
         testee.onBrokenSiteSelected()
         val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("", command.data.url)
+    }
+
+    @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsThenBrokenSiteFeedbackCommandIssued() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
+        advanceUntilIdle()
+
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.data.url)
+    }
+
+    @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsWhileTabHiddenThenNoReport() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+        testee.onViewHidden()
+        advanceUntilIdle()
+
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<Command.BrokenSiteFeedback>()
     }
 
     @Test
