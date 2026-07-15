@@ -1125,7 +1125,8 @@ class OmnibarLayoutViewModel @Inject constructor(
 
             is LaunchAdBlockingAnimation -> {
                 val hasFocus = _viewState.value.hasFocus
-                if (!hasFocus) {
+                val isCustomTab = viewState.value.viewMode is CustomTab
+                if (!hasFocus && !isCustomTab) {
                     _viewState.update {
                         it.copy(
                             leadingIconState = PrivacyShield,

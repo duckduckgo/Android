@@ -2127,6 +2127,21 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenAdBlockingAnimationStartedInCustomTabThenSuppressedCommandSent() = runTest {
+        // The badge is not shown in custom tabs; instead it signals suppression so the browser
+        // releases its exclusivity claim and the tracker/cookie animations can still run.
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            expectMostRecentItem().assertCommand(Command.AdBlockingAnimationSuppressed::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun givenSomeTrackers(): List<Entity> {
         val network = TestingEntity("Network", "Network", 1.0)
         val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
