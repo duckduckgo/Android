@@ -74,6 +74,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -207,8 +208,9 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
-        // isAppReinstall must run even when Sync Restore wins (side-effecting).
-        verify(appBuildConfig).isAppReinstall()
+        // isAppReinstall must run even when Sync Restore wins (side-effecting): once eagerly to gate
+        // enrollment in the home-screen-prompts experiment, once via the first-dialog memo.
+        verify(appBuildConfig, times(2)).isAppReinstall()
         orchestrator.onEvent(NewUserOnboardingEvent.RestoreRequested)
         verify(pixel).fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
         verify(syncAutoRestore).restoreSyncAccount()
@@ -991,9 +993,6 @@ class NewUserOnboardingPlanProviderTest {
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
-    // The dock-only/dock-and-widget cohorts are exercised once add_to_dock's implementation lands
-    // on its own branch — until then those cohorts simply see no new pages here, same as CONTROL.
-
     @Test
     fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
         val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
@@ -1022,6 +1021,17 @@ class NewUserOnboardingPlanProviderTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+    }
+
+    @Test
+    fun whenReinstallThenNotEnrolledInHomeScreenPromptsExperiment() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(homeScreenPromptsExperiment.enroll())
+            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
+        verify(homeScreenPromptsExperiment, never()).enroll()
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     // endregion

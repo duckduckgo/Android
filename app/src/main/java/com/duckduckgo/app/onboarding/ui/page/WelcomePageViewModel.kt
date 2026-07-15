@@ -285,7 +285,6 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             WIDGET_PROMPT -> {
-                // not composed by the legacy flow
             }
         }
     }
@@ -340,7 +339,6 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             WIDGET_PROMPT -> {
-                // not composed by the legacy flow
             }
         }
     }
@@ -408,7 +406,6 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             WIDGET_PROMPT -> {
-                // not composed by the legacy flow
             }
         }
     }

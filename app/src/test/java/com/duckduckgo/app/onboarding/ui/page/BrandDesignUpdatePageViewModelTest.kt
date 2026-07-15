@@ -928,9 +928,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     // region Widget prompt (orchestrator-driven flow)
 
-    // These hand-built steps mirror the shapes NewUserOnboardingPlanProvider's widgetPromptStep()/
-    // addWidgetStep() resolve to (Task 5); the orchestrator here is the mock, so `transition` is never actually
-    // invoked to advance state — these tests only assert the VM's dialog rendering and CTA -> event mapping.
     private fun widgetPromptStep() =
         NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.WIDGET_PROMPT,
@@ -968,11 +965,6 @@ class BrandDesignUpdatePageViewModelTest {
         verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.AddWidgetRequested)
     }
 
-    // TODO: this only covers the VM's CTA -> event mapping (WidgetPromptSkipped). Asserting that the add_widget
-    // step is then actually skipped requires the real addWidgetStep()/ctx.skipAddWidget precondition wired by
-    // NewUserOnboardingPlanProvider (Task 5) driven through a real LinearOnboardingOrchestratorImpl, as in
-    // BrandDesignUpdatePageViewModelOrchestratorTest — this file's mock orchestrator never evaluates preconditions
-    // or advances plan state. The precondition-skip behaviour itself is covered by NewUserOnboardingPlanProviderTest.
     @Test
     fun whenWidgetPromptSecondaryThenWidgetPromptSkippedEmitted() = runTest {
         orchestratorState.value = inProgressOn(widgetPromptStep())
@@ -996,8 +988,6 @@ class BrandDesignUpdatePageViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
 
-        // No page of its own (PreOnboardingDialogType has no AddWidget entry) and no orchestrator event yet -
-        // advancing only happens later, from checkAddWidgetPromptResult() on the next onResume.
         assertNull(testee.viewState.value.currentDialog)
         verify(mockOrchestrator, never()).onEvent(any())
     }
@@ -1007,7 +997,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         orchestratorState.value = inProgressOn(addWidgetStep())
         val testee = createViewModel()
-        advanceUntilIdle() // applies the AddWidget dialog: sends LaunchAddWidgetPrompt, marks the flow started
+        advanceUntilIdle()
 
         testee.checkAddWidgetPromptResult()
         advanceUntilIdle()

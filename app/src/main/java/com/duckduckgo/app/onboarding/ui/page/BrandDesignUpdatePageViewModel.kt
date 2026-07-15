@@ -382,14 +382,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    // Called on the fragment's onResume: if the add-widget step launched the system prompt, re-check
-    // whether a widget was added and advance the orchestrator with the result.
     fun checkAddWidgetPromptResult() {
-        if (!addWidgetPromptFlowStarted) return
-        viewModelScope.launch {
-            val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
-            addWidgetPromptFlowStarted = false
-            orchestrator.onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = hasWidget))
+        if (addWidgetPromptFlowStarted) {
+            viewModelScope.launch {
+                val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
+                addWidgetPromptFlowStarted = false
+                orchestrator.onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = hasWidget))
+            }
         }
     }
 
@@ -531,9 +530,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.WidgetPrompt ->
                 setCurrentDialog(WIDGET_PROMPT, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AddWidget -> {
-                // Action step: launch the system add-widget prompt and mark the flow started. Advance happens on
-                // the next onResume via checkAddWidgetPromptResult(). No page of its own, like DefaultBrowserPrompt
-                // — the widget_prompt page stays visible under the system dialog.
                 addWidgetPromptFlowStarted = true
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }

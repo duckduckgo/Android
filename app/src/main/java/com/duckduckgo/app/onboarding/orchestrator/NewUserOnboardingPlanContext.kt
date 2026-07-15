@@ -49,7 +49,7 @@ class NewUserOnboardingPlanContext {
     var pendingDuckAiPrompt: String? = null
 
     /**
-     * Set true by the [NewUserOnboardingStepIds.WIDGET_PROMPT] step when the user taps "Maybe later",
+     * Set true by the [NewUserOnboardingStepIds.WIDGET_PROMPT] step when the user taps "Skip",
      * read by the [NewUserOnboardingStepIds.ADD_WIDGET] precondition to skip launching the system prompt.
      */
     @Volatile

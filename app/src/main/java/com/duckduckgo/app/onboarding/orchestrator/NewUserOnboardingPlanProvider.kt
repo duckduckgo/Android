@@ -119,7 +119,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
-            val variant = onboardingPromptsExperimentManager.enroll()
+            val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+            val variant = if (isReinstall) {
+                null
+            } else {
+                onboardingPromptsExperimentManager.enroll()
+            }
             buildDefaultPlan(onCompleted, onSkipped, variant)
         }
 
