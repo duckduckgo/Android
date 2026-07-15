@@ -61,6 +61,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.ui.v2.SyncActivity as SyncActivityV2
 
 @InjectWith(ActivityScope::class)
 class SyncInternalSettingsActivity : DuckDuckGoActivity() {
@@ -115,6 +116,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     private fun configureListeners() {
         binding.launchSyncSettingsButton.setOnClickListener {
             startActivity(Intent(this, SyncActivity::class.java))
+        }
+        binding.launchSimplifiedSyncSettingsButton.setOnClickListener {
+            startActivity(Intent(this, SyncActivityV2::class.java))
         }
         binding.openV2PairingDebugButton.setOnClickListener {
             startActivity(Intent(this, SyncV2PairingDebugActivity::class.java))

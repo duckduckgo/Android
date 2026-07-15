@@ -15,5 +15,11 @@
   -->
 
 <resources>
-
+    <!-- Simplified Sync  -->
+    <string name="sync_settings_v2_header_headline_disabled">Keep DuckDuckGo in sync!</string>
+    <string name="sync_settings_v2_header_headline_enabled">DuckDuckGo is in sync.</string>
+    <string name="sync_settings_v2_header_body_disabled">Sync your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai chats, end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai chats, are being synced with end-to-end encryption.</string>
 </resources>

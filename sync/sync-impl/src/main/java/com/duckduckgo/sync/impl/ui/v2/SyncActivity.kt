@@ -16,24 +16,76 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.FrameLayout
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2Binding
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class SyncActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncV2Binding>()
+
+    private val viewModel by bindViewModel<SyncActivityViewModel>()
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(
-            FrameLayout(this).apply {
-                setBackgroundColor(Color.MAGENTA)
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            },
+
+        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (isEdgeToEdge) {
+            enableTransparentEdgeToEdge()
+        }
+        setContentView(binding.root)
+        if (isEdgeToEdge) {
+            configureEdgeToEdgeInsets()
+        }
+
+        configureToolbar()
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        binding.syncHeader.setState(
+            isSyncEnabled = viewState.showAccount,
+            isDuckAiAvailable = viewState.aiChatSyncEnabled,
         )
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(binding.includeToolbar.toolbar)
+        binding.includeToolbar.toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 }
