@@ -103,6 +103,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -501,6 +502,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.onChatDeleteConfirmed()
                         currentTab?.refreshAutoComplete()
                     }
+                }
+                FireDialog.EVENT_ON_FIRE_TABS_CLEARING_COMPLETE -> {
+                    // All Fire tabs were burned; land the user on the (now empty) Fire tab switcher
+                    globalActivityStarter.start(this, TabSwitcherScreenWithParams(BrowserMode.FIRE))
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
                     val origin = bundle.getString(FireDialog.RESULT_KEY_ORIGIN)

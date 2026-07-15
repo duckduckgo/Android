@@ -61,7 +61,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuBack"
                     app:menuActionSrc="@drawable/ic_arrow_left_24" />
 
@@ -70,8 +70,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuForward"
                     app:menuActionSrc="@drawable/ic_arrow_right_24" />
 
@@ -80,8 +80,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuNewTab"
                     app:menuActionSrc="@drawable/ic_add_24" />
 
@@ -90,8 +90,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuDuckChat"
                     app:menuActionSrc="@drawable/ic_duck_ai_menu_logo_24" />
 
@@ -100,7 +100,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
+                    android:layout_marginStart="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuSettings"
                     app:menuActionSrc="@drawable/ic_settings_24" />
 
@@ -109,7 +109,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
+                    android:layout_marginStart="@dimen/keyline_0"
                     android:visibility="gone"
                     app:menuActionLabel="@string/browserMenuRefresh"
                     app:menuActionSrc="@drawable/ic_reload_24"

@@ -1448,9 +1448,13 @@ class BrowserTabFragment :
                     if (binding.autoCompleteSuggestionsList.isVisible) {
                         viewModel.autoCompleteSuggestionsGone()
                     }
-                    viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
+                    val fireTabsAvailable = fireModeAvailability.isAvailable()
+                    viewModel.triggerAutocomplete("", hasFocus = fireTabsAvailable, hasQueryChanged = true)
                     binding.autoCompleteSuggestionsList.gone()
-                    binding.focusedView.gone()
+                    // With Fire tabs off, keep the pre-Fire-tabs behaviour of hiding the focused view on clear.
+                    if (!fireTabsAvailable) {
+                        binding.focusedView.gone()
+                    }
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
@@ -6005,9 +6009,13 @@ class BrowserTabFragment :
         }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
-            // Chat tab owns rendering its autoCompleteSuggestionsList.
+            // Chat never shows the focused NTP overlay. With Fire tabs on, clearing can leave it visible,
+            // so hide it here; with Fire tabs off it was already hidden on clear (pre-existing behaviour).
             if (nativeInputManager.isChatTabSelected()) {
                 lastSeenAutoCompleteViewState = null
+                if (fireModeAvailability.isAvailable()) {
+                    hideFocusedView()
+                }
                 return
             }
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -6037,8 +6045,7 @@ class BrowserTabFragment :
         }
 
         private fun showFocusedView(hasFavorites: Boolean = true) {
-            binding.focusedView.show()
-            binding.focusedView.showLogo(!hasFavorites)
+            binding.focusedView.show(isLogoVisible = !hasFavorites, browserMode)
         }
 
         private fun hideFocusedView() {

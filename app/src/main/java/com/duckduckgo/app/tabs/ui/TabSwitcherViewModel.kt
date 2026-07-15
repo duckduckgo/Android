@@ -88,6 +88,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -152,6 +153,7 @@ class TabSwitcherViewModel @Inject constructor(
     )
 
     private var tabSwitcherPromoHandled = false
+    private var fireDataCleared = false
 
     init {
         viewModelScope.launch {
@@ -203,6 +205,10 @@ class TabSwitcherViewModel @Inject constructor(
             browserMode = browserMode,
             regularTabCount = regularTabCount,
         )
+    }.onEach { state ->
+        if (!state.showFireTabsEmptyState) {
+            fireDataCleared = false
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
@@ -245,7 +251,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
         data object ShowFireBottomSheet : Command()
         data object DismissSnackbar : Command()
-        data object SwitchToRegularMode : Command()
+        data object SwitchToRegularModeAndClose : Command()
     }
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
@@ -293,26 +299,31 @@ class TabSwitcherViewModel @Inject constructor(
         _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }
 
-    // Runs on the app scope so the burn survives the activity recreate() that the Fire -> Regular
-    // mode switch triggers, otherwise the clear would be cancelled mid-flight.
-    private fun switchToRegularModeClearingFireData() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            dataClearingWideEvent.start(
-                entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
-                clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
-            )
-            try {
-                dataClearing.clearDataUsingManualFireOptions(
-                    shouldRestartIfRequired = false,
-                    browserMode = BrowserMode.FIRE,
+    private fun clearFireModeTabsAndDataIfNeeded() {
+        if (viewState.value.showFireTabsEmptyState && !fireDataCleared) {
+            fireDataCleared = true
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+                    clearOptions = setOf(
+                        FireClearOption.TABS,
+                        FireClearOption.DATA,
+                        FireClearOption.DUCKAI_CHATS,
+                    ),
                 )
-                dataClearingWideEvent.finishSuccess()
-            } catch (e: Exception) {
-                dataClearingWideEvent.finishFailure(e)
-                throw e
+                try {
+                    dataClearing.clearDataUsingManualFireOptions(
+                        shouldRestartIfRequired = false,
+                        browserMode = BrowserMode.FIRE,
+                    )
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    fireDataCleared = false
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
         }
-        command.value = Command.SwitchToRegularMode
     }
 
     suspend fun onTabSelected(tabId: String) {
@@ -339,6 +350,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     private suspend fun deleteTabs(tabIds: List<String>) {
         tabRepository.deleteTabs(tabIds.filterNot { it == TRACKER_ANIMATION_PANEL_ID })
+
+        clearFireModeTabsAndDataIfNeeded()
     }
 
     private fun triggerEmptySelectionMode() {
@@ -482,9 +495,7 @@ class TabSwitcherViewModel @Inject constructor(
                 tabRepository.markDeletable(tabIds)
 
                 if (fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
-                    // emptying all Fire tabs returns the user to Regular mode, matching the single-tab
-                    // close path; the tab switcher stays open instead of closing with an undo snackbar
-                    switchToRegularModeClearingFireData()
+                    command.value = Command.ShowUndoDeleteTabsMessage(tabIds)
                 } else {
                     // the undo snackbar will be displayed when the tab switcher is closed
                     command.value = Command.CloseAndShowUndoMessage(tabIds)
@@ -511,10 +522,7 @@ class TabSwitcherViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val isLastTab = tabs.size == 1
-            if (isLastTab && fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
-                markTabAsDeletable(tab, swipeGestureUsed)
-                switchToRegularModeClearingFireData()
-            } else if (isLastTab) {
+            if (isLastTab && currentMode.value != BrowserMode.FIRE) {
                 // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                 markTabAsDeletable(tab, swipeGestureUsed)
                 command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
@@ -584,7 +592,8 @@ class TabSwitcherViewModel @Inject constructor(
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
         } else if (viewState.value.showFireTabsEmptyState) {
-            command.value = Command.SwitchToRegularMode
+            clearFireModeTabsAndDataIfNeeded()
+            command.value = Command.SwitchToRegularModeAndClose
         } else {
             command.value = Command.Close
         }
@@ -596,7 +605,8 @@ class TabSwitcherViewModel @Inject constructor(
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
         } else if (viewState.value.showFireTabsEmptyState) {
-            command.value = Command.SwitchToRegularMode
+            clearFireModeTabsAndDataIfNeeded()
+            command.value = Command.SwitchToRegularModeAndClose
         } else {
             command.value = Command.Close
         }
@@ -745,7 +755,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        return if (!isTrackersAnimationInfoPanelHidden) {
+        return if (!isTrackersAnimationInfoPanelHidden && browserMode != BrowserMode.FIRE) {
             val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {

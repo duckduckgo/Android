@@ -32,6 +32,8 @@
         android:background="?attr/daxColorToolbar"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:buttonGravity="center_vertical"
-        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+        app:contentInsetStartWithNavigation="0dp"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu"
+        app:titleMarginStart="@dimen/keyline_4" />
 
 </com.google.android.material.appbar.AppBarLayout>
