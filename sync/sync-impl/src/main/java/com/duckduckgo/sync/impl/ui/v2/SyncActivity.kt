@@ -16,22 +16,31 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2Binding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -47,6 +56,8 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    private val syncedDeviceAdapter = SyncedDeviceAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -60,6 +71,9 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         configureToolbar()
+        configureDevicesRecyclerView()
+        configureDataExpirationNotice()
+        configureDataDeletionItem()
 
         observeViewModel()
     }
@@ -76,10 +90,17 @@ class SyncActivity : DuckDuckGoActivity() {
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
         )
+
         binding.includeDisabledView.root.isGone = viewState.showAccount
         binding.includeDisabledView.synOnOtherPlatformsItem.setState(
             isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
         )
+
+        binding.includeEnabledView.root.isVisible = viewState.showAccount
+        binding.includeEnabledView.synOnOtherPlatformsItem.setState(
+            isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
+        )
+        syncedDeviceAdapter.submitList(viewState.syncedDevices)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -92,5 +113,33 @@ class SyncActivity : DuckDuckGoActivity() {
         setSupportActionBar(binding.includeToolbar.toolbar)
         binding.includeToolbar.toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun configureDevicesRecyclerView() {
+        binding.includeEnabledView.devicesRecycler.apply {
+            layoutManager = LinearLayoutManager(this@SyncActivity)
+            adapter = syncedDeviceAdapter
+        }
+    }
+
+    private fun configureDataExpirationNotice() {
+        binding.includeEnabledView.expirationNoticeLabel.addClickableSpan(
+            textSequence = getText(R.string.sync_settings_data_expiration),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        logcat { "Learn more clicked" }
+                    }
+                },
+            ),
+        )
+    }
+
+    private fun configureDataDeletionItem() {
+        val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
+        binding.includeEnabledView.deleteAccountItem.apply {
+            leadingIcon().imageTintList = color
+            setPrimaryTextColorStateList(color)
+        }
     }
 }

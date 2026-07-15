@@ -48,7 +48,15 @@
                 android:id="@+id/include_disabled_view"
                 layout="@layout/view_sync_v2_disabled"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/include_enabled_view"
+                layout="@layout/view_sync_v2_enabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>
