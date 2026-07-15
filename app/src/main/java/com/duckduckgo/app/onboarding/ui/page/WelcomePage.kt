@@ -507,7 +507,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                 INPUT_SCREEN_PREVIEW -> return@let // handled by configureInputScreenPreviewDialog()
                 QUICK_SETUP -> return@let
-                ADD_TO_DOCK, WIDGET_PROMPT -> return@let
+                ADD_TO_DOCK -> return@let
+                WIDGET_PROMPT -> return@let
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }

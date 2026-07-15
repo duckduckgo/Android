@@ -1122,7 +1122,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
                     binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.ComparisonChart)
+                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddToDock)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
@@ -1265,13 +1265,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 SKIP_ONBOARDING_OPTION -> Unit
 
                 ADDRESS_BAR_POSITION -> {
+                    releaseAddToDockVideo()
                     dismissBottomWingAnimation()
                     dismissLeftWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addToDockContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = false
                     binding.daxDialogCta.secondaryCta.isVisible = false
-                    releaseAddToDockVideo()
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
                     updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
@@ -1832,7 +1832,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddWidget)
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddToDock)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false

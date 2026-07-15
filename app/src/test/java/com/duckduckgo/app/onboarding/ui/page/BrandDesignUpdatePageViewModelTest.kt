@@ -939,9 +939,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     // region Add to Dock / Widget prompt (orchestrator-driven flow)
 
-    // These hand-built steps mirror the shapes NewUserOnboardingPlanProvider's addToDockStep()/widgetPromptStep()/
-    // addWidgetStep() resolve to (Task 5); the orchestrator here is the mock, so `transition` is never actually
-    // invoked to advance state — these tests only assert the VM's dialog rendering and CTA -> event mapping.
     private fun addToDockStep() =
         NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.ADD_TO_DOCK,
