@@ -530,7 +530,7 @@ class DuckChatContextualFragment :
             viewModel.onContextualClose()
         }
         binding.contextualNewChat.setOnClickListener {
-            hideKeyboard(binding.inputField)
+            hideKeyboard(binding.legacyInputField)
             viewModel.onChatsIconClicked()
         }
         binding.contextualFire.setOnClickListener {
@@ -538,7 +538,7 @@ class DuckChatContextualFragment :
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
-        binding.inputField.setOnEditorActionListener(
+        binding.legacyInputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     sendNativePrompt()
@@ -547,7 +547,7 @@ class DuckChatContextualFragment :
                 false
             },
         )
-        binding.inputField.addTextChangedListener(
+        binding.legacyInputField.addTextChangedListener(
             object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -578,6 +578,10 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
+            // Clear the field directly: typed text isn't mirrored into viewState.prompt, so relying on
+            // onPromptCleared() alone is a no-op re-render (prompt is usually already empty) and the
+            // visible text would stay. Still notify the ViewModel to keep prompt state consistent.
+            clearInputField()
             viewModel.onPromptCleared()
         }
 
@@ -594,24 +598,24 @@ class DuckChatContextualFragment :
             val currentInput = if (viewModel.viewState.value.nativeChatInputEnabled) {
                 binding.contextualNativeInputWidget.text
             } else {
-                binding.inputField.text.toString()
+                binding.legacyInputField.text.toString()
             }
             viewModel.onQuickActionClicked(currentInput)
         }
     }
 
     private fun clearInputField() {
-        binding.inputField.text.clear()
-        binding.inputField.setSelection(0)
-        binding.inputField.scrollTo(0, 0)
+        binding.legacyInputField.text.clear()
+        binding.legacyInputField.setSelection(0)
+        binding.legacyInputField.scrollTo(0, 0)
     }
 
     private fun sendNativePrompt() {
-        val prompt = binding.inputField.text.toString()
+        val prompt = binding.legacyInputField.text.toString()
         if (prompt.isNotEmpty()) {
             viewModel.onPromptSent(prompt)
             clearInputField()
-            hideKeyboard(binding.inputField)
+            hideKeyboard(binding.legacyInputField)
         }
     }
 
@@ -717,7 +721,7 @@ class DuckChatContextualFragment :
 
         binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
         binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
-        binding.inputField.setHint(viewState.chatHintResId)
+        binding.legacyInputField.setHint(viewState.chatHintResId)
 
         if (viewState.showChatsIcon) {
             binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
@@ -763,8 +767,8 @@ class DuckChatContextualFragment :
                         }
                     }
                     if (viewState.prompt.isNotEmpty()) {
-                        binding.inputField.setText(viewState.prompt)
-                        binding.inputField.setSelection(viewState.prompt.length)
+                        binding.legacyInputField.setText(viewState.prompt)
+                        binding.legacyInputField.setSelection(viewState.prompt.length)
                     } else {
                         clearInputField()
                     }

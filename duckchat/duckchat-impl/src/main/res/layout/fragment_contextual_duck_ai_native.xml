@@ -222,7 +222,7 @@
                         android:orientation="horizontal">
 
                         <EditText
-                            android:id="@+id/inputField"
+                            android:id="@+id/legacyInputField"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
