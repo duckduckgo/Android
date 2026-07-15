@@ -3690,11 +3690,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserPressesBackAndGoesToHomeThenKeyboardShown() {
+    fun whenUserPressesBackAndGoesToHomeThenKeyboardNotShown() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+        assertCommandNotIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenUserPressesBackAndGoesToHomeThenHomeShown() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+
+        val result = testee.onUserPressedBack()
+
+        assertFalse(browserViewState().browserShowing)
+        assertTrue(result)
     }
 
     @Test
