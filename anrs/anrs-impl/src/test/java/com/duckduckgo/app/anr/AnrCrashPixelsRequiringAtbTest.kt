@@ -38,6 +38,11 @@ class AnrCrashPixelsRequiringAtbTest {
     }
 
     @Test
+    fun verifiedInstallCrashPixelIsCovered() {
+        assertTrue(isCovered(CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName))
+    }
+
+    @Test
     fun unrelatedPixelIsNotCovered() {
         assertFalse(isCovered("m_search"))
     }
