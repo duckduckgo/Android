@@ -937,7 +937,19 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region Widget prompt (orchestrator-driven flow)
+    // region Add to Dock / Widget prompt (orchestrator-driven flow)
+
+    // These hand-built steps mirror the shapes NewUserOnboardingPlanProvider's addToDockStep()/widgetPromptStep()/
+    // addWidgetStep() resolve to (Task 5); the orchestrator here is the mock, so `transition` is never actually
+    // invoked to advance state — these tests only assert the VM's dialog rendering and CTA -> event mapping.
+    private fun addToDockStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
+            pixelName = null,
+            showsStepIndicator = true,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
+        )
 
     private fun widgetPromptStep() =
         NewUserOnboardingActivityStep(
@@ -962,6 +974,19 @@ class BrandDesignUpdatePageViewModelTest {
             currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
             currentStepIndex = 0,
         )
+
+    @Test
+    fun whenAddToDockPrimaryCtaThenContinueClickedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(addToDockStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.ADD_TO_DOCK, testee.viewState.value.currentDialog)
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.ContinueClicked)
+    }
 
     @Test
     fun whenWidgetPromptPrimaryThenAddWidgetRequestedEmitted() = runTest {

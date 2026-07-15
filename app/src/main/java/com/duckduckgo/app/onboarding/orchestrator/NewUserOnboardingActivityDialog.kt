@@ -28,6 +28,7 @@ sealed interface NewUserOnboardingActivityDialog {
     data object ComparisonChart : NewUserOnboardingActivityDialog
     data object AiComparisonChart : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
+    data object AddToDock : NewUserOnboardingActivityDialog
     data object WidgetPrompt : NewUserOnboardingActivityDialog
 
     data object AddWidget : NewUserOnboardingActivityDialog

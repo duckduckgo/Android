@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADD_TO_DOCK
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -284,7 +285,7 @@ class WelcomePageViewModel @Inject constructor(
             QUICK_SETUP -> {
             }
 
-            WIDGET_PROMPT -> {
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
             }
         }
     }
@@ -338,7 +339,7 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
-            WIDGET_PROMPT -> {
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
             }
         }
     }
@@ -405,7 +406,7 @@ class WelcomePageViewModel @Inject constructor(
             QUICK_SETUP -> {
             }
 
-            WIDGET_PROMPT -> {
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
             }
         }
     }
