@@ -65,7 +65,7 @@ jobs:
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -84,7 +84,7 @@ jobs:
       - name: Get Asana task permalink
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: get-task-permalink
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: Add Asana task to Release Board project
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
@@ -138,7 +138,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -149,7 +149,7 @@ jobs:
 
       - name: Adding as a release blocker
         if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}

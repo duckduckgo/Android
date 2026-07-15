@@ -61,7 +61,7 @@ jobs:
 
       - name: Add Asana task to Browser Sync & Backup project
         if: ${{ failure() && steps.maestro-cloud-asana.outputs.asana_task_id != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure'}}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

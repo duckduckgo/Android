@@ -127,7 +127,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Add task to project (no-op if already there)
-        uses: duckduckgo/native-github-asana-sync@v2.5.1
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
@@ -135,7 +135,7 @@ jobs:
           asana-task-id: ${{ matrix.task_id }}
           action: 'add-task-asana-project'
       - name: Tag task as LGC
-        uses: duckduckgo/native-github-asana-sync@v2.5.1
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-task-id: ${{ matrix.task_id }}
