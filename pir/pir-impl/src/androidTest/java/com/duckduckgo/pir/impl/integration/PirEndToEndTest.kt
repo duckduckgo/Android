@@ -809,7 +809,7 @@ class PirEndToEndTest {
             StartedEventHandler(),
             LoadUrlCompleteEventHandler(),
             LoadUrlFailedEventHandler(),
-            ErrorReceivedHandler(pirRunStateHandler),
+            ErrorReceivedHandler(pirRunStateHandler, fakeTimeProvider),
             RetryGetCaptchaSolutionEventHandler(),
             RetryAwaitCaptchaSolutionEventHandler(),
             JsActionSuccessEventHandler(pirRunStateHandler, fakeTimeProvider),
