@@ -527,8 +527,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
-            // The toggle-row back arrow flips with text presence (inverse of the nav bar).
-            nativeInputState?.let { updateBackButtons(it) }
         }
     }
 
@@ -741,9 +739,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateBackButtons(state: NativeInputState) {
-        val hasText = !inputField.text.isNullOrEmpty()
         findViewById<View?>(R.id.inputModeWidgetBack)?.visibility =
-            if (state.shouldShowToggleRowBack(hasText)) VISIBLE else GONE
+            if (state.shouldShowToggleRowBack(duckChatFeature.nativeInputNavBar().isEnabled())) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
             if (state.shouldShowCardRowBack()) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
@@ -1626,11 +1623,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 internal fun NativeInputState.chatHintRes(): Int =
     if (chatId != null) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint
 
-// Inverse of the top nav bar: the nav bar shows its own back arrow while the field is empty, so this
-// one shows only once there is text — the two are never visible at the same time (browser only; this
-// arrow never renders in Duck.ai / contextual, where toggleVisible is false).
-internal fun NativeInputState.shouldShowToggleRowBack(hasText: Boolean): Boolean =
-    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && hasText
+// The nav bar carries its own back arrow, so this one only fills in when the nav bar feature is off
+// (browser only; this arrow never renders in Duck.ai / contextual, where toggleVisible is false).
+internal fun NativeInputState.shouldShowToggleRowBack(isNavBarFeatureEnabled: Boolean): Boolean =
+    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && !isNavBarFeatureEnabled
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
