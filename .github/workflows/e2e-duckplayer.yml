@@ -59,7 +59,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure'}}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}

@@ -81,7 +81,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Notify Mattermost that Play Store build is starting
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -116,7 +116,7 @@ jobs:
 
       - name: Notify Mattermost of Play Store upload
         id: send-mm-message-ps-upload
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -131,7 +131,7 @@ jobs:
 
       - name: Notify Mattermost of GH upload
         id: send-mm-message-gh-upload
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -141,7 +141,7 @@ jobs:
 
       - name: Notify Mattermost of Release completed
         id: send-mm-message-release-complete
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -163,7 +163,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
