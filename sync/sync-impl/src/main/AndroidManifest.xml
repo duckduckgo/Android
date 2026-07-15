@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.duckduckgo.sync.impl"
+<manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -82,5 +82,12 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
+
+        <activity
+            android:name=".ui.v2.SyncActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
     </application>
 </manifest>

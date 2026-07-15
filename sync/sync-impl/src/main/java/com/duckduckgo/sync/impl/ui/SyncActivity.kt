@@ -22,7 +22,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -108,10 +107,6 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class, delayGeneration = true)
-@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
-@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
-@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
-@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
