@@ -49,9 +49,16 @@ class SyncActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        configureEdgeToEdge()
-        configureToolbar()
+        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (isEdgeToEdge) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
+        if (isEdgeToEdge) {
+            configureEdgeToEdgeInsets()
+        }
+
+        configureToolbar()
 
         observeViewModel()
     }
@@ -70,18 +77,15 @@ class SyncActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
+
     private fun configureToolbar() {
         setSupportActionBar(binding.includeToolbar.toolbar)
         binding.includeToolbar.toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun configureEdgeToEdge() {
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)) {
-            enableTransparentEdgeToEdge()
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
-        }
     }
 }
