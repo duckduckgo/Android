@@ -67,7 +67,7 @@ interface ContextualNativeInputManager {
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
         // Invoked when the widget submits a prompt while the sheet is in INPUT mode: starts a new chat.
         // WEBVIEW-mode submissions keep going through the in-chat JS event path (see setupWidget).
-        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit = {},
+        onNewPromptSubmitted: (NativeInputPrompt) -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -107,14 +107,14 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
-        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onNewPromptSubmitted: (NativeInputPrompt) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested, onNewChatPromptSubmitted)
+        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested, onNewPromptSubmitted)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -195,8 +195,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
                 widget.clearAttachments()
-                if (lastMode == Mode.INPUT) {
-                    // Initial sheet: start a new chat via the ViewModel so the sheet switches to WEBVIEW.
+                if (lastMode != Mode.WEBVIEW) {
                     onNewChatPromptSubmitted(
                         NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
                     )

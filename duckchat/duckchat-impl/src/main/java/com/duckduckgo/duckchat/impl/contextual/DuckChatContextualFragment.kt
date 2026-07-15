@@ -234,7 +234,12 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    if (binding.inputField.hasFocus()) {
+                    val composerHasFocus = if (viewModel.viewState.value.nativeChatInputEnabled) {
+                        binding.contextualNativeInputWidget.hasFocus()
+                    } else {
+                        binding.contextualModeNativeContent.hasFocus()
+                    }
+                    if (composerHasFocus) {
                         viewModel.onKeyboardVisibilityChanged(imeVisible)
                     }
                 }
@@ -473,7 +478,7 @@ class DuckChatContextualFragment :
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
             },
-            onNewChatPromptSubmitted = { submitted ->
+            onNewPromptSubmitted = { submitted ->
                 viewModel.onPromptSent(
                     prompt = submitted.prompt,
                     modelId = submitted.modelId,
@@ -586,7 +591,12 @@ class DuckChatContextualFragment :
             viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
-            viewModel.onQuickActionClicked(binding.inputField.text.toString())
+            val currentInput = if (viewModel.viewState.value.nativeChatInputEnabled) {
+                binding.contextualNativeInputWidget.text
+            } else {
+                binding.inputField.text.toString()
+            }
+            viewModel.onQuickActionClicked(currentInput)
         }
     }
 
@@ -738,15 +748,19 @@ class DuckChatContextualFragment :
 
                     renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                    if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
-                        binding.duckAiContextualLayout.gone()
-                        binding.duckAiAttachContextLayout.gone()
-                    } else if (viewState.showContext) {
-                        binding.duckAiContextualLayout.show()
-                        binding.duckAiAttachContextLayout.gone()
-                    } else {
-                        binding.duckAiContextualLayout.gone()
-                        binding.duckAiAttachContextLayout.show()
+                    when {
+                        viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE -> {
+                            binding.duckAiContextualLayout.gone()
+                            binding.duckAiAttachContextLayout.gone()
+                        }
+                        viewState.showContext -> {
+                            binding.duckAiContextualLayout.show()
+                            binding.duckAiAttachContextLayout.gone()
+                        }
+                        else -> {
+                            binding.duckAiContextualLayout.gone()
+                            binding.duckAiAttachContextLayout.show()
+                        }
                     }
                     if (viewState.prompt.isNotEmpty()) {
                         binding.inputField.setText(viewState.prompt)

@@ -221,12 +221,12 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewChatPromptSubmitted = { submitted = it },
+            onNewPromptSubmitted = { submitted = it },
         )
         testee.onInputMode()
 
         val captor = argumentCaptor<(String) -> Unit>()
-        verify(widget).bindInputEvents(any(), any(), captor.capture())
+        verify(widget).bindInputEvents(any(), any(), captor.capture(), any())
         captor.firstValue.invoke("hello")
 
         assertEquals("hello", submitted?.prompt)
@@ -250,16 +250,44 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewChatPromptSubmitted = { submitted = it },
+            onNewPromptSubmitted = { submitted = it },
         )
         testee.onWebViewMode()
 
         val captor = argumentCaptor<(String) -> Unit>()
-        verify(widget).bindInputEvents(any(), any(), captor.capture())
+        verify(widget).bindInputEvents(any(), any(), captor.capture(), any())
         captor.firstValue.invoke("hello")
 
         assertNull(submitted)
         verify(jsMessaging).sendSubscriptionEvent(any())
+    }
+
+    @Test
+    fun `when chat submitted before any mode set then routes to new chat callback`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        val jsMessaging = mock<JsMessaging>()
+        var submitted: NativeInputPrompt? = null
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = jsMessaging,
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onNewPromptSubmitted = { submitted = it },
+        )
+        // Submit before onInputMode/onWebViewMode runs (lastMode still null): must start a new chat,
+        // not fall through to the in-chat JS path.
+
+        val captor = argumentCaptor<(String) -> Unit>()
+        verify(widget).bindInputEvents(any(), any(), captor.capture(), any())
+        captor.firstValue.invoke("hello")
+
+        assertEquals("hello", submitted?.prompt)
+        verify(jsMessaging, never()).sendSubscriptionEvent(any())
     }
 
     private fun mockCard(): MaterialCardView {
