@@ -28,10 +28,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -43,18 +43,22 @@ jobs:
       - name: Set Default Inputs for Scheduled Runs
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          echo "package_name=com.duckduckgo.mobile.android" >> $GITHUB_ENV
-          echo "langs=en" >> $GITHUB_ENV
-          echo "countries=us" >> $GITHUB_ENV
-          echo "count=10000" >> $GITHUB_ENV
+          {
+            echo "package_name=com.duckduckgo.mobile.android"
+            echo "langs=en"
+            echo "countries=us"
+            echo "count=10000"
+          } >> "$GITHUB_ENV"
 
       - name: Override Inputs for Manual Trigger
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          echo "package_name=${{ github.event.inputs.package_name }}" >> $GITHUB_ENV
-          echo "langs=${{ github.event.inputs.langs }}" >> $GITHUB_ENV
-          echo "countries=${{ github.event.inputs.countries }}" >> $GITHUB_ENV
-          echo "count=${{ github.event.inputs.count }}" >> $GITHUB_ENV
+          {
+            echo "package_name=${{ github.event.inputs.package_name }}"
+            echo "langs=${{ github.event.inputs.langs }}"
+            echo "countries=${{ github.event.inputs.countries }}"
+            echo "count=${{ github.event.inputs.count }}"
+          } >> "$GITHUB_ENV"
 
       - name: Run Review Analysis Script
         id: run-script
@@ -64,13 +68,15 @@ jobs:
             --langs "${{ env.langs }}" \
             --countries "${{ env.countries }}" \
             --count "${{ env.count }}" > output.txt
-          echo "script_output<<EOF" >> $GITHUB_ENV
-          cat output.txt >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo "script_output<<EOF"
+            cat output.txt
+            echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Get Current Date
         id: date
-        run: echo "current_date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "current_date=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
 
       - name: Sync Output to Asana
         uses: duckduckgo/native-github-asana-sync@v2.6.0
