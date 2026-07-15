@@ -129,6 +129,12 @@
         "type": "boolean",
         "description": "Whether the subscription purchase is a free trial"
     },
+    "consentHeuristicEnabled": {
+        "key": "consentHeuristicEnabled",
+        "type": "string",
+        "description": "Heuristic action mode derived from user preference and feature flags.",
+        "enum": ["off", "tier1", "tier2", "reject"]
+    },
     "pirCancellationReason": {
         "key": "feature.data.ext.cancellation_reason",
         "type": "string",

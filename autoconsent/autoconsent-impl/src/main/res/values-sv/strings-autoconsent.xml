@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Skydd mot popup-fönster för cookies</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo kommer att försöka välja de mest privata inställningarna som finns tillgängliga och dölja dessa popup-fönster åt dig.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="autoconsentToggle">Låt DuckDuckGo hantera popup-fönster för cookies</string>
+    <string name="autoconsentAutoManageToggle">Hantera popup-fönster för cookies automatiskt</string>
+    <string name="autoconsentAutoManageDescription">Vi strävar efter att endast välja de mest privata cookiealternativen som finns tillgängliga för dig, och sedan stänga dessa popup-fönster.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan automatiskt hantera cookieinställningar för att maximera din integritet, minimera antalet cookies och stänga dessa popup-fönster.\n<a href=\"\">Läs mer</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Popup-fönster där det inte går att välja bort cookies</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Låt även DuckDuckGo spara ett klick för dig genom att acceptera cookies i popup-fönster där det inte går att välja bort dessa.</string>
 </resources>

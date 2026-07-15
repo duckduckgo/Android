@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentDescription"><![CDATA[Το DuckDuckGo θα προσπαθήσει να επιλέξει τις πιο ιδιωτικές ρυθμίσεις που υπάρχουν διαθέσιμες και να αποκρύψει αυτά τα αναδυόμενα παράθυρα για εσάς.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="autoconsentToggle">Επιτρέψτε στο DuckDuckGo να διαχειρίζεται τα αναδυόμενα παράθυρα για cookies</string>
+    <string name="autoconsentAutoManageToggle">Αυτόματη διαχείριση αναδυόμενων παραθύρων cookie</string>
+    <string name="autoconsentAutoManageDescription">Θα προσπαθήσουμε να επιλέξουμε μόνο τις πιο ιδιωτικές διαθέσιμες επιλογές cookie για εσάς και έπειτα να κλείσουμε αυτά τα αναδυόμενα παράθυρα.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[Το DuckDuckGo μπορεί να διαχειρίζεται αυτόματα τις προτιμήσεις για τα cookie ώστε να μεγιστοποιείται το απόρρητο, να ελαχιστοποιούνται τα cookie και να κλείνουν αυτά τα αναδυόμενα παράθυρα.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Αναδυόμενα παράθυρα χωρίς επιλογή εξαίρεσης</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Επίσης, επιτρέψτε στο DuckDuckGo να σας γλιτώσει ένα κλικ αποδεχόμενο cookie εκ μέρους σας, ώστε να κλείνουν τα αναδυόμενα παράθυρα που δεν σας επιτρέπουν να εξαιρεθείτε.</string>
 </resources>

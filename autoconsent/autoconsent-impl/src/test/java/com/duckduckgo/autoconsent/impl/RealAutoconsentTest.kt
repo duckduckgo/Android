@@ -119,6 +119,40 @@ class RealAutoconsentTest {
     }
 
     @Test
+    fun whenChangeClickAcceptEnabledThenRepoSetValueChanged() {
+        autoconsent.changeClickAcceptEnabled(true)
+        assertTrue(settingsRepository.clickAcceptEnabled)
+
+        autoconsent.changeClickAcceptEnabled(false)
+        assertFalse(autoconsent.isClickAcceptEnabled())
+    }
+
+    @Test
+    fun whenChangeSettingToTrueThenSettingEnabled() {
+        autoconsent.changeSetting(true)
+
+        assertTrue(autoconsent.isSettingEnabled())
+    }
+
+    @Test
+    fun whenChangeSettingToFalseThenSettingDisabled() {
+        autoconsent.changeSetting(true)
+        autoconsent.changeSetting(false)
+
+        assertFalse(autoconsent.isSettingEnabled())
+    }
+
+    @Test
+    fun whenInjectAutoconsentWithUserSettingEnabledThenCallEvaluate() {
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
     fun whenSettingEnabledCalledThenReturnValueFromRepo() {
         settingsRepository.userSetting = false
         assertFalse(autoconsent.isSettingEnabled())

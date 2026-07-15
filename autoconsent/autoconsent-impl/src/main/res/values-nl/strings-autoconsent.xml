@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Bescherming tegen cookiepop-ups</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo zal proberen de meest privacyvriendelijke instellingen te selecteren en deze pop-ups voor je te verbergen.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="autoconsentToggle">Laat DuckDuckGo cookiepop-ups verwerken</string>
+    <string name="autoconsentAutoManageToggle">Cookiepop-ups automatisch beheren</string>
+    <string name="autoconsentAutoManageDescription">We proberen alleen de meest privacyvriendelijke cookie-opties voor je te selecteren en sluiten daarna deze pop-ups.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan cookievoorkeuren automatisch beheren om je privacy te maximaliseren, het aantal cookies te minimaliseren en deze pop-ups te sluiten.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pop-ups zonder afmeldmogelijkheid</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Laat DuckDuckGo je ook een klik besparen door namens jou cookies te accepteren om pop-ups te sluiten waarbij je je niet kunt afmelden.</string>
 </resources>
