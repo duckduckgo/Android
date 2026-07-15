@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Send funksjonssviktrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til relansering</string>
+    <string name="ad_blocking_omnibar_badge_text">Annonseblokkering på YouTube er på</string>
 </resources>

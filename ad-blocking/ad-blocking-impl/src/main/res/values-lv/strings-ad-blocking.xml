@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Nosūtīt ziņojumu par traucējumiem</string>
     <string name="ad_blocking_disabled_secondary_action">Atcelt</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Atspējots līdz atkārtotai palaišanai</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube reklāmu bloķēšana ieslēgta</string>
 </resources>
