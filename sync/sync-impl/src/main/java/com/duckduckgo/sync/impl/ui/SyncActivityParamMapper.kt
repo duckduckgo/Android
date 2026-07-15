@@ -36,6 +36,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.sync.impl.ui.v2.SyncActivity as SyncActivityV2
 
+// Typically, ParamToActivityMapper instances are generated in the code via @ContributeToActivityStarter
+// annotations on an Activity. This mapper is handwritten because we need to support two separate Activity
+// paths as long as the useSimplifiedSync feature flag is available.
+//
+// Once the FF is removed we can drop one of the code paths and move mapper contribution back to annotations.
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class, boundType = ParamToActivityMapper::class)
 @ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
