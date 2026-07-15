@@ -120,8 +120,6 @@ dependencies {
 }
 
 android {
-    namespace "com.duckduckgo.sync.impl"
-
     anvil {
         generateDaggerFactories = true // default is false
     }
