@@ -1935,9 +1935,6 @@ class BrowserTabViewModel @Inject constructor(
             }
             return true
         } else if (!skipHome && !isCustomTab) {
-            if (!duckAiFeatureState.showInputScreen.value) {
-                command.value = ShowKeyboard
-            }
             navigateHome()
             return true
         }
