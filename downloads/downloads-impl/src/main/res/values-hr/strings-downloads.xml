@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Podijeli s...</string>
     <string name="downloadsStateInProgress">U tijeku...</string>
     <string name="downloadsUndoActionName">Poništi</string>
+    <string name="downloadsSearchHint">Pretraživanje</string>
 </resources>
