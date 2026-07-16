@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Distribuie către...</string>
     <string name="downloadsStateInProgress">În curs...</string>
     <string name="downloadsUndoActionName">Anulează</string>
+    <string name="downloadsSearchHint">Căutare</string>
 </resources>
