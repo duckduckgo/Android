@@ -252,6 +252,68 @@ class EventHubConfigParserTest {
     }
 
     @Test
+    fun `experiments template parses without source or buckets`() {
+        val config = EventHubConfigParser.parseSinglePixelConfig("test", experimentsPixelJson())!!
+        val param = config.parameters.getValue("experiments")
+        assertTrue(param.isExperiments)
+        assertNull(param.matchExperiments)
+    }
+
+    @Test
+    fun `experiments template parses matchExperiments into prefix list`() {
+        val config = EventHubConfigParser.parseSinglePixelConfig(
+            "test",
+            experimentsPixelJson(matchExperiments = "tdsNextExperiment|contentScopeExperiment1"),
+        )!!
+        val param = config.parameters.getValue("experiments")
+        assertEquals(listOf("tdsNextExperiment", "contentScopeExperiment1"), param.matchExperiments)
+    }
+
+    @Test
+    fun `experiments and counter templates coexist in one pixel`() {
+        val json = """
+            {
+                "state": "enabled",
+                "trigger": { "period": { "days": 1 } },
+                "parameters": {
+                    "count": { "template": "counter", "source": "e", "buckets": { "0+": {"gte": 0} } },
+                    "experiments": { "template": "experiments" }
+                }
+            }
+        """.trimIndent()
+        val config = EventHubConfigParser.parseSinglePixelConfig("test", json)!!
+        assertTrue(config.parameters.getValue("count").isCounter)
+        assertTrue(config.parameters.getValue("experiments").isExperiments)
+    }
+
+    @Test
+    fun `experiments template round-trips through serialization`() {
+        val original = EventHubConfigParser.parseSinglePixelConfig(
+            "test",
+            experimentsPixelJson(matchExperiments = "tdsNextExperiment|css1"),
+        )!!
+        val json = EventHubConfigParser.serializePixelConfig(original)!!
+        val restored = EventHubConfigParser.parseSinglePixelConfig("test", json)!!
+        assertEquals(
+            original.parameters.getValue("experiments").matchExperiments,
+            restored.parameters.getValue("experiments").matchExperiments,
+        )
+    }
+
+    private fun experimentsPixelJson(matchExperiments: String? = null): String {
+        val matchLine = if (matchExperiments != null) ", \"matchExperiments\": \"$matchExperiments\"" else ""
+        return """
+            {
+                "state": "enabled",
+                "trigger": { "period": { "days": 1 } },
+                "parameters": {
+                    "experiments": { "template": "experiments"$matchLine }
+                }
+            }
+        """.trimIndent()
+    }
+
+    @Test
     fun `parseSinglePixelConfig with malformed JSON returns null`() {
         assertNull(EventHubConfigParser.parseSinglePixelConfig("test", "not json"))
     }

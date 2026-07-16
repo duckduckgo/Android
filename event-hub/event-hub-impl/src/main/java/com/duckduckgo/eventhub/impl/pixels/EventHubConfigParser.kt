@@ -46,6 +46,7 @@ private data class TelemetryParameterJson(
     val template: String,
     val source: String? = null,
     val buckets: Map<String, BucketJson>? = null,
+    val matchExperiments: String? = null,
 )
 
 private data class BucketJson(
@@ -96,9 +97,10 @@ object EventHubConfigParser {
                 TelemetryParameterJson(
                     template = paramConfig.template,
                     source = paramConfig.source,
-                    buckets = paramConfig.buckets.mapValues { (_, bucket) ->
+                    buckets = paramConfig.buckets.takeIf { it.isNotEmpty() }?.mapValues { (_, bucket) ->
                         BucketJson(gte = bucket.gte, lt = bucket.lt)
                     },
+                    matchExperiments = paramConfig.matchExperiments?.joinToString(MATCH_EXPERIMENTS_SEPARATOR),
                 )
             },
         )
@@ -134,7 +136,14 @@ object EventHubConfigParser {
     }
 
     private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
-        if (json.template != "counter") return null
+        return when (json.template) {
+            "counter" -> toCounterParameterConfig(json)
+            "experiments" -> toExperimentsParameterConfig(json)
+            else -> null
+        }
+    }
+
+    private fun toCounterParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
         val source = json.source ?: return null
         val bucketsJson = json.buckets ?: return null
 
@@ -145,4 +154,16 @@ object EventHubConfigParser {
 
         return TelemetryParameterConfig(template = json.template, source = source, buckets = buckets)
     }
+
+    private fun toExperimentsParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig {
+        val matchExperiments = json.matchExperiments
+            ?.split(MATCH_EXPERIMENTS_SEPARATOR)
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }
+            ?.takeIf { it.isNotEmpty() }
+
+        return TelemetryParameterConfig(template = json.template, matchExperiments = matchExperiments)
+    }
+
+    private const val MATCH_EXPERIMENTS_SEPARATOR = "|"
 }

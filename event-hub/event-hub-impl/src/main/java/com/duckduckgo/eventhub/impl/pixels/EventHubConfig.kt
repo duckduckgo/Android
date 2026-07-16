@@ -41,10 +41,19 @@ data class TelemetryPeriodConfig(
 
 data class TelemetryParameterConfig(
     val template: String,
-    val source: String,
-    val buckets: Map<String, BucketConfig>,
+    val source: String? = null,
+    val buckets: Map<String, BucketConfig> = emptyMap(),
+    /**
+     * Optional allow-list of experiment name prefixes for the `experiments` template.
+     * When null the parameter reports every active experiment; otherwise only experiments
+     * whose (sub)feature name starts with one of these prefixes are reported.
+     * Parsed from the pipe-separated `matchExperiments` config string, e.g.
+     * `"tdsNextExperiment|contentScopeExperiment1"` -> `["tdsNextExperiment", "contentScopeExperiment1"]`.
+     */
+    val matchExperiments: List<String>? = null,
 ) {
     val isCounter: Boolean get() = template == "counter"
+    val isExperiments: Boolean get() = template == "experiments"
 }
 
 data class BucketConfig(
@@ -53,6 +62,17 @@ data class BucketConfig(
 )
 
 data class ParamState(val value: Int, val stopCounting: Boolean = false)
+
+/**
+ * The result of building a pixel's parameters for firing.
+ * @param parameters values that the pixel sender will URL-encode (e.g. counter buckets).
+ * @param encodedParameters values that are already %-encoded and must be sent verbatim (e.g. the
+ * `experiments` JSON object).
+ */
+data class BuiltPixel(
+    val parameters: Map<String, String>,
+    val encodedParameters: Map<String, String>,
+)
 
 data class PixelState(
     val pixelName: String,

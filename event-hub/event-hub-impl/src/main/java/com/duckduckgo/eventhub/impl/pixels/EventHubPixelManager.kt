@@ -34,6 +34,7 @@ import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
+import java.net.URLEncoder
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -71,6 +72,7 @@ class RealEventHubPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val eventHubFeature: EventHubFeature,
+    private val experimentCohortResolver: ExperimentCohortResolver,
 ) : EventHubPixelManager {
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
@@ -171,7 +173,7 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    private fun processPixelStates(): Long {
+    private suspend fun processPixelStates(): Long {
         val nowMillis = timeProvider.currentTimeMillis()
         var nextDeadline = Long.MAX_VALUE
 
@@ -253,21 +255,22 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun fireTelemetry(pixelState: PixelState): Long? {
-        val pixelData = buildPixel(pixelState)
+    private suspend fun fireTelemetry(pixelState: PixelState): Long? {
+        val builtPixel = buildPixel(pixelState)
 
-        if (pixelData.isNotEmpty()) {
+        if (builtPixel.parameters.isNotEmpty() || builtPixel.encodedParameters.isNotEmpty()) {
             val additionalParams = mapOf(
                 PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
                     pixelState.periodStartMillis,
                     pixelState.config.trigger.period,
                 ).toString(),
             )
-            val allParams = pixelData + additionalParams
-            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams" }
+            val allParams = builtPixel.parameters + additionalParams
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams encoded=${builtPixel.encodedParameters}" }
             pixel.enqueueFire(
                 pixelName = pixelState.pixelName,
                 parameters = allParams,
+                encodedParameters = builtPixel.encodedParameters,
             )
         } else {
             logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no params" }
@@ -302,20 +305,59 @@ class RealEventHubPixelManager @Inject constructor(
         return periodEndMillis
     }
 
-    private fun buildPixel(pixelState: PixelState): Map<String, String> {
-        val pixelData = mutableMapOf<String, String>()
+    private suspend fun buildPixel(pixelState: PixelState): BuiltPixel {
+        val parameters = mutableMapOf<String, String>()
+        val encodedParameters = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelState.config.parameters) {
-            if (paramConfig.isCounter) {
-                val value = (pixelState.params[paramName] ?: ParamState(0)).value
-                val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
-                if (bucketName != null) {
-                    pixelData[paramName] = bucketName
+            when {
+                paramConfig.isCounter -> {
+                    val value = (pixelState.params[paramName] ?: ParamState(0)).value
+                    val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
+                    if (bucketName != null) {
+                        parameters[paramName] = bucketName
+                    }
+                }
+
+                paramConfig.isExperiments -> {
+                    // Opt-in via remote config: the parameter is only present when config adds it.
+                    // Always emitted, even when the user is in no experiments (the empty object `{}`).
+                    // Routed through encodedParameters because the value is already %-encoded JSON and
+                    // must not be re-encoded by the pixel sender (Retrofit @QueryMap(encoded = true)).
+                    encodedParameters[paramName] = buildExperimentsParam(pixelState, paramConfig)
                 }
             }
         }
 
-        return pixelData
+        return BuiltPixel(parameters, encodedParameters)
+    }
+
+    /**
+     * Builds the %-encoded JSON object for an `experiments` parameter, e.g.
+     * `{"tdsNextExperiment007":{"cohort":"treatment","changedInPeriod":true},"cssExp1":{"cohort":"control"}}`.
+     *
+     * `changedInPeriod` is added when the user was enrolled into the cohort during this pixel's
+     * aggregation period, so partially-attributed periods can be identified downstream.
+     */
+    private suspend fun buildExperimentsParam(pixelState: PixelState, paramConfig: TelemetryParameterConfig): String {
+        val experiments = experimentCohortResolver.activeExperiments(paramConfig.matchExperiments)
+        val json = JSONObject()
+        for (experiment in experiments) {
+            val experimentJson = JSONObject().put("cohort", experiment.cohort)
+            if (isChangedInPeriod(experiment, pixelState)) {
+                experimentJson.put("changedInPeriod", true)
+            }
+            json.put(experiment.name, experimentJson)
+        }
+        return URLEncoder.encode(json.toString(), "UTF-8")
+    }
+
+    // Detects enrolment (a "join") during this period from the cohort's enrollment date. Detecting a
+    // "leave" mid-period (cohort present at period start, gone by fire time) would additionally require
+    // snapshotting the enrolled cohorts into PixelState at startNewPeriod; left as a follow-up.
+    private fun isChangedInPeriod(experiment: ResolvedExperiment, pixelState: PixelState): Boolean {
+        val enrolledAt = experiment.enrollmentDateMillis ?: return false
+        return enrolledAt >= pixelState.periodStartMillis && enrolledAt < pixelState.periodEndMillis
     }
 
     companion object {

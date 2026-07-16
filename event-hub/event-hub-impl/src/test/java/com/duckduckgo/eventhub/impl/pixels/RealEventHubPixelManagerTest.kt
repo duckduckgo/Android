@@ -42,6 +42,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.net.URLDecoder
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,6 +55,7 @@ class RealEventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
+    private val experimentCohortResolver = FakeExperimentCohortResolver()
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -71,6 +73,7 @@ class RealEventHubPixelManagerTest {
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
+            experimentCohortResolver,
         )
         manager.onAppForegrounded()
         eventHubFeature.self().setRawStoredState(savedState ?: Toggle.State(enable = false))
@@ -2507,6 +2510,124 @@ class RealEventHubPixelManagerTest {
         assertEquals("webTelemetry_testPixel1", captor.firstValue.pixelName)
         assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
         assertEquals(0, captor.firstValue.params.mapValues { it.value.value }["count"])
+    }
+
+    // --- experiments parameter ---
+
+    private val experimentsConfigJson = """
+        {
+            "state": "enabled",
+            "trigger": { "period": { "days": 1 } },
+            "parameters": {
+                "count": {
+                    "template": "counter",
+                    "source": "test",
+                    "buckets": { "0": {"gte": 0, "lt": 1}, "1+": {"gte": 1} }
+                },
+                "experiments": { "template": "experiments" }
+            }
+        }
+    """.trimIndent()
+
+    private fun fireExperimentsPixel(
+        periodStart: Long = 1769385600000L,
+        periodEnd: Long = periodStart + TimeUnit.DAYS.toMillis(1),
+    ): Map<String, String> {
+        timeProvider.time = periodEnd + 1
+        val state = PixelState(
+            pixelName = "experimentsPixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            params = mapOf("count" to ParamState(3)),
+            config = EventHubConfigParser.parseSinglePixelConfig("experimentsPixel", experimentsConfigJson)!!,
+        )
+        stubPixelStates(state)
+        manager.onAppForegrounded()
+
+        val captor = argumentCaptor<Map<String, String>>()
+        verify(pixel).enqueueFire(pixelName = eq("experimentsPixel"), parameters = any(), encodedParameters = captor.capture(), type = any())
+        return captor.firstValue
+    }
+
+    private fun decodeExperiments(params: Map<String, String>): JSONObject {
+        val raw = params["experiments"] ?: error("no experiments param fired")
+        return JSONObject(URLDecoder.decode(raw, "UTF-8"))
+    }
+
+    @Test
+    fun `fired pixel includes experiments param with cohort for each active experiment`() {
+        experimentCohortResolver.experiments = listOf(
+            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = null),
+            ResolvedExperiment(name = "contentScopeExperiment1", cohort = "control", enrollmentDateMillis = null),
+        )
+
+        val experiments = decodeExperiments(fireExperimentsPixel())
+
+        assertEquals("treatment", experiments.getJSONObject("tdsNextExperiment007").getString("cohort"))
+        assertEquals("control", experiments.getJSONObject("contentScopeExperiment1").getString("cohort"))
+    }
+
+    @Test
+    fun `experiments param is empty object when user is in no experiments`() {
+        experimentCohortResolver.experiments = emptyList()
+
+        val params = fireExperimentsPixel()
+
+        assertEquals("{}", URLDecoder.decode(params.getValue("experiments"), "UTF-8"))
+    }
+
+    @Test
+    fun `experiments param flags changedInPeriod when enrolled during the period`() {
+        val periodStart = 1769385600000L
+        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
+        experimentCohortResolver.experiments = listOf(
+            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = periodStart + 1000L),
+        )
+
+        val experiments = decodeExperiments(fireExperimentsPixel(periodStart, periodEnd))
+
+        assertTrue(experiments.getJSONObject("tdsNextExperiment007").getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param omits changedInPeriod when enrolled before the period`() {
+        val periodStart = 1769385600000L
+        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
+        experimentCohortResolver.experiments = listOf(
+            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = periodStart - 1000L),
+        )
+
+        val experiments = decodeExperiments(fireExperimentsPixel(periodStart, periodEnd))
+
+        assertFalse(experiments.getJSONObject("tdsNextExperiment007").has("changedInPeriod"))
+    }
+
+    @Test
+    fun `matchExperiments filter is forwarded to the resolver`() {
+        val configJson = """
+            {
+                "state": "enabled",
+                "trigger": { "period": { "days": 1 } },
+                "parameters": {
+                    "experiments": { "template": "experiments", "matchExperiments": "tdsNextExperiment|contentScopeExperiment1" }
+                }
+            }
+        """.trimIndent()
+        val periodStart = 1769385600000L
+        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = periodEnd + 1
+        val state = PixelState(
+            pixelName = "experimentsPixel",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            params = emptyMap(),
+            config = EventHubConfigParser.parseSinglePixelConfig("experimentsPixel", configJson)!!,
+        )
+        stubPixelStates(state)
+
+        manager.onAppForegrounded()
+
+        assertEquals(listOf("tdsNextExperiment", "contentScopeExperiment1"), experimentCohortResolver.lastRequestedMatch)
     }
 
     // --- helpers ---
