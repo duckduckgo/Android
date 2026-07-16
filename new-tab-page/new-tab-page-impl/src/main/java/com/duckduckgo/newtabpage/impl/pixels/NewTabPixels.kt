@@ -18,7 +18,9 @@ package com.duckduckgo.newtabpage.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -48,6 +50,7 @@ class RealNewTabPixels @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : NewTabPixels {
 
     override fun fireCustomizePagePressedPixel() {
@@ -80,6 +83,7 @@ class RealNewTabPixels @Inject constructor(
 
     override fun fireNewTabDisplayed() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            val browserModeParam = browserModeStateHolder.currentMode.value.name.lowercase()
             val paramsMap = mutableMapOf<String, String>().apply {
                 val allSections = sections.getPlugins()
                 val favoriteSection = getSectionParameterValue(allSections.firstOrNull { it.name == NewTabPageSection.FAVOURITES.name })
@@ -89,8 +93,9 @@ class RealNewTabPixels @Inject constructor(
                 val appTPSection = getSectionParameterValue(allSections.firstOrNull { it.name == NewTabPageSection.APP_TRACKING_PROTECTION.name })
                 put(NewTabPixelParameters.APP_TRACKING_PROTECTION, appTPSection)
                 put(NewTabPixelParameters.FAVORITES_COUNT, getFavoritesParameterValue())
+                put(BROWSER_MODE, browserModeParam)
             }
-            pixel.fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+            pixel.fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to browserModeParam))
             pixel.fire(pixel = NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
             pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
             pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())

@@ -227,6 +227,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -1083,7 +1084,7 @@ class BrowserTabFragment :
                         val mode = data.getStringExtra(InputScreenActivityResultParams.TAB_MODE_PARAM)
                             ?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() }
                             ?: browserMode
-                        browserActivity?.openExistingTabInMode(mode, tabId)
+                        browserActivity?.openExistingTabInMode(mode, tabId, BrowserModeSwitchSource.ESCAPE_HATCH)
                     }
                 }
 
@@ -2059,6 +2060,7 @@ class BrowserTabFragment :
             val params = mapOf(
                 PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
                 PixelParameter.STATUS to vpnStatus,
+                PixelParameter.BROWSER_MODE to browserMode.name.lowercase(),
             )
             pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
             pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
@@ -3883,7 +3885,11 @@ class BrowserTabFragment :
                 override fun onHatchPressed() {
                     hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
-                    browserActivity?.openExistingTabInMode(newTabReturnHatchView.targetMode, newTabReturnHatchView.tabId)
+                    browserActivity?.openExistingTabInMode(
+                        newTabReturnHatchView.targetMode,
+                        newTabReturnHatchView.tabId,
+                        BrowserModeSwitchSource.ESCAPE_HATCH,
+                    )
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
@@ -4872,7 +4878,7 @@ class BrowserTabFragment :
         ).show(binding.rootView, screenX, screenY)
         if (shown) {
             // Parity with the native long-press menu, which fires LONG_PRESS when the menu is shown.
-            pixel.fire(AppPixelName.LONG_PRESS)
+            pixel.fire(AppPixelName.LONG_PRESS, mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase()))
         }
         return shown
     }
@@ -4906,7 +4912,12 @@ class BrowserTabFragment :
         pixelName: AppPixelName,
         action: RequiredAction,
     ) {
-        pixel.fire(pixelName)
+        val params = when (pixelName) {
+            AppPixelName.LONG_PRESS_NEW_TAB, AppPixelName.LONG_PRESS_NEW_FIRE_TAB, AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB ->
+                mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+            else -> emptyMap()
+        }
+        pixel.fire(pixelName, params)
         val actionUrl = when (action) {
             is RequiredAction.OpenInNewTab -> action.url
             is RequiredAction.OpenInFireTab -> action.url

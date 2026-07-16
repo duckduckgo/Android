@@ -140,13 +140,15 @@ class EnqueuedPixelWorker @Inject constructor(
 
     suspend fun submitUnsentFirePixels() {
         withContext(dispatchers.io()) {
-            val count = unsentForgetAllPixelStore.pendingPixelCountClearData
-            logcat(INFO) { "Found $count unsent clear data pixels" }
-            if (count > 0) {
+            val pendingPixelCounts = unsentForgetAllPixelStore.pendingPixelCountsClearData
+            logcat(INFO) { "Found ${pendingPixelCounts.values.sum()} unsent clear data pixels" }
+            pendingPixelCounts.forEach { (mode, count) ->
+                val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
                 for (i in 1..count) {
-                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
+                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED, params)
                 }
-                unsentForgetAllPixelStore.resetCount()
+                pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, params, type = Pixel.PixelType.Daily())
+                unsentForgetAllPixelStore.resetCount(mode)
             }
         }
     }

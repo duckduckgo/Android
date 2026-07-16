@@ -26,6 +26,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -296,24 +297,73 @@ class EnqueuedPixelWorkerTest {
 
     @Test
     fun whenNoUnsentClearDataPixelsPendingThenPixelNotSent() = runTest {
-        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(0)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(emptyMap())
         enqueuedPixelWorker.submitUnsentFirePixels()
         verify(pixel, never()).fire(AppPixelName.FORGET_ALL_EXECUTED)
-        verify(unsentForgetAllPixelStore, never()).resetCount()
+        verify(unsentForgetAllPixelStore, never()).resetCount(any())
     }
 
     @Test
     fun whenUnsentClearDataPixelsPendingThenPixelSent() = runTest {
-        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(5)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.REGULAR to 5))
         enqueuedPixelWorker.submitUnsentFirePixels()
-        verify(pixel, times(5)).fire(AppPixelName.FORGET_ALL_EXECUTED)
+        verify(pixel, times(5)).fire(AppPixelName.FORGET_ALL_EXECUTED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
     fun whenClearDataPixelsSentThenStoreCleared() = runTest {
-        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(5)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.REGULAR to 5))
         enqueuedPixelWorker.submitUnsentFirePixels()
-        verify(unsentForgetAllPixelStore).resetCount()
+        verify(unsentForgetAllPixelStore).resetCount(BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun whenNoUnsentClearDataPixelsPendingThenDailyPixelNotSent() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(emptyMap())
+        enqueuedPixelWorker.submitUnsentFirePixels()
+        verify(pixel, never()).fire(
+            eq(AppPixelName.FORGET_ALL_EXECUTED_DAILY),
+            any(),
+            any(),
+            eq(Pixel.PixelType.Daily()),
+        )
+    }
+
+    @Test
+    fun whenUnsentClearDataPixelsPendingThenDailyPixelSentExactlyOnce() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.REGULAR to 5))
+        enqueuedPixelWorker.submitUnsentFirePixels()
+        verify(pixel, times(1)).fire(
+            AppPixelName.FORGET_ALL_EXECUTED_DAILY,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+            emptyMap(),
+            Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenUnsentFireModeClearDataPixelsPendingThenPixelsSentWithFireMode() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.FIRE to 2))
+
+        enqueuedPixelWorker.submitUnsentFirePixels()
+
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire")
+        verify(pixel, times(2)).fire(AppPixelName.FORGET_ALL_EXECUTED, params)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, params, emptyMap(), Pixel.PixelType.Daily())
+        verify(unsentForgetAllPixelStore).resetCount(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun whenBothModeClearDataPixelsPendingThenEachModeIsSubmittedAndCleared() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData)
+            .thenReturn(mapOf(BrowserMode.REGULAR to 1, BrowserMode.FIRE to 2))
+
+        enqueuedPixelWorker.submitUnsentFirePixels()
+
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
+        verify(pixel, times(2)).fire(AppPixelName.FORGET_ALL_EXECUTED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire"))
+        verify(unsentForgetAllPixelStore).resetCount(BrowserMode.REGULAR)
+        verify(unsentForgetAllPixelStore).resetCount(BrowserMode.FIRE)
     }
 
     private fun setupRemoteConfig(

@@ -20,14 +20,17 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import com.duckduckgo.browsermode.api.BrowserMode
 import javax.inject.Inject
 
 interface UnsentForgetAllPixelStore {
+    val pendingPixelCountsClearData: Map<BrowserMode, Int>
     val pendingPixelCountClearData: Int
+        get() = pendingPixelCountsClearData.values.sum()
     val lastClearTimestamp: Long
 
-    fun incrementCount()
-    fun resetCount()
+    fun incrementCount(mode: BrowserMode)
+    fun resetCount(mode: BrowserMode)
 }
 
 /**
@@ -37,26 +40,39 @@ interface UnsentForgetAllPixelStore {
  */
 class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val context: Context) : UnsentForgetAllPixelStore {
 
-    override val pendingPixelCountClearData: Int
-        get() = preferences.getInt(KEY_UNSENT_CLEAR_PIXELS, 0)
+    override val pendingPixelCountsClearData: Map<BrowserMode, Int>
+        get() = BrowserMode.entries
+            .associateWith(::pendingPixelCount)
+            .filterValues { it > 0 }
 
     override val lastClearTimestamp: Long
         get() = preferences.getLong(KEY_TIMESTAMP_LAST_CLEARED, 0L)
 
-    override fun incrementCount() {
-        val updated = pendingPixelCountClearData + 1
+    override fun incrementCount(mode: BrowserMode) {
+        val updated = pendingPixelCount(mode) + 1
 
         preferences.edit(commit = true) {
-            putInt(KEY_UNSENT_CLEAR_PIXELS, updated)
+            putInt(keyFor(mode), updated)
             putLong(KEY_TIMESTAMP_LAST_CLEARED, System.currentTimeMillis())
         }
     }
 
-    override fun resetCount() {
+    override fun resetCount(mode: BrowserMode) {
         preferences.edit(commit = true) {
-            putInt(KEY_UNSENT_CLEAR_PIXELS, 0)
+            putInt(keyFor(mode), 0)
         }
     }
+
+    private fun pendingPixelCount(mode: BrowserMode): Int {
+        val key = keyFor(mode)
+        return when {
+            preferences.contains(key) -> preferences.getInt(key, 0)
+            mode == BrowserMode.REGULAR -> preferences.getInt(KEY_UNSENT_CLEAR_PIXELS, 0)
+            else -> 0
+        }
+    }
+
+    private fun keyFor(mode: BrowserMode): String = "${KEY_UNSENT_CLEAR_PIXELS}_${mode.name}"
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 

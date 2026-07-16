@@ -33,6 +33,7 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
@@ -115,13 +116,13 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = true)
-        verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore).incrementCount(BrowserMode.REGULAR)
     }
 
     @Test
     fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount(any())
     }
 
     @Test
@@ -245,13 +246,13 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearBrowserDataOnlyCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = true)
-        verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore).incrementCount(BrowserMode.REGULAR)
     }
 
     @Test
     fun whenClearBrowserDataOnlyCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount(any())
     }
 
     @Test

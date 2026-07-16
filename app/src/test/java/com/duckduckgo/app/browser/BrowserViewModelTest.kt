@@ -32,6 +32,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -67,6 +68,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -714,17 +716,21 @@ class BrowserViewModelTest {
 
     @Test
     fun whenSwitchToRegularThenHolderUpdatedAndReturnsTrue() = runTest {
-        val result = testee.switchToMode(BrowserMode.REGULAR)
+        val result = testee.switchToMode(BrowserMode.REGULAR, BrowserModeSwitchSource.EXTERNAL_LAUNCH)
 
         assertTrue(result)
         verify(mockBrowserModeStateHolder).switchTo(BrowserMode.REGULAR)
+        verify(mockPixel).fire(
+            AppPixelName.BROWSER_MODE_SWITCHED,
+            mapOf(PixelParameter.BROWSER_MODE to "regular", PixelParameter.SOURCE to "external_launch"),
+        )
     }
 
     @Test
     fun whenSwitchToRegularThenAvailabilityNotConsulted() = runTest {
         clearInvocations(mockFireModeAvailability)
 
-        testee.switchToMode(BrowserMode.REGULAR)
+        testee.switchToMode(BrowserMode.REGULAR, BrowserModeSwitchSource.EXTERNAL_LAUNCH)
 
         verifyNoInteractions(mockFireModeAvailability)
     }
@@ -733,20 +739,25 @@ class BrowserViewModelTest {
     fun whenSwitchToFireAndAvailableThenHolderUpdatedAndReturnsTrue() = runTest {
         mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(true) }
 
-        val result = testee.switchToMode(BrowserMode.FIRE)
+        val result = testee.switchToMode(BrowserMode.FIRE, BrowserModeSwitchSource.NEW_TAB)
 
         assertTrue(result)
         verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+        verify(mockPixel).fire(
+            AppPixelName.BROWSER_MODE_SWITCHED,
+            mapOf(PixelParameter.BROWSER_MODE to "fire", PixelParameter.SOURCE to "new_tab"),
+        )
     }
 
     @Test
     fun whenSwitchToFireAndUnavailableThenHolderNotUpdatedAndReturnsFalse() = runTest {
         mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(false) }
 
-        val result = testee.switchToMode(BrowserMode.FIRE)
+        val result = testee.switchToMode(BrowserMode.FIRE, BrowserModeSwitchSource.NEW_TAB)
 
         assertFalse(result)
         verify(mockBrowserModeStateHolder, never()).switchTo(any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.BROWSER_MODE_SWITCHED), any(), any(), any())
     }
 
     private fun initTestee() {

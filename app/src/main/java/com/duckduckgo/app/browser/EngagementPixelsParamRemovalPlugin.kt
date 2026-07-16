@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_AICHAT_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED
@@ -69,6 +70,7 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED.pixelName to PixelParameter.removeAtb(),
             ADDRESS_BAR_WEBSITE_CANCELLED.pixelName to PixelParameter.removeAtb(),
             ADDRESS_BAR_SERP_CANCELLED.pixelName to PixelParameter.removeAtb(),
+            ADDRESS_BAR_AICHAT_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_NEW_TAB_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_WEBSITE_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_SERP_CLICKED.pixelName to PixelParameter.removeAtb(),

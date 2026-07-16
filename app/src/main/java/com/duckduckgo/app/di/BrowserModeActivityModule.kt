@@ -16,14 +16,19 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.WebViewLongPressHandler
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.webview.WebViewActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -31,16 +36,17 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 /**
- * Unqualified [TabRepository] and [BrowserMode] is intentionally bound only in [ActivityScope],
- * not [AppScope].
+ * Provides the activity-frozen [BrowserMode] binding, intentionally scoped to [ActivityScope] only
+ * (not [AppScope]), plus the unqualified bindings that are derived from it for that same activity:
+ * [TabRepository] and [LongPressHandler].
  *
  * Activity- and fragment-scoped consumers (BrowserViewModel, BrowserTabViewModel,
  * OmnibarLayoutViewModel, etc.) are recreated whenever the browser mode changes, so each new
- * instance resolves the right repo and mode at construction time.
+ * instance resolves the right mode — and anything derived from it — at construction time.
  */
 @ContributesTo(ActivityScope::class)
 @Module
-class TabRepositoryActivityModule {
+class BrowserModeActivityModule {
     /**
      * The activity's [BrowserMode] is captured **once** at activity-component creation
      * (`@SingleInstanceIn(ActivityScope::class)` on [provideActivityBrowserMode]) and reused for
@@ -79,4 +85,18 @@ class TabRepositoryActivityModule {
         BrowserMode.REGULAR -> regular
         BrowserMode.FIRE -> fire
     }
+
+    /**
+     * [WebViewLongPressHandler] only reports the mode for pixels, so it can take the frozen
+     * [BrowserMode] directly rather than the live [BrowserModeStateHolder] — its sole consumer,
+     * [BrowserTabViewModel][com.duckduckgo.app.browser.BrowserTabViewModel], is fragment-scoped and
+     * gets recreated on a real mode change just like the other consumers above.
+     */
+    @Provides
+    fun provideWebViewLongPressHandler(
+        context: Context,
+        pixel: Pixel,
+        customTabDetector: CustomTabDetector,
+        activityMode: BrowserMode,
+    ): LongPressHandler = WebViewLongPressHandler(context, pixel, customTabDetector, activityMode)
 }

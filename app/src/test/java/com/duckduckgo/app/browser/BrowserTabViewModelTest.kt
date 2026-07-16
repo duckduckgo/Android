@@ -3444,7 +3444,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -3487,7 +3487,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -3501,7 +3501,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -7824,12 +7824,13 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_1W to inactive1w,
                     PixelParameter.TAB_INACTIVE_2W to inactive2w,
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                    PixelParameter.BROWSER_MODE to "regular",
                 )
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
@@ -7857,12 +7858,13 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_1W to inactive1w,
                     PixelParameter.TAB_INACTIVE_2W to inactive2w,
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                    PixelParameter.BROWSER_MODE to "regular",
                 )
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
@@ -8379,7 +8381,7 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
 
     @Test
@@ -8390,7 +8392,10 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
+            verify(mockPixel).fire(
+                AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
+                mapOf(PixelParameter.FROM_FOCUSED_NTP to "false", PixelParameter.BROWSER_MODE to "regular"),
+            )
         }
 
     @Test
@@ -8401,7 +8406,10 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
+            verify(mockPixel).fire(
+                AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
+                mapOf(PixelParameter.FROM_FOCUSED_NTP to "true", PixelParameter.BROWSER_MODE to "regular"),
+            )
         }
 
     @Test
@@ -8415,7 +8423,7 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
 
     @Test

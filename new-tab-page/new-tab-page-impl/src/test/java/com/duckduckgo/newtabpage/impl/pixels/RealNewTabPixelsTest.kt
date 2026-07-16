@@ -1,15 +1,20 @@
 package com.duckduckgo.newtabpage.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.newtabpage.impl.disabledSectionPlugins
 import com.duckduckgo.newtabpage.impl.enabledSectionsPlugins
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -23,6 +28,9 @@ class RealNewTabPixelsTest {
 
     private val pixel: Pixel = mock()
     private val savedSitesRepository: SavedSitesRepository = mock()
+    private val browserModeStateHolder: BrowserModeStateHolder = mock {
+        on { currentMode } doReturn MutableStateFlow(BrowserMode.REGULAR)
+    }
 
     @Before
     fun setup() {
@@ -32,6 +40,7 @@ class RealNewTabPixelsTest {
             savedSitesRepository,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
+            browserModeStateHolder,
         )
     }
 
@@ -92,11 +101,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, "0")
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -110,11 +120,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, "1")
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -128,11 +139,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_2_3)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -146,11 +158,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_4_5)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -164,11 +177,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_6_10)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -182,11 +196,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_11_15)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -200,11 +215,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_16_25)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -218,11 +234,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "1")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "1")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_25)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
@@ -236,6 +253,7 @@ class RealNewTabPixelsTest {
             savedSitesRepository,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
+            browserModeStateHolder,
         )
 
         whenever(savedSitesRepository.favoritesCount()).thenReturn(50)
@@ -244,11 +262,12 @@ class RealNewTabPixelsTest {
             put(NewTabPixelParameters.SHORTCUTS, "0")
             put(NewTabPixelParameters.APP_TRACKING_PROTECTION, "0")
             put(NewTabPixelParameters.FAVORITES_COUNT, NewTabPixelValues.FAVORITES_25)
+            put(BROWSER_MODE, "regular")
         }
 
         testee.fireNewTabDisplayed()
 
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED, mapOf(BROWSER_MODE to "regular"))
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
         verify(pixel).fire(NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())

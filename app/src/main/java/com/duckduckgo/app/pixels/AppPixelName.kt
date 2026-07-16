@@ -34,6 +34,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORGET_ALL_PRESSED_SETTINGS("m_fire_button_tapped_settings"),
     FORGET_ALL_PRESSED_SETTINGS_DAILY("m_fire_button_tapped_settings_daily"),
     FORGET_ALL_EXECUTED("mf"),
+    FORGET_ALL_EXECUTED_DAILY("m_fire_button_executed_daily"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
 
@@ -138,6 +139,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_NEW_FIRE_TAB("m_long_press_new_fire_tab"),
     FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN("m_fire_tabs_promo_tab_switcher_shown"),
     FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED("m_fire_tabs_promo_tab_switcher_dismissed"),
+    BROWSER_MODE_SWITCHED("m_browser_mode_switched"),
 
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
@@ -389,6 +391,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
     ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
     ADDRESS_BAR_NTP_FOCUSED("m_addressbar_focus_ntp"),
+    ADDRESS_BAR_AICHAT_CLICKED("m_addressbar_click_aichat"),
 
     KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
     KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),

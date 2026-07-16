@@ -30,6 +30,7 @@ import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -103,6 +104,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doSuspendableAnswer
@@ -289,7 +291,7 @@ class TabSwitcherViewModelTest {
         testee.onNewTabRequested(fromOverflowMenu = true)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -298,7 +300,7 @@ class TabSwitcherViewModelTest {
         testee.onNewTabRequested(fromOverflowMenu = false)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -396,7 +398,7 @@ class TabSwitcherViewModelTest {
         testee.onTabSelected("abc")
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -637,7 +639,7 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
@@ -651,7 +653,7 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
@@ -727,8 +729,9 @@ class TabSwitcherViewModelTest {
     fun whenOnFireButtonTappedThenPixelsSent() {
         testee.onFireButtonTapped()
 
-        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING, params)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, params, type = Daily())
     }
 
     @Test
@@ -2130,7 +2133,7 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTab)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf("fire-1")), commandCaptor.lastValue)
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2158,7 +2161,7 @@ class TabSwitcherViewModelTest {
         verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(fireTabs.map { it.tabId }), commandCaptor.lastValue)
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2184,6 +2187,7 @@ class TabSwitcherViewModelTest {
         verify(mockDataClearingWideEvent).start(
             entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
             clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+            browserMode = BrowserMode.FIRE,
         )
         verify(mockDataClearing).clearDataUsingManualFireOptions(
             shouldRestartIfRequired = false,
@@ -2211,7 +2215,7 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         verify(mockFireTabRepository).deleteTabs(listOf("fire-1"))
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2221,7 +2225,7 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         verify(mockTabRepository).deleteTabs(listOf("1"))
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2244,7 +2248,7 @@ class TabSwitcherViewModelTest {
         testee.onBackButtonPressed()
         advanceUntilIdle()
 
-        verify(mockDataClearingWideEvent, times(1)).start(any(), any())
+        verify(mockDataClearingWideEvent, times(1)).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, times(1)).clearDataUsingManualFireOptions(
             shouldRestartIfRequired = false,
             browserMode = BrowserMode.FIRE,
@@ -2303,7 +2307,7 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         verify(mockFireTabRepository).purgeDeletableTabs()
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2313,7 +2317,7 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         verify(mockTabRepository).purgeDeletableTabs()
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
@@ -2335,7 +2339,7 @@ class TabSwitcherViewModelTest {
         currentModeFlow.value = BrowserMode.FIRE
         advanceUntilIdle()
 
-        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
         advanceUntilIdle()
 
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
@@ -2429,16 +2433,20 @@ class TabSwitcherViewModelTest {
     fun `when onBrowserModeToggled to fire then switches mode on state holder`() = runTest {
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
 
-        testee.onBrowserModeToggled(BrowserMode.FIRE)
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
 
         verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+        verify(mockPixel).fire(
+            AppPixelName.BROWSER_MODE_SWITCHED,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire", Pixel.PixelParameter.SOURCE to "tab_switcher_toggle"),
+        )
     }
 
     @Test
     fun `when onBrowserModeToggled then purges deletable tabs on leaving repo`() = runTest {
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
 
-        testee.onBrowserModeToggled(BrowserMode.FIRE)
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
         advanceUntilIdle()
 
         verify(mockTabRepository).purgeDeletableTabs()
@@ -2448,14 +2456,15 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when onBrowserModeToggled to current mode then does not call switchTo`() = runTest {
         // currentModeFlow starts at REGULAR
-        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
 
         verify(mockBrowserModeStateHolder, never()).switchTo(any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.BROWSER_MODE_SWITCHED), any(), any(), any())
     }
 
     @Test
     fun `when onBrowserModeToggled to current mode then does not purge`() = runTest {
-        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
         advanceUntilIdle()
 
         verify(mockTabRepository, never()).purgeDeletableTabs()
@@ -2493,7 +2502,7 @@ class TabSwitcherViewModelTest {
             remoteMessageModel,
         )
 
-        isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE)
+        isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
 
         verify(isolatedStateHolder, never()).switchTo(any())
     }
@@ -2623,7 +2632,7 @@ class TabSwitcherViewModelTest {
         val testee = createViewModel()
         advanceUntilIdle() // init sets isFireTabsPromoVisible = true
 
-        testee.onBrowserModeToggled(BrowserMode.FIRE)
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
 
         // The ViewModel survives the toggle-triggered recreate, so the banner must be dismissed here,
         // otherwise it reappears when the user returns to regular mode.
@@ -2640,7 +2649,7 @@ class TabSwitcherViewModelTest {
         whenever(fireTabsPromos.canShowTabSwitcherPromo()).doSuspendableAnswer { eligibility.await() }
 
         val testee = createViewModel() // init starts the eligibility read and suspends on it
-        testee.onBrowserModeToggled(BrowserMode.FIRE) // user dismisses the banner before it resolves
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE) // user dismisses the banner before it resolves
         eligibility.complete(true) // resolves true, but the promo was already handled by the toggle
         advanceUntilIdle()
 

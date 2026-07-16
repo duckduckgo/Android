@@ -60,11 +60,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -123,6 +125,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -1050,11 +1053,19 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
         if (touchAction == ACTION_UP) {
-            firePixelBasedOnCurrentUrl(
-                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
-                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
-                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
-            )
+            if (_viewState.value.viewMode == ViewMode.DuckAI) {
+                pixel.fire(
+                    AppPixelName.ADDRESS_BAR_AICHAT_CLICKED,
+                    mapOf(BROWSER_MODE to browserMode.name.lowercase()),
+                )
+            } else {
+                firePixelBasedOnCurrentUrl(
+                    AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
+                    AppPixelName.ADDRESS_BAR_SERP_CLICKED,
+                    AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
+                    extraParams = mapOf(BROWSER_MODE to browserMode.name.lowercase()),
+                )
+            }
         }
     }
 
@@ -1158,14 +1169,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         emptyUrlPixel: AppPixelName,
         duckDuckGoQueryUrlPixel: AppPixelName,
         websiteUrlPixel: AppPixelName,
+        extraParams: Map<String, String> = emptyMap(),
     ) {
         val text = _viewState.value.url
         if (text.isEmpty()) {
-            pixel.fire(emptyUrlPixel)
+            pixel.fire(emptyUrlPixel, extraParams)
         } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
-            pixel.fire(duckDuckGoQueryUrlPixel)
+            pixel.fire(duckDuckGoQueryUrlPixel, extraParams)
         } else if (isUrl(text)) {
-            pixel.fire(websiteUrlPixel)
+            pixel.fire(websiteUrlPixel, extraParams)
         }
     }
 

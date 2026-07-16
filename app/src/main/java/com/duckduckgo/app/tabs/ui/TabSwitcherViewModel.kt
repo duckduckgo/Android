@@ -32,6 +32,7 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -269,20 +270,22 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         command.value = Command.Close
+        val browserModeParam = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase())
         if (fromOverflowMenu) {
-            pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED, browserModeParam)
         } else {
-            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED, browserModeParam)
         }
     }
 
     fun onFireButtonTapped() {
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase())
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING, params)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, params, type = Daily())
         command.value = Command.ShowFireBottomSheet
     }
 
-    fun onBrowserModeToggled(mode: BrowserMode) {
+    fun onBrowserModeToggled(mode: BrowserMode, source: BrowserModeSwitchSource) {
         val previousMode = currentMode.value
         if (!fireModeAvailable || mode == previousMode) return
 
@@ -292,6 +295,12 @@ class TabSwitcherViewModel @Inject constructor(
         command.value = Command.DismissSnackbar
 
         browserModeStateHolder.switchTo(mode)
+
+        val browserModeParam = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
+        pixel.fire(
+            pixel = AppPixelName.BROWSER_MODE_SWITCHED,
+            parameters = browserModeParam + (Pixel.PixelParameter.SOURCE to source.value)
+        )
 
         // The promo banner has served its purpose once the user toggles modes; dismiss it so it does not
         // reappear when returning to regular mode (this ViewModel survives the toggle-triggered recreate).
@@ -310,6 +319,7 @@ class TabSwitcherViewModel @Inject constructor(
                         FireClearOption.DATA,
                         FireClearOption.DUCKAI_CHATS,
                     ),
+                    browserMode = BrowserMode.FIRE,
                 )
                 try {
                     dataClearing.clearDataUsingManualFireOptions(
@@ -339,7 +349,10 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             tabRepository.select(tabId)
             command.value = Command.Close
-            pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+            pixel.fire(
+                AppPixelName.TAB_MANAGER_SWITCH_TABS,
+                mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase()),
+            )
         }
     }
 
@@ -538,10 +551,11 @@ class TabSwitcherViewModel @Inject constructor(
         swipeGestureUsed: Boolean,
     ) {
         tabRepository.markDeletable(tab.tabEntity)
+        val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase())
         if (swipeGestureUsed) {
-            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED, browserModeParams)
         } else {
-            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED, browserModeParams)
         }
 
         if (viewState.value.mode is Selection) {

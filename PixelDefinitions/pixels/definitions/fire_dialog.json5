@@ -4,7 +4,7 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_automatic_data_clearing_options_updated": {
         "description": "The automatic data clearing options are updated",
@@ -18,14 +18,14 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_fire_dialog_clear_pressed_daily": {
         "description": "The user pressed clear in the fire dialog (daily)",
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_fire_button_tapped_settings": {
         "description": "The fire button was tapped from settings",
@@ -41,6 +41,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "browserMode",
             {
                 "key": "from_focused_ntp",
                 "description": "Whether the fire button was tapped while the address bar was focused on the new tab page",
@@ -53,6 +54,13 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
+    },
+    "m_fire_button_executed_daily": {
+        "description": "Fire data clear was executed at least once today — fires once per calendar day regardless of how many burns or which surface triggered them. Denominator for the 'Fire Button presses per daily Fire-Button user' KPI.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "browserMode"]
     }
 }

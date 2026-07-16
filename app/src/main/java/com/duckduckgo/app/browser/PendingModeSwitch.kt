@@ -20,6 +20,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.browsermode.api.BrowserMode
 
 /**
@@ -42,14 +43,15 @@ internal sealed class PendingAction {
     data class OpenExistingTab(val tabId: String) : PendingAction()
 }
 
-/** A [PendingAction] paired with the [BrowserMode] it must run in. */
+/** A [PendingAction] paired with the [BrowserMode] it must run in and the UI origin of the switch. */
 internal data class PendingModeSwitch(
     val targetMode: BrowserMode,
     val action: PendingAction,
+    val source: BrowserModeSwitchSource,
 )
 
 internal fun PendingModeSwitch.toBundle(): Bundle {
-    val bundle = bundleOf(KEY_TARGET_MODE to targetMode.name)
+    val bundle = bundleOf(KEY_TARGET_MODE to targetMode.name, KEY_SOURCE to source.name)
     when (val pendingAction = action) {
         is PendingAction.ProcessIntent -> {
             bundle.putString(KEY_ACTION, ACTION_PROCESS_INTENT)
@@ -72,6 +74,7 @@ internal fun PendingModeSwitch.toBundle(): Bundle {
 
 internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
     val targetMode = getString(KEY_TARGET_MODE)?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() } ?: return null
+    val source = getString(KEY_SOURCE)?.let { runCatching { BrowserModeSwitchSource.valueOf(it) }.getOrNull() } ?: return null
     val action = when (getString(KEY_ACTION)) {
         ACTION_PROCESS_INTENT -> {
             val intent = BundleCompat.getParcelable(this, KEY_INTENT, Intent::class.java) ?: return null
@@ -88,10 +91,11 @@ internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
         )
         else -> return null
     }
-    return PendingModeSwitch(targetMode, action)
+    return PendingModeSwitch(targetMode, action, source)
 }
 
 private const val KEY_TARGET_MODE = "pendingModeSwitchTargetMode"
+private const val KEY_SOURCE = "pendingModeSwitchSource"
 private const val KEY_ACTION = "pendingModeSwitchAction"
 private const val KEY_INTENT = "pendingModeSwitchIntent"
 private const val KEY_QUERY = "pendingModeSwitchQuery"

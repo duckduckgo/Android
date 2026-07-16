@@ -22,6 +22,8 @@ import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.KEY_UNSENT_CLEAR_PIXELS
+import com.duckduckgo.browsermode.api.BrowserMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,22 +44,22 @@ class UnsentForgetAllPixelStoreSharedPreferencesTest {
     }
 
     @Test
-    fun whenFirstInitialisedThenPendingCountIs0() {
-        assertEquals(0, testee.pendingPixelCountClearData)
+    fun whenFirstInitialisedThenNoPendingCounts() {
+        assertEquals(emptyMap<BrowserMode, Int>(), testee.pendingPixelCountsClearData)
     }
 
     @Test
-    fun whenIncrementedOneThenValueIncrementsTo1() {
-        testee.incrementCount()
-        assertEquals(1, testee.pendingPixelCountClearData)
+    fun whenRegularIncrementedThenRegularCountIncrements() {
+        testee.incrementCount(BrowserMode.REGULAR)
+        assertEquals(mapOf(BrowserMode.REGULAR to 1), testee.pendingPixelCountsClearData)
     }
 
     @Test
-    fun whenIncrementedManyTimesThenIncrementsAsExpected() {
-        testee.incrementCount()
-        testee.incrementCount()
-        testee.incrementCount()
-        assertEquals(3, testee.pendingPixelCountClearData)
+    fun whenBothModesIncrementedThenCountsRemainSeparate() {
+        testee.incrementCount(BrowserMode.REGULAR)
+        testee.incrementCount(BrowserMode.FIRE)
+        testee.incrementCount(BrowserMode.FIRE)
+        assertEquals(mapOf(BrowserMode.REGULAR to 1, BrowserMode.FIRE to 2), testee.pendingPixelCountsClearData)
     }
 
     @Test
@@ -67,20 +69,29 @@ class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     @Test
     fun whenIncrementedThenTimestampUpdated() {
-        testee.incrementCount()
+        testee.incrementCount(BrowserMode.REGULAR)
         assertTrue(testee.lastClearTimestamp > 0)
     }
 
     @Test
-    fun whenResetWhenAlready0ThenCountIs0() {
-        testee.resetCount()
-        assertEquals(0, testee.pendingPixelCountClearData)
+    fun whenResetWhenAlready0ThenNoCountsArePending() {
+        testee.resetCount(BrowserMode.REGULAR)
+        assertEquals(emptyMap<BrowserMode, Int>(), testee.pendingPixelCountsClearData)
     }
 
     @Test
-    fun whenResetFromAbove0ThenCountIs0() {
-        testee.incrementCount()
-        testee.resetCount()
-        assertEquals(0, testee.pendingPixelCountClearData)
+    fun whenResetOneModeThenOtherModeRemainsPending() {
+        testee.incrementCount(BrowserMode.REGULAR)
+        testee.incrementCount(BrowserMode.FIRE)
+        testee.resetCount(BrowserMode.REGULAR)
+        assertEquals(mapOf(BrowserMode.FIRE to 1), testee.pendingPixelCountsClearData)
+    }
+
+    @Test
+    fun whenLegacyCountExistsThenItIsReadAsRegular() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        context.getSharedPreferences(FILENAME, 0).edit { putInt(KEY_UNSENT_CLEAR_PIXELS, 3) }
+
+        assertEquals(mapOf(BrowserMode.REGULAR to 3), testee.pendingPixelCountsClearData)
     }
 }

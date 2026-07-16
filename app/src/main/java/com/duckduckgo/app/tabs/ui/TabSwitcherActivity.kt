@@ -61,9 +61,9 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
@@ -143,9 +143,6 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var webViewPreviewPersister: WebViewPreviewPersister
-
-    @Inject
-    lateinit var pixel: Pixel
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -358,7 +355,7 @@ class TabSwitcherActivity :
         val requestedMode = intent.getActivityParams(TabSwitcherScreenWithParams::class.java)?.browserMode ?: return false
         if (requestedMode == currentBrowserMode) return false
 
-        viewModel.onBrowserModeToggled(requestedMode)
+        viewModel.onBrowserModeToggled(requestedMode, BrowserModeSwitchSource.PROMOTION)
 
         // only recreate when it actually switched, otherwise we'd pointlessly recreate into the same mode.
         if (viewModel.currentMode.value != requestedMode) return false
@@ -605,7 +602,7 @@ class TabSwitcherActivity :
         // Just toggle the mode; observeBrowserModeChanges() recreates as a consequence. The recreated
         // activity still fades the new mode's tabs in via the saved fadingInAfterRecreate flag.
         if (tabsRecycler.visibility != View.VISIBLE) {
-            viewModel.onBrowserModeToggled(newMode)
+            viewModel.onBrowserModeToggled(newMode, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
             return
         }
 
@@ -614,7 +611,7 @@ class TabSwitcherActivity :
             .setDuration(MODE_SWITCH_FADE_OUT_MS)
             .withEndAction {
                 tabsRecycler.visibility = View.INVISIBLE
-                viewModel.onBrowserModeToggled(newMode)
+                viewModel.onBrowserModeToggled(newMode, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
             }
             .start()
     }
@@ -936,7 +933,7 @@ class TabSwitcherActivity :
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
             Command.SwitchToRegularModeAndClose -> {
                 finishingAfterModeSwitch = true
-                viewModel.onBrowserModeToggled(BrowserMode.REGULAR)
+                viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
         }
