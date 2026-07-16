@@ -16,7 +16,6 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -25,8 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
-        android:background="#f0f"
-        tools:ignore="InvalidColorAttribute">
+        android:background="@drawable/background_large_rounded_surface"
+        android:paddingVertical="@dimen/keyline_2">
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/syncThisDeviceToggle"
@@ -45,7 +44,7 @@
         android:layout_marginBottom="60dp"
         android:text="@string/sync_setup_with_another_device_cta_title"
         app:daxButtonSize="large"
-        app:icon="@drawable/ic_qr_24" />
+        app:icon="@drawable/ic_qr2_24" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
