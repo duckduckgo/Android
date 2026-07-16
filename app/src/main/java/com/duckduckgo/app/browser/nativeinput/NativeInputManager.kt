@@ -28,6 +28,7 @@ import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
+import androidx.core.view.doOnAttach
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -1097,10 +1098,24 @@ class RealNativeInputManager @Inject constructor(
     private fun onEnterComplete(widgetView: View) {
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
-        // Skip the IME-raising work if the widget has been detached before the animation
-        // finished (e.g. fragment-manager transient detach during a tab switch). Otherwise
-        // focusInput would raise the keyboard on whatever tab is now in front.
-        if (!widgetView.isAttachedToWindow) return
+        if (widgetView.isAttachedToWindow) {
+            completeEnter(widgetView)
+            return
+        }
+        // The enter finished while the widget was transiently detached — e.g. the ViewPager re-attaches
+        // fragments when a new tab is created. Raising the IME now could target whatever tab is in front,
+        // so defer the focus until this widget re-attaches. Hide the omnibar immediately so the tab can't
+        // settle with both the omnibar and the widget visible, and finish focus on re-attach (guarded so a
+        // since-replaced widget is a no-op).
+        omnibarController.hide()
+        widgetView.doOnAttach {
+            if (widgetRoot === widgetView && !omnibarController.isDuckAiMode()) {
+                completeEnter(widgetView)
+            }
+        }
+    }
+
+    private fun completeEnter(widgetView: View) {
         omnibarController.hide()
         widgetFrom(widgetView)?.apply {
             focusInput(rootView.context as? Activity)
