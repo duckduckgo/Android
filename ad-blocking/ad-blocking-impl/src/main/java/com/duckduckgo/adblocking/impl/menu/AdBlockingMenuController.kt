@@ -53,13 +53,12 @@ interface AdBlockingMenuController {
     fun onChoiceSelected(choice: AdBlockingChoice)
 
     /**
-     * Handles a tap on the "Enable" browsing-menu row, enabling ad blocking directly without
-     * showing the choice sheet.
+     * Handles a tap on the "Enable" browsing-menu row, enabling ad blocking.
      */
     fun onEnableTapped()
 
     /**
-     * Handles a tap on the "Disable" browsing-menu row, which opens the disable-mode picker.
+     * Handles a tap on the "Disable" browsing-menu row.
      */
     fun onDisableTapped()
 }
