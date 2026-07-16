@@ -20,6 +20,8 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Partilhar favoritos</string>
     <string name="sync_enable_option_favorites_subtitle">Usa os mesmos favoritos em todos os teus dispositivos. Deixa desativado para manter separados os favoritos em dispositivos móveis e computadores.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Partilhar favoritos entre dispositivos</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Usa os mesmos marcadores favoritos no telemóvel e no computador.</string>
     <string name="saved_site_limit_warning"><b>Sincronização em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>A sincronização de marcadores está em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns marcadores para retomar a sincronização.</string>
     <string name="saved_site_invalid_warning"><b>Sincronização em pausa</b>\nAlguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
@@ -101,6 +103,8 @@
     <!-- Sync Favicons -->
     <string name="sync_fetch_icons_title">A obter ícones dos marcadores</string>
     <string name="sync_fetch_icons_subtitle">Transferir automaticamente ícones para os teus marcadores sincronizados.</string>
+    <string name="sync_simplified_fetch_icons_title">Carregar ícones de marcadores</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Carrega ícones de sites que guardaste nos marcadores. As transferências de ícones são expostas à tua rede.</string>
     <string name="faviconsPromptTitle">Transferir ícones em falta?</string>
     <string name="faviconsPromptMessage">Queres que este dispositivo transfira automaticamente os ícones dos marcadores sincronizados dos sites nos marcadores?</string>
     <string name="faviconsPromptPrimaryCta">Manter os ícones dos marcadores atualizados</string>
