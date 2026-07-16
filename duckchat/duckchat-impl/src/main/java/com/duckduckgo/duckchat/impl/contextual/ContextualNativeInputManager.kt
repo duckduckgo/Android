@@ -83,6 +83,14 @@ interface ContextualNativeInputManager {
      * widget wrote during its lifetime.
      */
     fun onContextualClosed(tabId: String)
+
+    /**
+     * Called when the contextual sheet is reopened for a tab that was previously closed. Restores the
+     * per-tab [NativeInputState] to the contextual (DUCK_AI) values that [onContextualClosed] reverted,
+     * so the widget's plugin controls (attach, model picker, tools — gated on toggleSelection == DUCK_AI)
+     * reappear. Without this the reused widget keeps the browser/search state and renders without them.
+     */
+    fun onContextualReopened(tabId: String)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -135,6 +143,17 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = browser,
                 toggleSelection = NativeInputState.defaultToggleFor(browser),
+            )
+        }
+    }
+
+    override fun onContextualReopened(tabId: String) {
+        if (tabId.isBlank()) return
+        val contextual = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        nativeInputStatePublisher.update(tabId) {
+            it.copy(
+                inputContext = contextual,
+                toggleSelection = NativeInputState.defaultToggleFor(contextual),
             )
         }
     }

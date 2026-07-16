@@ -271,6 +271,8 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
 
+        contextualNativeInputManager.onContextualReopened(sheetTabId)
+
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: requesting page context after sheet reopened" }
