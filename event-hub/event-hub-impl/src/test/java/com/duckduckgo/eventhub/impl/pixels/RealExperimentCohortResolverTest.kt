@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.ZonedDateTime
@@ -37,12 +36,11 @@ class RealExperimentCohortResolverTest {
     @Test
     fun `resolves active experiments to name cohort and enrollment millis`() = runTest {
         val enrollmentDate = "2026-01-26T00:00:00-05:00[America/New_York]"
-        whenever(inventory.getAllActiveExperimentToggles()).doReturn(
-            listOf(
-                fakeToggle("tdsNextExperiment007", "blockList", "treatment", enrollmentDate),
-                fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
-            ),
+        val toggles = listOf(
+            fakeToggle("tdsNextExperiment007", "blockList", "treatment", enrollmentDate),
+            fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
         )
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
         val result = resolver.activeExperiments(matchExperiments = null)
 
@@ -56,12 +54,11 @@ class RealExperimentCohortResolverTest {
 
     @Test
     fun `matchExperiments filters by name prefix`() = runTest {
-        whenever(inventory.getAllActiveExperimentToggles()).doReturn(
-            listOf(
-                fakeToggle("tdsNextExperiment007", "blockList", "treatment", null),
-                fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
-            ),
+        val toggles = listOf(
+            fakeToggle("tdsNextExperiment007", "blockList", "treatment", null),
+            fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
         )
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
         val result = resolver.activeExperiments(matchExperiments = listOf("tdsNextExperiment"))
 
@@ -71,29 +68,29 @@ class RealExperimentCohortResolverTest {
 
     @Test
     fun `toggles without an assigned cohort are omitted`() = runTest {
-        whenever(inventory.getAllActiveExperimentToggles()).doReturn(
-            listOf(fakeToggle("tdsNextExperiment007", "blockList", cohort = null, enrollmentDateET = null)),
-        )
+        val toggles = listOf(fakeToggle("tdsNextExperiment007", "blockList", cohort = null, enrollmentDateET = null))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
         assertEquals(0, resolver.activeExperiments(matchExperiments = null).size)
     }
 
     @Test
     fun `unparseable enrollment date resolves to null millis`() = runTest {
-        whenever(inventory.getAllActiveExperimentToggles()).doReturn(
-            listOf(fakeToggle("tdsNextExperiment007", "blockList", "treatment", "not-a-date")),
-        )
+        val toggles = listOf(fakeToggle("tdsNextExperiment007", "blockList", "treatment", "not-a-date"))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
         assertNull(resolver.activeExperiments(matchExperiments = null)[0].enrollmentDateMillis)
     }
 
-    private fun fakeToggle(
+    private suspend fun fakeToggle(
         name: String,
         parentName: String,
         cohort: String?,
         enrollmentDateET: String?,
-    ): Toggle = mock {
-        on { featureName() } doReturn Toggle.FeatureName(parentName = parentName, name = name)
-        onBlocking { getCohort() } doReturn cohort?.let { Toggle.State.Cohort(name = it, weight = 1, enrollmentDateET = enrollmentDateET) }
+    ): Toggle = mock<Toggle>().apply {
+        whenever(featureName()).thenReturn(Toggle.FeatureName(parentName = parentName, name = name))
+        whenever(getCohort()).thenReturn(
+            cohort?.let { Toggle.State.Cohort(name = it, weight = 1, enrollmentDateET = enrollmentDateET) },
+        )
     }
 }
