@@ -938,7 +938,11 @@ class SingleTabFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
+        verify(mockPixel).enqueueFire(
+            FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+            type = Daily(),
+        )
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
