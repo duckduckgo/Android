@@ -1077,7 +1077,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Jsi připraven(a) chatovat soukromě s ChatGPT, Claudem a dalšími umělými inteligencemi zdarma v prohlížeči, který tě aktivně chrání?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Nezapomeň: Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Spustit chat s AI</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Ochrana AI je aktivní!</string>

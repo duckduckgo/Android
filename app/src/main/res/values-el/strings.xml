@@ -1037,7 +1037,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Είστε έτοιμοι να συνομιλήσετε ιδιωτικά με το ChatGPT, το Claude και άλλα μοντέλα τεχνητής νοημοσύνης δωρεάν, σε ένα πρόγραμμα περιήγησης που σας προστατεύει ενεργά;</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Θυμηθείτε: μπορείτε να χρησιμοποιήσετε το Duck.ai από οπουδήποτε βλέπετε το εικονίδιο συνομιλίας</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Έναρξη συνομιλίας με τεχνητή νοημοσύνη</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Ενεργοποιήθηκαν οι προστασίες τεχνητής νοημοσύνης!</string>
