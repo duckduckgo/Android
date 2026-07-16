@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.plusAssign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,9 +38,11 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
@@ -103,6 +106,9 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncSetupWideEvent: SyncSetupWideEvent
 
+    @Inject
+    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
@@ -161,6 +167,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureSyncThisDeviceCta()
         configureDevicesRecyclerView()
+        configureBookmarksSection()
         configureDataExpirationNotice()
         configureDataDeletionItem()
 
@@ -350,6 +357,21 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.includeEnabledView.devicesRecycler.apply {
             layoutManager = LinearLayoutManager(this@SyncActivity)
             adapter = syncedDeviceAdapter
+        }
+    }
+
+    private fun configureBookmarksSection() {
+        binding.includeEnabledView.apply {
+            val hasPlugins = syncSettingsPlugin.isNotEmpty()
+            bookmarksSectionHeader.isVisible = hasPlugins
+            bookmarksSectionContainer.isVisible = hasPlugins
+            bookmarksSectionDivider.isVisible = hasPlugins
+
+            if (hasPlugins) {
+                syncSettingsPlugin.toSortedMap().forEach { (_, plugin) ->
+                    bookmarksSectionContainer += plugin.getView(this@SyncActivity)
+                }
+            }
         }
     }
 
