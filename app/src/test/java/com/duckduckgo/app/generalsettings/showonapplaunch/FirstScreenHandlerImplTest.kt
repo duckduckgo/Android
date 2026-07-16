@@ -113,6 +113,7 @@ class FirstScreenHandlerImplTest {
             modeSwitchRecreateSignal = modeSwitchRecreateSignal,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
+            idleThresholdResolver = RealIdleThresholdResolver(androidBrowserConfigFeature),
         )
     }
 
