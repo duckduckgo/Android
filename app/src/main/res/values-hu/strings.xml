@@ -1009,5 +1009,6 @@
     <string name="fireTabsNewTabButton">Új Fire-lap</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ÚJ! </b> Próbáld ki a Fire-lapokat, és böngéssz helyi előzmények mentése nélkül.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 </resources>

@@ -1029,5 +1029,6 @@
     <string name="fireTabsNewTabButton">Noua filă Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOU!</b> Încearcă filele Fire pentru a naviga fără a salva istoricul local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 </resources>

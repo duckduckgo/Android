@@ -1049,5 +1049,6 @@
     <string name="fireTabsNewTabButton">Nova Fire kartica</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Isprobaj Fire kartice za pregledavanje bez spremanja lokalne povijesti.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Želiš li izbrisati Fire kartice i njihove podatke?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
 </resources>

@@ -1049,5 +1049,6 @@
     <string name="fireTabsNewTabButton">Naujas „Fire“ skirtukas</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NAUJIENA!</b> Išbandykite „Fire“ skirtukus naršymui neišsaugant vietinės naršymo istorijos.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ar trinti „Fire“ skirtukus ir jų duomenis?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
 </resources>

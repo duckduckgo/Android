@@ -1009,5 +1009,6 @@
     <string name="fireTabsNewTabButton">Ny Fire-flik</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYTT!</b> Prova Fire-flikar för att surfa utan att spara lokal historik.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 </resources>

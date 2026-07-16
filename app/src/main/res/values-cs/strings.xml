@@ -1049,5 +1049,6 @@
     <string name="fireTabsNewTabButton">Nová karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyzkoušej karty Fire pro prohlížení bez ukládání místní historie.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Smazat karty Fire a jejich data?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Soubor nejde otevřít. Zkus vyhledat kompatibilní aplikaci.</string>
 </resources>

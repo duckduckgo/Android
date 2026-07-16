@@ -1009,5 +1009,6 @@
     <string name="fireTabsNewTabButton">Nueva Fire tab</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>¡NUEVO!</b> Prueba Fire Tabs para navegar sin guardar el historial local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">¿Eliminar Fire tabs y sus datos?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">No se puede abrir el archivo. Busca una aplicación compatible.</string>
 </resources>

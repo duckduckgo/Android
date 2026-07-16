@@ -1009,5 +1009,6 @@
     <string name="fireTabsNewTabButton">Yeni Fire Sekmesi</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>YENİ!</b> Yerel geçmişi kaydetmeden göz atmak için Fire Sekmelerini deneyin.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 </resources>
