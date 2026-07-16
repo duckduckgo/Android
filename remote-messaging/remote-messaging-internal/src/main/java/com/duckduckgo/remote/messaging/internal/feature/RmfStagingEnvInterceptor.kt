@@ -58,6 +58,8 @@ class RmfStagingEnvInterceptor @Inject constructor(
 
     companion object {
         private const val RMF_REQUEST = "https://staticcdn.duckduckgo.com/remotemessaging/"
-        private const val RMF_STAGING_ENV = "https://staticcdn.duckduckgo.com/remotemessaging/config/staging/"
+
+        // DO NOT MERGE: idle-RMF ship-review custom build — points at the /376/ staging config.
+        private const val RMF_STAGING_ENV = "https://staticcdn.duckduckgo.com/remotemessaging/config/staging/376/"
     }
 }

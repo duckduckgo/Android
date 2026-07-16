@@ -158,7 +158,8 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    // DO NOT MERGE: forced on for the idle-RMF ship-review custom build.
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun showNTPAfterIdleReturn(): Toggle
 
     /**
@@ -166,7 +167,8 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    // DO NOT MERGE: forced on for the idle-RMF ship-review custom build.
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun ntpAsDefaultAfterIdleReturn(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

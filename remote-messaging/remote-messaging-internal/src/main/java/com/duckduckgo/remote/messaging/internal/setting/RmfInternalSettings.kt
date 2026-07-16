@@ -29,6 +29,7 @@ interface RmfInternalSettings {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    // DO NOT MERGE: forced on for the idle-RMF ship-review custom build (routes RMF fetches to staging).
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useStatingEndpoint(): Toggle
 }
