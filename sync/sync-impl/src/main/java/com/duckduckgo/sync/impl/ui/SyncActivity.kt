@@ -75,6 +75,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
@@ -456,6 +457,8 @@ class SyncActivity : DuckDuckGoActivity() {
                     deepLinkIntoSetup(command.barcodeSyncUrl.asUrl())
                 }
             }
+            // This is a no-op in this flow. Simplified sync flow uses a toggle that needs to be checked off.
+            is SyncThisDeviceCanceled -> Unit
         }
     }
 

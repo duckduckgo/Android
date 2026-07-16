@@ -254,6 +254,7 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
         data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
+        data object SyncThisDeviceCanceled : Command()
     }
 
     enum class OriginalFlow {
@@ -548,6 +549,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onLearnMoreClicked() {
         viewModelScope.launch {
             command.send(Command.LaunchLearnMore(LEARN_MORE_URL))
+        }
+    }
+
+    fun onSyncThisDeviceCanceled() {
+        viewModelScope.launch {
+            command.send(Command.SyncThisDeviceCanceled)
         }
     }
 
