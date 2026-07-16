@@ -235,7 +235,7 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    val composerHasFocus = if (viewModel.viewState.value.nativeChatInputEnabled) {
+                    val composerHasFocus = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                         binding.contextualNativeInputWidget.hasFocus()
                     } else {
                         binding.contextualModeNativeContent.hasFocus()
@@ -599,7 +599,7 @@ class DuckChatContextualFragment :
             viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
-            val currentInput = if (viewModel.viewState.value.nativeChatInputEnabled) {
+            val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                 binding.contextualNativeInputWidget.text
             } else {
                 binding.legacyInputField.text.toString()
@@ -677,7 +677,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.FocusInput -> {
-                        if (viewModel.viewState.value.nativeChatInputEnabled) {
+                        if (viewModel.viewState.value.contextualNativeInputEnabled) {
                             binding.contextualNativeInputWidget.focusInput(activity)
                         } else {
                             binding.legacyInputField.let {
@@ -759,8 +759,8 @@ class DuckChatContextualFragment :
                 }
                 binding.contextualFire.gone()
 
-                if (viewState.nativeChatInputEnabled) {
-                    // The unified input widget is the composer; ContextualNativeInputManager.onInputMode()
+                if (viewState.contextualNativeInputEnabled) {
+                    // The unified input widget is the INPUT composer; ContextualNativeInputManager.onInputMode()
                     // shows its card. Hide the legacy EditText composer and its context chip/placeholder.
                     binding.contextualModeNativeContent.gone()
                 } else {

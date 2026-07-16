@@ -319,4 +319,14 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun removeChatHistory(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai contextual sheet's initial INPUT state should use the native
+     * unified input widget as its composer. Gated together with [nativeChatInput] (and
+     * [nativeInputField]): when this is off but native chat input is on, the contextual sheet uses
+     * the legacy input for INPUT mode while still using the native widget in WEBVIEW (in-chat) mode.
+     * When native chat input is off, this has no effect (everything falls back to legacy/web input).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualNativeInput(): Toggle
 }
