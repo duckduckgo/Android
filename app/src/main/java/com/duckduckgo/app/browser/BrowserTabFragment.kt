@@ -2094,6 +2094,10 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
+        // Dismiss the native input first (no-op when it isn't shown). Reachable from the input nav bar's
+        // tabs button while the widget is open; leaving it attached breaks the "UTI open ⟺ omnibar hidden"
+        // invariant, so on return the re-rendered omnibar and the lingering widget would both be visible.
+        nativeInputManager.hideNativeInput(animate = false)
         val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
