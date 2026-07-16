@@ -172,6 +172,33 @@ class LaunchViewModelTest {
     }
 
     @Test
+    fun whenOrchestratorEngagedWithBrowserActivityHostThenCommandIsHome() = runTest {
+        // Simulates resuming a new-user onboarding run left in progress on a BrowserActivity-hosted
+        // step (e.g. the Duck.ai demo) after the app process survived being backed out of.
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.BrowserActivity))),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
     fun whenNewUserAndBrandDesignUpdateDisabledThenOnboardingCommandAndPlanNotStarted() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
