@@ -598,6 +598,58 @@ class RealBrowserMenuViewStateFactoryTest {
     }
 
     @Test
+    fun `when browser page is a duckduckgo search results page then privacy protection and report site items are hidden`() = runTest {
+        val serpUrl = "https://duckduckgo.com/?q=cats"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(serpUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(serpUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = serpUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is not a duckduckgo search results page then privacy protection and report site items propagate`() = runTest {
+        val siteUrl = "https://example.com/page"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(siteUrl)).thenReturn(false)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(siteUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = siteUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertTrue(viewState.canChangePrivacyProtection)
+        assertTrue(viewState.canReportSite)
+    }
+
+    @Test
     fun `when error with no site but omnibarText then page context header is Error with omnibarText`() = runTest {
         val result = testee.create(
             omnibarViewMode = ViewMode.Browser("https://broken-site.com/"),
