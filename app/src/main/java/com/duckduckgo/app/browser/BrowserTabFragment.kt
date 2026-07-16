@@ -2094,10 +2094,13 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        // Dismiss the native input first (no-op when it isn't shown). Reachable from the input nav bar's
-        // tabs button while the widget is open; leaving it attached breaks the "UTI open ⟺ omnibar hidden"
-        // invariant, so on return the re-rendered omnibar and the lingering widget would both be visible.
-        nativeInputManager.hideNativeInput(animate = false)
+        // Dismiss the native input first (no-op when it isn't shown) so a browser-input widget doesn't
+        // linger behind the switcher and leave the omnibar and widget both visible on return. Skip Duck.ai:
+        // there the widget is the persistent chat input, and hideNativeInput would restore the default
+        // omnibar and tear it down.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
