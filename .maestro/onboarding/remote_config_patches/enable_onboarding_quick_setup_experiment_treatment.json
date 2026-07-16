@@ -1,0 +1,10 @@
+[
+  {
+    "op": "replace",
+    "path": "/features/onboardingQuickSetup/features/onboardingQuickSetupExperimentJun3/cohorts",
+    "value": [
+      { "name": "control", "weight": 0 },
+      { "name": "treatment", "weight": 1 }
+    ]
+  }
+]

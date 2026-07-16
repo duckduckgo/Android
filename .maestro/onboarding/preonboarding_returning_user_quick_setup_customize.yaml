@@ -1,0 +1,62 @@
+appId: com.duckduckgo.mobile.android
+name: "Preonboarding: Reinstaller quick setup - customize address bar, search options, and default browser"
+tags:
+  - onboardingNonReleaseBlockingTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      # First launch as a fresh install
+      - launchApp:
+          clearState: true
+      # Wait for the welcome dialog so we create the reinstaller marker before relaunch
+      - assertVisible:
+          text: "(let's get started!|Let's do it!)"
+      # Relaunch with app data cleared
+      - launchApp:
+          clearState: true
+      - assertVisible:
+          text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
+      - assertVisible:
+          text: "(let's get started!|Let's do it!)"
+      # Wait for privacy config to download
+      - extendedWaitUntil:
+          visible:
+            id: "skipOnboardingButton"
+          timeout: 30000
+      - tapOn: "I've been here before"
+      - assertVisible:
+          text: ".*Want to customize anything?.*"
+
+      - tapOn: "Address bar position"
+      - assertVisible:
+          text: ".*Where do you want your address bar?.*"
+      - tapOn:
+          id: "bottomOmnibarContainer"
+      - tapOn: "Done"
+
+      - tapOn: "Address bar search options"
+      - assertVisible:
+          text: ".*Want Search & AI chat in the address bar?.*"
+      - tapOn:
+          id: "inputScreenSearchOnlyContainer"
+      - tapOn: "Done"
+
+      - tapOn:
+          id: "quickSetupSwitchRowSwitch"
+          childOf:
+            id: "setDefaultBrowserItem"
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+
+      - tapOn: "Start Browsing"
+      - assertVisible:
+          id: "newTabPage"
+      - assertVisible:
+          id: "toolbarContainer"
+          below:
+            id: "newTabPage"
