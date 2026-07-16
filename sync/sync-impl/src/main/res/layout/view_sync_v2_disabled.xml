@@ -65,7 +65,7 @@
         android:layout_marginVertical="@dimen/keyline_4" />
 
     <com.duckduckgo.sync.impl.ui.v2.SyncOnOtherPlatformsListItem
-        android:id="@+id/synOnOtherPlatformsItem"
+        android:id="@+id/sync_on_other_platforms_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
