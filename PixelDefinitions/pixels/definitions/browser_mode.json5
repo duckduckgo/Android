@@ -11,14 +11,7 @@
             {
                 "key": "source",
                 "description": "Origin of the mode switch",
-                "enum": [
-                    "tab_switcher_toggle",
-                    "promotion",
-                    "new_tab",
-                    "escape_hatch",
-                    "external_launch",
-                    "tab_switcher_exit"
-                ]
+                "enum": ["tab_switcher_toggle", "promotion", "new_tab", "escape_hatch", "external_launch", "tab_switcher_exit"]
             }
         ]
     },
