@@ -20,6 +20,8 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Jaga lemmikuid</string>
     <string name="sync_enable_option_favorites_subtitle">Kasuta kõigis seadmetes samu lemmikuid. Kui soovid mobiili ja arvuti lemmikud lahus hoida, siis ära seda sisse lülita.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Jaga lemmikuid kõigis seadmetes</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Kasuta samu lemmikuid järjehoidjaid nii mobiilis kui ka lauaarvutis.</string>
     <string name="saved_site_limit_warning"><b>Sünkroonimine peatatud</b>\nOled saavutanud maksimaalse järjehoidjate arvu. Kustuta mõni, et jätkata sünkroonimisega.\n\n<annotation type="manage_bookmarks">Halda järjehoidjaid</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Järjehoidjate sünkroonimine on peatatud</b>\nOled saavutanud maksimaalse järjehoidjate arvu. Sünkroonimise jätkamiseks kustuta mõned järjehoidjad.</string>
     <string name="saved_site_invalid_warning"><b>Sünkroonimine peatatud</b>\nMõned järjehoidjad on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.\n\n<annotation type="manage_bookmarks">Halda järjehoidjaid</annotation></string>
@@ -101,6 +103,8 @@
     <!-- Sync Favicons -->
     <string name="sync_fetch_icons_title">Too järjehoidjaikoonid</string>
     <string name="sync_fetch_icons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
+    <string name="sync_simplified_fetch_icons_title">Laadi järjehoidjaikoonid</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Laadib ikoonid veebisaitidelt, mille oled järjehoidjatesse lisanud. Ikoonide allalaadimine toimub sinu võrgus.</string>
     <string name="faviconsPromptTitle">Kas laadida alla puuduvad ikoonid?</string>
     <string name="faviconsPromptMessage">Kas soovite, et see seade laadiks automaatselt alla sünkroonitud järjehoidjate ikoone järjehoidjatesse lisatud veebilehtedelt?</string>
     <string name="faviconsPromptPrimaryCta">Hoidke järjehoidjate ikoonid ajakohastatud</string>
