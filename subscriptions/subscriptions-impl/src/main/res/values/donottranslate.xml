@@ -40,8 +40,23 @@
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
     <!-- Subscription Onboarding (English only, not translated) -->
-    <string name="subscriptionOnboardingWelcomeTitle">Welcome step</string>
-    <string name="subscriptionOnboardingWelcomeText">Welcome to the new subscription onboarding flow</string>
-    <string name="subscriptionOnboardingWelcomeContinue">Continue</string>
+    <string name="subscriptionOnboardingWelcomeTitle">Protections unlocked!</string>
+    <string name="subscriptionOnboardingWelcomeDescription">Start using your premium protections today.</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle1">Day</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle2">1</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle3">of your free trial</string>
+    <string name="subscriptionOnboardingWelcomeBannerDescription">Billing starts on May 7, 2026</string>
+    <string name="subscriptionOnboardingWelcomePrimaryButton">Let\'s go!</string>
+    <string name="subscriptionOnboardingFeaturesTitle">Ready to activate your new protections?</string>
+    <string name="subscriptionOnboardingFeaturesDescription">Next, we\'ll get your VPN online and help you activate all your premium protections.</string>
+    <string name="subscriptionOnboardingFeature1Title">VPN</string>
+    <string name="subscriptionOnboardingFeature1Description">Get an extra layer of online protection with the VPN built for speed and simplicity.</string>
+    <string name="subscriptionOnboardingFeature2Title">Identity Theft Restoration</string>
+    <string name="subscriptionOnboardingFeature2Description">If your identity is stolen, let us handle the stress and expense to help you restore it.</string>
+    <string name="subscriptionOnboardingFeature3Title">Advanced Models in Duck.ai </string>
+    <string name="subscriptionOnboardingFeature3Description">You get advanced AI models and higher limits, all anonymized by DuckDuckGo.</string>
+    <string name="subscriptionOnboardingFeature4Title">Personal Information Removal</string>
+    <string name="subscriptionOnboardingFeature4Description">Find and remove your personal info from sites that store and sell it, reducing spam. </string>
+    <string name="subscriptionOnboardingFeaturesPrimaryButton">Next</string>
 
 </resources>
