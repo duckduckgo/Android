@@ -21,11 +21,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.time.ZonedDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealExperimentCohortResolverTest {
@@ -34,63 +32,44 @@ class RealExperimentCohortResolverTest {
     private val resolver = RealExperimentCohortResolver(inventory)
 
     @Test
-    fun `resolves active experiments to name cohort and enrollment millis`() = runTest {
-        val enrollmentDate = "2026-01-26T00:00:00-05:00[America/New_York]"
+    fun `resolves active experiments to name to cohort map`() = runTest {
         val toggles = listOf(
-            fakeToggle("tdsNextExperiment007", "blockList", "treatment", enrollmentDate),
-            fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
+            fakeToggle("tdsNextExperiment007", "blockList", "treatment"),
+            fakeToggle("cssExp1", "contentScopeExperiments", "control"),
         )
         whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
-        val result = resolver.activeExperiments(matchExperiments = null)
+        val result = resolver.activeExperimentCohorts()
 
-        assertEquals(2, result.size)
-        assertEquals(ResolvedExperiment("cssExp1", "control", null), result[0])
-        assertEquals(
-            ResolvedExperiment("tdsNextExperiment007", "treatment", ZonedDateTime.parse(enrollmentDate).toInstant().toEpochMilli()),
-            result[1],
-        )
-    }
-
-    @Test
-    fun `matchExperiments filters by name prefix`() = runTest {
-        val toggles = listOf(
-            fakeToggle("tdsNextExperiment007", "blockList", "treatment", null),
-            fakeToggle("cssExp1", "contentScopeExperiments", "control", null),
-        )
-        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
-
-        val result = resolver.activeExperiments(matchExperiments = listOf("tdsNextExperiment"))
-
-        assertEquals(1, result.size)
-        assertEquals("tdsNextExperiment007", result[0].name)
+        assertEquals(mapOf("tdsNextExperiment007" to "treatment", "cssExp1" to "control"), result)
     }
 
     @Test
     fun `toggles without an assigned cohort are omitted`() = runTest {
-        val toggles = listOf(fakeToggle("tdsNextExperiment007", "blockList", cohort = null, enrollmentDateET = null))
+        val toggles = listOf(
+            fakeToggle("tdsNextExperiment007", "blockList", cohort = null),
+            fakeToggle("cssExp1", "contentScopeExperiments", "control"),
+        )
         whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
 
-        assertEquals(0, resolver.activeExperiments(matchExperiments = null).size)
+        assertEquals(mapOf("cssExp1" to "control"), resolver.activeExperimentCohorts())
     }
 
     @Test
-    fun `unparseable enrollment date resolves to null millis`() = runTest {
-        val toggles = listOf(fakeToggle("tdsNextExperiment007", "blockList", "treatment", "not-a-date"))
-        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(toggles)
+    fun `no active experiments resolves to empty map`() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
 
-        assertNull(resolver.activeExperiments(matchExperiments = null)[0].enrollmentDateMillis)
+        assertEquals(emptyMap<String, String>(), resolver.activeExperimentCohorts())
     }
 
     private suspend fun fakeToggle(
         name: String,
         parentName: String,
         cohort: String?,
-        enrollmentDateET: String?,
     ): Toggle = mock<Toggle>().apply {
         whenever(featureName()).thenReturn(Toggle.FeatureName(parentName = parentName, name = name))
         whenever(getCohort()).thenReturn(
-            cohort?.let { Toggle.State.Cohort(name = it, weight = 1, enrollmentDateET = enrollmentDateET) },
+            cohort?.let { Toggle.State.Cohort(name = it, weight = 1) },
         )
     }
 }

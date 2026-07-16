@@ -22,7 +22,7 @@ import androidx.room.migration.Migration
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         EventHubPixelStateEntity::class,
     ],

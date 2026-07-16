@@ -58,6 +58,7 @@ class RealEventHubRepository @Inject constructor(
                 periodEndMillis = state.periodEndMillis,
                 paramsJson = serializeParams(state.params),
                 configJson = configJson,
+                experimentSnapshotJson = serializeExperimentSnapshot(state.experimentSnapshot),
             ),
         )
     }
@@ -73,14 +74,21 @@ class RealEventHubRepository @Inject constructor(
             periodEndMillis = entity.periodEndMillis,
             config = config,
             params = parseParamsJson(entity.paramsJson),
+            experimentSnapshot = parseExperimentSnapshotJson(entity.experimentSnapshotJson),
         )
     }
 
     companion object {
+        private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).build() }
+
         private val paramsAdapter by lazy {
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
             val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
             moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
+        }
+
+        private val experimentSnapshotAdapter by lazy {
+            val type = Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+            moshi.adapter<Map<String, String>>(type).lenient()
         }
 
         fun parseParamsJson(json: String): Map<String, ParamState> {
@@ -93,6 +101,18 @@ class RealEventHubRepository @Inject constructor(
 
         fun serializeParams(params: Map<String, ParamState>): String {
             return paramsAdapter.toJson(params)
+        }
+
+        fun parseExperimentSnapshotJson(json: String): Map<String, String> {
+            return try {
+                experimentSnapshotAdapter.fromJson(json) ?: emptyMap()
+            } catch (e: Exception) {
+                emptyMap()
+            }
+        }
+
+        fun serializeExperimentSnapshot(snapshot: Map<String, String>): String {
+            return experimentSnapshotAdapter.toJson(snapshot)
         }
     }
 }

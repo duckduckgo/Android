@@ -23,6 +23,7 @@ data class TelemetryPixelConfig(
     val parameters: Map<String, TelemetryParameterConfig>,
 ) {
     val isEnabled: Boolean get() = state == "enabled"
+    val hasExperimentsParameter: Boolean get() = parameters.values.any { it.isExperiments }
 }
 
 data class TelemetryTriggerConfig(
@@ -80,4 +81,11 @@ data class PixelState(
     val periodEndMillis: Long,
     val config: TelemetryPixelConfig,
     val params: Map<String, ParamState>,
+    /**
+     * Snapshot of the experiment cohorts (experiment name -> cohort name) the user was enrolled in
+     * when this period started. Compared against the current enrolments at fire time to detect
+     * joins/leaves/cohort-changes during the period (the `changedInPeriod` flag). Empty for pixels
+     * that do not report experiments.
+     */
+    val experimentSnapshot: Map<String, String> = emptyMap(),
 )

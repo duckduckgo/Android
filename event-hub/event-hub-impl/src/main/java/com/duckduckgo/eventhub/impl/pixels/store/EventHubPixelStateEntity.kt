@@ -26,6 +26,9 @@ import androidx.room.PrimaryKey
  * [paramsJson] parameter data as JSON, e.g. {"count": {"value": 5, "stopCounting": true}}
  * [configJson] snapshot of the per-pixel telemetry config at period start — used for all
  *   processing during the period so that mid-period config changes don't affect the running pixel.
+ * [experimentSnapshotJson] snapshot of the experiment cohorts (name -> cohort) the user was enrolled
+ *   in at period start, e.g. {"tdsNextExperiment007":"treatment"}. Used to detect enrolment changes
+ *   during the period. Empty object for pixels that do not report experiments.
  */
 @Entity(tableName = "event_hub_pixel_state")
 data class EventHubPixelStateEntity(
@@ -34,4 +37,5 @@ data class EventHubPixelStateEntity(
     val periodEndMillis: Long,
     val paramsJson: String,
     val configJson: String = "{}",
+    val experimentSnapshotJson: String = "{}",
 )

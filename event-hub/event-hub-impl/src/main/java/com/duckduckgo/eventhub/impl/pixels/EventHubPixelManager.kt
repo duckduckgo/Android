@@ -191,7 +191,7 @@ class RealEventHubPixelManager @Inject constructor(
         return nextDeadline
     }
 
-    private fun initMissingPixels(): Long {
+    private suspend fun initMissingPixels(): Long {
         var nextDeadline = Long.MAX_VALUE
         for (pixelConfig in getTelemetryConfigs()) {
             if (repository.getPixelState(pixelConfig.name) == null) {
@@ -282,7 +282,7 @@ class RealEventHubPixelManager @Inject constructor(
         return if (latestPixelConfig != null) startNewPeriod(latestPixelConfig) else null
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
+    private suspend fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
         if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
@@ -290,6 +290,14 @@ class RealEventHubPixelManager @Inject constructor(
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
         val periodEndMillis = nowMillis + periodMillis
+
+        // Snapshot the current experiment enrolments so we can detect changes when the pixel fires.
+        // Only resolved for pixels that report experiments to avoid unnecessary work.
+        val experimentSnapshot = if (pixelConfig.hasExperimentsParameter) {
+            experimentCohortResolver.activeExperimentCohorts()
+        } else {
+            emptyMap()
+        }
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
         repository.savePixelState(
@@ -299,6 +307,7 @@ class RealEventHubPixelManager @Inject constructor(
                 periodEndMillis = periodEndMillis,
                 config = pixelConfig,
                 params = pixelConfig.parameters.keys.associateWith { ParamState(0) },
+                experimentSnapshot = experimentSnapshot,
             ),
         )
 
@@ -333,31 +342,50 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     /**
-     * Builds the %-encoded JSON object for an `experiments` parameter, e.g.
-     * `{"tdsNextExperiment007":{"cohort":"treatment","changedInPeriod":true},"cssExp1":{"cohort":"control"}}`.
+     * Builds the %-encoded JSON object for an `experiments` parameter by comparing the cohorts
+     * enrolled at period start (the snapshot) against the cohorts enrolled now, e.g.
+     * `{"tdsA":{"cohort":"treatment"},"tdsB":{"cohort":"treatment","changedInPeriod":true},`
+     * `"cssC":{"cohort":null,"previousCohort":"control","changedInPeriod":true}}`.
      *
-     * `changedInPeriod` is added when the user was enrolled into the cohort during this pixel's
-     * aggregation period, so partially-attributed periods can be identified downstream.
+     * Per experiment (after applying the parameter's `matchExperiments` filter):
+     *  - unchanged: `{"cohort": <cohort>}`
+     *  - joined during period: `{"cohort": <new>, "changedInPeriod": true}`
+     *  - left during period: `{"cohort": null, "previousCohort": <prev>, "changedInPeriod": true}`
+     *  - cohort changed during period: `{"cohort": <new>, "previousCohort": <prev>, "changedInPeriod": true}`
+     *
+     * Only the net change over the period is represented (multiple mid-period changes collapse to
+     * start-vs-now), matching the design's "only the latest enrolment change is recorded".
      */
     private suspend fun buildExperimentsParam(pixelState: PixelState, paramConfig: TelemetryParameterConfig): String {
-        val experiments = experimentCohortResolver.activeExperiments(paramConfig.matchExperiments)
+        val startCohorts = pixelState.experimentSnapshot
+        val currentCohorts = experimentCohortResolver.activeExperimentCohorts()
+
+        val relevantNames = (startCohorts.keys + currentCohorts.keys)
+            .filter { matchesFilter(it, paramConfig.matchExperiments) }
+            .sorted()
+
         val json = JSONObject()
-        for (experiment in experiments) {
-            val experimentJson = JSONObject().put("cohort", experiment.cohort)
-            if (isChangedInPeriod(experiment, pixelState)) {
+        for (name in relevantNames) {
+            val previous = startCohorts[name]
+            val current = currentCohorts[name]
+            if (previous == null && current == null) continue
+
+            val experimentJson = JSONObject()
+            experimentJson.put("cohort", current ?: JSONObject.NULL)
+            if (previous != current) {
                 experimentJson.put("changedInPeriod", true)
+                if (previous != null) {
+                    experimentJson.put("previousCohort", previous)
+                }
             }
-            json.put(experiment.name, experimentJson)
+            json.put(name, experimentJson)
         }
         return URLEncoder.encode(json.toString(), "UTF-8")
     }
 
-    // Detects enrolment (a "join") during this period from the cohort's enrollment date. Detecting a
-    // "leave" mid-period (cohort present at period start, gone by fire time) would additionally require
-    // snapshotting the enrolled cohorts into PixelState at startNewPeriod; left as a follow-up.
-    private fun isChangedInPeriod(experiment: ResolvedExperiment, pixelState: PixelState): Boolean {
-        val enrolledAt = experiment.enrollmentDateMillis ?: return false
-        return enrolledAt >= pixelState.periodStartMillis && enrolledAt < pixelState.periodEndMillis
+    private fun matchesFilter(name: String, matchExperiments: List<String>?): Boolean {
+        if (matchExperiments == null) return true
+        return matchExperiments.any { prefix -> name.startsWith(prefix) }
     }
 
     companion object {

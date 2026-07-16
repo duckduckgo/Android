@@ -17,18 +17,8 @@
 package com.duckduckgo.eventhub.impl.pixels
 
 class FakeExperimentCohortResolver(
-    var experiments: List<ResolvedExperiment> = emptyList(),
+    var cohorts: Map<String, String> = emptyMap(),
 ) : ExperimentCohortResolver {
 
-    var lastRequestedMatch: List<String>? = null
-        private set
-
-    override suspend fun activeExperiments(matchExperiments: List<String>?): List<ResolvedExperiment> {
-        lastRequestedMatch = matchExperiments
-        return if (matchExperiments == null) {
-            experiments
-        } else {
-            experiments.filter { experiment -> matchExperiments.any { experiment.name.startsWith(it) } }
-        }
-    }
+    override suspend fun activeExperimentCohorts(): Map<String, String> = cohorts
 }

@@ -2530,104 +2530,109 @@ class RealEventHubPixelManagerTest {
     """.trimIndent()
 
     private fun fireExperimentsPixel(
+        snapshot: Map<String, String> = emptyMap(),
+        current: Map<String, String> = emptyMap(),
+        configJson: String = experimentsConfigJson,
+        params: Map<String, ParamState> = mapOf("count" to ParamState(3)),
         periodStart: Long = 1769385600000L,
         periodEnd: Long = periodStart + TimeUnit.DAYS.toMillis(1),
-    ): Map<String, String> {
+    ): JSONObject {
+        experimentCohortResolver.cohorts = current
         timeProvider.time = periodEnd + 1
         val state = PixelState(
             pixelName = "experimentsPixel",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mapOf("count" to ParamState(3)),
-            config = EventHubConfigParser.parseSinglePixelConfig("experimentsPixel", experimentsConfigJson)!!,
+            params = params,
+            config = EventHubConfigParser.parseSinglePixelConfig("experimentsPixel", configJson)!!,
+            experimentSnapshot = snapshot,
         )
         stubPixelStates(state)
         manager.onAppForegrounded()
 
         val captor = argumentCaptor<Map<String, String>>()
         verify(pixel).enqueueFire(pixelName = eq("experimentsPixel"), parameters = any(), encodedParameters = captor.capture(), type = any())
-        return captor.firstValue
-    }
-
-    private fun decodeExperiments(params: Map<String, String>): JSONObject {
-        val raw = params["experiments"] ?: error("no experiments param fired")
-        return JSONObject(URLDecoder.decode(raw, "UTF-8"))
+        return JSONObject(URLDecoder.decode(captor.firstValue.getValue("experiments"), "UTF-8"))
     }
 
     @Test
-    fun `fired pixel includes experiments param with cohort for each active experiment`() {
-        experimentCohortResolver.experiments = listOf(
-            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = null),
-            ResolvedExperiment(name = "contentScopeExperiment1", cohort = "control", enrollmentDateMillis = null),
-        )
+    fun `experiments param reports active cohorts with no changedInPeriod when unchanged`() {
+        val cohorts = mapOf("tdsNextExperiment007" to "treatment", "contentScopeExperiment1" to "control")
 
-        val experiments = decodeExperiments(fireExperimentsPixel())
+        val experiments = fireExperimentsPixel(snapshot = cohorts, current = cohorts)
 
         assertEquals("treatment", experiments.getJSONObject("tdsNextExperiment007").getString("cohort"))
         assertEquals("control", experiments.getJSONObject("contentScopeExperiment1").getString("cohort"))
-    }
-
-    @Test
-    fun `experiments param is empty object when user is in no experiments`() {
-        experimentCohortResolver.experiments = emptyList()
-
-        val params = fireExperimentsPixel()
-
-        assertEquals("{}", URLDecoder.decode(params.getValue("experiments"), "UTF-8"))
-    }
-
-    @Test
-    fun `experiments param flags changedInPeriod when enrolled during the period`() {
-        val periodStart = 1769385600000L
-        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
-        experimentCohortResolver.experiments = listOf(
-            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = periodStart + 1000L),
-        )
-
-        val experiments = decodeExperiments(fireExperimentsPixel(periodStart, periodEnd))
-
-        assertTrue(experiments.getJSONObject("tdsNextExperiment007").getBoolean("changedInPeriod"))
-    }
-
-    @Test
-    fun `experiments param omits changedInPeriod when enrolled before the period`() {
-        val periodStart = 1769385600000L
-        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
-        experimentCohortResolver.experiments = listOf(
-            ResolvedExperiment(name = "tdsNextExperiment007", cohort = "treatment", enrollmentDateMillis = periodStart - 1000L),
-        )
-
-        val experiments = decodeExperiments(fireExperimentsPixel(periodStart, periodEnd))
-
         assertFalse(experiments.getJSONObject("tdsNextExperiment007").has("changedInPeriod"))
     }
 
     @Test
-    fun `matchExperiments filter is forwarded to the resolver`() {
+    fun `experiments param is empty object when user is in no experiments`() {
+        val experiments = fireExperimentsPixel(snapshot = emptyMap(), current = emptyMap())
+
+        assertEquals(0, experiments.length())
+    }
+
+    @Test
+    fun `experiments param flags a join during the period`() {
+        val experiments = fireExperimentsPixel(
+            snapshot = emptyMap(),
+            current = mapOf("tdsNextExperiment007" to "treatment"),
+        )
+
+        val exp = experiments.getJSONObject("tdsNextExperiment007")
+        assertEquals("treatment", exp.getString("cohort"))
+        assertTrue(exp.getBoolean("changedInPeriod"))
+        assertFalse(exp.has("previousCohort"))
+    }
+
+    @Test
+    fun `experiments param flags a leave during the period with null cohort and previousCohort`() {
+        val experiments = fireExperimentsPixel(
+            snapshot = mapOf("tdsNextExperiment007" to "treatment"),
+            current = emptyMap(),
+        )
+
+        val exp = experiments.getJSONObject("tdsNextExperiment007")
+        assertTrue(exp.isNull("cohort"))
+        assertEquals("treatment", exp.getString("previousCohort"))
+        assertTrue(exp.getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param flags a cohort change during the period`() {
+        val experiments = fireExperimentsPixel(
+            snapshot = mapOf("tdsNextExperiment007" to "control"),
+            current = mapOf("tdsNextExperiment007" to "treatment"),
+        )
+
+        val exp = experiments.getJSONObject("tdsNextExperiment007")
+        assertEquals("treatment", exp.getString("cohort"))
+        assertEquals("control", exp.getString("previousCohort"))
+        assertTrue(exp.getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `matchExperiments filters which experiments are reported`() {
         val configJson = """
             {
                 "state": "enabled",
                 "trigger": { "period": { "days": 1 } },
                 "parameters": {
-                    "experiments": { "template": "experiments", "matchExperiments": "tdsNextExperiment|contentScopeExperiment1" }
+                    "experiments": { "template": "experiments", "matchExperiments": "tdsNextExperiment" }
                 }
             }
         """.trimIndent()
-        val periodStart = 1769385600000L
-        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
-        timeProvider.time = periodEnd + 1
-        val state = PixelState(
-            pixelName = "experimentsPixel",
-            periodStartMillis = periodStart,
-            periodEndMillis = periodEnd,
+
+        val experiments = fireExperimentsPixel(
+            snapshot = mapOf("tdsNextExperiment007" to "treatment", "contentScopeExperiment1" to "control"),
+            current = mapOf("tdsNextExperiment007" to "treatment", "contentScopeExperiment1" to "control"),
+            configJson = configJson,
             params = emptyMap(),
-            config = EventHubConfigParser.parseSinglePixelConfig("experimentsPixel", configJson)!!,
         )
-        stubPixelStates(state)
 
-        manager.onAppForegrounded()
-
-        assertEquals(listOf("tdsNextExperiment", "contentScopeExperiment1"), experimentCohortResolver.lastRequestedMatch)
+        assertTrue(experiments.has("tdsNextExperiment007"))
+        assertFalse(experiments.has("contentScopeExperiment1"))
     }
 
     // --- helpers ---
