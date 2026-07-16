@@ -4,17 +4,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.newtabpage.impl.disabledSectionPlugins
 import com.duckduckgo.newtabpage.impl.enabledSectionsPlugins
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -28,9 +25,6 @@ class RealNewTabPixelsTest {
 
     private val pixel: Pixel = mock()
     private val savedSitesRepository: SavedSitesRepository = mock()
-    private val browserModeStateHolder: BrowserModeStateHolder = mock {
-        on { currentMode } doReturn MutableStateFlow(BrowserMode.REGULAR)
-    }
 
     @Before
     fun setup() {
@@ -40,7 +34,7 @@ class RealNewTabPixelsTest {
             savedSitesRepository,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            browserModeStateHolder,
+            BrowserMode.REGULAR,
         )
     }
 
@@ -253,7 +247,7 @@ class RealNewTabPixelsTest {
             savedSitesRepository,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            browserModeStateHolder,
+            BrowserMode.REGULAR,
         )
 
         whenever(savedSitesRepository.favoritesCount()).thenReturn(50)

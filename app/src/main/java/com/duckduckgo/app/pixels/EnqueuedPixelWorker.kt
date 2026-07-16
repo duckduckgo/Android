@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -147,7 +148,11 @@ class EnqueuedPixelWorker @Inject constructor(
                 for (i in 1..count) {
                     pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED, params)
                 }
-                pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, params, type = Pixel.PixelType.Daily())
+                val dailyPixel = when (mode) {
+                    BrowserMode.REGULAR -> AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY
+                    BrowserMode.FIRE -> AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY
+                }
+                pixel.get().fire(dailyPixel, params, type = Pixel.PixelType.Daily())
                 unsentForgetAllPixelStore.resetCount(mode)
             }
         }

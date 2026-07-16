@@ -299,7 +299,7 @@ class TabSwitcherViewModel @Inject constructor(
         val browserModeParam = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
         pixel.fire(
             pixel = AppPixelName.BROWSER_MODE_SWITCHED,
-            parameters = browserModeParam + (Pixel.PixelParameter.SOURCE to source.value)
+            parameters = browserModeParam + (Pixel.PixelParameter.SOURCE to source.value),
         )
 
         // The promo banner has served its purpose once the user toggles modes; dismiss it so it does not

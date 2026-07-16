@@ -128,7 +128,11 @@ class PendingModeSwitchTest {
 
     @Test
     fun whenProcessIntentActionHasNoIntentThenDecodesToNull() {
-        val bundle = PendingModeSwitch(BrowserMode.REGULAR, PendingAction.ProcessIntent(Intent(Intent.ACTION_VIEW)), BrowserModeSwitchSource.EXTERNAL_LAUNCH)
+        val bundle = PendingModeSwitch(
+            BrowserMode.REGULAR,
+            PendingAction.ProcessIntent(Intent(Intent.ACTION_VIEW)),
+            BrowserModeSwitchSource.EXTERNAL_LAUNCH,
+        )
             .toBundle()
         bundle.remove(KEY_INTENT)
 

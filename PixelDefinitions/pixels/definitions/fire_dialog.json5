@@ -56,8 +56,15 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "browserMode"]
     },
-    "m_fire_button_executed_daily": {
-        "description": "Fire data clear was executed at least once today — fires once per calendar day regardless of how many burns or which surface triggered them. Denominator for the 'Fire Button presses per daily Fire-Button user' KPI.",
+    "m_fire_button_executed_regular_daily": {
+        "description": "Regular-mode data clear was executed at least once today — fires once per calendar day regardless of how many burns or which surface triggered them. Denominator for the 'Fire Button presses per daily Fire-Button user' KPI. Mirrors iOS's m_normal-mode_burn_executed.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "browserMode"]
+    },
+    "m_fire_button_executed_fire_daily": {
+        "description": "Fire-mode data clear was executed at least once today — fires once per calendar day regardless of how many burns or which surface triggered them. Mirrors iOS's m_fire-mode_burn_executed.",
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

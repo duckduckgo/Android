@@ -322,7 +322,13 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(emptyMap())
         enqueuedPixelWorker.submitUnsentFirePixels()
         verify(pixel, never()).fire(
-            eq(AppPixelName.FORGET_ALL_EXECUTED_DAILY),
+            eq(AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY),
+            any(),
+            any(),
+            eq(Pixel.PixelType.Daily()),
+        )
+        verify(pixel, never()).fire(
+            eq(AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY),
             any(),
             any(),
             eq(Pixel.PixelType.Daily()),
@@ -334,7 +340,7 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.REGULAR to 5))
         enqueuedPixelWorker.submitUnsentFirePixels()
         verify(pixel, times(1)).fire(
-            AppPixelName.FORGET_ALL_EXECUTED_DAILY,
+            AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY,
             mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
             emptyMap(),
             Pixel.PixelType.Daily(),
@@ -349,7 +355,7 @@ class EnqueuedPixelWorkerTest {
 
         val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire")
         verify(pixel, times(2)).fire(AppPixelName.FORGET_ALL_EXECUTED, params)
-        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, params, emptyMap(), Pixel.PixelType.Daily())
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY, params, emptyMap(), Pixel.PixelType.Daily())
         verify(unsentForgetAllPixelStore).resetCount(BrowserMode.FIRE)
     }
 
