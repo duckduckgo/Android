@@ -195,7 +195,10 @@ class RealNativeInputManager @Inject constructor(
     private var widgetRoot: View? = null
     private var navBarRoot: View? = null
     private var navBarShown: Boolean? = null
-    private var isKeyboardVisible: Boolean = false
+
+    // The nav bar is shown once when the browser input opens empty, then latched off the first time the
+    // user types. Latched stays off for the session — clearing text or toggling the keyboard won't bring it back.
+    private var navBarInteractionLatched: Boolean = false
     private var navBarHeightPx: Int = 0
     private var navBarIsBottom: Boolean = false
     private var navBarTabCountLiveData: LiveData<Int>? = null
@@ -445,10 +448,8 @@ class RealNativeInputManager @Inject constructor(
         } else {
             onKeyboardHidden(widget)
         }
-
-        // The nav bar is shown while the keyboard is up (both placements) and hidden when it's dismissed.
-        isKeyboardVisible = isVisible
-        refreshNavBarVisibility()
+        // Nav bar visibility is decoupled from the keyboard: it's decided at open (empty → shown) and only
+        // hidden on the first keystroke. Toggling the keyboard neither shows nor hides it.
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
@@ -543,15 +544,15 @@ class RealNativeInputManager @Inject constructor(
         }
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
-        // The nav bar belongs to browser input only. Duck.ai (and, via a separate manager, contextual)
-        // never show it. Gated behind the nativeInputNavBar flag and Search & Duck.ai mode — search-only
-        // users, or users without the flag, never get it.
-        val navBarView = if (shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability)) {
-            createNavBarView(layoutInflater)
-        } else {
-            null
-        }
         val prefillText = query.ifEmpty { omnibarController.getText() }
+        // The nav bar is a first-focus affordance for the empty browser input. It belongs to browser input
+        // only (Duck.ai / contextual never show it), is gated behind the nativeInputNavBar flag and the
+        // Search & Duck.ai mode, and is only created when the field opens empty — focusing a site (URL
+        // prefilled) never gets one. Fresh session, so the interaction latch resets.
+        navBarInteractionLatched = false
+        val createNavBar = shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
+            prefillText.isEmpty()
+        val navBarView = if (createNavBar) createNavBarView(layoutInflater) else null
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (navBarView != null) bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
@@ -576,14 +577,11 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
-        // The widget opens focused, so the soft keyboard rises immediately. Seed the keyboard state to
-        // match (unless a hardware keyboard means no soft IME) so the bar snaps to its resting state
-        // instead of sliding in once the real keyboard callback lands.
-        isKeyboardVisible = !isExternalKeyboardConnected()
         applyNavBarVisibility(
             show = navBarShouldBeVisible(),
             animate = false,
         )
+        syncBackArrowToNavBar()
         lifecycleOwner.lifecycleScope.launch {
             if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
         }
@@ -604,6 +602,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         val widget = widgetFrom(widgetView) ?: return
         val onSearchTextChanged: (String) -> Unit = { text ->
+            if (text.isNotEmpty()) onNavBarInputInteraction()
             if (omnibarController.isDuckAiMode() && text.isBlank()) {
                 callbacks.onClearAutocomplete()
             } else {
@@ -919,16 +918,30 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    /** Current on-screen visibility the nav bar should have, combining the create-time gate with the
-     *  browser-context rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
+    /** Current on-screen visibility the nav bar should have: still browser + flag + Search & Duck.ai (so a
+     *  live mode/flag change hides it) and not yet latched off by the user's first keystroke. */
     private fun navBarShouldBeVisible(): Boolean =
         shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
-            shouldShowNavBar(isBrowserContext = navBarRoot != null, isKeyboardVisible = isKeyboardVisible)
+            shouldShowNavBar(isBrowserContext = navBarRoot != null, interactionLatched = navBarInteractionLatched)
 
     /** Re-applies the nav bar visibility for the current input state; no-op when no bar is attached. */
     private fun refreshNavBarVisibility() {
         if (navBarRoot == null) return
         applyNavBarVisibility(show = navBarShouldBeVisible(), animate = true)
+        syncBackArrowToNavBar()
+    }
+
+    /** The toggle-row back arrow is the inverse of the nav bar: it fills in as the back affordance only
+     *  while the nav bar is hidden, so exactly one back arrow shows at a time. */
+    private fun syncBackArrowToNavBar() {
+        widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
+    }
+
+    /** The user typed: latch the nav bar off for the rest of this input session and slide it out. */
+    private fun onNavBarInputInteraction() {
+        if (navBarInteractionLatched || navBarRoot == null) return
+        navBarInteractionLatched = true
+        refreshNavBarVisibility()
     }
 
     /**
@@ -1298,18 +1311,19 @@ internal fun computeVoiceButtonAvailability(
  * Whether to create the nav bar for this input session. It's a browser-input affordance gated behind the
  * [nativeInputNavBar][com.duckduckgo.duckchat.impl.feature.DuckChatFeature.nativeInputNavBar] flag and the
  * Search & Duck.ai input mode: search-only users, Duck.ai/contextual input, or a disabled flag never get it.
- * Once created, per-state visibility is decided by [shouldShowNavBar].
+ * The caller additionally only creates it when the field opens empty (a first-focus affordance), so focusing
+ * a site with a prefilled URL never gets one. Once created, on-screen visibility is decided by [shouldShowNavBar].
  */
 internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, inputMode: NativeInputState.InputMode): Boolean =
     featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
 /**
- * Whether the input-mode nav bar should currently be on screen. It's tied to the keyboard: shown while
- * the browser-input session has the keyboard up (both top and bottom placements), hidden once it's
- * dismissed. Duck.ai and contextual input never show it.
+ * Whether the input-mode nav bar should currently be on screen. It's shown for a browser-input session that
+ * opened empty and stays shown until the user's first keystroke latches it off — the keyboard state does not
+ * affect it, and once latched clearing the text won't bring it back. Duck.ai and contextual input never show it.
  */
-internal fun shouldShowNavBar(isBrowserContext: Boolean, isKeyboardVisible: Boolean): Boolean =
-    isBrowserContext && isKeyboardVisible
+internal fun shouldShowNavBar(isBrowserContext: Boolean, interactionLatched: Boolean): Boolean =
+    isBrowserContext && !interactionLatched
 
 /**
  * Whether a visibility change is needed. [currentShown] is null before the first apply, which always

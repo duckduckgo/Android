@@ -44,19 +44,19 @@ class NavBarVisibilityDecisionTest {
     }
 
     @Test
-    fun `nav bar shows in browser context while the keyboard is visible`() {
-        assertTrue(shouldShowNavBar(isBrowserContext = true, isKeyboardVisible = true))
+    fun `nav bar shows in browser context until the user interacts`() {
+        assertTrue(shouldShowNavBar(isBrowserContext = true, interactionLatched = false))
     }
 
     @Test
-    fun `nav bar hides when the keyboard is dismissed`() {
-        assertFalse(shouldShowNavBar(isBrowserContext = true, isKeyboardVisible = false))
+    fun `nav bar hides once the interaction latch is set`() {
+        assertFalse(shouldShowNavBar(isBrowserContext = true, interactionLatched = true))
     }
 
     @Test
     fun `nav bar never shows outside the browser context`() {
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isKeyboardVisible = false))
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isKeyboardVisible = true))
+        assertFalse(shouldShowNavBar(isBrowserContext = false, interactionLatched = false))
+        assertFalse(shouldShowNavBar(isBrowserContext = false, interactionLatched = true))
     }
 
     @Test
