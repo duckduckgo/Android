@@ -35,6 +35,9 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
     private var lastAnimatedVideoId: String? = null
 
     override suspend fun getAnimation(url: String, pageChanged: Boolean): AdBlockingAnimation {
+        // TODO (cbarreiro) Remove after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true
+        return AdBlockingAnimation.Skip
+
         val videoId = videoIdOrNull(url)
         if (videoId == null) {
             lastAnimatedVideoId = null
