@@ -435,6 +435,66 @@ internal class AppearanceViewModelTest {
         }
 
     @Test
+    fun whenLightThemeThenCanForceDarkModeIsFalse() =
+        runTest {
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+            initializeViewModel()
+
+            testee.viewState().test {
+                assertEquals(false, expectMostRecentItem().canForceDarkMode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenDarkThemeThenCanForceDarkModeIsTrue() =
+        runTest {
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.DARK)
+            initializeViewModel()
+
+            testee.viewState().test {
+                assertEquals(true, expectMostRecentItem().canForceDarkMode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSystemDefaultThemeThenCanForceDarkModeIsTrue() =
+        runTest {
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
+            initializeViewModel()
+
+            testee.viewState().test {
+                assertEquals(true, expectMostRecentItem().canForceDarkMode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenThemeChangedToLightThenCanForceDarkModeIsFalse() =
+        runTest {
+            givenThemeSelected(DuckDuckGoTheme.DARK)
+
+            testee.viewState().test {
+                testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+                assertEquals(false, expectMostRecentItem().canForceDarkMode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenThemeChangedFromLightToDarkThenCanForceDarkModeIsTrue() =
+        runTest {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
+
+            testee.viewState().test {
+                testee.onThemeSelected(DuckDuckGoTheme.DARK)
+                assertEquals(true, expectMostRecentItem().canForceDarkMode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() =
         runTest {
             whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)

@@ -195,8 +195,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
-                    binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
-                    binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
+                    binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode && viewState.canForceDarkMode
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
