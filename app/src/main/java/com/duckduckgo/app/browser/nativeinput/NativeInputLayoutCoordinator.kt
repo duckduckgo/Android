@@ -409,15 +409,6 @@ class NativeInputLayoutCoordinator(
         suspendedContentTransition = null
     }
 
-    /**
-     * Sets the nav bar inset used by the content-offset math WITHOUT re-applying — the caller's own
-     * per-frame drive (e.g. the exit's [onWidgetAnimationFrame]) applies it. Use [updateNavBarInset] when
-     * an immediate re-apply is wanted instead.
-     */
-    fun setNavBarInset(px: Int) {
-        navBarInsetPx = px
-    }
-
     fun updateNavBarInset(px: Int) {
         navBarInsetPx = px
         reapplyContentOffset?.invoke()

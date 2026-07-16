@@ -366,37 +366,23 @@ class RealNativeInputManager @Inject constructor(
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
-            // A visible nav bar rides the same exit: its slide is keyed off the exit's fraction (one
-            // animator, one timeline) and the content offset is driven per-frame by onWidgetAnimationFrame,
-            // so bar, widget and content collapse together instead of the bar sitting still and popping at
-            // the end. Suspend the reflow transition so the per-frame content padding is instant.
-            val exitingNavBar = navBarRoot?.takeIf { navBarShown == true }
-            val navStartY = exitingNavBar?.translationY ?: 0f
-            val navEndY = -navBarHeightPx.toFloat()
-            if (exitingNavBar != null) {
-                layoutCoordinator.suspendContentReflow()
-                navBarShown = false
-            }
+            // The nav bar stays in place during the exit — only the input card morphs back to the omnibar
+            // (removed with the widget in removeWidget). Suspend the content-reflow transition so the
+            // per-frame content offset driven by onWidgetAnimationFrame is instant; otherwise it animates
+            // on the transition's own clock and the reset-to-base races, leaving stale top padding.
+            layoutCoordinator.suspendContentReflow()
             animator.animateExit(
                 widgetCard = card,
                 widgetView = widgetView,
                 omnibarCard = omnibarCard,
                 isBottom = isBottom,
-                onUpdate = { fraction ->
-                    if (exitingNavBar != null) {
-                        val navY = navStartY + (navEndY - navStartY) * fraction
-                        exitingNavBar.translationY = navY
-                        layoutCoordinator.setNavBarInset((navBarHeightPx + navY).toInt().coerceIn(0, navBarHeightPx))
-                    }
-                    layoutCoordinator.onWidgetAnimationFrame(card)
-                },
+                onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
                     layoutCoordinator.setWidgetAnimating(false)
                     layoutCoordinator.resumeContentReflow()
                 },
                 onComplete = {
                     layoutCoordinator.setWidgetAnimating(false)
-                    layoutCoordinator.resumeContentReflow()
                     isExiting = false
                     onHide()
                 },
@@ -602,7 +588,6 @@ class RealNativeInputManager @Inject constructor(
     ) {
         val widget = widgetFrom(widgetView) ?: return
         val onSearchTextChanged: (String) -> Unit = { text ->
-            if (text.isNotEmpty()) onNavBarInputInteraction()
             if (omnibarController.isDuckAiMode() && text.isBlank()) {
                 callbacks.onClearAutocomplete()
             } else {
@@ -611,6 +596,10 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
+            // Fires on every keystroke regardless of the selected tab (search text routes to
+            // onSearchTextChanged, chat text to onChatTextChanged), so this is the tab-agnostic signal
+            // that latches the nav bar off on the user's first input.
+            onInputTextEmptyChanged = { isEmpty -> if (!isEmpty) onNavBarInputInteraction() },
             onSearchSubmitted = { query ->
                 nativeInputEventListener.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
