@@ -73,6 +73,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
@@ -676,7 +677,14 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.FocusInput -> {
-                        binding.contextualNativeInputWidget.focusInput(activity)
+                        if (viewModel.viewState.value.nativeChatInputEnabled) {
+                            binding.contextualNativeInputWidget.focusInput(activity)
+                        } else {
+                            binding.legacyInputField.let {
+                                it.requestFocus()
+                                activity?.showKeyboard(it)
+                            }
+                        }
                     }
                 }
             }.launchIn(lifecycleScope)

@@ -733,8 +733,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
                 addPageContext()
-                // Focus the input in the same tap so the keyboard and the (focus-gated) tools row come
-                // up without the user needing a second tap.
                 commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
