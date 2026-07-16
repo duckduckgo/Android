@@ -17,7 +17,6 @@
 package com.duckduckgo.app.fire
 
 import androidx.core.content.edit
-import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.KEY_UNSENT_CLEAR_PIXELS
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
