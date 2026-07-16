@@ -73,6 +73,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCod
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
@@ -199,7 +200,7 @@ class SyncActivity : DuckDuckGoActivity() {
             )
             syncWithAnotherDeviceButton.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
             syncThisDeviceToggle.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
-            recoverDataItem.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
+            recoverDataItem.isEnabled = SignInFlow !in viewState.disabledSetupFlows
         }
     }
 
