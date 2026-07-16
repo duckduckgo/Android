@@ -50,6 +50,8 @@ class NativeInputLayoutCoordinator(
 
     private var navBarInsetPx: Int = 0
     private var reapplyContentOffset: (() -> Unit)? = null
+    /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
+    private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
 
     // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
@@ -323,6 +325,9 @@ class NativeInputLayoutCoordinator(
         }
 
         reapplyContentOffset = { applyOffset() }
+        resetContentOffset = {
+            targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+        }
         widgetView.post { applyOffset() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -353,6 +358,7 @@ class NativeInputLayoutCoordinator(
                     pendingContentLayoutTransition = null
                     widgetAnimationFrameHandler = null
                     reapplyContentOffset = null
+                    resetContentOffset = null
                     isWidgetAnimating = false
                     contentTransitionGroup = null
                     suspendedContentTransition = null
@@ -369,10 +375,6 @@ class NativeInputLayoutCoordinator(
         )
     }
 
-    /**
-     * Updates the nav bar top-inset used by the (already-registered) content-offset listeners and
-     * re-applies immediately. Cheap: no new listeners — unlike re-calling [configureContentOffset].
-     */
     /**
      * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
      * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
@@ -407,6 +409,15 @@ class NativeInputLayoutCoordinator(
         isContentReflowSuspended = false
         contentTransitionGroup?.layoutTransition = suspendedContentTransition
         suspendedContentTransition = null
+    }
+
+    /**
+     * Instantly restores content padding to the [configureContentOffset] baseline. Call while the
+     * content-reflow transition is suspended (e.g. exit teardown) so a [LayoutTransition] can't race
+     * the reset and leave stale top padding after the omnibar returns.
+     */
+    fun resetContentOffsetToBase() {
+        resetContentOffset?.invoke()
     }
 
     fun updateNavBarInset(px: Int) {

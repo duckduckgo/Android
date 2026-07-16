@@ -382,7 +382,11 @@ class RealNativeInputManager @Inject constructor(
                     layoutCoordinator.resumeContentReflow()
                 },
                 onComplete = {
-                    layoutCoordinator.setWidgetAnimating(false)
+                    // Reset content under the still-suspended reflow and keep isWidgetAnimating true
+                    // until removeWidget's detach: clearing the animating flag here lets layout
+                    // listeners re-apply the exit-end inset during the fade and race the detach reset,
+                    // which is what left intermittent leftover space under the omnibar.
+                    layoutCoordinator.resetContentOffsetToBase()
                     isExiting = false
                     onHide()
                 },
@@ -1080,6 +1084,14 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            // Once the morph has the omnibar's screen position, hide it immediately when a nav bar
+            // is replacing the chrome — otherwise the omnibar sits on top of the bar for the whole
+            // enter and pops away at the end (the flicker).
+            onStart = {
+                if (navBarRoot != null) {
+                    omnibarController.hide()
+                }
+            },
             onCancel = {
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->

@@ -43,6 +43,12 @@ interface NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit = {},
+        /**
+         * Invoked after the omnibar's on-screen position has been captured and before the morph
+         * starts. Use to hide the omnibar when a nav bar is replacing it, so it doesn't cover the
+         * bar for the duration of the enter.
+         */
+        onStart: () -> Unit = {},
         onCancel: () -> Unit = {},
         onComplete: () -> Unit = {},
     )
@@ -121,6 +127,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit,
+        onStart: () -> Unit,
         onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
@@ -132,6 +139,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
         waitForLayout(widgetCard) {
             val omnibarPosition = visibleSurfacePosition(omnibarCard)
+            // Position is captured — safe to tear down the omnibar (e.g. reveal the nav bar) before
+            // the morph runs.
+            onStart()
             performEnterAnimation(
                 widgetCard,
                 omnibarCard,
@@ -429,7 +439,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             onCancel = onCancel,
             onEnd = {
                 widgetContent?.alpha = 1f
-                omnibarCard.alpha = 1f
+                // Leave omnibarCard at 0 — [onComplete] hides the omnibar. Restoring alpha here
+                // flashes the card for a frame before hide().
                 animateCornerRadius(card, widgetCornerRadius)
                 restoreLayout(card, params, margins)
                 card.post { applyLayoutTransitions(widgetView) }
