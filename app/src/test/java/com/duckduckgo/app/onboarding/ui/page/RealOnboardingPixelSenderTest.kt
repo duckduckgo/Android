@@ -264,15 +264,22 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireSetDefaultClickedThenNoValueAndTagWithoutValue() = runTest {
+    fun whenFireSetDefaultClickedEngagedThenValueEngage() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
+        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked(engaged = true))
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
-            type = Unique(tag = "onboarding_set-default_clicked"),
+            mapOf(
+                "it" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "engage",
+            ),
+            type = Unique(tag = "onboarding_set-default_clicked_engage"),
         )
     }
 
@@ -664,15 +671,22 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireAiComparisonClickedThenNoValueAndTagWithoutValue() = runTest {
+    fun whenFireAiComparisonClickedEngagedThenValueEngage() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+        testee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked(engaged = true))
 
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
-            type = Unique(tag = "onboarding_ai-intro_clicked"),
+            mapOf(
+                "it" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "engage",
+            ),
+            type = Unique(tag = "onboarding_ai-intro_clicked_engage"),
         )
     }
 

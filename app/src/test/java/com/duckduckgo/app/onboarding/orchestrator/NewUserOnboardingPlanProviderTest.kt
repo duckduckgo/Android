@@ -814,7 +814,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -933,7 +933,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -965,7 +965,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
         assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
         orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
-        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     // endregion
