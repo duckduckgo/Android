@@ -143,7 +143,14 @@ class EnqueuedPixelWorker @Inject constructor(
         withContext(dispatchers.io()) {
             val pendingPixelCounts = unsentForgetAllPixelStore.pendingPixelCountsClearData
             logcat(INFO) { "Found ${pendingPixelCounts.values.sum()} unsent clear data pixels" }
+            if (pendingPixelCounts.values.any { it > 0 }) {
+                pixel.get().fire(
+                    AppPixelName.FORGET_ALL_EXECUTED_DAILY,
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
             pendingPixelCounts.forEach { (mode, count) ->
+                if (count <= 0) return@forEach
                 val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
                 for (i in 1..count) {
                     pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED, params)

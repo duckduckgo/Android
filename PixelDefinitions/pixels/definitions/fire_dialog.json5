@@ -63,6 +63,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "browserMode"]
     },
+    "m_fire_button_executed_daily": {
+        "description": "Data was cleared in either browser mode at least once today — fires once per calendar day regardless of how many burns or which mode they used.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_fire_button_executed_fire_daily": {
         "description": "Fire-mode data clear was executed at least once today — fires once per calendar day regardless of how many burns or which surface triggered them. Mirrors iOS's m_fire-mode_burn_executed.",
         "owners": ["0nko"],

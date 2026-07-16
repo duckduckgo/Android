@@ -34,6 +34,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORGET_ALL_PRESSED_SETTINGS("m_fire_button_tapped_settings"),
     FORGET_ALL_PRESSED_SETTINGS_DAILY("m_fire_button_tapped_settings_daily"),
     FORGET_ALL_EXECUTED("mf"),
+    FORGET_ALL_EXECUTED_DAILY("m_fire_button_executed_daily"),
     FORGET_ALL_EXECUTED_REGULAR_DAILY("m_fire_button_executed_regular_daily"),
     FORGET_ALL_EXECUTED_FIRE_DAILY("m_fire_button_executed_fire_daily"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
