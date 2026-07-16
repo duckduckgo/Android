@@ -17,8 +17,11 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch.rmf
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.EscapeHatchTarget
+import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.remote.messaging.api.MessageTrigger
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,20 +36,32 @@ import org.mockito.kotlin.whenever
 class AfterIdleMessageTriggerProviderTest {
 
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val escapeHatchTargetResolver: EscapeHatchTargetResolver = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
-    private val testee = AfterIdleMessageTriggerProvider(ntpAfterIdleManager, feature)
+    private val testee = AfterIdleMessageTriggerProvider(ntpAfterIdleManager, feature, escapeHatchTargetResolver)
 
     @Test
-    fun whenBothFlagsEnabledAndAfterIdleReturnThenAfterIdleTrigger() = runTest {
+    fun whenBothFlagsEnabledAndAfterIdleReturnWithReturnTargetThenAfterIdleTrigger() = runTest {
         enableBothFlags()
         whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(true))
+        whenever(escapeHatchTargetResolver.resolve()).thenReturn(EscapeHatchTarget("tab1", BrowserMode.REGULAR))
 
         assertEquals(MessageTrigger.AFTER_IDLE, testee.activeTrigger().firstOrNull())
     }
 
     @Test
-    fun whenBothFlagsEnabledAndNotAfterIdleReturnThenNull() = runTest {
+    fun whenAfterIdleReturnButNoReturnTargetThenNull() = runTest {
+        // e.g. cold launch onto an existing NTP: after-idle, but nothing real to return to.
+        enableBothFlags()
+        whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(true))
+        whenever(escapeHatchTargetResolver.resolve()).thenReturn(null)
+
+        assertNull(testee.activeTrigger().firstOrNull())
+    }
+
+    @Test
+    fun whenNotAfterIdleReturnThenNull() = runTest {
         enableBothFlags()
         whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(false))
 
@@ -55,8 +70,8 @@ class AfterIdleMessageTriggerProviderTest {
 
     @Test
     fun whenShowNtpAfterIdleReturnFlagDisabledThenNull() = runTest {
+        feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
         feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        // showNTPAfterIdleReturn stays off → gated out before idle state is observed
 
         assertNull(testee.activeTrigger().firstOrNull())
     }
@@ -64,7 +79,7 @@ class AfterIdleMessageTriggerProviderTest {
     @Test
     fun whenNtpAsDefaultFlagDisabledThenNull() = runTest {
         feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        // ntpAsDefaultAfterIdleReturn stays off → gated out before idle state is observed
+        feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
 
         assertNull(testee.activeTrigger().firstOrNull())
     }
