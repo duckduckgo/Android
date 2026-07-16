@@ -44,7 +44,8 @@ tags:
 
       - tapOn:
           id: "quickSetupSwitchRowSwitch"
-          index: 0
+          childOf:
+            id: "setDefaultBrowserItem"
       - runFlow:
           when:
             visible: "set as default"
