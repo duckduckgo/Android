@@ -16,31 +16,32 @@
 
 package com.duckduckgo.app.fire
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.core.content.edit
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.KEY_UNSENT_CLEAR_PIXELS
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
-@RunWith(AndroidJUnit4::class)
 class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     private lateinit var testee: UnsentForgetAllPixelStoreSharedPreferences
+    private val preferences = InMemorySharedPreferences()
+    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
+        on { getSharedPreferences(any(), any(), any()) } doReturn preferences
+    }
 
-    @SuppressLint("DenyListedApi")
     @Before
     fun setup() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        context.getSharedPreferences(FILENAME, 0).edit { clear() }
-        testee = UnsentForgetAllPixelStoreSharedPreferences(context)
+        preferences.edit { clear() }
+        testee = UnsentForgetAllPixelStoreSharedPreferences(sharedPreferencesProvider)
     }
 
     @Test
@@ -89,8 +90,7 @@ class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     @Test
     fun whenLegacyCountExistsThenItIsReadAsRegular() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        context.getSharedPreferences(FILENAME, 0).edit { putInt(KEY_UNSENT_CLEAR_PIXELS, 3) }
+        preferences.edit { putInt(KEY_UNSENT_CLEAR_PIXELS, 3) }
 
         assertEquals(mapOf(BrowserMode.REGULAR to 3), testee.pendingPixelCountsClearData)
     }
