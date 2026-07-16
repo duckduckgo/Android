@@ -211,7 +211,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            // SKIP_ONBOARDING_OPTION is never shown in the orchestrator (brand-design) flow; only the legacy WelcomePage uses it.
             INPUT_SCREEN_PREVIEW, QUICK_SETUP, SKIP_ONBOARDING_OPTION -> Unit
         }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
@@ -239,7 +238,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 val state = _viewState.value
                 emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
             }
-            // SKIP_ONBOARDING_OPTION is never shown in the orchestrator (brand-design) flow; only the legacy WelcomePage uses it.
             SKIP_ONBOARDING_OPTION -> Unit
         }
     }

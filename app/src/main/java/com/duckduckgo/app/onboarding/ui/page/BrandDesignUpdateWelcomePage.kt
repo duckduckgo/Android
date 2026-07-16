@@ -1025,7 +1025,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
-                // SKIP_ONBOARDING_OPTION is never shown in the orchestrator (brand-design) flow; only the legacy WelcomePage uses it.
                 SKIP_ONBOARDING_OPTION -> Unit
 
                 ADDRESS_BAR_POSITION -> {
@@ -1584,7 +1583,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
 
-            // SKIP_ONBOARDING_OPTION is never shown in the orchestrator (brand-design) flow; only the legacy WelcomePage uses it.
             SKIP_ONBOARDING_OPTION -> Unit
 
             ADDRESS_BAR_POSITION -> {
