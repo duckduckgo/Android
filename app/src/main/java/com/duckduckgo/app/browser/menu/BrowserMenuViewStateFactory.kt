@@ -139,7 +139,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         serpLogoUrl: String? = null,
         siteUrl: String? = null,
     ): BrowserMenuViewState.Browser {
-        val isDuckDuckGoSerp = siteUrl?.let { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) } ?: false
+        val isDuckDuckGoPage = siteUrl?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
@@ -163,9 +163,9 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canFindInPage = browserViewState.canFindInPage && browserViewState.currentPdfCachedUri == null,
             addToHomeVisible = browserViewState.addToHomeVisible,
             addToHomeEnabled = browserViewState.addToHomeEnabled,
-            canChangePrivacyProtection = browserViewState.canChangePrivacyProtection && !isDuckDuckGoSerp,
+            canChangePrivacyProtection = browserViewState.canChangePrivacyProtection && !isDuckDuckGoPage,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
-            canReportSite = browserViewState.canReportSite && !isDuckDuckGoSerp,
+            canReportSite = browserViewState.canReportSite && !isDuckDuckGoPage,
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,

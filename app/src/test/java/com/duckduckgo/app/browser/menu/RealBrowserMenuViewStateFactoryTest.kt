@@ -600,7 +600,7 @@ class RealBrowserMenuViewStateFactoryTest {
     @Test
     fun `when browser page is a duckduckgo search results page then privacy protection and report site items are hidden`() = runTest {
         val serpUrl = "https://duckduckgo.com/?q=cats"
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(serpUrl)).thenReturn(true)
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(serpUrl)).thenReturn(true)
         val browserViewState = BrowserViewState(
             canChangePrivacyProtection = true,
             isPrivacyProtectionDisabled = false,
@@ -624,9 +624,35 @@ class RealBrowserMenuViewStateFactoryTest {
     }
 
     @Test
-    fun `when browser page is not a duckduckgo search results page then privacy protection and report site items propagate`() = runTest {
+    fun `when browser page is a non-search duckduckgo page then privacy protection and report site items are hidden`() = runTest {
+        val ddgUrl = "https://duckduckgo.com/about"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(ddgUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = ddgUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is not a duckduckgo page then privacy protection and report site items propagate`() = runTest {
         val siteUrl = "https://example.com/page"
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(siteUrl)).thenReturn(false)
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(siteUrl)).thenReturn(false)
         val browserViewState = BrowserViewState(
             canChangePrivacyProtection = true,
             isPrivacyProtectionDisabled = false,
