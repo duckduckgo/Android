@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Palautuksen PDF-tiedoston tallennus edellyttää tallennusluvan</string>
     <string name="sync_share_title">Jaa...</string>
     <string name="sync_pdf_title">Synkronoi palautuskoodi</string>
-    <string name="sync_pdf_description">Palautuskoodin avulla voit synkronoida kirjanmerkkisi useiden laitteiden välillä ja palauttaa synkronoidut tiedot, jos menetät pääsyn laitteeseen.</string>
+    <string name="sync_pdf_description">Palautuskoodin avulla voit synkronoida salasanasi, automaattisen täytön tietosi ja Duck.ai-keskustelusi useiden laitteiden välillä ja palauttaa synkronoidut tietosi, jos menetät pääsyn laitteeseen.</string>
     <string name="sync_code_box_title">Säilytä nämä tiedot turvallisessa paikassa.</string>
-    <string name="sync_instructions_title">Miten tämä toimii?</string>
-    <string name="sync_instructions_step1">Avaa DuckDuckGo toisella laitteella ja siirry kohtaan Synkronointi asetuksissa.</string>
-    <string name="sync_instructions_step2">Skannaa QR-koodi tai kopioi ja liitä tekstikoodi toiseen DuckDuckGo-sovellukseen.</string>
+    <string name="sync_instructions_title">Miten tämä koodi toimii?</string>
+    <string name="sync_instructions_step1">Avaa DuckDuckGo laitteella, jonka haluat synkronoida, ja siirry kohtaan Sync &amp; Backup asetuksissa.</string>
+    <string name="sync_instructions_step2">Valitse ”Synkronoi toisen laitteen kanssa” ja skannaa QR-koodi tai syötä tekstikoodi.</string>
     <string name="sync_instructions_step3">Synkronointi käynnistetään ja saat taas kaikki tietosi haltuusi.</string>
+    <string name="sync_pdf_retention_notice">Jos et käytä DuckDuckGo-selainta yli 18 kuukauteen Sync &amp; Backup -toiminnon ollessa käytössä, tietosi poistetaan palvelimelta eikä niitä voi palauttaa.</string>
     <string name="remove_device_dialog_title">Poistetaanko laite?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" ei enää pääse käsiksi synkronoituihin tietoihisi.</string>
     <string name="remove_device_dialog_primary_button">Poista</string>
