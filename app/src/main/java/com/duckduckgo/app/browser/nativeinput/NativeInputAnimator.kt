@@ -62,6 +62,7 @@ interface NativeInputAnimator {
         heightPx: Int,
         show: Boolean,
         animate: Boolean,
+        onFrame: (onScreenHeightPx: Int) -> Unit = {},
         onComplete: () -> Unit = {},
     )
     fun cancelAnimation()
@@ -174,6 +175,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         heightPx: Int,
         show: Boolean,
         animate: Boolean,
+        onFrame: (onScreenHeightPx: Int) -> Unit,
         onComplete: () -> Unit,
     ) {
         navBarAnimator?.cancel()
@@ -182,6 +184,10 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val hiddenY = -heightPx.toFloat()
         val ridesWidget = !isBottom
         val endBar = if (show) 0f else hiddenY
+
+        // How much of the bar is currently on screen given its slide translation, used to keep the
+        // content offset in lock-step with the bar every frame.
+        fun onScreenHeight(barTranslationY: Float): Int = (heightPx + barTranslationY).toInt().coerceIn(0, heightPx)
 
         if (!animate) {
             navBarView.translationY = endBar
@@ -201,8 +207,10 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             interpolator = FastOutSlowInInterpolator()
             addUpdateListener { anim ->
                 val f = anim.animatedFraction
-                navBarView.translationY = lerpF(startBar, endBar, f)
+                val bar = lerpF(startBar, endBar, f)
+                navBarView.translationY = bar
                 if (ridesWidget) widgetView.translationY = lerpF(startWidget, endWidget, f)
+                onFrame(onScreenHeight(bar))
             }
             addListener(object : AnimatorListenerAdapter() {
                 private var cancelled = false
@@ -215,6 +223,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                     navBarView.translationY = endBar
                     if (ridesWidget) widgetView.translationY = endWidget
                     if (!show) navBarView.visibility = View.GONE
+                    onFrame(onScreenHeight(endBar))
                     onComplete()
                 }
             })

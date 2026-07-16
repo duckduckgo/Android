@@ -52,6 +52,12 @@ class NativeInputLayoutCoordinator(
     private var reapplyContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
 
+    // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
+    // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
+    private var contentTransitionGroup: ViewGroup? = null
+    private var suspendedContentTransition: LayoutTransition? = null
+    private var isContentReflowSuspended: Boolean = false
+
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -223,6 +229,11 @@ class NativeInputLayoutCoordinator(
         // setPadding during the enter would spawn CHANGING animators and the content would lag the widget.
         val ntpGroup = newTabContent as? ViewGroup
         val previousNtpTransition = ntpGroup?.layoutTransition
+        // Fresh session: reset any stale nav bar slide bookkeeping and track this NTP group as the reflow
+        // transition owner so begin/endNavBarSlide can suspend it.
+        contentTransitionGroup = ntpGroup
+        isContentReflowSuspended = false
+        suspendedContentTransition = null
         if (ntpGroup != null) {
             pendingContentLayoutTransition =
                 ntpGroup to
@@ -343,6 +354,9 @@ class NativeInputLayoutCoordinator(
                     widgetAnimationFrameHandler = null
                     reapplyContentOffset = null
                     isWidgetAnimating = false
+                    contentTransitionGroup = null
+                    suspendedContentTransition = null
+                    isContentReflowSuspended = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
@@ -359,6 +373,51 @@ class NativeInputLayoutCoordinator(
      * Updates the nav bar top-inset used by the (already-registered) content-offset listeners and
      * re-applies immediately. Cheap: no new listeners — unlike re-calling [configureContentOffset].
      */
+    /**
+     * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
+     * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
+     * with the bar. Paired with [endNavBarSlide]; both idempotent, so a rapid re-toggle that cancels the
+     * previous slide stays suspended until the last slide ends. [configureContentOffset]/detach reset it.
+     */
+    fun beginNavBarSlide() {
+        isWidgetAnimating = true
+        suspendContentReflow()
+    }
+
+    fun endNavBarSlide() {
+        isWidgetAnimating = false
+        resumeContentReflow()
+    }
+
+    /**
+     * Suspends the content-reflow [LayoutTransition] so a per-frame content-offset drive (nav bar slide or
+     * widget exit) moves the content instantly, instead of the transition animating each change on its own
+     * clock and lagging the driver. Idempotent; paired with [resumeContentReflow].
+     */
+    fun suspendContentReflow() {
+        if (isContentReflowSuspended) return
+        val group = contentTransitionGroup ?: return
+        isContentReflowSuspended = true
+        suspendedContentTransition = group.layoutTransition
+        group.layoutTransition = null
+    }
+
+    fun resumeContentReflow() {
+        if (!isContentReflowSuspended) return
+        isContentReflowSuspended = false
+        contentTransitionGroup?.layoutTransition = suspendedContentTransition
+        suspendedContentTransition = null
+    }
+
+    /**
+     * Sets the nav bar inset used by the content-offset math WITHOUT re-applying — the caller's own
+     * per-frame drive (e.g. the exit's [onWidgetAnimationFrame]) applies it. Use [updateNavBarInset] when
+     * an immediate re-apply is wanted instead.
+     */
+    fun setNavBarInset(px: Int) {
+        navBarInsetPx = px
+    }
+
     fun updateNavBarInset(px: Int) {
         navBarInsetPx = px
         reapplyContentOffset?.invoke()

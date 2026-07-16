@@ -194,6 +194,7 @@ class RealNativeInputManager @Inject constructor(
     private var widgetRoot: View? = null
     private var navBarRoot: View? = null
     private var navBarShown: Boolean? = null
+    private var isKeyboardVisible: Boolean = false
     private var navBarHeightPx: Int = 0
     private var navBarIsBottom: Boolean = false
     private var navBarTabCountLiveData: LiveData<Int>? = null
@@ -361,15 +362,37 @@ class RealNativeInputManager @Inject constructor(
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
+            // A visible nav bar rides the same exit: its slide is keyed off the exit's fraction (one
+            // animator, one timeline) and the content offset is driven per-frame by onWidgetAnimationFrame,
+            // so bar, widget and content collapse together instead of the bar sitting still and popping at
+            // the end. Suspend the reflow transition so the per-frame content padding is instant.
+            val exitingNavBar = navBarRoot?.takeIf { navBarShown == true }
+            val navStartY = exitingNavBar?.translationY ?: 0f
+            val navEndY = -navBarHeightPx.toFloat()
+            if (exitingNavBar != null) {
+                layoutCoordinator.suspendContentReflow()
+                navBarShown = false
+            }
             animator.animateExit(
                 widgetCard = card,
                 widgetView = widgetView,
                 omnibarCard = omnibarCard,
                 isBottom = isBottom,
-                onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
-                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+                onUpdate = { fraction ->
+                    if (exitingNavBar != null) {
+                        val navY = navStartY + (navEndY - navStartY) * fraction
+                        exitingNavBar.translationY = navY
+                        layoutCoordinator.setNavBarInset((navBarHeightPx + navY).toInt().coerceIn(0, navBarHeightPx))
+                    }
+                    layoutCoordinator.onWidgetAnimationFrame(card)
+                },
+                onCancel = {
+                    layoutCoordinator.setWidgetAnimating(false)
+                    layoutCoordinator.resumeContentReflow()
+                },
                 onComplete = {
                     layoutCoordinator.setWidgetAnimating(false)
+                    layoutCoordinator.resumeContentReflow()
                     isExiting = false
                     onHide()
                 },
@@ -421,6 +444,10 @@ class RealNativeInputManager @Inject constructor(
         } else {
             onKeyboardHidden(widget)
         }
+
+        // The nav bar is shown while the keyboard is up (both placements) and hidden when it's dismissed.
+        isKeyboardVisible = isVisible
+        refreshNavBarVisibility()
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
@@ -548,6 +575,10 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
+        // The widget opens focused, so the soft keyboard rises immediately. Seed the keyboard state to
+        // match (unless a hardware keyboard means no soft IME) so the bar snaps to its resting state
+        // instead of sliding in once the real keyboard callback lands.
+        isKeyboardVisible = !isExternalKeyboardConnected()
         applyNavBarVisibility(
             show = navBarShouldBeVisible(),
             animate = false,
@@ -891,7 +922,7 @@ class RealNativeInputManager @Inject constructor(
      *  browser-context rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
     private fun navBarShouldBeVisible(): Boolean =
         shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
-            shouldShowNavBar(isBrowserContext = navBarRoot != null)
+            shouldShowNavBar(isBrowserContext = navBarRoot != null, isKeyboardVisible = isKeyboardVisible)
 
     /** Re-applies the nav bar visibility for the current input state; no-op when no bar is attached. */
     private fun refreshNavBarVisibility() {
@@ -910,19 +941,35 @@ class RealNativeInputManager @Inject constructor(
         if (!shouldAnimateNavBar(navBarShown, show)) return
         navBarShown = show
         val navBarInset = if (show) navBarHeightPx else 0
+        if (!animate) {
+            animator.animateNavBarVisibility(
+                navBarView = navBar,
+                widgetView = widget,
+                isBottom = navBarIsBottom,
+                heightPx = navBarHeightPx,
+                show = show,
+                animate = false,
+                onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
+            )
+            return
+        }
+        // Drive the content offset from the bar's on-screen height every frame, under a suspended reflow
+        // transition, so the NTP/browser content moves in lock-step with the sliding bar/widget instead
+        // of lagging it (top mode) or animating on the LayoutTransition's own clock (bottom mode).
+        layoutCoordinator.beginNavBarSlide()
         animator.animateNavBarVisibility(
             navBarView = navBar,
             widgetView = widget,
             isBottom = navBarIsBottom,
             heightPx = navBarHeightPx,
             show = show,
-            animate = animate,
-            // Re-apply after the slide settles so the top-mode "show" case (widget rides down to its
-            // final position) recomputes the offset from where the widget actually lands.
-            onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
+            animate = true,
+            onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
+            onComplete = {
+                layoutCoordinator.updateNavBarInset(navBarInset)
+                layoutCoordinator.endNavBarSlide()
+            },
         )
-        // Apply immediately too, so the inset tracks the toggle without waiting for the animation.
-        layoutCoordinator.updateNavBarInset(navBarInset)
     }
 
     private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
@@ -1242,10 +1289,12 @@ internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, 
     featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
 /**
- * The persistent input-mode nav bar is shown for the whole browser-input session, regardless of
- * whether the field has text. Duck.ai and contextual input never show it.
+ * Whether the input-mode nav bar should currently be on screen. It's tied to the keyboard: shown while
+ * the browser-input session has the keyboard up (both top and bottom placements), hidden once it's
+ * dismissed. Duck.ai and contextual input never show it.
  */
-internal fun shouldShowNavBar(isBrowserContext: Boolean): Boolean = isBrowserContext
+internal fun shouldShowNavBar(isBrowserContext: Boolean, isKeyboardVisible: Boolean): Boolean =
+    isBrowserContext && isKeyboardVisible
 
 /**
  * Whether a visibility change is needed. [currentShown] is null before the first apply, which always
