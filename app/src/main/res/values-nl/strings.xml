@@ -1009,6 +1009,5 @@
     <string name="fireTabsNewTabButton">Nieuw Fire-tabblad</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NIEUW!</b> Probeer Fire Tabs om te browsen zonder de lokale geschiedenis op te slaan.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Fire-tabbladen en hun gegevens verwijderen?</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
 </resources>

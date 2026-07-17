@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Partager avec…</string>
     <string name="downloadsStateInProgress">En cours...</string>
     <string name="downloadsUndoActionName">Annuler</string>
-    <string name="downloadsSearchHint">Rechercher</string>
 </resources>

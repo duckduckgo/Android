@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Del med ...</string>
     <string name="downloadsStateInProgress">I gang ...</string>
     <string name="downloadsUndoActionName">Fortryd</string>
-    <string name="downloadsSearchHint">Søg</string>
 </resources>

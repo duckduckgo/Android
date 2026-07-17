@@ -1029,6 +1029,5 @@
     <string name="fireTabsNewTabButton">Jauna Fire cilne</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>JAUNUMS!</b> Izmēģini Fire Tabs, lai pārlūkotu, nesaglabājot vietējo vēsturi.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
-
     <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

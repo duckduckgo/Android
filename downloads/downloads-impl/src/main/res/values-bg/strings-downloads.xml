@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Споделяне с…</string>
     <string name="downloadsStateInProgress">В процес на изпълнение…</string>
     <string name="downloadsUndoActionName">Отмяна</string>
-    <string name="downloadsSearchHint">Търсене</string>
 </resources>

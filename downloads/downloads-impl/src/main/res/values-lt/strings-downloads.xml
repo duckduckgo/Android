@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Dalintis su...</string>
     <string name="downloadsStateInProgress">Vykdoma...</string>
     <string name="downloadsUndoActionName">Anuliuoti</string>
-    <string name="downloadsSearchHint">Paieška</string>
 </resources>

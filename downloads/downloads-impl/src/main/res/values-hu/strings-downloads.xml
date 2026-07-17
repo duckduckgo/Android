@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Megosztás vele…</string>
     <string name="downloadsStateInProgress">Folyamatban…</string>
     <string name="downloadsUndoActionName">Visszavonás</string>
-    <string name="downloadsSearchHint">Keresés</string>
 </resources>
