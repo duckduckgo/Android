@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirma
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
@@ -80,6 +81,13 @@ class BrokerActionFailedEventHandler @Inject constructor(
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
         val error = (event as BrokerActionFailed).error
 
+        // A condition action reports a failure (JsActionFailed, or a local timeout) when its expectation
+        // is not met. For a condition that is expected rather than fatal: treat it as "condition not met"
+        // and skip to the next action, instead of retrying and then failing the whole broker step.
+        if (currentAction is BrokerAction.Condition) {
+            return handleConditionNotMet(state)
+        }
+
         // If failure is on Any captcha action, we proceed to next action
         return if (shouldRetryFailedAction(state, event, currentAction)) {
             Next(
@@ -108,6 +116,33 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 ),
             )
         }
+    }
+
+    private suspend fun handleConditionNotMet(state: State): Next {
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        if (currentBrokerStep is OptOutStep) {
+            pirRunStateHandler.handleState(
+                BrokerOptOutConditionNotFound(
+                    broker = currentBrokerStep.broker,
+                    actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                    attemptId = state.attemptId,
+                    durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                    currentActionAttemptCount = state.actionRetryCount + 1,
+                ),
+            )
+        }
+
+        return Next(
+            nextState = state.copy(
+                currentActionIndex = state.currentActionIndex + 1,
+                actionRetryCount = 0,
+            ),
+            nextEvent = ExecuteBrokerStepAction(
+                UserProfile(
+                    userProfile = state.profileQuery,
+                ),
+            ),
+        )
     }
 
     private fun isEventValid(state: State): Boolean {
