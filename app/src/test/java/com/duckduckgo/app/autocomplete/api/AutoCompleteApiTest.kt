@@ -89,9 +89,6 @@ class AutoCompleteApiTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockFireTabRepository: TabRepository
-
-    @Mock
     private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
 
     @Mock
@@ -127,7 +124,6 @@ class AutoCompleteApiTest {
         whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
-        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         runTest {
             whenever(mockDeviceAppLookup.query(any())).thenReturn(emptyList())
         }

@@ -68,7 +68,7 @@ class RealDuckChatSyncRepository @Inject constructor(
 
     /*
      * Chat activity in a non-syncable mode must never enter the sync pipeline (those chats stay on-device). Every
-     * queue/timestamp writer below guards on [BrowserMode.isSyncable] over the current mode — the single write-side
+     * queue/timestamp writer below guards on [BrowserMode.isSyncable] over the caller-supplied mode — the single write-side
      * choke point.
      *
      * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps non-syncable
