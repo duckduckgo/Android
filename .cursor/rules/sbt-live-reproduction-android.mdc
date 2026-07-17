@@ -1,0 +1,55 @@
+---
+description: Android build, install, launch, screenshot, and cleanup guidance for SBT live-site reproduction on Cursor self-hosted agents.
+alwaysApply: false
+---
+
+# SBT Live Reproduction: Android
+
+Use this when running Android live-site breakage reproduction on `ddg-native-android`.
+
+## Build And Install
+
+- Use `npm run android:build` for build smoke.
+- Use `npm run android:install` when the target AVD does not already have DDG installed.
+- If an emulator restart loses the install but the APK exists, reinstall with:
+
+```sh
+adb install -r android/app/build/outputs/apk/internal/debug/<apk-name>
+```
+
+## Emulator
+
+- Default to `ddg_pixel9_api35`; it is the current known-good AVD.
+- Start headlessly:
+
+```sh
+emulator -avd ddg_pixel9_api35 -no-window -no-snapshot-save -no-boot-anim
+```
+
+## Load URL
+
+Use the debug package explicitly:
+
+```sh
+adb shell am start -W -a android.intent.action.VIEW -d '<url>' com.duckduckgo.mobile.android.debug
+```
+
+## Screenshots
+
+Prefer device-file screenshots; avoid `adb exec-out screencap -p` because it has hung on this pool.
+
+```sh
+adb shell screencap -p /sdcard/before.png
+adb pull /sdcard/before.png /opt/cursor/artifacts/<dir>/before.png
+```
+
+## System UI Cleanup
+
+If screenshots are blocked by `Application Not Responding: com.google.android.apps.nexuslauncher`, verify DDG is foreground/responsive first.
+
+```sh
+adb shell input keyevent BACK
+adb shell am force-stop com.google.android.apps.nexuslauncher
+```
+
+Then relaunch the URL activity and report the cleanup in the SBT output.
