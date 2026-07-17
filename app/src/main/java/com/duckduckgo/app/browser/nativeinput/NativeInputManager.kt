@@ -204,6 +204,8 @@ class RealNativeInputManager @Inject constructor(
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+    /** True while an enter morph from [attachWidget] still owns [NativeInputLayoutCoordinator]'s animating flag. */
+    private var pendingEnterOwnsAnimating = false
 
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
@@ -350,6 +352,13 @@ class RealNativeInputManager @Inject constructor(
             lastCallbacks?.restoreOmnibarAutocomplete?.invoke(omnibarController.getText())
         }
 
+        // Slide the nav bar out with the close instead of leaving it up until removeWidget pops it.
+        // Visual-only: exit owns content reflow / isWidgetAnimating until removeWidget, so we must not
+        // run begin/endNavBarSlide (that would resume reflow mid-exit and reintroduce the padding race).
+        if (navBarShown == true) {
+            slideNavBarOutWithClose(animate = animate)
+        }
+
         if (!animate) {
             animator.cancelAnimation()
             isExiting = false
@@ -366,10 +375,11 @@ class RealNativeInputManager @Inject constructor(
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
-            // The nav bar stays in place during the exit — only the input card morphs back to the omnibar
-            // (removed with the widget in removeWidget). Suspend the content-reflow transition so the
-            // per-frame content offset driven by onWidgetAnimationFrame is instant; otherwise it animates
-            // on the transition's own clock and the reset-to-base races, leaving stale top padding.
+            // The nav bar slides out on its own timeline (started in hideNativeInput); this exit
+            // only morphs the input card back to the omnibar. Suspend the content-reflow transition
+            // so the per-frame content offset driven by onWidgetAnimationFrame is instant; otherwise
+            // it animates on the transition's own clock and the reset-to-base races, leaving stale
+            // top padding.
             layoutCoordinator.suspendContentReflow()
             animator.animateExit(
                 widgetCard = card,
@@ -569,7 +579,10 @@ class RealNativeInputManager @Inject constructor(
         attachWidget(widgetView, navBarView, isBottom, tabId)
         applyNavBarVisibility(
             show = navBarShouldBeVisible(),
-            animate = false,
+            animate = true,
+            // Enter morph (when started) owns isWidgetAnimating until it completes; clearing it when
+            // the open slide finishes first would re-enable layout listeners mid-enter.
+            clearAnimatingOnComplete = !pendingEnterOwnsAnimating,
         )
         syncBackArrowToNavBar()
         lifecycleOwner.lifecycleScope.launch {
@@ -709,6 +722,7 @@ class RealNativeInputManager @Inject constructor(
             navBarRoot = null
         }
         navBarShown = null
+        pendingEnterOwnsAnimating = false
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         navBarTabCountObserver = null
         navBarTabCountLiveData = null
@@ -941,8 +955,16 @@ class RealNativeInputManager @Inject constructor(
      * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
      * is already in the target state. On change it slides the bar (and, in top mode, the widget) and
      * reflows content to clear or reclaim the bar strip.
+     *
+     * @param clearAnimatingOnComplete when true (default), clears [NativeInputLayoutCoordinator]'s
+     * animating flag after the slide — correct for mid-session toggles. Pass false when the slide
+     * runs alongside enter/exit, which already owns that flag.
      */
-    private fun applyNavBarVisibility(show: Boolean, animate: Boolean) {
+    private fun applyNavBarVisibility(
+        show: Boolean,
+        animate: Boolean,
+        clearAnimatingOnComplete: Boolean = true,
+    ) {
         val navBar = navBarRoot ?: return
         val widget = widgetRoot ?: return
         if (!shouldAnimateNavBar(navBarShown, show)) return
@@ -960,10 +982,12 @@ class RealNativeInputManager @Inject constructor(
             )
             return
         }
-        // Drive the content offset from the bar's on-screen height every frame, under a suspended reflow
-        // transition, so the NTP/browser content moves in lock-step with the sliding bar/widget instead
-        // of lagging it (top mode) or animating on the LayoutTransition's own clock (bottom mode).
-        layoutCoordinator.beginNavBarSlide()
+        // When the open slide shares the session with enter, skip begin/endNavBarSlide: enter already
+        // owns isWidgetAnimating, and endNavBarSlide's resume would clear the LayoutTransition that
+        // onEnterComplete just assigned. Mid-session toggles (default) take full ownership.
+        if (clearAnimatingOnComplete) {
+            layoutCoordinator.beginNavBarSlide()
+        }
         animator.animateNavBarVisibility(
             navBarView = navBar,
             widgetView = widget,
@@ -974,8 +998,33 @@ class RealNativeInputManager @Inject constructor(
             onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
             onComplete = {
                 layoutCoordinator.updateNavBarInset(navBarInset)
-                layoutCoordinator.endNavBarSlide()
+                if (clearAnimatingOnComplete) {
+                    layoutCoordinator.endNavBarSlide()
+                    layoutCoordinator.setWidgetAnimating(false)
+                }
             },
+        )
+    }
+
+    /**
+     * Hides the nav bar as UTI closes. Unlike [applyNavBarVisibility], this does not take ownership of
+     * content reflow — the exit morph already suspends it and resets padding on complete. Calling
+     * [NativeInputLayoutCoordinator.endNavBarSlide] here would resume reflow mid-exit.
+     */
+    private fun slideNavBarOutWithClose(animate: Boolean) {
+        val navBar = navBarRoot ?: return
+        val widget = widgetRoot ?: return
+        if (!shouldAnimateNavBar(navBarShown, targetShown = false)) return
+        navBarShown = false
+        animator.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = navBarIsBottom,
+            heightPx = navBarHeightPx,
+            show = false,
+            animate = animate,
+            onFrame = {},
+            onComplete = {},
         )
     }
 
@@ -986,6 +1035,9 @@ class RealNativeInputManager @Inject constructor(
         this.navBarIsBottom = isBottom
         if (navBarView != null) {
             rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+            // Start off-screen so the first apply can slide the bar in (or snap it) instead of
+            // flashing it at rest for a frame. -height matches animateNavBarVisibility's hiddenY.
+            navBarView.translationY = -navBarHeightPx.toFloat()
             // Bottom omnibar only: the autocomplete list overlaps the top strip and would draw over the
             // bar (e.g. the Duck.ai tab's suggestions), so float it above via translationZ. Suppress the
             // shadow the raised Z would otherwise cast, we only want the draw order, not the elevation.
@@ -997,6 +1049,11 @@ class RealNativeInputManager @Inject constructor(
         }
         // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))
+        // Top mode: the widget rides the bar. Start it off-screen with the bar so the open slide is
+        // unified (bottom mode leaves the widget alone — it only morphs from the omnibar).
+        if (navBarView != null && !isBottom) {
+            widgetView.translationY = -navBarHeightPx.toFloat()
+        }
         widgetRoot = widgetView
         navBarRoot = navBarView
 
@@ -1007,10 +1064,14 @@ class RealNativeInputManager @Inject constructor(
 
         applyWindowChrome(widgetView, isBottom)
 
-        if (!startEnterAnimation(widgetView, isBottom)) {
+        val enterStarted = startEnterAnimation(widgetView, isBottom)
+        if (!enterStarted) {
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+        // Stash so showNativeInput can avoid clearing isWidgetAnimating when the open slide
+        // finishes before the enter morph.
+        pendingEnterOwnsAnimating = enterStarted
     }
 
     override fun setInteractionLock(lock: InteractionLock) {
@@ -1093,6 +1154,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onCancel = {
+                pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
                     widget.endEnterAnimationPreview()
@@ -1102,6 +1164,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onComplete = {
+                pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
             },
@@ -1328,8 +1391,8 @@ internal fun shouldShowNavBar(isBrowserContext: Boolean, interactionLatched: Boo
 
 /**
  * Whether a visibility change is needed. [currentShown] is null before the first apply, which always
- * applies (snaps to the resting state); otherwise apply only when the target differs — this makes
- * repeated same-state callbacks (e.g. the prefill-driven emptiness callback) no-ops.
+ * applies; otherwise apply only when the target differs — this makes repeated same-state callbacks
+ * (e.g. the prefill-driven emptiness callback) no-ops.
  */
 internal fun shouldAnimateNavBar(currentShown: Boolean?, targetShown: Boolean): Boolean =
     currentShown != targetShown

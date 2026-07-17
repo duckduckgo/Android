@@ -150,4 +150,28 @@ class RealNativeInputAnimatorTest {
         assertEquals(0f, navBar.translationY, 0f)
         assertEquals(99f, widget.translationY, 0f)
     }
+
+    @Test
+    fun whenAnimateShowFromRestThenBarStartsOffScreen() {
+        val navBar = FrameLayout(context).apply { translationY = 0f }
+        val widget = FrameLayout(context).apply { translationY = 0f }
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = true, heightPx = 56, show = true, animate = true)
+
+        // Animator starts from hiddenY so the slide-in has travel; first frame may not have run yet
+        // under Robolectric, but the view must be positioned off-screen before the ValueAnimator ticks.
+        assertEquals(View.VISIBLE, navBar.visibility)
+        assertEquals(-56f, navBar.translationY, 0f)
+    }
+
+    @Test
+    fun whenAnimateShowInTopModeFromRestThenWidgetRidesOffScreenWithBar() {
+        val navBar = FrameLayout(context).apply { translationY = 0f }
+        val widget = FrameLayout(context).apply { translationY = 0f }
+
+        testee.animateNavBarVisibility(navBar, widget, isBottom = false, heightPx = 56, show = true, animate = true)
+
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(-56f, widget.translationY, 0f)
+    }
 }

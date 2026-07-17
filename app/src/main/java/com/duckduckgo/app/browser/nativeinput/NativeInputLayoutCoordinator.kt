@@ -386,8 +386,12 @@ class NativeInputLayoutCoordinator(
         suspendContentReflow()
     }
 
+    /**
+     * Ends a [beginNavBarSlide] session. Resumes content reflow but leaves [isWidgetAnimating] alone —
+     * the slide may run alongside enter/exit, which owns that flag until its own complete/cancel.
+     * Callers that solely own the session (mid-session show/hide) should clear it after this returns.
+     */
     fun endNavBarSlide() {
-        isWidgetAnimating = false
         resumeContentReflow()
     }
 
