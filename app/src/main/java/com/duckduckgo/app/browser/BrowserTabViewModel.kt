@@ -1256,6 +1256,11 @@ class BrowserTabViewModel @Inject constructor(
             previousUrl != null &&
             sameOrigin(previousUrl, url)
         ) {
+            /* An in-page (same-origin) navigation can be reported by WebView as a new page, rebuilding the
+            Site with a null certificate. Unlike a real load, no progress callback follows to re-capture it,
+            so the Privacy Dashboard would wrongly report an invalid certificate. Seed the new Site with the
+            previous certificate as a fallback; if a certificate callback does arrive it overwrites this value.
+             */
             site?.certificate = previousCertificate
         }
         if (updateMaliciousSiteStatus) {
