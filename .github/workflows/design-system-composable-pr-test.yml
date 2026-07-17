@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Design System Maestro Tests
         id: maestro-run
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        uses: mobile-dev-inc/action-maestro-cloud@v3.0.1
         timeout-minutes: 30
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -71,7 +71,7 @@ jobs:
           name: design_system_pr_${{ github.event.pull_request.number }}_${{ github.sha }}
           timeout: 15
           app-file: apk/internal.apk
-          android-api-level: 30
+          device-os: android-30
           workspace: .maestro
           include-tags: androidDesignSystemTest
 
