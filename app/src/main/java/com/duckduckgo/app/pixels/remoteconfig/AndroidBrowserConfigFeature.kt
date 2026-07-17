@@ -443,4 +443,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun customTabEndlessLoopFix(): Toggle
+
+    /**
+     * Controls whether a Site rebuilt for the same origin (e.g. an in-page/SPA navigation that
+     * WebView reports as a new page) inherits the previous Site's TLS certificate.
+     * @return `true` when the remote config has the global "preserveCertificateOnSameOrigin" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun preserveCertificateOnSameOrigin(): Toggle
 }
