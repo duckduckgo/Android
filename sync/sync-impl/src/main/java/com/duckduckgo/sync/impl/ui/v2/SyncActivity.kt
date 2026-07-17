@@ -131,7 +131,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
-                logcat { "Device clicked: $device" }
+                viewModel.onEditDeviceClicked(device)
             }
         },
     )
@@ -222,7 +222,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is AskEditDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    logcat { "Edit device" }
+                }
             }
 
             is AskRemoveDevice -> {

@@ -242,7 +242,7 @@ class SyncActivityViewModel @Inject constructor(
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
-        data class AskEditDevice(val device: ConnectedDevice) : Command()
+        data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
@@ -488,7 +488,15 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onEditDeviceClicked(device: ConnectedDevice) {
         viewModelScope.launch {
-            command.send(AskEditDevice(device))
+            val isSimplifiedFlow = withContext(dispatchers.io()) { syncFeatureToggle.useSimplifiedSync() }
+            val askEditCommand = AskEditDevice(device, requireAuthentication = isSimplifiedFlow)
+            if (isSimplifiedFlow) {
+                requiresSetupAuthentication {
+                    command.send(askEditCommand)
+                }
+            } else {
+                command.send(askEditCommand)
+            }
         }
     }
 

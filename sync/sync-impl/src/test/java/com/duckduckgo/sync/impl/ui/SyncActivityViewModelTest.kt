@@ -46,6 +46,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
@@ -508,6 +509,63 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.AskRemoveDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedAndNotSimplifiedSyncThenAskEditDeviceWithoutAuthentication() = runTest {
+        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(false)
+
+        testee.onEditDeviceClicked(connectedDevice)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(AskEditDevice::class)
+            assertEquals(connectedDevice, (command as AskEditDevice).device)
+            assertFalse(command.requireAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedAndNotSimplifiedSyncThenNoAuthenticationRequested() = runTest {
+        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(false)
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onEditDeviceClicked(connectedDevice)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(AskEditDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedAndSimplifiedSyncWithDeviceAuthenticationThenAskEditDeviceWithAuthentication() = runTest {
+        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(true)
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onEditDeviceClicked(connectedDevice)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(AskEditDevice::class)
+            assertEquals(connectedDevice, (command as AskEditDevice).device)
+            assertTrue(command.requireAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedAndSimplifiedSyncWithoutDeviceAuthenticationThenRequestSetupAuthentication() = runTest {
+        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(true)
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onEditDeviceClicked(connectedDevice)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

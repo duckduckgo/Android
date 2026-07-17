@@ -264,6 +264,7 @@ class FakeSyncFeatureToggle : SyncFeatureToggle {
     var allowCreateAccountOnNewerVersion: Boolean = true
     var automaticallyUpdateSyncSettings: Boolean = true
     var allowAiChatSync: Boolean = true
+    var useSimplifiedSync: Boolean = false
     override fun showSync() = showSync
     override fun allowDataSyncing() = allowDataSyncing
     override fun allowDataSyncingOnNewerVersion() = allowDataSyncingOnNewerVersion
@@ -273,4 +274,5 @@ class FakeSyncFeatureToggle : SyncFeatureToggle {
     override fun allowCreateAccountOnNewerVersion() = allowCreateAccountOnNewerVersion
     override fun automaticallyUpdateSyncSettings() = automaticallyUpdateSyncSettings
     override fun allowAiChatSync() = allowAiChatSync
+    override fun useSimplifiedSync() = useSimplifiedSync
 }
