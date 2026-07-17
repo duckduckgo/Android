@@ -121,6 +121,8 @@ class BrowserViewModel @Inject constructor(
     private val browserMode: BrowserMode,
 ) : ViewModel(), CoroutineScope {
 
+    // Mode-switch orchestrator: observes the mode it also writes via switchTo().
+    @Suppress("DenyListedApi")
     val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
 
     fun switchToMode(mode: BrowserMode, source: BrowserModeSwitchSource): Boolean {

@@ -126,6 +126,14 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             errorMessage = "Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, " +
                 "or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
         ),
+        DenyListedEntry(
+            className = "com.duckduckgo.browsermode.api.BrowserModeStateHolder",
+            functionName = "getCurrentMode",
+            errorMessage = "Do not read the mutable global browser mode. Scoped components must inject the frozen BrowserMode; " +
+                "AppScope components must take a BrowserMode parameter or a @RegularMode/@FireMode-qualified binding. " +
+                "Genuine mode-transition observers may @Suppress(\"DenyListedApi\") with a justification comment.",
+            allowInTests = true,
+        ),
     )
 
     override fun getApplicableUastTypes() = config.applicableTypes()
@@ -204,8 +212,34 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             }
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
-                val reference = node.resolve() as? PsiField ?: return
-                visitField(reference, node)
+                // Skip nodes that are the callee of a call expression — those are regular
+                // function calls handled (with full parameter/receiver checking) by
+                // visitCallExpression. Only process genuine property accesses here.
+                if (node.uastParent is UCallExpression) return
+                when (val reference = node.resolve()) {
+                    is PsiField -> visitField(reference, node)
+                    is PsiMethod -> visitGetterMethod(reference, node)
+                }
+            }
+
+            private fun visitGetterMethod(reference: PsiMethod, node: UElement) {
+                // Only handle zero-parameter methods. Kotlin property getters always have 0
+                // JVM parameters; extension functions (like first()) carry the receiver as a
+                // parameter in the JVM bytecode and are already handled by visitCallExpression.
+                if (reference.parameterList.parametersCount != 0) return
+                val className = reference.containingClass?.qualifiedName
+                val typeConfig = typeConfigs[className] ?: return
+                val functionName = reference.name.substringBefore("-")
+                val deniedFunctions = typeConfig.functionEntries.getOrDefault(functionName, emptyList()) +
+                    typeConfig.functionEntries.getOrDefault(MATCH_ALL, emptyList())
+                deniedFunctions.forEach { denyListEntry ->
+                    if (denyListEntry.allowInTests && context.isTestSource) return@forEach
+                    context.report(
+                        issue = ISSUE,
+                        location = context.getLocation(node),
+                        message = denyListEntry.errorMessage,
+                    )
+                }
             }
 
             private fun visitField(reference: PsiField, node: UElement) {

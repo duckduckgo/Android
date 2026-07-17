@@ -125,6 +125,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
 
+    // Mode-switch orchestrator: observes the mode it also writes via switchTo().
+    @Suppress("DenyListedApi")
     val currentMode: StateFlow<BrowserMode> =
         if (fireModeAvailable) {
             browserModeStateHolder.currentMode

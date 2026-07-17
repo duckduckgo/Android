@@ -55,6 +55,8 @@ class RealNativeInputStateStore @Inject constructor(
 
     private val flows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
 
+    // Mode-transition observer: the cross-activity tab registry must follow the live mode.
+    @Suppress("DenyListedApi")
     override val state: Flow<NativeInputState> by lazy {
         browserModeStateHolder.currentMode
             .flatMapLatest { mode -> tabRepositoryProvider.get().forMode(mode).flowSelectedTab }

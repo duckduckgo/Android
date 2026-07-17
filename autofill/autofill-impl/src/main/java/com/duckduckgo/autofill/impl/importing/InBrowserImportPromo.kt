@@ -50,6 +50,8 @@ class RealInBrowserImportPromo @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
 ) : InBrowserImportPromo {
 
+    // TODO: convert by capturing the mode at the per-WebView autofill config boundary; low risk (UX gate only).
+    @Suppress("DenyListedApi")
     override suspend fun canShowPromo(
         credentialsAvailableForCurrentPage: Boolean,
         url: String?,

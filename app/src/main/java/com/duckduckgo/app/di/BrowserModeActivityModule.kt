@@ -60,6 +60,8 @@ class BrowserModeActivityModule {
      * standalone in-app web viewer (help/settings/external links), not a browser tab. Neither should
      * inherit the user's Fire-mode session, and both keep their WebView on the default profile.
      */
+    // Freeze boundary: the single place the frozen activity BrowserMode is minted.
+    @Suppress("DenyListedApi")
     @Provides
     @SingleInstanceIn(ActivityScope::class)
     fun provideActivityBrowserMode(
