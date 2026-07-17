@@ -244,8 +244,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         adBlockingView.show()
         adBlockingView.alpha = 0F
         adBlockingView.setImageResource(iconRes)
-        // The static player icon has no built-in inset (unlike the cookie Lottie), so pad it off the
-        // badge container's leading edge to line it up with the cookie/tracker icons.
+        // The static player icon has no built-in inset (unlike the cookie/tracker Lottie compositions,
+        // whose artwork fills the badge chip), so pad it to center the glyph in the chip and match their
+        // spacing to the text.
         adBlockingView.setPaddingRelative(AD_BLOCKING_ICON_START_PADDING_DP.toPx(), 0, 0, 0)
 
         val slideInTransition: Transition = createSlideTransition()
@@ -573,7 +574,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         // before starting the cookies animation
         private const val DELAY_BETWEEN_ANIMATIONS_DURATION = 1500L
 
-        private const val AD_BLOCKING_ICON_START_PADDING_DP = 6
+        private const val AD_BLOCKING_ICON_START_PADDING_DP = 9
     }
 }
 
