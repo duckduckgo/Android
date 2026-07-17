@@ -128,6 +128,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val editDeviceLauncher = registerForActivityResult(
+        EditDeviceContract(),
+    ) { result ->
+        logcat { "Edit device result: $result" }
+    }
+
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
@@ -223,7 +229,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskEditDevice -> {
                 authenticate {
-                    logcat { "Edit device" }
+                    editDeviceLauncher.launch(EditDeviceContract.Input(command.device))
                 }
             }
 

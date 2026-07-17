@@ -22,7 +22,7 @@
     <string name="sync_settings_v2_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai chats, end-to-end encrypted across your DuckDuckGo apps.</string>
     <string name="sync_settings_v2_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
     <string name="sync_settings_v2_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai chats, are being synced with end-to-end encryption.</string>
-    <string name="sync_settings_v2_this_device_cta_title">Sync &amp; Backup this device</string>
+    <string name="sync_settings_v2_this_device_cta_title">Sync This Device</string>
     <string name="sync_settings_v2_devices_section_header">My Devices</string>
     <string name="sync_settings_v2_download_section_header">Download</string>
     <string name="sync_settings_v2_download_recovery_code_item">Download Your Recovery Code</string>
@@ -31,4 +31,9 @@
     <string name="sync_setup_v2_header_headline">Sync this device with a nearby computer.</string>
     <string name="sync_setup_v2_header_body">We’ll help you sync your devices.</string>
     <string name="sync_setup_v2_this_device_cta_title">Sync This Device Only</string>
+    <string name="sync_setup_v2_device_synced_status">Synced</string>
+    <string name="sync_setup_v2_remove_device_name_item">Remove Device</string>
+    <string name="sync_setup_v2_edit_device_name_item">Edit Name</string>
+    <string name="sync_setup_v2_remove_this_device_notice">This device will no longer be able to access your synced data if you remove it.</string>
+    <string name="sync_setup_v2_remove_another_device_notice">This device will no longer be able to access your synced data if this is turned off.</string>
 </resources>
