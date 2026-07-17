@@ -50,6 +50,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -241,6 +242,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     private var activeTabId: String? = null
 
@@ -1393,7 +1397,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     val pluginScope = CoroutineScope(SupervisorJob() + dispatchers.main())
                     chatItemPluginScope = pluginScope
                     owner.lifecycleScope.launch {
-                        binding.loadPluginItems(context, pluginScope)
+                        binding.loadPluginItems(context, pluginScope, browserMode)
                     }
                 }
             }

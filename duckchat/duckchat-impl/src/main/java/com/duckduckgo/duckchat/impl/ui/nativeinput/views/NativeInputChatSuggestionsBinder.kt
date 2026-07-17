@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -94,10 +95,10 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
          * so an item created after a submit self-initialises from that state, and [pluginContentObserver]
          * folds its rows into hasContent. There's no load-vs-submit ordering to manage.
          */
-        suspend fun loadPluginItems(context: Context, scope: CoroutineScope) {
+        suspend fun loadPluginItems(context: Context, scope: CoroutineScope, browserMode: BrowserMode) {
             var insertIndex = 0
             chatItemPlugins.getPlugins().forEach { plugin ->
-                val item = plugin.create(context, scope)
+                val item = plugin.create(context, scope, browserMode)
                 // Insert each item's adapters at the running index so plugins keep priority order and
                 // their adapters keep their own order, all above the built-in sections.
                 item.adapters.forEach { adapter ->
