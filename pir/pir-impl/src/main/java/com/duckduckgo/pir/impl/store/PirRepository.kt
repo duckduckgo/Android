@@ -85,7 +85,11 @@ interface PirRepository {
 
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
-    suspend fun clearAllBrokerJsons()
+    /**
+     * Clears all broker configuration: both the download etags and the parsed broker details
+     * (details, scan/optOut steps, scheduling config, mirror sites).
+     */
+    suspend fun clearAllBrokerData()
 
     suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
@@ -348,9 +352,10 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun clearAllBrokerJsons() {
+    override suspend fun clearAllBrokerData() {
         withContext(dispatcherProvider.io()) {
             brokerJsonDao()?.deleteAll()
+            brokerDao()?.deleteAll()
         }
     }
 
