@@ -1,0 +1,59 @@
+name: 'Develocity Runner Info'
+description: 'Capture GitHub Actions runner hardware and region as Develocity build scan custom values'
+
+inputs:
+  runner-type:
+    description: >-
+      Optional human-readable label for the runner (e.g. "ubuntu-latest-4-core").
+      Only needed if you want a friendly name alongside the auto-detected VM size,
+      CPU count and region below. Leave unset to rely purely on runtime detection,
+      which needs no maintenance as runner sizes change.
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Capture runner info
+      shell: bash
+      run: |
+        # Every value below is exposed to the Gradle build as an env var; settings.gradle
+        # reads them and publishes them as build scan custom values.
+
+        # Optional human label — only emitted if the caller passed one.
+        if [ -n "${{ inputs.runner-type }}" ]; then
+          echo "DDG_RUNNER_TYPE=${{ inputs.runner-type }}" >> "$GITHUB_ENV"
+        fi
+
+        # From the runner context: the runner name and hosted/self-hosted environment.
+        # environment also tells us whether the Azure IMDS lookups below are expected to
+        # succeed (github-hosted) or not. os/arch are omitted on purpose — the build scan
+        # already records them natively.
+        echo "DDG_RUNNER_NAME=${{ runner.name }}" >> "$GITHUB_ENV"
+        echo "DDG_RUNNER_ENVIRONMENT=${{ runner.environment }}" >> "$GITHUB_ENV"
+
+        # CPU count is available on every runner (hosted or self-hosted) and needs no
+        # maintenance — it reflects the actual hardware the job was given.
+        CPU_COUNT="$(nproc 2>/dev/null || echo '')"
+        if [ -n "$CPU_COUNT" ]; then
+          echo "DDG_RUNNER_CPU_COUNT=$CPU_COUNT" >> "$GITHUB_ENV"
+        fi
+
+        # GitHub-hosted runners are Azure VMs. Query the Azure Instance Metadata Service
+        # (IMDS) for the authoritative VM size and region — no hardcoding, self-updating
+        # as GitHub changes runner SKUs. Best-effort: a self-hosted/restricted runner has
+        # no IMDS, and this must never fail the build.
+        IMDS='http://169.254.169.254/metadata/instance/compute'
+        VM_SIZE="$(curl --silent --fail --max-time 5 -H 'Metadata: true' "$IMDS/vmSize?api-version=2021-02-01&format=text" || true)"
+        REGION="$(curl --silent --fail --max-time 5 -H 'Metadata: true' "$IMDS/location?api-version=2021-02-01&format=text" || true)"
+        if [ -n "$VM_SIZE" ]; then
+          echo "DDG_RUNNER_VM_SIZE=$VM_SIZE" >> "$GITHUB_ENV"
+        fi
+        if [ -n "$REGION" ]; then
+          echo "DDG_RUNNER_REGION=$REGION" >> "$GITHUB_ENV"
+        fi
+
+        echo "Runner: name='${{ runner.name }}' env='${{ runner.environment }}' type='${{ inputs.runner-type }}' vmSize='${VM_SIZE:-?}' cpus='${CPU_COUNT:-?}' region='${REGION:-?}'"
+        if [ -z "$VM_SIZE$REGION" ]; then
+          echo "::notice::Azure IMDS unavailable (self-hosted or restricted runner); only CPU count captured."
+        fi

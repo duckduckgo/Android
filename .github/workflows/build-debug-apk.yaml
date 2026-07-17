@@ -62,6 +62,11 @@ jobs:
           cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
+      - name: Capture runner info for build scans
+        uses: ./.github/actions/develocity-runner-info
+        # Runner VM size, CPU count and region are auto-detected at runtime; no need to
+        # hardcode a type. Pass runner-type only if you want an extra human-readable label.
+
       - name: Restore Develocity Setup + Artifact Cache
         uses: ./.github/actions/develocity-artifact-cache
         with:
