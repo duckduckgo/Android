@@ -79,7 +79,7 @@ runs:
   steps:
     - name: Run Maestro Cloud
       id: maestro-run
-      uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      uses: mobile-dev-inc/action-maestro-cloud@v3.0.1
       with:
         api-key: ${{ inputs.maestro_api_key }}
         project-id: ${{ inputs.maestro_project_id }}
@@ -87,7 +87,7 @@ runs:
         timeout: ${{ inputs.maestro_timeout }}
         app-file: ${{ inputs.maestro_app_binary_id == '' && inputs.maestro_app_file || '' }}
         app-binary-id: ${{ inputs.maestro_app_binary_id != '' && inputs.maestro_app_binary_id || '' }}
-        android-api-level: ${{ inputs.maestro_api_level }}
+        device-os: android-${{ inputs.maestro_api_level }}
         workspace: .maestro
         include-tags: ${{ inputs.maestro_include_tags }}
         env: ${{ inputs.maestro_env }}
