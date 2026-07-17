@@ -121,18 +121,19 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
+        val currentMode = browserModeStateHolder.currentMode.value
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
                 }
                 return
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             if (!isVoiceSessionActiveOnCurrentTab()) {
-                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+                showOnAppLaunchOptionHandler.handleAppLaunchOption(currentMode)
             }
         }
     }

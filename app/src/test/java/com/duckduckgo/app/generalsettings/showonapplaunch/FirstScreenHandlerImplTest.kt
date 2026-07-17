@@ -183,7 +183,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -196,7 +196,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -234,7 +234,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = false)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = false, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -247,7 +247,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -260,7 +260,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -286,7 +286,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -299,7 +299,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -325,7 +325,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption(BrowserMode.REGULAR)
     }
 
     @Test
@@ -383,7 +383,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -397,7 +397,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     // --- Voice session active (legacy fresh launch path) ---
@@ -429,7 +429,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption(BrowserMode.REGULAR)
     }
 
     @Test
@@ -441,7 +441,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption(BrowserMode.REGULAR)
     }
 
     // --- Synchronous onIdleReturnTriggered (only on fresh launch when current tab is already an NTP) ---
@@ -558,7 +558,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -594,7 +594,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -625,7 +625,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -638,7 +638,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = false)
+        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = false, currentMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -652,7 +652,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
     }
 
     // --- Mode-switch recreate guard ---
