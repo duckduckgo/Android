@@ -88,8 +88,10 @@ class LaunchViewModel @Inject constructor(
                     LinearOnboardingHost.OnboardingActivity -> {
                         command.value = Command.Onboarding
                     }
-                    LinearOnboardingHost.BrowserActivity -> {
-                        command.value = Command.Home()
+
+                    else -> {
+                        // extend to support initial hosts in the future
+                        throw IllegalArgumentException("unsupported initial onboarding host transition")
                     }
                 }
             } else {
