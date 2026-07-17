@@ -174,4 +174,63 @@ class RealNativeInputAnimatorTest {
         assertEquals(-56f, navBar.translationY, 0f)
         assertEquals(-56f, widget.translationY, 0f)
     }
+
+    @Test
+    fun whenAnimateShowInTopModeWithoutMovingWidgetThenWidgetStaysPlanted() {
+        val navBar = FrameLayout(context).apply { translationY = 0f }
+        val widget = FrameLayout(context).apply { translationY = 0f }
+
+        testee.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = false,
+            heightPx = 56,
+            show = true,
+            animate = true,
+            moveWidgetWithBar = false,
+        )
+
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(0f, widget.translationY, 0f)
+    }
+
+    @Test
+    fun whenSnapHideInTopModeWithoutMovingWidgetThenWidgetStaysPlanted() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context).apply { translationY = 12f }
+
+        testee.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = false,
+            heightPx = 56,
+            show = false,
+            animate = false,
+            moveWidgetWithBar = false,
+        )
+
+        assertEquals(View.GONE, navBar.visibility)
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(12f, widget.translationY, 0f)
+    }
+
+    @Test
+    fun whenMoveWidgetWithBarTrueInBottomModeThenWidgetStillUntouched() {
+        val navBar = FrameLayout(context)
+        val widget = FrameLayout(context).apply { translationY = 99f }
+
+        testee.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = true,
+            heightPx = 56,
+            show = false,
+            animate = false,
+            moveWidgetWithBar = true,
+        )
+
+        assertEquals(View.GONE, navBar.visibility)
+        assertEquals(-56f, navBar.translationY, 0f)
+        assertEquals(99f, widget.translationY, 0f)
+    }
 }

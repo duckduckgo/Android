@@ -362,10 +362,11 @@ class RealNativeInputManager @Inject constructor(
             lastCallbacks?.restoreOmnibarAutocomplete?.invoke(omnibarController.getText())
         }
 
-        // Slide the nav bar out with the close instead of leaving it up until removeWidget pops it.
-        // Visual-only: exit owns content reflow / isWidgetAnimating until removeWidget, so we must not
-        // run begin/endNavBarSlide (that would resume reflow mid-exit and reintroduce the padding race).
-        if (navBarShown == true) {
+        // Bottom omnibar: slide the nav bar out with the close (visual-only — exit owns reflow /
+        // isWidgetAnimating, so no begin/endNavBarSlide). Top omnibar: leave the bar in place for
+        // the exit morph so the card morphs back to the omnibar while the buttons stay put
+        // (removed with the widget in removeWidget) — sliding it would steal that animation.
+        if (navBarShown == true && navBarIsBottom) {
             slideNavBarOutWithClose(animate = animate)
         }
 
@@ -385,11 +386,11 @@ class RealNativeInputManager @Inject constructor(
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
-            // The nav bar slides out on its own timeline (started in hideNativeInput); this exit
-            // only morphs the input card back to the omnibar. Suspend the content-reflow transition
-            // so the per-frame content offset driven by onWidgetAnimationFrame is instant; otherwise
-            // it animates on the transition's own clock and the reset-to-base races, leaving stale
-            // top padding.
+            // Bottom: nav bar may already be sliding out on its own timeline. Top: bar stays put —
+            // this exit only morphs the input card back to the omnibar. Suspend the content-reflow
+            // transition so the per-frame content offset driven by onWidgetAnimationFrame is instant;
+            // otherwise it animates on the transition's own clock and the reset-to-base races, leaving
+            // stale top padding.
             layoutCoordinator.suspendContentReflow()
             animator.animateExit(
                 widgetCard = card,
@@ -587,12 +588,17 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
+        // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
+        // morph can run from the omnibar while the buttons appear without animating — a concurrent
+        // top slide fights that morph (and was only needed for bottom chrome).
         applyNavBarVisibility(
             show = navBarShouldBeVisible(),
-            animate = true,
+            animate = isBottom,
             // Enter morph (when started) owns isWidgetAnimating until it completes; clearing it when
-            // the open slide finishes first would re-enable layout listeners mid-enter.
+            // an open slide finishes first would re-enable layout listeners mid-enter.
             clearAnimatingOnComplete = !pendingEnterOwnsAnimating,
+            // Never ride the widget during open — bottom never does; top must stay planted for morph.
+            moveWidgetWithBar = false,
         )
         syncBackArrowToNavBar()
         lifecycleOwner.lifecycleScope.launch {
@@ -963,17 +969,20 @@ class RealNativeInputManager @Inject constructor(
 
     /**
      * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
-     * is already in the target state. On change it slides the bar (and, in top mode, the widget) and
-     * reflows content to clear or reclaim the bar strip.
+     * is already in the target state. On change it slides the bar and reflows content to clear or
+     * reclaim the bar strip. In top mode, mid-session toggles also translate the widget with the bar
+     * unless [moveWidgetWithBar] is false (enter/exit morph — card must stay put relative to omnibar).
      *
      * @param clearAnimatingOnComplete when true (default), clears [NativeInputLayoutCoordinator]'s
      * animating flag after the slide — correct for mid-session toggles. Pass false when the slide
      * runs alongside enter/exit, which already owns that flag.
+     * @param moveWidgetWithBar top mid-session only. Bottom mode never moves the widget with the bar.
      */
     private fun applyNavBarVisibility(
         show: Boolean,
         animate: Boolean,
         clearAnimatingOnComplete: Boolean = true,
+        moveWidgetWithBar: Boolean = !navBarIsBottom,
     ) {
         val navBar = navBarRoot ?: return
         val widget = widgetRoot ?: return
@@ -988,6 +997,7 @@ class RealNativeInputManager @Inject constructor(
                 heightPx = navBarHeightPx,
                 show = show,
                 animate = false,
+                moveWidgetWithBar = moveWidgetWithBar,
                 onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
             )
             return
@@ -1005,6 +1015,7 @@ class RealNativeInputManager @Inject constructor(
             heightPx = navBarHeightPx,
             show = show,
             animate = true,
+            moveWidgetWithBar = moveWidgetWithBar,
             onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
             onComplete = {
                 layoutCoordinator.updateNavBarInset(navBarInset)
@@ -1020,6 +1031,9 @@ class RealNativeInputManager @Inject constructor(
      * Hides the nav bar as UTI closes. Unlike [applyNavBarVisibility], this does not take ownership of
      * content reflow — the exit morph already suspends it and resets padding on complete. Calling
      * [NativeInputLayoutCoordinator.endNavBarSlide] here would resume reflow mid-exit.
+     *
+     * Never moves the widget with the bar: exit morph needs the card planted so it can morph back to
+     * the omnibar while the buttons slide away alone (top and bottom).
      */
     private fun slideNavBarOutWithClose(animate: Boolean) {
         val navBar = navBarRoot ?: return
@@ -1033,6 +1047,7 @@ class RealNativeInputManager @Inject constructor(
             heightPx = navBarHeightPx,
             show = false,
             animate = animate,
+            moveWidgetWithBar = false,
             onFrame = {},
             onComplete = {},
         )
@@ -1058,12 +1073,9 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
+        // Do not translate the widget off-screen with the bar: enter morph needs it planted so the card
+        // can grow from the omnibar while only the bar (buttons) slides in.
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))
-        // Top mode: the widget rides the bar. Start it off-screen with the bar so the open slide is
-        // unified (bottom mode leaves the widget alone — it only morphs from the omnibar).
-        if (navBarView != null && !isBottom) {
-            widgetView.translationY = -navBarHeightPx.toFloat()
-        }
         widgetRoot = widgetView
         navBarRoot = navBarView
 

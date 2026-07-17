@@ -61,6 +61,12 @@ interface NativeInputAnimator {
         onCancel: () -> Unit = {},
         onComplete: () -> Unit,
     )
+    /**
+     * @param moveWidgetWithBar top mode only: when true, [widgetView] tracks the bar's translation
+     * (mid-session latch). Pass false while an enter/exit morph is running so the card can morph
+     * from/to the omnibar while the bar (buttons) slides alone. Ignored in bottom mode — the widget
+     * never rides the bar there.
+     */
     fun animateNavBarVisibility(
         navBarView: View,
         widgetView: View,
@@ -68,6 +74,7 @@ interface NativeInputAnimator {
         heightPx: Int,
         show: Boolean,
         animate: Boolean,
+        moveWidgetWithBar: Boolean = !isBottom,
         onFrame: (onScreenHeightPx: Int) -> Unit = {},
         onComplete: () -> Unit = {},
     )
@@ -189,6 +196,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         heightPx: Int,
         show: Boolean,
         animate: Boolean,
+        moveWidgetWithBar: Boolean,
         onFrame: (onScreenHeightPx: Int) -> Unit,
         onComplete: () -> Unit,
     ) {
@@ -196,7 +204,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         navBarAnimator = null
 
         val hiddenY = -heightPx.toFloat()
-        val ridesWidget = !isBottom
+        // Bottom mode never couples the widget to the bar; top mode only when the caller asks.
+        val ridesWidget = !isBottom && moveWidgetWithBar
         val endBar = if (show) 0f else hiddenY
 
         // How much of the bar is currently on screen given its slide translation, used to keep the
