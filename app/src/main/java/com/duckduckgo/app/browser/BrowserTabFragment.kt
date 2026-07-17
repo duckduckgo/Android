@@ -1240,7 +1240,7 @@ class BrowserTabFragment :
         )
 
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput()
+            nativeInputManager.hideNativeInput(animate = false)
         }
 
         webViewContainer = binding.webViewContainer
@@ -2094,6 +2094,13 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
+        // Dismiss the native input first (no-op when it isn't shown) so a browser-input widget doesn't
+        // linger behind the switcher and leave the omnibar and widget both visible on return. Skip Duck.ai:
+        // there the widget is the persistent chat input, and hideNativeInput would restore the default
+        // omnibar and tear it down.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
@@ -2872,9 +2879,11 @@ class BrowserTabFragment :
                     // Surface the native input widget so its onEnterComplete focuses the input
                     // and brings up the keyboard via the same path as a manual omnibar tap.
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
-                    // multiple times per session (e.g. CTA refresh) and showNativeInput()
-                    // tears down and re-animates the widget on each call.
-                    if (binding.rootView.findViewById<View?>(com.duckduckgo.app.browser.R.id.inputModeTopRoot) == null) {
+                    // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
+                    // showNativeInput() tears down and re-animates the widget on each call.
+                    // Must cover bottom omnibar too (inputModeBottomRoot); checking only the top
+                    // root re-opened UTI on every swipe and stacked NTP content insets.
+                    if (!nativeInputManager.isNativeInputShown()) {
                         showNativeInput()
                     }
                 } else {
@@ -5190,6 +5199,9 @@ class BrowserTabFragment :
     private fun onTabVisible() {
         if (!isAdded) return
         webView?.onResume()
+        // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
+        // away on a previous visit isn't left as an icons-only strip.
+        omnibar.setExpanded(true)
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
     }
@@ -6770,6 +6782,12 @@ class BrowserTabFragment :
     }
 
     fun onTabSwipedAway() {
+        // Dismiss browser UTI when leaving the tab so the omnibar is restored and we don't leave a
+        // half-hidden address field / leftover nav chrome for the next visit. Skip Duck.ai: the
+        // widget is the persistent chat input there.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         viewModel.onTabSwipedAway()
     }
 

@@ -950,6 +950,11 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
+        // Custom Tab / find-in-page hide the address field. Browser mode must put it back — otherwise
+        // a prior hide leaves an empty toolbar strip with only the trailing icons (especially noticeable
+        // with a bottom omnibar after tab swipe).
+        ensureBrowserAddressFieldVisible()
+
         renderOutline(viewState.hasFocus)
         renderOmnibarText(viewState)
         if (viewState.expanded) {
@@ -984,6 +989,17 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState)
+    }
+
+    private fun ensureBrowserAddressFieldVisible() {
+        if (!omniBarContainer.isVisible || omniBarContainer.alpha < 1f) {
+            omniBarContainer.alpha = 1f
+            omniBarContainer.show()
+        }
+        if (!omnibarCardShadow.isVisible || omnibarCardShadow.alpha < 1f) {
+            omnibarCardShadow.alpha = 1f
+            omnibarCardShadow.show()
+        }
     }
 
     private fun renderDuckAiMode(viewState: ViewState) {

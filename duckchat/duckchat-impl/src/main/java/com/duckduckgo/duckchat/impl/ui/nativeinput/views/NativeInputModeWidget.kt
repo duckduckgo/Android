@@ -124,6 +124,10 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun setToggleVisible(visible: Boolean)
+
+    /** Whether the input nav bar is currently on screen. The toggle-row back arrow fills in as the back
+     *  affordance only while the nav bar (which carries its own back arrow) is hidden. */
+    fun setNavBarVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun getResolvedReasoningEffort(): String?
@@ -260,6 +264,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
+
+    // Set by the manager; the toggle-row back arrow is the inverse of this (fills in while the nav bar is hidden).
+    private var navBarVisible: Boolean = false
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
 
@@ -527,8 +534,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
-            // The toggle-row back arrow flips with text presence (inverse of the nav bar).
-            nativeInputState?.let { updateBackButtons(it) }
         }
     }
 
@@ -741,9 +746,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateBackButtons(state: NativeInputState) {
-        val hasText = !inputField.text.isNullOrEmpty()
         findViewById<View?>(R.id.inputModeWidgetBack)?.visibility =
-            if (state.shouldShowToggleRowBack(hasText)) VISIBLE else GONE
+            if (state.shouldShowToggleRowBack(navBarVisible)) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
             if (state.shouldShowCardRowBack()) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
@@ -1072,6 +1076,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         suspendLayoutTransitions {
             applyToggleVisibility(isVisible)
         }
+    }
+
+    override fun setNavBarVisible(visible: Boolean) {
+        if (navBarVisible == visible) return
+        navBarVisible = visible
+        nativeInputState?.let { updateBackButtons(it) }
     }
 
     private inline fun suspendLayoutTransitions(block: () -> Unit) {
@@ -1626,11 +1636,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 internal fun NativeInputState.chatHintRes(): Int =
     if (chatId != null) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint
 
-// Inverse of the top nav bar: the nav bar shows its own back arrow while the field is empty, so this
-// one shows only once there is text — the two are never visible at the same time (browser only; this
-// arrow never renders in Duck.ai / contextual, where toggleVisible is false).
-internal fun NativeInputState.shouldShowToggleRowBack(hasText: Boolean): Boolean =
-    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && hasText
+// The nav bar carries its own back arrow, so this one fills in as the back affordance only while the nav
+// bar is hidden — the two are never visible at once (browser only; this arrow never renders in Duck.ai /
+// contextual, where toggleVisible is false).
+internal fun NativeInputState.shouldShowToggleRowBack(isNavBarVisible: Boolean): Boolean =
+    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && !isNavBarVisible
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
