@@ -125,6 +125,9 @@ interface NativeInputManager {
      */
     fun isNativeInputActive(): Boolean
 
+    /** True when the native input widget is currently attached (top or bottom omnibar). */
+    fun isNativeInputShown(): Boolean
+
     /** True when the widget is shown with the chat tab selected. */
     fun isChatTabSelected(): Boolean
 
@@ -275,6 +278,13 @@ class RealNativeInputManager @Inject constructor(
         // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
         return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
+    }
+
+    override fun isNativeInputShown(): Boolean {
+        if (!::rootView.isInitialized) return false
+        return widgetRoot != null ||
+            rootView.findViewById<View?>(R.id.inputModeTopRoot) != null ||
+            rootView.findViewById<View?>(R.id.inputModeBottomRoot) != null
     }
 
     override fun isChatTabSelected(): Boolean {

@@ -197,9 +197,20 @@ class NativeInputLayoutCoordinator(
         this.navBarInsetPx = navBarInsetPx
         data class Target(val view: View, val basePadding: Padding)
 
+        // Drop any prior session's applied inset before snapshotting. Otherwise a leftover top/bottom
+        // padding (incomplete close, or ShowKeyboard → showNativeInput after a tab swipe) becomes the
+        // new baseline and stacks on every reopen.
+        resetContentOffset?.invoke()
+        clearNtpScrollArtifacts()
+
         val newTabContent =
             rootView.findViewById<View?>(R.id.newTabPage)
                 ?: rootView.findViewById(R.id.includeNewBrowserTab)
+        // newTabPage has no XML padding — any top/bottom here is from a prior offset session. Zero it
+        // so the snapshot can't inherit a dirty baseline. Leave browserLayout alone: its bottom padding
+        // is owned by BottomOmnibarBrowserContainerLayoutBehavior.
+        newTabContent?.setPadding(newTabContent.paddingLeft, 0, newTabContent.paddingRight, 0)
+
         val targets =
             listOfNotNull(
                 rootView.findViewById(R.id.browserLayout),
@@ -298,6 +309,7 @@ class NativeInputLayoutCoordinator(
         fun applyOffset() {
             if (!widgetView.isShown) {
                 targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+                clearNtpScrollArtifacts()
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
@@ -327,6 +339,7 @@ class NativeInputLayoutCoordinator(
         reapplyContentOffset = { applyOffset() }
         resetContentOffset = {
             targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+            clearNtpScrollArtifacts()
         }
         widgetView.post { applyOffset() }
         val layoutListener =
@@ -366,6 +379,7 @@ class NativeInputLayoutCoordinator(
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
+                    clearNtpScrollArtifacts()
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
                     ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
@@ -373,6 +387,22 @@ class NativeInputLayoutCoordinator(
                 }
             },
         )
+    }
+
+    /**
+     * LayoutTransition CHANGING (Search ↔ Duck.ai reflow) can leave temporary margins/translations on
+     * [R.id.newTabContainerScrollView]. Clear them whenever we restore the content baseline so tab-swipe
+     * reopen cycles can't accumulate a growing gap above the NTP content.
+     */
+    private fun clearNtpScrollArtifacts() {
+        val scrollView = rootView.findViewById<View?>(R.id.newTabContainerScrollView) ?: return
+        val lp = scrollView.layoutParams as? ViewGroup.MarginLayoutParams
+        if (lp != null && (lp.topMargin != 0 || lp.bottomMargin != 0 || lp.leftMargin != 0 || lp.rightMargin != 0)) {
+            lp.setMargins(0, 0, 0, 0)
+            scrollView.layoutParams = lp
+        }
+        if (scrollView.translationX != 0f) scrollView.translationX = 0f
+        if (scrollView.translationY != 0f) scrollView.translationY = 0f
     }
 
     /**

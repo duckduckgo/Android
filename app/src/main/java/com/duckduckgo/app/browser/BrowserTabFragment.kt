@@ -2879,9 +2879,11 @@ class BrowserTabFragment :
                     // Surface the native input widget so its onEnterComplete focuses the input
                     // and brings up the keyboard via the same path as a manual omnibar tap.
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
-                    // multiple times per session (e.g. CTA refresh) and showNativeInput()
-                    // tears down and re-animates the widget on each call.
-                    if (binding.rootView.findViewById<View?>(com.duckduckgo.app.browser.R.id.inputModeTopRoot) == null) {
+                    // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
+                    // showNativeInput() tears down and re-animates the widget on each call.
+                    // Must cover bottom omnibar too (inputModeBottomRoot); checking only the top
+                    // root re-opened UTI on every swipe and stacked NTP content insets.
+                    if (!nativeInputManager.isNativeInputShown()) {
                         showNativeInput()
                     }
                 } else {
