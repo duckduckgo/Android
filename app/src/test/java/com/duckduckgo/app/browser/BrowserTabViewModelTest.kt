@@ -7484,6 +7484,49 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewPageForSameOriginThenCertificateIsPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = true))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        // In-page navigation that WebView reports as a new page (originalUrl changed) on the same origin
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://m.youtube.com/", currentUrl = "https://m.youtube.com/"),
+        )
+
+        assertEquals(certificate, testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
+    fun whenNewPageForDifferentOriginThenCertificateIsNotPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = true))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com/", currentUrl = "https://www.example.com/"),
+        )
+
+        assertNull(testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
+    fun whenNewPageForSameOriginAndFeatureDisabledThenCertificateIsNotPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = false))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://m.youtube.com/", currentUrl = "https://m.youtube.com/"),
+        )
+
+        assertNull(testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl

@@ -1249,7 +1249,20 @@ class BrowserTabViewModel @Inject constructor(
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
+        val previousUrl = site?.uri
+        val previousCertificate = site?.certificate
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
+        if (androidBrowserConfig.preserveCertificateOnSameOrigin().isEnabled() &&
+            previousUrl != null &&
+            sameOrigin(previousUrl, url)
+        ) {
+            /* An in-page (same-origin) navigation can be reported by WebView as a new page, rebuilding the
+            Site with a null certificate. Unlike a real load, no progress callback follows to re-capture it,
+            so the Privacy Dashboard would wrongly report an invalid certificate. Seed the new Site with the
+            previous certificate as a fallback; if a certificate callback does arrive it overwrites this value.
+             */
+            site?.certificate = previousCertificate
+        }
         if (updateMaliciousSiteStatus) {
             site?.maliciousSiteStatus = maliciousSiteStatus
         }
@@ -4344,9 +4357,17 @@ class BrowserTabViewModel @Inject constructor(
         firstUrl: String,
         secondUrl: String,
     ): Boolean {
+        return runCatching {
+            sameOrigin(Uri.parse(firstUrl), secondUrl)
+        }.getOrNull() ?: return false
+    }
+
+    private fun sameOrigin(
+        firstUri: Uri,
+        secondUrl: String,
+    ): Boolean {
         return kotlin
             .runCatching {
-                val firstUri = Uri.parse(firstUrl)
                 val secondUri = Uri.parse(secondUrl)
 
                 firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
