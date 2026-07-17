@@ -212,10 +212,10 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             }
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
-                // Skip nodes that are the callee of a call expression — those are regular
-                // function calls handled (with full parameter/receiver checking) by
-                // visitCallExpression. Only process genuine property accesses here.
-                if (node.uastParent is UCallExpression) return
+                // Only handle genuine property accesses (foo.bar), not function calls (foo.bar()).
+                // Java and Kotlin UAST differ: Java puts the ref as the UCallExpression's callee
+                // (parent is UCallExpression); Kotlin wraps the call as the selector instead.
+                if (node.uastParent is UCallExpression || node.selector is UCallExpression) return
                 when (val reference = node.resolve()) {
                     is PsiField -> visitField(reference, node)
                     is PsiMethod -> visitGetterMethod(reference, node)
