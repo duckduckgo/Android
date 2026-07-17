@@ -225,31 +225,6 @@ class SyncRemoteFeatureToggleTest {
         assertFalse(testee.allowAiChatSync())
     }
 
-    @Test
-    fun whenShowSyncEnabledAndUseSimplifiedSyncEnabledThenUseSimplifiedSyncTrue() {
-        syncFeature.useSimplifiedSync().setRawStoredState(State(enable = true))
-        givenSyncRemoteFeatureToggle(syncFeature)
-
-        assertTrue(testee.useSimplifiedSync())
-    }
-
-    @Test
-    fun whenShowSyncEnabledAndUseSimplifiedSyncDisabledThenUseSimplifiedSyncFalse() {
-        syncFeature.useSimplifiedSync().setRawStoredState(State(enable = false))
-        givenSyncRemoteFeatureToggle(syncFeature)
-
-        assertFalse(testee.useSimplifiedSync())
-    }
-
-    @Test
-    fun whenShowSyncDisabledThenUseSimplifiedSyncFalse() {
-        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))
-        syncFeature.useSimplifiedSync().setRawStoredState(State(enable = true))
-        givenSyncRemoteFeatureToggle(syncFeature)
-
-        assertFalse(testee.useSimplifiedSync())
-    }
-
     private fun givenSyncRemoteFeatureToggle(syncFeature: SyncFeature) {
         testee = SyncRemoteFeatureToggle(
             context = context,

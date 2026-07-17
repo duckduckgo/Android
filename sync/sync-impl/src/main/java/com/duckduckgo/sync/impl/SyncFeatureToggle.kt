@@ -54,8 +54,6 @@ interface SyncFeatureToggle {
     fun automaticallyUpdateSyncSettings(): Boolean
 
     fun allowAiChatSync(): Boolean
-
-    fun useSimplifiedSync(): Boolean
 }
 
 @ContributesBinding(
@@ -130,11 +128,6 @@ class SyncRemoteFeatureToggle @Inject constructor(
 
         // Check the AI chat sync flag
         return syncFeature.aiChatSync().isEnabled()
-    }
-
-    override fun useSimplifiedSync(): Boolean {
-        if (!showSync()) return false
-        return syncFeature.useSimplifiedSync().isEnabled()
     }
 
     private fun isToggleEnabledOnNewerVersion(toggle: Toggle): Boolean {

@@ -514,10 +514,8 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnEditDeviceClickedAndNotSimplifiedSyncThenAskEditDeviceWithoutAuthentication() = runTest {
-        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(false)
-
-        testee.onEditDeviceClicked(connectedDevice)
+    fun whenOnEditDeviceClickedWithoutRequireAuthThenAskEditDeviceWithoutAuthentication() = runTest {
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = false)
 
         testee.commands().test {
             val command = awaitItem()
@@ -529,11 +527,10 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnEditDeviceClickedAndNotSimplifiedSyncThenNoAuthenticationRequested() = runTest {
-        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(false)
+    fun whenOnEditDeviceClickedWithoutRequireAuthThenNoAuthenticationRequested() = runTest {
         givenUserHasDeviceAuthentication(false)
 
-        testee.onEditDeviceClicked(connectedDevice)
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = false)
 
         testee.commands().test {
             awaitItem().assertCommandType(AskEditDevice::class)
@@ -542,11 +539,10 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnEditDeviceClickedAndSimplifiedSyncWithDeviceAuthenticationThenAskEditDeviceWithAuthentication() = runTest {
-        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(true)
+    fun whenOnEditDeviceClickedWithRequireAuthAndDeviceAuthenticationThenAskEditDeviceWithAuthentication() = runTest {
         givenUserHasDeviceAuthentication(true)
 
-        testee.onEditDeviceClicked(connectedDevice)
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = true)
 
         testee.commands().test {
             val command = awaitItem()
@@ -558,11 +554,10 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnEditDeviceClickedAndSimplifiedSyncWithoutDeviceAuthenticationThenRequestSetupAuthentication() = runTest {
-        whenever(syncFeatureToggle.useSimplifiedSync()).thenReturn(true)
+    fun whenOnEditDeviceClickedWithRequireAuthWithoutDeviceAuthenticationThenRequestSetupAuthentication() = runTest {
         givenUserHasDeviceAuthentication(false)
 
-        testee.onEditDeviceClicked(connectedDevice)
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = true)
 
         testee.commands().test {
             awaitItem().assertCommandType(RequestSetupAuthentication::class)

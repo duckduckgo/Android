@@ -137,7 +137,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
-                viewModel.onEditDeviceClicked(device)
+                viewModel.onEditDeviceClicked(device, requireAuth = true)
             }
         },
     )

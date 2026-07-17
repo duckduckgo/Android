@@ -486,11 +486,10 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onEditDeviceClicked(device: ConnectedDevice) {
+    fun onEditDeviceClicked(device: ConnectedDevice, requireAuth: Boolean) {
         viewModelScope.launch {
-            val isSimplifiedFlow = withContext(dispatchers.io()) { syncFeatureToggle.useSimplifiedSync() }
-            val askEditCommand = AskEditDevice(device, requireAuthentication = isSimplifiedFlow)
-            if (isSimplifiedFlow) {
+            val askEditCommand = AskEditDevice(device, requireAuthentication = requireAuth)
+            if (requireAuth) {
                 requiresSetupAuthentication {
                     command.send(askEditCommand)
                 }
