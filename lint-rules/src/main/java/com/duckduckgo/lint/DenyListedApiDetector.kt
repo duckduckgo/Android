@@ -222,7 +222,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                 }
             }
 
-            private fun visitGetterMethod(reference: PsiMethod, node: UElement) {
+            private fun visitGetterMethod(reference: PsiMethod, node: UQualifiedReferenceExpression) {
                 // Only handle zero-parameter methods. Kotlin property getters always have 0
                 // JVM parameters; extension functions (like first()) carry the receiver as a
                 // parameter in the JVM bytecode and are already handled by visitCallExpression.
@@ -234,6 +234,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                     typeConfig.functionEntries.getOrDefault(MATCH_ALL, emptyList())
                 deniedFunctions.forEach { denyListEntry ->
                     if (denyListEntry.allowInTests && context.isTestSource) return@forEach
+                    if (denyListEntry.receiverTypeExcluded(context, node)) return@forEach
                     context.report(
                         issue = ISSUE,
                         location = context.getLocation(node),
@@ -276,6 +277,19 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
         ): Boolean {
             val excluded = excludedReceiverTypes ?: return false
             val receiverType = node.receiverType ?: return false
+            val rawType = if (receiverType is PsiClassType) receiverType.rawType() else receiverType
+            val receiverClass = context.evaluator.findClass(rawType.canonicalText) ?: return false
+            return excluded.any { fqcn ->
+                receiverClass.qualifiedName == fqcn || context.evaluator.inheritsFrom(receiverClass, fqcn)
+            }
+        }
+
+        private fun DenyListedEntry.receiverTypeExcluded(
+            context: JavaContext,
+            node: UQualifiedReferenceExpression,
+        ): Boolean {
+            val excluded = excludedReceiverTypes ?: return false
+            val receiverType = node.receiver.getExpressionType() ?: return false
             val rawType = if (receiverType is PsiClassType) receiverType.rawType() else receiverType
             val receiverClass = context.evaluator.findClass(rawType.canonicalText) ?: return false
             return excluded.any { fqcn ->

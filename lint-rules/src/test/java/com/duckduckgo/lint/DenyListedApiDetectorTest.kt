@@ -28,6 +28,7 @@ class DenyListedApiDetectorTest {
             """
             package kotlinx.coroutines.flow
             interface StateFlow<out T> { val value: T }
+            fun <T> StateFlow<T>.filter(predicate: (T) -> Boolean): StateFlow<T> = TODO()
             """,
         ).indented(),
         kt(
@@ -82,5 +83,67 @@ class DenyListedApiDetectorTest {
             .issues(DenyListedApiDetector.ISSUE)
             .run()
             .expectClean()
+    }
+
+    @Test
+    fun whenCurrentModeIsReceiverOfChainedCallThenFailWithError() {
+        lint()
+            .files(
+                *browserModeStubs,
+                kt(
+                    """
+                    package com.duckduckgo.test
+                    import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+                    class Observer(private val holder: BrowserModeStateHolder) {
+                        fun observe() = holder.currentMode.toString()
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(DenyListedApiDetector.ISSUE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenCurrentModeIsReceiverOfFlowOperatorThenFailWithError() {
+        lint()
+            .files(
+                *browserModeStubs,
+                kt(
+                    """
+                    package com.duckduckgo.test
+                    import com.duckduckgo.browsermode.api.BrowserMode
+                    import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+                    import kotlinx.coroutines.flow.filter
+                    class Observer(private val holder: BrowserModeStateHolder) {
+                        fun observe() = holder.currentMode.filter { it == BrowserMode.FIRE }
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(DenyListedApiDetector.ISSUE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenCurrentModeValueIsCallArgumentThenFailWithExactlyOneError() {
+        lint()
+            .files(
+                *browserModeStubs,
+                kt(
+                    """
+                    package com.duckduckgo.test
+                    import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+                    class Consumer(private val holder: BrowserModeStateHolder) {
+                        fun mode() = requireNotNull(holder.currentMode.value)
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(DenyListedApiDetector.ISSUE)
+            .run()
+            .expectErrorCount(1)
     }
 }
