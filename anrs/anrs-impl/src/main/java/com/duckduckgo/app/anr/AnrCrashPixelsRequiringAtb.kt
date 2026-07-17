@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,16 @@
 
 package com.duckduckgo.app.anr
 
-import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
-)
-class VerifiedCrashPixelDataCleaner @Inject constructor() : PixelParamRemovalPlugin {
-    override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return listOf(
-            APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
-        )
-    }
+@ContributesMultibinding(AppScope::class)
+class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin {
+    override fun names(): List<String> = listOf(
+        AnrPixelName.ANR_PIXEL.pixelName,
+        CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName,
+        CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
+    )
 }
