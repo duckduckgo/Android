@@ -232,7 +232,14 @@ class RealNativeInputManager @Inject constructor(
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
             .onEach { isEnabled ->
-                if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
+                if (isNativeInputFieldEnabled && !isEnabled) {
+                    // Instant teardown before clearing the flag. Settings toggles often fire while the
+                    // tab is paused, so an animated exit's waitForLayout may never run; and once the
+                    // flag is false, hideNativeInput used to no-op and leave UTI chrome / a missing
+                    // address field on return to NTP.
+                    hideNativeInput(animate = false)
+                    onDisabled()
+                }
                 isNativeInputFieldEnabled = isEnabled
             }
             .launchIn(lifecycleOwner.lifecycleScope)
@@ -334,11 +341,14 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun hideNativeInput(animate: Boolean, isNavigation: Boolean): Boolean {
-        if (!isNativeInputFieldEnabled) return false
+        if (!::rootView.isInitialized) return false
 
         val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
             ?: rootView.findViewById(R.id.inputModeBottomRoot)
             ?: return false
+
+        // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
+        // off (and after a paused animated hide left the widget attached).
 
         if (isNavigation) {
             widgetFrom(widgetView)?.let { widget ->
@@ -373,6 +383,12 @@ class RealNativeInputManager @Inject constructor(
         if (!animate) {
             animator.cancelAnimation()
             isExiting = false
+            // Match animated exit: suspend LayoutTransition before resetting offsets so CHANGING
+            // can't leave a leftover NTP gap (e.g. live switch to Search-only while UTI is open on
+            // bottom omnibar with a nav-bar top inset).
+            layoutCoordinator.suspendContentReflow()
+            layoutCoordinator.updateNavBarInset(0)
+            layoutCoordinator.resetContentOffsetToBase()
             omnibarController.restore()
             omnibarController.show()
             removeWidget()
@@ -1033,7 +1049,9 @@ class RealNativeInputManager @Inject constructor(
      * [NativeInputLayoutCoordinator.endNavBarSlide] here would resume reflow mid-exit.
      *
      * Never moves the widget with the bar: exit morph needs the card planted so it can morph back to
-     * the omnibar while the buttons slide away alone (top and bottom).
+     * the omnibar while the buttons slide away alone. Still drives [NativeInputLayoutCoordinator.updateNavBarInset]
+     * each frame so NTP/browser content tracks the sliding bar instead of keeping the full inset until
+     * exit's reset-to-base.
      */
     private fun slideNavBarOutWithClose(animate: Boolean) {
         val navBar = navBarRoot ?: return
@@ -1048,8 +1066,8 @@ class RealNativeInputManager @Inject constructor(
             show = false,
             animate = animate,
             moveWidgetWithBar = false,
-            onFrame = {},
-            onComplete = {},
+            onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
+            onComplete = { layoutCoordinator.updateNavBarInset(0) },
         )
     }
 

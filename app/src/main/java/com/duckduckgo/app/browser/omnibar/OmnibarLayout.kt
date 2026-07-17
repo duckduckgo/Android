@@ -992,9 +992,14 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun ensureBrowserAddressFieldVisible() {
-        if (omniBarContainer.isVisible) return
-        omniBarContainer.show()
-        omnibarCardShadow.show()
+        if (!omniBarContainer.isVisible || omniBarContainer.alpha < 1f) {
+            omniBarContainer.alpha = 1f
+            omniBarContainer.show()
+        }
+        if (!omnibarCardShadow.isVisible || omnibarCardShadow.alpha < 1f) {
+            omnibarCardShadow.alpha = 1f
+            omnibarCardShadow.show()
+        }
     }
 
     private fun renderDuckAiMode(viewState: ViewState) {

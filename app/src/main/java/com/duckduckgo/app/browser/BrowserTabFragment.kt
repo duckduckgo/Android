@@ -1240,7 +1240,7 @@ class BrowserTabFragment :
         )
 
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput()
+            nativeInputManager.hideNativeInput(animate = false)
         }
 
         webViewContainer = binding.webViewContainer
