@@ -16,15 +16,17 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.AdBlockingAnimation
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +35,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
 class RealAdBlockingOmnibarAnimationTest {
 
@@ -40,32 +43,42 @@ class RealAdBlockingOmnibarAnimationTest {
     val coroutineRule = CoroutineTestRule()
 
     private val statusChecker: AdBlockingStatusChecker = mock()
+    private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
 
     private lateinit var testee: RealAdBlockingOmnibarAnimation
 
     @Before
     fun setup() {
         whenever(statusChecker.canInject()).thenReturn(true)
-        testee = RealAdBlockingOmnibarAnimation(statusChecker, RealAdBlockingExtensionDomainMatcher())
+        feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = true))
+        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = true))
+        testee = RealAdBlockingOmnibarAnimation(statusChecker, RealAdBlockingExtensionDomainMatcher(), feature)
     }
 
     @Test
-    fun whenPageLoadedOnWatchVideoThenDoNotShow() = runTest {
-        assertFalse(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
-    }
-
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
     fun whenPageLoadedOnWatchVideoThenShow() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
+    fun whenShowAdBlockingOmnibarAnimationDisabledThenSkip() = runTest {
+        feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = false))
+        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
+    }
+
+    @Test
+    fun whenAdBlockingUXImprovementsDisabledThenSkip() = runTest {
+        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = false))
+        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
+    }
+
+    @Test
     fun whenUrlChangedToSameVideoIdThenRetain() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = false) is AdBlockingAnimation.Retain)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenPageReloadedOnSameVideoThenShowAgain() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
 
@@ -73,42 +86,42 @@ class RealAdBlockingOmnibarAnimationTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenUrlChangedAToBToAThenShowOnReturn() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=aaa", pageChanged = false) is AdBlockingAnimation.Show)
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=bbb", pageChanged = false) is AdBlockingAnimation.Show)
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=aaa", pageChanged = false) is AdBlockingAnimation.Show)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenShortsLiveClipVideosThenShow() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/shorts/short1", pageChanged = false) is AdBlockingAnimation.Show)
         assertTrue(testee.getAnimation("https://www.youtube.com/live/live1", pageChanged = false) is AdBlockingAnimation.Show)
         assertTrue(testee.getAnimation("https://www.youtube.com/clip/clip1", pageChanged = false) is AdBlockingAnimation.Show)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenWatchUrlHasEmptyVideoIdThenSkip() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenNonVideoUrlThenSkip() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/results?search_query=cats", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenNonYoutubeUrlThenSkip() = runTest {
         assertTrue(testee.getAnimation("https://www.example.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
-    fun whenFeatureToggleOffThenAlwaysSkip() = runTest {
+    @Test
+    fun whenCannotInjectThenAlwaysSkip() = runTest {
         whenever(statusChecker.canInject()).thenReturn(false)
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
-    @Test @Ignore("Add back after fixing https://app.asana.com/1/137249556945/task/1216628472297441?focus=true")
+    @Test
     fun whenNonVideoAfterVideoThenReturningToVideoShows() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = false) is AdBlockingAnimation.Show)
 
