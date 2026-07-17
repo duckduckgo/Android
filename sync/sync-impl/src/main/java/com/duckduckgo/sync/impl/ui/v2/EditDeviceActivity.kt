@@ -32,7 +32,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2EditDeviceBinding
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_KEY
@@ -44,6 +43,7 @@ import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class EditDeviceActivity : DuckDuckGoActivity() {
@@ -95,7 +95,13 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
         binding.syncThisDeviceToggleContainer.isVisible = viewState.device.thisDevice
 
-        binding.removeNoticeLabel.setText(if (viewState.device.thisDevice) R.string.sync_setup_v2_remove_this_device_notice else R.string.sync_setup_v2_remove_another_device_notice)
+        binding.removeNoticeLabel.setText(
+            if (viewState.device.thisDevice) {
+                R.string.sync_setup_v2_remove_this_device_notice
+            } else {
+                R.string.sync_setup_v2_remove_another_device_notice
+            },
+        )
     }
 
     private fun processCommand(command: Command) {
