@@ -23,11 +23,11 @@ tags:
 
       - scrollUntilVisible:
           element:
-            text: "YouTube Ad Blocking"
+            text: "Ad Blocking"
           direction: DOWN
 
       - tapOn:
-          text: "YouTube Ad Blocking"
+          text: "Ad Blocking"
 
       - tapOn:
           text: "Duck Player"
