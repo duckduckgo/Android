@@ -557,6 +557,14 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenSubscriptionLinkDetectedThenCloseTabIfBlank() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        verify(listener).closeAndReturnToSourceIfBlankTab()
+    }
+
+    @Test
     fun whenDuckChatLinkDetectedThenLaunchDuckChatAndReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
