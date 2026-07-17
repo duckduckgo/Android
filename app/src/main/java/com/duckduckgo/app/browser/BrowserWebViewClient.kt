@@ -256,6 +256,7 @@ class BrowserWebViewClient @Inject constructor(
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
                 is SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink -> {
                     subscriptions.launchSubscription(webView.context, url)
+                    webViewClientListener?.closeAndReturnToSourceIfBlankTab()
                     true
                 }
 

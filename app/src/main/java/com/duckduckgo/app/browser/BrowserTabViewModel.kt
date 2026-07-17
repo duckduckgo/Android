@@ -1811,7 +1811,7 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
-    fun closeAndReturnToSourceIfBlankTab() {
+    override fun closeAndReturnToSourceIfBlankTab() {
         if (url == null) {
             closeAndSelectSourceTab()
         }
