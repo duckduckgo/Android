@@ -30,6 +30,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.ReturnAndAdvance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
@@ -48,6 +49,17 @@ class LinearOnboardingOrchestratorImplTest {
     }
 
     private object Next : LinearOnboardingEvent
+    private object Back : LinearOnboardingEvent
+
+    // A step that goes back on [Back] and advances on anything else, for exercising GoBack.
+    private fun backAwareStep(
+        id: String,
+        precondition: suspend () -> Boolean = { true },
+    ): LinearOnboardingStep = step(
+        id = id,
+        precondition = precondition,
+        transition = { event -> if (event is Back) GoBack else Advance },
+    )
 
     private fun step(
         id: String,
@@ -421,5 +433,111 @@ class LinearOnboardingOrchestratorImplTest {
         val state = testee.state.value
         assertEquals(Completed(rootPlanId = PLAN_ID), state)
         assertEquals(PLAN_ID, (state as Completed).rootPlanId)
+    }
+
+    @Test
+    fun `when on first step then can go back is false`() = runTest {
+        testee.startPlan(LinearOnboardingPlan(id = PLAN_ID, steps = listOf(step("a"), step("b"))))
+
+        assertEquals(false, (testee.state.value as InProgress).canGoBack)
+    }
+
+    @Test
+    fun `when advanced past first step then can go back is true`() = runTest {
+        testee.startPlan(LinearOnboardingPlan(id = PLAN_ID, steps = listOf(step("a"), step("b"))))
+
+        testee.onEvent(Next) // a -> b
+
+        val state = testee.state.value as InProgress
+        assertEquals("b", state.currentStep.id)
+        assertEquals(true, state.canGoBack)
+    }
+
+    @Test
+    fun `when go back then returns to previous step`() = runTest {
+        testee.startPlan(
+            LinearOnboardingPlan(id = PLAN_ID, steps = listOf(backAwareStep("a"), backAwareStep("b"))),
+        )
+
+        testee.onEvent(Next) // a -> b
+        testee.onEvent(Back) // b -> back to a
+
+        val state = testee.state.value as InProgress
+        assertEquals("a", state.currentStep.id)
+        // Back on the first shown step again would be a no-op.
+        assertEquals(false, state.canGoBack)
+    }
+
+    @Test
+    fun `when go back on first step then no op and state unchanged`() = runTest {
+        testee.startPlan(
+            LinearOnboardingPlan(id = PLAN_ID, steps = listOf(backAwareStep("a"), backAwareStep("b"))),
+        )
+
+        testee.onEvent(Back) // nothing earlier -> no-op
+
+        val state = testee.state.value as InProgress
+        assertEquals("a", state.currentStep.id)
+        assertEquals(false, state.canGoBack)
+    }
+
+    @Test
+    fun `when go back to a step whose precondition became false then it is still restored`() = runTest {
+        // "a" is eligible when first shown, then becomes ineligible (e.g. marked complete). History-based back
+        // must still restore it; a precondition-recomputing back could not.
+        var aEligible = true
+        testee.startPlan(
+            LinearOnboardingPlan(
+                id = PLAN_ID,
+                steps = listOf(backAwareStep("a", precondition = { aEligible }), backAwareStep("b")),
+            ),
+        )
+
+        testee.onEvent(Next) // a -> b
+        aEligible = false // "a" would now be skipped by a forward advance
+        testee.onEvent(Back) // b -> back to a, restored from history
+
+        assertEquals("a", (testee.state.value as InProgress).currentStep.id)
+    }
+
+    @Test
+    fun `when advance after go back then moves forward again`() = runTest {
+        testee.startPlan(
+            LinearOnboardingPlan(id = PLAN_ID, steps = listOf(backAwareStep("a"), backAwareStep("b"), backAwareStep("c"))),
+        )
+
+        testee.onEvent(Next) // a -> b
+        testee.onEvent(Next) // b -> c
+        testee.onEvent(Back) // c -> b
+        assertEquals("b", (testee.state.value as InProgress).currentStep.id)
+
+        testee.onEvent(Next) // b -> c again
+
+        val state = testee.state.value as InProgress
+        assertEquals("c", state.currentStep.id)
+        assertEquals(true, state.canGoBack)
+    }
+
+    @Test
+    fun `when go back across a switch to boundary then restores the caller step`() = runTest {
+        val sidePlan = LinearOnboardingPlan(id = SIDE_PLAN_ID, steps = listOf(backAwareStep("side")))
+        testee.startPlan(
+            LinearOnboardingPlan(
+                id = PLAN_ID,
+                steps = listOf(
+                    step("a", transition = { event -> if (event is Back) GoBack else SwitchTo(sidePlan) }),
+                    backAwareStep("b"),
+                ),
+            ),
+        )
+
+        testee.onEvent(Next) // a -> SwitchTo(side); now on "side"
+        assertEquals("side", (testee.state.value as InProgress).currentStep.id)
+
+        testee.onEvent(Back) // side -> back to caller step "a"
+
+        val state = testee.state.value as InProgress
+        assertEquals("a", state.currentStep.id)
+        assertEquals(PLAN_ID, state.rootPlanId)
     }
 }

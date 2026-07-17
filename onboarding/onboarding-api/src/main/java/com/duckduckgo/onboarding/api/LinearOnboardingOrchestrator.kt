@@ -71,11 +71,13 @@ sealed interface LinearOnboardingState {
     /**
      * Paused on [currentStep], the [currentStepIndex]-th step of [currentPlan], waiting for the next event.
      * [currentPlan] is the frame on top of the stack and may be a side plan. [rootPlanId] is the root plan.
+     * [canGoBack] is true when an earlier step was shown in this run.
      */
     data class InProgress(
         override val rootPlanId: LinearOnboardingPlanId,
         val currentPlan: LinearOnboardingPlan,
         val currentStepIndex: Int,
+        val canGoBack: Boolean = false,
     ) : Started {
         val currentStep: LinearOnboardingStep
             get() = currentPlan.steps[currentStepIndex]
@@ -150,6 +152,7 @@ interface LinearOnboardingStep {
 enum class LinearOnboardingHost {
     OnboardingActivity,
     BrowserActivity,
+    SubscriptionOnboardingActivity,
 }
 
 /** A marker for events. Concrete event types live with the plan provider. The orchestrator only routes them to [LinearOnboardingStep.transition]. */
@@ -168,6 +171,9 @@ sealed interface LinearOnboardingTransition {
 
     /** Pop the top frame and advance the caller past the step that pushed it. */
     data object ReturnAndAdvance : LinearOnboardingTransition
+
+    /** Return to the previously shown step. No-op on the first shown step, where nothing earlier exists. */
+    data object GoBack : LinearOnboardingTransition
 
     /** End the entire flow as Skipped and clear the whole frame stack. */
     data object AbortPlan : LinearOnboardingTransition

@@ -15,4 +15,11 @@
   -->
 
 <resources>
+
+    <!-- Subscription onboarding - VPN step (placeholder copy) -->
+    <string name="subscriptionOnboardingVpnTitle">VPN step</string>
+    <string name="subscriptionOnboardingVpnText">VPN onboarding setup</string>
+    <string name="subscriptionOnboardingVpnNext">Next</string>
+    <string name="subscriptionOnboardingVpnSkip">Not now</string>
+
 </resources>

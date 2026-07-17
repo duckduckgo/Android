@@ -81,6 +81,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -627,11 +628,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 // NO OP
             }
             is PurchaseStateView.Waiting -> {
-                onPurchaseSuccess(null)
+                onPurchaseSuccess(subscriptionEventData = null, launchOnboarding = false)
             }
             is PurchaseStateView.Success -> {
                 pixelSender.reportPurchaseSuccessOrigin(params.origin, purchaseState.isFreeTrial)
-                onPurchaseSuccess(purchaseState.subscriptionEventData)
+                onPurchaseSuccess(purchaseState.subscriptionEventData, purchaseState.launchOnboarding)
             }
             is PurchaseStateView.Recovered -> {
                 onPurchaseRecovered()
@@ -657,7 +658,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData?) {
+    private fun onPurchaseSuccess(
+        subscriptionEventData: SubscriptionEventData?,
+        launchOnboarding: Boolean,
+    ) {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseCompletedTitle))
             .setMessage(getString(string.purchaseCompletedText))
@@ -665,10 +669,17 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        if (subscriptionEventData != null) {
-                            subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
-                        } else {
-                            finishToSettings()
+                        when {
+                            launchOnboarding -> {
+                                globalActivityStarter.start(this@SubscriptionsWebViewActivity, SubscriptionOnboardingScreenWithEmptyParams)
+                                finish()
+                            }
+                            subscriptionEventData != null -> {
+                                subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                            }
+                            else -> {
+                                finishToSettings()
+                            }
                         }
                     }
                 },
