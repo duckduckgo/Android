@@ -31,13 +31,13 @@ import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import logcat.logcat
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class RequestBlocklistTest {
 
