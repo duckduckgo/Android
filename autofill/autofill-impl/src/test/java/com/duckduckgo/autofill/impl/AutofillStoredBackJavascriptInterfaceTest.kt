@@ -155,7 +155,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         )
         whenever(autofillResponseWriter.generateEmptyResponseGetAutofillData()).thenReturn("")
         whenever(autofillResponseWriter.generateResponseGetAutofillData(any())).thenReturn("")
-        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(false)
         whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
     }
 
@@ -489,21 +489,21 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     @Test
     fun whenUserShouldBePromptedToImportPasswordsCallbackIsInvoked() = runTest {
-        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(true)
         initiateGetAutofillDataRequest()
         assertImportPasswordPrompted()
     }
 
     @Test
     fun whenUserShouldNotBePromptedToImportPasswordsBecauseImportRulesExcludeItThenCallbackIsNotInvoked() = runTest {
-        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(false)
         initiateGetAutofillDataRequest()
         assertImportPasswordNotPrompted()
     }
 
     @Test
     fun whenUserShouldBeNotPromptedToImportPasswordsBecauseThereArePageCredentialsCallbackIsNotInvoked() = runTest {
-        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(true)
         whenever(autofillStore.getCredentials(any())).thenReturn(listOf(LoginCredentials(0, "example.com", "username", "password")))
         initiateGetAutofillDataRequest()
         assertImportPasswordNotPrompted()

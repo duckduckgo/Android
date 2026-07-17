@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.api
 import android.webkit.WebView
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.browsermode.api.BrowserMode
 
 /**
  * Public interface for accessing and configuring browser autofill functionality for a WebView instance
@@ -30,16 +31,21 @@ interface BrowserAutofill {
          * This should be called once per page load (e.g., onPageStarted())
          *
          * Responsible for injecting the required autofill configuration to the JS layer
+         *
+         * @param browserMode The hosting tab's frozen browser mode.
          */
         fun configureAutofillForCurrentPage(
             webView: WebView,
             url: String?,
+            browserMode: BrowserMode,
         )
     }
 
     /**
      * Adds the native->JS interface to the given WebView
      * This should be called once per WebView where autofill is to be available in it
+     *
+     * @param browserMode The hosting tab's frozen browser mode.
      */
     fun addJsInterface(
         webView: WebView,
@@ -47,6 +53,7 @@ interface BrowserAutofill {
         emailProtectionInContextCallback: EmailProtectionUserPromptListener? = null,
         emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener? = null,
         tabId: String,
+        browserMode: BrowserMode,
     )
 
     /**

@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesPro
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.store.emptyReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
@@ -66,7 +67,7 @@ class RealAutofillRuntimeConfigProviderTest {
 
         runTest {
             whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
-            whenever(availableInputTypesProvider.getTypes(any(), any())).thenReturn(
+            whenever(availableInputTypesProvider.getTypes(any(), any(), any())).thenReturn(
                 AvailableInputTypes(
                     username = false,
                     password = false,
@@ -104,21 +105,21 @@ class RealAutofillRuntimeConfigProviderTest {
     @Test
     fun whenAutofillNotEnabledThenConfigurationUserPrefsCredentialsIsFalse() = runTest {
         configureAutofillCapabilities(enabled = false)
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyAutofillCredentialsReturnedAs(false)
     }
 
     @Test
     fun whenAutofillEnabledThenConfigurationUserPrefsCredentialsIsTrue() = runTest {
         configureAutofillCapabilities(enabled = true)
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyAutofillCredentialsReturnedAs(true)
     }
 
     @Test
     fun whenCanAutofillThenConfigSpecifiesShowingKeyIcon() = runTest {
         configureAutofillCapabilities(enabled = true)
-        whenever(availableInputTypesProvider.getTypes(EXAMPLE_URL)).thenReturn(
+        whenever(availableInputTypesProvider.getTypes(eq(EXAMPLE_URL), any(), any())).thenReturn(
             AvailableInputTypes(
                 username = true,
                 password = true,
@@ -126,7 +127,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 credentialsImport = false,
             ),
         )
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyKeyIconRequestedToShow()
     }
 
@@ -134,7 +135,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenCanCategorizePasswordVariantEnabledThenConfigurationUserPrefsReflectsThat() = runTest {
         configureAutofillCapabilities(enabled = false)
         autofillFeature.passwordVariantCategorization().setRawStoredState(State(enable = true))
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyCanCategorizePasswordVariant(true)
     }
 
@@ -142,7 +143,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenCanCategorizePasswordVariantDisabledThenConfigurationUserPrefsReflectsThat() = runTest {
         configureAutofillCapabilities(enabled = false)
         autofillFeature.passwordVariantCategorization().setRawStoredState(State(enable = false))
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyCanCategorizePasswordVariant(false)
     }
 
@@ -155,18 +156,18 @@ class RealAutofillRuntimeConfigProviderTest {
             email = true,
             credentialsImport = true,
         )
-        whenever(availableInputTypesProvider.getTypes(EXAMPLE_URL)).thenReturn(expectedInputTypes)
+        whenever(availableInputTypesProvider.getTypes(eq(EXAMPLE_URL), any(), any())).thenReturn(expectedInputTypes)
 
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
 
-        verify(availableInputTypesProvider).getTypes(EXAMPLE_URL)
+        verify(availableInputTypesProvider).getTypes(eq(EXAMPLE_URL), any(), any())
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(eq(expectedInputTypes))
     }
 
     @Test
     fun whenSiteNotInNeverSaveListThenCanSaveCredentials() = runTest {
         configureAutofillCapabilities(enabled = true)
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyCanSaveCredentialsReturnedAs(true)
     }
 
@@ -175,7 +176,7 @@ class RealAutofillRuntimeConfigProviderTest {
         configureAutofillCapabilities(enabled = true)
         whenever(neverSavedSiteRepository.isInNeverSaveList(EXAMPLE_URL)).thenReturn(true)
 
-        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails())
+        testee.getRuntimeConfiguration("", EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
         verifyCanSaveCredentialsReturnedAs(true)
     }
 

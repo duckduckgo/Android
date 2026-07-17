@@ -4579,7 +4579,7 @@ class BrowserTabFragment :
             systemAutofillEngagement.onSystemAutofillEvent()
         }
 
-        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
+        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId, browserMode)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->

@@ -561,7 +561,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 

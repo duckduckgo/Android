@@ -537,7 +537,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
-        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
+        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null, BrowserMode.REGULAR)
     }
 
     @Test

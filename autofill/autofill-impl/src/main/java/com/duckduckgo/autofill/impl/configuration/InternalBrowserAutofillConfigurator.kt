@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.configuration
 import android.webkit.WebView
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 
 interface InternalBrowserAutofillConfigurator : Configurator {
     /**
@@ -28,10 +29,12 @@ interface InternalBrowserAutofillConfigurator : Configurator {
      * @param webView The WebView to configure
      * @param url The URL of the current page
      * @param reauthenticationDetails Whether to enable automatic re-authentication for this page
+     * @param browserMode The hosting tab's frozen browser mode.
      */
     fun configureAutofillForCurrentPage(
         webView: WebView,
         url: String?,
         reauthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
     )
 }
