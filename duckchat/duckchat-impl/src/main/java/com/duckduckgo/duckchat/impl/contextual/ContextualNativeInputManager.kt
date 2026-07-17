@@ -23,9 +23,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -95,11 +95,12 @@ interface ContextualNativeInputManager {
 
 @ContributesBinding(FragmentScope::class)
 class RealContextualNativeInputManager @Inject constructor(
-    private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
+    private var isContextualNativeInputEnabled = false
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
@@ -172,13 +173,13 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
-        if (isNativeInputEnabled) {
+        if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
             card?.show()
             // INPUT mode is a new chat: restore the picker so the user can pick a model before starting.
             modelPickerEnabled.value = true
         } else {
-            // Flag off: the legacy EditText composer is shown instead, so keep the widget card hidden.
+            // contextualNativeInput off: the legacy EditText composer is shown instead, so keep the card hidden.
             card?.gone()
         }
     }
@@ -248,12 +249,10 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun observeNativeInputSetting(lifecycleOwner: LifecycleOwner) {
-        duckChat.observeNativeChatInputEnabled()
+        isContextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled()
+        duckChatInternal.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 isNativeInputEnabled = isEnabled
-                // Re-apply the current mode so the card shows/hides immediately when the flag
-                // flips at runtime — otherwise a card left over from WEBVIEW mode would overlap
-                // the web input after the flag turns off.
                 when (lastMode) {
                     Mode.WEBVIEW -> onWebViewMode()
                     Mode.INPUT -> onInputMode()

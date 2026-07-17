@@ -181,6 +181,8 @@ class FakeDuckChatInternal(
     override fun isNativeStorageEnabled(): Boolean = false
     override fun isNativeChatInputEnabled(): Boolean = false
 
+    override fun isContextualNativeInputEnabled(): Boolean = false
+
     override fun keepSessionIntervalInMinutes(): Int = 30
 
     override fun isInputScreenFeatureAvailable(): Boolean = false

@@ -160,6 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 prompt = "",
                 isFireButtonEnabled = false,
                 quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                contextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled(),
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -263,9 +264,8 @@ class DuckChatContextualViewModel @Inject constructor(
         // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
         val showChatsIcon: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
-        // When true, the initial (INPUT) sheet uses the unified input widget as its composer instead
-        // of the legacy EditText. Mirrors duckChat.observeNativeChatInputEnabled().
         val nativeChatInputEnabled: Boolean = false,
+        val contextualNativeInputEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
