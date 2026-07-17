@@ -21,10 +21,8 @@ import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import kotlinx.coroutines.flow.Flow
 
 interface VoiceSearchRepository {
-    fun declinePermissionForever()
     fun acceptRationaleDialog()
     fun saveLoggedAvailability()
-    fun getHasPermissionDeclinedForever(): Boolean
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
     fun isVoiceSearchUserEnabled(default: Boolean): Boolean
@@ -41,10 +39,6 @@ class RealVoiceSearchRepository constructor(
     private val dataStore: VoiceSearchDataStore,
     private val voiceSearchStatusListener: VoiceSearchStatusListener,
 ) : VoiceSearchRepository {
-    override fun declinePermissionForever() {
-        dataStore.permissionDeclinedForever = true
-    }
-
     override fun acceptRationaleDialog() {
         dataStore.userAcceptedRationaleDialog = true
     }
@@ -52,8 +46,6 @@ class RealVoiceSearchRepository constructor(
     override fun saveLoggedAvailability() {
         dataStore.availabilityLogged = true
     }
-
-    override fun getHasPermissionDeclinedForever(): Boolean = dataStore.permissionDeclinedForever
 
     override fun getHasAcceptedRationaleDialog(): Boolean = dataStore.userAcceptedRationaleDialog
 
