@@ -695,6 +695,23 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativeConfigValuesAndEligibilityCheckThrowsThenSupportsSubscriptionIsFalse() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenThrow(RuntimeException("Error"))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSubscription"))
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledAndModeFullThenReturnCorrectData() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
