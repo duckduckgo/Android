@@ -61,6 +61,7 @@ interface NativeInputAnimator {
         onCancel: () -> Unit = {},
         onComplete: () -> Unit,
     )
+
     /**
      * @param moveWidgetWithBar top mode only: when true, [widgetView] tracks the bar's translation
      * (mid-session latch). Pass false while an enter/exit morph is running so the card can morph
@@ -79,6 +80,7 @@ interface NativeInputAnimator {
         onComplete: () -> Unit = {},
     )
     fun cancelAnimation()
+
     /** Cancels only the enter/exit morph; leaves an in-flight nav-bar slide running. */
     fun cancelMorphAnimation()
     fun applyLayoutTransitions(widgetView: View)

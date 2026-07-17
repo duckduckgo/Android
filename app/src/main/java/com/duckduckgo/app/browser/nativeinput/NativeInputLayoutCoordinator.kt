@@ -50,6 +50,7 @@ class NativeInputLayoutCoordinator(
 
     private var navBarInsetPx: Int = 0
     private var reapplyContentOffset: (() -> Unit)? = null
+
     /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
     private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null

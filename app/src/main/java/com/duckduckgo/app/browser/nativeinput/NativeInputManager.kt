@@ -207,6 +207,7 @@ class RealNativeInputManager @Inject constructor(
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+
     /** True while an enter morph from [attachWidget] still owns [NativeInputLayoutCoordinator]'s animating flag. */
     private var pendingEnterOwnsAnimating = false
 
