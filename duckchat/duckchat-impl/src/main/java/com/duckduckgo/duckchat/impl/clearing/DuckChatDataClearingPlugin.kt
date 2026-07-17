@@ -60,6 +60,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
     private suspend fun deleteAllForMode(mode: BrowserMode) {
         when (mode) {
             BrowserMode.REGULAR -> deleteAllRegularChats()
+            // Fire deletions bypass the DuckChatDeleter chain deliberately — see DuckChatDeleter's KDoc.
             BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
                 fireChatStore.deleteAllChats()
             }
