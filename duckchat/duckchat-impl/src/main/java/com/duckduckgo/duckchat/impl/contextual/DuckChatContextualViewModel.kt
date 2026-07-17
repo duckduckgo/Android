@@ -127,6 +127,10 @@ class DuckChatContextualViewModel @Inject constructor(
         data class ChangeSheetState(
             val newState: Int,
             val prefillNativeInput: String? = null,
+            // Hide the soft keyboard as part of this transition (e.g. leaving the initial input state for
+            // the chat). Folded into this command rather than a separate one because commandChannel is a
+            // capacity-1 DROP_OLDEST channel: two commands emitted in the same burst would lose the older.
+            val hideKeyboard: Boolean = false,
         ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
@@ -139,6 +143,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val sourceTabId: String,
         ) : Command()
         data object LaunchChatHistory : Command()
+        data object FocusInput : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -155,6 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 prompt = "",
                 isFireButtonEnabled = false,
                 quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                contextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled(),
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -258,13 +264,14 @@ class DuckChatContextualViewModel @Inject constructor(
         // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
         val showChatsIcon: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
-        // When true, the initial (INPUT) sheet uses the unified input widget as its composer instead
-        // of the legacy EditText. Mirrors duckChat.observeNativeChatInputEnabled().
         val nativeChatInputEnabled: Boolean = false,
+        val contextualNativeInputEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
+
+        contextualNativeInputManager.onContextualReopened(sheetTabId)
 
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
@@ -405,10 +412,17 @@ class DuckChatContextualViewModel @Inject constructor(
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
+                // Sending from the initial input state leaves the sheet in the chat; hide the keyboard so
+                // the user sees the streaming reply instead of the composer.
+                val wasInInputMode = _viewState.value.sheetMode == SheetMode.INPUT
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
                         prompt = "",
+                        // The context has already been captured in contextPrompt above, so drop the
+                        // page-context chip from the input once the prompt is sent — mirroring how image
+                        // attachments are cleared on submit.
+                        showContext = false,
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
@@ -418,6 +432,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     Command.ChangeSheetState(
                         newState = BottomSheetBehavior.STATE_EXPANDED,
                         prefillNativeInput = prefillText.orEmpty(),
+                        hideKeyboard = wasInInputMode,
                     ),
                 )
             }
@@ -611,21 +626,19 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun removePageContext() {
         logcat { "Duck.ai Contextual: removePageContext" }
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(
-                    showContext = false,
-                    userRemovedContext = true,
-                    quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
-                        QuickActionState.ASK_ABOUT_PAGE
-                    } else {
-                        current.quickActionState
-                    },
-                )
-            }
-            if (_viewState.value.showsAttachContextPlaceholder()) {
-                duckChatPixels.reportContextualPlaceholderContextShown()
-            }
+        _viewState.update { current ->
+            current.copy(
+                showContext = false,
+                userRemovedContext = true,
+                quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                    QuickActionState.ASK_ABOUT_PAGE
+                } else {
+                    current.quickActionState
+                },
+            )
+        }
+        if (_viewState.value.showsAttachContextPlaceholder()) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
@@ -720,6 +733,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
                 addPageContext()
+                commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
                 }
@@ -737,6 +751,25 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onAskAboutTabClicked() {
+        if (!isContextValid(updatedPageContext)) {
+            // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
+            return
+        }
+        addPageContext()
+        commandChannel.trySend(Command.FocusInput)
+        _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+    }
+
+    fun onAskAboutPageClicked() {
+        if (!_viewState.value.showContext) {
+            // Context not attached; nothing to ask about.
+            return
+        }
+        commandChannel.trySend(Command.FocusInput)
+        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
     }
 
     fun onPromptCleared() {

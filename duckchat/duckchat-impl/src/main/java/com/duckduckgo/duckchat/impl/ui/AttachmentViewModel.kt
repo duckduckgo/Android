@@ -39,6 +39,7 @@ import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,6 +80,7 @@ class AttachmentViewModel @Inject constructor(
     data class AttachmentState(
         val images: List<ImageAttachment> = emptyList(),
         val files: List<FileAttachment> = emptyList(),
+        val pageContext: PageContextAttachment? = null,
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
         val fileSizeError: String? = null,
@@ -88,7 +90,7 @@ class AttachmentViewModel @Inject constructor(
         val supportsImageUpload: Boolean = false,
         val supportedFileTypes: List<String> = emptyList(),
     ) {
-        val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
+        val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty() || pageContext != null
         val acceptedMimeTypes: List<String> get() {
             val types = mutableListOf<String>()
             if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)
@@ -100,17 +102,20 @@ class AttachmentViewModel @Inject constructor(
     @VisibleForTesting
     internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
     private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
+    private val _pageContextAttachment = MutableStateFlow<PageContextAttachment?>(null)
 
     private val isDuckAiModeFlow: StateFlow<Boolean> = nativeInputStateProvider.state
         .map { it.inputContext != NativeInputState.InputContext.BROWSER }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
-        combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
+        combine(imageAttachments, _fileAttachments, _pageContextAttachment) { images, files, pageContext ->
+            Triple(images, files, pageContext)
+        },
         modelManager.modelState,
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         isDuckAiModeFlow,
-    ) { (images, files), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
+    ) { (images, files, pageContext), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
@@ -126,6 +131,7 @@ class AttachmentViewModel @Inject constructor(
         AttachmentState(
             images = images,
             files = files,
+            pageContext = pageContext,
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
             fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
@@ -270,10 +276,21 @@ class AttachmentViewModel @Inject constructor(
         if (removed) duckChatPixels.fireFileRemoved()
     }
 
+    fun setPageContext(attachment: PageContextAttachment) {
+        _pageContextAttachment.value = attachment
+    }
+
+    fun removePageContext() {
+        _pageContextAttachment.value = null
+    }
+
+    fun getPageContext(): PageContextAttachment? = _pageContextAttachment.value
+
     fun clearAttachments() {
         val toRecycle = imageAttachments.value
         imageAttachments.value = emptyList()
         _fileAttachments.value = emptyList()
+        _pageContextAttachment.value = null
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 

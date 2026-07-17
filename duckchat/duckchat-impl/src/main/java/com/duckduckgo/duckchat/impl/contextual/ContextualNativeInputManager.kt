@@ -23,9 +23,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -41,9 +41,9 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 /**
- * A prompt submitted from the unified input widget while the contextual sheet is in its initial
- * (INPUT) state. Carries the widget's current model/reasoning/tool/attachment selections so the
- * new chat starts with everything the user configured.
+ * A prompt submitted from the unified input widget in the contextual sheet, in either the initial
+ * (INPUT) state or a running chat (WEBVIEW). Carries the widget's current model/reasoning/tool/
+ * attachment selections so the chat is submitted with everything the user configured.
  */
 data class NativeInputPrompt(
     val prompt: String,
@@ -65,9 +65,12 @@ interface ContextualNativeInputManager {
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
-        // Invoked when the widget submits a prompt while the sheet is in INPUT mode: starts a new chat.
-        // WEBVIEW-mode submissions keep going through the in-chat JS event path (see setupWidget).
-        onNewPromptSubmitted: (NativeInputPrompt) -> Unit = {},
+        // Invoked when the widget submits a prompt, in both INPUT and WEBVIEW modes. Routing every submit
+        // through the ViewModel keeps prompt-building (and page-context attachment) in one place.
+        onPromptSubmitted: (NativeInputPrompt) -> Unit = {},
+        onAskAboutTab: () -> Unit = {},
+        onAskAboutPage: () -> Unit = {},
+        onPageContextRemoved: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -80,15 +83,24 @@ interface ContextualNativeInputManager {
      * widget wrote during its lifetime.
      */
     fun onContextualClosed(tabId: String)
+
+    /**
+     * Called when the contextual sheet is reopened for a tab that was previously closed. Restores the
+     * per-tab [NativeInputState] to the contextual (DUCK_AI) values that [onContextualClosed] reverted,
+     * so the widget's plugin controls (attach, model picker, tools — gated on toggleSelection == DUCK_AI)
+     * reappear. Without this the reused widget keeps the browser/search state and renders without them.
+     */
+    fun onContextualReopened(tabId: String)
 }
 
 @ContributesBinding(FragmentScope::class)
 class RealContextualNativeInputManager @Inject constructor(
-    private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
+    private var isContextualNativeInputEnabled = false
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
@@ -107,14 +119,21 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
-        onNewPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested, onNewPromptSubmitted)
+        setupWidget(
+            tabId, widget, chatIdFlow, onSearchSubmitted,
+            onCameraCaptureRequested, onFilePickerRequested,
+            onPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
+        )
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -125,6 +144,17 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = browser,
                 toggleSelection = NativeInputState.defaultToggleFor(browser),
+            )
+        }
+    }
+
+    override fun onContextualReopened(tabId: String) {
+        if (tabId.isBlank()) return
+        val contextual = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        nativeInputStatePublisher.update(tabId) {
+            it.copy(
+                inputContext = contextual,
+                toggleSelection = NativeInputState.defaultToggleFor(contextual),
             )
         }
     }
@@ -143,13 +173,13 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
-        if (isNativeInputEnabled) {
+        if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
             card?.show()
             // INPUT mode is a new chat: restore the picker so the user can pick a model before starting.
             modelPickerEnabled.value = true
         } else {
-            // Flag off: the legacy EditText composer is shown instead, so keep the widget card hidden.
+            // contextualNativeInput off: the legacy EditText composer is shown instead, so keep the card hidden.
             card?.gone()
         }
     }
@@ -172,7 +202,10 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
-        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
@@ -182,6 +215,11 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindAttachmentCallbacks(
             onCameraCaptureRequested = onCameraCaptureRequested,
             onFilePickerRequested = onFilePickerRequested,
+        )
+        widget.setContextualAttachmentActions(
+            onAskAboutTab = onAskAboutTab,
+            onAskAboutPage = onAskAboutPage,
+            onPageContextRemoved = onPageContextRemoved,
         )
         widget.bindInputEvents(
             onSearchTextChanged = { },
@@ -195,14 +233,15 @@ class RealContextualNativeInputManager @Inject constructor(
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
                 widget.clearAttachments()
-                if (lastMode != Mode.WEBVIEW) {
-                    onNewChatPromptSubmitted(
-                        NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
-                    )
-                } else {
-                    // Chat already in progress: submit into the running chat via the JS event.
-                    sendPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
-                }
+                // Both the initial submit (INPUT) and follow-ups in a running chat (WEBVIEW) go through the
+                // ViewModel so the prompt is built in one place (generateContextPrompt). That single path is
+                // what attaches any page context the user added from the "+" menu; the previous WEBVIEW
+                // shortcut built its own JS event and silently dropped that context. onPromptSent starts a
+                // new chat from INPUT and appends to the active chat from WEBVIEW — the web page decides
+                // which, based on its own state, not on the native caller.
+                onPromptSubmitted(
+                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
+                )
                 widget.clearSelectedTool()
                 widget.text = ""
             },
@@ -210,12 +249,10 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun observeNativeInputSetting(lifecycleOwner: LifecycleOwner) {
-        duckChat.observeNativeChatInputEnabled()
+        isContextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled()
+        duckChatInternal.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 isNativeInputEnabled = isEnabled
-                // Re-apply the current mode so the card shows/hides immediately when the flag
-                // flips at runtime — otherwise a card left over from WEBVIEW mode would overlap
-                // the web input after the flag turns off.
                 when (lastMode) {
                     Mode.WEBVIEW -> onWebViewMode()
                     Mode.INPUT -> onInputMode()
@@ -223,49 +260,6 @@ class RealContextualNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
-    }
-
-    private fun sendPrompt(
-        prompt: String,
-        modelId: String? = null,
-        reasoningEffort: String? = null,
-        selectedTool: String? = null,
-        imagesJson: JSONArray? = null,
-        filesJson: JSONArray? = null,
-    ) {
-        val params = JSONObject().apply {
-            put("platform", "android")
-            put("tool", "query")
-            put(
-                "query",
-                JSONObject().apply {
-                    put("prompt", prompt)
-                    put("autoSubmit", true)
-                    if (modelId != null) {
-                        put("modelId", modelId)
-                    }
-                    if (reasoningEffort != null) {
-                        put("reasoningEffort", reasoningEffort)
-                    }
-                    if (selectedTool != null) {
-                        put("toolChoice", JSONArray().apply { put(selectedTool) })
-                    }
-                    if (imagesJson != null) {
-                        put("images", imagesJson)
-                    }
-                    if (filesJson != null) {
-                        put("files", filesJson)
-                    }
-                },
-            )
-        }
-        jsMessaging?.sendSubscriptionEvent(
-            SubscriptionEventData(
-                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-                subscriptionName = "submitAIChatNativePrompt",
-                params = params,
-            ),
-        )
     }
 
     private fun sendStopEvent() {

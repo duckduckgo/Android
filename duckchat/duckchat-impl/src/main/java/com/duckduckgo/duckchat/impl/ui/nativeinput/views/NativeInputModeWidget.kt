@@ -67,6 +67,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
@@ -145,6 +146,14 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
+    fun setPageContext(title: String, url: String, faviconUrl: String?)
+    fun clearPageContext()
+    fun getPageContext(): PageContextAttachment?
+    fun setContextualAttachmentActions(
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
+    )
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual(tabId: String)
@@ -326,6 +335,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    private var pendingIsContextual: Boolean = false
+    private var pendingAskAboutTab: (() -> Unit)? = null
+    private var pendingAskAboutPage: (() -> Unit)? = null
+    private var pendingOnPageContextRemoved: (() -> Unit)? = null
+    private var pendingPageContext: PageContextAttachment? = null
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -432,7 +446,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentView = pluginView
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
+            pluginView.isContextual = pendingIsContextual
+            pluginView.onAskAboutTab = pendingAskAboutTab
+            pluginView.onAskAboutPage = pendingAskAboutPage
+            pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
+            pendingPageContext?.let { pluginView.setPageContext(it) }
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -1203,6 +1222,36 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
+
+    override fun setPageContext(title: String, url: String, faviconUrl: String?) {
+        val attachment = PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl)
+        pendingPageContext = attachment
+        attachmentView?.setPageContext(attachment)
+    }
+
+    override fun clearPageContext() {
+        pendingPageContext = null
+        attachmentView?.clearPageContext()
+    }
+
+    override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
+
+    override fun setContextualAttachmentActions(
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
+    ) {
+        pendingIsContextual = true
+        pendingAskAboutTab = onAskAboutTab
+        pendingAskAboutPage = onAskAboutPage
+        pendingOnPageContextRemoved = onPageContextRemoved
+        attachmentView?.let { view ->
+            view.isContextual = true
+            view.onAskAboutTab = onAskAboutTab
+            view.onAskAboutPage = onAskAboutPage
+            view.onPageContextRemoved = onPageContextRemoved
+        }
+    }
 
     override fun clearAttachments() {
         attachmentView?.clearAttachments()

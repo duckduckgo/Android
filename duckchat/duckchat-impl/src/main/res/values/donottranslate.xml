@@ -24,4 +24,11 @@
     <string name="subscriptionOnboardingDuckAiText">Duck.ai onboarding step</string>
     <string name="subscriptionOnboardingDuckAiNext">Next</string>
 
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Ask about tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask about page</string>
+
+    <!-- Page context attachment -->
+    <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
+
 </resources>

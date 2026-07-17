@@ -73,6 +73,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
@@ -234,7 +235,7 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    val composerHasFocus = if (viewModel.viewState.value.nativeChatInputEnabled) {
+                    val composerHasFocus = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                         binding.contextualNativeInputWidget.hasFocus()
                     } else {
                         binding.contextualModeNativeContent.hasFocus()
@@ -478,7 +479,7 @@ class DuckChatContextualFragment :
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
             },
-            onNewPromptSubmitted = { submitted ->
+            onPromptSubmitted = { submitted ->
                 viewModel.onPromptSent(
                     prompt = submitted.prompt,
                     modelId = submitted.modelId,
@@ -488,6 +489,9 @@ class DuckChatContextualFragment :
                     filesJson = submitted.filesJson,
                 )
             },
+            onAskAboutTab = { viewModel.onAskAboutTabClicked() },
+            onAskAboutPage = { viewModel.onAskAboutPageClicked() },
+            onPageContextRemoved = { viewModel.removePageContext() },
         )
         observeViewModel()
 
@@ -595,7 +599,7 @@ class DuckChatContextualFragment :
             viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
-            val currentInput = if (viewModel.viewState.value.nativeChatInputEnabled) {
+            val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                 binding.contextualNativeInputWidget.text
             } else {
                 binding.legacyInputField.text.toString()
@@ -647,6 +651,7 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
                         command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -669,6 +674,17 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
                         globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                    }
+
+                    is DuckChatContextualViewModel.Command.FocusInput -> {
+                        if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                            binding.contextualNativeInputWidget.focusInput(activity)
+                        } else {
+                            binding.legacyInputField.let {
+                                it.requestFocus()
+                                activity?.showKeyboard(it)
+                            }
+                        }
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -743,8 +759,8 @@ class DuckChatContextualFragment :
                 }
                 binding.contextualFire.gone()
 
-                if (viewState.nativeChatInputEnabled) {
-                    // The unified input widget is the composer; ContextualNativeInputManager.onInputMode()
+                if (viewState.contextualNativeInputEnabled) {
+                    // The unified input widget is the INPUT composer; ContextualNativeInputManager.onInputMode()
                     // shows its card. Hide the legacy EditText composer and its context chip/placeholder.
                     binding.contextualModeNativeContent.gone()
                 } else {
@@ -786,6 +802,16 @@ class DuckChatContextualFragment :
                 if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
+        }
+
+        if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
+            binding.contextualNativeInputWidget.setPageContext(
+                title = viewState.contextTitle,
+                url = viewState.contextUrl,
+                faviconUrl = null,
+            )
+        } else {
+            binding.contextualNativeInputWidget.clearPageContext()
         }
     }
 

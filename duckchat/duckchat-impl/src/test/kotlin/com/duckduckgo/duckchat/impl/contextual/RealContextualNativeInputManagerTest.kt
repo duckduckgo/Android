@@ -23,9 +23,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.google.android.material.card.MaterialCardView
@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -55,9 +54,9 @@ class RealContextualNativeInputManagerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val duckChat: DuckChat = mock()
+    private val duckChatInternal: DuckChatInternal = mock()
     private val publisher: NativeInputStatePublisher = mock()
-    private val testee = RealContextualNativeInputManager(duckChat, publisher)
+    private val testee = RealContextualNativeInputManager(duckChatInternal, publisher)
 
     @Test
     fun `when onContextualClosed called with blank tabId then publisher is not touched`() {
@@ -107,7 +106,8 @@ class RealContextualNativeInputManagerTest {
     @Test
     fun `when webview mode then input mode modelPickerEnabled emits false then true`() = runTest {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.isContextualNativeInputEnabled()).thenReturn(true)
         val widget = mock<NativeInputModeWidget>()
         val pickerFlowCaptor = argumentCaptor<Flow<Boolean>>()
         testee.init(
@@ -138,7 +138,7 @@ class RealContextualNativeInputManagerTest {
     @Test
     fun `when native chat input flips off in web view mode then card is hidden`() {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val card = mockCard()
         val widget = mock<NativeInputModeWidget>()
         testee.init(
@@ -158,9 +158,10 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when native chat input enabled and onInputMode then card shown`() {
+    fun `when contextual native input enabled and onInputMode then card shown`() {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.isContextualNativeInputEnabled()).thenReturn(true)
         val card = mockCard()
         // View.show() only writes visibility when it isn't already VISIBLE; a mock defaults to 0
         // (VISIBLE), so start it GONE to observe the transition.
@@ -186,7 +187,7 @@ class RealContextualNativeInputManagerTest {
     @Test
     fun `when native chat input disabled and onInputMode then card hidden`() {
         val enabled = MutableStateFlow(false)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val card = mockCard()
         val widget = mock<NativeInputModeWidget>()
         testee.init(
@@ -207,7 +208,7 @@ class RealContextualNativeInputManagerTest {
     @Test
     fun `when input mode and chat submitted then routes to new chat callback with widget selections`() {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val widget = mock<NativeInputModeWidget>()
         whenever(widget.getSelectedModelId()).thenReturn("model-1")
         whenever(widget.getResolvedReasoningEffort()).thenReturn("high")
@@ -221,7 +222,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         testee.onInputMode()
 
@@ -236,10 +237,11 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when web view mode and chat submitted then sends in-chat prompt event and skips new chat callback`() {
+    fun `when web view mode and chat submitted then routes to prompt callback and does not send event directly`() {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val widget = mock<NativeInputModeWidget>()
+        whenever(widget.getSelectedModelId()).thenReturn("model-1")
         val jsMessaging = mock<JsMessaging>()
         var submitted: NativeInputPrompt? = null
         testee.init(
@@ -250,7 +252,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         testee.onWebViewMode()
 
@@ -258,14 +260,17 @@ class RealContextualNativeInputManagerTest {
         verify(widget).bindInputEvents(any(), any(), captor.capture(), any())
         captor.firstValue.invoke("hello")
 
-        assertNull(submitted)
-        verify(jsMessaging).sendSubscriptionEvent(any())
+        // Follow-ups in a running chat now route through the ViewModel too, so page context is attached
+        // in one place; the manager no longer builds and sends its own in-chat event.
+        assertEquals("hello", submitted?.prompt)
+        assertEquals("model-1", submitted?.modelId)
+        verify(jsMessaging, never()).sendSubscriptionEvent(any())
     }
 
     @Test
     fun `when chat submitted before any mode set then routes to new chat callback`() {
         val enabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val widget = mock<NativeInputModeWidget>()
         val jsMessaging = mock<JsMessaging>()
         var submitted: NativeInputPrompt? = null
@@ -277,7 +282,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         // Submit before onInputMode/onWebViewMode runs (lastMode still null): must start a new chat,
         // not fall through to the in-chat JS path.
