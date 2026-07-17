@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.adblocking.api.AdBlockingAnimation
 import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -30,6 +31,7 @@ import javax.inject.Inject
 class RealAdBlockingOmnibarAnimation @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val domainMatcher: AdBlockingExtensionDomainMatcher,
+    private val adBlockingFeature: AdBlockingExtensionFeature,
 ) : AdBlockingOmnibarAnimationProvider {
 
     private var lastAnimatedVideoId: String? = null
@@ -38,6 +40,9 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
         val videoId = videoIdOrNull(url)
         if (videoId == null) {
             lastAnimatedVideoId = null
+            return AdBlockingAnimation.Skip
+        }
+        if (!adBlockingFeature.showAdBlockingOmnibarAnimation().isEnabled() || !adBlockingFeature.adBlockingUXImprovements().isEnabled()) {
             return AdBlockingAnimation.Skip
         }
         if (!statusChecker.canInject()) return AdBlockingAnimation.Skip
