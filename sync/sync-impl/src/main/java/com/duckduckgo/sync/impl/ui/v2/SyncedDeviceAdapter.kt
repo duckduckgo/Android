@@ -30,8 +30,11 @@ import com.duckduckgo.sync.impl.databinding.ItemSyncV2DeviceRemoteBinding
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.ui.v2.SyncedDeviceAdapter.Listener
 
-class SyncedDeviceAdapter : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCallback) {
+class SyncedDeviceAdapter(
+    private val listener: Listener,
+) : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCallback) {
     override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
         is LoadingItem -> R.layout.item_sync_device_loading
         is SyncedDevice -> when {
@@ -48,11 +51,17 @@ class SyncedDeviceAdapter : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCall
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.item_sync_v2_device_local -> {
-                LocalDeviceViewHolder(ItemSyncV2DeviceLocalBinding.inflate(inflater, parent, false))
+                LocalDeviceViewHolder(
+                    ItemSyncV2DeviceLocalBinding.inflate(inflater, parent, false),
+                    listener,
+                )
             }
 
             R.layout.item_sync_v2_device_remote -> {
-                RemoteDeviceViewHolder(ItemSyncV2DeviceRemoteBinding.inflate(inflater, parent, false))
+                RemoteDeviceViewHolder(
+                    ItemSyncV2DeviceRemoteBinding.inflate(inflater, parent, false),
+                    listener,
+                )
             }
 
             R.layout.item_sync_device_loading -> {
@@ -71,6 +80,10 @@ class SyncedDeviceAdapter : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCall
             is LocalDeviceViewHolder -> holder.bind((getItem(position) as SyncedDevice).device)
             is RemoteDeviceViewHolder -> holder.bind((getItem(position) as SyncedDevice).device)
         }
+    }
+
+    interface Listener {
+        fun onDeviceClicked(device: ConnectedDevice)
     }
 }
 
@@ -96,12 +109,19 @@ private object ItemCallback : DiffUtil.ItemCallback<SyncDeviceListItem>() {
 
 private class LocalDeviceViewHolder(
     private val binding: ItemSyncV2DeviceLocalBinding,
+    private val listener: Listener,
 ) : ViewHolder(binding.root) {
+    private var device: ConnectedDevice? = null
+
     init {
         binding.root.setSecondaryText(itemView.context.getString(R.string.sync_device_this_device_hint))
+        binding.root.setOnClickListener {
+            device?.let(listener::onDeviceClicked)
+        }
     }
 
     fun bind(device: ConnectedDevice) {
+        this.device = device
         binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
         binding.root.setPrimaryText(device.deviceName)
     }
@@ -109,8 +129,18 @@ private class LocalDeviceViewHolder(
 
 private class RemoteDeviceViewHolder(
     private val binding: ItemSyncV2DeviceRemoteBinding,
+    private val listener: Listener,
 ) : ViewHolder(binding.root) {
+    private var device: ConnectedDevice? = null
+
+    init {
+        binding.root.setOnClickListener {
+            device?.let(listener::onDeviceClicked)
+        }
+    }
+
     fun bind(device: ConnectedDevice) {
+        this.device = device
         binding.root.setPrimaryText(device.deviceName)
         binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
     }

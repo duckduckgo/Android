@@ -40,6 +40,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
@@ -127,7 +128,13 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val syncedDeviceAdapter = SyncedDeviceAdapter()
+    private val syncedDeviceAdapter = SyncedDeviceAdapter(
+        object : SyncedDeviceAdapter.Listener {
+            override fun onDeviceClicked(device: ConnectedDevice) {
+                logcat { "Device clicked: $device" }
+            }
+        },
+    )
 
     private val syncThisDeviceListener = OnCheckedChangeListener { _, isChecked ->
         if (isChecked) viewModel.onSyncThisDevice(launchSource)
