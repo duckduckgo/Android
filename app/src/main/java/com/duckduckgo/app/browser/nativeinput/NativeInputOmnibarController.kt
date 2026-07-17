@@ -264,6 +264,8 @@ class RealNativeInputOmnibarController(
 
     private fun restoreOmnibarContent() {
         val omnibarView = omnibar.omnibarView as? View ?: return
+        omnibarView.findViewById<View?>(R.id.omniBarContainerShadow)?.show()
+        omnibarView.findViewById<View?>(R.id.omniBarContainer)?.show()
         omnibarView.findViewById<View?>(R.id.endIconsContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()

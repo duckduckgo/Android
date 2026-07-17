@@ -5199,6 +5199,9 @@ class BrowserTabFragment :
     private fun onTabVisible() {
         if (!isAdded) return
         webView?.onResume()
+        // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
+        // away on a previous visit isn't left as an icons-only strip.
+        omnibar.setExpanded(true)
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
     }
@@ -6779,6 +6782,12 @@ class BrowserTabFragment :
     }
 
     fun onTabSwipedAway() {
+        // Dismiss browser UTI when leaving the tab so the omnibar is restored and we don't leave a
+        // half-hidden address field / leftover nav chrome for the next visit. Skip Duck.ai: the
+        // widget is the persistent chat input there.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         viewModel.onTabSwipedAway()
     }
 
