@@ -21,20 +21,23 @@ import android.os.Looper
 import android.os.SystemClock
 import android.webkit.WebView
 import androidx.test.espresso.IdlingResource
+import logcat.logcat
 
 class JsObjectIdlingResource(
     private val webView: WebView,
     private val objectName: String,
+    private val timeoutMillis: Long = DEFAULT_TIMEOUT_MILLIS,
+    private val failOnTimeout: Boolean = true,
 ) : IdlingResource {
 
     @Volatile
     private var callback: IdlingResource.ResourceCallback? = null
 
+    @Volatile
     private var isIdle = false
 
     private val handler = Handler(Looper.getMainLooper())
     private val checkInterval = 100L // milliseconds
-    private val timeoutMillis = 20_000L // 20 seconds
     private val startTime = SystemClock.elapsedRealtime()
 
     override fun getName(): String = "JsObjectIdlingResource for $objectName"
@@ -50,8 +53,12 @@ class JsObjectIdlingResource(
         if (SystemClock.elapsedRealtime() - startTime > timeoutMillis) {
             isIdle = true
             callback?.onTransitionToIdle()
-            // fail test if the object is not found within the timeout
-            throw AssertionError("JS object '$objectName' did not appear within timeout.")
+            if (failOnTimeout) {
+                // fail test if the object is not found within the timeout if opted-in
+                throw AssertionError("JS object '$objectName' did not appear within ${timeoutMillis}ms.")
+            }
+            logcat { "JsObjectIdlingResource: '$objectName' did not appear within ${timeoutMillis}ms; proceeding" }
+            return
         }
 
         webView.evaluateJavascript(
@@ -64,5 +71,9 @@ class JsObjectIdlingResource(
                 handler.postDelayed({ pollForJsObject() }, checkInterval)
             }
         }
+    }
+
+    companion object {
+        private const val DEFAULT_TIMEOUT_MILLIS = 20_000L
     }
 }
