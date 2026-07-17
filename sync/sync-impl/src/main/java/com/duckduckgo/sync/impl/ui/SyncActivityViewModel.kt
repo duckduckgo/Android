@@ -249,7 +249,7 @@ class SyncActivityViewModel @Inject constructor(
         ) : Command()
 
         data object ShowDeviceUnsupported : Command()
-        data object RequestSetupAuthentication : Command()
+        data class RequestSetupAuthentication(val forSyncThisDevice: Boolean) : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
@@ -287,6 +287,7 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
             requiresSetupAuthentication(
+                forSyncThisDevice = true,
                 onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
             ) {
                 if (syncAutoRestore.canRestore()) {
@@ -587,11 +588,15 @@ class SyncActivityViewModel @Inject constructor(
         newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
     )
 
-    private suspend fun requiresSetupAuthentication(onDeviceAuthNotEnrolled: suspend() -> Unit = {}, action: suspend () -> Unit) {
+    private suspend fun requiresSetupAuthentication(
+        forSyncThisDevice: Boolean = false,
+        onDeviceAuthNotEnrolled: suspend () -> Unit = {},
+        action: suspend () -> Unit,
+    ) {
         val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
         if (hasValidDeviceAuthentication.not() && deviceAuthenticator.isAuthenticationRequired()) {
             onDeviceAuthNotEnrolled()
-            command.send(RequestSetupAuthentication)
+            command.send(RequestSetupAuthentication(forSyncThisDevice))
         } else {
             action()
         }

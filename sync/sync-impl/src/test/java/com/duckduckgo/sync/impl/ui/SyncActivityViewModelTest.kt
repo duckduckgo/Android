@@ -260,7 +260,9 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(false)
         testee.commands().test {
             testee.onSyncThisDevice()
-            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            val command = awaitItem()
+            command.assertCommandType(RequestSetupAuthentication::class)
+            assertTrue((command as RequestSetupAuthentication).forSyncThisDevice)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -560,7 +562,9 @@ class SyncActivityViewModelTest {
         testee.onEditDeviceClicked(connectedDevice, requireAuth = true)
 
         testee.commands().test {
-            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            val command = awaitItem()
+            command.assertCommandType(RequestSetupAuthentication::class)
+            assertFalse((command as RequestSetupAuthentication).forSyncThisDevice)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -296,7 +296,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is RequestSetupAuthentication -> {
-                launchDeviceAuthEnrollment()
+                launchDeviceAuthEnrollment(command.forSyncThisDevice)
             }
 
             is ShowDeviceConnected -> {
@@ -374,7 +374,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun launchDeviceAuthEnrollment() {
+    private fun launchDeviceAuthEnrollment(forSyncThisDevice: Boolean) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_require_device_passcode_dialog_title)
             .setMessage(getString(R.string.sync_require_device_passcode_dialog_body))
@@ -390,11 +390,12 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onSyncThisDeviceCanceled()
+                        // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
+                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
 
                     override fun onDialogCancelled() {
-                        viewModel.onSyncThisDeviceCanceled()
+                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
                 },
             )
