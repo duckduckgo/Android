@@ -41,6 +41,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -83,6 +84,7 @@ class SystemSearchViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private var userStageStore: UserStageStore,
     autoCompleteFactory: AutoCompleteFactory,
+    private val browserMode: BrowserMode,
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -192,6 +194,7 @@ class SystemSearchViewModel @Inject constructor(
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = true),
+        browserMode,
     )
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)

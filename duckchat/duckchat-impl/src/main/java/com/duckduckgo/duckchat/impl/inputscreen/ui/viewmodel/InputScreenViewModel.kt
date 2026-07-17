@@ -41,6 +41,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -137,6 +138,7 @@ enum class UserSelectedMode {
 class InputScreenViewModel @AssistedInject constructor(
     @Assisted currentOmnibarText: String,
     autoCompleteFactory: AutoCompleteFactory,
+    private val browserMode: BrowserMode,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -162,6 +164,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+        browserMode,
     )
     private var isTapTransition = false
     private var chatSuggestionsFetchJob: Job? = null

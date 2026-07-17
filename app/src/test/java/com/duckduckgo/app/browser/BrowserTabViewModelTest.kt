@@ -284,7 +284,6 @@ import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -775,8 +774,6 @@ class BrowserTabViewModelTest {
             val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
             whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
             whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockTabRepository)
-            val browserModeStateHolder: BrowserModeStateHolder = mock()
-            whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
 
             mockAutoCompleteApi =
                 AutoCompleteApi(
@@ -785,7 +782,7 @@ class BrowserTabViewModelTest {
                     mockNavigationHistory,
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
-                    browserModeStateHolder,
+                    BrowserMode.REGULAR,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,
