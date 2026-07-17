@@ -41,11 +41,13 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -110,6 +112,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val appInstall: AppInstall,
     private val appBuildConfig: AppBuildConfig,
+    private val subscriptions: Subscriptions,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -397,6 +400,14 @@ class RealDuckChatJSHelper @Inject constructor(
         mode: Mode,
         browserMode: BrowserMode,
     ): JsCallbackData {
+        val supportsSubscription = withContext(dispatcherProvider.io()) {
+            runCatching {
+                subscriptions.isEligible()
+            }.getOrElse {
+                logcat { "DuckChat-Sync: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
+                false
+            }
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -418,6 +429,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
+                put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
@@ -604,6 +616,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"

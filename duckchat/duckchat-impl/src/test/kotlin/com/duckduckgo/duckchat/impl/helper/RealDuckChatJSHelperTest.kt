@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -92,6 +93,9 @@ class RealDuckChatJSHelperTest {
     private val mockAppBuildConfig: AppBuildConfig = mock {
         onBlocking { isAppReinstall() } doReturn false
     }
+    private val mockSubscriptions: Subscriptions = mock {
+        onBlocking { isEligible() } doReturn false
+    }
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -107,6 +111,7 @@ class RealDuckChatJSHelperTest {
         nativeInputStatePublisher = mockNativeInputStatePublisher,
         appInstall = mockAppInstall,
         appBuildConfig = mockAppBuildConfig,
+        subscriptions = mockSubscriptions,
     )
     private val viewModel =
         object {
@@ -301,6 +306,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -641,6 +647,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -651,6 +658,57 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSubscriptionEligibleThenSupportsSubscriptionIsTrue() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsSubscription"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSubscriptionNotEligibleThenSupportsSubscriptionIsFalse() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSubscription"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndEligibilityCheckThrowsThenSupportsSubscriptionIsFalse() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenThrow(RuntimeException("Error"))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSubscription"))
     }
 
     @Test
@@ -686,6 +744,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -844,6 +903,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -891,6 +951,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", true)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -935,6 +996,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -979,6 +1041,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1290,6 +1353,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1331,6 +1395,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1372,6 +1437,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1414,6 +1480,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
