@@ -64,6 +64,7 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -72,6 +73,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
@@ -85,7 +87,7 @@ import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
+import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiNativeBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
@@ -120,7 +122,7 @@ import javax.inject.Named
 
 @InjectWith(FragmentScope::class)
 class DuckChatContextualFragment :
-    DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai),
+    DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai_native),
     DownloadConfirmationDialogListener {
 
     @Inject
@@ -209,7 +211,7 @@ class DuckChatContextualFragment :
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
-    private val binding: FragmentContextualDuckAiBinding by viewBinding()
+    private val binding: FragmentContextualDuckAiNativeBinding by viewBinding()
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val root: ViewGroup by lazy { binding.root }
@@ -233,7 +235,12 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
-                    if (binding.inputField.hasFocus()) {
+                    val composerHasFocus = if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                        binding.contextualNativeInputWidget.hasFocus()
+                    } else {
+                        binding.contextualModeNativeContent.hasFocus()
+                    }
+                    if (composerHasFocus) {
                         viewModel.onKeyboardVisibilityChanged(imeVisible)
                     }
                 }
@@ -472,6 +479,19 @@ class DuckChatContextualFragment :
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
             },
+            onPromptSubmitted = { submitted ->
+                viewModel.onPromptSent(
+                    prompt = submitted.prompt,
+                    modelId = submitted.modelId,
+                    reasoningEffort = submitted.reasoningEffort,
+                    selectedTool = submitted.selectedTool,
+                    imagesJson = submitted.imagesJson,
+                    filesJson = submitted.filesJson,
+                )
+            },
+            onAskAboutTab = { viewModel.onAskAboutTabClicked() },
+            onAskAboutPage = { viewModel.onAskAboutPageClicked() },
+            onPageContextRemoved = { viewModel.removePageContext() },
         )
         observeViewModel()
 
@@ -514,7 +534,7 @@ class DuckChatContextualFragment :
             viewModel.onContextualClose()
         }
         binding.contextualNewChat.setOnClickListener {
-            hideKeyboard(binding.inputField)
+            hideKeyboard(binding.legacyInputField)
             viewModel.onChatsIconClicked()
         }
         binding.contextualFire.setOnClickListener {
@@ -522,7 +542,7 @@ class DuckChatContextualFragment :
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
-        binding.inputField.setOnEditorActionListener(
+        binding.legacyInputField.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     sendNativePrompt()
@@ -531,7 +551,7 @@ class DuckChatContextualFragment :
                 false
             },
         )
-        binding.inputField.addTextChangedListener(
+        binding.legacyInputField.addTextChangedListener(
             object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -562,6 +582,10 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
+            // Clear the field directly: typed text isn't mirrored into viewState.prompt, so relying on
+            // onPromptCleared() alone is a no-op re-render (prompt is usually already empty) and the
+            // visible text would stay. Still notify the ViewModel to keep prompt state consistent.
+            clearInputField()
             viewModel.onPromptCleared()
         }
 
@@ -575,22 +599,27 @@ class DuckChatContextualFragment :
             viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
-            viewModel.onQuickActionClicked(binding.inputField.text.toString())
+            val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                binding.contextualNativeInputWidget.text
+            } else {
+                binding.legacyInputField.text.toString()
+            }
+            viewModel.onQuickActionClicked(currentInput)
         }
     }
 
     private fun clearInputField() {
-        binding.inputField.text.clear()
-        binding.inputField.setSelection(0)
-        binding.inputField.scrollTo(0, 0)
+        binding.legacyInputField.text.clear()
+        binding.legacyInputField.setSelection(0)
+        binding.legacyInputField.scrollTo(0, 0)
     }
 
     private fun sendNativePrompt() {
-        val prompt = binding.inputField.text.toString()
+        val prompt = binding.legacyInputField.text.toString()
         if (prompt.isNotEmpty()) {
             viewModel.onPromptSent(prompt)
             clearInputField()
-            hideKeyboard(binding.inputField)
+            hideKeyboard(binding.legacyInputField)
         }
     }
 
@@ -622,6 +651,7 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
                         command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -644,6 +674,17 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
                         globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                    }
+
+                    is DuckChatContextualViewModel.Command.FocusInput -> {
+                        if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                            binding.contextualNativeInputWidget.focusInput(activity)
+                        } else {
+                            binding.legacyInputField.let {
+                                it.requestFocus()
+                                activity?.showKeyboard(it)
+                            }
+                        }
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -696,7 +737,7 @@ class DuckChatContextualFragment :
 
         binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
         binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
-        binding.inputField.setHint(viewState.chatHintResId)
+        binding.legacyInputField.setHint(viewState.chatHintResId)
 
         if (viewState.showChatsIcon) {
             binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
@@ -704,8 +745,11 @@ class DuckChatContextualFragment :
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
-                binding.contextualModeNativeContent.show()
                 binding.contextualWebviewContainer.gone()
+                binding.contextualModePrompts.show()
+                binding.contextualInputContainer.setBackgroundColor(
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+                )
                 contextualNativeInputManager.onInputMode()
 
                 if (viewState.showChatsIcon) {
@@ -715,33 +759,59 @@ class DuckChatContextualFragment :
                 }
                 binding.contextualFire.gone()
 
-                renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+                if (viewState.contextualNativeInputEnabled) {
+                    // The unified input widget is the INPUT composer; ContextualNativeInputManager.onInputMode()
+                    // shows its card. Hide the legacy EditText composer and its context chip/placeholder.
+                    binding.contextualModeNativeContent.gone()
+                } else {
+                    binding.contextualModeNativeContent.show()
 
-                if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
-                    binding.duckAiContextualLayout.gone()
-                    binding.duckAiAttachContextLayout.gone()
-                } else if (viewState.showContext) {
-                    binding.duckAiContextualLayout.show()
-                    binding.duckAiAttachContextLayout.gone()
-                } else {
-                    binding.duckAiContextualLayout.gone()
-                    binding.duckAiAttachContextLayout.show()
-                }
-                if (viewState.prompt.isNotEmpty()) {
-                    binding.inputField.setText(viewState.prompt)
-                    binding.inputField.setSelection(viewState.prompt.length)
-                } else {
-                    clearInputField()
+                    renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
+
+                    when {
+                        viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE -> {
+                            binding.duckAiContextualLayout.gone()
+                            binding.duckAiAttachContextLayout.gone()
+                        }
+                        viewState.showContext -> {
+                            binding.duckAiContextualLayout.show()
+                            binding.duckAiAttachContextLayout.gone()
+                        }
+                        else -> {
+                            binding.duckAiContextualLayout.gone()
+                            binding.duckAiAttachContextLayout.show()
+                        }
+                    }
+                    if (viewState.prompt.isNotEmpty()) {
+                        binding.legacyInputField.setText(viewState.prompt)
+                        binding.legacyInputField.setSelection(viewState.prompt.length)
+                    } else {
+                        clearInputField()
+                    }
                 }
             }
 
             DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
+                binding.contextualModePrompts.gone()
+                binding.contextualInputContainer.setBackgroundColor(
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground),
+                )
                 binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
                 if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
+        }
+
+        if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
+            binding.contextualNativeInputWidget.setPageContext(
+                title = viewState.contextTitle,
+                url = viewState.contextUrl,
+                faviconUrl = null,
+            )
+        } else {
+            binding.contextualNativeInputWidget.clearPageContext()
         }
     }
 

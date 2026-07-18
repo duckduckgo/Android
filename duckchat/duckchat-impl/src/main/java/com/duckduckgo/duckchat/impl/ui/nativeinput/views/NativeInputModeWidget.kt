@@ -67,6 +67,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
@@ -145,6 +146,14 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
+    fun setPageContext(title: String, url: String, faviconUrl: String?)
+    fun clearPageContext()
+    fun getPageContext(): PageContextAttachment?
+    fun setContextualAttachmentActions(
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
+    )
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual(tabId: String)
@@ -326,6 +335,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    private var pendingIsContextual: Boolean = false
+    private var pendingAskAboutTab: (() -> Unit)? = null
+    private var pendingAskAboutPage: (() -> Unit)? = null
+    private var pendingOnPageContextRemoved: (() -> Unit)? = null
+    private var pendingPageContext: PageContextAttachment? = null
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -389,6 +403,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
             launch {
                 viewModel.plugins.collect { plugins ->
                     for (plugin in plugins) {
+                        // The start-chat shortcut is a search-only address-bar affordance; it has no place
+                        // in the contextual sheet's Duck.ai composer (and reads the shared per-tab state,
+                        // which can be search-only), so skip it there.
+                        if (isContextualWidget && plugin.containerId == R.id.startChatContainer) continue
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
@@ -428,7 +446,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentView = pluginView
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
+            pluginView.isContextual = pendingIsContextual
+            pluginView.onAskAboutTab = pendingAskAboutTab
+            pluginView.onAskAboutPage = pendingAskAboutPage
+            pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
+            pendingPageContext?.let { pluginView.setPageContext(it) }
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -589,6 +612,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // and animating the padding shrink afterwards looks like a two-step collapse.
             if (hasFocus) {
                 beginFocusTransition()
+                reassertContextualPluginVisibility()
             } else if (isDuckAiPageContext()) {
                 hideKeyboard()
             }
@@ -614,6 +638,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
+    }
+
+    /**
+     * In the contextual sheet the widget is reused across the sheet being hidden and shown again;
+     * on reopen the bottom-row plugin containers can end up hidden (their visibility is set once when
+     * plugins first load and isn't restored on reuse). Re-assert them here, from the focus path so the
+     * change rides the focus layout transition and re-measures. Scoped to the contextual widget so the
+     * omnibar is untouched. The model picker is gated on its enabled state so it stays hidden mid-chat.
+     */
+    private fun reassertContextualPluginVisibility() {
+        if (!isContextualWidget) return
+        val onChatTab = isChatTabSelected()
+        findViewById<View?>(R.id.attachButtonContainer)?.isVisible = onChatTab
+        findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = onChatTab
+        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = onChatTab && viewModel.modelPickerEnabled.value
     }
 
     private fun updateToggleVisibilityForState() {
@@ -697,7 +736,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingButtons?.setNewLineButtonVisible(visible)
     }
 
-    private fun applyState(state: NativeInputState) {
+    private fun applyState(incomingState: NativeInputState) {
+        // The contextual sheet is always a Duck.ai chat surface, but the shared per-tab state store can
+        // carry a browser/search state written by the main omnibar widget (e.g. for search-only users).
+        // Force the Duck.ai context/toggle here so the contextual widget never renders that search state,
+        // which would otherwise flip the tab off "chat" (hiding the chat-tab controls).
+        val state = if (isContextualWidget) {
+            incomingState.copy(
+                inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+                toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+            )
+        } else {
+            incomingState
+        }
         val previousState = nativeInputState
         val firstStateEmission = previousState == null
         val contextChanged = previousState?.inputContext != state.inputContext
@@ -1172,6 +1223,36 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
 
+    override fun setPageContext(title: String, url: String, faviconUrl: String?) {
+        val attachment = PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl)
+        pendingPageContext = attachment
+        attachmentView?.setPageContext(attachment)
+    }
+
+    override fun clearPageContext() {
+        pendingPageContext = null
+        attachmentView?.clearPageContext()
+    }
+
+    override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
+
+    override fun setContextualAttachmentActions(
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
+    ) {
+        pendingIsContextual = true
+        pendingAskAboutTab = onAskAboutTab
+        pendingAskAboutPage = onAskAboutPage
+        pendingOnPageContextRemoved = onPageContextRemoved
+        attachmentView?.let { view ->
+            view.isContextual = true
+            view.onAskAboutTab = onAskAboutTab
+            view.onAskAboutPage = onAskAboutPage
+            view.onPageContextRemoved = onPageContextRemoved
+        }
+    }
+
     override fun clearAttachments() {
         attachmentView?.clearAttachments()
     }
@@ -1214,7 +1295,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
-        // The contextual sheet's parent card has a top-only rounded shape applied by
+        // The contextual sheet's parent card has its rounded shape applied by
         // ContextualNativeInputManager.applyCardShape(); never overwrite it from here. The
         // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
         // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
