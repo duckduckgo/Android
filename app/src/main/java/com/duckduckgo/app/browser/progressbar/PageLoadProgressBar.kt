@@ -53,6 +53,11 @@ class PageLoadProgressBar @JvmOverloads constructor(
         shimmerColor = lighten(barColor, shimmerLightenFraction(config)),
     )
 
+    private val indeterminateSweepRenderer = IndeterminateSweepRenderer(
+        config = config,
+        barColor = barColor,
+    )
+
     private val progressPaint = Paint().apply {
         color = barColor
         style = Paint.Style.FILL
@@ -76,6 +81,10 @@ class PageLoadProgressBar @JvmOverloads constructor(
      */
     val isStarted: Boolean get() = _isStarted
 
+    fun setStallDetectionEnabled(enabled: Boolean) {
+        engine.stallDetectionEnabled = enabled
+    }
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             val dtSeconds = if (lastFrameTimeNanos == 0L) {
@@ -86,6 +95,12 @@ class PageLoadProgressBar @JvmOverloads constructor(
             lastFrameTimeNanos = frameTimeNanos
 
             val state = engine.tick(dtSeconds)
+
+            if (state.phase == Phase.INDETERMINATE && !indeterminateSweepRenderer.isActive) {
+                indeterminateSweepRenderer.start(SystemClock.elapsedRealtime(), state.displayProgress / 100f)
+            } else if (state.phase != Phase.INDETERMINATE && indeterminateSweepRenderer.isActive) {
+                indeterminateSweepRenderer.stop()
+            }
 
             invalidate()
 
@@ -143,6 +158,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         animate().cancel()
         engine.reset()
         shimmerRenderer.stop()
+        indeterminateSweepRenderer.stop()
         Choreographer.getInstance().removeFrameCallback(frameCallback)
         lastFrameTimeNanos = 0L
         visibility = INVISIBLE
@@ -161,6 +177,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
                     isDismissing = false
                     engine.reset()
                     shimmerRenderer.stop()
+                    indeterminateSweepRenderer.stop()
                     visibility = INVISIBLE
                     alpha = 1f
                     lastFrameTimeNanos = 0L
@@ -171,12 +188,16 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         val state = engine.frameState
-        if (state.displayProgress <= 0f) return
+        if (state.phase == Phase.INDETERMINATE) {
+            val top = height - barHeightPx
+            indeterminateSweepRenderer.draw(canvas, width.toFloat(), top, height.toFloat(), SystemClock.elapsedRealtime())
+            return
+        }
 
+        if (state.displayProgress <= 0f) return
         val progressWidth = (state.displayProgress / 100f) * width
         val cornerRadius = barHeightPx / 2f
         val top = height - barHeightPx
-        // Draw round rect starting off-screen left so left corners are clipped by the view bounds
         canvas.drawRoundRect(-cornerRadius, top, progressWidth, height.toFloat(), cornerRadius, cornerRadius, progressPaint)
 
         if (shimmerRenderer.isActive) {
