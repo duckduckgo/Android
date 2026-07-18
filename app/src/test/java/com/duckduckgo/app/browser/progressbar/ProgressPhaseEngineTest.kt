@@ -268,4 +268,93 @@ class ProgressPhaseEngineTest {
         assertEquals(Phase.IDLE, engine.phase)
         assertEquals(0f, engine.displayProgress)
     }
+
+    // --- Indeterminate fallback ---
+
+    @Test
+    fun `does not enter INDETERMINATE when stall detection disabled`() {
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1000)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `enters INDETERMINATE after stall timeout with no forward progress`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `forward progress before timeout keeps TRACKING and resets the stall timer`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs - 500); engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        engine.onProgressUpdate(60f) // forward → resets timer
+        time.advance(600); engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `equal progress does not reset the stall timer`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs - 100); engine.tick(0.016f)
+        engine.onProgressUpdate(50f) // equal → ignored, timer NOT reset
+        time.advance(200); engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `forward progress exits INDETERMINATE back to TRACKING`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1); engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        engine.onProgressUpdate(60f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `displayProgress is frozen during INDETERMINATE`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        repeat(100) { time.advance(16); engine.tick(0.016f) }
+        time.advance(config.stallTimeoutMs + 1); engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        val frozen = engine.displayProgress
+        repeat(100) { time.advance(16); engine.tick(0.016f) }
+        assertEquals(frozen, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `triggerCompletion from INDETERMINATE completes to 100`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601); engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1); engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        engine.triggerCompletion()
+        assertEquals(Phase.COMPLETING, engine.phase)
+        time.advance(301); engine.tick(0.301f)
+        assertEquals(100f, engine.displayProgress)
+        assertEquals(Phase.DONE, engine.phase)
+    }
 }

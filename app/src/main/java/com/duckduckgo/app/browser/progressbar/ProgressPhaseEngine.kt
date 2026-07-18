@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.progressbar
 
 enum class Phase {
-    IDLE, FAST_START, TRACKING, COMPLETING, DONE
+    IDLE, FAST_START, TRACKING, INDETERMINATE, COMPLETING, DONE
 }
 
 data class FrameState(
@@ -40,10 +40,13 @@ class ProgressPhaseEngine(
     var displayProgress: Float = 0f
         private set
 
+    var stallDetectionEnabled: Boolean = false
+
     private var realProgress: Float = 0f
     private var velocity: Float = 0f
     private var phaseStartTime: Long = 0L
     private var creepProgress: Float = 0f
+    private var lastForwardProgressTime: Long = 0L
 
     private var completionFrom: Float = 0f
 
@@ -62,13 +65,20 @@ class ProgressPhaseEngine(
         creepProgress = 0f
 
         phaseStartTime = timeProvider.elapsedRealtime()
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
     }
 
     fun onProgressUpdate(progress: Float) {
         if (phase == Phase.IDLE || phase == Phase.DONE) return
         if (progress <= 0f) return
-        if (progress <= realProgress) return // ignore backward progress
+        if (progress <= realProgress) return // ignore backward/equal progress
         realProgress = progress
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
+        if (phase == Phase.INDETERMINATE) {
+            // Real progress resumed — return to determinate tracking from the frozen value.
+            phase = Phase.TRACKING
+            velocity = 0f
+        }
     }
 
     fun triggerCompletion() {
@@ -93,6 +103,7 @@ class ProgressPhaseEngine(
             Phase.IDLE -> {} // no-op
             Phase.FAST_START -> tickFastStart()
             Phase.TRACKING -> tickTracking(dt)
+            Phase.INDETERMINATE -> {} // hold displayProgress frozen; the view renders the sweep
             Phase.COMPLETING -> tickCompleting()
             Phase.DONE -> {} // no-op
         }
@@ -115,6 +126,14 @@ class ProgressPhaseEngine(
     }
 
     private fun tickTracking(dt: Float) {
+        if (stallDetectionEnabled &&
+            timeProvider.elapsedRealtime() - lastForwardProgressTime >= config.stallTimeoutMs
+        ) {
+            phase = Phase.INDETERMINATE
+            velocity = 0f
+            return
+        }
+
         val floor = config.fastStartTarget
 
         // Perpetual creep accumulates independently
