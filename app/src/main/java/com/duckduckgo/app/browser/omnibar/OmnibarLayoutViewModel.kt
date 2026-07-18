@@ -127,6 +127,8 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
+    private val isProgressBarIndeterminateEnabled =
+        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
@@ -140,6 +142,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
+            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
         ),
     )
 
@@ -268,6 +271,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
+        val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
     ) {
         /**
