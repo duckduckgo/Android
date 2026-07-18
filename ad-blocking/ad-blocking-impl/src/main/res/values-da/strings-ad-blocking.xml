@@ -39,7 +39,7 @@
     <string name="ad_blocking_disabled_popup_title">Virker YouTube annonceblokering ikke?</string>
     <string name="ad_blocking_disabled_popup_description">Send en anonym rapport om nedbrud til DuckDuckGo. Hjælp med at gøre blokering af annoncer bedre for alle!</string>
     <string name="ad_blocking_disabled_primary_action">Send rapport om nedbrud</string>
-    <string name="ad_blocking_disabled_secondary_action">Annullér</string>
+    <string name="ad_blocking_disabled_secondary_action">Annuller</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiveret indtil genstart</string>
-    <string name="ad_blocking_omnibar_badge_text">Blokering af YouTube-annoncer slået til</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube Ad Block er slået til</string>
 </resources>
