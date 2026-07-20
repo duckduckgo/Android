@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <attr name="textAppearanceButtonLarge" format="reference" />
+
+    <attr name="daxButtonSmallHeight" format="dimension" />
+    <attr name="daxButtonLargeHeight" format="dimension" />
+    <attr name="daxButtonSmallSidePadding" format="dimension" />
+    <attr name="daxButtonLargeSidePadding" format="dimension" />
+    <attr name="daxButtonSmallTopPadding" format="dimension" />
+    <attr name="daxButtonLargeTopPadding" format="dimension" />
+    <attr name="daxButtonSmallVerticalInset" format="dimension" />
+    <attr name="daxButtonLargeVerticalInset" format="dimension" />
+
+    <attr name="daxColorRebrandButtonPrimaryContainer" format="color" />
+    <attr name="daxColorRebrandButtonPrimaryContainerPressed" format="color" />
+    <attr name="daxColorRebrandButtonPrimaryText" format="color" />
+    <attr name="daxColorRebrandButtonSecondaryFillContainer" format="color" />
+    <attr name="daxColorRebrandButtonSecondaryFillContainerPressed" format="color" />
+    <attr name="daxColorRebrandButtonSecondaryFillText" format="color" />
+    <attr name="daxColorRebrandButtonGhostContainerPressed" format="color" />
+    <attr name="daxColorRebrandButtonGhostText" format="color" />
+    <attr name="daxColorRebrandButtonGhostTextPressed" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveContainer" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveContainerPressed" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveText" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveSecondaryText" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveSecondaryTextPressed" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
+    <attr name="daxColorRebrandButtonDestructiveGhostTextPressed" format="color" />
+
+    <dimen name="rebrandButtonSmallHeight">48dp</dimen>
+    <dimen name="rebrandButtonLargeHeight">56dp</dimen>
+    <dimen name="rebrandButtonSmallTopPadding">10dp</dimen>
+    <dimen name="rebrandButtonLargeTopPadding">18dp</dimen>
+    <dimen name="rebrandButtonSmallVerticalInset">4dp</dimen>
+    <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
+
+    <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
+        <item name="android:textSize">15sp</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:lineHeight">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Rebrand.ButtonLarge" parent="Typography.DuckDuckGo">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:lineHeight">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Rebrand.ButtonDuckSans" parent="Typography.DuckDuckGo">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Rebrand.ButtonDuckSansLarge" parent="Typography.DuckDuckGo">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/pillShapeCornerRadius</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.Brand">
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Rebrand.Button</item>
+        <item name="android:textColor">@color/button_brand_text_color_selector</item>
+        <item name="backgroundTint">@color/button_brand_container_selector</item>
+        <item name="iconTint">@color/button_brand_text_color_selector</item>
+        <item name="rippleColor">?attr/daxColorButtonBrandContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.Primary">
+        <item name="android:textColor">@color/rebrand_button_primary_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_primary_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_primary_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonPrimaryContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill">
+        <item name="android:textColor">@color/rebrand_button_secondary_fill_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_secondary_fill_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_secondary_fill_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonSecondaryFillContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.Ghost">
+        <item name="android:textColor">@color/rebrand_button_ghost_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_ghost_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_ghost_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonGhostContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructivePrimary">
+        <item name="android:textColor">@color/rebrand_button_destructive_primary_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_destructive_primary_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_destructive_primary_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonDestructiveContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveSecondary">
+        <item name="android:textColor">@color/rebrand_button_destructive_secondary_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_secondary_fill_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_destructive_secondary_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonSecondaryFillContainerPressed</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveGhost">
+        <item name="android:textColor">@color/rebrand_button_destructive_ghost_text_selector</item>
+        <item name="backgroundTint">@color/rebrand_button_destructive_ghost_container_selector</item>
+        <item name="iconTint">@color/rebrand_button_destructive_ghost_text_selector</item>
+        <item name="rippleColor">?attr/daxColorRebrandButtonDestructiveGhostContainerPressed</item>
+    </style>
+
+    <style name="ThemeOverlay.DaxButton.Rebrand" parent="">
+        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Primary</item>
+        <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill</item>
+        <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Ghost</item>
+        <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Ghost</item>
+        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructivePrimary</item>
+        <item name="daxButtonDestructiveSecondary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveSecondary</item>
+        <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveGhost</item>
+        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Rebrand.Button</item>
+        <item name="textAppearanceButtonLarge">@style/Typography.DuckDuckGo.Rebrand.ButtonLarge</item>
+        <item name="daxButtonSmallHeight">@dimen/rebrandButtonSmallHeight</item>
+        <item name="daxButtonLargeHeight">@dimen/rebrandButtonLargeHeight</item>
+        <item name="daxButtonSmallSidePadding">@dimen/keyline_4</item>
+        <item name="daxButtonLargeSidePadding">@dimen/keyline_5</item>
+        <item name="daxButtonSmallTopPadding">@dimen/rebrandButtonSmallTopPadding</item>
+        <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
+        <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
+        <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
+    </style>
+
+</resources>
