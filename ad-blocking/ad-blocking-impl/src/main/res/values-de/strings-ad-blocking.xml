@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Deaktivieren bis zum Neustart</string>
     <string name="ad_blocking_menu_always_off">Immer aus</string>
     <string name="ad_blocking_disabled_popup_title">YouTube-Werbeblockierung funktioniert nicht?</string>
-    <string name="ad_blocking_disabled_popup_description">Sende einen anonymen Störungsbericht an DuckDuckGo. Hilf mit, den Werbeblocker für alle zu verbessern!</string>
+    <string name="ad_blocking_disabled_popup_description">Sende einen anonymen Bericht an DuckDuckGo und hilf mit, den Werbeblocker für alle zu verbessern!</string>
     <string name="ad_blocking_disabled_primary_action">Störungsbericht senden</string>
     <string name="ad_blocking_disabled_secondary_action">Abbrechen</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiviert bis zum Neustart</string>
-    <string name="ad_blocking_omnibar_badge_text">YouTube-Werbungsblocker aktiviert</string>
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. Keep it as short as possible — aim for under ~20 characters or it will be truncated with an ellipsis. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Werbeblockierung aktiv</string>
 </resources>
