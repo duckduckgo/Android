@@ -1801,6 +1801,46 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when auto-attach on and removed context then navigating to a new url re-attaches`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        assertTrue(testee.viewState.value.showContext)
+        // User removes the auto-attached context for page A.
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(testee.viewState.value.showContext)
+        assertTrue(testee.viewState.value.userRemovedContext)
+
+        // Navigating to page B auto-attaches again.
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+        assertFalse(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when auto-attach on and removed context then re-receiving the same url stays removed`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(testee.viewState.value.showContext)
+
+        // The same page's context arriving again (e.g. a refresh) must respect the removal.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+
+        assertFalse(testee.viewState.value.showContext)
+        assertTrue(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
     fun `when sheet closed then isPageContextRequested is reset`() = runTest {
         val tabId = "tab-1"
         testee.onSheetOpened(tabId)

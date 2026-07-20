@@ -837,12 +837,14 @@ class DuckChatContextualViewModel @Inject constructor(
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
 
+                val urlChanged = inputMode.contextUrl.isNotEmpty() && url != inputMode.contextUrl
+                val remainsUserRemoved = inputMode.userRemovedContext && !urlChanged
                 val dropStaleAttachment = !allowsAutomaticContextAttachment &&
                     inputMode.showContext &&
-                    url != inputMode.contextUrl
+                    urlChanged
 
                 val showContext = when {
-                    allowsAutomaticContextAttachment -> !inputMode.userRemovedContext
+                    allowsAutomaticContextAttachment -> !remainsUserRemoved
                     dropStaleAttachment -> false
                     else -> inputMode.showContext
                 }
@@ -854,6 +856,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext = showContext,
+                        userRemovedContext = remainsUserRemoved,
                         quickActionState = when {
                             isContextualSheetImprovementsEnabled && newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
                             isContextualSheetImprovementsEnabled && dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
