@@ -159,7 +159,7 @@ class EnqueuedPixelWorker @Inject constructor(
                     BrowserMode.REGULAR -> AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY
                     BrowserMode.FIRE -> AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY
                 }
-                pixel.get().fire(dailyPixel, params, type = Pixel.PixelType.Daily())
+                pixel.get().fire(dailyPixel, type = Pixel.PixelType.Daily())
                 unsentForgetAllPixelStore.resetCount(mode)
             }
         }

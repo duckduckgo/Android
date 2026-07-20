@@ -341,12 +341,7 @@ class EnqueuedPixelWorkerTest {
     fun whenUnsentClearDataPixelsPendingThenDailyPixelSentExactlyOnce() = runTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountsClearData).thenReturn(mapOf(BrowserMode.REGULAR to 5))
         enqueuedPixelWorker.submitUnsentFirePixels()
-        verify(pixel, times(1)).fire(
-            AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY,
-            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
-            emptyMap(),
-            Pixel.PixelType.Daily(),
-        )
+        verify(pixel, times(1)).fire(AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -358,7 +353,7 @@ class EnqueuedPixelWorkerTest {
         val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire")
         verify(pixel, times(2)).fire(AppPixelName.FORGET_ALL_EXECUTED, params)
         verify(pixel, times(1)).fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, type = Pixel.PixelType.Daily())
-        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY, params, emptyMap(), Pixel.PixelType.Daily())
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY, type = Pixel.PixelType.Daily())
         verify(unsentForgetAllPixelStore).resetCount(BrowserMode.FIRE)
     }
 
@@ -372,18 +367,8 @@ class EnqueuedPixelWorkerTest {
         verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         verify(pixel, times(2)).fire(AppPixelName.FORGET_ALL_EXECUTED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire"))
         verify(pixel, times(1)).fire(AppPixelName.FORGET_ALL_EXECUTED_DAILY, type = Pixel.PixelType.Daily())
-        verify(pixel).fire(
-            AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY,
-            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
-            emptyMap(),
-            Pixel.PixelType.Daily(),
-        )
-        verify(pixel).fire(
-            AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY,
-            mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire"),
-            emptyMap(),
-            Pixel.PixelType.Daily(),
-        )
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY, type = Pixel.PixelType.Daily())
         verify(unsentForgetAllPixelStore).resetCount(BrowserMode.REGULAR)
         verify(unsentForgetAllPixelStore).resetCount(BrowserMode.FIRE)
     }
