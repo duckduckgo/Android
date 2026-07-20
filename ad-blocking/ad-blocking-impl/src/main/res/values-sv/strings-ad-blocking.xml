@@ -24,7 +24,7 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Öppnar videor i ett störningsfritt visningsläge som förhindrar att det du tittar på påverkar ditt YouTube-flöde.</string>
     <string name="ad_blocking_settings_title_v2">Annonsblockering</string>
-    <string name="ad_blocking_settings_header_description">Blockerar invasiva spårare innan de läses in, vilket i stort sett eliminerar annonser som bygger på spårning</string>
+    <string name="ad_blocking_settings_header_description">Blockerar invasiva spårare innan de läses in, vilket effektivt eliminerar annonser som bygger på spårning.</string>
     <string name="contingencyMessageTitle">Annonsblockering på YouTube är inte tillgänglig</string>
     <string name="contingencyMessageContent">De senaste ändringarna på YouTube har påverkat annonsblockeringen. Vi jobbar på att lösa problemen och tackar för din förståelse.</string>
     <string name="contingencyMessagePrimaryButton">Jag förstår</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Inaktivera till omstart</string>
     <string name="ad_blocking_menu_always_off">Alltid av</string>
     <string name="ad_blocking_disabled_popup_title">Fungerar inte annonsblockering på YouTube?</string>
-    <string name="ad_blocking_disabled_popup_description">Skicka en anonym felrapport till DuckDuckGo. Hjälp till att göra annonsblockeringen bättre för alla!</string>
+    <string name="ad_blocking_disabled_popup_description">Skicka en anonym rapport till DuckDuckGo och hjälp till att göra annonsblockeringen bättre för alla!</string>
     <string name="ad_blocking_disabled_primary_action">Skicka felrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Inaktiverad till omstart</string>
-    <string name="ad_blocking_omnibar_badge_text">YouTube-annonsblockering på</string>
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. Keep it as short as possible — aim for under ~20 characters or it will be truncated with an ellipsis. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Annonsblockering på</string>
 </resources>
