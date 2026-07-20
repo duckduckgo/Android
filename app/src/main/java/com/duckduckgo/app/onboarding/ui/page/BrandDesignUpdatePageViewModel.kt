@@ -112,6 +112,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
+        val hideAddressBarRow: Boolean = false,
         val isCustomAiOnboardingFlow: Boolean = false,
         val stepIndicator: StepProgress? = null,
         val onboardingImprovementsV2Enabled: Boolean = true,
@@ -525,6 +526,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         showSplitOption = dialog.showSplitOption,
                         hideSetDefaultBrowserRow = dialog.hideSetDefaultBrowserRow,
                         hideAddWidgetRow = dialog.hideAddWidgetRow,
+                        hideAddressBarRow = dialog.hideAddressBarRow,
                         isReinstallUser = dialog.isReinstallUser,
                     )
                 }

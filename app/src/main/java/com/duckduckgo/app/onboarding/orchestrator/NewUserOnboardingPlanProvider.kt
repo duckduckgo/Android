@@ -152,7 +152,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val ctx = NewUserOnboardingPlanContext()
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
 
-        val quickSetupPlan = quickSetupPlan(ctx)
+        val quickSetupPlan = quickSetupPlan(ctx, forceWithAiInput = true)
 
         val dismissDuckAiFireCta = suspend {
             // End-of-plan dismissal for Duck AI Fire CTA — deferred to here (vs. on user interaction)
@@ -209,8 +209,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             result = { ctx.completionResult },
         )
 
-    private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan =
-        LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx)).firingShownPixels().abortingOnDevSkip())
+    private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean = false): LinearOnboardingPlan =
+        LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx, forceWithAiInput)).firingShownPixels().abortingOnDevSkip())
 
     /**
      * Wraps each step so the internal dev "skip all onboarding" shortcut aborts the run from wherever
@@ -607,7 +607,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun quickSetupStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun quickSetupStep(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_QUICK_SETUP
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.QUICK_SETUP,
@@ -620,6 +620,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     showSplitOption = isSplitOmnibarEnabled(),
                     hideSetDefaultBrowserRow = isDefault,
                     hideAddWidgetRow = hasWidget,
+                    hideAddressBarRow = forceWithAiInput,
                     isReinstallUser = ctx.isReinstall,
                 )
             },
@@ -629,6 +630,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         val resolved = resolveOmnibarType(event.type)
                         settingsDataStore.omnibarType = resolved
                         applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
+                        if (forceWithAiInput) {
+                            duckChat.setInputScreenUserSetting(true)
+                        }
                         onboardingPixelSender.fire(
                             pixelName,
                             OnboardingPixelAction.QuickSetupClicked(

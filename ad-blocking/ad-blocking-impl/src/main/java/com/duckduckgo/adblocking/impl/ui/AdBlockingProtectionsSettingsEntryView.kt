@@ -55,6 +55,7 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
     private val listItem = SettingsListItem(context).apply {
         setLeadingIconResource(CommonR.drawable.ic_ads_blocked_color_24)
         setPrimaryText(context.getString(R.string.ad_blocking_settings_title_v2))
+        setStatus(true)
     }
 
     init {
@@ -84,7 +85,6 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
         conflatedStateJob += viewModel.viewState
             .onEach {
                 isGone = !it.isVisible
-                listItem.setStatus(it.isOn)
             }
             .launchIn(coroutineScope!!)
 

@@ -168,7 +168,7 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     // Starts the real orchestrator on a single QUICK_SETUP step so the view model actually renders QUICK_SETUP.
-    private suspend fun createViewModelAtQuickSetup(): BrandDesignUpdatePageViewModel {
+    private suspend fun createViewModelAtQuickSetup(hideAddressBarRow: Boolean = false): BrandDesignUpdatePageViewModel {
         val plan = LinearOnboardingPlan(
             id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
             steps = listOf(
@@ -181,6 +181,7 @@ class BrandDesignUpdatePageViewModelTest {
                             showSplitOption = false,
                             hideSetDefaultBrowserRow = false,
                             hideAddWidgetRow = false,
+                            hideAddressBarRow = hideAddressBarRow,
                             isReinstallUser = false,
                         )
                     },
@@ -575,6 +576,24 @@ class BrandDesignUpdatePageViewModelTest {
             assertFalse((command as Command.SyncAddWidgetSwitch).isChecked)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    // endregion
+
+    // region Quick setup address bar row visibility
+
+    @Test
+    fun whenQuickSetupDialogHidesAddressBarRowThenViewStateHideAddressBarRowIsTrue() = runTest {
+        val testee = createViewModelAtQuickSetup(hideAddressBarRow = true)
+        advanceUntilIdle()
+        assertTrue(testee.viewState.value.hideAddressBarRow)
+    }
+
+    @Test
+    fun whenQuickSetupDialogShowsAddressBarRowThenViewStateHideAddressBarRowIsFalse() = runTest {
+        val testee = createViewModelAtQuickSetup(hideAddressBarRow = false)
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.hideAddressBarRow)
     }
 
     // endregion
