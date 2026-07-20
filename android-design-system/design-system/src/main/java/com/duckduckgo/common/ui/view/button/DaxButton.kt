@@ -76,11 +76,7 @@ open class DaxButton @JvmOverloads constructor(
             if (buttonSize == Small) R.attr.daxButtonSmallHeight else R.attr.daxButtonLargeHeight,
             Size.dimension(buttonSize),
         )
-        minHeight = if (buttonSize == Size.Large && verticalInset != null) {
-            resolvedHeight + verticalInset * 2
-        } else {
-            resolvedHeight
-        }
+        minHeight = buttonSize.resolveMinHeight(resolvedHeight, verticalInset)
 
         setPadding(sidePadding, topPadding, sidePadding, topPadding)
 
@@ -138,6 +134,11 @@ enum class Size {
     }
 }
 
+internal fun Size.resolveMinHeight(
+    tokenHeight: Int,
+    verticalInset: Int?,
+): Int = if (this == Size.Large && verticalInset != null) tokenHeight + verticalInset * 2 else tokenHeight
+
 enum class ButtonType {
     PRIMARY,
     GHOST,
@@ -146,6 +147,7 @@ enum class ButtonType {
     DESTRUCTIVE_SECONDARY,
     GHOST_DESTRUCTIVE,
     GHOST_ALT,
+    BRAND,
     ;
 
     fun getView(context: Context): DaxButton {
@@ -157,6 +159,7 @@ enum class ButtonType {
             DESTRUCTIVE_SECONDARY -> DaxButtonDestructiveSecondary(context, null)
             GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
             GHOST_ALT -> DaxButtonGhostAlt(context, null)
+            BRAND -> DaxButtonBrand(context, null)
         }
     }
 }
