@@ -45,6 +45,7 @@ import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_
 import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
+import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
@@ -110,6 +111,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
             INVALID_DAX_BUTTON_PROPERTY,
+            INVALID_DAX_BUTTON_DUCK_SANS,
             INVALID_SKELETON_VIEW_BACKGROUND,
             WRONG_STYLE_PARAMETER,
             WRONG_STYLE_NAME,
