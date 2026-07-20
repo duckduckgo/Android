@@ -135,8 +135,9 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
         binding.removeAnotherDeviceItem.isGone = viewState.device.thisDevice
 
-        binding.editThisDeviceNameItem.isVisible = viewState.device.thisDevice
+        binding.editThisDeviceNameItem.isVisible = viewState.device.thisDevice && !viewState.isEditingName
         binding.editThisDeviceNameItem.setSecondaryText(viewState.device.deviceName)
+        binding.editThisDeviceNameShimmer.isVisible = viewState.device.thisDevice && viewState.isEditingName
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
         binding.syncThisDeviceToggleContainer.isVisible = viewState.device.thisDevice
 
