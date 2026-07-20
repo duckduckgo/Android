@@ -160,7 +160,7 @@ interface DuckChatFeature {
      * is in Search & Duck.ai mode. Search-only users, or users with this disabled, never see it.
      * If the remote feature is not present defaults to `internal`.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeInputNavBar(): Toggle
 
     /**
