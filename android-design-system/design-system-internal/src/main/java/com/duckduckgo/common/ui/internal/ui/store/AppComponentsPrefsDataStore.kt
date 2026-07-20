@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.internal.ui.store
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -63,7 +64,20 @@ class AppComponentsPrefsDataStore(
         }
     }
 
+    val brandDesignUpdateFlow: Flow<Boolean> = store.data.map { preferences ->
+        preferences[booleanPreferencesKey(KEY_BRAND_DESIGN_UPDATE)] ?: false
+    }.flowOn(dispatcherProvider.io())
+
+    suspend fun setBrandDesignUpdate(enabled: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            store.edit { preferences ->
+                preferences[booleanPreferencesKey(KEY_BRAND_DESIGN_UPDATE)] = enabled
+            }
+        }
+    }
+
     companion object {
         const val KEY_SELECTED_THEME = "KEY_SELECTED_THEME"
+        const val KEY_BRAND_DESIGN_UPDATE = "KEY_BRAND_DESIGN_UPDATE"
     }
 }

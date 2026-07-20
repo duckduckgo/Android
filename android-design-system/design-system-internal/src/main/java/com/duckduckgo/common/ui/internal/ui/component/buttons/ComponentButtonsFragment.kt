@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
@@ -44,6 +45,7 @@ import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.mobile.android.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlin.math.roundToInt
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 
 @SuppressLint("NoFragment", "DenyListedApi") // we don't use DI here
@@ -67,7 +69,39 @@ class ComponentButtonsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val isBrandDesignUpdate = runBlocking { appComponentsViewModel.brandDesignUpdateFlow.first() }
         setupComposeViews(view, isDarkTheme)
+        applyBrandDesignSpacing(isBrandDesignUpdate)
+    }
+
+    private fun applyBrandDesignSpacing(isBrandDesignUpdate: Boolean) {
+        if (!isBrandDesignUpdate) return
+
+        val largeButtons = listOf(
+            binding.daxButtonBrandLarge,
+            binding.daxButtonBrandLargeIcon,
+            binding.daxButtonPrimaryLarge,
+            binding.daxButtonPrimaryLargeIcon,
+            binding.daxButtonSecondaryLarge,
+            binding.daxButtonSecondaryLargeIcon,
+            binding.daxButtonDestructiveLarge,
+            binding.daxButtonDestructiveLargeIcon,
+            binding.daxButtonGhostLarge,
+            binding.daxButtonGhostLargeIcon,
+            binding.daxButtonDestructiveSecondaryLarge,
+            binding.daxButtonDestructiveSecondaryLargeIcon,
+            binding.daxButtonGhostDestructiveLarge,
+            binding.daxButtonGhostDestructiveLargeIcon,
+            binding.daxButtonGhostAltLarge,
+            binding.daxButtonGhostAltLargeIcon,
+        )
+        val verticalInsetPx = (6 * resources.displayMetrics.density).roundToInt()
+        largeButtons.forEach { button ->
+            button.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = verticalInsetPx
+                bottomMargin = verticalInsetPx
+            }
+        }
     }
 
     @Suppress("LongMethod")
