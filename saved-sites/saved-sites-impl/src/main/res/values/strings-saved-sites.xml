@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Share Favorites</string>
-    <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
     <string name="sync_simplified_enable_option_favorites_title">Share Favorites Across Devices</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Use the same favorite bookmarks on mobile and desktop.</string>
     <string name="saved_site_limit_warning"><b>Sync Paused</b>\nYou\'ve reached the maximum number of bookmarks. Please delete some to resume sync.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
@@ -101,8 +99,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Fetch Bookmark Icons</string>
-    <string name="sync_fetch_icons_subtitle">Automatically download icons for your synced bookmarks.</string>
     <string name="sync_simplified_fetch_icons_title">Load Bookmark Icons</string>
     <string name="sync_simplified_fetch_icons_subtitle">Loads icons from websites you’ve bookmarked. Icon downloads are exposed to your network.</string>
     <string name="faviconsPromptTitle">Download Missing Icons?</string>

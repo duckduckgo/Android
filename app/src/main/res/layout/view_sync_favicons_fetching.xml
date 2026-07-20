@@ -24,9 +24,9 @@
         android:id="@+id/sync_favicons_fetching"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_image_24"
+        app:leadingIcon="@drawable/ic_sync_favicons_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_fetch_icons_title"
-        app:secondaryText="@string/sync_fetch_icons_subtitle"
+        app:primaryText="@string/sync_simplified_fetch_icons_title"
+        app:secondaryText="@string/sync_simplified_fetch_icons_subtitle"
         app:showSwitch="true" />
 </FrameLayout>
