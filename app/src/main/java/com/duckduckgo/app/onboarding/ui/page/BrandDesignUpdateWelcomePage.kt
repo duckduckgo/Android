@@ -1041,7 +1041,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 WIDGET_PROMPT -> {
                     dismissBottomWingAnimation()
-                    releaseCardBottomInset()
                     binding.daxDialogCta.welcomeContent.root.isVisible = false
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = true
@@ -1050,11 +1049,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
                         getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
 
-                    val leftWingView = binding.leftWingAnimation
-                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = leftWingView,
+                    val showLeftWingAnimation = applyDecorationLayout(
+                        binding.leftWingAnimation,
+                        LEFT_WING_MAX_HEIGHT_DP,
+                        LEFT_WING_MIN_HEIGHT_DP,
+                        bottomOverlapPx = leftWingBottomOverlapPx(),
                     )
                     if (!showLeftWingAnimation) {
                         binding.leftWingAnimation.isVisible = false
@@ -1793,11 +1792,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
                     getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
 
-                val leftWingView = binding.leftWingAnimation
-                val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = leftWingView,
+                val showLeftWing = applyDecorationLayout(
+                    binding.leftWingAnimation,
+                    LEFT_WING_MAX_HEIGHT_DP,
+                    LEFT_WING_MIN_HEIGHT_DP,
+                    bottomOverlapPx = leftWingBottomOverlapPx(),
                 )
                 binding.leftWingAnimation.apply {
                     cancelAnimation()
