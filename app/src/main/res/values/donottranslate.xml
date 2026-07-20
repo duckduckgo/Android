@@ -100,7 +100,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
 
     <!-- Add to Dock (onboarding) -->
-    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen in a snap.</string>
+    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
     <string name="preOnboardingAddToDockBody">Just find the DuckDuckGo icon, press and hold it, then drag it into place.</string>
     <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 </resources>

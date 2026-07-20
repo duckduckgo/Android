@@ -57,6 +57,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -1088,6 +1089,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 ADD_TO_DOCK -> {
                     setupAddToDockVideo()
 
+                    val keepBottomWingAnchor = binding.bottomWingAnimation.isVisible
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.welcomeContent.root.isVisible = false
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
@@ -1095,9 +1097,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = false
 
                     binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        if (keepBottomWingAnchor) {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = binding.bottomWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
                     }
 
                     binding.daxDialogCta.secondaryCta.visibility = View.GONE
@@ -1842,11 +1850,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.addToDockContent.root.isVisible = true
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = false
 
-                // No bobbing dax/bottom wing decoration on this dialog — always pin to the top,
-                // otherwise a fresh view (e.g. after a rotation-triggered recreation) falls back
-                // to the top-level layout's default bottom-anchored bias.
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    verticalBias = 0f
+                    verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
                     bottomToTop = ConstraintLayout.LayoutParams.UNSET
                     bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                 }
@@ -2805,7 +2810,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             speed = 1f
             addAnimatorListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    isGone = true
+                    isInvisible = true
                     removeAnimatorListener(this)
                 }
             })
