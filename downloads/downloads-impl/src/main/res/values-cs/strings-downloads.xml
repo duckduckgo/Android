@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Sdílet s...</string>
     <string name="downloadsStateInProgress">Probíhá...</string>
     <string name="downloadsUndoActionName">Vrátit</string>
+    <string name="downloadsSearchHint">Vyhledávání</string>
 </resources>
