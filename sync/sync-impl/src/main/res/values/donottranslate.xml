@@ -37,4 +37,15 @@
     <string name="sync_setup_v2_edit_device_name_item">Edit Name</string>
     <string name="sync_setup_v2_remove_this_device_notice">This device will no longer be able to access your synced data if you remove it.</string>
     <string name="sync_setup_v2_remove_another_device_notice">This device will no longer be able to access your synced data if this is turned off.</string>
+    <string name="sync_device_v2_edit_device_dialog_title">Edit Name</string>
+    <string name="sync_device_v2_edit_device_dialog_primary_button">Done</string>
+    <string name="sync_device_v2_edit_device_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_remove_device_dialog_title">Remove Device?</string>
+    <string name="sync_device_v2_remove_device_dialog_body" instruction="Placeholder is a device name">\"%1$s\" will no longer be able to access your synced data.</string>
+    <string name="sync_device_v2_remove_device_dialog_primary_button">Remove</string>
+    <string name="sync_device_v2_remove_device_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_title">Turn Off Sync &amp; Backup?</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_body">This device will no longer be able to access your synced data on other devices.</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_primary_button">Turn Off</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_secondary_button">Cancel</string>
 </resources>

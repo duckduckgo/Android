@@ -47,6 +47,11 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
 
     companion object {
         const val DEVICE_KEY = "device"
+        const val RESULT_DEVICE_EDITED = 200
+        const val RESULT_DEVICE_REMOVED = 201
+        const val RESULT_SYNC_TURNED_OFF = 202
+
+        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
     }
 }
 

@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
 import androidx.core.view.isGone
@@ -29,6 +30,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
@@ -37,9 +40,21 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2EditDeviceBinding
+import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_KEY
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_EDITED
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_REMOVED
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_SYNC_TURNED_OFF
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskRemoveDevice
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ResetTurnOffSyncToggle
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetEditDeviceResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetRemoveDeviceResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetTurnOffSyncResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.ViewState
@@ -50,11 +65,6 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class EditDeviceActivity : DuckDuckGoActivity() {
-    private val device
-        get() = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_KEY, ParcelableDevice::class.java)) {
-            "Missing intent extra: '$DEVICE_KEY'"
-        }.toConnectedDevice()
-
     private val binding by viewBinding<ActivitySyncV2EditDeviceBinding>()
 
     @Inject
@@ -67,7 +77,17 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel by viewModels<EditDeviceViewModel> {
-        Provider(vmFactory, device)
+        val device = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_KEY, ParcelableDevice::class.java)) {
+            "Missing intent extra: '$DEVICE_KEY'"
+        }
+
+        Provider(vmFactory, device.toConnectedDevice())
+    }
+
+    private val currentDevice get() = viewModel.viewState.value.device
+
+    private val turnOffSyncListener = OnCheckedChangeListener { _, isChecked ->
+        if (!isChecked) viewModel.onTurnOffSync()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,7 +103,9 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         }
 
         configureToolbar()
+        configureEditDeviceNameItem()
         configureRemoveAnotherDeviceItem()
+        configureTurnOffSyncToggle()
 
         observeViewModel()
     }
@@ -129,8 +151,109 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            Close -> finish()
+            is AskEditDevice -> {
+                askEditDevice()
+            }
+
+            is SetEditDeviceResult -> {
+                setResult(RESULT_DEVICE_EDITED, EditDeviceContract.resultIntent(currentDevice))
+            }
+
+            is AskRemoveDevice -> {
+                askRemoveDevice()
+            }
+
+            is SetRemoveDeviceResult -> {
+                setResult(RESULT_DEVICE_REMOVED, EditDeviceContract.resultIntent(currentDevice))
+            }
+
+            is AskTurnOffSync -> {
+                askTurnOffSync()
+            }
+
+            is SetTurnOffSyncResult -> {
+                setResult(RESULT_SYNC_TURNED_OFF, EditDeviceContract.resultIntent(currentDevice))
+            }
+
+            is ResetTurnOffSyncToggle -> {
+                binding.syncThisDeviceToggle.quietlySetIsChecked(true, turnOffSyncListener)
+            }
+
+            is ShowError -> {
+                showError(command)
+            }
+
+            is Close -> {
+                finish()
+            }
         }
+    }
+
+    private fun askEditDevice() {
+        val inputBinding = DialogEditDeviceBinding.inflate(layoutInflater).apply {
+            customDialogTextInput.text = currentDevice.deviceName
+        }
+        CustomAlertDialogBuilder(this)
+            .setTitle(R.string.sync_device_v2_edit_device_dialog_title)
+            .setPositiveButton(R.string.sync_device_v2_edit_device_dialog_primary_button)
+            .setNegativeButton(R.string.sync_device_v2_edit_device_dialog_secondary_button)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.confirmNewDeviceName(inputBinding.customDialogTextInput.text)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun askRemoveDevice() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_device_v2_remove_device_dialog_title)
+            .setMessage(getString(R.string.sync_device_v2_remove_device_dialog_body, currentDevice.deviceName))
+            .setPositiveButton(R.string.sync_device_v2_remove_device_dialog_primary_button)
+            .setNegativeButton(R.string.sync_device_v2_remove_device_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onRemoveDeviceConfirmed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun askTurnOffSync() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_device_v2_turn_off_sync_dialog_title)
+            .setMessage(getString(R.string.sync_device_v2_turn_off_sync_dialog_body))
+            .setPositiveButton(R.string.sync_device_v2_turn_off_sync_dialog_primary_button)
+            .setNegativeButton(R.string.sync_device_v2_turn_off_sync_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onTurnOffSyncCanceled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onTurnOffSyncCanceled()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showError(command: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(command.message) + "\n" + command.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .show()
     }
 
     private fun configureToolbar() {
@@ -139,11 +262,25 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureEditDeviceNameItem() {
+        binding.editThisDeviceNameItem.setOnClickListener {
+            viewModel.onEditDeviceName()
+        }
+    }
+
+    private fun configureTurnOffSyncToggle() {
+        binding.syncThisDeviceToggle.apply {
+            setIsChecked(true)
+            setOnCheckedChangeListener(turnOffSyncListener)
+        }
+    }
+
     private fun configureRemoveAnotherDeviceItem() {
         val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
         binding.removeAnotherDeviceItem.apply {
             leadingIcon().imageTintList = color
             setPrimaryTextColorStateList(color)
+            setOnClickListener { viewModel.onRemoveDevice() }
         }
     }
 
