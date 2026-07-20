@@ -40,6 +40,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
@@ -127,7 +128,19 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val syncedDeviceAdapter = SyncedDeviceAdapter()
+    private val editDeviceLauncher = registerForActivityResult(
+        EditDeviceContract(),
+    ) { result ->
+        logcat { "Edit device result: $result" }
+    }
+
+    private val syncedDeviceAdapter = SyncedDeviceAdapter(
+        object : SyncedDeviceAdapter.Listener {
+            override fun onDeviceClicked(device: ConnectedDevice) {
+                viewModel.onEditDeviceClicked(device, requireAuth = true)
+            }
+        },
+    )
 
     private val syncThisDeviceListener = OnCheckedChangeListener { _, isChecked ->
         if (isChecked) viewModel.onSyncThisDevice(launchSource)
@@ -215,7 +228,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is AskEditDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    editDeviceLauncher.launch(EditDeviceContract.Input(command.device))
+                }
             }
 
             is AskRemoveDevice -> {
@@ -281,7 +296,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is RequestSetupAuthentication -> {
-                launchDeviceAuthEnrollment()
+                launchDeviceAuthEnrollment(command.forSyncThisDevice)
             }
 
             is ShowDeviceConnected -> {
@@ -359,7 +374,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun launchDeviceAuthEnrollment() {
+    private fun launchDeviceAuthEnrollment(forSyncThisDevice: Boolean) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_require_device_passcode_dialog_title)
             .setMessage(getString(R.string.sync_require_device_passcode_dialog_body))
@@ -375,11 +390,12 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onSyncThisDeviceCanceled()
+                        // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
+                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
 
                     override fun onDialogCancelled() {
-                        viewModel.onSyncThisDeviceCanceled()
+                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
                 },
             )
