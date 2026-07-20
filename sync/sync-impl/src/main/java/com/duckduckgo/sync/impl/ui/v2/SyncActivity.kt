@@ -80,6 +80,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.EditDevice
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.NoOp
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.RemoveDevice
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.TurnOffSync
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -137,7 +141,13 @@ class SyncActivity : DuckDuckGoActivity() {
     private val editDeviceLauncher = registerForActivityResult(
         EditDeviceContract(),
     ) { result ->
-        logcat { "Edit device result: $result" }
+        when (result) {
+            is RemoveDevice -> viewModel.onRemoveDeviceConfirmed(result.device)
+            is TurnOffSync -> viewModel.onTurnOffSyncConfirmed(result.device)
+            // We don't have to refresh the device after editing it because it will be reloaded when a user returns here.
+            is EditDevice -> Unit
+            is NoOp -> Unit
+        }
     }
 
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
