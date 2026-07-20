@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,6 +46,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
@@ -57,11 +60,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -120,6 +125,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -314,6 +320,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         ) : Command()
 
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
+        data class StartAdBlockingAnimation(
+            @field:DrawableRes val icon: Int,
+            @field:StringRes val text: Int,
+        ) : Command()
+        data object AdBlockingAnimationSuppressed : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
@@ -1042,11 +1053,19 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
         if (touchAction == ACTION_UP) {
-            firePixelBasedOnCurrentUrl(
-                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
-                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
-                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
-            )
+            if (_viewState.value.viewMode == ViewMode.DuckAI) {
+                pixel.fire(
+                    AppPixelName.ADDRESS_BAR_AICHAT_CLICKED,
+                    mapOf(BROWSER_MODE to browserMode.name.lowercase()),
+                )
+            } else {
+                firePixelBasedOnCurrentUrl(
+                    AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
+                    AppPixelName.ADDRESS_BAR_SERP_CLICKED,
+                    AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
+                    extraParams = mapOf(BROWSER_MODE to browserMode.name.lowercase()),
+                )
+            }
         }
     }
 
@@ -1115,6 +1134,25 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
             }
 
+            is LaunchAdBlockingAnimation -> {
+                val hasFocus = _viewState.value.hasFocus
+                val isCustomTab = viewState.value.viewMode is CustomTab
+                if (!hasFocus && !isCustomTab) {
+                    _viewState.update {
+                        it.copy(
+                            leadingIconState = PrivacyShield,
+                        )
+                    }
+                    viewModelScope.launch {
+                        command.send(Command.StartAdBlockingAnimation(decoration.icon, decoration.text))
+                    }
+                } else {
+                    viewModelScope.launch {
+                        command.send(Command.AdBlockingAnimationSuppressed)
+                    }
+                }
+            }
+
             else -> {
                 // no-op
             }
@@ -1131,14 +1169,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         emptyUrlPixel: AppPixelName,
         duckDuckGoQueryUrlPixel: AppPixelName,
         websiteUrlPixel: AppPixelName,
+        extraParams: Map<String, String> = emptyMap(),
     ) {
         val text = _viewState.value.url
         if (text.isEmpty()) {
-            pixel.fire(emptyUrlPixel)
+            pixel.fire(emptyUrlPixel, extraParams)
         } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
-            pixel.fire(duckDuckGoQueryUrlPixel)
+            pixel.fire(duckDuckGoQueryUrlPixel, extraParams)
         } else if (isUrl(text)) {
-            pixel.fire(websiteUrlPixel)
+            pixel.fire(websiteUrlPixel, extraParams)
         }
     }
 

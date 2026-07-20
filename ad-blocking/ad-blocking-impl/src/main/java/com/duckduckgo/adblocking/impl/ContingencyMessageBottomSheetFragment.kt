@@ -16,11 +16,15 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetContingencyMessageBinding
+import com.duckduckgo.common.ui.setRoundCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ContingencyMessageBottomSheetFragment : BottomSheetDialogFragment() {
@@ -34,6 +38,14 @@ class ContingencyMessageBottomSheetFragment : BottomSheetDialogFragment() {
         binding.contingencyMessageCloseButton.setOnClickListener { dismiss() }
         binding.contingencyMessagePrimaryButton.setOnClickListener { dismiss() }
         return binding.root
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.behavior.skipCollapsed = true
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.setOnShowListener { dialog.setRoundCorners() }
+        return dialog
     }
 
     companion object {

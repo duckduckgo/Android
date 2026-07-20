@@ -66,6 +66,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -283,6 +284,8 @@ class ImportGoogleBookmarksWebFlowFragment :
                 this@ImportGoogleBookmarksWebFlowFragment,
                 this@ImportGoogleBookmarksWebFlowFragment,
                 CUSTOM_FLOW_TAB_ID,
+                // Bookmark import is an independent Regular-mode flow; Fire mode never offers to import.
+                BrowserMode.REGULAR,
             )
         }
 
@@ -376,7 +379,8 @@ class ImportGoogleBookmarksWebFlowFragment :
         lifecycleScope.launch(dispatchers.main()) {
             binding?.let {
                 val reauthDetails = url?.let { viewModel.getReauthData(url) } ?: ReAuthenticationDetails()
-                browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails)
+                // Bookmark import is an independent Regular-mode flow; Fire mode never offers to import.
+                browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails, BrowserMode.REGULAR)
             }
         }
     }

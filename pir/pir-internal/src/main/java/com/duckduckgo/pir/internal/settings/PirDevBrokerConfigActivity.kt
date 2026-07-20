@@ -192,9 +192,9 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
 
             try {
                 withContext(dispatcherProvider.io()) {
-                    // Clear etags to force re-download
+                    // Clear etags AND parsed broker details to force a real re-download
                     repository.updateMainEtag(null)
-                    repository.clearAllBrokerJsons()
+                    repository.clearAllBrokerData()
                     repository.setHasBrokerConfigBeenManuallyUpdated(false)
                 }
 

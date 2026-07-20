@@ -267,6 +267,20 @@
             }
         ]
     },
+    "m_dbp_optoutjob_reappeared": {
+        "description": "Fired when a previously-removed profile reappears in a later scan, reverting its opt-out job record from REMOVED back to REQUESTED.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker on which the profile reappeared",
+                "type": "string"
+            }
+        ]
+    },
     "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],

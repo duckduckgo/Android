@@ -38,4 +38,13 @@ interface PixelService {
         @QueryMap(encoded = true) encodedQueryParams: Map<String, String> = emptyMap(),
         @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Completable
+
+    @GET("${AppUrl.Url.PIXEL}/t/{pixelName}_android_{formFactor}")
+    fun fireWithoutAtb(
+        @Path("pixelName") pixelName: String,
+        @Path("formFactor") formFactor: String,
+        @QueryMap additionalQueryParams: Map<String, String> = emptyMap(),
+        @QueryMap(encoded = true) encodedQueryParams: Map<String, String> = emptyMap(),
+        @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+    ): Completable
 }

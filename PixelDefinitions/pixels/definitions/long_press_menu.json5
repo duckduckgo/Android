@@ -11,6 +11,6 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     }
 }

@@ -25,6 +25,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class ShowOnAppLaunchPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return ShowOnAppLaunchPixelName.entries.map { it.pixelName to PixelParameter.removeAtb() }
+        return ShowOnAppLaunchPixelName.entries.map { it.pixelName to PixelParameter.removeAtb() } +
+            NtpAfterIdleStatePixelName.entries.map { it.pixelName to PixelParameter.removeAtb() }
     }
 }

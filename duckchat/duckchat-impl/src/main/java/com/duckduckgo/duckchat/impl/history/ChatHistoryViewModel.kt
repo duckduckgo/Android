@@ -61,6 +61,7 @@ class ChatHistoryViewModel @Inject constructor(
     private val duckAiModelManager: DuckAiModelManager,
     @RegularMode private val tabRepository: TabRepository,
     private val pixel: Pixel,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -256,7 +257,7 @@ class ChatHistoryViewModel @Inject constructor(
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
         val urls = chatIds.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
         appScope.launch {
-            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.SelectedForMode(urls, BrowserMode.REGULAR)))
+            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.SelectedForMode(urls, browserMode)))
         }
     }
 

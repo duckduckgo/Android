@@ -56,6 +56,8 @@ class BottomAppBarBehavior<V : View>(
         R.id.browserLayout,
         R.id.includeNewBrowserTab,
         R.id.inputModeBottomRoot,
+        R.id.inputModeTopRoot,
+        R.id.inputModeWidgetNavLayout,
     )
 
     @SuppressLint("RestrictedApi")

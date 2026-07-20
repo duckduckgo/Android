@@ -32,6 +32,7 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
@@ -278,7 +279,8 @@ class ClearPersonalDataAction(
     private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.main()) {
             if (shouldFireDataClearPixel) {
-                clearingStore.incrementCount()
+                // this is only called in Regular mode
+                clearingStore.incrementCount(BrowserMode.REGULAR)
             }
 
             dataManager.clearData(createWebView(), createWebStorage())
@@ -291,7 +293,8 @@ class ClearPersonalDataAction(
     private suspend fun clearDataGranularlyAsync(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.main()) {
             if (shouldFireDataClearPixel) {
-                clearingStore.incrementCount()
+                // this is only called in Regular mode
+                clearingStore.incrementCount(BrowserMode.REGULAR)
             }
 
             dataManager.clearData(
@@ -311,6 +314,7 @@ class ClearPersonalDataAction(
     }
 
     private fun createWebStorage(): WebStorage {
+        // this is only called in Regular mode
         return WebStorage.getInstance()
     }
 

@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Zaštita od kolačića i skočnih prozora</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo će pokušati za tebe odabrati najprivatnije dostupne postavke i sakriti skočne prozore.\n<a href=\"\">Saznaj više</a>]]></string>
     <string name="autoconsentToggle">Neka DuckDuckGo upravlja skočnim prozorima kolačića</string>
+    <string name="autoconsentAutoManageToggle">Automatsko upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentAutoManageDescription">Pokušat ćemo za tebe odabrati samo najprivatnije dostupne opcije kolačića, a zatim zatvoriti te skočne prozore.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo može automatski upravljati postavkama kolačića za povećanje privatnosti, smanjenje kolačića i zatvaranje skočnih prozora.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Skočni prozori bez mogućnosti isključivanja</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Dopusti da ti DuckDuckGo uštedi klik prihvaćanjem kolačića u tvoje ime kako bi zatvorio skočne prozore koji ti ne dopuštaju isključivanje.</string>
 </resources>

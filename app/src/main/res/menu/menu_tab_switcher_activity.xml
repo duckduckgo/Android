@@ -22,7 +22,7 @@
     <item
         android:id="@+id/duckAIToolbarButton"
         android:icon="@drawable/ic_ai_chat_24"
-        android:title="@string/tabSwitcherListViewMenu"
+        android:title="@string/duckChatMenuItem"
         app:showAsAction="always" />
 
     <item
@@ -40,7 +40,7 @@
     <item
         android:id="@+id/popupMenuToolbarButton"
         android:icon="@drawable/ic_menu_vertical_24"
-        android:title="@string/browserPopupMenu"
+        android:title="@string/options"
         app:showAsAction="always" />
 
 </menu>

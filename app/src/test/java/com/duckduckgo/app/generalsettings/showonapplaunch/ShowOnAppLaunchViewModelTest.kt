@@ -70,6 +70,7 @@ class ShowOnAppLaunchViewModelTest {
             settingsDataStore,
             pixel,
             ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
     }
 
@@ -117,6 +118,7 @@ class ShowOnAppLaunchViewModelTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -130,6 +132,7 @@ class ShowOnAppLaunchViewModelTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -145,6 +148,7 @@ class ShowOnAppLaunchViewModelTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -160,6 +164,7 @@ class ShowOnAppLaunchViewModelTest {
         )
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -176,6 +181,7 @@ class ShowOnAppLaunchViewModelTest {
         )
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -191,6 +197,7 @@ class ShowOnAppLaunchViewModelTest {
         )
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -256,6 +263,7 @@ class ShowOnAppLaunchViewModelTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.viewState.test {
@@ -271,6 +279,7 @@ class ShowOnAppLaunchViewModelTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
 
         testee.commands.test {

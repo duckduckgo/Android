@@ -71,18 +71,19 @@ class ChatHistoryViewModelTest {
     // ends up running its coroutines on real background threads. That makes the init block's
     // fetchModels() call race the test. Lazy construction happens after the rule, keeping everything
     // on the test thread.
-    private val viewModel by lazy {
-        ChatHistoryViewModel(
-            repository,
-            coroutineRule.testScope,
-            duckChat,
-            dataClearingTrigger,
-            duckAiFeatureState,
-            duckAiModelManager,
-            tabRepository,
-            pixel,
-        )
-    }
+    private val viewModel by lazy { createViewModel() }
+
+    private fun createViewModel(browserMode: BrowserMode = BrowserMode.REGULAR) = ChatHistoryViewModel(
+        repository,
+        coroutineRule.testScope,
+        duckChat,
+        dataClearingTrigger,
+        duckAiFeatureState,
+        duckAiModelManager,
+        tabRepository,
+        pixel,
+        browserMode,
+    )
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -841,6 +842,29 @@ class ChatHistoryViewModelTest {
             expectNoEvents()
         }
         assertTrue(dataClearingTrigger.calls.isEmpty())
+    }
+
+    @Test
+    fun `whenSelectedClearDispatchedInFireModeThenClearUsesFireMode`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+
+            viewModel.onDeleteSelectedRequested()
+
+            val final = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
+        }
+        assertEquals(
+            listOf(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a"), BrowserMode.FIRE))),
+            dataClearingTrigger.calls,
+        )
     }
 
     @Test

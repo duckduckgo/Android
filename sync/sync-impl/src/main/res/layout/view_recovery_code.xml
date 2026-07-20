@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_sync_success_128"
+        android:src="@drawable/qr_success_hero"
         android:layout_gravity="center_horizontal"
         tools:ignore="ContentDescription"/>
 
@@ -239,6 +239,21 @@
         </LinearLayout>
     </LinearLayout>
 
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/pdf_retention_notice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_7"
+        android:layout_marginEnd="@dimen/keyline_7"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/questions_group"
+        android:textColor="?attr/daxColorBlack"
+        android:gravity="center"
+        app:typography="caption"
+        android:text="@string/sync_pdf_retention_notice"/>
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/horizontal_divider"
         android:layout_width="288dp"
@@ -246,19 +261,20 @@
         app:defaultPadding="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/questions_group"
+        app:layout_constraintTop_toBottomOf="@id/pdf_retention_notice"
         android:layout_marginTop="@dimen/keyline_3"/>
 
     <ImageView
         android:id="@+id/dax_logo"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/horizontal_divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@drawable/ic_dax_stacked"
+        app:srcCompat="@drawable/logo_horizontal"
         android:layout_gravity="center_horizontal"
         tools:ignore="ContentDescription"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

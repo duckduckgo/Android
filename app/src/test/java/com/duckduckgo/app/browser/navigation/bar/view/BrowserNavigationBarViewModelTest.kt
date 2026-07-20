@@ -25,6 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -65,6 +66,7 @@ class BrowserNavigationBarViewModelTest {
             tabRepository = tabRepositoryMock,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             browserMenuHighlight = browserMenuHighlight,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -110,7 +112,10 @@ class BrowserNavigationBarViewModelTest {
         val handled = testee.onTabsButtonLongClicked()
 
         Assert.assertTrue(handled)
-        verify(pixelMock).fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
+        verify(pixelMock).fire(
+            AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+        )
     }
 
     @Test

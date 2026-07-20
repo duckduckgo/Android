@@ -61,7 +61,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val compiled = findCompiledTracker(host(url)) ?: return Client.Result(matches = false, isATracker = false)
+        val compiled = findCompiledTracker(host(url)) ?: return Client.Result.NO_MATCH
         val matches = matchesTrackerEntry(compiled, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -77,7 +77,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val compiled = findCompiledTracker(url.host) ?: return Client.Result(matches = false, isATracker = false)
+        val compiled = findCompiledTracker(url.host) ?: return Client.Result.NO_MATCH
         val matches = matchesTrackerEntry(compiled, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -114,6 +114,9 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): MatchedResult {
+        // The request type depends only on (url, requestHeaders), so it is invariant across rules. Computing it once.
+        var type: String? = null
+        var typeResolved = false
         compiled.rules.forEach { compiledRule ->
             val rule = compiledRule.rule
             val regex = if (precompileRegex) {
@@ -122,7 +125,10 @@ class TdsClient(
                 ".*${rule.rule}.*".toRegex()
             }
             if (url.matches(regex)) {
-                val type = urlToTypeMapper.map(url, requestHeaders)
+                if (!typeResolved) {
+                    type = urlToTypeMapper.map(url, requestHeaders)
+                    typeResolved = true
+                }
 
                 if (rule.options != null) {
                     if (!matchedDomainAndTypes(rule.options.domains, rule.options.types, documentUrl, type)) {

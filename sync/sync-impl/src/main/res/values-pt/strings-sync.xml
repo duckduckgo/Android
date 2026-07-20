@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">É necessária a permissão de armazenamento para guardar o PDF de recuperação</string>
     <string name="sync_share_title">Partilhar com...</string>
     <string name="sync_pdf_title">Sincronizar código de recuperação</string>
-    <string name="sync_pdf_description">O código de recuperação permite sincronizar os teus marcadores em vários dispositivos e recuperar os dados sincronizados se perderes o acesso a um dispositivo.</string>
+    <string name="sync_pdf_description">O código de recuperação permite-te sincronizar as tuas palavras-passe, dados de preenchimento automático e os teus chats Duck.ai em vários dispositivos, e recuperar os teus dados sincronizados se perderes o acesso a um dispositivo.</string>
     <string name="sync_code_box_title">Guarda estas informações em segurança.</string>
-    <string name="sync_instructions_title">Como funciona?</string>
-    <string name="sync_instructions_step1">Abre o DuckDuckGo noutro dispositivo e acede a Sincronização em Definições.</string>
-    <string name="sync_instructions_step2">Lê o código QR ou copia e cola o código de texto noutra aplicação DuckDuckGo.</string>
+    <string name="sync_instructions_title">Como funciona este código?</string>
+    <string name="sync_instructions_step1">Abre o DuckDuckGo no dispositivo que queres sincronizar e vai a Sync &amp; Backup nas Definições.</string>
+    <string name="sync_instructions_step2">Seleciona \"Sincronizar com outro dispositivo\" e digitaliza o código QR ou introduz o código de texto.</string>
     <string name="sync_instructions_step3">A sincronização será ativada e terás novamente acesso a todos os teus dados.</string>
+    <string name="sync_pdf_retention_notice">Se passares mais de 18 meses sem usar um navegador DuckDuckGo com Sync &amp; Backup ativado, os teus dados serão apagados do servidor e não poderão ser recuperados.</string>
     <string name="remove_device_dialog_title">Remover dispositivo?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" deixará de poder aceder aos teus dados sincronizados.</string>
     <string name="remove_device_dialog_primary_button">Remover</string>

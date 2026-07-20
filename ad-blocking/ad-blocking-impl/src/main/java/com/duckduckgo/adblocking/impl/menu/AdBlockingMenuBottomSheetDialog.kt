@@ -24,17 +24,19 @@ import androidx.core.graphics.drawable.toDrawable
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingMenuBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class AdBlockingMenuBottomSheetDialog(
     builderContext: Context,
-    private val selectedChoice: AdBlockingChoice,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
+    selectedChoice: AdBlockingChoice,
+    edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     builderContext,
     if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
@@ -60,6 +62,12 @@ class AdBlockingMenuBottomSheetDialog(
             binding.root.applyBottomSystemBarInsetPadding()
         }
 
+        behavior.skipCollapsed = true
+        behavior.maxHeight = context.resources.displayMetrics.heightPixels * MAX_HEIGHT_PERCENT / 100
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        setOnShowListener { setRoundCorners() }
+
         binding.adBlockingMenuAlwaysOn.setChecked(selectedChoice == AdBlockingChoice.ALWAYS_ON)
         binding.adBlockingMenuDisableUntilRelaunch.setChecked(selectedChoice == AdBlockingChoice.DISABLE_UNTIL_RELAUNCH)
         binding.adBlockingMenuAlwaysOff.setChecked(selectedChoice == AdBlockingChoice.ALWAYS_OFF)
@@ -83,5 +91,9 @@ class AdBlockingMenuBottomSheetDialog(
         } else {
             setLeadingIconDrawable(Color.TRANSPARENT.toDrawable())
         }
+    }
+
+    private companion object {
+        private const val MAX_HEIGHT_PERCENT = 90
     }
 }

@@ -23,7 +23,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -44,6 +43,7 @@ import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -66,6 +66,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,13 +88,13 @@ class RealDuckChatJSHelperTest {
     private val mockLimitsHandler: LimitsHandler = mock()
     private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
     private val mockAppInstall: AppInstall = mock {
-        on { getInstallationTimestamp() } doReturn DEFAULT_INSTALL_TIMESTAMP
+        onBlocking { getInstallAge() } doReturn Duration.ZERO
     }
     private val mockAppBuildConfig: AppBuildConfig = mock {
         onBlocking { isAppReinstall() } doReturn false
     }
-    private val mockCurrentTimeProvider: CurrentTimeProvider = mock {
-        on { currentTimeMillis() } doReturn DEFAULT_INSTALL_TIMESTAMP
+    private val mockSubscriptions: Subscriptions = mock {
+        onBlocking { isEligible() } doReturn false
     }
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
@@ -109,7 +111,7 @@ class RealDuckChatJSHelperTest {
         nativeInputStatePublisher = mockNativeInputStatePublisher,
         appInstall = mockAppInstall,
         appBuildConfig = mockAppBuildConfig,
-        currentTimeProvider = mockCurrentTimeProvider,
+        subscriptions = mockSubscriptions,
     )
     private val viewModel =
         object {
@@ -304,6 +306,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -348,9 +351,6 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenGetAIChatNativeConfigValuesThenInstallAgeIsBucketedByDaysSinceInstall() = runTest {
-        val now = 1_700_000_000_000L
-        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
-
         val daysToExpectedBucket = mapOf(
             0L to 0,
             1L to 1,
@@ -365,7 +365,7 @@ class RealDuckChatJSHelperTest {
         )
 
         daysToExpectedBucket.forEach { (days, expectedBucket) ->
-            whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(now - days * DAY_MILLIS)
+            whenever(mockAppInstall.getInstallAge()).thenReturn(days.days)
 
             val result = testee.processJsCallbackMessage(
                 featureName = "aiChat",
@@ -384,25 +384,8 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenInstallTimestampIsInFutureThenInstallAgeIsOmitted() = runTest {
-        val now = 1_700_000_000_000L
-        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
-        whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(now + 5 * DAY_MILLIS)
-
-        val result = testee.processJsCallbackMessage(
-            featureName = "aiChat",
-            method = "getAIChatNativeConfigValues",
-            id = "123",
-            data = null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        assertFalse(result!!.params.has("installAge"))
-    }
-
-    @Test
-    fun whenInstallTimestampNotRecordedThenInstallAgeIsOmitted() = runTest {
-        whenever(mockAppInstall.getInstallationTimestamp()).thenReturn(0L)
+    fun whenInstallAgeIsNullThenInstallAgeIsOmitted() = runTest {
+        whenever(mockAppInstall.getInstallAge()).thenReturn(null)
 
         val result = testee.processJsCallbackMessage(
             featureName = "aiChat",
@@ -664,6 +647,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -674,6 +658,57 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSubscriptionEligibleThenSupportsSubscriptionIsTrue() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsSubscription"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSubscriptionNotEligibleThenSupportsSubscriptionIsFalse() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSubscription"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndEligibilityCheckThrowsThenSupportsSubscriptionIsFalse() = runTest {
+        val method = "getAIChatNativeConfigValues"
+
+        whenever(mockSubscriptions.isEligible()).thenThrow(RuntimeException("Error"))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSubscription"))
     }
 
     @Test
@@ -709,6 +744,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -867,6 +903,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -914,6 +951,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", true)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -958,6 +996,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1002,6 +1041,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1313,6 +1353,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1354,6 +1395,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1395,6 +1437,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1437,6 +1480,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2155,10 +2199,5 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
-    }
-
-    companion object {
-        private const val DAY_MILLIS = 24L * 60 * 60 * 1000
-        private const val DEFAULT_INSTALL_TIMESTAMP = 1_700_000_000_000L
     }
 }

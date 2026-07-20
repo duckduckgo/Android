@@ -306,6 +306,15 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun schedulePaywallNotSeenPixels(): Toggle
+
+    /**
+     * When enabled, showing a native subscription onboarding purchase
+     * instead of redirecting the FE to /welcome.
+     *
+     * TODO: Change for experiment framework
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun onboardingSubscriptionExperiment(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

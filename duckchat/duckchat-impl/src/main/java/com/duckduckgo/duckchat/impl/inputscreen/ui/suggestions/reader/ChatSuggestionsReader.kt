@@ -25,7 +25,7 @@ import android.webkit.WebViewClient
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
@@ -50,7 +50,7 @@ interface ChatSuggestionsReader {
     fun tearDown()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealChatSuggestionsReader @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,

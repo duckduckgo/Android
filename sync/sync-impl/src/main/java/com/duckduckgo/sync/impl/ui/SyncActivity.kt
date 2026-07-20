@@ -22,7 +22,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -76,6 +75,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
@@ -108,10 +108,6 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class, delayGeneration = true)
-@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
-@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
-@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
-@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -131,7 +127,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val syncedDevicesAdapter = SyncedDevicesAdapter(
         object : ConnectedDeviceClickListener {
             override fun onEditDeviceClicked(device: ConnectedDevice) {
-                viewModel.onEditDeviceClicked(device)
+                viewModel.onEditDeviceClicked(device, requireAuth = false)
             }
 
             override fun onRemoveDeviceClicked(device: ConnectedDevice) {
@@ -461,6 +457,8 @@ class SyncActivity : DuckDuckGoActivity() {
                     deepLinkIntoSetup(command.barcodeSyncUrl.asUrl())
                 }
             }
+            // This is a no-op in this flow. Simplified sync flow uses a toggle that needs to be checked off.
+            is SyncThisDeviceCanceled -> Unit
         }
     }
 

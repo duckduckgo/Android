@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Lagring av gjenopprettings-PDF krever lagringstillatelse</string>
     <string name="sync_share_title">Del med …</string>
     <string name="sync_pdf_title">Gjenopprettingskode for synkronisering</string>
-    <string name="sync_pdf_description">Med gjenopprettingskoden kan du synkronisere bokmerkene dine på flere enheter og gjenopprette de synkroniserte dataene dine hvis du mister tilgang til en enhet.</string>
+    <string name="sync_pdf_description">Med gjenopprettingskoden kan du synkronisere passord, autofylldata og Duck.ai-chatter over flere enheter samt gjenopprette synkroniserte data hvis du mister tilgang til en enhet.</string>
     <string name="sync_code_box_title">Ta godt vare på denne informasjonen.</string>
-    <string name="sync_instructions_title">Hvordan fungerer dette?</string>
-    <string name="sync_instructions_step1">Åpne DuckDuckGo på en annen enhet og gå til Synkronisering i innstillingene.</string>
-    <string name="sync_instructions_step2">Skann QR-koden eller kopier og lim inn tekstkoden i en annen DuckDuckGo-app.</string>
+    <string name="sync_instructions_title">Hvordan fungerer koden?</string>
+    <string name="sync_instructions_step1">Åpne DuckDuckGo på enheten du vil synkronisere, og gå til Sync &amp; Backup i innstillingene.</string>
+    <string name="sync_instructions_step2">Velg «Synkroniser med en annen enhet» og skann QR-koden eller skriv inn tekstkoden.</string>
     <string name="sync_instructions_step3">Synkronisering blir aktivert, og du får igjen tilgang til alle dataene dine.</string>
+    <string name="sync_pdf_retention_notice">Hvis det går mer enn 18 måneder uten at du bruker en DuckDuckGo-nettleser med Sync &amp; Backup aktivert, blir dataene dine slettet fra serveren og kan ikke gjenopprettes.</string>
     <string name="remove_device_dialog_title">Vil du fjerne enheten?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">«%1$s» får ikke lenger tilgang til dine synkroniserte data.</string>
     <string name="remove_device_dialog_primary_button">Fjern</string>

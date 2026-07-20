@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +81,7 @@ class DataClearingWorker(
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.AUTO_BACKGROUND,
                     clearOptions = clearOptions,
+                    browserMode = BrowserMode.REGULAR,
                 )
                 try {
                     dataClearing.clearDataUsingAutomaticFireOptions()

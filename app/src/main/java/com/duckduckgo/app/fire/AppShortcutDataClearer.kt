@@ -49,6 +49,7 @@ class RealAppShortcutDataClearer @Inject constructor(
             dataClearingWideEvent.start(
                 entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
                 clearOptions = clearOptions,
+                browserMode = browserMode,
             )
             try {
                 dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = browserMode)

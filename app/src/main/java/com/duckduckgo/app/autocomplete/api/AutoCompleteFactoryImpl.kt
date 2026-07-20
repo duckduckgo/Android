@@ -23,8 +23,8 @@ import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -41,7 +41,6 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val browserModeStateHolder: BrowserModeStateHolder,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -51,14 +50,14 @@ class AutoCompleteFactoryImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : AutoCompleteFactory {
 
-    override fun create(config: AutoComplete.Config): AutoComplete {
+    override fun create(config: AutoComplete.Config, browserMode: BrowserMode): AutoComplete {
         return AutoCompleteApi(
             autoCompleteService = autoCompleteService,
             savedSitesRepository = savedSitesRepository,
             navigationHistory = navigationHistory,
             autoCompleteScorer = autoCompleteScorer,
             tabRepositoryProvider = tabRepositoryProvider,
-            browserModeStateHolder = browserModeStateHolder,
+            browserMode = browserMode,
             autocompleteTabsFeature = autocompleteTabsFeature,
             duckChat = duckChat,
             history = history,

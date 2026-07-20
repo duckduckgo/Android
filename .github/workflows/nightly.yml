@@ -223,7 +223,7 @@ jobs:
     steps:
       - name: Create Asana task when workflow failed
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
@@ -235,7 +235,7 @@ jobs:
       - name: Adding as a release blocker
         # Only block releases for the default Anvil path. Metro is informational.
         if: ${{ env.DDG_DI == 'AnvilDagger' && steps.create-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}

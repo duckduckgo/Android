@@ -466,6 +466,9 @@ dependencies {
 
     implementation project(':windows-api')
     implementation project(':windows-impl')
+
+    implementation project(':feedback-api')
+    implementation project(':feedback-impl')
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')

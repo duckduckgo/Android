@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.configuration
 
 import android.webkit.WebView
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -44,7 +45,7 @@ class InlineBrowserAutofillConfiguratorTest {
     @Before
     fun before() = runTest {
         whenever(autofillJavascriptLoader.getAutofillJavascript()).thenReturn("")
-        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any(), any())).thenReturn("")
+        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any(), any(), any())).thenReturn("")
 
         val internalConfigurator = RealInlineBrowserAutofillConfigurator(
             autofillRuntimeConfigProvider,
@@ -59,7 +60,7 @@ class InlineBrowserAutofillConfiguratorTest {
     @Test
     fun whenFeatureIsNotEnabledThenDoNotInject() = runTest {
         givenFeatureIsDisabled()
-        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
+        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com", BrowserMode.REGULAR)
 
         verify(webView, never()).evaluateJavascript("javascript:", null)
     }
@@ -67,7 +68,7 @@ class InlineBrowserAutofillConfiguratorTest {
     @Test
     fun whenFeatureIsEnabledThenInject() = runTest {
         givenFeatureIsEnabled()
-        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com")
+        inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com", BrowserMode.REGULAR)
 
         verify(webView).evaluateJavascript("javascript:", null)
     }

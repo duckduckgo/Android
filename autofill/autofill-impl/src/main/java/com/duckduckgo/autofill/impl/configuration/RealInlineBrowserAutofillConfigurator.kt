@@ -19,6 +19,7 @@ import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -41,19 +42,21 @@ class RealInlineBrowserAutofillConfigurator @Inject constructor(
     override fun configureAutofillForCurrentPage(
         webView: WebView,
         url: String?,
+        browserMode: BrowserMode,
     ) {
-        configureAutofillForCurrentPage(webView, url, ReAuthenticationDetails())
+        configureAutofillForCurrentPage(webView, url, ReAuthenticationDetails(), browserMode)
     }
 
     override fun configureAutofillForCurrentPage(
         webView: WebView,
         url: String?,
         reauthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
     ) {
         coroutineScope.launch(dispatchers.io()) {
             if (canJsBeInjected(url)) {
                 val rawJs = autofillJavascriptLoader.getAutofillJavascript()
-                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url, reauthenticationDetails)
+                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url, reauthenticationDetails, browserMode)
 
                 withContext(dispatchers.main()) {
                     webView.evaluateJavascript("javascript:$formatted", null)

@@ -24,7 +24,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,7 +33,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -55,9 +53,6 @@ internal class AboutDuckDuckGoViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback
-
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -68,7 +63,6 @@ internal class AboutDuckDuckGoViewModelTest {
         testee = AboutDuckDuckGoViewModel(
             mockAppBuildConfig,
             mockPixel,
-            subscriptionUnifiedFeedback,
         )
     }
 
@@ -147,32 +141,6 @@ internal class AboutDuckDuckGoViewModelTest {
 
             assertTrue(testee.hasResetEasterEggCounter())
             verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnProvideFeedbackClickedThenCommandLaunchFeedbackIsSent() = runTest {
-        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        testee.commands().test {
-            testee.onProvideFeedbackClicked()
-
-            assertEquals(Command.LaunchFeedback, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnProvideFeedbackClickedAndUnifiedFeedbackEnabledThenCommandLaunchUnifiedFeedbackIsSent() = runTest {
-        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
-        testee.commands().test {
-            testee.onProvideFeedbackClicked()
-
-            assertEquals(Command.LaunchSubscriptionUnifiedFeedback, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }

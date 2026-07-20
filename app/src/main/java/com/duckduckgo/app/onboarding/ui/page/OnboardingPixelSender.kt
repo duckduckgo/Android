@@ -48,7 +48,7 @@ import javax.inject.Inject
 sealed interface OnboardingPixelAction {
     data object Shown : OnboardingPixelAction
 
-    data class Clicked(val engaged: Boolean? = null) : OnboardingPixelAction
+    data class Clicked(val engaged: Boolean) : OnboardingPixelAction
     data class SetDefaultConfirmed(val isDdgDefault: Boolean) : OnboardingPixelAction
     data class WidgetConfirmed(val added: Boolean) : OnboardingPixelAction
     data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelAction
@@ -127,7 +127,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireStep(pixelName, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelAction.Clicked ->
-                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.engaged?.let(::engageOrDismiss))
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, engageOrDismiss(action.engaged))
 
             is OnboardingPixelAction.SetDefaultConfirmed ->
                 fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.isDdgDefault) VALUE_DDG else VALUE_OTHER)
@@ -161,7 +161,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireStep(pixelName, PIXEL_EVENT_SHOWN, includeValueInTag = false)
 
             is OnboardingPixelAction.Clicked ->
-                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.engaged?.let(::engageOrDismiss), includeValueInTag = false)
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, engageOrDismiss(action.engaged), includeValueInTag = false)
 
             is OnboardingPixelAction.SuggestionClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM, includeValueInTag = false)

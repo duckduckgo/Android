@@ -46,6 +46,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
@@ -55,6 +56,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
@@ -258,7 +260,9 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(false)
         testee.commands().test {
             testee.onSyncThisDevice()
-            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            val command = awaitItem()
+            command.assertCommandType(RequestSetupAuthentication::class)
+            assertTrue((command as RequestSetupAuthentication).forSyncThisDevice)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -315,6 +319,15 @@ class SyncActivityViewModelTest {
         testee.onConnectionCancelled()
 
         verify(syncSetupWideEvent).onFlowCancelled()
+    }
+
+    @Test
+    fun whenSyncThisDeviceCanceledThenEmitCommandSyncThisDeviceCanceled() = runTest {
+        testee.commands().test {
+            testee.onSyncThisDeviceCanceled()
+            awaitItem().assertCommandType(SyncThisDeviceCanceled::class)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -498,6 +511,60 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.AskRemoveDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedWithoutRequireAuthThenAskEditDeviceWithoutAuthentication() = runTest {
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = false)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(AskEditDevice::class)
+            assertEquals(connectedDevice, (command as AskEditDevice).device)
+            assertFalse(command.requireAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedWithoutRequireAuthThenNoAuthenticationRequested() = runTest {
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = false)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(AskEditDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedWithRequireAuthAndDeviceAuthenticationThenAskEditDeviceWithAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = true)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(AskEditDevice::class)
+            assertEquals(connectedDevice, (command as AskEditDevice).device)
+            assertTrue(command.requireAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditDeviceClickedWithRequireAuthWithoutDeviceAuthenticationThenRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onEditDeviceClicked(connectedDevice, requireAuth = true)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(RequestSetupAuthentication::class)
+            assertFalse((command as RequestSetupAuthentication).forSyncThisDevice)
             cancelAndIgnoreRemainingEvents()
         }
     }

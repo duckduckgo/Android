@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clearing
 
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -35,7 +36,7 @@ class DelegatingDuckChatDeleter @Inject constructor(
     // Typed as RealDuckChatDeleter (not DuckChatDeleter) to prevent Anvil
     // from treating this field as a competing binding for the DuckChatDeleter interface.
     private val webViewDeleter: RealDuckChatDeleter,
-    private val store: DuckAiChatStore,
+    @param:RegularMode private val store: DuckAiChatStore,
     private val feature: DuckChatFeature,
     // Lazy to break the DI cycle: RealDuckChat → DuckChatDeleter → DuckChatPixels
     //   → DuckChatTermsOfServiceHandler → DuckChatInternal (RealDuckChat)

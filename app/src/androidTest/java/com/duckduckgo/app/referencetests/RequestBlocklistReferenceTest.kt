@@ -300,7 +300,7 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         val trackerDetectorImpl = TrackerDetectorImpl(
             entityLookup,
-            userAllowlistDao,
+            userAllowListRepository,
             contentBlocking,
             trackerAllowlist,
             mockAdClickManager,

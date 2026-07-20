@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Odoslať správu o poruche</string>
     <string name="ad_blocking_disabled_secondary_action">Zrušiť</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Zakázané až do opätovného spustenia</string>
+    <string name="ad_blocking_omnibar_badge_text">Blokovanie reklám na YouTube je zapnuté</string>
 </resources>

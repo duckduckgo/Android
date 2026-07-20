@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -162,7 +163,7 @@ class NativeInputChatSuggestionsBinderTest {
         binder = binderWith(fakePlugin(first), fakePlugin(second))
         val binding = createBinding()
 
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         val adapters = (binding.adapter as ConcatAdapter).adapters
         assertEquals(first.adapters.single(), adapters[0])
@@ -178,7 +179,7 @@ class NativeInputChatSuggestionsBinderTest {
         binder = binderWith(fakePlugin(fakeItem(a0, a1)))
         val binding = createBinding()
 
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         val adapters = (binding.adapter as ConcatAdapter).adapters
         assertEquals(a0, adapters[0])
@@ -190,7 +191,7 @@ class NativeInputChatSuggestionsBinderTest {
     fun whenPluginItemHasRowsThenOverlayKeptOpenWithNoChatOrTyping() = runTest {
         binder = binderWith(fakePlugin(fakeItem(countingAdapter(1))))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         var hasContent: Boolean? = null
         binding.submit(
@@ -210,7 +211,7 @@ class NativeInputChatSuggestionsBinderTest {
     fun whenPluginItemHasNoRowsAndNoChatOrTypingThenOverlayNotKeptOpen() = runTest {
         binder = binderWith(fakePlugin(fakeItem(countingAdapter(0))))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         var hasContent: Boolean? = null
         binding.submit(
@@ -242,7 +243,7 @@ class NativeInputChatSuggestionsBinderTest {
             isHistoryAvailable = true,
             onCommit = { committed += it },
         )
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         // Loading folds the plugin's rows into hasContent and re-fires onCommit (recompute, not replay).
         assertEquals(listOf(false, true), committed)
@@ -253,7 +254,7 @@ class NativeInputChatSuggestionsBinderTest {
         val adapter = MutableCountingAdapter(1)
         binder = binderWith(fakePlugin(fakeItem(adapter)))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         val committed = mutableListOf<Boolean>()
         // Empty query, no chat: the only content is the plugin row, so the overlay opens.
@@ -278,7 +279,7 @@ class NativeInputChatSuggestionsBinderTest {
         val adapter = MutableCountingAdapter(1)
         binder = binderWith(fakePlugin(fakeItem(adapter)))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         val committed = mutableListOf<Boolean>()
         // Empty query, no chat: only the plugin row is content, so the overlay opens.
@@ -306,7 +307,7 @@ class NativeInputChatSuggestionsBinderTest {
         val adapter = MutableCountingAdapter(1)
         binder = binderWith(fakePlugin(fakeItem(adapter)))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope)
+        binding.loadPluginItems(mock(), scope, BrowserMode.REGULAR)
 
         val committed = mutableListOf<Boolean>()
         binding.submit(
@@ -381,7 +382,7 @@ class NativeInputChatSuggestionsBinderTest {
 
     private fun fakePlugin(item: NativeInputChatTabItem): NativeInputChatTabItemPlugin =
         object : NativeInputChatTabItemPlugin {
-            override fun create(context: Context, scope: CoroutineScope): NativeInputChatTabItem = item
+            override fun create(context: Context, scope: CoroutineScope, browserMode: BrowserMode): NativeInputChatTabItem = item
         }
 
     private fun fakeItem(vararg adapters: RecyclerView.Adapter<*>): FakeChatItem = FakeChatItem(adapters.toList())

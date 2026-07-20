@@ -258,11 +258,23 @@ class RealNativeInputOmnibarController(
         } else {
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.show()
         }
+        rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.show()
         omnibar.isScrollingEnabled = true
     }
 
     private fun restoreOmnibarContent() {
         val omnibarView = omnibar.omnibarView as? View ?: return
+        // Enter morph fades the address card to 0 and intentionally leaves it there before hide().
+        // Restore must put alpha back — otherwise show() reveals an invisible field with only the
+        // trailing fire/tabs/menu icons visible (common after Search-only / Duck.ai-off teardown).
+        omnibarView.findViewById<View?>(R.id.omniBarContainerShadow)?.apply {
+            alpha = 1f
+            show()
+        }
+        omnibarView.findViewById<View?>(R.id.omniBarContainer)?.apply {
+            alpha = 1f
+            show()
+        }
         omnibarView.findViewById<View?>(R.id.endIconsContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()

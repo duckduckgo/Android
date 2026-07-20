@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Skicka felrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Inaktiverad till omstart</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube-annonsblockering på</string>
 </resources>

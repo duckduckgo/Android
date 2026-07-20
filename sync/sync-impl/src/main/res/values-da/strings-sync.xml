@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Download af gendannelses-PDF kræver lagringstilladelse</string>
     <string name="sync_share_title">Del med ...</string>
     <string name="sync_pdf_title">Kode til gendannelse af synkronisering</string>
-    <string name="sync_pdf_description">Gendannelseskoden giver dig mulighed for at synkronisere dine bogmærker på tværs af flere enheder og gendanne dine synkroniserede data, hvis du mister adgangen til en enhed.</string>
+    <string name="sync_pdf_description">Gendannelseskoden giver dig mulighed for at synkronisere dine adgangskoder, data til automatisk udfyldning og Duck.ai-chats på tværs af flere enheder og gendanne dine synkroniserede data, hvis du mister adgangen til en enhed.</string>
     <string name="sync_code_box_title">Opbevar disse oplysninger sikkert.</string>
-    <string name="sync_instructions_title">Hvordan fungerer det?</string>
-    <string name="sync_instructions_step1">Åbn DuckDuckGo på en anden enhed, og gå til Synkronisering i Indstillinger.</string>
-    <string name="sync_instructions_step2">Scan QR-koden, eller kopier og indsæt tekstkoden i en anden DuckDuckGo-app.</string>
+    <string name="sync_instructions_title">Hvordan fungerer denne kode?</string>
+    <string name="sync_instructions_step1">Åbn DuckDuckGo på den enhed, du vil synkronisere, og gå til Sync &amp; Backup i Indstillinger.</string>
+    <string name="sync_instructions_step2">Vælg Synkronisér med en anden enhed, og scan QR-koden eller indtast tekstkoden.</string>
     <string name="sync_instructions_step3">Synkroniseringen aktiveres, og du har igen adgang til alle dine data.</string>
+    <string name="sync_pdf_retention_notice">Hvis du ikke bruger en DuckDuckGo-browser med Sync &amp; Backup slået til i mere end 18 måneder, bliver dine data slettet fra serveren og kan ikke gendannes.</string>
     <string name="remove_device_dialog_title">Fjern enhed?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" kan ikke længere få adgang til dine synkroniserede data.</string>
     <string name="remove_device_dialog_primary_button">Fjern</string>

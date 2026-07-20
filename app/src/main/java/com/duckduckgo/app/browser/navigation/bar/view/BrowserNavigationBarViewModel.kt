@@ -38,8 +38,10 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.Channel
@@ -64,6 +66,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
     tabRepository: TabRepository,
     dispatcherProvider: DispatcherProvider,
     browserMenuHighlight: BrowserMenuHighlight,
+    private val browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -111,7 +114,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         if (_viewState.value.viewMode != Browser) {
             return false
         }
-        pixel.fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
+        pixel.fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName, mapOf(BROWSER_MODE to browserMode.name.lowercase()))
         _commands.trySend(NotifyTabsButtonLongClicked)
         return true
     }

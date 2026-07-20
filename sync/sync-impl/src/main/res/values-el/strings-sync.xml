@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_share_title">Κοινή χρήση με...</string>
     <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
-    <string name="sync_pdf_description">Ο Κωδικός ανάκτησης σάς επιτρέπει να συγχρονίζετε τους σελιδοδείκτες σας σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε μια συσκευή.</string>
+    <string name="sync_pdf_description">Ο κωδικός ανάκτησης σας επιτρέπει να συγχρονίζετε τους κωδικούς πρόσβασής σας, τα δεδομένα αυτόματης συμπλήρωσης και τις συνομιλίες του Duck.ai σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας εάν χάσετε την πρόσβαση σε μια συσκευή.</string>
     <string name="sync_code_box_title">Διατηρήστε αυτές τις πληροφορίες ασφαλείς.</string>
-    <string name="sync_instructions_title">Πώς λειτουργεί αυτό;</string>
-    <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo σε μια άλλη συσκευή και μεταβείτε στον Συγχρονισμό από τις Ρυθμίσεις.</string>
-    <string name="sync_instructions_step2">Σαρώστε τον Κωδικό QR ή αντιγράψτε και επικολλήστε τον κωδικό κειμένου σε μια άλλη εφαρμογή του DuckDuckGo.</string>
+    <string name="sync_instructions_title">Πώς λειτουργεί αυτός ο κώδικας;</string>
+    <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo στη συσκευή που θέλετε να συγχρονίσετε και μεταβείτε στο Sync &amp; Backup στις Ρυθμίσεις.</string>
+    <string name="sync_instructions_step2">Επιλέξτε «Συγχρονισμός με άλλη συσκευή» και σαρώστε τον κωδικό QR ή εισαγάγετε τον κωδικό κειμένου.</string>
     <string name="sync_instructions_step3">Ο Συγχρονισμός θα ενεργοποιηθεί και θα έχετε και πάλι πρόσβαση σε όλα τα δεδομένα σας.</string>
+    <string name="sync_pdf_retention_notice">Εάν περάσουν περισσότεροι από 18 μήνες χωρίς να χρησιμοποιήσετε ένα πρόγραμμα περιήγησης DuckDuckGo με ενεργοποιημένο το Sync &amp; Backup, τα δεδομένα σας θα διαγραφούν από τον διακομιστή και δεν θα μπορούν να ανακτηθούν.</string>
     <string name="remove_device_dialog_title">Αφαίρεση συσκευής;</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
     <string name="remove_device_dialog_primary_button">Αφαίρεση</string>

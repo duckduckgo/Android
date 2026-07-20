@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
@@ -58,19 +59,20 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
     override fun create(
         context: Context,
         scope: CoroutineScope,
+        browserMode: BrowserMode,
     ): NativeInputChatTabItem {
         val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter, edgeToEdgeProvider)
         val adapter = ChatSyncPromoAdapter(listener)
 
-        val showJob = scope.showPromotionBanner(adapter)
+        val showJob = scope.showPromotionBanner(adapter, browserMode)
         scope.hideBannerOnInput(adapter, showJob)
 
         return ChatSyncChatTabItem(adapter)
     }
 
-    private fun CoroutineScope.showPromotionBanner(adapter: ChatSyncPromoAdapter): Job {
+    private fun CoroutineScope.showPromotionBanner(adapter: ChatSyncPromoAdapter, browserMode: BrowserMode): Job {
         return launch {
-            if (chatSyncPromotion.canShowPromotion()) adapter.show()
+            if (chatSyncPromotion.canShowPromotion(browserMode)) adapter.show()
         }
     }
 

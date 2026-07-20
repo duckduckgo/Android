@@ -29,10 +29,10 @@ import dagger.Provides
 
 @Module
 @ContributesTo(AppScope::class)
-open class AppConfigurationDownloaderModule {
+object AppConfigurationDownloaderModule {
 
     @Provides
-    open fun appConfigurationDownloader(
+    fun appConfigurationDownloader(
         trackerDataDownloader: TrackerDataDownloader,
         httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
         resourceSurrogateDownloader: ResourceSurrogateListDownloader,

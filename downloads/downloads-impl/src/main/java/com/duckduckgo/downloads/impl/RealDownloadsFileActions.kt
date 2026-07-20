@@ -18,8 +18,10 @@ package com.duckduckgo.downloads.impl
 
 import android.content.ActivityNotFoundException
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
@@ -37,16 +39,38 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
 
     override fun openFile(applicationContext: Context, file: File): Boolean {
         val intent = createIntentToOpenFile(applicationContext, file)
-        return applicationContext.packageManager?.let { packageManager ->
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(applicationContext, intent)
-            } else {
-                logcat(ERROR) { "Failed to resolve activity" }
-                false
+        val packageManager = applicationContext.packageManager ?: return false
+        val launchIntent = excludeOwnPackage(applicationContext, packageManager, intent)
+        return if (launchIntent.resolveActivity(packageManager) != null) {
+            startActivity(applicationContext, launchIntent)
+        } else {
+            logcat(ERROR) { "Failed to resolve activity" }
+            false
+        }
+    }
+
+    // DuckDuckGo now registers itself as a system PDF handler, so a file it just downloaded can
+    // otherwise resolve back to itself instead of the external viewer the user expects.
+    private fun excludeOwnPackage(applicationContext: Context, packageManager: PackageManager, intent: Intent): Intent {
+        val ownPackage = applicationContext.packageName
+        val matches = packageManager.queryIntentActivities(intent, 0).map { it.activityInfo }
+        val ownMatches = matches.filter { it.packageName == ownPackage }
+        if (ownMatches.isEmpty()) return intent
+
+        val externalMatches = matches.filter { it.packageName != ownPackage }
+        return when (externalMatches.size) {
+            0 -> intent
+            1 -> intent.apply { setClassName(externalMatches[0].packageName, externalMatches[0].name) }
+            else -> Intent.createChooser(intent, null).apply {
+                putExtra(
+                    Intent.EXTRA_EXCLUDE_COMPONENTS,
+                    ownMatches.map { ComponentName(it.packageName, it.name) }.toTypedArray(),
+                )
             }
         }
-            ?: false
     }
+
+    override fun getShareableUri(applicationContext: Context, file: File): Uri = getFilePathUri(applicationContext, file)
 
     override fun shareFile(applicationContext: Context, file: File): Boolean {
         val intent = createShareIntent(applicationContext, file)

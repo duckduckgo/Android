@@ -41,6 +41,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityEmailProtectionInContextSignupBinding
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ExitButtonAction
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -279,7 +280,8 @@ class EmailProtectionInContextSignupActivity :
     }
 
     override fun onPageStarted(url: String) {
-        configurator.configureAutofillForCurrentPage(binding.webView, url)
+        // Email Protection in-context signup is an independent activity, always Regular mode.
+        configurator.configureAutofillForCurrentPage(binding.webView, url, BrowserMode.REGULAR)
     }
 
     override fun onPageFinished(url: String) {

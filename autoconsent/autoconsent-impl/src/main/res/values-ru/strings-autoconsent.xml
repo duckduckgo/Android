@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Защита от всплывающих окон куки</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo по возможности откажется от куки-файлов и скроет подобные окна.\n<a href=\"\">Подробнее...</a>]]></string>
     <string name="autoconsentToggle">Разрешить DuckDuckGo взять на себя окна выбора куки-файлов</string>
+    <string name="autoconsentAutoManageToggle">Автоматическое управление окнами выбора файлов cookie</string>
+    <string name="autoconsentAutoManageDescription">Мы постараемся выбрать для вас только максимально конфиденциальные настройки файлов cookie, а затем закроем эти окна.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo может автоматически управлять настройками файлов cookie, чтобы обеспечить максимальную конфиденциальность, минимизировать использование cookie и закрывать соответствующие всплывающие окна.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Всплывающие окна без возможности отказа</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Также разрешите DuckDuckGo экономить вам время, принимая файлы cookie за вас, чтобы закрывать всплывающие окна без возможности отказа.</string>
 </resources>

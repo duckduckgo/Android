@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.*
+import com.duckduckgo.browsermode.api.BrowserMode
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +87,14 @@ class InlineBrowserAutofillTest {
 
     @Test
     fun whenRemoveJsInterfaceThenRemoveReferenceToWebview() {
-        testee.addJsInterface(testWebView, testCallback, emailProtectionInContextCallback, emailProtectionInContextSignupFlowCallback, "tabId")
+        testee.addJsInterface(
+            testWebView,
+            testCallback,
+            emailProtectionInContextCallback,
+            emailProtectionInContextSignupFlowCallback,
+            "tabId",
+            BrowserMode.REGULAR,
+        )
 
         assertNotNull(autofillJavascriptInterface.webView)
 
@@ -160,5 +168,6 @@ class InlineBrowserAutofillTest {
         override var webView: WebView? = null
         override var autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor? = null
         override var tabId: String? = null
+        override var browserMode: BrowserMode? = null
     }
 }

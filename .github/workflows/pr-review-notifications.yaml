@@ -1,24 +1,34 @@
-name: Pull Request Reviewed -> Sync With Asana
+name: Pull Request Review/Mentions -> Sync With Asana
 
 on:
   pull_request_review:
     types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+  issue_comment:
+    types: [created]
 
 jobs:
-  pr-reviewed:
-    name: Add PR reviewed comment
+  sync:
+    name: Sync PR review/mentions with Asana
     runs-on: ubuntu-latest
+    # issue_comment fires on both issues and PRs; only run it for PR comments.
+    # The review events always run (github.event.issue is absent for them).
+    if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     steps:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
         with:
-            ref: v1.9
-            # Do not change the below path (downstream actions expect it)
-            path: native-github-asana-sync
-            repository: duckduckgo/native-github-asana-sync
+          ref: v2.6.0
+          # Do not change the below path (the composite expects it)
+          path: native-github-asana-sync
+          repository: duckduckgo/native-github-asana-sync
 
-      - name: Trigger PR review workflow
+      # Posts canned review-event notes, and forwards review summaries,
+      # inline comments, and PR conversation comments @-mentioning a user.
+      - name: Sync PR review/mentions with Asana
         uses: ./native-github-asana-sync/.github/actions/pr-review-notifications
         with:
           trigger-phrase: "Task/Issue URL:"
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          user-map: ${{ vars.GH_ANDROID_USER_MAP }}

@@ -8088,7 +8088,7 @@
           message: `could not find element to click with selector '${element.selector}'!`
         });
       }
-      const loopLength = element.multiple && element.multiple === true ? elements2.length : 1;
+      const loopLength = element.multiple == true ? elements2.length : 1;
       for (let i = 0; i < loopLength; i++) {
         const elem = elements2[i];
         if ("disabled" in elem) {

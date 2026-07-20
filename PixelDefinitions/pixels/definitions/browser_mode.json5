@@ -1,0 +1,18 @@
+// Fire Mode / Regular Mode browsing-mode pixels
+{
+    "m_browser_mode_switched": {
+        "description": "Fires when the browsing mode actually changes, regardless of origin",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "browserMode",
+            {
+                "key": "source",
+                "description": "Origin of the mode switch",
+                "enum": ["tab_switcher_toggle", "promotion", "new_tab", "escape_hatch", "external_launch", "tab_switcher_exit"]
+            }
+        ]
+    }
+}

@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatSuggestionsStore
@@ -30,8 +30,8 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, replaces = [RealChatSuggestionsReader::class])
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(ActivityScope::class, replaces = [RealChatSuggestionsReader::class])
+@SingleInstanceIn(ActivityScope::class)
 class DelegatingChatSuggestionsReader @Inject constructor(
     private val nativeReader: ChatSuggestionsNativeReader,
     // Typed as RealChatSuggestionsReader (not ChatSuggestionsReader) to prevent Anvil
