@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Spremanje PDF za oporavak zahtijeva dopuštenje za pohranu</string>
     <string name="sync_share_title">Podijeli s...</string>
     <string name="sync_pdf_title">Šifra za oporavak sinkronizacije</string>
-    <string name="sync_pdf_description">Šifra za oporavak omogućuje ti sinkronizaciju oznaka na više uređaja i oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
+    <string name="sync_pdf_description">Kôd za oporavak omogućuje ti sinkronizaciju lozinki, podataka za automatsko popunjavanje i Duck.ai čavrljanja na više uređaja te oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
     <string name="sync_code_box_title">Čuvaj ove podatke na sigurnom.</string>
-    <string name="sync_instructions_title">Kako to funkcionira?</string>
-    <string name="sync_instructions_step1">Otvori DuckDuckGo na drugom uređaju i idi na Sinkronizaciju u Postavkama.</string>
-    <string name="sync_instructions_step2">Skeniraj QR kod ili kopiraj i zalijepi tekstualnu šifru u drugu aplikaciju DuckDuckGo.</string>
+    <string name="sync_instructions_title">Kako ovaj kôd funkcionira?</string>
+    <string name="sync_instructions_step1">Otvori DuckDuckGo na uređaju koji želiš sinkronizirati i idi na Sync &amp; Backup u Postavkama.</string>
+    <string name="sync_instructions_step2">Odaberi \'Sinkroniziraj s drugim uređajem\' i skeniraj QR kôd ili unesi tekstualni kôd.</string>
     <string name="sync_instructions_step3">Sinkronizacija će se aktivirati i opet ćeš imati pristup svim svojim podacima.</string>
+    <string name="sync_pdf_retention_notice">Ako više od 18 mjeseci ne koristiš DuckDuckGo preglednik s uključenom opcijom Sync &amp; Backup, tvoji podaci će biti izbrisani s poslužitelja i neće se moći vratiti.</string>
     <string name="remove_device_dialog_title">Želiš li ukloniti uređaj?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" više neće moći pristupiti tvojim sinkroniziranim podacima.</string>
     <string name="remove_device_dialog_primary_button">Ukloni</string>

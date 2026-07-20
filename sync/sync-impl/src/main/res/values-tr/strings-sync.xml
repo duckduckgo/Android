@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Kurtarma PDF\'ini kaydetmek için depolama izni gereklidir</string>
     <string name="sync_share_title">Paylaş…</string>
     <string name="sync_pdf_title">Kurtarma Kodunu Senkronize Et</string>
-    <string name="sync_pdf_description">Kurtarma Kodu, yer imlerinizi birden fazla cihaz arasında senkronize etmenize ve bir cihaza erişiminizi kaybetmeniz durumunda senkronize edilmiş verilerinizi kurtarmanıza olanak tanır.</string>
+    <string name="sync_pdf_description">Kurtarma kodu, parolalarınızı, otomatik doldurma verilerinizi ve Duck.ai sohbetlerinizi birden fazla cihaz arasında senkronize etmenize ve bir cihaza erişiminizi kaybettiğinizde senkronize edilmiş verilerinizi kurtarmanıza olanak tanır.</string>
     <string name="sync_code_box_title">Bu bilgileri güvende tutun.</string>
-    <string name="sync_instructions_title">Bu nasıl çalışıyor?</string>
-    <string name="sync_instructions_step1">DuckDuckGo\'yu başka bir cihazda açın ve Ayarlar\'da Senkronizasyon\'a gidin.</string>
-    <string name="sync_instructions_step2">QR kodunu tarayın veya metin kodunu kopyalayıp başka bir DuckDuckGo uygulamasına yapıştırın.</string>
-    <string name="sync_instructions_step3">Senkronizasyon etkinleştirilir ve tüm verilerinize bir kez daha erişebileceksiniz.</string>
+    <string name="sync_instructions_title">Bu kod nasıl çalışıyor?</string>
+    <string name="sync_instructions_step1">Senkronize etmek istediğiniz cihazda DuckDuckGo uygulamasını açın ve Ayarlar\'da Sync &amp; Backup bölümüne gidin.</string>
+    <string name="sync_instructions_step2">\'Başka Bir Cihazla Senkronize Et\'i seçin ve QR kodunu tarayın veya metin kodunu girin.</string>
+    <string name="sync_instructions_step3">Senkronizasyon etkinleştirilecek ve tüm verilerinize tekrar erişebileceksiniz.</string>
+    <string name="sync_pdf_retention_notice">Sync &amp; Backup etkinleştirilmiş bir DuckDuckGo tarayıcısını 18 aydan uzun süre kullanmazsanız verileriniz sunucudan silinir ve geri yüklenemez.</string>
     <string name="remove_device_dialog_title">Cihaz Kaldırılsın mı?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" artık senkronize edilmiş verilerinize erişemeyecektir.</string>
     <string name="remove_device_dialog_primary_button">Kaldır</string>
