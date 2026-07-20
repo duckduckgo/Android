@@ -484,7 +484,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.ContinueClicked -> {
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked())
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
                     else -> Stay
