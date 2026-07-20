@@ -542,6 +542,13 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onDeviceUpdated(device: ConnectedDevice) {
+        viewModelScope.launch {
+            viewState.value = viewState.value.showDeviceListItemLoading(device)
+            fetchRemoteDevices(showLoadingState = false)
+        }
+    }
+
     fun onGetOnOtherPlatformsClickedWhenSyncDisabled() {
         viewModelScope.launch(dispatchers.main()) {
             command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_DISABLED))

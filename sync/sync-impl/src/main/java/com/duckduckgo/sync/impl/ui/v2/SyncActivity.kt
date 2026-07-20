@@ -80,10 +80,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.EditDevice
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.DeviceEdited
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.NoOp
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.RemoveDevice
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.TurnOffSync
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.RemoveDeviceConfirmed
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.TurnOffSyncConfirmed
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -142,10 +142,9 @@ class SyncActivity : DuckDuckGoActivity() {
         EditDeviceContract(),
     ) { result ->
         when (result) {
-            is RemoveDevice -> viewModel.onRemoveDeviceConfirmed(result.device)
-            is TurnOffSync -> viewModel.onTurnOffSyncConfirmed(result.device)
-            // We don't have to refresh the device after editing it because it will be reloaded when a user returns here.
-            is EditDevice -> Unit
+            is DeviceEdited -> viewModel.onDeviceUpdated(result.device)
+            is RemoveDeviceConfirmed -> viewModel.onRemoveDeviceConfirmed(result.device)
+            is TurnOffSyncConfirmed -> viewModel.onTurnOffSyncConfirmed(result.device)
             is NoOp -> Unit
         }
     }

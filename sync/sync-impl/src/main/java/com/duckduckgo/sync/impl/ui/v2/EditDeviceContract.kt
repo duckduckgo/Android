@@ -43,9 +43,9 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
             ?: return Output.NoOp
 
         return when (resultCode) {
-            RESULT_DEVICE_EDITED -> Output.EditDevice(device)
-            RESULT_DEVICE_REMOVED -> Output.RemoveDevice(device)
-            RESULT_SYNC_TURNED_OFF -> Output.TurnOffSync(device)
+            RESULT_DEVICE_EDITED -> Output.DeviceEdited(device)
+            RESULT_DEVICE_REMOVED -> Output.RemoveDeviceConfirmed(device)
+            RESULT_SYNC_TURNED_OFF -> Output.TurnOffSyncConfirmed(device)
             else -> Output.NoOp
         }
     }
@@ -55,15 +55,15 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
     )
 
     sealed interface Output {
-        data class EditDevice(
+        data class DeviceEdited(
             val device: ConnectedDevice,
         ) : Output
 
-        data class TurnOffSync(
+        data class TurnOffSyncConfirmed(
             val device: ConnectedDevice,
         ) : Output
 
-        data class RemoveDevice(
+        data class RemoveDeviceConfirmed(
             val device: ConnectedDevice,
         ) : Output
 
