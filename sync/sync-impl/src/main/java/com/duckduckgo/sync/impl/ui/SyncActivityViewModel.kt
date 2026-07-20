@@ -542,9 +542,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onDeviceUpdated(device: ConnectedDevice) {
+    fun onDevicesUpdated() {
         viewModelScope.launch {
-            viewState.value = viewState.value.showDeviceListItemLoading(device)
             fetchRemoteDevices(showLoadingState = false)
         }
     }

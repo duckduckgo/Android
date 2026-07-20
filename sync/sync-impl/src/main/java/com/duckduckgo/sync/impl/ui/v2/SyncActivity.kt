@@ -142,7 +142,7 @@ class SyncActivity : DuckDuckGoActivity() {
         EditDeviceContract(),
     ) { result ->
         when (result) {
-            is DeviceEdited -> viewModel.onDeviceUpdated(result.device)
+            is DeviceEdited -> viewModel.onDevicesUpdated()
             is RemoveDeviceConfirmed -> viewModel.onRemoveDeviceConfirmed(result.device)
             is TurnOffSyncConfirmed -> viewModel.onTurnOffSyncConfirmed(result.device)
             is NoOp -> Unit

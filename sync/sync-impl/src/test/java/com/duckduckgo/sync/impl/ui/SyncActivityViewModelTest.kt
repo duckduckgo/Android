@@ -696,16 +696,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnDeviceUpdatedThenFetchRemoteDevices() = runTest {
-        givenAuthenticatedUser()
-
-        testee.onDeviceUpdated(connectedDevice)
-
-        verify(syncAccountRepository).getConnectedDevices()
-    }
-
-    @Test
-    fun whenOnDeviceUpdatedThenViewStateReflectsRefreshedDevices() = runTest {
+    fun whenOnDevicesUpdatedThenViewStateReflectsRefreshedDevices() = runTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -713,7 +704,7 @@ class SyncActivityViewModelTest {
 
             val updatedDevice = connectedDevice.copy(deviceName = "updatedDevice")
             whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(updatedDevice)))
-            testee.onDeviceUpdated(connectedDevice)
+            testee.onDevicesUpdated()
             val refreshedItem = expectMostRecentItem()
             assertNotNull(refreshedItem.syncedDevices.filterIsInstance<SyncedDevice>().first { it.device.deviceName == updatedDevice.deviceName })
 
