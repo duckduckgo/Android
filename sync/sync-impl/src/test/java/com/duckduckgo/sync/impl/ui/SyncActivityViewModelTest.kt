@@ -55,6 +55,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
@@ -315,6 +316,15 @@ class SyncActivityViewModelTest {
         testee.onConnectionCancelled()
 
         verify(syncSetupWideEvent).onFlowCancelled()
+    }
+
+    @Test
+    fun whenSyncThisDeviceCanceledThenEmitCommandSyncThisDeviceCanceled() = runTest {
+        testee.commands().test {
+            testee.onSyncThisDeviceCanceled()
+            awaitItem().assertCommandType(SyncThisDeviceCanceled::class)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
