@@ -27,13 +27,13 @@
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_3"
-    android:paddingTop="@dimen/keyline_1"
-    android:paddingBottom="@dimen/keyline_1">
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/pageContextFavicon"
-        android:layout_width="@dimen/keyline_6"
-        android:layout_height="@dimen/keyline_6"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         android:importantForAccessibility="no"
         app:srcCompat="@drawable/ic_page_content_attach_24" />
 
