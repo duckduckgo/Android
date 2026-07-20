@@ -106,13 +106,10 @@ class EditDeviceViewModelTest {
         testee.commands.test {
             testee.confirmNewDeviceName("New Device Name")
 
-            val resetToggleCommand = awaitItem()
-            assertIs<ResetTurnOffSyncToggle>(resetToggleCommand)
-
-            val showErrorCommand = awaitItem()
-            assertIs<ShowError>(showErrorCommand)
-            assertEquals(R.string.sync_edit_device_error, showErrorCommand.message)
-            assertEquals("boom", showErrorCommand.reason)
+            val command = awaitItem()
+            assertIs<ShowError>(command)
+            assertEquals(R.string.sync_edit_device_error, command.message)
+            assertEquals("boom", command.reason)
 
             cancel()
         }

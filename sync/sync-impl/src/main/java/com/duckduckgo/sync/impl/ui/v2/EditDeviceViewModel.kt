@@ -70,7 +70,6 @@ class EditDeviceViewModel @AssistedInject constructor(
                 }
 
                 is Error -> {
-                    _commands.send(Command.ResetTurnOffSyncToggle)
                     _commands.send(Command.ShowError(R.string.sync_edit_device_error, result.reason))
                 }
             }
