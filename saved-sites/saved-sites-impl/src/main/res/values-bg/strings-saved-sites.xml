@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Споделяне на любими</string>
-    <string name="sync_enable_option_favorites_subtitle">Използвайте едни и същи любими елементи на всички устройства. Оставете изключено, ако имате различни предпочитания за мобилни устройства и настолни компютри.</string>
     <string name="sync_simplified_enable_option_favorites_title">Споделяне на любимите на всички устройства</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Използвайте едни и същи любими отметки на мобилни устройства и на компютър.</string>
     <string name="saved_site_limit_warning"><b>Синхронизирането е на пауза</b>\nДостигнахте максималния брой отметки. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_bookmarks">Управление на отметките</annotation></string>
@@ -101,8 +99,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Извличане на икони на отметки</string>
-    <string name="sync_fetch_icons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
     <string name="sync_simplified_fetch_icons_title">Зареждане на икони на отметки</string>
     <string name="sync_simplified_fetch_icons_subtitle">Зарежда икони от уебсайтове, които сте добавили в отметките. Изтеглянето на икони се разкрива във Вашата мрежа.</string>
     <string name="faviconsPromptTitle">Изтегляне липсващи икони?</string>

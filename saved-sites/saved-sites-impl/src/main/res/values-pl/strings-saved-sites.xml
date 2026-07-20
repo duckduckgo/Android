@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Udostępnij ulubione</string>
-    <string name="sync_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych na wszystkich urządzeniach. Wyłącz, aby oddzielić ulubione na urządzenia mobilne i stacjonarne.</string>
     <string name="sync_simplified_enable_option_favorites_title">Udostępnij ulubione na urządzeniach</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="saved_site_limit_warning"><b>Synchronizacja wstrzymana</b>\nOsiągnięto maksymalną liczbę zakładek. Usuń część z nich, aby wznowić synchronizację.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
@@ -109,8 +107,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Pobierz ikony zakładek</string>
-    <string name="sync_fetch_icons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
     <string name="sync_simplified_fetch_icons_title">Pobierz ikony zakładek</string>
     <string name="sync_simplified_fetch_icons_subtitle">Ładuje ikony ze stron dodanych do zakładek. Pobieranie ikon jest widoczne w Twojej sieci.</string>
     <string name="faviconsPromptTitle">Pobrać brakujące ikony?</string>

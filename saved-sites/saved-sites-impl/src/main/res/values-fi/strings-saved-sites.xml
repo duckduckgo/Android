@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Jaa suosikit</string>
-    <string name="sync_enable_option_favorites_subtitle">Käytä samoja suosikkeja kaikilla laitteilla. Jätä pois, jos haluat pitää mobiili- ja työpöytäsuosikit erillään.</string>
     <string name="sync_simplified_enable_option_favorites_title">Jaa suosikit eri laitteilla</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Käytä samoja suosikkikirjanmerkkejä mobiililaitteessa ja tietokoneella.</string>
     <string name="saved_site_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjanmerkkikiintiösi on täynnä. Poista joitain kirjanmerkkejä jatkaaksesi synkronointia.\n\n<annotation type="manage_bookmarks">Hallitse kirjanmerkkejä</annotation></string>
@@ -101,8 +99,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Nouda kirjanmerkkikuvakkeet</string>
-    <string name="sync_fetch_icons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_simplified_fetch_icons_title">Lataa kirjanmerkkikuvakkeet</string>
     <string name="sync_simplified_fetch_icons_subtitle">Lataa kuvakkeet verkkosivustoista, jotka olet merkinnyt kirjanmerkkeihin. Kuvakkeiden lataukset näkyvät verkossasi.</string>
     <string name="faviconsPromptTitle">Puuttuvatko kuvakkeet latauksesta?</string>

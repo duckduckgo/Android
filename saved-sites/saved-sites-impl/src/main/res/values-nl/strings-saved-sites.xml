@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Favorieten delen</string>
-    <string name="sync_enable_option_favorites_subtitle">Gebruik dezelfde favorieten op alle apparaten. Schakel deze optie uit als je je favoriete bladwijzers niet wilt synchroniseren tussen je mobiele apparaat en pc.</string>
     <string name="sync_simplified_enable_option_favorites_title">Deel favorieten op verschillende apparaten</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Gebruik dezelfde favoriete bladwijzers op mobiel en desktop.</string>
     <string name="saved_site_limit_warning"><b>Synchronisatie gepauzeerd</b>\nJe hebt het maximum aantal bladwijzers bereikt. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
@@ -101,8 +99,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Weet je zeker dat je bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Bladwijzerpictogrammen ophalen</string>
-    <string name="sync_fetch_icons_subtitle">Download automatisch pictogrammen voor je gesynchroniseerde bladwijzers.</string>
     <string name="sync_simplified_fetch_icons_title">Bladwijzerpictogrammen laden</string>
     <string name="sync_simplified_fetch_icons_subtitle">Laadt pictogrammen van websites die je als bladwijzer hebt opgeslagen. Pictogramdownloads worden weergegeven in je netwerk.</string>
     <string name="faviconsPromptTitle">Ontbrekende pictogrammen downloaden?</string>

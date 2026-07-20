@@ -18,8 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Del favoritter</string>
-    <string name="sync_enable_option_favorites_subtitle">Bruk de samme favorittene på alle enheter. La være av for å holde mobil- og skrivebordsfavoritter adskilt.</string>
     <string name="sync_simplified_enable_option_favorites_title">Del favoritter fra enhet til enhet</string>
     <string name="sync_simplified_enable_option_favorites_subtitle">Bruk de samme favorittbokmerkene på mobil og datamaskin.</string>
     <string name="saved_site_limit_warning"><b>Synkronisering satt på pause</b>\nDu har nådd maksimalt antall bokmerker. Slett noen for å gjenoppta synkronisering.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
@@ -101,8 +99,6 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på at du vil slette bokmerket for &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Hent bokmerkeikoner</string>
-    <string name="sync_fetch_icons_subtitle">Last ned ikoner automatisk for dine synkroniserte bokmerker.</string>
     <string name="sync_simplified_fetch_icons_title">Hent bokmerkeikoner</string>
     <string name="sync_simplified_fetch_icons_subtitle">Laster inn ikoner fra nettsteder du har bokmerket. Nedlasting av ikoner er synlig på nettverket du er tilkoblet.</string>
     <string name="faviconsPromptTitle">Vil du laste ned manglende ikoner?</string>
