@@ -144,7 +144,7 @@
         ]
     },
     "onboarding_set-default": {
-        "description": "Set-as-default-browser step. shown when the comparison/set-default screen is displayed; clicked (no value) when the user taps 'Choose your browser'; confirmed ddg/other after the OS default-browser chooser returns. Unique once per user per (event, value).",
+        "description": "Set-as-default-browser step. shown when the comparison/set-default screen is displayed; clicked engage when the user taps 'Choose your browser'; confirmed ddg/other after the OS default-browser chooser returns. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -167,8 +167,8 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=confirmed: the resulting default browser. Absent for shown and clicked.",
-                "enum": ["ddg", "other"]
+                "description": "Set to engage when e=clicked. When e=confirmed, the resulting default browser. Absent for shown.",
+                "enum": ["engage", "ddg", "other"]
             }
         ]
     },
@@ -319,7 +319,7 @@
         ]
     },
     "onboarding_ai-intro": {
-        "description": "AI intro step. shown when the AI comparison chart is displayed; clicked (no value) when the user taps the primary CTA. Unique once per user per event.",
+        "description": "AI intro step. shown when the AI comparison chart is displayed; clicked engage when the user taps the primary CTA. Unique once per user per event.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -338,11 +338,12 @@
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_fire-button": {
-        "description": "Fire-button demo step. shown when the in-browser fire-button demo is presented; clicked (no value) when the demo completes. Displayed both in the Duck.ai flow, on the chat tab, and in the regular flow in the browser tab.",
+        "description": "Fire-button demo step. shown when the in-browser fire-button demo is presented; clicked engage when the demo completes. Displayed both in the Duck.ai flow, on the chat tab, and in the regular flow in the browser tab.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -367,7 +368,8 @@
                 "type": "string",
                 "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
                 "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            }
+            },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_search": {
