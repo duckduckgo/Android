@@ -39,6 +39,8 @@ class FireTabsPromoModeObserver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
+    // Mode-transition observer: fires once on the first entry into Fire mode.
+    @Suppress("DenyListedApi")
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             browserModeStateHolder.currentMode

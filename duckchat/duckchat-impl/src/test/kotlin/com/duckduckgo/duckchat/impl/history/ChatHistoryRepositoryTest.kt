@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.history
 
 import android.content.Context
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ChatType
@@ -34,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -65,6 +67,7 @@ class ChatHistoryRepositoryTest {
             duckChatSyncRepository = duckChatSyncRepository,
             syncEngine = syncEngine,
             chatExportWriter = chatExportWriter,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -216,7 +219,7 @@ class ChatHistoryRepositoryTest {
         repository.setPinned("abc", pinned = true)
 
         verify(chatStore).pinChat("abc")
-        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate(eq("abc"), eq(BrowserMode.REGULAR))
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -225,7 +228,7 @@ class ChatHistoryRepositoryTest {
         repository.setPinned("abc", pinned = false)
 
         verify(chatStore).unpinChat("abc")
-        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate(eq("abc"), eq(BrowserMode.REGULAR))
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 

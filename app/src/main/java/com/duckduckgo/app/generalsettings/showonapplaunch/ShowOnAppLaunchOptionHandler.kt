@@ -29,7 +29,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -42,8 +41,8 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
-    suspend fun handleAfterInactivityOption(wasIdle: Boolean)
-    suspend fun handleAppLaunchOption()
+    suspend fun handleAfterInactivityOption(wasIdle: Boolean, currentMode: BrowserMode)
+    suspend fun handleAppLaunchOption(currentMode: BrowserMode)
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
         isRootOfTab: Boolean,
@@ -60,23 +59,20 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : ShowOnAppLaunchOptionHandler {
 
-    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
+    override suspend fun handleAfterInactivityOption(wasIdle: Boolean, currentMode: BrowserMode) {
         logcat { "FirstScreen: Inactivity Timer passed" }
-        applyShowOnAppLaunchOption(fromInactivity = wasIdle)
+        applyShowOnAppLaunchOption(fromInactivity = wasIdle, currentMode = currentMode)
     }
 
-    override suspend fun handleAppLaunchOption() {
-        applyShowOnAppLaunchOption(fromInactivity = false)
+    override suspend fun handleAppLaunchOption(currentMode: BrowserMode) {
+        applyShowOnAppLaunchOption(fromInactivity = false, currentMode = currentMode)
     }
 
-    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
+    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean, currentMode: BrowserMode) {
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
-
-        val currentMode = browserModeStateHolder.currentMode.value
 
         when (option) {
             LastOpenedTab -> {

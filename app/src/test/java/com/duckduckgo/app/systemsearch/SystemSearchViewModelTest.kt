@@ -42,6 +42,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -96,7 +97,7 @@ class SystemSearchViewModelTest {
     fun setup() = runTest {
         whenever(mockAutoComplete.autoComplete(QUERY)).thenReturn(flowOf(autocompleteQueryResult))
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(flowOf(autocompleteBlankResult))
-        whenever(mockAutoCompleteFactory.create(any())).thenReturn(mockAutoComplete)
+        whenever(mockAutoCompleteFactory.create(any(), any())).thenReturn(mockAutoComplete)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList())) // Ensure initial favorites is empty for most tests
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -110,6 +111,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -427,6 +429,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -461,6 +464,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -529,6 +533,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,

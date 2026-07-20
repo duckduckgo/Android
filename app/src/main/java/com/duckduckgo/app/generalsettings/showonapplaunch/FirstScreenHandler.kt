@@ -65,6 +65,8 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val idleThresholdResolver: IdleThresholdResolver,
 ) : BrowserLifecycleObserver {
 
+    // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
+    @Suppress("DenyListedApi")
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
 
@@ -120,19 +122,22 @@ class FirstScreenHandlerImpl @Inject constructor(
         return lastBackgrounded != 0L && elapsed >= timeoutMs
     }
 
+    // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
+    @Suppress("DenyListedApi")
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
+        val currentMode = browserModeStateHolder.currentMode.value
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
                 }
                 return
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             if (!isVoiceSessionActiveOnCurrentTab()) {
-                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+                showOnAppLaunchOptionHandler.handleAppLaunchOption(currentMode)
             }
         }
     }

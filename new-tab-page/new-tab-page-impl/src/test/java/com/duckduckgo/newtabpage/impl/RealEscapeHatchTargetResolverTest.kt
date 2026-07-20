@@ -20,9 +20,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -38,8 +36,6 @@ class RealEscapeHatchTargetResolverTest {
 
     private val regularRepo: TabRepository = mock()
     private val fireRepo: TabRepository = mock()
-    private val modeFlow = MutableStateFlow(BrowserMode.REGULAR)
-    private val stateHolder: BrowserModeStateHolder = mock { on { currentMode } doReturn modeFlow }
     private val fireModeAvailability: FireModeAvailability = mock { on { isAvailable() } doReturn true }
 
     private val provider = object : BrowserModeDataProvider<TabRepository> {
@@ -47,16 +43,16 @@ class RealEscapeHatchTargetResolverTest {
             if (mode == BrowserMode.FIRE) fireRepo else regularRepo
     }
 
-    private val testee = RealEscapeHatchTargetResolver(stateHolder, provider, fireModeAvailability)
+    private val testee = RealEscapeHatchTargetResolver(BrowserMode.REGULAR, provider, fireModeAvailability)
 
     private fun tab(id: String, accessed: LocalDateTime?) =
         TabEntity(tabId = id, url = "https://$id.com", title = id, lastAccessTime = accessed)
 
     @Test
     fun whenFireModeThenReturnsNull() = runTest {
-        modeFlow.value = BrowserMode.FIRE
+        val fireTestee = RealEscapeHatchTargetResolver(BrowserMode.FIRE, provider, fireModeAvailability)
 
-        assertNull(testee.resolve())
+        assertNull(fireTestee.resolve())
     }
 
     @Test

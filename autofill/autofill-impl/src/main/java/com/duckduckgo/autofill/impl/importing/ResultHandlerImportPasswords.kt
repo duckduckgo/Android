@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesPro
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -76,7 +77,8 @@ class ResultHandlerImportPasswords @Inject constructor(
         originalUrl: String,
     ) {
         withContext(dispatchers.io()) {
-            val availableInputTypes = autofillAvailableInputTypesProvider.getTypes(originalUrl)
+            // Import-completion can only originate from a Regular-mode flow; Fire mode never offers to import.
+            val availableInputTypes = autofillAvailableInputTypesProvider.getTypes(originalUrl, browserMode = BrowserMode.REGULAR)
             val json = autofillResponseWriter.generateResponseNewAutofillDataAvailable(availableInputTypes)
             logcat { "Autofill: import completed; refresh request: $json" }
             autofillMessagePoster.postMessage(webView, json)

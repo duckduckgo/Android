@@ -126,6 +126,14 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             errorMessage = "Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, " +
                 "or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
         ),
+        DenyListedEntry(
+            className = "com.duckduckgo.browsermode.api.BrowserModeStateHolder",
+            functionName = "getCurrentMode",
+            errorMessage = "Do not read the mutable global browser mode. Scoped components must inject the frozen BrowserMode; " +
+                "AppScope components must take a BrowserMode parameter or a @RegularMode/@FireMode-qualified binding. " +
+                "Genuine mode-transition observers may @Suppress(\"DenyListedApi\") with a justification comment.",
+            allowInTests = true,
+        ),
     )
 
     override fun getApplicableUastTypes() = config.applicableTypes()
@@ -204,8 +212,35 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             }
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
-                val reference = node.resolve() as? PsiField ?: return
-                visitField(reference, node)
+                // Only handle genuine property accesses (foo.bar), not function calls (foo.bar()).
+                // Java and Kotlin UAST differ: Java puts the ref as the UCallExpression's callee
+                // (parent is UCallExpression); Kotlin wraps the call as the selector instead.
+                if (node.uastParent is UCallExpression || node.selector is UCallExpression) return
+                when (val reference = node.resolve()) {
+                    is PsiField -> visitField(reference, node)
+                    is PsiMethod -> visitGetterMethod(reference, node)
+                }
+            }
+
+            private fun visitGetterMethod(reference: PsiMethod, node: UQualifiedReferenceExpression) {
+                // Only handle zero-parameter methods. Kotlin property getters always have 0
+                // JVM parameters; extension functions (like first()) carry the receiver as a
+                // parameter in the JVM bytecode and are already handled by visitCallExpression.
+                if (reference.parameterList.parametersCount != 0) return
+                val className = reference.containingClass?.qualifiedName
+                val typeConfig = typeConfigs[className] ?: return
+                val functionName = reference.name.substringBefore("-")
+                val deniedFunctions = typeConfig.functionEntries.getOrDefault(functionName, emptyList()) +
+                    typeConfig.functionEntries.getOrDefault(MATCH_ALL, emptyList())
+                deniedFunctions.forEach { denyListEntry ->
+                    if (denyListEntry.allowInTests && context.isTestSource) return@forEach
+                    if (denyListEntry.receiverTypeExcluded(context, node)) return@forEach
+                    context.report(
+                        issue = ISSUE,
+                        location = context.getLocation(node),
+                        message = denyListEntry.errorMessage,
+                    )
+                }
             }
 
             private fun visitField(reference: PsiField, node: UElement) {
@@ -242,6 +277,19 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
         ): Boolean {
             val excluded = excludedReceiverTypes ?: return false
             val receiverType = node.receiverType ?: return false
+            val rawType = if (receiverType is PsiClassType) receiverType.rawType() else receiverType
+            val receiverClass = context.evaluator.findClass(rawType.canonicalText) ?: return false
+            return excluded.any { fqcn ->
+                receiverClass.qualifiedName == fqcn || context.evaluator.inheritsFrom(receiverClass, fqcn)
+            }
+        }
+
+        private fun DenyListedEntry.receiverTypeExcluded(
+            context: JavaContext,
+            node: UQualifiedReferenceExpression,
+        ): Boolean {
+            val excluded = excludedReceiverTypes ?: return false
+            val receiverType = node.receiver.getExpressionType() ?: return false
             val rawType = if (receiverType is PsiClassType) receiverType.rawType() else receiverType
             val receiverClass = context.evaluator.findClass(rawType.canonicalText) ?: return false
             return excluded.any { fqcn ->

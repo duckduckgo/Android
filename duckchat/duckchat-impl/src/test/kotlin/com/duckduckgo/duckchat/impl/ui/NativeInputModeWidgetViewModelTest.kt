@@ -163,7 +163,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
-        whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
+        whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
@@ -181,6 +181,7 @@ class NativeInputModeWidgetViewModelTest {
             chatSuggestionsReader = chatSuggestionsReader,
             nativeInputPlugins = fakePluginPoint,
             autoCompleteFactory = autoCompleteFactory,
+            browserMode = BrowserMode.REGULAR,
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             dispatchers = coroutineRule.testDispatcherProvider,

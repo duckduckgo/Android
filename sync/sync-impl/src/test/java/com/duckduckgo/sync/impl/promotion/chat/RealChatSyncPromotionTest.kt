@@ -52,9 +52,6 @@ class RealChatSyncPromotionTest {
     private var isChatHistoryEnabled = false
     private val hasChatSuggestions = MutableStateFlow(false)
 
-    // BrowserModeStateHolder properties
-    private val browserMode = MutableStateFlow(BrowserMode.REGULAR)
-
     private val testee = RealChatSyncPromotion(
         promotionDataStore = dataStore,
         syncState = mock {
@@ -66,9 +63,6 @@ class RealChatSyncPromotionTest {
             onBlocking { hasUserEnabledChatHistory() } doAnswer { isChatHistoryEnabled }
             on { observeHasChatSuggestions() } doReturn hasChatSuggestions
         },
-        browserModeStateHolder = mock {
-            on { currentMode } doReturn browserMode
-        },
         pixel = pixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
@@ -77,7 +71,7 @@ class RealChatSyncPromotionTest {
     fun `when all preconditions are met can show promotion`() = runTest {
         configurePromotionToShow()
 
-        assertTrue(testee.canShowPromotion())
+        assertTrue(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -85,7 +79,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         testee.recordPromotionAccepted()
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -93,7 +87,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         testee.recordPromotionDismissed()
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -103,10 +97,10 @@ class RealChatSyncPromotionTest {
         repeat(RealChatSyncPromotion.MAX_IMPRESSION_COUNT - 1) {
             testee.incrementImpressionCount()
         }
-        assertTrue(testee.canShowPromotion())
+        assertTrue(testee.canShowPromotion(BrowserMode.REGULAR))
 
         testee.incrementImpressionCount()
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -114,7 +108,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         isSyncEnabled = false
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -122,7 +116,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         isChatSyncEnabled = false
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -130,7 +124,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         isUserSignedIn = true
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -138,7 +132,7 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         isChatHistoryEnabled = false
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
@@ -146,15 +140,12 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         hasChatSuggestions.value = false
-        assertFalse(testee.canShowPromotion())
+        assertFalse(testee.canShowPromotion(BrowserMode.REGULAR))
     }
 
     @Test
-    fun `when browser is in Fire Mode cannot show promotion`() = runTest {
-        configurePromotionToShow()
-
-        browserMode.value = BrowserMode.FIRE
-        assertFalse(testee.canShowPromotion())
+    fun whenInFireModeThenPromotionNotShown() = runTest {
+        assertFalse(testee.canShowPromotion(BrowserMode.FIRE))
     }
 
     @Test
@@ -225,7 +216,7 @@ class RealChatSyncPromotionTest {
         }
         pixel.clear()
 
-        testee.canShowPromotion()
+        testee.canShowPromotion(BrowserMode.REGULAR)
 
         assertEquals(
             listOf(
@@ -245,7 +236,7 @@ class RealChatSyncPromotionTest {
         testee.recordPromotionDismissed()
         pixel.clear()
 
-        testee.canShowPromotion()
+        testee.canShowPromotion(BrowserMode.REGULAR)
 
         assertTrue(pixel.firedPixels.isEmpty())
     }
@@ -257,7 +248,6 @@ class RealChatSyncPromotionTest {
         isUserSignedIn = false
         isChatHistoryEnabled = true
         hasChatSuggestions.value = true
-        browserMode.value = BrowserMode.REGULAR
     }
 }
 
