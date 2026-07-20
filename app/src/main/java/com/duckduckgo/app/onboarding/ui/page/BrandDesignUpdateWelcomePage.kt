@@ -54,7 +54,6 @@ import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -74,6 +73,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage.Companion.LEFT_WING_CARD_GAP_DP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
@@ -111,8 +111,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -1040,16 +1038,30 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 WIDGET_PROMPT -> {
                     dismissBottomWingAnimation()
+                    releaseCardBottomInset()
                     binding.daxDialogCta.welcomeContent.root.isVisible = false
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
                     binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+                    binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
+                        getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+
+                    val leftWingView = binding.leftWingAnimation
+                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = leftWingView,
+                    )
+                    if (!showLeftWingAnimation) {
+                        binding.leftWingAnimation.isVisible = false
+                    } else {
+                        playLeftWingAnimation()
+                    }
 
                     val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
                     val bodyView = binding.daxDialogCta.widgetPromptContent.widgetPromptBody
                     val widgetPromptImage = binding.daxDialogCta.widgetPromptContent.widgetPromptMedia
-                    bodyView.text = getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
                     bodyView.alpha = 0f
                     widgetPromptImage.alpha = 0f
 
@@ -1069,18 +1081,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddWidget)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
-
-                    val leftWingView = binding.leftWingAnimation
-                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = leftWingView,
-                    )
-                    if (!showLeftWingAnimation) {
-                        binding.leftWingAnimation.isVisible = false
-                    } else {
-                        playLeftWingAnimation()
-                    }
 
                     val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -1783,6 +1783,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
+                binding.daxDialogCta.secondaryCta.visibility = View.VISIBLE
+                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
+                binding.daxDialogCta.secondaryCta.alpha = 1f
+                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
+                binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
+                    getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+
                 val leftWingView = binding.leftWingAnimation
                 val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                     rootView = binding.root,
@@ -1816,8 +1823,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 titleView.cancelAnimation()
                 titleView.text = getString(R.string.preOnboardingWidgetPromptTitle).preventWidows()
                 titleView.alpha = 1f
-                binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
-                    getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
                 binding.daxDialogCta.widgetPromptContent.widgetPromptBody.alpha = 1f
                 binding.daxDialogCta.widgetPromptContent.widgetPromptMedia.alpha = 1f
 
@@ -1828,11 +1833,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingWidgetPromptPrimaryCta)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-
-                binding.daxDialogCta.secondaryCta.visibility = View.VISIBLE
-                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
-                binding.daxDialogCta.secondaryCta.alpha = 1f
-                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
                 binding.daxDialogCta.stepIndicator.showStep(stepIndicator)

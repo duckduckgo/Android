@@ -23,8 +23,8 @@
     <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
     <dimen name="preOnboardingDaxCtaPaddingTop">40dp</dimen>
-    <dimen name="preOnboardingWidgetPromptMediaHeight">120dp</dimen>
-    <dimen name="preOnboardingWidgetPromptMediaMaxWidth">400dp</dimen>
+    <dimen name="preOnboardingWidgetPromptMediaHeight">200dp</dimen>
+    <dimen name="preOnboardingWidgetPromptMediaMaxWidth">280dp</dimen>
     <dimen name="onboardingContextualBackgroundOverlap">90dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
     <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>

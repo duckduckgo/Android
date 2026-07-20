@@ -61,37 +61,29 @@
         app:typography="onboarding_body"
         tools:alpha="1" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/widgetPromptMedia"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_1"
+        android:layout_gravity="center"
         android:layout_marginTop="@dimen/keyline_6"
         android:alpha="0"
+        android:background="@drawable/onboarding_widget_prompt_sketch_frame"
         android:gravity="center"
-        android:orientation="vertical"
         tools:alpha="1">
 
         <ImageView
+            android:id="@+id/widgetPromptMediaImage"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/preOnboardingWidgetPromptMediaHeight"
-            android:layout_marginHorizontal="@dimen/keyline_1"
-            android:background="@drawable/onboarding_widget_prompt_sketch_frame"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="@dimen/keyline_0"
             android:importantForAccessibility="no"
             android:maxWidth="@dimen/preOnboardingWidgetPromptMediaMaxWidth"
-            android:paddingHorizontal="@dimen/keyline_1"
-            android:paddingTop="@dimen/keyline_1"
+            android:maxHeight="@dimen/preOnboardingWidgetPromptMediaHeight"
             android:scaleType="fitXY"
             android:src="@drawable/onboarding_widget_prompt_preview" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:importantForAccessibility="no"
-            android:maxWidth="@dimen/preOnboardingWidgetPromptMediaMaxWidth"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/onboarding_phone_sketch_line" />
-
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

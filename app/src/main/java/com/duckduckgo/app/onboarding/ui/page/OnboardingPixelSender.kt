@@ -48,12 +48,8 @@ import javax.inject.Inject
 sealed interface OnboardingPixelAction {
     data object Shown : OnboardingPixelAction
 
-    /** A click/tap. [engaged] null = no value param; true/false = engage/dismiss. */
     data class Clicked(val engaged: Boolean? = null) : OnboardingPixelAction
-
     data class SetDefaultConfirmed(val isDdgDefault: Boolean) : OnboardingPixelAction
-
-    /** Widget-prompt confirmed result. value = added | not_added. */
     data class WidgetConfirmed(val added: Boolean) : OnboardingPixelAction
     data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelAction
     data class AddressBarClicked(val position: OmnibarType) : OnboardingPixelAction
@@ -63,7 +59,6 @@ sealed interface OnboardingPixelAction {
         val isChat: Boolean,
     ) : OnboardingPixelAction
 
-    /** A suggestion-screen click. value = suggested | custom. */
     data class SuggestionClicked(val fromSuggestion: Boolean) : OnboardingPixelAction
 
     data class QuickSetupClicked(
