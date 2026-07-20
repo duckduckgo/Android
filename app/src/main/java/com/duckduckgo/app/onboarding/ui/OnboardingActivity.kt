@@ -84,7 +84,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     fun onSkipClicked() {
         viewModel.onOnboardingSkipped()
-        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
         finish()
     }
 
@@ -97,7 +97,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun handOffToBrowserActivity() {
-        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
         finish()
     }
 
@@ -113,7 +113,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun onOnboardingDone() {
         lifecycleScope.launch {
             viewModel.onOnboardingDone()
-            startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+            startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
             finish()
         }
     }
