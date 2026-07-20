@@ -1008,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Novo separador Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Experimenta os separadores Fire para navegar sem guardar o histórico local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Eliminar separadores Fire e respetivos dados?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
 </resources>
