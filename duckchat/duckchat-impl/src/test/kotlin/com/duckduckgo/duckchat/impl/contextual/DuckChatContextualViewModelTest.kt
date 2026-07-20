@@ -1053,6 +1053,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when summarize quick action clicked in submit mode then summarize prompt selected pixel fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1067,6 +1068,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when ask about page quick action clicked then summarize prompt selected pixel not fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1080,6 +1082,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when ask about page quick action clicked then focus input command emitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -1814,6 +1817,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in ASK_ABOUT_PAGE with valid context then state transitions to SUBMIT_SUMMARIZE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1838,8 +1842,27 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when contextualSheetImprovements enabled and page context arrives then context is NOT auto-attached`() = runTest {
+    fun `when contextualSheetImprovements enabled and auto-attach enabled then context is auto-attached in SUBMIT_SUMMARIZE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+            testee.viewState.value.quickActionState,
+        )
+        verify(duckChatPixels).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled and auto-attach disabled then page context is NOT auto-attached`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1847,12 +1870,17 @@ class DuckChatContextualViewModelTest {
         testee.onPageContextReceived("tab-1", pageContext)
 
         assertFalse(testee.viewState.value.showContext)
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE,
+            testee.viewState.value.quickActionState,
+        )
         verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
     }
 
     @Test
     fun `when contextualSheetImprovements enabled then context only attaches after ASK_ABOUT_PAGE clicked`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1867,6 +1895,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in ASK_ABOUT_PAGE with valid page context then context is attached`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1880,6 +1909,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in SUBMIT_SUMMARIZE then summarize prompt is auto-submitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1902,6 +1932,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked then context-attach pixel not re-fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1919,6 +1950,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked after user removed context then summarize is NOT submitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1940,6 +1972,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when new chat triggered with contextualSheetImprovements enabled then quickActionState resets to ASK_ABOUT_PAGE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1965,6 +1998,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked with typed input then web prefill event emitted after auto-submit`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1996,6 +2030,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked with typed input then ChangeSheetState carries prefill`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -2045,6 +2080,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when removePageContext from SUBMIT_SUMMARIZE then quickActionState reverts to ASK_ABOUT_PAGE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -2109,6 +2145,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when removePageContext reverts to ASK_ABOUT_PAGE then placeholder shown pixel is not fired but removed pixel is`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""

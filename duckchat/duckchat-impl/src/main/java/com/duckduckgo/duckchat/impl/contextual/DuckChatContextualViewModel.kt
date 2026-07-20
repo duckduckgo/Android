@@ -836,20 +836,28 @@ class DuckChatContextualViewModel @Inject constructor(
             val inputMode = _viewState.value
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+                val showContext = if (allowsAutomaticContextAttachment) {
+                    !inputMode.userRemovedContext
+                } else {
+                    inputMode.showContext
+                }
+                val newlyAutoAttached = showContext && !inputMode.showContext
                 val updatedState =
                     inputMode.copy(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
-                        showContext =
-                        if (allowsAutomaticContextAttachment && !isContextualSheetImprovementsEnabled) {
-                            !inputMode.userRemovedContext
+                        showContext = showContext,
+                        // With the improved sheet, auto-attaching context skips the ASK_ABOUT_PAGE step:
+                        // move the quick action straight to submit-summarize so the pill reads "Summarize".
+                        quickActionState = if (isContextualSheetImprovementsEnabled && newlyAutoAttached) {
+                            QuickActionState.SUBMIT_SUMMARIZE
                         } else {
-                            inputMode.showContext
+                            inputMode.quickActionState
                         },
                     )
-                if (updatedState.showContext && !inputMode.showContext) {
+                if (newlyAutoAttached) {
                     duckChatPixels.reportContextualPageContextAutoAttached()
                 }
                 _viewState.update { updatedState }
