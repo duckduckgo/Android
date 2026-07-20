@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Κοινή χρήση με...</string>
     <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
     <string name="downloadsUndoActionName">Αναίρεση</string>
-    <string name="downloadsSearchHint">Αναζήτηση</string>
 </resources>

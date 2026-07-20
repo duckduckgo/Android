@@ -50,5 +50,4 @@
     <string name="downloadsShareTitle">Delen met...</string>
     <string name="downloadsStateInProgress">Bezig...</string>
     <string name="downloadsUndoActionName">Ongedaan maken</string>
-    <string name="downloadsSearchHint">Zoeken</string>
 </resources>
