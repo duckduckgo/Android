@@ -836,10 +836,15 @@ class DuckChatContextualViewModel @Inject constructor(
             val inputMode = _viewState.value
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
-                val showContext = if (allowsAutomaticContextAttachment) {
-                    !inputMode.userRemovedContext
-                } else {
-                    inputMode.showContext
+
+                val dropStaleAttachment = !allowsAutomaticContextAttachment &&
+                    inputMode.showContext &&
+                    url != inputMode.contextUrl
+
+                val showContext = when {
+                    allowsAutomaticContextAttachment -> !inputMode.userRemovedContext
+                    dropStaleAttachment -> false
+                    else -> inputMode.showContext
                 }
                 val newlyAutoAttached = showContext && !inputMode.showContext
                 val updatedState =
@@ -849,12 +854,10 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext = showContext,
-                        // With the improved sheet, auto-attaching context skips the ASK_ABOUT_PAGE step:
-                        // move the quick action straight to submit-summarize so the pill reads "Summarize".
-                        quickActionState = if (isContextualSheetImprovementsEnabled && newlyAutoAttached) {
-                            QuickActionState.SUBMIT_SUMMARIZE
-                        } else {
-                            inputMode.quickActionState
+                        quickActionState = when {
+                            isContextualSheetImprovementsEnabled && newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
+                            isContextualSheetImprovementsEnabled && dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
+                            else -> inputMode.quickActionState
                         },
                     )
                 if (newlyAutoAttached) {

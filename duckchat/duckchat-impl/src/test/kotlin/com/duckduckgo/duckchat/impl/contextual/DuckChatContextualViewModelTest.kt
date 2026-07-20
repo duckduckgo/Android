@@ -1700,6 +1700,107 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when auto-attach enabled then a navigation page context push refreshes the attached context`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Context for the initial page is auto-attached.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // URL changes: the browser pushes the new page's context unsolicited.
+        testee.onMainBrowserPageFinished(isStorePageContextEnabled = true)
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach disabled then a navigation page context push does not refresh the attached context`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Context for the initial page is available and manually attached.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // URL changes: the unsolicited push must be ignored, leaving the attached context untouched.
+        testee.onMainBrowserPageFinished(isStorePageContextEnabled = true)
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach off and sheet reopened on a different url then the stale attached context is dropped`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Manually attach context for page A.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Close, navigate to page B, and reopen: the page-A attachment is now stale.
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when auto-attach off and sheet reopened on the same url then the attached context is kept`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Reopen on the same page: the attachment still matches, so keep it.
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach on and sheet reopened on a different url then the attached context is refreshed not dropped`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
     fun `when sheet closed then isPageContextRequested is reset`() = runTest {
         val tabId = "tab-1"
         testee.onSheetOpened(tabId)
