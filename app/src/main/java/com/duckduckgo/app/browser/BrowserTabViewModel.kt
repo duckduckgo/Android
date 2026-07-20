@@ -3704,15 +3704,16 @@ class BrowserTabViewModel @Inject constructor(
 
         openNewTab()
 
+        val browserModeParams = mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
         if (longPress) {
-            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, browserModeParams)
         } else {
             val url = site?.url
             if (url != null) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP, browserModeParams)
                 } else {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE, browserModeParams)
                 }
             }
         }
@@ -4068,7 +4069,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
         browserInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
 
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
+        val browserModeParams = mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED, browserModeParams)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         fireDailyLaunchPixel()
@@ -4079,7 +4081,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is Omnibar.ViewMode.NewTab -> {
-                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString()) + browserModeParams
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
 
@@ -4087,9 +4089,9 @@ class BrowserTabViewModel @Inject constructor(
                 val url = site?.url
                 if (url != null) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP, browserModeParams)
                     } else {
-                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE, browserModeParams)
                     }
                 }
             }
@@ -4117,6 +4119,7 @@ class BrowserTabViewModel @Inject constructor(
                     PixelParameter.TAB_INACTIVE_1W to inactive1w.await(),
                     PixelParameter.TAB_INACTIVE_2W to inactive2w.await(),
                     PixelParameter.TAB_INACTIVE_3W to inactive3w.await(),
+                    PixelParameter.BROWSER_MODE to browserMode.name.lowercase(),
                 )
             pixel.fire(TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
         }

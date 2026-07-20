@@ -55,6 +55,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RATING
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -122,9 +123,16 @@ class BrowserViewModel @Inject constructor(
 
     val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
 
-    fun switchToMode(mode: BrowserMode): Boolean {
+    fun switchToMode(mode: BrowserMode, source: BrowserModeSwitchSource): Boolean {
         if (mode != BrowserMode.REGULAR && !fireModeAvailability.isAvailable()) return false
         browserModeStateHolder.switchTo(mode)
+        pixel.fire(
+            AppPixelName.BROWSER_MODE_SWITCHED,
+            mapOf(
+                PixelParameter.BROWSER_MODE to mode.name.lowercase(),
+                PixelParameter.SOURCE to source.value,
+            ),
+        )
         return true
     }
 

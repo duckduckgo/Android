@@ -34,10 +34,12 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -67,6 +69,8 @@ class NonGranularFireDialogViewModelTest {
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockDateProvider: DateProvider = mock()
     private val dataClearingWideEvent: DataClearingWideEvent = mock()
+    private val mockTabRepository: TabRepository = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -77,6 +81,7 @@ class NonGranularFireDialogViewModelTest {
 
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+            whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         }
     }
 
@@ -91,6 +96,8 @@ class NonGranularFireDialogViewModelTest {
         dateProvider = mockDateProvider,
         dataClearingWideEvent = dataClearingWideEvent,
         browserMode = BrowserMode.REGULAR,
+        tabRepository = mockTabRepository,
+        duckChat = mockDuckChat,
     )
 
     @Test
@@ -313,7 +320,7 @@ class NonGranularFireDialogViewModelTest {
 
         testee.onShow()
 
-        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -323,7 +330,7 @@ class NonGranularFireDialogViewModelTest {
         testee.onShow()
         testee.onShow()
 
-        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test

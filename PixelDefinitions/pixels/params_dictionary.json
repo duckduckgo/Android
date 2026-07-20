@@ -26,6 +26,12 @@
         "description": "ETag for the remote config used when the pixel was sent.  Can be empty string.",
         "pattern": "^$|^[-0-9a-f]{32}$"
     },
+    "browserMode": {
+        "key": "browser_mode",
+        "type": "string",
+        "description": "Whether the user was in Fire Mode or Regular Mode when the pixel was sent",
+        "enum": ["regular", "fire"]
+    },
     "widePixelAppName": {
         "key": "app.name",
         "type": "string",

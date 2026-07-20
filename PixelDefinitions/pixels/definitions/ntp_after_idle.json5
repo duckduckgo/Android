@@ -252,14 +252,14 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_ntp_after_idle_escape_hatch_burn_with_confirmation_tapped_daily": {
         "description": "(Daily Pixel) User tapped Burn tab from the new tab return hatch menu (the confirmation FireDialog is shown next)",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_ntp_after_idle_escape_hatch_after_inactivity_tapped": {
         "description": "User tapped After inactivity from the new tab return hatch menu",

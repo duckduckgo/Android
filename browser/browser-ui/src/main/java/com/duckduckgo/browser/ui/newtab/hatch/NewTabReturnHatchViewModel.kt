@@ -194,8 +194,9 @@ class NewTabReturnHatchViewModel @Inject constructor(
     }
 
     fun onBurnTabPressed() {
-        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, type = Count)
-        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to viewState.value.mode.name.lowercase())
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, params, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, params, type = Daily())
     }
 
     fun onUndoCloseTab(tabId: String) {

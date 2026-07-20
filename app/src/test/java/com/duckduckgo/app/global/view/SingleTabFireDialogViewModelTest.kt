@@ -66,6 +66,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -841,7 +842,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.Browser)
 
-        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -852,7 +853,7 @@ class SingleTabFireDialogViewModelTest {
         testee.setOrigin(FireDialogOrigin.Browser)
         testee.setOrigin(FireDialogOrigin.Settings)
 
-        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -937,7 +938,11 @@ class SingleTabFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
+        verify(mockPixel).enqueueFire(
+            FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+            type = Daily(),
+        )
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
@@ -1082,6 +1087,9 @@ class SingleTabFireDialogViewModelTest {
         verify(mockDataClearingWideEvent).start(
             entryPoint = any(),
             clearOptions = any(),
+            browserMode = any(),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
         )
         verify(mockDataClearingWideEvent).finishSuccess()
     }
@@ -1296,7 +1304,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         verify(mockDataClearingWideEvent, never()).finishSuccess()
     }
 
@@ -1474,8 +1482,9 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, params)
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, params, type = Daily())
     }
 
     @Test
@@ -1801,8 +1810,9 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, params)
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, params, type = Daily())
     }
 
     @Test

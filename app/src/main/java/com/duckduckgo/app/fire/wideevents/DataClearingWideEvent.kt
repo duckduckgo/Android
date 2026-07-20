@@ -22,6 +22,7 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,7 +31,22 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DataClearingWideEvent {
-    suspend fun start(entryPoint: EntryPoint, clearOptions: Set<FireClearOption>)
+    /**
+     * @param browserMode The mode this clear applies to. Automatic foreground/background clearing
+     * also clears Fire data as a side effect, but is attributed as [BrowserMode.REGULAR] since
+     * that's the mode context it always runs in.
+     * @param tabType The type of the active tab when the burn was confirmed. Only meaningful for
+     * dialog-driven flows; omit where there is no active-tab context (app shortcut, auto clears,
+     * fire tabs emptied).
+     * @param tabCount The number of open tabs when the burn was confirmed (bucketed before sending).
+     */
+    suspend fun start(
+        entryPoint: EntryPoint,
+        clearOptions: Set<FireClearOption>,
+        browserMode: BrowserMode,
+        tabType: TabType? = null,
+        tabCount: Int? = null,
+    )
 
     suspend fun startLegacy(entryPoint: EntryPoint, clearWhatOption: ClearWhatOption, clearDuckAiData: Boolean)
 
@@ -55,6 +71,11 @@ interface DataClearingWideEvent {
         LEGACY_AUTO_FOREGROUND("legacy_auto_foreground"),
         LEGACY_AUTO_BACKGROUND("legacy_auto_background"),
     }
+
+    enum class TabType(val value: String) {
+        WEB("web"),
+        AI("ai"),
+    }
 }
 
 enum class DataClearingFlowStep(val stepName: String) {
@@ -76,16 +97,27 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private var cachedFlowId: Long? = null
 
-    override suspend fun start(entryPoint: DataClearingWideEvent.EntryPoint, clearOptions: Set<FireClearOption>) {
+    override suspend fun start(
+        entryPoint: DataClearingWideEvent.EntryPoint,
+        clearOptions: Set<FireClearOption>,
+        browserMode: BrowserMode,
+        tabType: DataClearingWideEvent.TabType?,
+        tabCount: Int?,
+    ) {
         if (!isFeatureEnabled()) return
         resetExistingFlow()
+
+        val metadata = buildMap {
+            put(KEY_CLEAR_OPTIONS, clearOptions.asMetadataValue())
+            put(KEY_BROWSER_MODE, browserMode.name.lowercase())
+            tabType?.let { put(KEY_TAB_TYPE, it.value) }
+            tabCount?.let { put(KEY_TAB_COUNT, it.asTabCountBucket()) }
+        }
 
         cachedFlowId = wideEventClient.flowStart(
             name = FLOW_NAME,
             flowEntryPoint = entryPoint.value,
-            metadata = mapOf(
-                KEY_CLEAR_OPTIONS to clearOptions.asMetadataValue(),
-            ),
+            metadata = metadata,
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         ).getOrNull()
 
@@ -102,7 +134,9 @@ class DataClearingWideEventImpl @Inject constructor(
         clearWhatOption: ClearWhatOption,
         clearDuckAiData: Boolean,
     ) {
-        start(entryPoint, legacyOptionsToClearOptions(clearWhatOption, clearDuckAiData))
+        // The legacy clearing path (ClearDataAction/ClearPersonalDataAction) is wired exclusively to
+        // @RegularMode, so every "Legacy" entry point is always a Regular-mode clear.
+        start(entryPoint, legacyOptionsToClearOptions(clearWhatOption, clearDuckAiData), BrowserMode.REGULAR)
     }
 
     override suspend fun stepSuccess(step: DataClearingFlowStep) {
@@ -219,9 +253,25 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private fun Throwable.toErrorClass(): String = javaClass.simpleName
 
+    // Same bucket labels as TabStatsBucketing.TAB_COUNT_BUCKETS, applied to a caller-supplied count
+    // (TabStatsBucketing reads the @RegularMode repo itself, which would be wrong for Fire-mode burns).
+    private fun Int.asTabCountBucket(): String = when {
+        this <= 1 -> "1"
+        this <= 5 -> "2-5"
+        this <= 10 -> "6-10"
+        this <= 20 -> "11-20"
+        this <= 40 -> "21-40"
+        this <= 60 -> "41-60"
+        this <= 80 -> "61-80"
+        else -> "81+"
+    }
+
     private companion object {
         const val FLOW_NAME = "data-clearing"
         const val KEY_CLEAR_OPTIONS = "clear_options"
         const val KEY_TOTAL_DURATION_MS_BUCKETED = "total_duration_ms_bucketed"
+        const val KEY_BROWSER_MODE = "browser_mode"
+        const val KEY_TAB_TYPE = "tab_type"
+        const val KEY_TAB_COUNT = "tab_count"
     }
 }

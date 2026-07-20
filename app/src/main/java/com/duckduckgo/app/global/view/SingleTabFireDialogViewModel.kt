@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.TabType
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -139,7 +140,11 @@ class SingleTabFireDialogViewModel @Inject constructor(
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
+            pixel.enqueueFire(
+                AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+                mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()),
+                type = Daily(),
+            )
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
@@ -159,9 +164,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
                 val clearOptions = fireDataStore.getManualClearOptions()
+                val stateData = (viewState.value as? ViewState.Loaded)?.stateData
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
                     clearOptions = clearOptions,
+                    browserMode = browserMode,
+                    tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
+                    tabCount = stateData?.tabCount,
                 )
                 try {
                     dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
@@ -235,8 +244,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         viewModelScope.launch {
             shouldRestartAfterClearing = false
 
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
+            val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, browserModeParams)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, browserModeParams, type = Daily())
 
             command.send(Command.OnClearStarted)
 
@@ -289,7 +299,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun onShow(isDataSubtitleVisible: Boolean) {
         command.send(Command.OnShow)
-        pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
+        pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()))
 
         if (isDataSubtitleVisible) {
             withContext(dispatcherProvider.io()) {
