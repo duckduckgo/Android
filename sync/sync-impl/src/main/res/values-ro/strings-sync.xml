@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
     <string name="sync_share_title">Distribuie către...</string>
     <string name="sync_pdf_title">Codul de recuperare a sincronizării</string>
-    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
+    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi parolele, datele de completare automată și chaturile Duck.ai pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
     <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>
-    <string name="sync_instructions_title">Cum funcționează?</string>
-    <string name="sync_instructions_step1">Deschide DuckDuckGo pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
-    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație DuckDuckGo.</string>
+    <string name="sync_instructions_title">Cum funcționează acest cod?</string>
+    <string name="sync_instructions_step1">Deschide DuckDuckGo pe dispozitivul pe care vrei să îl sincronizezi și mergi la Sync &amp; Backup în Setări.</string>
+    <string name="sync_instructions_step2">Selectează „Sincronizează cu un alt dispozitiv” și scanează codul QR sau completează codul text.</string>
     <string name="sync_instructions_step3">Sincronizarea va fi activată și vei avea din nou acces la toate datele tale.</string>
+    <string name="sync_pdf_retention_notice">Dacă trec mai mult de 18 luni fără să folosești un browser DuckDuckGo cu Sync &amp; Backup activat, datele tale vor fi șterse de pe server și nu vor mai putea fi recuperate.</string>
     <string name="remove_device_dialog_title">Elimini dispozitivul?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s„%%@” nu va mai putea accesa datele tale sincronizate.</string>
     <string name="remove_device_dialog_primary_button">Elimină</string>

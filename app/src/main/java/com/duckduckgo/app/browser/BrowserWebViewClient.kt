@@ -256,6 +256,7 @@ class BrowserWebViewClient @Inject constructor(
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
                 is SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink -> {
                     subscriptions.launchSubscription(webView.context, url)
+                    webViewClientListener?.closeAndReturnToSourceIfBlankTab()
                     true
                 }
 
@@ -560,7 +561,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 

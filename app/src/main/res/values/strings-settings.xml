@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="'%1$d' is a placeholder and will be replaced with the number of minutes, e.g. '5 minutes'">%1$d minutes</string>
     <string name="afterInactivityTimeout1Hour">1 hour</string>
     <string name="afterInactivityTimeoutXHours" instruction="'%1$d' is a placeholder and will be replaced with the number of hours, e.g. '2 hours'">%1$d hours</string>
+    <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
+    <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
 </resources>

@@ -19,8 +19,9 @@ package com.duckduckgo.app.trackerdetection
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.browser.UriString.Companion.removePort
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -34,7 +35,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
-import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -43,7 +43,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val adClickManager: AdClickManager,
@@ -52,11 +52,19 @@ class TrackerDetectorImpl @Inject constructor(
     private val clients = CopyOnWriteArrayList<Client>()
 
     /**
+     * We're only interested in [BLOCKING] clients. Recomputed only when [addClient] runs. Evaluation reads
+     * this directly instead of filtering [clients] on every request.
+     */
+    @Volatile
+    private var blockingClients: List<Client> = emptyList()
+
+    /**
      * Adds a new client. If the client's name matches an existing client, old client is replaced
      */
     override fun addClient(client: Client) {
         clients.removeAll { client.name == it.name }
         clients.add(client)
+        blockingClients = clients.filter { it.name.type == BLOCKING }
     }
 
     override fun evaluate(
@@ -74,13 +82,13 @@ class TrackerDetectorImpl @Inject constructor(
             return null
         }
 
-        val result = clients
-            .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+        val result = blockingClients
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
-        val sameEntity = sameNetworkName(url, documentUrl)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+        val urlNetwork = entityLookup.entityForUrl(url)
+        val sameEntity = sameNetwork(urlNetwork, documentUrl)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
+        val isDocumentInAllowedList = userAllowListRepository.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
@@ -91,7 +99,7 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-        val cleanedUrl = removePortFromUrl(url)
+        val cleanedUrl = removePort(url)
         val documentUrlString = documentUrl.toString()
 
         if (checkFirstParty && firstParty(documentUrl, cleanedUrl)) {
@@ -99,13 +107,13 @@ class TrackerDetectorImpl @Inject constructor(
             return null
         }
 
-        val result = clients
-            .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+        val result = blockingClients
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
 
-        val sameEntity = sameNetworkName(documentUrl, url)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+        val urlNetwork = entityLookup.entityForUrl(url)
+        val sameEntity = sameNetwork(urlNetwork, documentUrl)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else urlNetwork
+        val isDocumentInAllowedList = userAllowListRepository.isDocumentAllowListed(documentUrl)
 
         return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
     }
@@ -118,11 +126,14 @@ class TrackerDetectorImpl @Inject constructor(
         isDocumentInAllowedList: Boolean,
         entity: Entity?,
     ): TrackingEvent {
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
         val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
         val isATrackerAllowed = result.isATracker && !result.matches
-        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
+        val shouldBlock = result.matches &&
+            !sameEntity &&
+            !isInTrackerAllowList &&
+            !isInAdClickAllowList &&
+            !contentBlocking.isAnException(documentUrlString)
 
         val status = when {
             sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
@@ -150,15 +161,6 @@ class TrackerDetectorImpl @Inject constructor(
         }
     }
 
-    private fun removePortFromUrl(url: String): String {
-        return try {
-            val uri = Uri.parse(url)
-            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
-        } catch (e: Exception) {
-            url
-        }
-    }
-
     private fun firstParty(
         firstUrl: Uri,
         secondUrl: String,
@@ -171,22 +173,13 @@ class TrackerDetectorImpl @Inject constructor(
     ): Boolean =
         sameOrSubdomainPair(firstUrl, secondUrl)
 
-    private fun sameNetworkName(
-        first: Uri,
-        second: String,
-    ): Boolean {
-        val firstNetwork = entityLookup.entityForUrl(first) ?: return false
-        val secondNetwork = entityLookup.entityForUrl(second) ?: return false
-        return firstNetwork.name == secondNetwork.name
-    }
-
-    private fun sameNetworkName(
-        url: Uri,
+    private fun sameNetwork(
+        urlNetwork: Entity?,
         documentUrl: Uri,
     ): Boolean {
-        val firstNetwork = entityLookup.entityForUrl(url) ?: return false
-        val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
-        return firstNetwork.name == secondNetwork.name
+        if (urlNetwork == null) return false
+        val documentNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
+        return urlNetwork.name == documentNetwork.name
     }
 
     @VisibleForTesting
@@ -194,9 +187,9 @@ class TrackerDetectorImpl @Inject constructor(
         get() = clients.count()
 }
 
-private fun UserAllowListDao.isDocumentAllowListed(document: Uri?): Boolean {
+private fun UserAllowListRepository.isDocumentAllowListed(document: Uri?): Boolean {
     document?.host?.let {
-        return contains(it)
+        return isDomainInUserAllowList(it)
     }
     return false
 }

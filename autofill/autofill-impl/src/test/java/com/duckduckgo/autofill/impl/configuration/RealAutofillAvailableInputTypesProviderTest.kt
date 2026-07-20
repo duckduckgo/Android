@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -69,7 +70,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
             whenever(shareableCredentials.shareableCredentials(any())).thenReturn(emptyList())
             whenever(emailManager.isSignedIn()).thenReturn(false)
-            whenever(inBrowserPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+            whenever(inBrowserPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(false)
             whenever(autofillCapabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(true)
         }
     }
@@ -80,7 +81,7 @@ class RealAutofillAvailableInputTypesProviderTest {
         whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
         whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(emptyList())
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.username)
         assertFalse(result.password)
@@ -100,7 +101,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertTrue(result.password)
@@ -121,7 +122,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertTrue(result.password)
@@ -141,7 +142,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertFalse(result.password)
@@ -161,7 +162,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.username)
         assertTrue(result.password)
@@ -181,7 +182,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.username)
         assertTrue(result.password)
@@ -201,7 +202,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertFalse(result.password)
@@ -221,7 +222,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.username)
         assertFalse(result.password)
@@ -241,7 +242,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(null)
+        val result = testee.getTypes(null, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.username)
         assertFalse(result.password)
@@ -253,7 +254,11 @@ class RealAutofillAvailableInputTypesProviderTest {
         whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
         whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(emptyList())
 
-        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+        val result = testee.getTypes(
+            EXAMPLE_URL,
+            reAuthenticationDetails = ReAuthenticationDetails(password = "password"),
+            browserMode = BrowserMode.REGULAR,
+        )
 
         assertFalse(result.username)
         assertTrue(result.password)
@@ -274,7 +279,11 @@ class RealAutofillAvailableInputTypesProviderTest {
         )
         whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(emptyList())
 
-        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+        val result = testee.getTypes(
+            EXAMPLE_URL,
+            reAuthenticationDetails = ReAuthenticationDetails(password = "password"),
+            browserMode = BrowserMode.REGULAR,
+        )
         assertTrue(result.password)
     }
 
@@ -293,7 +302,11 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+        val result = testee.getTypes(
+            EXAMPLE_URL,
+            reAuthenticationDetails = ReAuthenticationDetails(password = "password"),
+            browserMode = BrowserMode.REGULAR,
+        )
         assertTrue(result.password)
     }
 
@@ -302,7 +315,7 @@ class RealAutofillAvailableInputTypesProviderTest {
         configureAutofillCapabilities(enabled = true)
         whenever(emailManager.isSignedIn()).thenReturn(true)
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.email)
     }
@@ -312,7 +325,7 @@ class RealAutofillAvailableInputTypesProviderTest {
         configureAutofillCapabilities(enabled = true)
         whenever(emailManager.isSignedIn()).thenReturn(false)
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.email)
     }
@@ -320,9 +333,9 @@ class RealAutofillAvailableInputTypesProviderTest {
     @Test
     fun whenImportPromoCanShowThenCredentialsImportIsTrue() = runTest {
         configureAutofillCapabilities(enabled = true)
-        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(true)
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.credentialsImport)
     }
@@ -330,9 +343,9 @@ class RealAutofillAvailableInputTypesProviderTest {
     @Test
     fun whenImportPromoCannotShowThenCredentialsImportIsFalse() = runTest {
         configureAutofillCapabilities(enabled = true)
-        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(false)
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertFalse(result.credentialsImport)
     }
@@ -357,7 +370,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertTrue(result.password)
@@ -387,7 +400,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertTrue(result.password)
@@ -407,9 +420,9 @@ class RealAutofillAvailableInputTypesProviderTest {
             ),
         )
         whenever(emailManager.isSignedIn()).thenReturn(true)
-        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        whenever(inBrowserPromo.canShowPromo(any(), anyOrNull(), any())).thenReturn(true)
 
-        val result = testee.getTypes(EXAMPLE_URL)
+        val result = testee.getTypes(EXAMPLE_URL, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result.username)
         assertTrue(result.password)

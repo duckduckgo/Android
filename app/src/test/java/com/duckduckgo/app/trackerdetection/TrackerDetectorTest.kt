@@ -20,7 +20,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
@@ -43,14 +43,14 @@ import org.mockito.kotlin.whenever
 class TrackerDetectorTest {
 
     private val mockEntityLookup: EntityLookup = mock()
-    private val mockUserAllowListDao: UserAllowListDao = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockAdClickManager: AdClickManager = mock()
 
     private val trackerDetector = TrackerDetectorImpl(
         mockEntityLookup,
-        mockUserAllowListDao,
+        mockUserAllowListRepository,
         mockContentBlocking,
         mockTrackerAllowlist,
         mockAdClickManager,
@@ -260,7 +260,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
@@ -282,7 +282,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent2() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
@@ -304,7 +304,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsUserAllowListedAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
@@ -326,7 +326,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsUserAllowListedAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
@@ -348,7 +348,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -369,7 +369,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent2() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -390,7 +390,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsUserAllowListedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -411,7 +411,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsUserAllowListedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -474,7 +474,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -495,7 +495,7 @@ class TrackerDetectorTest {
 
     @Test
     fun whenSiteIsNotUserAllowListedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate2() {
-        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",

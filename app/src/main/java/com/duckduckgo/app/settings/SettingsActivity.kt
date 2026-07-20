@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -30,7 +31,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
-import com.duckduckgo.app.about.FeedbackContract
 import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
@@ -95,6 +95,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -147,6 +148,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var feedbackLauncher: FeedbackLauncher
+
+    private lateinit var feedbackFlow: ActivityResultLauncher<Void?>
+
+    @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
@@ -176,16 +182,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         _completeSetupSettingsPlugin.getPlugins()
     }
 
-    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
-        if (resultOk) {
-            Snackbar.make(
-                binding.root,
-                R.string.thanksForTheFeedback,
-                Snackbar.LENGTH_LONG,
-            ).show()
-        }
-    }
-
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
@@ -209,6 +205,16 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        feedbackFlow = registerForActivityResult(feedbackLauncher.feedbackContract()) { resultOk ->
+            if (resultOk) {
+                Snackbar.make(
+                    binding.root,
+                    R.string.thanksForTheFeedback,
+                    Snackbar.LENGTH_LONG,
+                ).show()
+            }
+        }
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
         if (edgeToEdgeEnabled) {
@@ -551,7 +557,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                 BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
             )
             is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
-            is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
+            is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType, launchedFromSettings = true))
         }
     }
 

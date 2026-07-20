@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.browsermode.api.BrowserMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -31,7 +32,7 @@ class PendingModeSwitchTest {
     @Test
     fun whenProcessIntentEncodedThenItRoundTripsPreservingModeAndIntent() {
         val intent = Intent(Intent.ACTION_VIEW).putExtra(EXTRA_KEY, EXTRA_VALUE)
-        val original = PendingModeSwitch(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent))
+        val original = PendingModeSwitch(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent), BrowserModeSwitchSource.EXTERNAL_LAUNCH)
 
         val restored = original.toBundle().toPendingModeSwitch()
 
@@ -53,6 +54,7 @@ class PendingModeSwitchTest {
                 skipHome = true,
                 isExternal = true,
             ),
+            source = BrowserModeSwitchSource.NEW_TAB,
         )
 
         val restored = original.toBundle().toPendingModeSwitch()
@@ -70,6 +72,7 @@ class PendingModeSwitchTest {
                 skipHome = false,
                 isExternal = false,
             ),
+            source = BrowserModeSwitchSource.NEW_TAB,
         )
 
         val restored = original.toBundle().toPendingModeSwitch()
@@ -92,6 +95,22 @@ class PendingModeSwitchTest {
     }
 
     @Test
+    fun whenSourceNameIsUnknownThenDecodesToNull() {
+        val bundle = openNewTabBundle()
+        bundle.putString(KEY_SOURCE, "NOT_A_REAL_SOURCE")
+
+        assertNull(bundle.toPendingModeSwitch())
+    }
+
+    @Test
+    fun whenSourceIsMissingThenDecodesToNull() {
+        val bundle = openNewTabBundle()
+        bundle.remove(KEY_SOURCE)
+
+        assertNull(bundle.toPendingModeSwitch())
+    }
+
+    @Test
     fun whenActionIsMissingThenDecodesToNull() {
         val bundle = openNewTabBundle()
         bundle.remove(KEY_ACTION)
@@ -109,7 +128,11 @@ class PendingModeSwitchTest {
 
     @Test
     fun whenProcessIntentActionHasNoIntentThenDecodesToNull() {
-        val bundle = PendingModeSwitch(BrowserMode.REGULAR, PendingAction.ProcessIntent(Intent(Intent.ACTION_VIEW)))
+        val bundle = PendingModeSwitch(
+            BrowserMode.REGULAR,
+            PendingAction.ProcessIntent(Intent(Intent.ACTION_VIEW)),
+            BrowserModeSwitchSource.EXTERNAL_LAUNCH,
+        )
             .toBundle()
         bundle.remove(KEY_INTENT)
 
@@ -118,7 +141,7 @@ class PendingModeSwitchTest {
 
     @Test
     fun whenOpenExistingTabActionHasNoTabIdThenDecodesToNull() {
-        val bundle = PendingModeSwitch(BrowserMode.FIRE, PendingAction.OpenExistingTab("tab-123"))
+        val bundle = PendingModeSwitch(BrowserMode.FIRE, PendingAction.OpenExistingTab("tab-123"), BrowserModeSwitchSource.ESCAPE_HATCH)
             .toBundle()
         bundle.remove(KEY_EXISTING_TAB_ID)
 
@@ -130,6 +153,7 @@ class PendingModeSwitchTest {
         val original = PendingModeSwitch(
             targetMode = BrowserMode.FIRE,
             action = PendingAction.OpenExistingTab("tab-123"),
+            source = BrowserModeSwitchSource.ESCAPE_HATCH,
         )
 
         val restored = original.toBundle().toPendingModeSwitch()
@@ -141,6 +165,7 @@ class PendingModeSwitchTest {
     private fun openNewTabBundle() = PendingModeSwitch(
         targetMode = BrowserMode.REGULAR,
         action = PendingAction.OpenNewTab(query = "q", sourceTabId = "t", skipHome = false, isExternal = false),
+        source = BrowserModeSwitchSource.NEW_TAB,
     ).toBundle()
 
     private companion object {
@@ -151,6 +176,7 @@ class PendingModeSwitchTest {
         // tests above start from a valid bundle and mutate a single field, so a stale key here fails the
         // assertNull rather than silently passing.
         const val KEY_TARGET_MODE = "pendingModeSwitchTargetMode"
+        const val KEY_SOURCE = "pendingModeSwitchSource"
         const val KEY_ACTION = "pendingModeSwitchAction"
         const val KEY_INTENT = "pendingModeSwitchIntent"
         const val KEY_EXISTING_TAB_ID = "pendingModeSwitchExistingTabId"

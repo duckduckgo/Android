@@ -16,11 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.clearing
 
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import javax.inject.Inject
 
 class NativeDuckChatDeleter @Inject constructor(
-    private val store: DuckAiChatStore,
+    @param:RegularMode private val store: DuckAiChatStore,
 ) : DuckChatDeleter {
 
     override suspend fun deleteChat(chatId: String): Boolean = store.deleteChat(chatId)

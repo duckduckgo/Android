@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minut(y)</string>
     <string name="afterInactivityTimeout1Hour">1 hodina</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d hodin(y)</string>
+    <string name="returnToLastTabSettingTitle">Zpět na poslední kartu</string>
+    <string name="returnToLastTabSettingSubtitle">Zobrazit odkaz na poslední kartu na stránce Nová karta při opětovném otevření aplikace</string>
 </resources>

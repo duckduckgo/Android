@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d минут</string>
     <string name="afterInactivityTimeout1Hour">1 ч.</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d ч.</string>
+    <string name="returnToLastTabSettingTitle">Вернуться к последней вкладке</string>
+    <string name="returnToLastTabSettingSubtitle">Показывать ссылку на последнюю вкладку на странице «Новая вкладка» при повторном открытии приложения</string>
 </resources>

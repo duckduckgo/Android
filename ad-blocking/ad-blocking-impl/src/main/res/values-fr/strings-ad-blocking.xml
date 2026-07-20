@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Envoyer un rapport de défaillance</string>
     <string name="ad_blocking_disabled_secondary_action">Annuler</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Désactivé jusqu\'au redémarrage</string>
+    <string name="ad_blocking_omnibar_badge_text">Blocage des publicités sur YouTube activé</string>
 </resources>

@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo spróbuje wybrać najbardziej prywatne dostępne ustawienia i ukryć te wyskakujące okienka.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="autoconsentToggle">Pozwól DuckDuckGo zajmować się wyskakującymi okienkami plików cookie</string>
+    <string name="autoconsentAutoManageToggle">Automatycznie zarządzaj okienkami z prośbą o zgodę</string>
+    <string name="autoconsentAutoManageDescription">Postaramy się wybrać dla Ciebie tylko najbardziej prywatne dostępne opcje plików cookie, a następnie zamknąć wyskakujące okienka.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo może automatycznie zarządzać preferencjami dotyczącymi plików cookie, aby zmaksymalizować prywatność, zminimalizować liczbę plików cookie i zamknąć wyskakujące okienka.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Wyskakujące okienka bez możliwości rezygnacji</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Pozwól też DuckDuckGo zaoszczędzić Ci kliknięcie, akceptując w Twoim imieniu pliki cookie, aby zamknąć wyskakujące okienka, z których nie możesz zrezygnować.</string>
 </resources>

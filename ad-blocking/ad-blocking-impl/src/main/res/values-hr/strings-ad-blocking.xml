@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Pošalji izvješće o problemu</string>
     <string name="ad_blocking_disabled_secondary_action">Otkaži</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Onemogućeno do ponovnog pokretanja</string>
+    <string name="ad_blocking_omnibar_badge_text">Blokiranje YouTube oglasa je uključeno</string>
 </resources>

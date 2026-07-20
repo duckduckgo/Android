@@ -42,6 +42,8 @@ interface ExternalIntentProcessingState {
     fun onDuckAiClosed()
 }
 
+// Mode-transition observer: resets cross-activity pending-intent flags when the mode changes.
+@Suppress("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

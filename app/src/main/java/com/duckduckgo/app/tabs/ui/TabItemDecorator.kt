@@ -52,7 +52,7 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
         strokeWidth = selectionBorderWidth
 
         val typedValue = TypedValue()
-        context.theme.resolveAttribute(CommonR.attr.daxColorAccentBlue, typedValue, true)
+        context.theme.resolveAttribute(CommonR.attr.daxColorOmnibarAccent, typedValue, true)
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 

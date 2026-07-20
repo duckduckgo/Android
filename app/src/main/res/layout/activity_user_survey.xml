@@ -27,6 +27,19 @@
         android:layout_height="match_parent"
         android:background="@drawable/survey_background">
 
+        <ImageView
+            android:id="@+id/dismissButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:contentDescription="@string/surveyDismissContentDescription"
+            app:layout_constraintBottom_toBottomOf="@id/title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title"
+            app:srcCompat="@drawable/ic_close_24"
+            app:tint="?attr/daxColorWhite" />
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
@@ -36,22 +49,9 @@
             android:paddingEnd="@dimen/keyline_4"
             android:text="@string/surveyTitle"
             android:textColor="?daxColorWhite"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/dismissButton"
             app:layout_constraintTop_toTopOf="parent"
             app:typography="h2" />
-
-        <ImageView
-            android:id="@+id/dismissButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:contentDescription="@string/surveyDismissContentDescription"
-            app:layout_constraintBottom_toBottomOf="@id/title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/title"
-            app:srcCompat="@drawable/ic_close_24"
-            app:tint="?attr/daxColorWhite" />
 
         <WebView
             android:id="@+id/webView"

@@ -537,7 +537,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
-        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
+        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null, BrowserMode.REGULAR)
     }
 
     @Test
@@ -554,6 +554,14 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(subscriptions).launchSubscription(any(), any())
+    }
+
+    @Test
+    fun whenSubscriptionLinkDetectedThenCloseTabIfBlank() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        verify(listener).closeAndReturnToSourceIfBlankTab()
     }
 
     @Test

@@ -43,6 +43,8 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.AdBlockingAnimation
+import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -274,13 +276,14 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -644,6 +647,16 @@ class BrowserTabViewModelTest {
     private val mockBrowserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin> = mock {
         on { getPlugins() } doReturn listOf(browserRefreshTriggerPlugin)
     }
+    private val mockAdBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider = mock {
+        onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+    }
+    private val brokenSiteReportTriggerFlow = MutableSharedFlow<BrokenSiteData.ReportFlow>(extraBufferCapacity = 1)
+    private val brokenSiteReportTriggerPlugin: BrokenSiteReportTriggerPlugin = mock {
+        on { observeReportRequests() } doReturn brokenSiteReportTriggerFlow
+    }
+    private val mockBrokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin> = mock {
+        on { getPlugins() } doReturn listOf(brokenSiteReportTriggerPlugin)
+    }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -761,8 +774,6 @@ class BrowserTabViewModelTest {
             val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
             whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
             whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockTabRepository)
-            val browserModeStateHolder: BrowserModeStateHolder = mock()
-            whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
 
             mockAutoCompleteApi =
                 AutoCompleteApi(
@@ -771,7 +782,7 @@ class BrowserTabViewModelTest {
                     mockNavigationHistory,
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
-                    browserModeStateHolder,
+                    BrowserMode.REGULAR,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,
@@ -1041,6 +1052,7 @@ class BrowserTabViewModelTest {
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
+                brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
@@ -1053,6 +1065,7 @@ class BrowserTabViewModelTest {
                 browserMode = browserMode,
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
+                adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3068,6 +3081,29 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsThenBrokenSiteFeedbackCommandIssued() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
+        advanceUntilIdle()
+
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.data.url)
+    }
+
+    @Test
+    fun whenBrokenSiteReportTriggerPluginEmitsWhileTabHiddenThenNoReport() = runTest {
+        loadUrl("foo.com", isBrowserShowing = true)
+        testee.onViewHidden()
+        advanceUntilIdle()
+
+        brokenSiteReportTriggerFlow.emit(BrokenSiteData.ReportFlow.MENU)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<Command.BrokenSiteFeedback>()
+    }
+
+    @Test
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
         loadUrl("foo.com")
         testee.onShareSelected()
@@ -3405,7 +3441,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -3448,7 +3484,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -3462,7 +3498,7 @@ class BrowserTabViewModelTest {
         testee.onNewTabMenuItemClicked(longPress = true)
 
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -3684,11 +3720,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserPressesBackAndGoesToHomeThenKeyboardShown() {
+    fun whenUserPressesBackAndGoesToHomeThenKeyboardNotShown() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+        assertCommandNotIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenUserPressesBackAndGoesToHomeThenHomeShown() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+
+        val result = testee.onUserPressedBack()
+
+        assertFalse(browserViewState().browserShowing)
+        assertTrue(result)
     }
 
     @Test
@@ -7436,6 +7481,49 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewPageForSameOriginThenCertificateIsPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = true))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        // In-page navigation that WebView reports as a new page (originalUrl changed) on the same origin
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://m.youtube.com/", currentUrl = "https://m.youtube.com/"),
+        )
+
+        assertEquals(certificate, testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
+    fun whenNewPageForDifferentOriginThenCertificateIsNotPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = true))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com/", currentUrl = "https://www.example.com/"),
+        )
+
+        assertNull(testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
+    fun whenNewPageForSameOriginAndFeatureDisabledThenCertificateIsNotPreserved() = runTest {
+        fakeAndroidConfigBrowserFeature.preserveCertificateOnSameOrigin().setRawStoredState(State(enable = false))
+        val certificate = aRSASslCertificate()
+        loadUrl("https://m.youtube.com/gaming")
+        testee.onCertificateReceived(certificate)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://m.youtube.com/", currentUrl = "https://m.youtube.com/"),
+        )
+
+        assertNull(testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = exampleUrl
@@ -7776,12 +7864,13 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_1W to inactive1w,
                     PixelParameter.TAB_INACTIVE_2W to inactive2w,
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                    PixelParameter.BROWSER_MODE to "regular",
                 )
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
@@ -7809,12 +7898,13 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_1W to inactive1w,
                     PixelParameter.TAB_INACTIVE_2W to inactive2w,
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                    PixelParameter.BROWSER_MODE to "regular",
                 )
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
             verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
@@ -8331,7 +8421,7 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
 
     @Test
@@ -8342,7 +8432,10 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
+            verify(mockPixel).fire(
+                AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
+                mapOf(PixelParameter.FROM_FOCUSED_NTP to "false", PixelParameter.BROWSER_MODE to "regular"),
+            )
         }
 
     @Test
@@ -8353,7 +8446,10 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
+            verify(mockPixel).fire(
+                AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
+                mapOf(PixelParameter.FROM_FOCUSED_NTP to "true", PixelParameter.BROWSER_MODE to "regular"),
+            )
         }
 
     @Test
@@ -8367,7 +8463,7 @@ class BrowserTabViewModelTest {
 
             testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
-            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
 
     @Test
@@ -9942,6 +10038,189 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSpaNavigationAndOmnibarNotFocusedThenAdBlockingBadgeShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle() // let the launched decision coroutine run
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenAdBlockingAnimationSuppressedThenClaimReleasedAndTrackersCanAnimate() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        // Ad-blocking claims exclusivity for the page...
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle() // let the launched decision coroutine run
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+
+        // ...but if the omnibar reports the badge was suppressed (focused), the claim is released.
+        testee.onAdBlockingAnimationSuppressed()
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenSameVideoRepeatEventReturnsRetainThenClaimKeptAndTrackersStaySuppressed() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Retain
+        }
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=abc")
+        advanceUntilIdle()
+
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenSpaNavigationsFireRapidlyThenBadgeStillShown() = runTest {
+        loadUrl("https://www.youtube.com")
+        givenAdBlockingBadgeWillShow()
+
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=a")
+        testee.onHistoryUrlChanged("https://www.youtube.com/watch?v=b")
+        advanceTimeBy(1L)
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenNavigatingAwayBeforeDeferredBadgeShownThenStaleBadgeNotShownOnNewPage() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val nonVideo = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video)
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // Navigate to a non-video page (NewPage); its load completing must not flush the stale video badge.
+        testee.navigationStateChanged(buildWebNavigation(currentUrl = nonVideo, originalUrl = nonVideo))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndSameVideoRepeatEventThenBadgeStillShownAndTrackersSuppressed() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // YouTube fires a repeat same-video url event during the same load (returns Retain); it must not
+        // drop the deferred badge.
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Retain
+        }
+        testee.onHistoryUrlChanged(video)
+        advanceUntilIdle()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+
+        // Claim is held for the shown badge, so trackers stay suppressed.
+        testee.onStartTrackersAnimation()
+        assertCommandNotIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndNewNonVideoPageThenBadgeNotShownAndTrackersCanAnimate() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val nonVideo = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // A new (non-video) page load supersedes the deferred badge; its completion must not flush it.
+        loadUrl(nonVideo)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // The new page returned Skip, so the claim is released and trackers can animate.
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenDeferredVideoBadgeAndSpaNavigationAwayThenBadgeNotShownAndClaimReleased() = runTest {
+        val video = "https://www.youtube.com/watch?v=abc"
+        val search = "https://www.youtube.com/results?search_query=cats"
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Skip
+            onBlocking { getAnimation(eq(video), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl(video) // NewPage while loading: badge deferred
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        // SPA away to a non-video url (returns Skip): the deferred badge is dropped and the claim released.
+        testee.onHistoryUrlChanged(search)
+        advanceUntilIdle()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        testee.onStartTrackersAnimation()
+        assertCommandIssued<Command.StartAddressBarTrackersAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadInProgressAndOmnibarNotFocusedThenAdBlockingBadgeDeferredUntilProgressReaches100() = runTest {
+        givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = true)
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadNavigationButNotLoadingThenAdBlockingBadgeShownImmediately() = runTest {
+        givenAdBlockingBadgeWillShow()
+        testee.loadingViewState.value = LoadingViewState(isLoading = false)
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
+    fun whenPageLoadCompletesBeforePageChangedThenAdBlockingBadgeStillShown() = runTest {
+        givenAdBlockingBadgeWillShow()
+        setBrowserShowing(true)
+
+        // Simulate the race: progress reaches 100 before the (async) pageChanged runs.
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        loadUrl("https://www.youtube.com/watch?v=abc")
+
+        assertCommandIssued<Command.StartAdBlockingAnimation>()
+    }
+
+    @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
@@ -10325,6 +10604,12 @@ class BrowserTabViewModelTest {
     )
 
     private fun omnibarViewState() = testee.omnibarViewState.value!!
+
+    private fun givenAdBlockingBadgeWillShow() {
+        mockAdBlockingOmnibarAnimationProvider.stub {
+            onBlocking { getAnimation(any(), any()) } doReturn AdBlockingAnimation.Show(icon = 1, text = 2)
+        }
+    }
 
     private fun loadingViewState() = testee.loadingViewState.value!!
 

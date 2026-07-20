@@ -29,6 +29,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_addressbar_click_aichat": {
+        "description": "Fires when the user touches the address bar while the Duck.ai chat input is showing",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "browserMode"]
+    },
     "m_aichat_contextual_sheet_opened_count": {
         "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
         "owners": ["malmstein"],

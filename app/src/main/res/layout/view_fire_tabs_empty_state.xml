@@ -97,7 +97,8 @@
                     android:layout_marginTop="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_2"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_info_solid_16" />
+                    android:src="@drawable/ic_info_solid_16"
+                    app:tint="?attr/daxColorSecondaryIcon" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="0dp"

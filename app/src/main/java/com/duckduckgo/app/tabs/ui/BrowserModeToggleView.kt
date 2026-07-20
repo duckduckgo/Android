@@ -24,6 +24,7 @@ import android.view.MotionEvent
 import android.view.View.MeasureSpec
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -53,8 +54,12 @@ class BrowserModeToggleView @JvmOverloads constructor(
     private val binding: ViewBrowserModeToggleBinding =
         ViewBrowserModeToggleBinding.inflate(LayoutInflater.from(context), this)
 
-    private val segmentWidthPx: Int =
+    private val nominalSegmentWidthPx: Int =
         resources.getDimensionPixelSize(R.dimen.browserModeToggleSegmentWidth)
+
+    private var effectiveSegmentWidthPx: Int = nominalSegmentWidthPx
+
+    private val minSegmentWidthPx: Int = MIN_SEGMENT_WIDTH_DP.toPx()
 
     private val touchSlop: Int = ViewConfiguration.get(context).scaledTouchSlop
 
@@ -64,6 +69,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
     private var dragging = false
     private var initialTouchX = 0f
     private var initialIndicatorX = 0f
+    private var indicatorSliding = false
 
     private var pulseAnimation: PulseAnimation? = null
 
@@ -78,6 +84,36 @@ class BrowserModeToggleView @JvmOverloads constructor(
 
         binding.fireSegment.setOnClickListener { dispatchToggle() }
         binding.regularSegment.setOnClickListener { dispatchToggle() }
+
+        // Long-pressing shows the label as a tooltip and consumes the press, so it no longer toggles the mode.
+        TooltipCompat.setTooltipText(binding.fireSegment, binding.fireSegment.contentDescription)
+        TooltipCompat.setTooltipText(binding.regularSegment, binding.regularSegment.contentDescription)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED) {
+            val available = MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
+            val effective = nominalSegmentWidthPx.coerceAtMost((available / 2).coerceAtLeast(minSegmentWidthPx))
+            if (effective != effectiveSegmentWidthPx) {
+                effectiveSegmentWidthPx = effective
+                for (segment in listOf(binding.fireSegment, binding.regularSegment, binding.selectionIndicator)) {
+                    segment.layoutParams.width = effective
+                }
+                // An in-flight slide targets coordinates from the old width — clamp it onto
+                // the new track and replay it, otherwise just snap to the resting position.
+                val slideTarget = if (indicatorSliding) currentMode else null
+                binding.selectionIndicator.animate().cancel()
+                indicatorSliding = false
+                if (slideTarget != null) {
+                    binding.selectionIndicator.translationX =
+                        binding.selectionIndicator.translationX.coerceIn(0f, effectiveSegmentWidthPx.toFloat())
+                    animateIndicatorTo(slideTarget, animated = true)
+                } else {
+                    binding.selectionIndicator.translationX = indicatorTargetX(currentMode)
+                }
+            }
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     fun setMode(mode: BrowserMode) {
@@ -153,13 +189,13 @@ class BrowserModeToggleView @JvmOverloads constructor(
             MotionEvent.ACTION_MOVE -> {
                 val candidate = initialIndicatorX + (ev.x - initialTouchX)
                 binding.selectionIndicator.translationX =
-                    candidate.coerceIn(0f, segmentWidthPx.toFloat())
+                    candidate.coerceIn(0f, effectiveSegmentWidthPx.toFloat())
                 return true
             }
             MotionEvent.ACTION_UP -> {
                 val finalX = binding.selectionIndicator.translationX
                 val snappedMode =
-                    if (finalX < segmentWidthPx / 2f) BrowserMode.FIRE else BrowserMode.REGULAR
+                    if (finalX < effectiveSegmentWidthPx / 2f) BrowserMode.FIRE else BrowserMode.REGULAR
                 dragging = false
 
                 if (snappedMode != currentMode) {
@@ -185,15 +221,23 @@ class BrowserModeToggleView @JvmOverloads constructor(
         return super.onTouchEvent(ev)
     }
 
+    private fun indicatorTargetX(mode: BrowserMode?): Float = when (mode) {
+        BrowserMode.REGULAR -> effectiveSegmentWidthPx.toFloat()
+        BrowserMode.FIRE, null -> 0f
+    }
+
     private fun animateIndicatorTo(mode: BrowserMode, animated: Boolean) {
-        val targetX = if (mode == BrowserMode.REGULAR) segmentWidthPx.toFloat() else 0f
+        val targetX = indicatorTargetX(mode)
         if (animated) {
+            indicatorSliding = true
             binding.selectionIndicator.animate()
                 .translationX(targetX)
                 .setDuration(SLIDE_DURATION_MS)
                 .setInterpolator(FastOutSlowInInterpolator())
+                .withEndAction { indicatorSliding = false }
                 .start()
         } else {
+            indicatorSliding = false
             binding.selectionIndicator.translationX = targetX
         }
     }
@@ -213,5 +257,8 @@ class BrowserModeToggleView @JvmOverloads constructor(
         const val DIGIT_TEXT_SIZE_SP = 12f
         const val INFINITE_TEXT_SIZE_SP = 13f
         const val INFINITE_VERTICAL_SHIFT_DP = 1
+
+        // 32dp floor keeps the icon + tab count usable on extreme-narrow windows (<300dp).
+        const val MIN_SEGMENT_WIDTH_DP = 32
     }
 }

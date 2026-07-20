@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Чтобы сохранить PDF для восстановления, требуется разрешение на хранение данных</string>
     <string name="sync_share_title">Поделиться с…</string>
     <string name="sync_pdf_title">Код восстановления данных</string>
-    <string name="sync_pdf_description">Этот код восстановления позволяет синхронизировать закладки на нескольких устройствах и восстанавливать их.</string>
+    <string name="sync_pdf_description">Код восстановления позволяет синхронизировать пароли, данные автозаполнения и чаты Duck.ai на нескольких устройствах, а также восстановить синхронизированные данные в случае потери доступа к устройству.</string>
     <string name="sync_code_box_title">Надежная защита для ваших данных</string>
-    <string name="sync_instructions_title">Как это работает?</string>
-    <string name="sync_instructions_step1">Запустите DuckDuckGo на другом устройстве и откройте раздел «Синхронизация» в «Настройках».</string>
-    <string name="sync_instructions_step2">Отсканируйте QR-код или скопируйте и вставьте текстовый код в приложение DuckDuckGo на другом устройстве.</string>
-    <string name="sync_instructions_step3">Приложение активирует синхронизацию, и вы снова получите доступ ко всем своим данным.</string>
+    <string name="sync_instructions_title">Как работает этот код?</string>
+    <string name="sync_instructions_step1">Откройте DuckDuckGo на устройстве, которое хотите синхронизировать, и перейдите в раздел «Sync &amp; Backup» в настройках.</string>
+    <string name="sync_instructions_step2">Нажмите «Синхронизировать с другим устройством» и отсканируйте QR-код или введите текстовый код.</string>
+    <string name="sync_instructions_step3">Синхронизация будет активирована, и ты снова получишь доступ ко всем своим данным.</string>
+    <string name="sync_pdf_retention_notice">Если вы не будете использовать браузер DuckDuckGo с включенной функцией Sync &amp; Backup более 18 месяцев, ваши данные будут удалены с сервера без возможности восстановления.</string>
     <string name="remove_device_dialog_title">Удалить устройство?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">Устройство «%1$s» утратит доступ к синхронизированным данным.</string>
     <string name="remove_device_dialog_primary_button">Удалить</string>

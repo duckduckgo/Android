@@ -22,6 +22,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -114,6 +115,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             edgeToEdgeHandler.applySystemBarInsets(binding.daxPromptBrowserComparisonContainer)
         }
 
+        if (SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
+        }
+
         setupListeners()
         setupObservers()
         setupOnBackNavigation()
@@ -132,6 +137,14 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (lockedInPortraitMode && newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (SDK_INT < 34) {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, R.anim.slide_to_bottom)
         }
     }
 

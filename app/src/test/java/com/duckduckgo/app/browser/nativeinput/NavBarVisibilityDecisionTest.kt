@@ -44,11 +44,19 @@ class NavBarVisibilityDecisionTest {
     }
 
     @Test
-    fun `nav bar shows only in browser context with an empty field`() {
-        assertTrue(shouldShowNavBar(isBrowserContext = true, isInputEmpty = true))
-        assertFalse(shouldShowNavBar(isBrowserContext = true, isInputEmpty = false))
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isInputEmpty = true))
-        assertFalse(shouldShowNavBar(isBrowserContext = false, isInputEmpty = false))
+    fun `nav bar shows in browser context until the user interacts`() {
+        assertTrue(shouldShowNavBar(isBrowserContext = true, interactionLatched = false))
+    }
+
+    @Test
+    fun `nav bar hides once the interaction latch is set`() {
+        assertFalse(shouldShowNavBar(isBrowserContext = true, interactionLatched = true))
+    }
+
+    @Test
+    fun `nav bar never shows outside the browser context`() {
+        assertFalse(shouldShowNavBar(isBrowserContext = false, interactionLatched = false))
+        assertFalse(shouldShowNavBar(isBrowserContext = false, interactionLatched = true))
     }
 
     @Test

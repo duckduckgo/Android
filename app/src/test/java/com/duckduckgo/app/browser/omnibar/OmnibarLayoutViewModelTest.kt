@@ -38,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -128,6 +129,7 @@ class OmnibarLayoutViewModelTest {
         on { softwareRenderingModeEnabled } doReturn softwareRenderingModeEnabledFlow
     }
     private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val browserMode: BrowserMode = BrowserMode.REGULAR
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
     private lateinit var testee: OmnibarLayoutViewModel
@@ -212,6 +214,7 @@ class OmnibarLayoutViewModelTest {
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
+            browserMode = browserMode,
         )
     }
 
@@ -860,21 +863,34 @@ class OmnibarLayoutViewModelTest {
     fun whenUserTouchedTextInputAndUrlEmptyThenPixelSent() = runTest {
         givenSiteLoaded("")
         testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-        verify(pixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+        verify(pixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
     fun whenUserTouchedTextInputAndSERPUrlThenPixelSent() = runTest {
         givenSiteLoaded(SERP_URL)
         testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-        verify(pixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+        verify(pixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
     fun whenUserTouchedTextInputAndUrlThenPixelSent() = runTest {
         givenSiteLoaded(RANDOM_URL)
         testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-        verify(pixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+        verify(pixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
+    }
+
+    @Test
+    fun whenUserTouchedTextInputAndDuckAiViewModeThenAiChatPixelSent() = runTest {
+        givenDuckAILoaded()
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_AICHAT_CLICKED,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+        )
+        verify(pixel, never()).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+        verify(pixel, never()).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+        verify(pixel, never()).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
     }
 
     @Test
@@ -2099,6 +2115,47 @@ class OmnibarLayoutViewModelTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun whenAdBlockingAnimationStartedAndNotFocusedThenStartAdBlockingAnimationCommandSent() = runTest {
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            expectMostRecentItem().assertCommand(Command.StartAdBlockingAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAdBlockingAnimationStartedAndFocusedThenSuppressedCommandSent() = runTest {
+        // When focused the badge is not shown (like trackers); instead it signals suppression so the
+        // browser releases its exclusivity claim.
+        testee.onOmnibarFocusChanged(true, "query")
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            expectMostRecentItem().assertCommand(Command.AdBlockingAnimationSuppressed::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAdBlockingAnimationStartedInCustomTabThenSuppressedCommandSent() = runTest {
+        // The badge is not shown in custom tabs; instead it signals suppression so the browser
+        // releases its exclusivity claim and the tracker/cookie animations can still run.
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+
+        testee.onAnimationStarted(Decoration.LaunchAdBlockingAnimation(icon = 1, text = 2))
+
+        testee.commands().test {
+            expectMostRecentItem().assertCommand(Command.AdBlockingAnimationSuppressed::class)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun givenSomeTrackers(): List<Entity> {

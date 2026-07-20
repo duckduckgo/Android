@@ -357,7 +357,11 @@ class GranularFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
+        verify(mockPixel).enqueueFire(
+            FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+            type = Daily(),
+        )
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
@@ -519,7 +523,11 @@ class GranularFireDialogViewModelTest {
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-            verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
+            verify(mockPixel).enqueueFire(
+                FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+                mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+                type = Daily(),
+            )
             verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             verify(mockPixel).enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
@@ -558,7 +566,7 @@ class GranularFireDialogViewModelTest {
 
         testee.onShow()
 
-        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -568,7 +576,7 @@ class GranularFireDialogViewModelTest {
         testee.onShow()
         testee.onShow()
 
-        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test

@@ -53,15 +53,16 @@
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
 
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
+        <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.FireDark</item>
     </style>
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireLight" parent="Theme.DuckDuckGo.Dark">
         <item name="daxColorWindow">@color/omnibar_card_fire_light</item>
-        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
-        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
-        <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireDark" parent="Theme.DuckDuckGo.Dark">
@@ -71,18 +72,20 @@
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>
 
-    <!-- Applied to the input mode widget card via android:theme. The DarkFire variant re-applies the
-         full dark Fire theme to the card subtree so it is pixel-identical to dark Fire mode; None is a
-         no-op used by every theme that should leave the card on its own palette. -->
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire" parent="Theme.DuckDuckGo.Dark.Fire">
-        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
-        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
-        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
-        <item name="daxColorOmnibarAccentContent">?attr/daxColorWhite</item>
-        <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
+        <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.InputModeCard.FireDark" parent="">
+        <item name="daxColorSurface">@color/omnibar_card_fire_dark</item>
+        <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
     </style>
 
 </resources>

@@ -34,13 +34,11 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -53,7 +51,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -69,8 +66,6 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private lateinit var fakeTabRepository: TabRepository
     private lateinit var fakeFireTabRepository: TabRepository
-    private val modeFlow = MutableStateFlow(BrowserMode.REGULAR)
-    private val browserModeStateHolder: BrowserModeStateHolder = mock { on { currentMode } doReturn modeFlow }
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
@@ -95,7 +90,6 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             systemAutofillEngagement,
             browserInteractionsPlugins,
             provider,
-            browserModeStateHolder,
         )
     }
 
@@ -103,7 +97,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenOptionIsLastTabOpenedThenNoTabIsAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -119,7 +113,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = "https://example.com", position = 0)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -134,7 +128,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenOptionIsNewTabPageAndNoSelectedTabThenNewTabPageIsAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -151,7 +145,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = null, position = 0)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -167,7 +161,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = "", position = 0)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -183,7 +177,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -200,7 +194,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tab = awaitItem()
@@ -217,7 +211,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         val existingTabId = fakeTabRepository.add(url)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             awaitItem()
@@ -233,7 +227,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -250,7 +244,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -268,7 +262,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(url)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -286,7 +280,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(url)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -304,7 +298,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(url)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -323,7 +317,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(httpsUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -342,7 +336,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(httpUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -361,7 +355,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
             fakeTabRepository.add(url)
 
-            testee.handleAppLaunchOption()
+            testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
             fakeTabRepository.flowTabs.test {
                 val tabs = awaitItem()
@@ -378,7 +372,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -396,7 +390,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryUrl))
         fakeTabRepository.add(queryUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -415,7 +409,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(pathUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -434,7 +428,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(pathUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -453,7 +447,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
         fakeTabRepository.add(url2)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -472,7 +466,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
         fakeTabRepository.add(url2)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -491,7 +485,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
         fakeTabRepository.add(url2)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -510,7 +504,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
         fakeTabRepository.add(url2)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -527,7 +521,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -546,7 +540,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
         fakeTabRepository.add(url2)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -563,7 +557,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(fragmentUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -582,7 +576,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeTabRepository.add(url1)
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url2))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -600,7 +594,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(fragmentUrl))
         fakeTabRepository.add(fragmentUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -617,7 +611,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryFragmentUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -635,7 +629,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryFragmentUrl))
         fakeTabRepository.add(queryFragmentUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -652,7 +646,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(ftpUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -670,7 +664,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(ftpUrl))
         fakeTabRepository.add(ftpUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -688,7 +682,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -708,7 +702,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
             fakeTabRepository.add(resolvedUrl)
 
-            testee.handleAppLaunchOption()
+            testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
             fakeTabRepository.flowTabs.test {
                 val tabs = awaitItem()
@@ -727,7 +721,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
         fakeTabRepository.add(resolvedUrl)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -744,7 +738,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -762,7 +756,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
         fakeTabRepository.add(url)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -782,7 +776,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             fakeDataStore.setShowOnAppLaunchOption(SpecificPage(noSubdomainUrl))
             fakeTabRepository.add(subdomainUrl)
 
-            testee.handleAppLaunchOption()
+            testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
             fakeTabRepository.flowTabs.test {
                 val tabs = awaitItem()
@@ -799,7 +793,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -816,7 +810,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenLastOpenedTabSelectedThenNoTabAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -830,7 +824,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenNewTabPageSelectedThenTabIsAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -845,7 +839,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenSpecificPageSelectedThenNavigatesToSpecificPage() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -864,7 +858,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = "https://example.com", position = 0)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager).onIdleReturnTriggered()
     }
@@ -879,7 +873,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = null, position = 0)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
@@ -888,7 +882,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenInactivityWasIdleFalseAndOptionNewTabPageThenIdleReturnNotNotified() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAfterInactivityOption(wasIdle = false)
+        testee.handleAfterInactivityOption(wasIdle = false, currentMode = BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
@@ -897,7 +891,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenInactivityOptionLastOpenedTabThenIdleReturnNotNotified() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
@@ -906,7 +900,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenInactivityOptionSpecificPageThenIdleReturnNotNotified() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
@@ -915,7 +909,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenAppLaunchOptionHandledOutsideInactivityPathThenIdleReturnNotNotified() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
@@ -927,7 +921,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement).setIdleReturnTriggered("new_tab_page")
     }
@@ -937,7 +931,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement).setIdleReturnTriggered("specific_page")
     }
@@ -947,7 +941,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
     }
@@ -957,7 +951,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(300L)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
     }
@@ -967,7 +961,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
     }
@@ -979,7 +973,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = "", position = 0)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
     }
@@ -989,7 +983,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
     }
@@ -1000,7 +994,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenConditionsMatchThenResolvedUrlIsStored() = runTest {
         val url = "https://example.com/"
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         val tabId = fakeDataStore.showOnAppLaunchTabId!!
 
@@ -1017,7 +1011,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenCurrentUrlIsNullThenResolvedUrlIsNotStored() = runTest {
         val url = "https://example.com/"
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         val tabId = fakeDataStore.showOnAppLaunchTabId!!
 
@@ -1034,7 +1028,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenNotRootOfTabThenResolvedUrlIsNotStored() = runTest {
         val url = "https://example.com/"
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         val tabId = fakeDataStore.showOnAppLaunchTabId!!
 
@@ -1051,7 +1045,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun whenTabIdDoesNotMatchThenResolvedUrlIsNotStored() = runTest {
         val url = "https://example.com/"
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        testee.handleAppLaunchOption()
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
         testee.handleResolvedUrlStorage(
             currentUrl = "https://www.example.com/",
@@ -1064,12 +1058,11 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     @Test
     fun whenFireModeAndOptionIsNewTabPageInactivityThenAddsFireTabWithoutTriggeringHatch() = runTest {
-        modeFlow.value = BrowserMode.FIRE
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
         (fakeFireTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "f1", url = "https://example.com", position = 0)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.FIRE)
 
         fakeFireTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -1083,12 +1076,11 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     @Test
     fun whenRegularModeAndOptionIsNewTabPageInactivityThenTriggersHatchAndAddsRegularTab() = runTest {
-        modeFlow.value = BrowserMode.REGULAR
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = "https://example.com", position = 0)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
@@ -1101,10 +1093,9 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     @Test
     fun whenFireModeAndOptionIsSpecificPageThenNoOp() = runTest {
-        modeFlow.value = BrowserMode.FIRE
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com"))
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.FIRE)
 
         assertTrue(fakeFireTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
         assertTrue(fakeTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
@@ -1112,10 +1103,9 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     @Test
     fun whenFireModeAndOptionIsLastOpenedTabThenNoOp() = runTest {
-        modeFlow.value = BrowserMode.FIRE
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
-        testee.handleAfterInactivityOption(wasIdle = true)
+        testee.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.FIRE)
 
         verify(browserInteractionsPlugins, never()).getPlugins()
         assertTrue(fakeFireTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)

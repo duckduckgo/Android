@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">We hebben toegang tot je opslag nodig om het PDF-bestand met herstelgegevens op te slaan</string>
     <string name="sync_share_title">Delen met...</string>
     <string name="sync_pdf_title">Herstelcode synchroniseren</string>
-    <string name="sync_pdf_description">Met de herstelcode kun je je bladwijzers synchroniseren op meerdere apparaten en je gesynchroniseerde gegevens herstellen als je geen toegang meer hebt tot een apparaat.</string>
+    <string name="sync_pdf_description">Met de herstelcode kun je je wachtwoorden, automatisch ingevulde gegevens en Duck.ai-chats op meerdere apparaten synchroniseren en je gesynchroniseerde gegevens herstellen als je de toegang tot een apparaat kwijtraakt.</string>
     <string name="sync_code_box_title">Bewaar deze informatie veilig.</string>
-    <string name="sync_instructions_title">Hoe werkt dit?</string>
-    <string name="sync_instructions_step1">Open DuckDuckGo op een ander apparaat en ga naar \'Synchroniseren\' in \'Instellingen\'.</string>
-    <string name="sync_instructions_step2">Scan de QR-code of kopieer en plak de tekstcode in een andere DuckDuckGo-app.</string>
+    <string name="sync_instructions_title">Hoe werkt deze code?</string>
+    <string name="sync_instructions_step1">Open DuckDuckGo op het apparaat dat je wilt synchroniseren en ga naar Synchronisatie en Backup in Instellingen.</string>
+    <string name="sync_instructions_step2">Selecteer \'Synchroniseren met een ander apparaat\' en scan de QR-code of voer de tekstcode in.</string>
     <string name="sync_instructions_step3">Synchronisatie wordt geactiveerd en je hebt weer toegang tot al je gegevens.</string>
+    <string name="sync_pdf_retention_notice">Als je langer dan 18 maanden geen DuckDuckGo-browser gebruikt met Sync &amp; Backup ingeschakeld, worden je gegevens van de server verwijderd en kunnen ze niet worden hersteld.</string>
     <string name="remove_device_dialog_title">Apparaat verwijderen?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\'%1$s\' heeft geen toegang meer tot je gesynchroniseerde gegevens.</string>
     <string name="remove_device_dialog_primary_button">Verwijderen</string>

@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minuta</string>
     <string name="afterInactivityTimeout1Hour">1 sat</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d sati</string>
+    <string name="returnToLastTabSettingTitle">Povratak na posljednju karticu</string>
+    <string name="returnToLastTabSettingSubtitle">Prikaži poveznicu na svoju posljednju karticu na stranici nove kartice kada ponovno otvoriš aplikaciju</string>
 </resources>

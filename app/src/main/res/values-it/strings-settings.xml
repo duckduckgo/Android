@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minuti</string>
     <string name="afterInactivityTimeout1Hour">1 ora</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d ore</string>
+    <string name="returnToLastTabSettingTitle">Torna all\'ultima scheda</string>
+    <string name="returnToLastTabSettingSubtitle">Mostra un link all\'ultima scheda nella pagina Nuova scheda alla riapertura dell\'app</string>
 </resources>

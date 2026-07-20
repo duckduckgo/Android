@@ -24,6 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,6 +35,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -65,25 +67,25 @@ class WebViewLongPressHandlerTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = WebViewLongPressHandler(context, mockPixel, mockCustomTabDetector)
+        testee = WebViewLongPressHandler(context, mockPixel, mockCustomTabDetector, BrowserMode.REGULAR)
     }
 
     @Test
     fun whenUserLongPressesWithImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel).fire(AppPixelName.LONG_PRESS)
+        verify(mockPixel).fire(AppPixelName.LONG_PRESS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
     fun whenUserLongPressesWithAnchorImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel).fire(AppPixelName.LONG_PRESS)
+        verify(mockPixel).fire(AppPixelName.LONG_PRESS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
     fun whenUserLongPressesWithUnknownTypeThenPixelNotFired() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel, never()).fire(AppPixelName.LONG_PRESS)
+        verify(mockPixel, never()).fire(eq(AppPixelName.LONG_PRESS), any(), any(), any())
     }
 
     @Test

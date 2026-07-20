@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Zapisywanie pliku PDF do odzyskiwania wymaga uprawnienia do pamięci</string>
     <string name="sync_share_title">Udostępnij…</string>
     <string name="sync_pdf_title">Kod odzyskiwania synchronizacji</string>
-    <string name="sync_pdf_description">Kod odzyskiwania synchronizacji umożliwia synchronizację zakładek na wielu urządzeniach i odzyskanie zsynchronizowanych danych w przypadku utraty dostępu do urządzenia.</string>
+    <string name="sync_pdf_description">Kod odzyskiwania pozwala na synchronizację haseł, danych automatycznego uzupełniania oraz czatów Duck.ai na wielu urządzeniach oraz na odzyskanie zsynchronizowanych danych, jeśli stracisz dostęp do urządzenia.</string>
     <string name="sync_code_box_title">Przechowuj te informacje w bezpiecznym miejscu.</string>
-    <string name="sync_instructions_title">Jak to działa?</string>
-    <string name="sync_instructions_step1">Otwórz DuckDuckGo na innym urządzeniu i wybierz opcję Synchronizacja w menu Ustawienia.</string>
-    <string name="sync_instructions_step2">Zeskanuj kod QR lub skopiuj i wklej kod tekstowy do innej aplikacji DuckDuckGo.</string>
-    <string name="sync_instructions_step3">Synchronizacja zostanie aktywowana i ponownie będziesz mieć dostęp do wszystkich danych.</string>
+    <string name="sync_instructions_title">Jak działa ten kod?</string>
+    <string name="sync_instructions_step1">Otwórz DuckDuckGo na urządzeniu, które chcesz zsynchronizować, i przejdź do Sync &amp; Backup w Ustawieniach.</string>
+    <string name="sync_instructions_step2">Wybierz „Sync With Another Device” i zeskanuj kod QR lub wprowadź kod tekstowy.</string>
+    <string name="sync_instructions_step3">Synchronizacja zostanie aktywowana i ponownie będziesz mieć dostęp do wszystkich swoich danych.</string>
+    <string name="sync_pdf_retention_notice">Jeśli nie korzystasz z przeglądarki DuckDuckGo dłużej niż 18 miesięcy z włączoną funkcją Sync &amp; Backup, Twoje dane zostaną usunięte z serwera i nie będzie można ich przywrócić.</string>
     <string name="remove_device_dialog_title">Usunąć urządzenie?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s” nie będzie już mieć dostępu do zsynchronizowanych danych.</string>
     <string name="remove_device_dialog_primary_button">Usuń</string>

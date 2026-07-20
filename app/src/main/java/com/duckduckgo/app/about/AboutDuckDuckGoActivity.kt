@@ -34,8 +34,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithLearnMoreUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithPrivacyProtectionsUrl
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithComparisonChartUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithSubscriptionUrl
@@ -55,8 +53,6 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -67,16 +63,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
-
-    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
-        if (resultOk) {
-            Snackbar.make(
-                binding.root,
-                R.string.thanksForTheFeedback,
-                Snackbar.LENGTH_LONG,
-            ).show()
-        }
-    }
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -228,8 +214,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
             LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen(PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo))
             LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
-            LaunchFeedback -> launchFeedback()
-            LaunchSubscriptionUnifiedFeedback -> launchSubscriptionUnifiedFeedback()
             LaunchWebViewWithComparisonChartUrl -> launchWebViewScreen(COMPARISON_CHART_URL, getString(R.string.settingsAboutDuckduckgo))
             LaunchWebViewWithSubscriptionUrl -> launchWebViewScreen(PPRO_URL, getString(R.string.settingsAboutDuckduckgo))
             LaunchWebViewWithVPNUrl -> launchWebViewScreen(VPN_URL, getString(R.string.settingsAboutDuckduckgo))
@@ -258,17 +242,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
                 url = PRIVACY_PROTECTIONS_WEB_LINK,
                 screenTitle = getString(R.string.settingsAboutDuckduckgo),
             ),
-        )
-    }
-
-    private fun launchFeedback() {
-        feedbackFlow.launch(null)
-    }
-
-    private fun launchSubscriptionUnifiedFeedback() {
-        globalActivityStarter.start(
-            this,
-            GeneralSubscriptionFeedbackScreenNoParams,
         )
     }
 

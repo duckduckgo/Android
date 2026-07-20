@@ -684,10 +684,16 @@ class RealPirRunStateHandler @Inject constructor(
                          * - We update the optOut status to REMOVED
                          * - We store the new extracted profiles (if profile query is not deprecated). We ignore the ones that already exist.
                          * - Update the corresponding ScanJobRecord
+                         * For every stored extractedProfile that reappears in the results and whose opt-out was previously
+                         * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
                          */
                         jobRecordUpdater.markRemovedOptOutJobRecords(it, brokerName, state.profileQueryId)
 
                         if (it.isNotEmpty()) {
+                            jobRecordUpdater.markReappearedOptOutJobRecords(it, brokerName, state.profileQueryId)
+                                .forEach { _ ->
+                                    pixelSender.reportBrokerOptOutProfileReappeared(state.broker.url)
+                                }
                             jobRecordUpdater.updateScanMatchesFound(it, brokerName, state.profileQueryId)
                             repository.saveNewExtractedProfiles(it)
                         } else {

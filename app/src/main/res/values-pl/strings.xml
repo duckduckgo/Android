@@ -423,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Szukaj w DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podziel się opinią</string>
-    <string name="missingBrowserFeaturesTitleLong">Brakuje funkcji przeglądarki lub nie działają one poprawnie</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemy funkcji przeglądarki</string>
-    <string name="missingBrowserFeaturesSubtitle">Jaką funkcję przeglądania stron powinniśmy dodać lub usprawnić?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Przejście do przodu, wstecz i/lub odświeżenie</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tworzenie kart i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokowanie reklam i wyskakujących okienek</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Oglądanie filmów</string>
-    <string name="missingBrowserFeatureSubReasonImages">Obsługa obrazów</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tworzenie zakładek i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonOther">Żadne z powyższych</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingSubtitle">Która witryna nie działa poprawnie?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Jaką funkcję wyszukiwania powinniśmy dodać lub usprawnić?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Wyszukiwanie techniczne/programistyczne</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Układ graficzny powinien być zbliżony do Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Szybszy czas wczytywania</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Wyszukiwanie w konkretnym języku bądź regionie</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepsza funkcja autouzupełniania</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Żadne z powyższych</string>
-
-    <string name="needMoreCustomizationTitleLong">Liczba możliwości spersonalizowania aplikacji jest niewystarczająca</string>
-    <string name="needMoreCustomizationTitleShort">Problemy z personalizacją</string>
-    <string name="needMoreCustomizationSubtitle">Jaką opcję personalizacji powinniśmy dodać lub usprawnić?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguracja ekranu głównego</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Sposób wyświetlania kart</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Wygląd aplikacji</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Rodzaje usuwanych danych</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Czas usuwania danych</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Sposób wyświetlania zakładek</string>
-    <string name="needMoreCustomizationSubReasonOther">Żadne z powyższych</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikacja działa wolno, zawiera błędy lub przestaje działać</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemy dotyczące poprawnego działania</string>
-    <string name="appIsSlowOrBuggySubtitle">Jakie problemy napotkałeś(-aś)?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Strony lub wyniki wyszukiwania wczytują się powoli</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacja przestaje działać lub zawiesza się</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Błędy podczas odtwarzania filmów i mediów</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Żadne z powyższych</string>
-
-    <string name="otherMainReasonTitleLong">Żadne z powyższych</string>
-    <string name="otherMainReasonTitleShort">Inne problemy</string>
-
-    <string name="openEndedInputHint">Podaj jak najdokładniejsze informacje</string>
-    <string name="submitFeedback">Wyślij</string>
-
-    <string name="tellUsHowToImprove">Powiedz nam, co możemy poprawić.</string>
-    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Co najbardziej przyprawia Cię o frustrację?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Przykro nam z tego powodu</string>
-    <string name="feedbackShareDetails">Przekaż informacje</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Czy chciał(a)byś przekazać naszemu zespołowi jakieś informacje?</string>
-    <string name="whatHaveYouBeenEnjoying">Co Ci się podoba?</string>
-    <string name="awesomeToHear">Świetnie!</string>
-    <string name="shareTheLoveWithARating">Podziel się swoimi wrażeniami, oceniając nas w Play Store.</string>
-    <string name="rateTheApp">Oceń aplikację</string>
-    <string name="declineFurtherFeedback">Nie, dziękuję, skończyłem(-am)</string>
-    <string name="whichBrokenSites">Gdzie dostrzegasz te problemy?</string>
-    <string name="whichBrokenSitesHint">Z jaką stroną związane są problemy?</string>
-    <string name="feedbackSpecificAsPossible">Podaj jak najdokładniejsze informacje</string>
-    <string name="feedbackInitialDisambiguationTitle">Zaczynajmy!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Do jakiej kategorii zaliczysz swoją opinię?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Przycisk pozytywnej opinii</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Przycisk negatywnej opinii</string>
-    <string name="feedbackIsImportantToUs">Twoja anonimowa opinia ma dla nas ogromne znaczenie.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nie można wyświetlić strony internetowej."</string>
     <string name="crashedWebViewErrorAction">"Załaduj ponownie"</string>
@@ -1100,6 +1028,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potwierdź</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Otwórz w karcie Fire</string>

@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -59,6 +60,6 @@ class DuckAiChatDeletionListenerImpl @Inject constructor(
         val backgroundTimestamp = duckChatFeatureRepository.getAppBackgroundTimestamp()
         val timestamp = backgroundTimestamp ?: currentTimeProvider.currentTimeMillis()
         logcat { "DuckChat-Sync: Duck AI chats deleted, using timestamp: $timestamp (background: ${backgroundTimestamp != null})" }
-        duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp)
+        duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp, BrowserMode.REGULAR)
     }
 }

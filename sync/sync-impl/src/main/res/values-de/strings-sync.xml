@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Zum Speichern der Wiederherstellungs-PDF ist eine Speicherberechtigung erforderlich</string>
     <string name="sync_share_title">Teilen mit …</string>
     <string name="sync_pdf_title">Wiederherstellungscode synchronisieren</string>
-    <string name="sync_pdf_description">Mit dem Wiederherstellungscode kannst du deine Lesezeichen auf mehreren Geräten synchronisieren und deine synchronisierten Daten wiederherstellen, falls du den Zugriff auf ein Gerät verlierst.</string>
+    <string name="sync_pdf_description">Mit dem Wiederherstellungscode kannst du deine Passwörter, Autofill-Daten und Duck.ai-Chats über mehrere Geräte hinweg synchronisieren und deine synchronisierten Daten wiederherstellen, falls du den Zugriff auf ein Gerät verlierst.</string>
     <string name="sync_code_box_title">Bewahre diese Informationen sicher und geschützt auf.</string>
-    <string name="sync_instructions_title">Wie funktioniert das?</string>
-    <string name="sync_instructions_step1">Öffne DuckDuckGo auf einem anderen Gerät und gehe in den Einstellungen zu Synchronisieren.</string>
-    <string name="sync_instructions_step2">Scanne den QR-Code oder kopiere ihn und füge ihn in eine andere DuckDuckGo-App ein.</string>
+    <string name="sync_instructions_title">Wie funktioniert dieser Code?</string>
+    <string name="sync_instructions_step1">Öffne DuckDuckGo auf dem Gerät, das du synchronisieren möchtest, und gehe in den Einstellungen zu „Sync &amp; Backup“.</string>
+    <string name="sync_instructions_step2">Wähle „Mit anderem Gerät synchronisieren“ und scanne den QR-Code oder gib den Textcode ein.</string>
     <string name="sync_instructions_step3">Sync wird aktiviert und du wirst wieder Zugriff auf all deine Daten haben.</string>
+    <string name="sync_pdf_retention_notice">Wenn du länger als 18 Monate keinen DuckDuckGo-Browser mit aktiviertem Sync &amp; Backup verwendest, werden deine Daten vom Server gelöscht und können nicht wiederhergestellt werden.</string>
     <string name="remove_device_dialog_title">Gerät entfernen?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ kann nicht mehr auf deine synchronisierten Daten zugreifen.</string>
     <string name="remove_device_dialog_primary_button">Entfernen</string>

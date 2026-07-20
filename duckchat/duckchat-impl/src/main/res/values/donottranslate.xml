@@ -19,4 +19,16 @@
     <!-- Remove chat history suggestion -->
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
+    <!-- Subscription onboarding - Duck.ai step (placeholder copy) -->
+    <string name="subscriptionOnboardingDuckAiTitle">Duck.ai step</string>
+    <string name="subscriptionOnboardingDuckAiText">Duck.ai onboarding step</string>
+    <string name="subscriptionOnboardingDuckAiNext">Next</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Ask about tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask about page</string>
+
+    <!-- Page context attachment -->
+    <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
+
 </resources>

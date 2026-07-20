@@ -16,11 +16,22 @@
 
 package com.duckduckgo.adblocking.impl.menu
 
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_DISABLE_TAPPED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_DISABLE_TAPPED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_ENABLE_TAPPED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_MENU_ENABLE_TAPPED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_OFF_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_OFF_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_ON_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_ALWAYS_ON_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,14 +47,20 @@ interface AdBlockingMenuController {
     fun currentChoice(): AdBlockingChoice
 
     /**
-     * Applies the user's selection to the persisted setting and/or the session override.
+     * Applies a selection made in the disable-mode picker to the persisted setting and/or the
+     * session override.
      */
     fun onChoiceSelected(choice: AdBlockingChoice)
 
     /**
-     * Enables ad blocking directly, without showing the choice sheet.
+     * Handles a tap on the "Enable" browsing-menu row, enabling ad blocking.
      */
-    fun enable()
+    fun onEnableTapped()
+
+    /**
+     * Handles a tap on the "Disable" browsing-menu row.
+     */
+    fun onDisableTapped()
 }
 
 @ContributesBinding(AppScope::class)
@@ -53,6 +70,7 @@ class RealAdBlockingMenuController @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : AdBlockingMenuController {
 
     override fun currentChoice(): AdBlockingChoice = when (statusChecker.currentState()) {
@@ -62,6 +80,35 @@ class RealAdBlockingMenuController @Inject constructor(
     }
 
     override fun onChoiceSelected(choice: AdBlockingChoice) {
+        when (choice) {
+            AdBlockingChoice.ALWAYS_ON -> {
+                pixel.fire(AD_BLOCKING_PICKER_ALWAYS_ON_DAILY, type = Pixel.PixelType.Daily())
+                pixel.fire(AD_BLOCKING_PICKER_ALWAYS_ON_COUNT)
+            }
+            AdBlockingChoice.DISABLE_UNTIL_RELAUNCH -> {
+                pixel.fire(AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_DAILY, type = Pixel.PixelType.Daily())
+                pixel.fire(AD_BLOCKING_PICKER_DISABLE_UNTIL_RELAUNCH_COUNT)
+            }
+            AdBlockingChoice.ALWAYS_OFF -> {
+                pixel.fire(AD_BLOCKING_PICKER_ALWAYS_OFF_DAILY, type = Pixel.PixelType.Daily())
+                pixel.fire(AD_BLOCKING_PICKER_ALWAYS_OFF_COUNT)
+            }
+        }
+        apply(choice)
+    }
+
+    override fun onEnableTapped() {
+        pixel.fire(AD_BLOCKING_MENU_ENABLE_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(AD_BLOCKING_MENU_ENABLE_TAPPED_COUNT)
+        apply(AdBlockingChoice.ALWAYS_ON)
+    }
+
+    override fun onDisableTapped() {
+        pixel.fire(AD_BLOCKING_MENU_DISABLE_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(AD_BLOCKING_MENU_DISABLE_TAPPED_COUNT)
+    }
+
+    private fun apply(choice: AdBlockingChoice) {
         appScope.launch(dispatcherProvider.io()) {
             when (choice) {
                 AdBlockingChoice.ALWAYS_ON -> {
@@ -76,6 +123,4 @@ class RealAdBlockingMenuController @Inject constructor(
             }
         }
     }
-
-    override fun enable() = onChoiceSelected(AdBlockingChoice.ALWAYS_ON)
 }

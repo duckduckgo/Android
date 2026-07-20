@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Siųsti pranešimą apie triktį</string>
     <string name="ad_blocking_disabled_secondary_action">Atšaukti</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Išjungta iki paleidimo iš naujo</string>
+    <string name="ad_blocking_omnibar_badge_text">„YouTube“ reklamų blokavimas įjungtas</string>
 </resources>

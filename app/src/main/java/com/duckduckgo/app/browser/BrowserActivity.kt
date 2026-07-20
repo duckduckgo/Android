@@ -76,7 +76,6 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
-import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -93,6 +92,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -104,6 +104,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -133,6 +134,7 @@ import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -502,6 +504,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.refreshAutoComplete()
                     }
                 }
+                FireDialog.EVENT_ON_FIRE_TABS_CLEARING_COMPLETE -> {
+                    // All Fire tabs were burned; land the user on the (now empty) Fire tab switcher
+                    globalActivityStarter.start(this, TabSwitcherScreenWithParams(BrowserMode.FIRE))
+                }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
                     val origin = bundle.getString(FireDialog.RESULT_KEY_ORIGIN)
                     val isDuckAiContextual = origin == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
@@ -760,7 +766,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
         if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
-            switchModeThen(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent))
+            switchModeThen(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent), BrowserModeSwitchSource.EXTERNAL_LAUNCH)
             return
         }
 
@@ -987,7 +993,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
-            is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
+            is Command.LaunchFeedbackView -> globalActivityStarter.start(this, FeedbackScreenNoParams)
             is Command.SwitchToTab -> openExistingTab(command.tabId)
             is Command.OpenInNewTab -> launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.openSavedSite(command.url)
@@ -1046,7 +1052,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire(launchedFromFocusedNtp: Boolean = false, isDuckAiOnboarding: Boolean = false) {
         pendingDuckAiOnboardingFire = isDuckAiOnboarding
-        val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
+        val params = mapOf(
+            PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString(),
+            PixelParameter.BROWSER_MODE to currentBrowserMode.name.lowercase(),
+        )
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params, type = Daily())
 
@@ -1489,7 +1498,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Action deferred across mode-switch recreate; handling now" }
                 pendingModeSwitch = null
                 processedOriginalIntent = true
-                switchModeThen(pending.targetMode, pending.action)
+                switchModeThen(pending.targetMode, pending.action, pending.source)
                 return
             }
 
@@ -1716,7 +1725,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean = false,
         browserMode: BrowserMode = currentBrowserMode,
     ) {
-        switchModeThen(browserMode, PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal))
+        switchModeThen(browserMode, PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal), BrowserModeSwitchSource.NEW_TAB)
     }
 
     /**
@@ -1729,14 +1738,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
      *
      * The replay calls this same method, so it is self-correcting: on the recreated instance the
      * mode matches and the action runs; were it ever to run before the recreate, it simply re-stashes.
+     *
+     * @param source The UI origin of the switch, reported on the mode-switched pixel.
      */
-    private fun switchModeThen(targetMode: BrowserMode, action: PendingAction) {
+    private fun switchModeThen(targetMode: BrowserMode, action: PendingAction, source: BrowserModeSwitchSource) {
         if (targetMode == currentBrowserMode) {
             runAction(action)
             return
         }
-        if (viewModel.switchToMode(targetMode)) {
-            pendingModeSwitch = PendingModeSwitch(targetMode, action)
+        if (viewModel.switchToMode(targetMode, source)) {
+            pendingModeSwitch = PendingModeSwitch(targetMode, action, source)
         } else {
             // Switch rejected (e.g. Fire mode unavailable); run the action in the current mode.
             runAction(action)
@@ -1817,8 +1828,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
-    fun openExistingTabInMode(mode: BrowserMode, tabId: String) =
-        switchModeThen(mode, PendingAction.OpenExistingTab(tabId))
+    fun openExistingTabInMode(mode: BrowserMode, tabId: String, source: BrowserModeSwitchSource) =
+        switchModeThen(mode, PendingAction.OpenExistingTab(tabId), source)
 
     fun onEditModeChanged(isInEditMode: Boolean) {
         viewModel.onOmnibarEditModeChanged(isInEditMode)
