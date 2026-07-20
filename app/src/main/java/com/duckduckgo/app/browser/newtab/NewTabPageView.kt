@@ -67,6 +67,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -74,6 +75,7 @@ import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -174,8 +176,15 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        conflatedNativeInputJob += duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { enabled -> updateLogoMargin(enabled) }
+        conflatedNativeInputJob += combine(
+            duckChat.observeNativeInputFieldUserSettingEnabled(),
+            inputModeState.inputModeCapability,
+        ) { enabled, capability ->
+            // Search-only still has the native-input field setting on, but the browser uses the
+            // legacy omnibar — drop the UTI chrome margin so the logo isn't left too low.
+            enabled && capability != NativeInputState.InputMode.SEARCH_ONLY
+        }
+            .onEach { updateLogoMargin(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         conflatedChatModeJob += inputModeState.displayedMode

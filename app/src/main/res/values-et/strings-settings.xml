@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minutit</string>
     <string name="afterInactivityTimeout1Hour">1 tund</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d tundi</string>
+    <string name="returnToLastTabSettingTitle">Tagasi viimasele vahelehele</string>
+    <string name="returnToLastTabSettingSubtitle">Kuva rakenduse uuesti avamisel uuel vahelehel link oma viimasele vahelehele</string>
 </resources>

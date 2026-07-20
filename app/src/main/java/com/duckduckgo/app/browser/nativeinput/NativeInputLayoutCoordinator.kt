@@ -50,7 +50,16 @@ class NativeInputLayoutCoordinator(
 
     private var navBarInsetPx: Int = 0
     private var reapplyContentOffset: (() -> Unit)? = null
+
+    /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
+    private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
+
+    // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
+    // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
+    private var contentTransitionGroup: ViewGroup? = null
+    private var suspendedContentTransition: LayoutTransition? = null
+    private var isContentReflowSuspended: Boolean = false
 
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
@@ -189,9 +198,20 @@ class NativeInputLayoutCoordinator(
         this.navBarInsetPx = navBarInsetPx
         data class Target(val view: View, val basePadding: Padding)
 
+        // Drop any prior session's applied inset before snapshotting. Otherwise a leftover top/bottom
+        // padding (incomplete close, or ShowKeyboard → showNativeInput after a tab swipe) becomes the
+        // new baseline and stacks on every reopen.
+        resetContentOffset?.invoke()
+        clearNtpScrollArtifacts()
+
         val newTabContent =
             rootView.findViewById<View?>(R.id.newTabPage)
                 ?: rootView.findViewById(R.id.includeNewBrowserTab)
+        // newTabPage has no XML padding — any top/bottom here is from a prior offset session. Zero it
+        // so the snapshot can't inherit a dirty baseline. Leave browserLayout alone: its bottom padding
+        // is owned by BottomOmnibarBrowserContainerLayoutBehavior.
+        newTabContent?.setPadding(newTabContent.paddingLeft, 0, newTabContent.paddingRight, 0)
+
         val targets =
             listOfNotNull(
                 rootView.findViewById(R.id.browserLayout),
@@ -223,6 +243,11 @@ class NativeInputLayoutCoordinator(
         // setPadding during the enter would spawn CHANGING animators and the content would lag the widget.
         val ntpGroup = newTabContent as? ViewGroup
         val previousNtpTransition = ntpGroup?.layoutTransition
+        // Fresh session: reset any stale nav bar slide bookkeeping and track this NTP group as the reflow
+        // transition owner so begin/endNavBarSlide can suspend it.
+        contentTransitionGroup = ntpGroup
+        isContentReflowSuspended = false
+        suspendedContentTransition = null
         if (ntpGroup != null) {
             pendingContentLayoutTransition =
                 ntpGroup to
@@ -285,6 +310,7 @@ class NativeInputLayoutCoordinator(
         fun applyOffset() {
             if (!widgetView.isShown) {
                 targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+                clearNtpScrollArtifacts()
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
@@ -312,6 +338,10 @@ class NativeInputLayoutCoordinator(
         }
 
         reapplyContentOffset = { applyOffset() }
+        resetContentOffset = {
+            targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+            clearNtpScrollArtifacts()
+        }
         widgetView.post { applyOffset() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -342,10 +372,15 @@ class NativeInputLayoutCoordinator(
                     pendingContentLayoutTransition = null
                     widgetAnimationFrameHandler = null
                     reapplyContentOffset = null
+                    resetContentOffset = null
                     isWidgetAnimating = false
+                    contentTransitionGroup = null
+                    suspendedContentTransition = null
+                    isContentReflowSuspended = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
+                    clearNtpScrollArtifacts()
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
                     ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
@@ -356,9 +391,70 @@ class NativeInputLayoutCoordinator(
     }
 
     /**
-     * Updates the nav bar top-inset used by the (already-registered) content-offset listeners and
-     * re-applies immediately. Cheap: no new listeners — unlike re-calling [configureContentOffset].
+     * LayoutTransition CHANGING (Search ↔ Duck.ai reflow) can leave temporary margins/translations on
+     * [R.id.newTabContainerScrollView]. Clear them whenever we restore the content baseline so tab-swipe
+     * reopen cycles can't accumulate a growing gap above the NTP content.
      */
+    private fun clearNtpScrollArtifacts() {
+        val scrollView = rootView.findViewById<View?>(R.id.newTabContainerScrollView) ?: return
+        val lp = scrollView.layoutParams as? ViewGroup.MarginLayoutParams
+        if (lp != null && (lp.topMargin != 0 || lp.bottomMargin != 0 || lp.leftMargin != 0 || lp.rightMargin != 0)) {
+            lp.setMargins(0, 0, 0, 0)
+            scrollView.layoutParams = lp
+        }
+        if (scrollView.translationX != 0f) scrollView.translationX = 0f
+        if (scrollView.translationY != 0f) scrollView.translationY = 0f
+    }
+
+    /**
+     * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
+     * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
+     * with the bar. Paired with [endNavBarSlide]; both idempotent, so a rapid re-toggle that cancels the
+     * previous slide stays suspended until the last slide ends. [configureContentOffset]/detach reset it.
+     */
+    fun beginNavBarSlide() {
+        isWidgetAnimating = true
+        suspendContentReflow()
+    }
+
+    /**
+     * Ends a [beginNavBarSlide] session. Resumes content reflow but leaves [isWidgetAnimating] alone —
+     * the slide may run alongside enter/exit, which owns that flag until its own complete/cancel.
+     * Callers that solely own the session (mid-session show/hide) should clear it after this returns.
+     */
+    fun endNavBarSlide() {
+        resumeContentReflow()
+    }
+
+    /**
+     * Suspends the content-reflow [LayoutTransition] so a per-frame content-offset drive (nav bar slide or
+     * widget exit) moves the content instantly, instead of the transition animating each change on its own
+     * clock and lagging the driver. Idempotent; paired with [resumeContentReflow].
+     */
+    fun suspendContentReflow() {
+        if (isContentReflowSuspended) return
+        val group = contentTransitionGroup ?: return
+        isContentReflowSuspended = true
+        suspendedContentTransition = group.layoutTransition
+        group.layoutTransition = null
+    }
+
+    fun resumeContentReflow() {
+        if (!isContentReflowSuspended) return
+        isContentReflowSuspended = false
+        contentTransitionGroup?.layoutTransition = suspendedContentTransition
+        suspendedContentTransition = null
+    }
+
+    /**
+     * Instantly restores content padding to the [configureContentOffset] baseline. Call while the
+     * content-reflow transition is suspended (e.g. exit teardown) so a [LayoutTransition] can't race
+     * the reset and leave stale top padding after the omnibar returns.
+     */
+    fun resetContentOffsetToBase() {
+        resetContentOffset?.invoke()
+    }
+
     fun updateNavBarInset(px: Int) {
         navBarInsetPx = px
         reapplyContentOffset?.invoke()

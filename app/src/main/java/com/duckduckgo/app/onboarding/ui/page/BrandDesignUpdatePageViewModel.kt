@@ -113,6 +113,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
+        val hideAddressBarRow: Boolean = false,
         val isCustomAiOnboardingFlow: Boolean = false,
         val stepIndicator: StepProgress? = null,
         val onboardingImprovementsV2Enabled: Boolean = true,
@@ -449,6 +450,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                                 _commands.send(Command.HandOffToBrowserActivity)
                                 return@onEach
                             }
+                            else -> {
+                                // Any other host is not this VM's screen (this VM only drives the new-user onboarding plan); ignore.
+                                return@onEach
+                            }
                         }
                         if (step is NewUserOnboardingActivityStep) {
                             applyDialog(step.resolveDialog(), state.stepIndicatorProgress())
@@ -517,6 +522,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         showSplitOption = dialog.showSplitOption,
                         hideSetDefaultBrowserRow = dialog.hideSetDefaultBrowserRow,
                         hideAddWidgetRow = dialog.hideAddWidgetRow,
+                        hideAddressBarRow = dialog.hideAddressBarRow,
                         isReinstallUser = dialog.isReinstallUser,
                     )
                 }

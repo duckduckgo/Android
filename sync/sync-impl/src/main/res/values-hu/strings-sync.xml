@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">A helyreállítási PDF mentéséhez tárolási engedély szükséges</string>
     <string name="sync_share_title">Megosztás vele…</string>
     <string name="sync_pdf_title">Helyreállítási kód szinkronizálása</string>
-    <string name="sync_pdf_description">A helyreállítási kód lehetővé teszi a könyvjelzők több eszközön történő szinkronizálását, illetve az eszközhöz való hozzáférés elvesztése esetén a szinkronizált adatok helyreállítását.</string>
+    <string name="sync_pdf_description">A helyreállítási kód lehetővé teszi, hogy a jelszavaidat, az automatikus kitöltési adatokat és a Duck.ai csevegéseket több eszközön szinkronizáld, és visszaállítsd a szinkronizált adataidat, ha elveszíted az eszközödhöz való hozzáférést.</string>
     <string name="sync_code_box_title">Tartsd biztonságban ezeket az információkat.</string>
-    <string name="sync_instructions_title">Hogy működik?</string>
-    <string name="sync_instructions_step1">Egy másik eszközön nyisd meg a DuckDuckGo alkalmazást, és válaszd a Beállítások menü Szinkronizálás elemét.</string>
-    <string name="sync_instructions_step2">Olvasd be a QR-kódot, vagy másold és illeszd be a szöveges kódot a másik DuckDuckGo alkalmazásba.</string>
+    <string name="sync_instructions_title">Hogyan működik ez a kód?</string>
+    <string name="sync_instructions_step1">Nyisd meg a DuckDuckGo alkalmazást azon az eszközön, amelyet szinkronizálni szeretnél, és lépj a Beállítások menü Sync &amp; Backup pontjára.</string>
+    <string name="sync_instructions_step2">Válaszd a „Szinkronizálás másik eszközzel” lehetőséget, majd olvasd be a QR-kódot vagy add meg a szöveges kódot.</string>
     <string name="sync_instructions_step3">A szinkronizálás aktiválódik, és ismét hozzáférhetsz minden adathoz.</string>
+    <string name="sync_pdf_retention_notice">Ha több mint 18 hónapig nem használod a DuckDuckGo böngészőt a Sync &amp; Backup engedélyezett állapotában, az adataid törölve lesznek a szerverről, és nem állíthatók vissza.</string>
     <string name="remove_device_dialog_title">Eszköz eltávolítása?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz.</string>
     <string name="remove_device_dialog_primary_button">Eltávolítás</string>

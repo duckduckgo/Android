@@ -41,4 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Trimite raportul de erori</string>
     <string name="ad_blocking_disabled_secondary_action">Anulează</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Dezactivat până la relansare</string>
+    <string name="ad_blocking_omnibar_badge_text">Blocarea reclamelor pe YouTube activată</string>
 </resources>

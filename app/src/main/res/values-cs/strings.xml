@@ -423,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Hledat DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podělte se o zpětnou vazbu</string>
-    <string name="missingBrowserFeaturesTitleLong">Funkce prohlížeče chybí nebo jsou frustrující.</string>
-    <string name="missingBrowserFeaturesTitleShort">Problémy s funkcemi prohlížeče</string>
-    <string name="missingBrowserFeaturesSubtitle">Kterou funkci prohlížení můžeme přidat nebo vylepšit?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigace dopředu, dozadu nebo obnovení</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tvorba a správa karet</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokování reklam a vyskakovacích oken</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Při přehrávání videí</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interakce s obrázky</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tvorba a správa záložek</string>
-    <string name="missingBrowserFeatureSubReasonOther">Žádné z výše uvedených</string>
-
-    <string name="websiteNotLoadingTitleLong">Potíže při načítání webu</string>
-    <string name="websiteNotLoadingTitleShort">Potíže při načítání webu</string>
-    <string name="websiteNotLoadingSubtitle">Které webové stránky jsou poškozené?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Vyhledávání DuckDuckGo není dostatečně dobré</string>
-    <string name="searchNotGoodEnoughTitleShort">Potíže s vyhledáváním DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Kterou funkci vyhledávání můžeme přidat nebo vylepšit?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programování/technické vyhledávání</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Rozložení by mělo být více podobné Googlu.</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Rychlejší načtení</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Vyhledávání v určitém jazyce nebo regionu</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepší automatické doplňování</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Žádné z výše uvedených</string>
-
-    <string name="needMoreCustomizationTitleLong">Není dostatek možností, jak aplikaci přizpůsobit.</string>
-    <string name="needMoreCustomizationTitleShort">Potíže při přizpůsobování</string>
-    <string name="needMoreCustomizationSubtitle">Kterou možnost přizpůsobení můžeme přidat nebo vylepšit?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfigurace domovské obrazovky</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Jak se zobrazují karty</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Jak aplikace vypadá</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Která data jsou vymazána</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kdy jsou data vymazána</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Jak se záložky zobrazují</string>
-    <string name="needMoreCustomizationSubReasonOther">Žádné z výše uvedených</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikace je pomalá, chybná nebo se hroutí</string>
-    <string name="appIsSlowOrBuggyTitleShort">Potíže s výkonností</string>
-    <string name="appIsSlowOrBuggySubtitle">Který problém zažíváte?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Webové stránky nebo výsledky vyhledávání se načítají pomalu.</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikace se hroutí nebo zamrzne</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Chyby při přehrávání videa nebo médií</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Žádné z výše uvedených</string>
-
-    <string name="otherMainReasonTitleLong">Žádné z výše uvedených</string>
-    <string name="otherMainReasonTitleShort">Další problémy</string>
-
-    <string name="openEndedInputHint">Buďte co nejkonkrétnější.</string>
-    <string name="submitFeedback">Odeslat</string>
-
-    <string name="tellUsHowToImprove">Řekněte nám prosím, co můžeme zlepšit.</string>
-    <string name="thanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">S čím souvisí vaše frustrace nejvíce?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Je nám líto, že nejste spokojení.</string>
-    <string name="feedbackShareDetails">Podělte se o podrobnosti.</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Máte nějaké podrobnosti, o které byste se chtěli podělit s týmem?</string>
-    <string name="whatHaveYouBeenEnjoying">Co se vám líbilo?</string>
-    <string name="awesomeToHear">To rádi slyšíme!</string>
-    <string name="shareTheLoveWithARating">Podělte se prosím o pozitiva hodnocením na Play Store.</string>
-    <string name="rateTheApp">Ohodnoťte aplikaci</string>
-    <string name="declineFurtherFeedback">Ne, děkuji, jsme hotoví</string>
-    <string name="whichBrokenSites">Kde jste narazili na tyto problémy?</string>
-    <string name="whichBrokenSitesHint">Které webové stránky mají problémy?</string>
-    <string name="feedbackSpecificAsPossible">Buďte co nejkonkrétnější.</string>
-    <string name="feedbackInitialDisambiguationTitle">Tak se do toho pustíme!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Do jaké kategorie byste zařadili svou zpětnou vazbu?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačítko pozitivní zpětné vazby</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačítko negativní zpětné vazby</string>
-    <string name="feedbackIsImportantToUs">Vaše anonymní zpětná vazba je pro nás důležitá.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Tuto webovou stránku nelze zobrazit."</string>
     <string name="crashedWebViewErrorAction">"Načíst znovu"</string>
@@ -864,7 +792,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Používej ChatGPT diskrétně s integrovaným Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj cílené reklamy a vyskakovací okna ohledně cookies</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Přehrávání videí na YouTube bez reklam</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
     <string name="preOnboardingAddressBarOkButton">Další</string>
@@ -927,7 +857,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chceš snadný přístup k soukromému chatu s umělou inteligencí v adresním řádku?</string>
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 
@@ -1053,7 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 
@@ -1099,6 +1029,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potvrdit</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Otevřít na kartě Fire</string>

@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
@@ -126,6 +127,10 @@ class DuckChatContextualViewModel @Inject constructor(
         data class ChangeSheetState(
             val newState: Int,
             val prefillNativeInput: String? = null,
+            // Hide the soft keyboard as part of this transition (e.g. leaving the initial input state for
+            // the chat). Folded into this command rather than a separate one because commandChannel is a
+            // capacity-1 DROP_OLDEST channel: two commands emitted in the same burst would lose the older.
+            val hideKeyboard: Boolean = false,
         ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
@@ -138,6 +143,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val sourceTabId: String,
         ) : Command()
         data object LaunchChatHistory : Command()
+        data object FocusInput : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -154,6 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 prompt = "",
                 isFireButtonEnabled = false,
                 quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                contextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled(),
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -190,6 +197,10 @@ class DuckChatContextualViewModel @Inject constructor(
                 observeCurrentChatDeletion()
             }
         }
+
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { enabled -> _viewState.update { it.copy(nativeChatInputEnabled = enabled) } }
+            .launchIn(viewModelScope)
     }
 
     // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
@@ -253,10 +264,14 @@ class DuckChatContextualViewModel @Inject constructor(
         // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
         val showChatsIcon: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
+        val nativeChatInputEnabled: Boolean = false,
+        val contextualNativeInputEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
+
+        contextualNativeInputManager.onContextualReopened(sheetTabId)
 
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
@@ -386,16 +401,28 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onPromptSent(
         prompt: String,
         followUpPrefill: String? = null,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            val contextPrompt = generateContextPrompt(prompt)
+            val contextPrompt = generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
+                // Sending from the initial input state leaves the sheet in the chat; hide the keyboard so
+                // the user sees the streaming reply instead of the composer.
+                val wasInInputMode = _viewState.value.sheetMode == SheetMode.INPUT
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
                         prompt = "",
+                        // The context has already been captured in contextPrompt above, so drop the
+                        // page-context chip from the input once the prompt is sent — mirroring how image
+                        // attachments are cleared on submit.
+                        showContext = false,
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
@@ -405,6 +432,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     Command.ChangeSheetState(
                         newState = BottomSheetBehavior.STATE_EXPANDED,
                         prefillNativeInput = prefillText.orEmpty(),
+                        hideKeyboard = wasInInputMode,
                     ),
                 )
             }
@@ -458,7 +486,14 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun generateContextPrompt(prompt: String): SubscriptionEventData {
+    private fun generateContextPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ): SubscriptionEventData {
         val viewState = _viewState.value
         val pageContext =
             if (viewState.showContext) {
@@ -479,8 +514,11 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPromptSubmittedWithContextNative()
         }
 
-        val modelId = modelManager.getSelectedModelId()
-        val reasoningEffort = modelManager.getResolvedReasoningEffort()
+        // The unified input widget is the source of truth for model/reasoning/tool/attachments when it
+        // is the composer; fall back to the shared model manager for callers that don't pass them (e.g.
+        // the Summarize/Ask-about-page quick action).
+        val resolvedModelId = modelId ?: modelManager.getSelectedModelId()
+        val resolvedReasoningEffort = reasoningEffort ?: modelManager.getResolvedReasoningEffort()
         val params =
             JSONObject().apply {
                 put("platform", "android")
@@ -490,11 +528,20 @@ class DuckChatContextualViewModel @Inject constructor(
                     JSONObject().apply {
                         put("prompt", prompt)
                         put("autoSubmit", true)
-                        if (modelId != null) {
-                            put("modelId", modelId)
+                        if (resolvedModelId != null) {
+                            put("modelId", resolvedModelId)
                         }
-                        if (reasoningEffort != null) {
-                            put("reasoningEffort", reasoningEffort)
+                        if (resolvedReasoningEffort != null) {
+                            put("reasoningEffort", resolvedReasoningEffort)
+                        }
+                        if (selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(selectedTool) })
+                        }
+                        if (imagesJson != null) {
+                            put("images", imagesJson)
+                        }
+                        if (filesJson != null) {
+                            put("files", filesJson)
                         }
                     },
                 )
@@ -579,21 +626,19 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun removePageContext() {
         logcat { "Duck.ai Contextual: removePageContext" }
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(
-                    showContext = false,
-                    userRemovedContext = true,
-                    quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
-                        QuickActionState.ASK_ABOUT_PAGE
-                    } else {
-                        current.quickActionState
-                    },
-                )
-            }
-            if (_viewState.value.showsAttachContextPlaceholder()) {
-                duckChatPixels.reportContextualPlaceholderContextShown()
-            }
+        _viewState.update { current ->
+            current.copy(
+                showContext = false,
+                userRemovedContext = true,
+                quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                    QuickActionState.ASK_ABOUT_PAGE
+                } else {
+                    current.quickActionState
+                },
+            )
+        }
+        if (_viewState.value.showsAttachContextPlaceholder()) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
@@ -688,6 +733,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
                 addPageContext()
+                commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
                 }
@@ -705,6 +751,25 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onAskAboutTabClicked() {
+        if (!isContextValid(updatedPageContext)) {
+            // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
+            return
+        }
+        addPageContext()
+        commandChannel.trySend(Command.FocusInput)
+        _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+    }
+
+    fun onAskAboutPageClicked() {
+        if (!_viewState.value.showContext) {
+            // Context not attached; nothing to ask about.
+            return
+        }
+        commandChannel.trySend(Command.FocusInput)
+        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
     }
 
     fun onPromptCleared() {

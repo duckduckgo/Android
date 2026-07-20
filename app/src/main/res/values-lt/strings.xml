@@ -423,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Ieškoti „DuckDuckGo“</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Bendrinti atsiliepimą</string>
-    <string name="missingBrowserFeaturesTitleLong">Naršyklės funkcijų trūksta arba jos neaiškios</string>
-    <string name="missingBrowserFeaturesTitleShort">Naršyklės funkcijų problemos</string>
-    <string name="missingBrowserFeaturesSubtitle">Kokią naršymo funkciją galime pridėti arba patobulinti?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Naršymas pirmyn, atgal ir (arba) atnaujinimas</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Kortelių kūrimas ir tvarkymas</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklamų ir iššokančiųjų langų blokavimas</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Vaizdo įrašų peržiūra</string>
-    <string name="missingBrowserFeatureSubReasonImages">Paveikslėlių naudojimas</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Žymių kūrimas ir tvarkymas</string>
-    <string name="missingBrowserFeatureSubReasonOther">Nei vienas iš šių</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemos kraunantis svetainei</string>
-    <string name="websiteNotLoadingTitleShort">Problemos kraunantis svetainei</string>
-    <string name="websiteNotLoadingSubtitle">Kuri svetainė neveikia?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">„DuckDuckGo“ paieška nepakankamai gera</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemos paieškai naudojant „DuckDuckGo“</string>
-    <string name="searchNotGoodEnoughSubtitle">Kokią paieškos funkciją galime pridėti arba patobulinti?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programavimas / techninė paieška</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Išdėstymas turėtų būti panašesnis į „Google“</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Spartesnis krovimasis</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Paieška konkrečia kalba ar konkrečiame regione</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Geresnis automatinis užbaigimas</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Nei vienas iš šių</string>
-
-    <string name="needMoreCustomizationTitleLong">Nepakanka galimybių tinkinti programą</string>
-    <string name="needMoreCustomizationTitleShort">Tinkinimo problemos</string>
-    <string name="needMoreCustomizationSubtitle">Kokią tinkinimo parinktį galime pridėti ar pagerinti?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Pagrindinio ekrano konfigūracija</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Kaip rodomos kortelės</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Kaip atrodo programa</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Kurie duomenys yra išvalomi</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kada duomenys yra išvalomi</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kaip rodomos žymės</string>
-    <string name="needMoreCustomizationSubReasonOther">Nei vienas iš šių</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Programa veikia lėtai, genda ar stringa</string>
-    <string name="appIsSlowOrBuggyTitleShort">Veikimo problemos</string>
-    <string name="appIsSlowOrBuggySubtitle">Su kokia problema susiduriate?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Žiniatinklio puslapiai arba paieškos rezultatai įkeliami lėtai</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Programa stringa arba nustoja veikti</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Vaizdo įrašų arba medijos atkūrimo klaidos</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Nei vienas iš šių</string>
-
-    <string name="otherMainReasonTitleLong">Nei vienas iš šių</string>
-    <string name="otherMainReasonTitleShort">Kitos problemos</string>
-
-    <string name="openEndedInputHint">Nurodykite kuo konkrečiau</string>
-    <string name="submitFeedback">Pateikti</string>
-
-    <string name="tellUsHowToImprove">Papasakokite, ką galime patobulinti.</string>
-    <string name="thanksForTheFeedback">Dėkojame už atsiliepimą!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Kas jums kelia didžiausią susierzinimą?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Apgailestaujame</string>
-    <string name="feedbackShareDetails">Dalintis informacija</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Ar norėtumėte papasakoti išsamiau?</string>
-    <string name="whatHaveYouBeenEnjoying">Kas jums patiko?</string>
-    <string name="awesomeToHear">Nuostabu tai girdėti!</string>
-    <string name="shareTheLoveWithARating">Įvertinkite mus „Play Store“ parduotuvėje.</string>
-    <string name="rateTheApp">Įvertinkite programą</string>
-    <string name="declineFurtherFeedback">Ačiū, ne, aš baigiau</string>
-    <string name="whichBrokenSites">Kur susiduriate su šiomis problemomis?</string>
-    <string name="whichBrokenSitesHint">Kokioje svetainėje susidūrėte su problema?</string>
-    <string name="feedbackSpecificAsPossible">Nurodykite kuo konkrečiau</string>
-    <string name="feedbackInitialDisambiguationTitle">Pradėkime!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Kaip suskirstytumėte atsiliepimus į kategorijas?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Teigiamų atsiliepimų mygtukas</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Neigiamų atsiliepimų mygtukas</string>
-    <string name="feedbackIsImportantToUs">Jūsų anoniminiai atsiliepimai mums labai svarbūs.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nepavyko parodyti tinklalapio."</string>
     <string name="crashedWebViewErrorAction">"Įkelti iš naujo"</string>
@@ -864,7 +792,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
     <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Naudok „ChatGPT“ privačiai su integruotu „Duck.ai“.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuoti tikslinę reklamą ir slapukų iškylančiuosius langus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Rodyti „YouTube“ vaizdo įrašus be reklamos</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
@@ -927,7 +857,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Norite lengvos prieigos prie privačių DI pokalbių?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Ar norite adreso juostoje lengvai pasiekti privatų DI pokalbį?</string>
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
 
@@ -1053,7 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
     <string name="preOnboardingWelcomeDialogBody1">Ar nori spartesnės naršyklės, kurią valdai tu?</string>
     <string name="preOnboardingWelcomeDialogBody2">DI neprivalomas, o privatumo apsauga – visada įjungta.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d iš %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d iš %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kaip angliškai pasakyti „antis“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip ispaniškai pasakyti „antis“</string>
 
@@ -1099,6 +1029,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Patvirtinti</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Dėkojame už atsiliepimą!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Atidaryti „Fire“ skirtuke</string>

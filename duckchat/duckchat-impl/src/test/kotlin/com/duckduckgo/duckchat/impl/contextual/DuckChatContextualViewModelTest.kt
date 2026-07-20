@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -266,6 +267,61 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when prompt sent with explicit model reasoning tool and attachments then query contains them`() = runTest {
+        val images = JSONArray().apply { put("image-1") }
+        val files = JSONArray().apply { put("file-1") }
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(
+                prompt = "hello",
+                modelId = "gpt-5.2",
+                reasoningEffort = "high",
+                selectedTool = "web-search",
+                imagesJson = images,
+                filesJson = files,
+            )
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertEquals("high", query.getString("reasoningEffort"))
+            assertEquals("web-search", query.getJSONArray("toolChoice").getString(0))
+            assertEquals("image-1", query.getJSONArray("images").getString(0))
+            assertEquals("file-1", query.getJSONArray("files").getString(0))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when explicit model not provided then falls back to model manager selection`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("fallback-model")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(prompt = "hello", selectedTool = "web-search")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("fallback-model", query.getString("modelId"))
+            assertEquals("low", query.getString("reasoningEffort"))
+            assertEquals("web-search", query.getJSONArray("toolChoice").getString(0))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when native chat input flag enabled then view state reflects it`() = runTest {
+        assertFalse(testee.viewState.value.nativeChatInputEnabled)
+
+        (duckChat as FakeDuckChat).setNativeChatInputEnabled(true)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.nativeChatInputEnabled)
     }
 
     @Test
@@ -1019,6 +1075,67 @@ class DuckChatContextualViewModelTest {
         testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
 
         verify(duckChatPixels, never()).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when ask about page quick action clicked then focus input command emitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.commands.test {
+            testee.onQuickActionClicked("") // ASK_ABOUT_PAGE with valid context
+            assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent then attached page context is cleared from input`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"Page","url":"https://example.com","content":"text"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        testee.onPromptSent(prompt = "hello")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when prompt sent from input state then sheet state change hides keyboard`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onPromptSent(prompt = "hello")
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
+            assertTrue((command as DuckChatContextualViewModel.Command.ChangeSheetState).hideKeyboard)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent while already in chat then keyboard is not hidden`() = runTest {
+        val testee = buildViewModel()
+        testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onPromptSent(prompt = "second") // already in WEBVIEW
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
+            assertFalse((command as DuckChatContextualViewModel.Command.ChangeSheetState).hideKeyboard)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -2290,6 +2407,131 @@ class DuckChatContextualViewModelTest {
         assertEquals("current", testee.chatId.value)
     }
 
+    @Test
+    fun `when ask about tab clicked with valid context then showContext true and no prompt sent`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text...",
+                    "truncated": false,
+                    "fullContentLength": 1234
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutTabClicked()
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertTrue(testee.viewState.value.showContext)
+        }
+
+    @Test
+    fun `when ask about tab clicked without valid context then showContext stays false`() =
+        runTest {
+            testee.onSheetOpened("tab-1")
+            testee.updatedPageContext = ""
+
+            testee.onAskAboutTabClicked()
+
+            assertFalse(testee.viewState.value.showContext)
+        }
+
+    @Test
+    fun `when ask about tab clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text..."
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.onAskAboutTabClicked()
+
+            assertEquals(
+                DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+                testee.viewState.value.quickActionState,
+            )
+        }
+
+    @Test
+    fun `when ask about tab clicked with valid context then focus input command emitted`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text..."
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.commands.test {
+                testee.onAskAboutTabClicked()
+                assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when ask about page clicked with context then submits ask about page prompt with pageContext`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text...",
+                    "truncated": false,
+                    "fullContentLength": 1234
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+            testee.addPageContext()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutPageClicked()
+
+                val event = awaitItem()
+                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+                val params = event.params
+                val query = params.getJSONObject("query")
+                assertEquals(context.getString(R.string.duckChatContextualAskAboutPage), query.getString("prompt"))
+                val pageContext = params.getJSONObject("pageContext")
+                assertEquals("https://example.com", pageContext.getString("url"))
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when ask about page clicked without context then no prompt sent`() =
+        runTest {
+            testee.onSheetOpened("tab-1")
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutPageClicked()
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun fakeChat(id: String, title: String, lastEditMillis: Long): ChatHistoryItem =
         ChatHistoryItem(
             chatId = id,
@@ -2322,6 +2564,10 @@ class DuckChatContextualViewModelTest {
         private val automaticContextAttachment = MutableStateFlow(true)
         private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
         private val nativeChatInputEnabled = MutableStateFlow(false)
+
+        fun setNativeChatInputEnabled(enabled: Boolean) {
+            nativeChatInputEnabled.value = enabled
+        }
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit

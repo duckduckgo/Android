@@ -109,6 +109,8 @@ interface WebViewClientListener {
 
     fun closeAndSelectSourceTab()
 
+    fun closeAndReturnToSourceIfBlankTab()
+
     fun upgradedToHttps()
 
     fun surrogateDetected(surrogate: SurrogateResponse)

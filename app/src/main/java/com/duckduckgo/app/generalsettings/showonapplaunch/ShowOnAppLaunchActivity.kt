@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ShowOnAppLaunchScreenNoParams::class)
+@ContributeToActivityStarter(ShowOnAppLaunchScreenNoParams::class, screenName = "settingsAfterInactivity")
 class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private val viewModel: ShowOnAppLaunchViewModel by bindViewModel()

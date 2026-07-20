@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.emptyReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,6 +37,7 @@ interface AutofillAvailableInputTypesProvider {
     suspend fun getTypes(
         url: String?,
         reAuthenticationDetails: ReAuthenticationDetails = emptyReAuthenticationDetails(),
+        browserMode: BrowserMode,
     ): AvailableInputTypes
 
     data class AvailableInputTypes(
@@ -59,6 +61,7 @@ class RealAutofillAvailableInputTypesProvider @Inject constructor(
     override suspend fun getTypes(
         url: String?,
         reAuthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
     ): AvailableInputTypes {
         return withContext(dispatchers.io()) {
             val availableInputTypeCredentials = determineIfCredentialsAvailable(url)
@@ -71,7 +74,7 @@ class RealAutofillAvailableInputTypesProvider @Inject constructor(
 
             val credentialsAvailableOnThisPage = finalCredentials.username || finalCredentials.password
             val emailAvailable = determineIfEmailAvailable()
-            val importPromoAvailable = inBrowserPromo.canShowPromo(credentialsAvailableOnThisPage, url)
+            val importPromoAvailable = inBrowserPromo.canShowPromo(credentialsAvailableOnThisPage, url, browserMode)
 
             AvailableInputTypes(
                 username = finalCredentials.username,

@@ -180,38 +180,6 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenEnabledAndNotContingencyModeThenStatusIndicatorOn() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = false)
-
-        createViewModel().viewState.test {
-            assertTrue(expectMostRecentItem().isStatusIndicatorOn)
-        }
-    }
-
-    @Test
-    fun whenContingencyModeOnThenStatusIndicatorOff() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = true)
-
-        createViewModel().viewState.test {
-            val state = expectMostRecentItem()
-            assertTrue(state.isEnabled)
-            assertFalse(state.isStatusIndicatorOn)
-        }
-    }
-
-    @Test
-    fun whenDisabledThenStatusIndicatorOff() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
-        setToggles(uxImprovements = true, contingency = false)
-
-        createViewModel().viewState.test {
-            assertFalse(expectMostRecentItem().isStatusIndicatorOn)
-        }
-    }
-
-    @Test
     fun whenViewModelCreatedThenFiresSettingsOpenedPixels() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 

@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.sync
 
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -25,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -67,7 +69,7 @@ class DuckAiChatDeletionListenerImplTest {
         val backgroundTimestamp = 1111111111L
         whenever(mockDuckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(backgroundTimestamp)
         testee.onDuckAiChatsDeleted()
-        verify(mockDuckChatSyncRepository).recordDuckAiChatsDeleted(backgroundTimestamp)
+        verify(mockDuckChatSyncRepository).recordDuckAiChatsDeleted(eq(backgroundTimestamp), eq(BrowserMode.REGULAR))
     }
 
     @Test
@@ -76,6 +78,6 @@ class DuckAiChatDeletionListenerImplTest {
         whenever(mockDuckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(null)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
         testee.onDuckAiChatsDeleted()
-        verify(mockDuckChatSyncRepository).recordDuckAiChatsDeleted(currentTime)
+        verify(mockDuckChatSyncRepository).recordDuckAiChatsDeleted(eq(currentTime), eq(BrowserMode.REGULAR))
     }
 }

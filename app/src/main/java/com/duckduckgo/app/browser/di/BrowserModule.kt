@@ -79,7 +79,6 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
-import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -130,15 +129,6 @@ class BrowserModule {
             androidBrowserConfigFeature,
             serpSettingsFeature,
         )
-    }
-
-    @Provides
-    fun webViewLongPressHandler(
-        context: Context,
-        pixel: Pixel,
-        customTabDetector: CustomTabDetector,
-    ): LongPressHandler {
-        return WebViewLongPressHandler(context, pixel, customTabDetector)
     }
 
     @Provides

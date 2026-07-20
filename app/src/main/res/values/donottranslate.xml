@@ -92,8 +92,4 @@
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
-
-    <!-- After Inactivity: return-to-last-tab hatch setting -->
-    <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
-    <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
 </resources>

@@ -129,48 +129,56 @@ jobs:
           path: unit-tests-report-${{ matrix.di }}.zip
 
   lint:
-    name: Lint
+    name: ${{ matrix.di == 'AnvilDagger' && 'Lint' || format('Lint ({0})', matrix.di) }}
     needs: [check_changes]
-    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        di: [AnvilDagger, Metro]
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up JDK version
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Set up Go
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-go@v5
         with:
           go-version: '1.18.3'
 
       - name: Setup Gradle
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Lint
-        run: ./gradlew lint
+        if: needs.check_changes.outputs.should_run == 'true'
+        run: ./gradlew lint -Pddg.di=${{ matrix.di }}
 
       - name: Bundle the lint report
-        if: always()
-        run: find . -name lint-results\* | zip -@ -r lint-report.zip
+        if: always() && needs.check_changes.outputs.should_run == 'true'
+        run: find . -name lint-results\* | zip -@ -r lint-report-${{ matrix.di }}.zip
 
       - name: Upload the JVM lint report
-        if: always()
+        if: always() && needs.check_changes.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: lint-report
-          path: lint-report.zip
+          name: lint-report-${{ matrix.di }}
+          path: lint-report-${{ matrix.di }}.zip
 
   android_tests:
     needs: [check_changes]

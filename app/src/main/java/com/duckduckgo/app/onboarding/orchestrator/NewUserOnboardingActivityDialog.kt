@@ -36,6 +36,7 @@ sealed interface NewUserOnboardingActivityDialog {
         val showSplitOption: Boolean,
         val hideSetDefaultBrowserRow: Boolean,
         val hideAddWidgetRow: Boolean,
+        val hideAddressBarRow: Boolean,
         val isReinstallUser: Boolean,
     ) : NewUserOnboardingActivityDialog
 }

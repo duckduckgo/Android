@@ -26,6 +26,12 @@
         "description": "ETag for the remote config used when the pixel was sent.  Can be empty string.",
         "pattern": "^$|^[-0-9a-f]{32}$"
     },
+    "browserMode": {
+        "key": "browser_mode",
+        "type": "string",
+        "description": "Whether the user was in Fire Mode or Regular Mode when the pixel was sent",
+        "enum": ["regular", "fire"]
+    },
     "widePixelAppName": {
         "key": "app.name",
         "type": "string",
@@ -128,6 +134,12 @@
         "key": "free_trial",
         "type": "boolean",
         "description": "Whether the subscription purchase is a free trial"
+    },
+    "consentHeuristicEnabled": {
+        "key": "consentHeuristicEnabled",
+        "type": "string",
+        "description": "Heuristic action mode derived from user preference and feature flags.",
+        "enum": ["off", "tier1", "tier2", "reject"]
     },
     "pirCancellationReason": {
         "key": "feature.data.ext.cancellation_reason",

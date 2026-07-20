@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
     <string name="sync_share_title">Споделяне с…</string>
     <string name="sync_pdf_title">Код за възстановяване на синхронизирането</string>
-    <string name="sync_pdf_description">Кодът за възстановяване Ви позволява да синхронизирате отметките на няколко устройства и да възстановявате синхронизираните данни, ако загубите достъп до устройство.</string>
+    <string name="sync_pdf_description">С кода за възстановяване можете да синхронизирате паролите, данните за автоматично попълване и чатовете на Duck.ai на няколко устройства, както и да възстановите синхронизираните данни, ако загубите достъп до някое от устройствата.</string>
     <string name="sync_code_box_title">Съхранявайте тази информация на сигурно място.</string>
-    <string name="sync_instructions_title">Как става това?</string>
-    <string name="sync_instructions_step1">Отворете DuckDuckGo на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
-    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на DuckDuckGo.</string>
+    <string name="sync_instructions_title">Как работи този код?</string>
+    <string name="sync_instructions_step1">Отворете DuckDuckGo на устройството, което искате да синхронизирате, и отидете на Sync &amp; Backup в Настройки.</string>
+    <string name="sync_instructions_step2">Изберете „Синхронизиране с друго устройство“ и сканирайте QR кода или въведете текстовия код.</string>
     <string name="sync_instructions_step3">Синхронизацията ще бъде активирана и отново ще имате достъп до всички свои данни.</string>
+    <string name="sync_pdf_retention_notice">Ако не използвате браузър DuckDuckGo с активирана функция Sync &amp; Backup повече от 18 месеца, данните Ви ще бъдат изтрити от сървъра и няма да могат да бъдат възстановени.</string>
     <string name="remove_device_dialog_title">Премахване на устройство?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>
     <string name="remove_device_dialog_primary_button">Премахване</string>

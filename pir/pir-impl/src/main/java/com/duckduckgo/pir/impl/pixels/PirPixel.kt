@@ -166,6 +166,11 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED(
+        baseName = "m_dbp_optoutjob_reappeared",
+        type = Count,
+    ),
+
     PIR_ENGAGEMENT_DAU(
         baseName = "m_dbp_engagement_dau",
         type = Count,

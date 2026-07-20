@@ -16,6 +16,8 @@
 
 package com.duckduckgo.browser.api.autocomplete
 
+import com.duckduckgo.browsermode.api.BrowserMode
+
 interface AutoCompleteFactory {
-    fun create(config: AutoComplete.Config = AutoComplete.Config()): AutoComplete
+    fun create(config: AutoComplete.Config = AutoComplete.Config(), browserMode: BrowserMode): AutoComplete
 }

@@ -37,6 +37,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -234,6 +235,7 @@ class AutomaticDataClearer @Inject constructor(
             dataClearingWideEvent.start(
                 entryPoint = DataClearingWideEvent.EntryPoint.AUTO_FOREGROUND,
                 clearOptions = clearOptions,
+                browserMode = BrowserMode.REGULAR,
             )
             val shouldRestart: Boolean
             try {

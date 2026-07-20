@@ -79,6 +79,9 @@ class DataClearingTest {
     private lateinit var mockClearDataAction: ClearDataAction
 
     @Mock
+    private lateinit var mockUnsentForgetAllPixelStore: UnsentForgetAllPixelStore
+
+    @Mock
     private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Mock
@@ -149,6 +152,7 @@ class DataClearingTest {
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
             clearDataAction = mockClearDataAction,
+            unsentForgetAllPixelStore = mockUnsentForgetAllPixelStore,
             settingsDataStore = mockSettingsDataStore,
             dataClearerTimeKeeper = mockTimeKeeper,
             duckAiFeatureState = mockDuckAiFeatureState,
@@ -1180,6 +1184,36 @@ class DataClearingTest {
     }
 
     @Test
+    fun `fire burn enqueues the fire executed pixel count when fire mode is available`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        verify(mockUnsentForgetAllPixelStore).incrementCount(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `fire burn does not enqueue the fire executed pixel count when fire mode is unavailable`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        verify(mockUnsentForgetAllPixelStore, never()).incrementCount(any())
+    }
+
+    @Test
+    fun `regular burn does not enqueue the fire executed pixel count`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockUnsentForgetAllPixelStore, never()).incrementCount(any())
+    }
+
+    @Test
     fun `regular burn with fire unavailable does not dispatch any fire set`() = runTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
@@ -1236,7 +1270,7 @@ class DataClearingTest {
 
         verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
-        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+        verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
     }
 
     @Test
@@ -1247,7 +1281,7 @@ class DataClearingTest {
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
 
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
-        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+        verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
     }
 
     @Test

@@ -40,6 +40,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -169,6 +170,75 @@ class LaunchViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
+    }
+
+    @Test
+    fun whenShowOnboardingOrHomeAndOrchestratorStartsWithBrowserActivityHostThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.BrowserActivity))),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.showOnboardingOrHome()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
+    fun whenShowOnboardingOrHomeAndOrchestratorStartsWithUnsupportedHostThenThrows() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(
+                id = "test_plan",
+                steps = listOf(stepHostedIn(LinearOnboardingHost.SubscriptionOnboardingActivity)),
+            ),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+
+        val exception = runCatching { testee.showOnboardingOrHome() }.exceptionOrNull()
+
+        assertTrue(exception is IllegalArgumentException)
+    }
+
+    @Test
+    fun whenShowOnboardingOrHomeAndNotNewUserThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.showOnboardingOrHome()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
     }
 
     @Test

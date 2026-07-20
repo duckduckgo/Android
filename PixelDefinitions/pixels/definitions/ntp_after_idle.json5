@@ -252,14 +252,14 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_ntp_after_idle_escape_hatch_burn_with_confirmation_tapped_daily": {
         "description": "(Daily Pixel) User tapped Burn tab from the new tab return hatch menu (the confirmation FireDialog is shown next)",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "browserMode"]
     },
     "m_ntp_after_idle_escape_hatch_after_inactivity_tapped": {
         "description": "User tapped After inactivity from the new tab return hatch menu",
@@ -308,6 +308,78 @@
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+
+    // Daily state-snapshot pixels: one per active user per day reflecting the current setting
+    "m_ntp_after_idle_return_to_last_tab_enabled_daily": {
+        "description": "(Daily Pixel) The Return To Last Tab shortcut is currently enabled",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_return_to_last_tab_disabled_daily": {
+        "description": "(Daily Pixel) The Return To Last Tab shortcut is currently disabled",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_always_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to Always (0s)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_60_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 60 seconds (1 minute)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_300_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 300 seconds (5 minutes)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_600_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 600 seconds (10 minutes)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_1800_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 1800 seconds (30 minutes)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_3600_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 3600 seconds (1 hour)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_43200_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 43200 seconds (12 hours)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_idle_timeout_86400_daily": {
+        "description": "(Daily Pixel) The idle timeout is currently set to 86400 seconds (24 hours)",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     }
 }

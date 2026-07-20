@@ -19,9 +19,8 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,10 +28,10 @@ import dagger.SingleInstanceIn
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@SingleInstanceIn(ActivityScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealEscapeHatchTargetResolver @Inject constructor(
-    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val browserMode: BrowserMode,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val fireModeAvailability: FireModeAvailability,
 ) : EscapeHatchTargetResolver {
@@ -40,7 +39,7 @@ class RealEscapeHatchTargetResolver @Inject constructor(
     override suspend fun resolve(): EscapeHatchTarget? {
         // No hatch in Fire mode — also defends against a stale process-global isAfterIdleReturn that
         // was set in Regular before the user switched to Fire.
-        if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) return null
+        if (browserMode == BrowserMode.FIRE) return null
 
         val candidateModes = if (fireModeAvailability.isAvailable()) {
             listOf(BrowserMode.REGULAR, BrowserMode.FIRE)

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_AICHAT_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED
@@ -28,6 +29,7 @@ import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED
 import com.duckduckgo.app.pixels.AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED
 import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT
 import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY
+import com.duckduckgo.app.pixels.AppPixelName.BROWSER_MODE_SWITCHED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED
@@ -69,6 +71,7 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED.pixelName to PixelParameter.removeAtb(),
             ADDRESS_BAR_WEBSITE_CANCELLED.pixelName to PixelParameter.removeAtb(),
             ADDRESS_BAR_SERP_CANCELLED.pixelName to PixelParameter.removeAtb(),
+            ADDRESS_BAR_AICHAT_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_NEW_TAB_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_WEBSITE_CLICKED.pixelName to PixelParameter.removeAtb(),
             KEYBOARD_GO_SERP_CLICKED.pixelName to PixelParameter.removeAtb(),
@@ -93,6 +96,7 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED.pixelName to PixelParameter.removeAtb(),
             AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT.pixelName to PixelParameter.removeAtb(),
             AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY.pixelName to PixelParameter.removeAtb(),
+            BROWSER_MODE_SWITCHED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

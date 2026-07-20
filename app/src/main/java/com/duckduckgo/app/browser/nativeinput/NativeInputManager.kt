@@ -28,6 +28,7 @@ import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
+import androidx.core.view.doOnAttach
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -124,6 +125,9 @@ interface NativeInputManager {
      */
     fun isNativeInputActive(): Boolean
 
+    /** True when the native input widget is currently attached (top or bottom omnibar). */
+    fun isNativeInputShown(): Boolean
+
     /** True when the widget is shown with the chat tab selected. */
     fun isChatTabSelected(): Boolean
 
@@ -194,11 +198,22 @@ class RealNativeInputManager @Inject constructor(
     private var widgetRoot: View? = null
     private var navBarRoot: View? = null
     private var navBarShown: Boolean? = null
+
+    // The nav bar is shown once when the browser input opens empty, then latched off the first time the
+    // user types. Latched stays off for the session — clearing text or toggling the keyboard won't bring it back.
+    private var navBarInteractionLatched: Boolean = false
     private var navBarHeightPx: Int = 0
     private var navBarIsBottom: Boolean = false
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+
+    /** True while an enter morph from [attachWidget] still owns [NativeInputLayoutCoordinator]'s animating flag. */
+    private var pendingEnterOwnsAnimating = false
+
+    // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
+    // on detach rather than re-showing unconditionally (which would show it with no favorites present).
+    private var savedTopNtpStrokeVisibility: Int? = null
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
@@ -218,7 +233,14 @@ class RealNativeInputManager @Inject constructor(
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
             .onEach { isEnabled ->
-                if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
+                if (isNativeInputFieldEnabled && !isEnabled) {
+                    // Instant teardown before clearing the flag. Settings toggles often fire while the
+                    // tab is paused, so an animated exit's waitForLayout may never run; and once the
+                    // flag is false, hideNativeInput used to no-op and leave UTI chrome / a missing
+                    // address field on return to NTP.
+                    hideNativeInput(animate = false)
+                    onDisabled()
+                }
                 isNativeInputFieldEnabled = isEnabled
             }
             .launchIn(lifecycleOwner.lifecycleScope)
@@ -264,6 +286,13 @@ class RealNativeInputManager @Inject constructor(
         // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
         return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
+    }
+
+    override fun isNativeInputShown(): Boolean {
+        if (!::rootView.isInitialized) return false
+        return widgetRoot != null ||
+            rootView.findViewById<View?>(R.id.inputModeTopRoot) != null ||
+            rootView.findViewById<View?>(R.id.inputModeBottomRoot) != null
     }
 
     override fun isChatTabSelected(): Boolean {
@@ -313,11 +342,14 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun hideNativeInput(animate: Boolean, isNavigation: Boolean): Boolean {
-        if (!isNativeInputFieldEnabled) return false
+        if (!::rootView.isInitialized) return false
 
         val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
             ?: rootView.findViewById(R.id.inputModeBottomRoot)
             ?: return false
+
+        // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
+        // off (and after a paused animated hide left the widget attached).
 
         if (isNavigation) {
             widgetFrom(widgetView)?.let { widget ->
@@ -341,9 +373,23 @@ class RealNativeInputManager @Inject constructor(
             lastCallbacks?.restoreOmnibarAutocomplete?.invoke(omnibarController.getText())
         }
 
+        // Bottom omnibar: slide the nav bar out with the close (visual-only — exit owns reflow /
+        // isWidgetAnimating, so no begin/endNavBarSlide). Top omnibar: leave the bar in place for
+        // the exit morph so the card morphs back to the omnibar while the buttons stay put
+        // (removed with the widget in removeWidget) — sliding it would steal that animation.
+        if (navBarShown == true && navBarIsBottom) {
+            slideNavBarOutWithClose(animate = animate)
+        }
+
         if (!animate) {
             animator.cancelAnimation()
             isExiting = false
+            // Match animated exit: suspend LayoutTransition before resetting offsets so CHANGING
+            // can't leave a leftover NTP gap (e.g. live switch to Search-only while UTI is open on
+            // bottom omnibar with a nav-bar top inset).
+            layoutCoordinator.suspendContentReflow()
+            layoutCoordinator.updateNavBarInset(0)
+            layoutCoordinator.resetContentOffsetToBase()
             omnibarController.restore()
             omnibarController.show()
             removeWidget()
@@ -357,15 +403,28 @@ class RealNativeInputManager @Inject constructor(
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
+            // Bottom: nav bar may already be sliding out on its own timeline. Top: bar stays put —
+            // this exit only morphs the input card back to the omnibar. Suspend the content-reflow
+            // transition so the per-frame content offset driven by onWidgetAnimationFrame is instant;
+            // otherwise it animates on the transition's own clock and the reset-to-base races, leaving
+            // stale top padding.
+            layoutCoordinator.suspendContentReflow()
             animator.animateExit(
                 widgetCard = card,
                 widgetView = widgetView,
                 omnibarCard = omnibarCard,
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
-                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
-                onComplete = {
+                onCancel = {
                     layoutCoordinator.setWidgetAnimating(false)
+                    layoutCoordinator.resumeContentReflow()
+                },
+                onComplete = {
+                    // Reset content under the still-suspended reflow and keep isWidgetAnimating true
+                    // until removeWidget's detach: clearing the animating flag here lets layout
+                    // listeners re-apply the exit-end inset during the fade and race the detach reset,
+                    // which is what left intermittent leftover space under the omnibar.
+                    layoutCoordinator.resetContentOffsetToBase()
                     isExiting = false
                     onHide()
                 },
@@ -417,6 +476,8 @@ class RealNativeInputManager @Inject constructor(
         } else {
             onKeyboardHidden(widget)
         }
+        // Nav bar visibility is decoupled from the keyboard: it's decided at open (empty → shown) and only
+        // hidden on the first keystroke. Toggling the keyboard neither shows nor hides it.
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
@@ -511,15 +572,15 @@ class RealNativeInputManager @Inject constructor(
         }
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
-        // The nav bar belongs to browser input only. Duck.ai (and, via a separate manager, contextual)
-        // never show it. Gated behind the nativeInputNavBar flag and Search & Duck.ai mode — search-only
-        // users, or users without the flag, never get it.
-        val navBarView = if (shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability)) {
-            createNavBarView(layoutInflater)
-        } else {
-            null
-        }
         val prefillText = query.ifEmpty { omnibarController.getText() }
+        // The nav bar is a first-focus affordance for the empty browser input. It belongs to browser input
+        // only (Duck.ai / contextual never show it), is gated behind the nativeInputNavBar flag and the
+        // Search & Duck.ai mode, and is only created when the field opens empty — focusing a site (URL
+        // prefilled) never gets one. Fresh session, so the interaction latch resets.
+        navBarInteractionLatched = false
+        val createNavBar = shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
+            prefillText.isEmpty()
+        val navBarView = if (createNavBar) createNavBarView(layoutInflater) else null
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (navBarView != null) bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
@@ -544,10 +605,19 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, navBarView, isBottom, tabId)
+        // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
+        // morph can run from the omnibar while the buttons appear without animating — a concurrent
+        // top slide fights that morph (and was only needed for bottom chrome).
         applyNavBarVisibility(
-            show = navBarShouldBeVisible(isInputEmpty = prefillText.isEmpty()),
-            animate = false,
+            show = navBarShouldBeVisible(),
+            animate = isBottom,
+            // Enter morph (when started) owns isWidgetAnimating until it completes; clearing it when
+            // an open slide finishes first would re-enable layout listeners mid-enter.
+            clearAnimatingOnComplete = !pendingEnterOwnsAnimating,
+            // Never ride the widget during open — bottom never does; top must stay planted for morph.
+            moveWidgetWithBar = false,
         )
+        syncBackArrowToNavBar()
         lifecycleOwner.lifecycleScope.launch {
             if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
         }
@@ -576,6 +646,10 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
+            // Fires on every keystroke regardless of the selected tab (search text routes to
+            // onSearchTextChanged, chat text to onChatTextChanged), so this is the tab-agnostic signal
+            // that latches the nav bar off on the user's first input.
+            onInputTextEmptyChanged = { isEmpty -> if (!isEmpty) onNavBarInputInteraction() },
             onSearchSubmitted = { query ->
                 nativeInputEventListener.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
@@ -630,12 +704,6 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
-            onInputTextEmptyChanged = { isEmpty ->
-                applyNavBarVisibility(
-                    show = navBarShouldBeVisible(isInputEmpty = isEmpty),
-                    animate = true,
-                )
-            },
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
@@ -652,11 +720,10 @@ class RealNativeInputManager @Inject constructor(
             callbacks.onClearAutocomplete()
             previousOnChatSelected?.invoke(animate)
         }
-        widget.onClearTextTapped = {
-            if (!widget.isChatTabSelected()) {
-                callbacks.onClearAutocomplete()
-            }
-        }
+        // Clearing the field must not dismiss the focused view: onClearAutocomplete re-triggers
+        // autocomplete with hasFocus=false and hides the focused view, so on a browser tab it would
+        // wipe the favourites the empty+focused state should show. The clear's own text change already
+        // re-renders the correct empty state (favourites), so no extra handling is needed here.
     }
 
     private fun showNtp() {
@@ -688,6 +755,7 @@ class RealNativeInputManager @Inject constructor(
             navBarRoot = null
         }
         navBarShown = null
+        pendingEnterOwnsAnimating = false
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         navBarTabCountObserver = null
         navBarTabCountLiveData = null
@@ -696,6 +764,10 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        savedTopNtpStrokeVisibility?.let { vis ->
+            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.visibility = vis
+            savedTopNtpStrokeVisibility = null
+        }
         duckAiToolbarHidden = false
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
@@ -886,47 +958,118 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    /** Current on-screen visibility the nav bar should have, combining the create-time gate with the
-     *  empty-field rule so a live mode/flag change (e.g. Search & Duck.ai → Search-only) hides it. */
-    private fun navBarShouldBeVisible(isInputEmpty: Boolean): Boolean =
+    /** Current on-screen visibility the nav bar should have: still browser + flag + Search & Duck.ai (so a
+     *  live mode/flag change hides it) and not yet latched off by the user's first keystroke. */
+    private fun navBarShouldBeVisible(): Boolean =
         shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
-            shouldShowNavBar(isBrowserContext = navBarRoot != null, isInputEmpty = isInputEmpty)
+            shouldShowNavBar(isBrowserContext = navBarRoot != null, interactionLatched = navBarInteractionLatched)
 
     /** Re-applies the nav bar visibility for the current input state; no-op when no bar is attached. */
     private fun refreshNavBarVisibility() {
         if (navBarRoot == null) return
-        applyNavBarVisibility(show = navBarShouldBeVisible(isInputEmpty = currentInputEmpty()), animate = true)
+        applyNavBarVisibility(show = navBarShouldBeVisible(), animate = true)
+        syncBackArrowToNavBar()
     }
 
-    private fun currentInputEmpty(): Boolean {
-        val widget = widgetRoot?.let { widgetFrom(it) } ?: return true
-        return widget.text.isNullOrEmpty()
+    /** The toggle-row back arrow is the inverse of the nav bar: it fills in as the back affordance only
+     *  while the nav bar is hidden, so exactly one back arrow shows at a time. */
+    private fun syncBackArrowToNavBar() {
+        widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
+    }
+
+    /** The user typed: latch the nav bar off for the rest of this input session and slide it out. */
+    private fun onNavBarInputInteraction() {
+        if (navBarInteractionLatched || navBarRoot == null) return
+        navBarInteractionLatched = true
+        refreshNavBarVisibility()
     }
 
     /**
      * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
-     * is already in the target state. On change it slides the bar (and, in top mode, the widget) and
-     * reflows content to clear or reclaim the bar strip.
+     * is already in the target state. On change it slides the bar and reflows content to clear or
+     * reclaim the bar strip. In top mode, mid-session toggles also translate the widget with the bar
+     * unless [moveWidgetWithBar] is false (enter/exit morph — card must stay put relative to omnibar).
+     *
+     * @param clearAnimatingOnComplete when true (default), clears [NativeInputLayoutCoordinator]'s
+     * animating flag after the slide — correct for mid-session toggles. Pass false when the slide
+     * runs alongside enter/exit, which already owns that flag.
+     * @param moveWidgetWithBar top mid-session only. Bottom mode never moves the widget with the bar.
      */
-    private fun applyNavBarVisibility(show: Boolean, animate: Boolean) {
+    private fun applyNavBarVisibility(
+        show: Boolean,
+        animate: Boolean,
+        clearAnimatingOnComplete: Boolean = true,
+        moveWidgetWithBar: Boolean = !navBarIsBottom,
+    ) {
         val navBar = navBarRoot ?: return
         val widget = widgetRoot ?: return
         if (!shouldAnimateNavBar(navBarShown, show)) return
         navBarShown = show
         val navBarInset = if (show) navBarHeightPx else 0
+        if (!animate) {
+            animator.animateNavBarVisibility(
+                navBarView = navBar,
+                widgetView = widget,
+                isBottom = navBarIsBottom,
+                heightPx = navBarHeightPx,
+                show = show,
+                animate = false,
+                moveWidgetWithBar = moveWidgetWithBar,
+                onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
+            )
+            return
+        }
+        // When the open slide shares the session with enter, skip begin/endNavBarSlide: enter already
+        // owns isWidgetAnimating, and endNavBarSlide's resume would clear the LayoutTransition that
+        // onEnterComplete just assigned. Mid-session toggles (default) take full ownership.
+        if (clearAnimatingOnComplete) {
+            layoutCoordinator.beginNavBarSlide()
+        }
         animator.animateNavBarVisibility(
             navBarView = navBar,
             widgetView = widget,
             isBottom = navBarIsBottom,
             heightPx = navBarHeightPx,
             show = show,
-            animate = animate,
-            // Re-apply after the slide settles so the top-mode "show" case (widget rides down to its
-            // final position) recomputes the offset from where the widget actually lands.
-            onComplete = { layoutCoordinator.updateNavBarInset(navBarInset) },
+            animate = true,
+            moveWidgetWithBar = moveWidgetWithBar,
+            onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
+            onComplete = {
+                layoutCoordinator.updateNavBarInset(navBarInset)
+                if (clearAnimatingOnComplete) {
+                    layoutCoordinator.endNavBarSlide()
+                    layoutCoordinator.setWidgetAnimating(false)
+                }
+            },
         )
-        // Apply immediately too, so the inset tracks the toggle without waiting for the animation.
-        layoutCoordinator.updateNavBarInset(navBarInset)
+    }
+
+    /**
+     * Hides the nav bar as UTI closes. Unlike [applyNavBarVisibility], this does not take ownership of
+     * content reflow — the exit morph already suspends it and resets padding on complete. Calling
+     * [NativeInputLayoutCoordinator.endNavBarSlide] here would resume reflow mid-exit.
+     *
+     * Never moves the widget with the bar: exit morph needs the card planted so it can morph back to
+     * the omnibar while the buttons slide away alone. Still drives [NativeInputLayoutCoordinator.updateNavBarInset]
+     * each frame so NTP/browser content tracks the sliding bar instead of keeping the full inset until
+     * exit's reset-to-base.
+     */
+    private fun slideNavBarOutWithClose(animate: Boolean) {
+        val navBar = navBarRoot ?: return
+        val widget = widgetRoot ?: return
+        if (!shouldAnimateNavBar(navBarShown, targetShown = false)) return
+        navBarShown = false
+        animator.animateNavBarVisibility(
+            navBarView = navBar,
+            widgetView = widget,
+            isBottom = navBarIsBottom,
+            heightPx = navBarHeightPx,
+            show = false,
+            animate = animate,
+            moveWidgetWithBar = false,
+            onFrame = { onScreenPx -> layoutCoordinator.updateNavBarInset(onScreenPx) },
+            onComplete = { layoutCoordinator.updateNavBarInset(0) },
+        )
     }
 
     private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
@@ -936,13 +1079,21 @@ class RealNativeInputManager @Inject constructor(
         this.navBarIsBottom = isBottom
         if (navBarView != null) {
             rootView.addView(navBarView, layoutCoordinator.buildNavBarLayoutParams(navBarHeightPx))
+            // Start off-screen so the first apply can slide the bar in (or snap it) instead of
+            // flashing it at rest for a frame. -height matches animateNavBarVisibility's hiddenY.
+            navBarView.translationY = -navBarHeightPx.toFloat()
             // Bottom omnibar only: the autocomplete list overlaps the top strip and would draw over the
-            // bar (e.g. the Duck.ai tab's suggestions), so float it above. Top omnibar has no such overlap,
-            // and the elevation shadow there would tint the bar's background so it no longer matches the
-            // content — leave it flat.
-            if (isBottom) navBarView.translationZ = WIDGET_ELEVATION_DP.toPx()
+            // bar (e.g. the Duck.ai tab's suggestions), so float it above via translationZ. Suppress the
+            // shadow the raised Z would otherwise cast, we only want the draw order, not the elevation.
+            // Top omnibar has no such overlap, leave it flat.
+            if (isBottom) {
+                navBarView.translationZ = WIDGET_ELEVATION_DP.toPx()
+                suppressShadow(navBarView)
+            }
         }
         // Top mode offsets the widget below the nav bar so it isn't overlapped; bottom mode is unaffected.
+        // Do not translate the widget off-screen with the bar: enter morph needs it planted so the card
+        // can grow from the omnibar while only the bar (buttons) slides in.
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom, topInsetPx = navBarHeightPx))
         widgetRoot = widgetView
         navBarRoot = navBarView
@@ -954,10 +1105,14 @@ class RealNativeInputManager @Inject constructor(
 
         applyWindowChrome(widgetView, isBottom)
 
-        if (!startEnterAnimation(widgetView, isBottom)) {
+        val enterStarted = startEnterAnimation(widgetView, isBottom)
+        if (!enterStarted) {
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+        // Stash so showNativeInput can avoid clearing isWidgetAnimating when the open slide
+        // finishes before the enter morph.
+        pendingEnterOwnsAnimating = enterStarted
     }
 
     override fun setInteractionLock(lock: InteractionLock) {
@@ -986,6 +1141,13 @@ class RealNativeInputManager @Inject constructor(
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
+            // The top outline strokes separate a top omnibar from content; with the input's nav bar at
+            // the top they just draw a hairline under the bar. Hide them, restored on close.
+            rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.gone()
+            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
+                if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
+                it.gone()
+            }
             if (omnibarController.isBrowserMode()) {
                 widgetView.setBackgroundColor(
                     widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
@@ -1024,7 +1186,16 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            // Once the morph has the omnibar's screen position, hide it immediately when a nav bar
+            // is replacing the chrome — otherwise the omnibar sits on top of the bar for the whole
+            // enter and pops away at the end (the flicker).
+            onStart = {
+                if (navBarRoot != null) {
+                    omnibarController.hide()
+                }
+            },
             onCancel = {
+                pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
                     widget.endEnterAnimationPreview()
@@ -1034,6 +1205,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onComplete = {
+                pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
             },
@@ -1044,10 +1216,24 @@ class RealNativeInputManager @Inject constructor(
     private fun onEnterComplete(widgetView: View) {
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
-        // Skip the IME-raising work if the widget has been detached before the animation
-        // finished (e.g. fragment-manager transient detach during a tab switch). Otherwise
-        // focusInput would raise the keyboard on whatever tab is now in front.
-        if (!widgetView.isAttachedToWindow) return
+        if (widgetView.isAttachedToWindow) {
+            completeEnter(widgetView)
+            return
+        }
+        // The enter finished while the widget was transiently detached — e.g. the ViewPager re-attaches
+        // fragments when a new tab is created. Raising the IME now could target whatever tab is in front,
+        // so defer the focus until this widget re-attaches. Hide the omnibar immediately so the tab can't
+        // settle with both the omnibar and the widget visible, and finish focus on re-attach (guarded so a
+        // since-replaced widget is a no-op).
+        omnibarController.hide()
+        widgetView.doOnAttach {
+            if (widgetRoot === widgetView && !omnibarController.isDuckAiMode()) {
+                completeEnter(widgetView)
+            }
+        }
+    }
+
+    private fun completeEnter(widgetView: View) {
         omnibarController.hide()
         widgetFrom(widgetView)?.apply {
             focusInput(rootView.context as? Activity)
@@ -1230,22 +1416,24 @@ internal fun computeVoiceButtonAvailability(
  * Whether to create the nav bar for this input session. It's a browser-input affordance gated behind the
  * [nativeInputNavBar][com.duckduckgo.duckchat.impl.feature.DuckChatFeature.nativeInputNavBar] flag and the
  * Search & Duck.ai input mode: search-only users, Duck.ai/contextual input, or a disabled flag never get it.
- * Once created, per-state visibility is decided by [shouldShowNavBar].
+ * The caller additionally only creates it when the field opens empty (a first-focus affordance), so focusing
+ * a site with a prefilled URL never gets one. Once created, on-screen visibility is decided by [shouldShowNavBar].
  */
 internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, inputMode: NativeInputState.InputMode): Boolean =
     featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
 /**
- * The persistent input-mode nav bar is shown only for browser input and only while the input field
- * is empty (whitespace counts as text). Duck.ai and contextual input never show it.
+ * Whether the input-mode nav bar should currently be on screen. It's shown for a browser-input session that
+ * opened empty and stays shown until the user's first keystroke latches it off — the keyboard state does not
+ * affect it, and once latched clearing the text won't bring it back. Duck.ai and contextual input never show it.
  */
-internal fun shouldShowNavBar(isBrowserContext: Boolean, isInputEmpty: Boolean): Boolean =
-    isBrowserContext && isInputEmpty
+internal fun shouldShowNavBar(isBrowserContext: Boolean, interactionLatched: Boolean): Boolean =
+    isBrowserContext && !interactionLatched
 
 /**
  * Whether a visibility change is needed. [currentShown] is null before the first apply, which always
- * applies (snaps to the resting state); otherwise apply only when the target differs — this makes
- * repeated same-state callbacks (e.g. the prefill-driven emptiness callback) no-ops.
+ * applies; otherwise apply only when the target differs — this makes repeated same-state callbacks
+ * (e.g. the prefill-driven emptiness callback) no-ops.
  */
 internal fun shouldAnimateNavBar(currentShown: Boolean?, targetShown: Boolean): Boolean =
     currentShown != targetShown

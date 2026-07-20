@@ -30,7 +30,7 @@ import javax.inject.Inject
  */
 interface FireTabsPromos {
     companion object {
-        const val FIRE_TABS_PROMO_MESSAGE_ID = "fire_tabs_promo"
+        const val FIRE_TABS_PROMO_MESSAGE_ID = "android_fire_tabs_promo"
     }
 
     /** True if the tab-switcher banner hasn't been shown/dismissed yet (show-once). */

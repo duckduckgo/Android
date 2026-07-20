@@ -242,18 +242,19 @@ class SyncActivityViewModel @Inject constructor(
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
-        data class AskEditDevice(val device: ConnectedDevice) : Command()
+        data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
         ) : Command()
 
         data object ShowDeviceUnsupported : Command()
-        data object RequestSetupAuthentication : Command()
+        data class RequestSetupAuthentication(val forSyncThisDevice: Boolean) : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
         data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
+        data object SyncThisDeviceCanceled : Command()
     }
 
     enum class OriginalFlow {
@@ -286,6 +287,7 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
             requiresSetupAuthentication(
+                forSyncThisDevice = true,
                 onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
             ) {
                 if (syncAutoRestore.canRestore()) {
@@ -485,9 +487,16 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onEditDeviceClicked(device: ConnectedDevice) {
+    fun onEditDeviceClicked(device: ConnectedDevice, requireAuth: Boolean) {
         viewModelScope.launch {
-            command.send(AskEditDevice(device))
+            val askEditCommand = AskEditDevice(device, requireAuthentication = requireAuth)
+            if (requireAuth) {
+                requiresSetupAuthentication {
+                    command.send(askEditCommand)
+                }
+            } else {
+                command.send(askEditCommand)
+            }
         }
     }
 
@@ -551,6 +560,12 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onSyncThisDeviceCanceled() {
+        viewModelScope.launch {
+            command.send(Command.SyncThisDeviceCanceled)
+        }
+    }
+
     private fun showAccountDetailsIfNeeded() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
@@ -573,11 +588,15 @@ class SyncActivityViewModel @Inject constructor(
         newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
     )
 
-    private suspend fun requiresSetupAuthentication(onDeviceAuthNotEnrolled: suspend() -> Unit = {}, action: suspend () -> Unit) {
+    private suspend fun requiresSetupAuthentication(
+        forSyncThisDevice: Boolean = false,
+        onDeviceAuthNotEnrolled: suspend () -> Unit = {},
+        action: suspend () -> Unit,
+    ) {
         val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
         if (hasValidDeviceAuthentication.not() && deviceAuthenticator.isAuthenticationRequired()) {
             onDeviceAuthNotEnrolled()
-            command.send(RequestSetupAuthentication)
+            command.send(RequestSetupAuthentication(forSyncThisDevice))
         } else {
             action()
         }

@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minuten</string>
     <string name="afterInactivityTimeout1Hour">1 uur</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d uur</string>
+    <string name="returnToLastTabSettingTitle">Terug naar laatste tabblad</string>
+    <string name="returnToLastTabSettingSubtitle">Een link naar je laatste tabblad tonen op de pagina Nieuw tabblad wanneer je de app opnieuw opent</string>
 </resources>

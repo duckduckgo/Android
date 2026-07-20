@@ -232,6 +232,31 @@ class NewUserOnboardingPlanProviderTest {
                 inputScreenSelected = true,
             ),
         )
+        verify(duckChat, never()).setInputScreenUserSetting(true)
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when custom ai path and quick setup confirmed with ai then forces input screen user setting on`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
+        // Skipping Custom AI onboarding via quick setup must force the input screen user setting on.
+        verify(duckChat).setInputScreenUserSetting(true)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_QUICK_SETUP,
+            OnboardingPixelAction.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = true,
+            ),
+        )
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
 
@@ -814,7 +839,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -933,7 +958,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -965,7 +990,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
         assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
         orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
-        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked())
+        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     // endregion

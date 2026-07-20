@@ -47,15 +47,6 @@ class RealVoiceSearchRepositoryTest {
     }
 
     @Test
-    fun whenPermissionDeclinedForeverThenGetHasPermissionDeclinedForeverShouldBeTrue() {
-        assertFalse(testee.getHasPermissionDeclinedForever())
-
-        testee.declinePermissionForever()
-
-        assertTrue(testee.getHasPermissionDeclinedForever())
-    }
-
-    @Test
     fun whenAvailabilityIsLoggedThengetHasLoggedAvailabilityShouldBeTrue() {
         assertFalse(testee.getHasLoggedAvailability())
 
@@ -100,7 +91,6 @@ class RealVoiceSearchRepositoryTest {
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
-    override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
     override var countVoiceSearchDismissed: Int = 0

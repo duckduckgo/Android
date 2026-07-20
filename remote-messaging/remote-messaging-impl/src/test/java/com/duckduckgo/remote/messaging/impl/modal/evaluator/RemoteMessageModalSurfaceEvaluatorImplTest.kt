@@ -17,8 +17,10 @@
 package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.SystemClock
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -64,15 +66,25 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     )
     private val mockOnboardingFlowChecker: OnboardingFlowChecker = mock()
     private val mockIntent: Intent = mock()
+    private val mockActivityOptions: ActivityOptions = mock()
+    private val mockOptionsBundle: Bundle = mock()
 
     private lateinit var testee: RemoteMessageModalSurfaceEvaluatorImpl
     private lateinit var mockSystemClock: MockedStatic<SystemClock>
+    private lateinit var mockActivityOptionsStatic: MockedStatic<ActivityOptions>
 
     @Before
     fun setUp() {
         // Mock the static SystemClock.elapsedRealtime() call
         mockSystemClock = mockStatic(SystemClock::class.java)
         mockSystemClock.`when`<Long> { SystemClock.elapsedRealtime() }.thenReturn(1000L * 60 * 60 * 10) // e.g., 10 hours
+
+        // Mock the static ActivityOptions.makeCustomAnimation() call used for the modal slide-up animation
+        mockActivityOptionsStatic = mockStatic(ActivityOptions::class.java)
+        mockActivityOptionsStatic.`when`<ActivityOptions> {
+            ActivityOptions.makeCustomAnimation(any(), any(), any())
+        }.thenReturn(mockActivityOptions)
+        whenever(mockActivityOptions.toBundle()).thenReturn(mockOptionsBundle)
 
         testee = RemoteMessageModalSurfaceEvaluatorImpl(
             appCoroutineScope = coroutinesTestRule.testScope,
@@ -88,8 +100,9 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
     @After
     fun tearDown() {
-        // Close the static mock after each test to avoid test interference
+        // Close the static mocks after each test to avoid test interference
         mockSystemClock.close()
+        mockActivityOptionsStatic.close()
     }
 
     @Test
@@ -192,7 +205,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(mockApplicationContext).startActivity(mockIntent)
+        verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
         verify(mockIntent).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
@@ -243,7 +256,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(mockApplicationContext).startActivity(mockIntent)
+        verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
     }
 
     @Test
@@ -304,7 +317,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
-        verify(mockApplicationContext).startActivity(mockIntent)
+        verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
     }
 
     @Test

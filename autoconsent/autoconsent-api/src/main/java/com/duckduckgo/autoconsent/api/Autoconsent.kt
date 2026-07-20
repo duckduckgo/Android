@@ -37,6 +37,16 @@ interface Autoconsent {
     fun changeSetting(setting: Boolean)
 
     /**
+     * Updates whether autoconsent may click accept on pop-ups without opt-outs.
+     */
+    fun changeClickAcceptEnabled(enabled: Boolean)
+
+    /**
+     * @return `true` if autoconsent may click accept on pop-ups without opt-outs.
+     */
+    fun isClickAcceptEnabled(): Boolean
+
+    /**
      * @return `true` if autoconsent was enabled by the user, `false` otherwise.
      */
     fun isSettingEnabled(): Boolean

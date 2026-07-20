@@ -82,7 +82,7 @@ class DuckChatDataClearingPluginTest {
         plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteAllChats()
-        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any(), eq(BrowserMode.REGULAR))
         verify(duckChatSyncRepository).clearPendingChatDeletions()
         verify(duckChatSyncRepository).clearPendingChatUpdates()
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
@@ -96,7 +96,7 @@ class DuckChatDataClearingPluginTest {
 
         plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
-        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(backgroundTimestamp)
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(eq(backgroundTimestamp), eq(BrowserMode.REGULAR))
     }
 
     @Test
@@ -106,7 +106,7 @@ class DuckChatDataClearingPluginTest {
 
         plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
-        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(1234567890L)
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(eq(1234567890L), eq(BrowserMode.REGULAR))
     }
 
     @Test
@@ -116,7 +116,7 @@ class DuckChatDataClearingPluginTest {
         plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteAllChats()
-        verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
+        verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any(), any())
         verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
         verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
@@ -133,7 +133,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(fireChatStore).deleteAllChats()
         // Sync only for Regular path
-        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any(), eq(BrowserMode.REGULAR))
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -156,7 +156,7 @@ class DuckChatDataClearingPluginTest {
 
         verify(fireChatStore).deleteAllChats()
         verify(duckChatDeleter, never()).deleteAllChats()
-        verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
+        verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any(), any())
         verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
         verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
@@ -184,7 +184,7 @@ class DuckChatDataClearingPluginTest {
 
         verify(fireChatStore).deleteChat("fire-abc")
         verify(duckChatDeleter, never()).deleteChat(any())
-        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any(), any())
         verify(syncEngine, never()).triggerSync(any())
     }
 
@@ -199,7 +199,7 @@ class DuckChatDataClearingPluginTest {
 
         verify(fireChatStore).deleteChat("alpha")
         verify(fireChatStore).deleteChat("beta")
-        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any(), any())
         verify(syncEngine, never()).triggerSync(any())
     }
 
@@ -226,7 +226,7 @@ class DuckChatDataClearingPluginTest {
         plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteChat("abc-123")
-        verify(duckChatSyncRepository).recordSingleChatDeletion("abc-123")
+        verify(duckChatSyncRepository).recordSingleChatDeletion(eq("abc-123"), eq(BrowserMode.REGULAR))
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -261,7 +261,7 @@ class DuckChatDataClearingPluginTest {
         plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteChat("abc-123")
-        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any(), any())
         verify(syncEngine, never()).triggerSync(any())
     }
 
@@ -278,8 +278,8 @@ class DuckChatDataClearingPluginTest {
 
         verify(duckChatDeleter).deleteChat("alpha")
         verify(duckChatDeleter).deleteChat("beta")
-        verify(duckChatSyncRepository).recordSingleChatDeletion("alpha")
-        verify(duckChatSyncRepository).recordSingleChatDeletion("beta")
+        verify(duckChatSyncRepository).recordSingleChatDeletion(eq("alpha"), eq(BrowserMode.REGULAR))
+        verify(duckChatSyncRepository).recordSingleChatDeletion(eq("beta"), eq(BrowserMode.REGULAR))
         // Batched sync trigger — one event for the whole subset, not one per chat.
         verify(syncEngine, times(1)).triggerSync(any())
     }
@@ -299,7 +299,7 @@ class DuckChatDataClearingPluginTest {
         plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteChat(any())
-        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any(), any())
         verify(syncEngine, never()).triggerSync(any())
     }
 

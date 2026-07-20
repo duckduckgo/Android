@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d dakika</string>
     <string name="afterInactivityTimeout1Hour">1 saat</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d saat</string>
+    <string name="returnToLastTabSettingTitle">Son Kullanılan Sekmeye Dön</string>
+    <string name="returnToLastTabSettingSubtitle">Uygulamayı yeniden açtığınızda Yeni Sekme Sayfasında son sekmenize giden bir bağlantı gösterin</string>
 </resources>

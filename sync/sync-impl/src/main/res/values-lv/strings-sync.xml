@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Lai saglabātu atkopšanas PDF failu, ir nepieciešama krātuves atļauja</string>
     <string name="sync_share_title">Kopīgot ar…</string>
     <string name="sync_pdf_title">Sinhronizācijas atgūšanas kods</string>
-    <string name="sync_pdf_description">Atgūšanas kods ļauj sinhronizēt grāmatzīmes vairākās ierīcēs un atjaunot sinhronizētos datus, ja zaudē piekļuvi kādai ierīcei.</string>
+    <string name="sync_pdf_description">Atkopšanas kods ļauj sinhronizēt paroles, automātiskās aizpildes datus un Duck.ai tērzēšanu vairākās ierīcēs, kā arī atgūt sinhronizētos datus, ja tu zaudē piekļuvi ierīcei.</string>
     <string name="sync_code_box_title">Glabā šo informāciju drošībā.</string>
-    <string name="sync_instructions_title">Kā tas darbojas?</string>
-    <string name="sync_instructions_step1">Atver DuckDuckGo citā ierīcē un iestatījumos atver sadaļu Sinhronizācija.</string>
-    <string name="sync_instructions_step2">Skenējiet kvadrātkodu vai nokopē un ielīmē teksta kodu citā DuckDuckGo lietotnē.</string>
-    <string name="sync_instructions_step3">Sinhronizācija tiks aktivizēta, un tev atkal būs pieejami visi tavi dati.</string>
+    <string name="sync_instructions_title">Kā šis kods darbojas?</string>
+    <string name="sync_instructions_step1">Atver DuckDuckGo ierīcē, kuru vēlies sinhronizēt, un iestatījumos dodies uz sadaļu Sync &amp; Backup.</string>
+    <string name="sync_instructions_step2">Izvēlies \'Sinhronizēt ar citu ierīci\' un noskenē kvadrātkodu vai ievadi teksta kodu.</string>
+    <string name="sync_instructions_step3">Sinhronizācija tiks aktivizēta, un tev atkal būs pieejami visi savi dati.</string>
+    <string name="sync_pdf_retention_notice">Ja tu vairāk nekā 18 mēnešus nelietosi DuckDuckGo pārlūku ar iespējotu Sync &amp; Backup, tavi dati tiks izdzēsti no servera un tos nevarēs atjaunot.</string>
     <string name="remove_device_dialog_title">Noņemt ierīci?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
     <string name="remove_device_dialog_primary_button">Noņemt</string>

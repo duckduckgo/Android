@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d min.</string>
     <string name="afterInactivityTimeout1Hour">1 val.</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d val.</string>
+    <string name="returnToLastTabSettingTitle">Grįžti į paskutinį skirtuką</string>
+    <string name="returnToLastTabSettingSubtitle">Rodyti nuorodą į jūsų paskutinį skirtuką Naujo skirtuko puslapyje, kai vėl atidarote programą</string>
 </resources>

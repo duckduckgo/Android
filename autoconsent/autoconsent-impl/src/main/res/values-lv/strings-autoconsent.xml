@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo centīsies atlasīt visprivātākos pieejamos iestatījumus un paslēpt uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentAutoManageToggle">Automātiski pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentAutoManageDescription">Mēs centīsimies tavā vietā atlasīt tikai visprivātākās pieejamās sīkfailu opcijas un pēc tam aizvērt šos uznirstošos logus.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo var automātiski pārvaldīt sīkfailu preferences, lai maksimāli palielinātu privātumu, samazinātu sīkfailus un aizvērtu šos uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Uznirstošie logi bez atteikšanās iespējas</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ļauj arī DuckDuckGo ietaupīt tev klikšķi, tavā vārdā pieņemot sīkfailus, lai aizvērtu uznirstošos logus, no kuriem nav iespējams atteikties.</string>
 </resources>

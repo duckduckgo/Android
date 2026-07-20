@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
     <string name="sync_share_title">Sdílet s...</string>
     <string name="sync_pdf_title">Synchronizovat kód pro obnovení</string>
-    <string name="sync_pdf_description">Kód pro obnovení umožňuje synchronizovat záložky v různých zařízeních a obnovit synchronizovaná data v případě ztráty přístupu k zařízení.</string>
+    <string name="sync_pdf_description">Obnovovací kód umožňuje synchronizovat hesla, data automatického vyplňování a chaty Duck.ai napříč více zařízeními a obnovit synchronizovaná data, pokud přijdeš o přístup k zařízení.</string>
     <string name="sync_code_box_title">Uchovávej tyhle informace v bezpečí.</string>
-    <string name="sync_instructions_title">Jak to funguje?</string>
-    <string name="sync_instructions_step1">Otevři DuckDuckGo na jiném zařízení a v Nastavení vyber možnost Synchronizace.</string>
-    <string name="sync_instructions_step2">V jiné aplikaci DuckDuckGo naskenuj QR kód nebo do ní zkopíruj a vlož textový kód.</string>
+    <string name="sync_instructions_title">Jak tento kód funguje?</string>
+    <string name="sync_instructions_step1">Otevři DuckDuckGo na zařízení, které chceš synchronizovat, a v Nastavení přejdi do Sync &amp; Backup.</string>
+    <string name="sync_instructions_step2">Vyber „Synchronizovat s jiným zařízením“ a naskenuj QR kód nebo zadej textový kód.</string>
     <string name="sync_instructions_step3">Dojde k synchronizaci a ty budeš mít zase přístup ke všem svým datům.</string>
+    <string name="sync_pdf_retention_notice">Pokud nepoužiješ prohlížeč DuckDuckGo se zapnutým Sync &amp; Backup po dobu 18 měsíců, budou tvoje data ze serveru smazána a nepůjde je obnovit.</string>
     <string name="remove_device_dialog_title">Smazat zařízení?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s už nebude mít přístup k synchronizovaným datům.</string>
     <string name="remove_device_dialog_primary_button">Odstranit</string>

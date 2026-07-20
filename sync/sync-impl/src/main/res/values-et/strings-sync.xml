@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
     <string name="sync_share_title">Jaga…</string>
     <string name="sync_pdf_title">Sünkroonimise taastamiskood</string>
-    <string name="sync_pdf_description">Taastamiskood võimaldab sünkroonida järjehoidjaid mitmes seadmes ja taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
+    <string name="sync_pdf_description">Taastekood võimaldab sul sünkroonida paroole, automaatse täitmise andmeid ja Duck.ai vestlusi mitme seadme vahel ning taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
     <string name="sync_code_box_title">Hoia seda teavet kindlas kohas.</string>
-    <string name="sync_instructions_title">Kuidas see toimib?</string>
-    <string name="sync_instructions_step1">Ava teises seadmes DuckDuckGo ning ava seadetes käsk Sünkrooni.</string>
-    <string name="sync_instructions_step2">Skanni QR-kood või kopeeri ja kleepi tekstikood teise DuckDuckGo rakendusse.</string>
+    <string name="sync_instructions_title">Kuidas see kood töötab?</string>
+    <string name="sync_instructions_step1">Ava seadmes, mida soovid sünkroonida, DuckDuckGo ja mine seadetes menüüsse Sync &amp; Backup.</string>
+    <string name="sync_instructions_step2">Vali suvand „Sünkrooni teise seadmega“ ja skanni QR-kood või sisesta tekstikood.</string>
     <string name="sync_instructions_step3">Sünkroonimine aktiveeritakse ja sul on uuesti juurdepääs kõikidele oma andmetele.</string>
+    <string name="sync_pdf_retention_notice">Kui sa ei kasuta DuckDuckGo brauserit, millel on Sync &amp; Backup lubatud, rohkem kui 18 kuud, kustutatakse sinu andmed serverist ja neid ei saa taastada.</string>
     <string name="remove_device_dialog_title">Kas seade eemaldada?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s ei pääse enam sinu sünkroonitud andmetele juurde.</string>
     <string name="remove_device_dialog_primary_button">Eemaldage</string>

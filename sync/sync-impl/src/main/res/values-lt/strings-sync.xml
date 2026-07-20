@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Išsaugoti atkūrimo PDF reikia saugojimo leidimo</string>
     <string name="sync_share_title">Dalintis su...</string>
     <string name="sync_pdf_title">Sinchronizuoti atkūrimo kodą</string>
-    <string name="sync_pdf_description">Atkūrimo kodas leidžia sinchronizuoti žymes keliuose įrenginiuose ir atkurti sinchronizuotus duomenis, jei prarandate prieigą prie įrenginio.</string>
+    <string name="sync_pdf_description">Atkūrimo kodas leidžia sinchronizuoti slaptažodžius, automatinio pildymo duomenis ir „Duck.ai“ pokalbius keliuose įrenginiuose bei atkurti sinchronizuotus duomenis, jei prarandate prieigą prie įrenginio.</string>
     <string name="sync_code_box_title">Saugokite šią informaciją.</string>
-    <string name="sync_instructions_title">Kaip tai veikia?</string>
-    <string name="sync_instructions_step1">Atidarykite „DuckDuckGo“ kitame įrenginyje ir eikite į „Nustatymai“ skiltį „Sinchronizavimas“.</string>
-    <string name="sync_instructions_step2">Nuskaitykite QR kodą arba nukopijuokite ir įklijuokite teksto kodą į kitą „DuckDuckGo“ programą.</string>
-    <string name="sync_instructions_step3">Sinchronizavimas bus aktyvuotas ir vėl galėsite naudotis visais savo duomenimis.</string>
+    <string name="sync_instructions_title">Kaip naudoti šį kodą?</string>
+    <string name="sync_instructions_step1">Atidarykite „DuckDuckGo“ įrenginyje, kurį norite sinchronizuoti, ir eikite į „Nustatymai“ skiltį „Sync &amp; Backup“.</string>
+    <string name="sync_instructions_step2">Pasirinkite „Sinchronizuoti su kitu įrenginiu“ ir nuskaitykite QR kodą arba įveskite tekstinį kodą.</string>
+    <string name="sync_instructions_step3">Sinchronizavimas bus aktyvuotas ir vėl turėsite prieigą prie visų savo duomenų.</string>
+    <string name="sync_pdf_retention_notice">Jei daugiau nei 18 mėnesių nenaudosite naršyklės „DuckDuckGo“ su įjungta funkcija „Sync &amp; Backup“, jūsų duomenys bus ištrinti iš serverio ir jų nebus galima atkurti.</string>
     <string name="remove_device_dialog_title">Pašalinti įrenginį?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
     <string name="remove_device_dialog_primary_button">Pašalinti</string>

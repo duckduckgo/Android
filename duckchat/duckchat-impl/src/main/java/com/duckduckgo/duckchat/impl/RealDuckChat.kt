@@ -284,6 +284,12 @@ interface DuckChatInternal : DuckChat {
     fun isNativeChatInputEnabled(): Boolean
 
     /**
+     * Returns whether the Duck.ai contextual sheet's INPUT mode should use the native unified input.
+     * True only when [isNativeChatInputEnabled] is true AND the [contextualNativeInput] toggle is on.
+     */
+    fun isContextualNativeInputEnabled(): Boolean
+
+    /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
      */
     fun areMultipleContentAttachmentsEnabled(): Boolean
@@ -449,6 +455,7 @@ class RealDuckChat @Inject constructor(
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
+    private var isContextualNativeInputEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -523,6 +530,8 @@ class RealDuckChat @Inject constructor(
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
 
     override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
+
+    override fun isContextualNativeInputEnabled(): Boolean = isContextualNativeInputEnabled
 
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
@@ -940,6 +949,9 @@ class RealDuckChat @Inject constructor(
             isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
             isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
             _nativeChatInputEnabled.value = isNativeChatInputEnabled
+            // Contextual native INPUT mode is gated by nativeChatInput AND the contextualNativeInput flag.
+            // Read synchronously via isContextualNativeInputEnabled() — no flow needed (static per session).
+            isContextualNativeInputEnabled = isNativeChatInputEnabled && duckChatFeature.contextualNativeInput().isEnabled()
             _nativeInputNavBarEnabled.value = duckChatFeature.nativeInputNavBar().isEnabled()
             val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
 

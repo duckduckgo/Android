@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Uloženie PDF na obnovenie vyžaduje povolenie na ukladanie</string>
     <string name="sync_share_title">Zdieľať s...</string>
     <string name="sync_pdf_title">Kód obnovenia synchronizácie</string>
-    <string name="sync_pdf_description">Obnovovací kód vám umožňuje synchronizovať záložky medzi viacerými zariadeniami a obnoviť synchronizované údaje, ak stratíte prístup k zariadeniu.</string>
+    <string name="sync_pdf_description">Kód na obnovenie ti umožňuje synchronizovať heslá, údaje automatického dopĺňania a čety Duck.ai na viacerých zariadeniach a obnoviť synchronizované údaje, ak stratíš prístup k zariadeniu.</string>
     <string name="sync_code_box_title">Uchovajte tieto informácie v bezpečí.</string>
-    <string name="sync_instructions_title">Ako to funguje?</string>
-    <string name="sync_instructions_step1">Otvorte DuckDuckGo na inom zariadení a prejdite v Nastaveniach na položku Synchronizácia.</string>
-    <string name="sync_instructions_step2">Naskenujte kód QR alebo skopírujte a vložte textový kód do inej aplikácie DuckDuckGo.</string>
-    <string name="sync_instructions_step3">Synchronizácia sa aktivuje a vy budete mať opäť prístup ku všetkým svojim údajom.</string>
+    <string name="sync_instructions_title">Ako tento kód funguje?</string>
+    <string name="sync_instructions_step1">Otvor DuckDuckGo na zariadení, ktoré chceš synchronizovať, a prejdite v Nastaveniach na položku Sync &amp; Backup.</string>
+    <string name="sync_instructions_step2">Vyber možnosť „Synchronizácia s iným zariadením“ a naskenuj QR kód alebo zadaj textový kód.</string>
+    <string name="sync_instructions_step3">Synchronizácia sa aktivuje a ty budeš mať opäť prístup ku všetkým svojim údajom.</string>
+    <string name="sync_pdf_retention_notice">Ak nebudeš používať prehliadač DuckDuckGo so zapnutým Sync &amp; Backup viac ako 18 mesiacov, tvoje údaje budú zo servera vymazané a nebude možné ich obnoviť.</string>
     <string name="remove_device_dialog_title">Odstrániť zariadenie?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%%@\"%1$suž nebude mať prístup k synchronizovaným údajom.</string>
     <string name="remove_device_dialog_primary_button">Odstrániť</string>

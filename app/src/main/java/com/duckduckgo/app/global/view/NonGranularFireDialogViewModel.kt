@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.global.view
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.TabType
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -34,10 +36,12 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +66,8 @@ class NonGranularFireDialogViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val dateProvider: DateProvider,
     private val browserMode: BrowserMode,
+    private val tabRepository: TabRepository,
+    private val duckChat: DuckChat,
 ) : ViewModel() {
 
     data class ViewState(
@@ -99,7 +105,7 @@ class NonGranularFireDialogViewModel @Inject constructor(
             command.send(Command.OnShow)
             if (!hasFiredDialogShownPixel) {
                 hasFiredDialogShownPixel = true
-                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
+                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()))
             }
         }
     }
@@ -132,6 +138,9 @@ class NonGranularFireDialogViewModel @Inject constructor(
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.NONGRANULAR_FIRE_DIALOG,
                     clearOptions = clearOptions,
+                    browserMode = browserMode,
+                    tabType = selectedTabType(),
+                    tabCount = tabRepository.getOpenTabCount(),
                 )
                 try {
                     dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
@@ -154,5 +163,11 @@ class NonGranularFireDialogViewModel @Inject constructor(
             fireButtonStore.storeLastFireButtonClearEventTime(now)
             pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
         }
+    }
+
+    private suspend fun selectedTabType(): TabType? {
+        val selectedTab = tabRepository.getSelectedTab() ?: return null
+        val isDuckAiTab = selectedTab.url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true
+        return if (isDuckAiTab) TabType.AI else TabType.WEB
     }
 }

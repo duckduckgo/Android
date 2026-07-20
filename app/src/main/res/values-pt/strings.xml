@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Pesquisar no DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Partilhar comentários</string>
-    <string name="missingBrowserFeaturesTitleLong">As funcionalidades do navegador estão ausentes ou são frustrantes</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemas com funcionalidade do navegador</string>
-    <string name="missingBrowserFeaturesSubtitle">Que funcionalidade de navegação podemos adicionar ou melhorar?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navegar para a frente, para trás e/ou atualizar</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Criar e gerir separadores</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Bloquear anúncios e pop-ups</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Ver vídeos</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interagir com imagens</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Criar e gerir marcadores</string>
-    <string name="missingBrowserFeatureSubReasonOther">Nenhuma das opções anteriores</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemas de carregamento do site</string>
-    <string name="websiteNotLoadingTitleShort">Problemas de carregamento do site</string>
-    <string name="websiteNotLoadingSubtitle">Que site está com falhas?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">A pesquisa do DuckDuckGo não é suficiente boa</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemas com a pesquisa do DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Que funcionalidade de pesquisa podemos adicionar ou melhorar?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programação/pesquisa técnica</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">A disposição deveria ser mais parecida com o Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Tempo de carregamento mais rápido</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Pesquisar num determinado idioma ou região</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Melhor preenchimento automático</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Nenhuma das opções anteriores</string>
-
-    <string name="needMoreCustomizationTitleLong">Não existem formas suficientes de personalizar a aplicação</string>
-    <string name="needMoreCustomizationTitleShort">Problemas de personalização</string>
-    <string name="needMoreCustomizationSubtitle">Que opção de personalização podemos adicionar ou melhorar?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">A configuração do ecrã inicial</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Como os separadores são apresentados</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Visual da aplicação</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Que dados são apagados</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Quando os dados são apagados</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Como os marcadores são apresentados</string>
-    <string name="needMoreCustomizationSubReasonOther">Nenhuma das opções anteriores</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">A aplicação é lenta, tem bugs ou falha</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemas de desempenho</string>
-    <string name="appIsSlowOrBuggySubtitle">Que problema está a enfrentar?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Páginas Web ou resultados de pesquisa carregados lentamente</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">A aplicação falha ou bloqueia</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Bugs de reprodução de vídeo ou multimédia</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Nenhuma das opções anteriores</string>
-
-    <string name="otherMainReasonTitleLong">Nenhuma das opções anteriores</string>
-    <string name="otherMainReasonTitleShort">Outros problemas</string>
-
-    <string name="openEndedInputHint">Seja o mais específico possível</string>
-    <string name="submitFeedback">Submeter</string>
-
-    <string name="tellUsHowToImprove">Diga-nos o que podemos melhorar.</string>
-    <string name="thanksForTheFeedback">Obrigado pelos comentários!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">A sua frustração está mais relacionada com o quê?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Lamentamos saber isso</string>
-    <string name="feedbackShareDetails">Partilhar detalhes</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Há alguns detalhes que gostaria de partilhar com a equipa?</string>
-    <string name="whatHaveYouBeenEnjoying">Do que tem gostado?</string>
-    <string name="awesomeToHear">É fantástico saber isso!</string>
-    <string name="shareTheLoveWithARating">Partilhe o que gosta com a classificação na Play Store.</string>
-    <string name="rateTheApp">Classificar a aplicação</string>
-    <string name="declineFurtherFeedback">Não, obrigado, já terminei</string>
-    <string name="whichBrokenSites">Onde está a ver esses problemas?</string>
-    <string name="whichBrokenSitesHint">Que website tem problemas?</string>
-    <string name="feedbackSpecificAsPossible">Seja o mais específico possível</string>
-    <string name="feedbackInitialDisambiguationTitle">Vamos começar!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Como classificaria os seus comentários?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Botão de comentário positivo</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Botão de comentário negativo</string>
-    <string name="feedbackIsImportantToUs">Os seus comentários anônimos são importantes para nós.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Não foi possível exibir a página web."</string>
     <string name="crashedWebViewErrorAction">"Recarregar"</string>
@@ -828,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina dados de navegação com um botão</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Utilizar o ChatGPT em privado com Duck.ai incorporado</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloqueia anúncios segmentados e pop-ups de cookies</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Reproduz vídeos do YouTube sem anúncios</string>
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
     <string name="preOnboardingAddressBarTitle">Onde devo posicionar a barra de endereços?</string>
     <string name="preOnboardingAddressBarOkButton">Seguinte</string>
@@ -887,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Queres acesso fácil ao chat privado com IA?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Queres acesso fácil ao chat privado com IA na barra de endereços?</string>
     <string name="preOnboardingInputScreenButton">Seguinte</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[As funcionalidades de IA são privadas e opcionais. Podes fazer alterações em <b>Definições > Funcionalidades de IA</b>.]]></string>
 
@@ -1013,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Olá.</string>
     <string name="preOnboardingWelcomeDialogBody1">Pronto para um navegador mais rápido que te coloca no controlo?</string>
     <string name="preOnboardingWelcomeDialogBody2">A IA é sempre opcional, e a proteção de privacidade está sempre ativa.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d de %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d de %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">como dizer \"pato\" em inglês</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">como dizer \"pato\" em espanhol</string>
 
@@ -1059,6 +989,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Confirmar</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Obrigado pelos comentários!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Abrir num separador Fire</string>

@@ -48,6 +48,12 @@ import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * The REGULAR-mode chat deletion chain. Fire-mode deletions never go through this interface —
+ * [DuckChatDataClearingPlugin] routes them directly to the `@FireMode` store: this chain exists to
+ * manage the WebView -> native storage migration (which Fire chats never had) and its callers wrap
+ * it in sync bookkeeping that must never run for Fire chats.
+ */
 interface DuckChatDeleter {
     suspend fun deleteChat(chatId: String): Boolean
     suspend fun deleteAllChats(): Boolean

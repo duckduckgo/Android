@@ -44,7 +44,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -52,7 +51,7 @@ import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.common.utils.toStringDropScheme
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -64,12 +63,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -86,19 +82,19 @@ const val minimumNumberInSuggestionGroup = 5
  * Provides a default [AutoComplete] instance with default configuration.
  * For dynamic configs, use [AutoCompleteFactory] instead.
  */
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class DefaultAutoComplete @Inject constructor(
-    private val factory: AutoCompleteFactory,
-) : AutoComplete by factory.create(AutoComplete.Config())
+    factory: AutoCompleteFactory,
+    browserMode: BrowserMode,
+) : AutoComplete by factory.create(AutoComplete.Config(), browserMode)
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val browserMode: BrowserMode,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -109,10 +105,8 @@ class AutoCompleteApi constructor(
     private val config: AutoComplete.Config,
 ) : AutoComplete {
 
-    private val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
-
     private val tabRepository: TabRepository
-        get() = tabRepositoryProvider.forMode(currentMode.value)
+        get() = tabRepositoryProvider.forMode(browserMode)
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
 
@@ -344,11 +338,9 @@ class AutoCompleteApi constructor(
     private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
         runCatching {
             if (autocompleteTabsEnabled) {
-                currentMode.flatMapLatest { mode ->
-                    val repo = tabRepositoryProvider.forMode(mode)
-                    combine(repo.flowTabs, repo.flowSelectedTab) { tabs, selectedTab ->
-                        rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
-                    }
+                val repo = tabRepositoryProvider.forMode(browserMode)
+                combine(repo.flowTabs, repo.flowSelectedTab) { tabs, selectedTab ->
+                    rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
                 }.distinctUntilChanged()
             } else {
                 flowOf(emptyList())

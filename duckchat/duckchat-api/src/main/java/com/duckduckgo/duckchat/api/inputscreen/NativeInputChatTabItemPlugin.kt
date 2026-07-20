@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.api.inputscreen
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import kotlinx.coroutines.CoroutineScope
 
@@ -42,8 +43,10 @@ interface NativeInputChatTabItemPlugin : ActivePlugin {
      * @param context a view context suitable for inflating the item's views.
      * @param scope cancelled by the host when the Chat tab is torn down. Use it to collect data into
      * the returned adapters; do not retain it beyond the returned [NativeInputChatTabItem].
+     * @param browserMode the hosting activity's frozen browser mode, for contributions whose
+     * eligibility is mode-dependent.
      */
-    fun create(context: Context, scope: CoroutineScope): NativeInputChatTabItem
+    fun create(context: Context, scope: CoroutineScope, browserMode: BrowserMode): NativeInputChatTabItem
 
     companion object {
         // Order of contributions, top to bottom. Lower value comes first (higher in the list); gaps

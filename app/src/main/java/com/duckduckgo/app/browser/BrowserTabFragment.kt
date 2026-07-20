@@ -227,6 +227,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -1083,7 +1084,7 @@ class BrowserTabFragment :
                         val mode = data.getStringExtra(InputScreenActivityResultParams.TAB_MODE_PARAM)
                             ?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() }
                             ?: browserMode
-                        browserActivity?.openExistingTabInMode(mode, tabId)
+                        browserActivity?.openExistingTabInMode(mode, tabId, BrowserModeSwitchSource.ESCAPE_HATCH)
                     }
                 }
 
@@ -1240,7 +1241,7 @@ class BrowserTabFragment :
         )
 
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput()
+            nativeInputManager.hideNativeInput(animate = false)
         }
 
         webViewContainer = binding.webViewContainer
@@ -1448,9 +1449,13 @@ class BrowserTabFragment :
                     if (binding.autoCompleteSuggestionsList.isVisible) {
                         viewModel.autoCompleteSuggestionsGone()
                     }
-                    viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
+                    val fireTabsAvailable = fireModeAvailability.isAvailable()
+                    viewModel.triggerAutocomplete("", hasFocus = fireTabsAvailable, hasQueryChanged = true)
                     binding.autoCompleteSuggestionsList.gone()
-                    binding.focusedView.gone()
+                    // With Fire tabs off, keep the pre-Fire-tabs behaviour of hiding the focused view on clear.
+                    if (!fireTabsAvailable) {
+                        binding.focusedView.gone()
+                    }
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
@@ -2055,6 +2060,7 @@ class BrowserTabFragment :
             val params = mapOf(
                 PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
                 PixelParameter.STATUS to vpnStatus,
+                PixelParameter.BROWSER_MODE to browserMode.name.lowercase(),
             )
             pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
             pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
@@ -2090,6 +2096,13 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
+        // Dismiss the native input first (no-op when it isn't shown) so a browser-input widget doesn't
+        // linger behind the switcher and leave the omnibar and widget both visible on return. Skip Duck.ai:
+        // there the widget is the persistent chat input, and hideNativeInput would restore the default
+        // omnibar and tear it down.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
@@ -2399,7 +2412,7 @@ class BrowserTabFragment :
 
         binding.pdfViewerContainer.show()
         val pdfFragment = DdgPdfViewerFragment()
-        pdfFragment.errorListener = object : DdgPdfViewerFragment.ErrorListener {
+        pdfFragment.listener = object : DdgPdfViewerFragment.Listener {
             override fun onLoadDocumentError(throwable: Throwable) {
                 viewModel.onPdfRenderFailure(throwable)
             }
@@ -2868,9 +2881,11 @@ class BrowserTabFragment :
                     // Surface the native input widget so its onEnterComplete focuses the input
                     // and brings up the keyboard via the same path as a manual omnibar tap.
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
-                    // multiple times per session (e.g. CTA refresh) and showNativeInput()
-                    // tears down and re-animates the widget on each call.
-                    if (binding.rootView.findViewById<View?>(com.duckduckgo.app.browser.R.id.inputModeTopRoot) == null) {
+                    // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
+                    // showNativeInput() tears down and re-animates the widget on each call.
+                    // Must cover bottom omnibar too (inputModeBottomRoot); checking only the top
+                    // root re-opened UTI on every swipe and stacked NTP content insets.
+                    if (!nativeInputManager.isNativeInputShown()) {
                         showNativeInput()
                     }
                 } else {
@@ -3143,6 +3158,11 @@ class BrowserTabFragment :
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
+            }
+
+            is Command.StartAdBlockingAnimation -> {
+                omnibar.cancelTrackersAnimation()
+                omnibar.createAdBlockingAnimation(it.icon, it.text)
             }
 
             is Command.PageContextReceived -> {
@@ -3874,7 +3894,11 @@ class BrowserTabFragment :
                 override fun onHatchPressed() {
                     hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
-                    browserActivity?.openExistingTabInMode(newTabReturnHatchView.targetMode, newTabReturnHatchView.tabId)
+                    browserActivity?.openExistingTabInMode(
+                        newTabReturnHatchView.targetMode,
+                        newTabReturnHatchView.tabId,
+                        BrowserModeSwitchSource.ESCAPE_HATCH,
+                    )
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
@@ -4135,6 +4159,10 @@ class BrowserTabFragment :
 
                 override fun onTrackersCountFinished() {
                     // no-op
+                }
+
+                override fun onAdBlockingAnimationSuppressed() {
+                    viewModel.onAdBlockingAnimationSuppressed()
                 }
             },
         )
@@ -4551,7 +4579,7 @@ class BrowserTabFragment :
             systemAutofillEngagement.onSystemAutofillEvent()
         }
 
-        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
+        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId, browserMode)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
@@ -4859,7 +4887,7 @@ class BrowserTabFragment :
         ).show(binding.rootView, screenX, screenY)
         if (shown) {
             // Parity with the native long-press menu, which fires LONG_PRESS when the menu is shown.
-            pixel.fire(AppPixelName.LONG_PRESS)
+            pixel.fire(AppPixelName.LONG_PRESS, mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase()))
         }
         return shown
     }
@@ -4893,7 +4921,12 @@ class BrowserTabFragment :
         pixelName: AppPixelName,
         action: RequiredAction,
     ) {
-        pixel.fire(pixelName)
+        val params = when (pixelName) {
+            AppPixelName.LONG_PRESS_NEW_TAB, AppPixelName.LONG_PRESS_NEW_FIRE_TAB, AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB ->
+                mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+            else -> emptyMap()
+        }
+        pixel.fire(pixelName, params)
         val actionUrl = when (action) {
             is RequiredAction.OpenInNewTab -> action.url
             is RequiredAction.OpenInFireTab -> action.url
@@ -5177,6 +5210,9 @@ class BrowserTabFragment :
     private fun onTabVisible() {
         if (!isAdded) return
         webView?.onResume()
+        // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
+        // away on a previous visit isn't left as an icons-only strip.
+        omnibar.setExpanded(true)
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
     }
@@ -5996,9 +6032,13 @@ class BrowserTabFragment :
         }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
-            // Chat tab owns rendering its autoCompleteSuggestionsList.
+            // Chat never shows the focused NTP overlay. With Fire tabs on, clearing can leave it visible,
+            // so hide it here; with Fire tabs off it was already hidden on clear (pre-existing behaviour).
             if (nativeInputManager.isChatTabSelected()) {
                 lastSeenAutoCompleteViewState = null
+                if (fireModeAvailability.isAvailable()) {
+                    hideFocusedView()
+                }
                 return
             }
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -6028,8 +6068,7 @@ class BrowserTabFragment :
         }
 
         private fun showFocusedView(hasFavorites: Boolean = true) {
-            binding.focusedView.show()
-            binding.focusedView.showLogo(!hasFavorites)
+            binding.focusedView.show(isLogoVisible = !hasFavorites, browserMode)
         }
 
         private fun hideFocusedView() {
@@ -6754,6 +6793,12 @@ class BrowserTabFragment :
     }
 
     fun onTabSwipedAway() {
+        // Dismiss browser UTI when leaving the tab so the omnibar is restored and we don't leave a
+        // half-hidden address field / leftover nav chrome for the next visit. Skip Duck.ai: the
+        // widget is the persistent chat input there.
+        if (omnibar.viewMode != ViewMode.DuckAI) {
+            nativeInputManager.hideNativeInput(animate = false)
+        }
         viewModel.onTabSwipedAway()
     }
 

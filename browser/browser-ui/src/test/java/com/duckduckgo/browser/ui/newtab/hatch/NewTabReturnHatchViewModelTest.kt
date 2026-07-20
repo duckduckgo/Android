@@ -540,8 +540,9 @@ class NewTabReturnHatchViewModelTest {
     fun whenOnBurnTabPressedThenFiresBurnTabCountAndDailyPixels() = runTest {
         testee.onBurnTabPressed()
 
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, type = Count)
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, type = Daily())
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, params, type = Count)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, params, type = Daily())
     }
 
     @Test

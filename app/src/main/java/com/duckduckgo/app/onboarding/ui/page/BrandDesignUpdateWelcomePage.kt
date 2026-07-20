@@ -2064,8 +2064,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             setDefaultBrowserDivider.isVisible = !state.hideSetDefaultBrowserRow
             addWidgetItem.isVisible = !state.hideAddWidgetRow
             addWidgetDivider.isVisible = !state.hideAddWidgetRow
-            addressBarSearchOptionsItem.isVisible = !state.isCustomAiOnboardingFlow
-            addressBarSearchOptionsDivider.isVisible = !state.isCustomAiOnboardingFlow
+            addressBarSearchOptionsItem.isVisible = !state.hideAddressBarRow
+            addressBarSearchOptionsDivider.isVisible = !state.hideAddressBarRow
         }
     }
 

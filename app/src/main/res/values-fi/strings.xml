@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Hae DuckDuckGosta</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Jaa palaute</string>
-    <string name="missingBrowserFeaturesTitleLong">Selaimen ominaisuudet ovat puutteellisia tai turhauttavia</string>
-    <string name="missingBrowserFeaturesTitleShort">Selainominaisuuksiin liittyvät ongelmat</string>
-    <string name="missingBrowserFeaturesSubtitle">Mitä selaustoimintoja voimme lisätä tai parantaa?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigointi eteen-/taaksepäin ja/tai päivittäminen</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Välilehtien luominen ja hallinnointi</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Mainosten ja ponnahdusikkunoiden esto</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Videoiden katselu</string>
-    <string name="missingBrowserFeatureSubReasonImages">Vuorovaikutus kuvien kanssa</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Kirjanmerkkien luominen ja hallinta</string>
-    <string name="missingBrowserFeatureSubReasonOther">Ei mikään näistä</string>
-
-    <string name="websiteNotLoadingTitleLong">Verkkosivustojen latausongelmat</string>
-    <string name="websiteNotLoadingTitleShort">Verkkosivustojen latausongelmat</string>
-    <string name="websiteNotLoadingSubtitle">Mikä verkkosivusto on viallinen?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-haku ei ole riittävän hyvä</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-hakuongelmat</string>
-    <string name="searchNotGoodEnoughSubtitle">Mitä hakuominaisuuksia voimme lisätä tai parantaa?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Ohjelmointi-/tekninen haku</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Ulkoasun pitäisi muistuttaa enemmän Googlea</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Nopeampi latausaika</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Haku tietyllä kielellä tai tietyllä alueella</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Parempi automaattinen täydennys</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Ei mikään näistä</string>
-
-    <string name="needMoreCustomizationTitleLong">Sovelluksen yksilöintimahdollisuuksia ei ole tarpeeksi</string>
-    <string name="needMoreCustomizationTitleShort">Yksilöintiongelmat</string>
-    <string name="needMoreCustomizationSubtitle">Mitä yksilöintivaihtoehtoja voimme lisätä tai parantaa?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Aloitusnäytön järjestys</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Välilehtien näyttäminen</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Sovelluksen ulkonäkö</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Tyhjennettävät tiedot</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Tietojen tyhjennyksen ajankohta</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kirjanmerkkien näyttäminen</string>
-    <string name="needMoreCustomizationSubReasonOther">Ei mikään näistä</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Sovellus on hidas, virheellinen tai kaatuu</string>
-    <string name="appIsSlowOrBuggyTitleShort">Suorituskykyyn liittyvät ongelmat</string>
-    <string name="appIsSlowOrBuggySubtitle">Mitä ongelmia sinulla on esiintynyt?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Verkkosivut tai hakutulokset latautuvat hitaasti</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Sovellus kaatuu tai jähmettyy</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Videon tai median toistovirheet</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Ei mikään näistä</string>
-
-    <string name="otherMainReasonTitleLong">Ei mikään näistä</string>
-    <string name="otherMainReasonTitleShort">Muut ongelmat</string>
-
-    <string name="openEndedInputHint">Kerro mahdollisimman tarkasti</string>
-    <string name="submitFeedback">Lähetä</string>
-
-    <string name="tellUsHowToImprove">Kerro meille, mitä voimme parantaa.</string>
-    <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Mikä turhauttaa sinua eniten?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Ikävä kuulla</string>
-    <string name="feedbackShareDetails">Kerro tarkempia tietoja</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Haluaisitko kertoa tiimille tarkempia tietoja?</string>
-    <string name="whatHaveYouBeenEnjoying">Mistä olet nauttinut?</string>
-    <string name="awesomeToHear">Mahtava kuulla!</string>
-    <string name="shareTheLoveWithARating">Jaathan kehusi Play Store -arviolla.</string>
-    <string name="rateTheApp">Arvioi sovellus</string>
-    <string name="declineFurtherFeedback">EI KIITOS, TÄMÄ RIITTI</string>
-    <string name="whichBrokenSites">Missä näitä ongelmia esiintyy?</string>
-    <string name="whichBrokenSitesHint">Millä verkkosivustolla on ongelmia?</string>
-    <string name="feedbackSpecificAsPossible">Kerro mahdollisimman tarkasti</string>
-    <string name="feedbackInitialDisambiguationTitle">Aloitetaan!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Miten luokittelisit palautteesi?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positiivinen palaute -painike</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatiivinen palaute -painike</string>
-    <string name="feedbackIsImportantToUs">Anonyymi palautteesi on meille tärkeää.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Verkkosivua ei voitu näyttää."</string>
     <string name="crashedWebViewErrorAction">"Lataa uudelleen"</string>
@@ -828,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
     <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Käytä ChatGPT:tä yksityisesti sisäänrakennetulla Duck.ai:lla</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Estä kohdennetut mainokset ja evästeponnahdusikkunat</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Toista YouTube-videoita ilman mainoksia</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
     <string name="preOnboardingAddressBarTitle">Mihin osoitepalkki pitäisi sijoittaa?</string>
     <string name="preOnboardingAddressBarOkButton">Seuraava</string>
@@ -887,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Haluatko helpon pääsyn yksityiseen tekoälychattiin?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Haluatko helpon pääsyn yksityiseen tekoälykeskusteluun osoiterivillä?</string>
     <string name="preOnboardingInputScreenButton">Seuraava</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tekoälyominaisuudet ovat yksityisiä ja valinnaisia. Voit tehdä muutoksia kohdassa <b>Asetukset > Tekoälyominaisuudet</b>.]]></string>
 
@@ -1013,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hei!</string>
     <string name="preOnboardingWelcomeDialogBody1">Oletko valmis nopeampaan selaimeen, joka antaa sinulle hallinnan?</string>
     <string name="preOnboardingWelcomeDialogBody2">Tekoäly on aina valinnainen, ja yksityisyyden suoja on aina päällä.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">miten sanotaan \"ankka\" espanjaksi</string>
 
@@ -1059,6 +989,9 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Vahvista</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
 
     <!-- Fire mode -->
     <string name="openInFireTab">Avaa Fire-välilehdessä</string>
