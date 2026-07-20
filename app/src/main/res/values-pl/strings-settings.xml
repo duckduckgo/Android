@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d min</string>
     <string name="afterInactivityTimeout1Hour">1 godzina</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d godz.</string>
+    <string name="returnToLastTabSettingTitle">Wróć do ostatniej karty</string>
+    <string name="returnToLastTabSettingSubtitle">Pokaż link do twojej ostatniej karty na stronie nowej karty, gdy ponownie otwierasz aplikację</string>
 </resources>

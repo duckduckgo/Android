@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minutter</string>
     <string name="afterInactivityTimeout1Hour">1 time</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d timer</string>
+    <string name="returnToLastTabSettingTitle">Gå tilbake til forrige fane</string>
+    <string name="returnToLastTabSettingSubtitle">Vis en lenke til den forrige fanen på Ny fane-siden når du åpner appen igjen</string>
 </resources>
