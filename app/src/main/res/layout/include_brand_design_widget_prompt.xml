@@ -80,7 +80,7 @@
             android:layout_marginBottom="@dimen/keyline_0"
             android:importantForAccessibility="no"
             android:maxWidth="@dimen/preOnboardingWidgetPromptMediaMaxWidth"
-            android:maxHeight="@dimen/preOnboardingWidgetPromptMediaHeight"
+            android:maxHeight="@dimen/preOnboardingWidgetPromptMediaMaxHeight"
             android:scaleType="fitXY"
             android:src="@drawable/onboarding_widget_prompt_preview" />
 
