@@ -21,7 +21,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
@@ -34,9 +33,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -51,7 +50,6 @@ class AdBlockingProtectionsSettingsEntryViewModel @Inject constructor(
 
     data class ViewState(
         val isVisible: Boolean = false,
-        val isOn: Boolean = false,
     )
 
     sealed class Command {
@@ -69,17 +67,12 @@ class AdBlockingProtectionsSettingsEntryViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewStateJob += combine(
-            statusChecker.settingsPlacementFlow(),
-            statusChecker.observeState(),
-        ) { placement, state ->
-            _viewState.update {
-                it.copy(
-                    isVisible = placement == SettingsPlacement.Protections,
-                    isOn = state is AdBlockingState.Enabled,
-                )
+        viewStateJob += statusChecker.settingsPlacementFlow()
+            .onEach { placement ->
+                _viewState.update {
+                    it.copy(isVisible = placement == SettingsPlacement.Protections)
+                }
             }
-        }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }

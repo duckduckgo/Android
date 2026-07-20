@@ -27,6 +27,7 @@ import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -62,12 +63,12 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
         maybeEnableEdgeToEdge()
         setContentView(binding.root)
         setTitle(R.string.ad_blocking_settings_title_v2)
+        binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)
         configure()
     }
 
     override fun render(state: AdBlockingSettingsViewModel.ViewState) {
         super.render(state)
-        binding.adBlockingStatusIndicator.setStatus(state.isStatusIndicatorOn)
         binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
         binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
         if (state.disabledUntilRelaunch) {
