@@ -27,17 +27,18 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class EditDeviceViewModel @AssistedInject constructor(
-    @Assisted private val device: ConnectedDevice,
+    @Assisted device: ConnectedDevice,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(
         ViewState(device = device),
     )
-    val viewState: Flow<ViewState> = _viewState.asStateFlow()
+    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
