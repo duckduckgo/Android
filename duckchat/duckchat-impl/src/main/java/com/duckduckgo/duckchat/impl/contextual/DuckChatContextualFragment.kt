@@ -1134,13 +1134,15 @@ class DuckChatContextualFragment :
         resultCode: Int,
         intent: Intent?,
     ) {
+        val uploadTask = pendingUploadTask
+        pendingUploadTask = null
         if (resultCode != Activity.RESULT_OK || intent == null) {
-            pendingUploadTask?.onReceiveValue(null)
+            uploadTask?.onReceiveValue(null)
             return
         }
 
         val uris = fileChooserIntentBuilder.extractSelectedFileUris(intent)
-        pendingUploadTask?.onReceiveValue(uris)
+        uploadTask?.onReceiveValue(uris)
     }
 
     override fun onResume() {
@@ -1150,7 +1152,9 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
-        viewModel.onSheetClosed()
+        if (pendingUploadTask == null) {
+            viewModel.onSheetClosed()
+        }
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
