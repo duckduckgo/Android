@@ -231,7 +231,6 @@ class NewUserOnboardingPlanProviderTest {
     fun `when custom ai path and quick setup confirmed with ai then forces input screen user setting on`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))

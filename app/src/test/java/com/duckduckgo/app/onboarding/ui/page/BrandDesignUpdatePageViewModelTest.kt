@@ -897,6 +897,7 @@ class BrandDesignUpdatePageViewModelTest {
                 showSplitOption = false,
                 hideSetDefaultBrowserRow = false,
                 hideAddWidgetRow = false,
+                hideAddressBarRow = false,
                 isReinstallUser = false,
             ),
             transition = { LinearOnboardingTransition.AbortPlan },
