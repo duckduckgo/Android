@@ -49,6 +49,10 @@
         android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="false"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
