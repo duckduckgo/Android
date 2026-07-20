@@ -61,9 +61,13 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
+    applyBrandDesignUpdate: Boolean = false,
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme, isFireMode))
+        if (applyBrandDesignUpdate) {
+            this.theme.applyStyle(R.style.ThemeOverlay_DaxButton_Rebrand, true)
+        }
     }
     return registerForThemeChangeBroadcast()
 }
