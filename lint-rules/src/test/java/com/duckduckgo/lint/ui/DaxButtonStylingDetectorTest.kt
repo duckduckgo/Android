@@ -291,6 +291,115 @@ class DaxButtonStylingDetectorTest {
     }
 
     @Test
+    fun whenDaxButtonBrandSetsTextAppearanceThenFailWithError() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+                      android:id="@+id/button"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+                      tools:ignore="RtlHardcoded"/>
+
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:9: Error: textAppearance is defined by the DaxButton Component, you shouldn't change it [InvalidDaxButtonProperty]
+                  <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenDaxButtonSetsDuckSansFontFamilyThenFailWithError() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                      android:id="@+id/button"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/ducksansproduct_regular"
+                      tools:ignore="RtlHardcoded"/>
+
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:9: Error: DuckSans fonts can only be applied to DaxButtonBrand via app:daxButtonBrandTypography="duckSans", not android:fontFamily [InvalidDaxButtonProperty]
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenDaxButtonSetsNonDuckSansFontFamilyThenSucceed() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                      android:id="@+id/button"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/roboto_mono"
+                      tools:ignore="RtlHardcoded"/>
+
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_BUTTON_PROPERTY)
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun whenNoStylingFoundThenSucceed() {
         lint()
             .files(

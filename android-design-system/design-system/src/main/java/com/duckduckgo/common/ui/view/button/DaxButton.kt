@@ -146,6 +146,7 @@ enum class ButtonType {
     DESTRUCTIVE_SECONDARY,
     GHOST_DESTRUCTIVE,
     GHOST_ALT,
+    BRAND,
     ;
 
     fun getView(context: Context): DaxButton {
@@ -157,6 +158,7 @@ enum class ButtonType {
             DESTRUCTIVE_SECONDARY -> DaxButtonDestructiveSecondary(context, null)
             GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
             GHOST_ALT -> DaxButtonGhostAlt(context, null)
+            BRAND -> DaxButtonBrand(context, null)
         }
     }
 }
