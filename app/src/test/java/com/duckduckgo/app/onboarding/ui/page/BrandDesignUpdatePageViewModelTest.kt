@@ -835,21 +835,6 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun `when skip confirmed then resume on skip option then emits skip confirmed then resume requested`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
-        advanceUntilIdle()
-
-        testee.onPrimaryCtaClicked()
-        testee.onSecondaryCtaClicked()
-        advanceUntilIdle()
-
-        assertEquals(
-            listOf(NewUserOnboardingEvent.SkipConfirmed, NewUserOnboardingEvent.ResumeRequested),
-            recordedEvents,
-        )
-    }
-
-    @Test
     fun `when demo query submitted then forwards event`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
         advanceUntilIdle()
@@ -908,12 +893,19 @@ class BrandDesignUpdatePageViewModelTest {
     @Test
     fun `when run aborted then sends onboarding skipped`() = runTest {
         val testee = startAt(
-            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption,
+            NewUserOnboardingActivityDialog.QuickSetup(
+                showSplitOption = false,
+                hideSetDefaultBrowserRow = false,
+                hideAddWidgetRow = false,
+                hideAddressBarRow = false,
+                isReinstallUser = false,
+            ),
             transition = { LinearOnboardingTransition.AbortPlan },
         )
         testee.commands.test {
             advanceUntilIdle()
-            realOrchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
+            // -> AbortPlan -> run skipped
+            realOrchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
             advanceUntilIdle()
             assertEquals(Command.OnboardingSkipped, awaitItem())
         }

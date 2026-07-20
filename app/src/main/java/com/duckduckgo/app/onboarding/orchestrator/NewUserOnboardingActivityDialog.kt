@@ -31,7 +31,6 @@ sealed interface NewUserOnboardingActivityDialog {
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog
     data class InputScreenPreview(val isSearchDefault: Boolean) : NewUserOnboardingActivityDialog
-    data object SkipNewUserOnboardingOption : NewUserOnboardingActivityDialog
     data class QuickSetup(
         val showSplitOption: Boolean,
         val hideSetDefaultBrowserRow: Boolean,

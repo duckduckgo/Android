@@ -34,6 +34,5 @@ internal object NewUserOnboardingStepIds {
     const val ADDRESS_BAR_POSITION: LinearOnboardingStepId = "address_bar_position"
     const val INPUT_SCREEN: LinearOnboardingStepId = "input_screen"
     const val INPUT_SCREEN_PREVIEW: LinearOnboardingStepId = "input_screen_preview"
-    const val SKIP_ONBOARDING_OPTION: LinearOnboardingStepId = "skip_onboarding_option"
     const val QUICK_SETUP: LinearOnboardingStepId = "quick_setup"
 }

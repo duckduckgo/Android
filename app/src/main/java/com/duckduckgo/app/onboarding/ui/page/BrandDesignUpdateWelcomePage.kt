@@ -94,7 +94,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
-import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -153,8 +152,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var welcomeFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
-    private var skipOnboardingFadeOutAnimatorSet: AnimatorSet? = null
-    private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
@@ -713,10 +710,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         comparisonChartFadeInAnimatorSet = null
         comparisonChartDetailAnimatorSet?.cancel()
         comparisonChartDetailAnimatorSet = null
-        skipOnboardingFadeOutAnimatorSet?.cancel()
-        skipOnboardingFadeOutAnimatorSet = null
-        skipOnboardingFadeInAnimatorSet?.cancel()
-        skipOnboardingFadeInAnimatorSet = null
         arrowSlideAnimator?.cancel()
         arrowSlideAnimator = null
         changeBoundsTransitionListener?.let { listener ->
@@ -1032,77 +1025,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
-                SKIP_ONBOARDING_OPTION -> {
-                    val fadeOutAnimators = listOf<Animator>(
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
-                            .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 0f)
-                            .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 0f)
-                            .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 0f)
-                            .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 0f)
-                            .setDuration(OUTRO_FADE_DURATION),
-                    )
-
-                    skipOnboardingFadeOutAnimatorSet = AnimatorSet().apply {
-                        playTogether(fadeOutAnimators)
-                        addListener(object : AnimatorListenerAdapter() {
-                            override fun onAnimationEnd(animation: Animator) {
-                                binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
-                                    getString(R.string.preOnboardingDaxDialog3Title)
-                                binding.daxDialogCta.welcomeContent.bodyText1.text =
-                                    if (isCustomAiOnboardingFlow) {
-                                        requireContext().appendIconToText(
-                                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
-                                            CommonR.drawable.ic_ai_chat_16,
-                                        )
-                                    } else {
-                                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
-                                    }
-                                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
-
-                                binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
-                                binding.daxDialogCta.welcomeContent.titleText.text = ""
-                                binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
-
-                                binding.daxDialogCta.primaryCta.text = getString(
-                                    if (isCustomAiOnboardingFlow) {
-                                        R.string.preOnboardingDaxDialog3ButtonCustomAi
-                                    } else {
-                                        R.string.preOnboardingDaxDialog3Button
-                                    },
-                                )
-                                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-
-                                binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
-                                    getString(R.string.preOnboardingDaxDialog3Title),
-                                ) {
-                                    skipOnboardingFadeInAnimatorSet = AnimatorSet().apply {
-                                        playTogether(
-                                            ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
-                                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                            ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                            ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
-                                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        )
-                                        addListener(object : AnimatorListenerAdapter() {
-                                            override fun onAnimationEnd(animation: Animator) {
-                                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-                                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
-                                                isAnimating = false
-                                            }
-                                        })
-                                        start()
-                                    }
-                                }
-                            }
-                        })
-                        start()
-                    }
-                }
+                SKIP_ONBOARDING_OPTION -> Unit
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
@@ -1660,57 +1583,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
 
-            SKIP_ONBOARDING_OPTION -> {
-                binding.logoAnimation.alpha = 0f
-                binding.welcomeTitle.alpha = 0f
-                binding.duckAiIntroAnimation.alpha = 0f
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
-
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.welcomeContent.root.isVisible = true
-                binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
-                binding.daxDialogCta.welcomeContent.bodyText1.text =
-                    if (isCustomAiOnboardingFlow) {
-                        requireContext().appendIconToText(
-                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
-                            CommonR.drawable.ic_ai_chat_16,
-                        )
-                    } else {
-                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
-                    }
-                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
-                binding.daxDialogCta.primaryCta.text = getString(
-                    if (isCustomAiOnboardingFlow) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingDaxDialog3Button,
-                )
-                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-                binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
-
-                val showWalkingDax = applyWalkingDaxLayout()
-                if (showWalkingDax) {
-                    with(binding.welcomeScreenWalkingDax) {
-                        cancelAnimation()
-                        progress = 1f
-                        alpha = 1f
-                        translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
-                    }
-                }
-                binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
-
-                binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
-                binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingDaxDialog3Title)
-                binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
-                binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
-
-                binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-
-                binding.daxDialogCta.secondaryCta.isVisible = true
-                binding.daxDialogCta.secondaryCta.alpha = 1f
-                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
-
-                binding.daxDialogCta.root.isVisible = true
-                binding.daxDialogCta.daxCtaContainer.alpha = 1f
-            }
+            SKIP_ONBOARDING_OPTION -> Unit
 
             ADDRESS_BAR_POSITION -> {
                 binding.logoAnimation.alpha = 0f
@@ -2443,9 +2316,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun skipCurrentDialogAnimation() {
         if (!isAnimating) return
 
-        // End the skip-onboarding fade-out first — its end listener starts the typing animation
-        skipOnboardingFadeOutAnimatorSet?.end()
-
         // Complete any active typing animation (triggers afterAnimation callback which starts fade-in)
         with(binding.daxDialogCta) {
             listOf(
@@ -2462,7 +2332,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         welcomeFadeInAnimatorSet?.end()
         comparisonChartFadeInAnimatorSet?.end()
         comparisonChartDetailAnimatorSet?.end()
-        skipOnboardingFadeInAnimatorSet?.end()
         addressBarFadeInAnimatorSet?.end()
         inputScreenFadeInAnimatorSet?.end()
         inputScreenPreviewFadeInAnimatorSet?.end()

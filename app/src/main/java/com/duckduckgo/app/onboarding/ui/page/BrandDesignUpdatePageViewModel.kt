@@ -56,7 +56,6 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERI
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -211,10 +210,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
-            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP, SKIP_ONBOARDING_OPTION -> Unit
         }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
@@ -233,7 +231,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
             INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW ->
                 emit(NewUserOnboardingEvent.ContinueClicked)
-            SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.SkipConfirmed)
             ADDRESS_BAR_POSITION ->
                 emit(NewUserOnboardingEvent.AddressBarConfirmed(_viewState.value.selectedAddressBarPosition))
             INPUT_SCREEN ->
@@ -242,6 +239,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 val state = _viewState.value
                 emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
             }
+            SKIP_ONBOARDING_OPTION -> Unit
         }
     }
 
@@ -249,8 +247,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             INITIAL_REINSTALL_USER, SYNC_RESTORE -> emit(NewUserOnboardingEvent.SkipRequested)
-            SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.ResumeRequested)
-            INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+            INITIAL,
+            COMPARISON_CHART,
+            AI_COMPARISON_CHART,
+            ADDRESS_BAR_POSITION,
+            INPUT_SCREEN,
+            INPUT_SCREEN_PREVIEW,
+            QUICK_SETUP,
+            SKIP_ONBOARDING_OPTION,
+            -> Unit
         }
     }
 
@@ -515,7 +520,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INPUT_SCREEN, stepIndicator = progress)
             is NewUserOnboardingActivityDialog.InputScreenPreview ->
                 setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, stepIndicator = progress)
-            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption -> setCurrentDialog(SKIP_ONBOARDING_OPTION)
             is NewUserOnboardingActivityDialog.QuickSetup -> {
                 _viewState.update {
                     it.copy(
