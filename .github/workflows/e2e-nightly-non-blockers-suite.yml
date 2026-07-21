@@ -3,11 +3,41 @@ name: 'End to End Tests - Full Suite of non release blocker tests (Nightly)'
 on:
   schedule:
     - cron: '0 5 * * *' # run at 5 AM UTC
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        required: false
+        type: string
+        default: 'AnvilDagger'
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        required: false
+        type: string
+        default: 'AnvilDagger'
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
+
+# Compute DI-variant suffixes once. Empty when AnvilDagger (or input missing) so
+# maestro test names and Asana task names stay byte-identical to pre-change for
+# the default Anvil path. Pattern uses truthy-first ternary because `A && '' || X`
+# is broken in GHA expressions (empty string is falsy).
+env:
+  DDG_DI: ${{ inputs.ddg_di || 'AnvilDagger' }}
+  DI_UNDERSCORE_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('_{0}', inputs.ddg_di) || '' }}
+  DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
 
 jobs:
   instrumentation_tests:
@@ -18,18 +48,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Assemble APKs
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:
-          commit: ${{ github.ref }}
+          commit: ${{ inputs.commit }}
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json'
+          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json -Pddg.di=${{ env.DDG_DI }}'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -41,7 +70,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: binary_internal_upload_${{ github.sha }}
+          maestro_test_name: binary_internal_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
           maestro_api_level: 34
@@ -49,7 +78,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Binary Upload
+          test_suite_name: Internal Binary Upload${{ env.DI_PAREN_SUFFIX }}
 
       - name: Upload Release Binary to Maestro
         id: maestro-upload-release-binary
@@ -58,7 +87,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: binary_release_upload_${{ github.sha }}
+          maestro_test_name: binary_release_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
           maestro_api_level: 34
@@ -66,7 +95,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Release Binary Upload
+          test_suite_name: Release Binary Upload${{ env.DI_PAREN_SUFFIX }}
 
       - name: Autofill Web Flows
         id: maestro-autofill-web
@@ -77,7 +106,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: autofill_secondary_functionality_${{ github.sha }}
+          maestro_test_name: autofill_secondary_functionality${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 34
@@ -85,7 +114,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Autofill Web Flows
+          test_suite_name: Autofill Web Flows${{ env.DI_PAREN_SUFFIX }}
 
       - name: Run Duck Player Maestro Tests
         id: maestro-cloud-asana
@@ -96,7 +125,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: duckPlayerTest_${{ github.sha }}
+          maestro_test_name: duckPlayerTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: duckplayer
@@ -104,7 +133,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Duck Player
+          test_suite_name: Duck Player${{ env.DI_PAREN_SUFFIX }}
 
       - name: Android Design System
         id: maestro-ads
@@ -115,7 +144,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: ads_${{ github.sha }}
+          maestro_test_name: ads${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: androidDesignSystemTest
@@ -123,7 +152,7 @@ jobs:
           maestro_api_level: 34
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Android Design System (Nightly)
+          test_suite_name: Android Design System (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
 
       - name: Onboarding
         id: maestro-onboarding-non-release-blocking
@@ -134,7 +163,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: onboardingNonReleaseBlockingTest_${{ github.sha }}
+          maestro_test_name: onboardingNonReleaseBlockingTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 34
@@ -142,7 +171,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Onboarding
+          test_suite_name: Onboarding${{ env.DI_PAREN_SUFFIX }}
 
       - name: SERP Flows
         id: maestro-serp-flows
@@ -153,7 +182,7 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: serp_${{ github.sha }}
+          maestro_test_name: serp${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_api_level: 34
@@ -161,7 +190,7 @@ jobs:
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: SERP Flows
+          test_suite_name: SERP Flows${{ env.DI_PAREN_SUFFIX }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
@@ -171,6 +200,6 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
           asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - End to End tests (Non Release Blockers)
-          asana-task-description: The end to end workflow has failed. These are non release blocking tests, no immediate action needed other than heads up to code owners. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - End to End tests${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
+          asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
