@@ -137,7 +137,11 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
         binding.editThisDeviceNameItem.isVisible = viewState.device.thisDevice && !viewState.isEditingName
         binding.editThisDeviceNameItem.setSecondaryText(viewState.device.deviceName)
-        binding.editThisDeviceNameShimmer.isVisible = viewState.device.thisDevice && viewState.isEditingName
+        binding.editThisDeviceNameShimmer.apply {
+            val showShimmer = viewState.device.thisDevice && viewState.isEditingName
+            isVisible = showShimmer
+            if (showShimmer) startShimmer() else stopShimmer()
+        }
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
         binding.syncThisDeviceToggleContainer.isVisible = viewState.device.thisDevice
 
