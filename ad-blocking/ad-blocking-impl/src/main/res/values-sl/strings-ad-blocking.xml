@@ -24,7 +24,7 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Videoposnetke odpre v načinu zasebnega kina, ki preprečuje, da bi vsebina, ki jo gledate, vplivala na vaša priporočila v YouTubu.</string>
     <string name="ad_blocking_settings_title_v2">Blokiranje oglasov</string>
-    <string name="ad_blocking_settings_header_description">Blokira invazivne sledilnike, še preden se naložijo, s čimer učinkovito odstrani oglase, ki temeljijo na sledenju</string>
+    <string name="ad_blocking_settings_header_description">Blokira invazivne sledilnike, še preden se naložijo, s čimer učinkovito odstrani oglase, ki temeljijo na sledenju.</string>
     <string name="contingencyMessageTitle">Blokiranje oglasov na YouTubu ni na voljo</string>
     <string name="contingencyMessageContent">Nedavne spremembe na YouTubu so vplivale na delovanje funkcije blokiranja oglasov. Prizadevamo si za odpravljanje teh težav in cenimo vaše razumevanje.</string>
     <string name="contingencyMessagePrimaryButton">Razumem</string>
@@ -37,9 +37,11 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Onemogoči do vnovičnega zagona</string>
     <string name="ad_blocking_menu_always_off">Vedno izklopljeno</string>
     <string name="ad_blocking_disabled_popup_title">Ali blokiranje oglasov na YouTubu ne deluje?</string>
-    <string name="ad_blocking_disabled_popup_description">DuckDuckGo pošljite anonimno poročilo o prekinitvi delovanja. Pomagajte izboljšati blokiranje oglasov za vse uporabnike.</string>
+    <string name="ad_blocking_disabled_popup_description">Pošljite anonimno poročilo v DuckDuckGo in pomagajte izboljšati blokiranje oglasov za vse uporabnike.</string>
     <string name="ad_blocking_disabled_primary_action">Pošlji poročilo o prekinitvi delovanja</string>
     <string name="ad_blocking_disabled_secondary_action">Prekliči</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Onemogočeno do vnovičnega zagona</string>
-    <string name="ad_blocking_omnibar_badge_text">Blokiranje oglasov na YouTubu je omogočeno</string>
+
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Blokiranje oglasov</string>
 </resources>

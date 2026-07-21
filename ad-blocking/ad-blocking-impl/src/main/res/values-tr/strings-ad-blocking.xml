@@ -24,9 +24,9 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Videoları, izlediğiniz içeriğin YouTube akışınızı etkilemesini engelleyen, dikkat dağıtıcı unsurlardan arındırılmış bir sinema moduyla açar.</string>
     <string name="ad_blocking_settings_title_v2">Reklam Engelleme</string>
-    <string name="ad_blocking_settings_header_description">İstilacı izleyicileri yüklenmeden önce engelleyerek, izlemeye dayalı reklamları etkili bir şekilde ortadan kaldırır</string>
+    <string name="ad_blocking_settings_header_description">İstilacı izleyicileri yüklenmeden önce engelleyerek, izlemeye dayalı reklamları etkili bir şekilde ortadan kaldırır.</string>
     <string name="contingencyMessageTitle">YouTube\'da Reklam Engelleme Kullanılamıyor</string>
-    <string name="contingencyMessageContent">YouTube\'da yapılan son değişiklikler reklam engelleme özelliğini etkiledi. Bu sorunları çözmeye çalışıyoruz. Anlayışınız için teşekkür ederiz</string>
+    <string name="contingencyMessageContent">YouTube\'da yapılan son değişiklikler Reklam Engelleme özelliğini etkiledi. Bu sorunları çözmeye çalışıyoruz. Anlayışınız için teşekkür ederiz.</string>
     <string name="contingencyMessagePrimaryButton">Anladım</string>
     <string name="contingencyMessageCloseContentDescription">Kapat</string>
     <string name="ad_blocking_menu_disable">YouTube\'da Reklam Engellemeyi Devre Dışı Bırak</string>
@@ -37,9 +37,11 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Yeniden başlatılana kadar devre dışı bırak</string>
     <string name="ad_blocking_menu_always_off">Her Zaman Kapalı</string>
     <string name="ad_blocking_disabled_popup_title">YouTube\'da reklam engelleme çalışmıyor mu?</string>
-    <string name="ad_blocking_disabled_popup_description">DuckDuckGo\'ya anonim bir hata raporu gönderin. Reklam engellemeyi herkes için daha iyi hale getirmemize yardımcı olun!</string>
+    <string name="ad_blocking_disabled_popup_description">DuckDuckGo\'ya anonim bir rapor göndererek reklam engellemeyi herkes için daha iyi hale getirmemize yardımcı olun!</string>
     <string name="ad_blocking_disabled_primary_action">Hata Raporu Gönder</string>
     <string name="ad_blocking_disabled_secondary_action">İptal</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Yeniden başlatılana kadar devre dışı bırakıldı</string>
-    <string name="ad_blocking_omnibar_badge_text">YouTube\'da Reklam Engelleme Açık</string>
+
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Reklam Engelleme</string>
 </resources>
