@@ -112,6 +112,8 @@ jobs:
 
       - name: Autofill Critical Path
         id: maestro-autofill-critical
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -134,6 +136,8 @@ jobs:
 
       - name: Custom tabs flows
         id: maestro-custom-tabs
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -156,6 +160,8 @@ jobs:
 
       - name: Internal Privacy Tests
         id: maestro-internal-privacy
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -178,6 +184,8 @@ jobs:
 
       - name: Onboarding flows
         id: maestro-onboarding
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -200,6 +208,8 @@ jobs:
 
       - name: Internal Onboarding Flows
         id: maestro-internal-onboarding
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -222,6 +232,8 @@ jobs:
 
       - name: Deeplink tests
         id: maestro-deeplink
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -244,6 +256,8 @@ jobs:
 
       - name: Ad click detection flows
         id: maestro-ad-click
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -266,6 +280,8 @@ jobs:
 
       - name: Privacy Tests
         id: maestro-privacy
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -288,6 +304,8 @@ jobs:
 
       - name: Security Tests
         id: maestro-security
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -310,6 +328,8 @@ jobs:
 
       - name: Release Tests
         id: maestro-release
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -332,6 +352,8 @@ jobs:
 
       - name: Unified Input Field
         id: maestro-unified-input
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -354,6 +376,8 @@ jobs:
 
       - name: Notifications permissions Android 13+
         id: maestro-notification-permissions
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
