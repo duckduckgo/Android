@@ -1152,9 +1152,6 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
-        if (pendingUploadTask == null) {
-            viewModel.onSheetClosed()
-        }
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
