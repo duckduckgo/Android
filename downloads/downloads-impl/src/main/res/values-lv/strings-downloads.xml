@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Kopīgot ar…</string>
     <string name="downloadsStateInProgress">Notiek...</string>
     <string name="downloadsUndoActionName">Atsaukt</string>
+    <string name="downloadsSearchHint">Meklēt</string>
 </resources>

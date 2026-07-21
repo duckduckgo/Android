@@ -41,5 +41,5 @@
     <string name="ad_blocking_disabled_primary_action">Functioneringsrapport verzenden</string>
     <string name="ad_blocking_disabled_secondary_action">Annuleren</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Uitgeschakeld tot opnieuw starten</string>
-    <string name="ad_blocking_omnibar_badge_text">Blokkering van YouTube-advertenties aan</string>
+    <string name="ad_blocking_omnibar_badge_text">Blokkering van YouTube-advertenties Aan</string>
 </resources>
