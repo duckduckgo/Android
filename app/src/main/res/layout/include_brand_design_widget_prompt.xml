@@ -61,29 +61,53 @@
         app:typography="onboarding_body"
         tools:alpha="1" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/widgetPromptMedia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/keyline_6"
         android:alpha="0"
-        android:background="@drawable/onboarding_widget_prompt_sketch_frame"
-        android:gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         tools:alpha="1">
 
-        <ImageView
-            android:id="@+id/widgetPromptMediaImage"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="@dimen/keyline_0"
-            android:importantForAccessibility="no"
-            android:maxWidth="@dimen/preOnboardingWidgetPromptMediaMaxWidth"
-            android:maxHeight="@dimen/preOnboardingWidgetPromptMediaMaxHeight"
-            android:scaleType="fitXY"
-            android:src="@drawable/onboarding_widget_prompt_preview" />
+            android:layout_marginHorizontal="@dimen/keyline_2"
+            android:background="@drawable/onboarding_widget_prompt_sketch_frame">
 
-    </FrameLayout>
+            <ImageView
+                android:id="@+id/widgetPromptMediaImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:layout_marginEnd="@dimen/keyline_1"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/onboarding_widget_prompt_preview"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="2.40:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="@dimen/preOnboardingWidgetPromptMediaMaxHeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1"
+                app:layout_constraintWidth_default="wrap"
+                app:layout_constraintWidth_max="@dimen/preOnboardingWidgetPromptMediaMaxWidth" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center_horizontal"
+            android:background="?attr/onboardingAccentPrimary"
+            android:importantForAccessibility="no"
+            tools:ignore="MissingHorizontalDivider" />
+
+    </LinearLayout>
 
 </LinearLayout>

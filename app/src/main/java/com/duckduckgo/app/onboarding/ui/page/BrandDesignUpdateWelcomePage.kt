@@ -658,7 +658,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         openDefaultBrowserSystemSettings()
                     }
                     BrandDesignUpdatePageViewModel.Command.LaunchAddWidgetPrompt -> {
-                        addWidgetLauncher.launchAddWidget(activity)
+                        addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
                     }
                     BrandDesignUpdatePageViewModel.Command.ShowRemoveWidgetBottomSheet -> {
                         showRemoveWidgetInstructionsBottomSheet()
