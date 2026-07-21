@@ -24,9 +24,9 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Отваря видеоклипове в режим на киносалон без разсейване, който предотвратява влиянието на гледаното съдържание върху емисията в YouTube.</string>
     <string name="ad_blocking_settings_title_v2">Блокиране на реклами</string>
-    <string name="ad_blocking_settings_header_description">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването</string>
+    <string name="ad_blocking_settings_header_description">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването.</string>
     <string name="contingencyMessageTitle">Блокирането на реклами в YouTube е недостъпно</string>
-    <string name="contingencyMessageContent">Блокирането на реклами е засегнато от скорошни промени в YouTube. Работим за отстраняване на тези проблеми и оценяваме Вашето разбиране</string>
+    <string name="contingencyMessageContent">Блокирането на реклами е засегнато от скорошни промени в YouTube. Работим за отстраняване на тези проблеми и оценяваме Вашето разбиране.</string>
     <string name="contingencyMessagePrimaryButton">Разбрах</string>
     <string name="contingencyMessageCloseContentDescription">Затваряне</string>
     <string name="ad_blocking_menu_disable">Деактивиране на блокирането на реклами в YouTube</string>
@@ -37,9 +37,11 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Деактивиране до рестартиране</string>
     <string name="ad_blocking_menu_always_off">Винаги изключено</string>
     <string name="ad_blocking_disabled_popup_title">Блокирането на реклами в YouTube не работи?</string>
-    <string name="ad_blocking_disabled_popup_description">Изпратете анонимен сигнал за повреда до DuckDuckGo. Помогнете за подобряване на блокирането на реклами за всички!</string>
+    <string name="ad_blocking_disabled_popup_description">Изпратете анонимен сигнал до DuckDuckGo и помогнете за подобряване на блокирането на реклами за всички!</string>
     <string name="ad_blocking_disabled_primary_action">Изпращане на сигнал за повреда</string>
     <string name="ad_blocking_disabled_secondary_action">Отмяна</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Деактивирано до рестартиране</string>
-    <string name="ad_blocking_omnibar_badge_text">Блокирането на рекламите в YouTube е включено</string>
+
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Блокирани реклами</string>
 </resources>

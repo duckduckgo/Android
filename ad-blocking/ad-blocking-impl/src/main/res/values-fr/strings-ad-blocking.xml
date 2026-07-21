@@ -41,5 +41,7 @@
     <string name="ad_blocking_disabled_primary_action">Envoyer un rapport de défaillance</string>
     <string name="ad_blocking_disabled_secondary_action">Annuler</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Désactivé jusqu\'au redémarrage</string>
-    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. Keep it as short as possible — aim for under ~20 characters or it will be truncated with an ellipsis. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Blocage des publicités activé</string>
+
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Blocage des publicités activé</string>
 </resources>
