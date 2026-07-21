@@ -48,6 +48,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -147,7 +148,7 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
-    fun setPageContext(title: String, url: String, faviconUrl: String?)
+    fun setPageContext(title: String, url: String)
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
@@ -245,6 +246,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var browserMode: BrowserMode
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
 
     private var activeTabId: String? = null
 
@@ -454,7 +458,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onAskAboutTab = pendingAskAboutTab
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
-            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
+            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
         }
         (pluginView as? ModelPicker)?.let { picker ->
@@ -1227,8 +1231,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
 
-    override fun setPageContext(title: String, url: String, faviconUrl: String?) {
-        val attachment = PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl)
+    override fun setPageContext(title: String, url: String) {
+        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId)
         pendingPageContext = attachment
         attachmentView?.setPageContext(attachment)
     }

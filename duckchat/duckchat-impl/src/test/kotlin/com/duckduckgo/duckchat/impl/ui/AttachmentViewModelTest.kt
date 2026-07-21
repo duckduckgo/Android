@@ -973,7 +973,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenSetPageContextThenAttachmentStateAndGetterReflectIt() = runTest {
-        val pageContext = PageContextAttachment(title = "Example", url = "https://example.com", faviconUrl = null)
+        val pageContext = PageContextAttachment(title = "Example", url = "https://example.com", tabId = "tab-1")
 
         viewModel.setPageContext(pageContext)
 
@@ -983,8 +983,8 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenSetPageContextTwiceThenLatestReplaces() = runTest {
-        viewModel.setPageContext(PageContextAttachment("First", "https://first.com", null))
-        val latest = PageContextAttachment("Second", "https://second.com", "https://second.com/fav.ico")
+        viewModel.setPageContext(PageContextAttachment("First", "https://first.com", "tab-1"))
+        val latest = PageContextAttachment("Second", "https://second.com", "tab-2")
 
         viewModel.setPageContext(latest)
 
@@ -993,7 +993,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenRemovePageContextThenStateIsNull() = runTest {
-        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", "tab-1"))
 
         viewModel.removePageContext()
 
@@ -1003,14 +1003,14 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenOnlyPageContextPresentThenHasAttachmentsIsTrue() = runTest {
-        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", "tab-1"))
 
         assertTrue(viewModel.attachmentState.value.hasAttachments)
     }
 
     @Test
     fun whenClearAttachmentsThenPageContextCleared() = runTest {
-        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", "tab-1"))
 
         viewModel.clearAttachments()
 

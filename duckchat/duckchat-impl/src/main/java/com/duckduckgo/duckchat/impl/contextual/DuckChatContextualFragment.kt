@@ -808,7 +808,6 @@ class DuckChatContextualFragment :
             binding.contextualNativeInputWidget.setPageContext(
                 title = viewState.contextTitle,
                 url = viewState.contextUrl,
-                faviconUrl = null,
             )
         } else {
             binding.contextualNativeInputWidget.clearPageContext()
