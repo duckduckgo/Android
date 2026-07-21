@@ -44,7 +44,7 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * a [SnackbarHost] and use the [DaxSnackbar] overload that accepts [SnackbarData]: duration,
  * placement and swipe-to-dismiss are owned by the host's [SnackbarHostState], not this composable.
  *
- * @param message The message text. May wrap onto multiple lines.
+ * @param message The message text. Wraps to at most two lines; longer text is truncated with an ellipsis.
  * @param modifier The [Modifier] to be applied to this snackbar.
  * @param action Optional trailing action (e.g. "Undo"). When null, only the message is shown.
  *
@@ -75,6 +75,7 @@ fun DaxSnackbar(
             text = message,
             style = DuckDuckGoTheme.typography.body2,
             color = DaxSnackbarDefaults.ContentColor,
+            maxLines = 2,
         )
     }
 }
@@ -154,6 +155,27 @@ private fun DaxSnackbarWithActionPreview() {
 
 @PreviewLightDark
 @Composable
+private fun DaxSnackbarTwoLinePreview() {
+    PreviewBox {
+        DaxSnackbar(
+            message = "This snackbar message is long enough to wrap onto two lines at the standard width.",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSnackbarTwoLineWithActionPreview() {
+    PreviewBox {
+        DaxSnackbar(
+            message = "This snackbar message is long enough to wrap onto two lines beside an action.",
+            action = DaxAction(text = "Undo", onClick = {}),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
 private fun DaxSnackbarShortMessagePreview() {
     PreviewBox {
         DaxSnackbar(
@@ -164,11 +186,11 @@ private fun DaxSnackbarShortMessagePreview() {
 
 @PreviewLightDark
 @Composable
-private fun DaxSnackbarLongMessagePreview() {
+private fun DaxSnackbarTruncatedToTwoLinesPreview() {
     PreviewBox {
         DaxSnackbar(
-            message = "This is a much longer snackbar message designed to wrap onto multiple lines so the " +
-                "multi-line layout can be verified alongside a trailing action.",
+            message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
+                "truncated with an ellipsis rather than growing unbounded beside the action.",
             action = DaxAction(text = "Action", onClick = {}),
         )
     }

@@ -660,6 +660,18 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                             onClick = { Toast.makeText(context, "Action pressed", Toast.LENGTH_SHORT).show() },
                         ),
                     )
+                    DaxSnackbar(
+                        message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
+                                "truncated with an ellipsis rather than growing unbounded beside the action.",
+                    )
+                    DaxSnackbar(
+                        message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
+                                "truncated with an ellipsis rather than growing unbounded beside the action.",
+                        action = DaxAction(
+                            text = "Action",
+                            onClick = { Toast.makeText(context, "Action pressed", Toast.LENGTH_SHORT).show() },
+                        ),
+                    )
                 }
             }
         }
