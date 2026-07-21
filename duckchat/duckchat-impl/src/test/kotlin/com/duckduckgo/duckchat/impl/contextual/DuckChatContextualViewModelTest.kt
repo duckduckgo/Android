@@ -841,7 +841,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received without request and attachments disabled then context ignored`() =
+    fun `when page context received without request and attachments disabled then attached chip is not updated but latest is tracked`() =
         runTest {
             whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
             whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
@@ -875,9 +875,11 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived("tab-1", serializedPageData, isStorePageContextEnabled = true)
 
             val state = testee.viewState.value
+            // The attached chip is untouched by an unsolicited push while auto-attach is off...
             assertEquals("", state.contextTitle)
             assertEquals("", state.contextUrl)
-            assertEquals("", testee.updatedPageContext)
+            // ...but the latest page is tracked so a later manual attach can use the current page.
+            assertEquals(serializedPageData, testee.updatedPageContext)
         }
 
     @Test
@@ -1645,13 +1647,16 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when main browser page finished in input mode with auto context disabled then no command emitted`() = runTest {
+    fun `when main browser page finished in input mode with auto context disabled then page context still requested to track latest`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
 
         testee.commands.test {
             testee.onMainBrowserPageFinished()
 
-            expectNoEvents()
+            // Even with auto-attach off we refresh the latest page context on navigation so a manual
+            // attach targets the current page; the attached chip is left untouched (see onPageContextReceived).
+            val command = awaitItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.RequestPageContext)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1838,6 +1843,49 @@ class DuckChatContextualViewModelTest {
 
         assertFalse(testee.viewState.value.showContext)
         assertTrue(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when auto-attach off and reattaching after navigating then the current page is attached`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // Navigate to page B (a passive navigation push, not sheet-solicited), then remove and re-attach.
+        testee.onMainBrowserPageFinished()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach off and attached then passive navigation leaves the attached chip unchanged`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Passive navigation to page B while the sheet stays open must not change the attached chip.
+        testee.onMainBrowserPageFinished()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
     }
 
     @Test
