@@ -1745,6 +1745,16 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet opened then tabId is set synchronously before the async open completes`() = runTest {
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+
+        // No advanceUntilIdle: tabId must already be set so per-tab consumers never read an empty id.
+        assertEquals("tab-1", testee.viewState.value.tabId)
+    }
+
+    @Test
     fun `when auto-attach off and sheet reopened on a different url then the stale attached context is dropped`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()

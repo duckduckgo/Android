@@ -351,6 +351,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onSheetOpened(tabId: String) {
+        _viewState.update { it.copy(tabId = tabId) }
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
             withContext(dispatchers.main()) {
