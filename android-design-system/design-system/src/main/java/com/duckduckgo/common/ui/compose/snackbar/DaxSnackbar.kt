@@ -89,7 +89,9 @@ fun DaxSnackbar(
  * Reads the message and optional action label from [snackbarData] and delegates to the visual
  * [DaxSnackbar] overload; tapping the action invokes [SnackbarData.performAction]. Trigger snackbars
  * via [SnackbarHostState.showSnackbar]. A dismiss action ([SnackbarData]'s `withDismissAction`) is
- * not rendered — the DDG snackbar design exposes only the message and an optional action.
+ * not rendered. The DDG snackbar design exposes only the message and an optional action. Unlike the                                                                                                                                                                                                              
+ * View `Snackbar`, a Compose `SnackbarHost` has no swipe-to-dismiss, so a `SnackbarDuration.Indefinite`                                                                                                                                                                                                          
+ * snackbar with no `actionLabel` can only be dismissed in code via [SnackbarHostState.currentSnackbarData].                                                                                                                                                                                                      
  *
  * @param snackbarData The data provided by the host's [SnackbarHostState].
  * @param modifier The [Modifier] to be applied to this snackbar.
