@@ -45,10 +45,6 @@ class PageContextAttachmentView @JvmOverloads constructor(
 
     fun current(): PageContextAttachment? = attachment
 
-    /**
-     * The favicon [ImageView] for the currently shown chip, or null when nothing is shown. The host
-     * loads the page favicon into it; until then it keeps its default placeholder icon.
-     */
     fun faviconView(): ImageView? = faviconView
 
     fun show(attachment: PageContextAttachment, onRemoved: () -> Unit) {
