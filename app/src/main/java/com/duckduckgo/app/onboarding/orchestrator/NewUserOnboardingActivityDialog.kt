@@ -30,7 +30,6 @@ sealed interface NewUserOnboardingActivityDialog {
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
     data object WidgetPrompt : NewUserOnboardingActivityDialog
 
-    /** No DDG UI of its own — triggers the system add-widget prompt, like [DefaultBrowserPrompt]. */
     data object AddWidget : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog

@@ -46,10 +46,8 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
      */
     data object SkipNewUserOnboardingDevOptionClicked : NewUserOnboardingEvent
 
-    /** Widget-prompt page: user tapped the primary "Add widget" CTA. */
     data object AddWidgetRequested : NewUserOnboardingEvent
 
-    /** Widget-prompt page: user tapped the secondary "Maybe later" CTA. */
     data object WidgetPromptSkipped : NewUserOnboardingEvent
 
     data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
