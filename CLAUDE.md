@@ -7,6 +7,7 @@ The following rule files contain detailed guidance for specific topics. Read the
 | File | Covers |
 |---|---|
 | `.cursor/rules/architecture.mdc` | Module structure, dependency injection, plugin system, ViewModels, URL classification, testing, git workflow |
+| `.cursor/rules/code-style.mdc` | Code comments: why-not-what, self-documenting code, banned comment categories, reviewer checklist |
 | `.cursor/rules/android-design-system.mdc` | ADS components, buttons, text, inputs, switches, list items, dialogs, bottom sheets, colors, spacing, lint rules |
 | `.cursor/rules/maestro-ui-tests.mdc` | Maestro test setup, organization, tags, running locally and in CI |
 | `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
