@@ -1008,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
 </resources>

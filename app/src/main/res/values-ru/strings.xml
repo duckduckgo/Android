@@ -1048,5 +1048,6 @@
     <string name="fireTabsNewTabButton">Новая Fire-вкладка</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>Новинка!</b> Используйте Fire-вкладки, чтобы просматривать веб-страницы без сохранения локальной истории.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
 </resources>
