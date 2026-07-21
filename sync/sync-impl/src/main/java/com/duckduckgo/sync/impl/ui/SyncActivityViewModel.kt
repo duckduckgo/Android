@@ -185,6 +185,7 @@ class SyncActivityViewModel @Inject constructor(
             newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
             showAutoRestoreToggle = autoRestoreState.showToggle,
             autoRestoreEnabled = autoRestoreState.enabled,
+            isThisDeviceSyncing = currentState.isThisDeviceSyncing,
         )
     }
 
