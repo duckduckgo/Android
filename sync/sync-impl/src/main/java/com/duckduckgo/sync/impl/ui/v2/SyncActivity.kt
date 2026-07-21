@@ -69,7 +69,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchOriginalF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SetSyncThisDeviceToggle
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
@@ -224,6 +223,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun renderDisabledState(viewState: ViewState) {
         binding.includeDisabledView.apply {
             root.isGone = viewState.showAccount
+            syncThisDeviceToggle.quietlySetIsChecked(viewState.isThisDeviceSyncing, syncThisDeviceListener)
             syncOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
@@ -334,10 +334,6 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is ShowRecoveryCode -> {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
-
-            is SetSyncThisDeviceToggle -> {
-                binding.includeDisabledView.syncThisDeviceToggle.quietlySetIsChecked(command.isOn, syncThisDeviceListener)
             }
 
             is SyncWithAnotherDevice -> {

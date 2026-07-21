@@ -66,6 +66,7 @@ import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -110,7 +111,7 @@ class SyncActivityViewModel @Inject constructor(
     // null until the first load from preference; used by onScreenExit() to detect changes.
     @Volatile private var initialAutoRestoreEnabled: Boolean? = null
 
-    private val command = Channel<Command>(Channel.BUFFERED)
+    private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
         checkIfDeviceSupported()
@@ -220,6 +221,7 @@ class SyncActivityViewModel @Inject constructor(
         val newDesktopBrowserSettingEnabled: Boolean = false,
         val showAutoRestoreToggle: Boolean = false,
         val autoRestoreEnabled: Boolean = false,
+        val isThisDeviceSyncing: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -253,7 +255,6 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
         data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
-        data class SetSyncThisDeviceToggle(val isOn: Boolean) : Command()
     }
 
     enum class OriginalFlow {
@@ -283,6 +284,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onSyncThisDevice(source: String? = null) {
+        viewState.value = viewState.value.setThisDeviceSyncInProgress()
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
             requiresSetupAuthentication(
@@ -370,12 +372,10 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncPixels.fireUserConfirmedToTurnOffSync()
 
-            viewState.value = viewState.value.hideAccount()
-            command.send(Command.SetSyncThisDeviceToggle(isOn = false))
+            viewState.value = viewState.value.hideAccount().setThisDeviceSyncIdle()
             when (val result = syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
                     viewState.value = viewState.value.showAccount()
-                    command.send(Command.SetSyncThisDeviceToggle(isOn = true))
                     command.send(ShowError(R.string.sync_turn_off_error, result.reason))
                 }
 
@@ -538,6 +538,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeviceConnected() {
+        viewState.value = viewState.value.setThisDeviceSyncIdle()
         viewModelScope.launch {
             fetchRemoteDevices()
         }
@@ -568,9 +569,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onSyncThisDeviceCanceled() {
-        viewModelScope.launch {
-            command.send(Command.SetSyncThisDeviceToggle(isOn = false))
-        }
+        viewState.value = viewState.value.setThisDeviceSyncIdle()
     }
 
     private fun showAccountDetailsIfNeeded() {
@@ -626,6 +625,8 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
+    private fun ViewState.setThisDeviceSyncInProgress() = copy(isThisDeviceSyncing = true)
+    private fun ViewState.setThisDeviceSyncIdle() = copy(isThisDeviceSyncing = false)
 
     fun processSetupDeepLink(setupUrl: String) {
         logcat { "Sync-setup: got setup deep link $setupUrl" }
