@@ -121,7 +121,7 @@
     <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_share_title">Κοινή χρήση με...</string>
     <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
-    <string name="sync_pdf_description">Ο κωδικός ανάκτησης σας επιτρέπει να συγχρονίζετε τους κωδικούς πρόσβασής σας, τα δεδομένα αυτόματης συμπλήρωσης και τις συνομιλίες του Duck.ai σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας εάν χάσετε την πρόσβαση σε μια συσκευή.</string>
+    <string name="sync_pdf_description">Ο κωδικός ανάκτησης σας επιτρέπει να συγχρονίζετε τους κωδικούς πρόσβασής σας, τα δεδομένα αυτόματης συμπλήρωσης και τις συνομιλίες του Duck.ai σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας εάν χάσετε την πρόσβαση σε μια συσκευή.\n\n</string>
     <string name="sync_code_box_title">Διατηρήστε αυτές τις πληροφορίες ασφαλείς.</string>
     <string name="sync_instructions_title">Πώς λειτουργεί αυτός ο κώδικας;</string>
     <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo στη συσκευή που θέλετε να συγχρονίσετε και μεταβείτε στο Sync &amp; Backup στις Ρυθμίσεις.</string>
