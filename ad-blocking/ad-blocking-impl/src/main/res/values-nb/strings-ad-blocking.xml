@@ -40,8 +40,8 @@
     <string name="ad_blocking_disabled_popup_description">Send en anonym rapport til DuckDuckGo og bidra til å gjøre annonseblokkering bedre for alle!</string>
     <string name="ad_blocking_disabled_primary_action">Send feilrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
-    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiver til neste oppstart</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til neste oppstart</string>
 
     <!-- smartling.character_limit = 19 -->
-    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Annonseblokkering på</string>
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Annonseblokkering</string>
 </resources>
