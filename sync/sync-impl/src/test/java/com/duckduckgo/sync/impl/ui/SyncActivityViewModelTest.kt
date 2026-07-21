@@ -55,8 +55,8 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SetSyncThisDeviceToggle
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
@@ -322,10 +322,12 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceCanceledThenEmitCommandSyncThisDeviceCanceled() = runTest {
+    fun whenSyncThisDeviceCanceledThenSyncThisDeviceToggleSetOff() = runTest {
         testee.commands().test {
             testee.onSyncThisDeviceCanceled()
-            awaitItem().assertCommandType(SyncThisDeviceCanceled::class)
+            val command = awaitItem()
+            command.assertCommandType(SetSyncThisDeviceToggle::class)
+            assertFalse((command as SetSyncThisDeviceToggle).isOn)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -396,6 +398,39 @@ class SyncActivityViewModelTest {
         testee.onTurnOffSyncConfirmed(connectedDevice)
 
         verify(syncPixels).fireUserConfirmedToTurnOffSync()
+    }
+
+    @Test
+    fun whenTurnOffSyncConfirmedThenSyncThisDeviceToggleSetOff() = runTest {
+        whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
+
+        testee.commands().test {
+            testee.onTurnOffSyncConfirmed(connectedDevice)
+            val command = awaitItem()
+            command.assertCommandType(SetSyncThisDeviceToggle::class)
+            assertFalse((command as SetSyncThisDeviceToggle).isOn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTurnOffSyncConfirmedFailsThenSyncThisDeviceToggleSetOnAndErrorShown() = runTest {
+        whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
+
+        testee.commands().test {
+            testee.onTurnOffSyncConfirmed(connectedDevice)
+
+            val toggleOff = awaitItem()
+            toggleOff.assertCommandType(SetSyncThisDeviceToggle::class)
+            assertFalse((toggleOff as SetSyncThisDeviceToggle).isOn)
+
+            val toggleOn = awaitItem()
+            toggleOn.assertCommandType(SetSyncThisDeviceToggle::class)
+            assertTrue((toggleOn as SetSyncThisDeviceToggle).isOn)
+
+            awaitItem().assertCommandType(Command.ShowError::class)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

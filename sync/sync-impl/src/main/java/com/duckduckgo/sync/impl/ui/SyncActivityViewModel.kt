@@ -66,7 +66,6 @@ import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -111,7 +110,7 @@ class SyncActivityViewModel @Inject constructor(
     // null until the first load from preference; used by onScreenExit() to detect changes.
     @Volatile private var initialAutoRestoreEnabled: Boolean? = null
 
-    private val command = Channel<Command>(1, DROP_OLDEST)
+    private val command = Channel<Command>(Channel.BUFFERED)
     private val viewState = MutableStateFlow(ViewState())
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
         checkIfDeviceSupported()
@@ -254,7 +253,7 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
         data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
-        data object SyncThisDeviceCanceled : Command()
+        data class SetSyncThisDeviceToggle(val isOn: Boolean) : Command()
     }
 
     enum class OriginalFlow {
@@ -372,9 +371,11 @@ class SyncActivityViewModel @Inject constructor(
             syncPixels.fireUserConfirmedToTurnOffSync()
 
             viewState.value = viewState.value.hideAccount()
+            command.send(Command.SetSyncThisDeviceToggle(isOn = false))
             when (val result = syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
                     viewState.value = viewState.value.showAccount()
+                    command.send(Command.SetSyncThisDeviceToggle(isOn = true))
                     command.send(ShowError(R.string.sync_turn_off_error, result.reason))
                 }
 
@@ -568,7 +569,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSyncThisDeviceCanceled() {
         viewModelScope.launch {
-            command.send(Command.SyncThisDeviceCanceled)
+            command.send(Command.SetSyncThisDeviceToggle(isOn = false))
         }
     }
 
