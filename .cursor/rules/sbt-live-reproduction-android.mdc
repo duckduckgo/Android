@@ -19,7 +19,7 @@ adb install -r android/app/build/outputs/apk/internal/debug/<apk-name>
 
 ## Emulator
 
-- Default to `ddg_pixel9_api35`; it is the current known-good AVD.
+- Default to `ddg_pixel9_api35` as a known-good AVD.
 - Start headlessly:
 
 ```sh
@@ -36,7 +36,7 @@ adb shell am start -W -a android.intent.action.VIEW -d '<url>' com.duckduckgo.mo
 
 ## Screenshots
 
-Prefer device-file screenshots; avoid `adb exec-out screencap -p` because it has hung on this pool.
+Prefer device-file screenshots; avoid `adb exec-out screencap -p` because it may hang.
 
 ```sh
 adb shell screencap -p /sdcard/before.png
@@ -52,4 +52,4 @@ adb shell input keyevent BACK
 adb shell am force-stop com.google.android.apps.nexuslauncher
 ```
 
-Then relaunch the URL activity and report the cleanup in the SBT output.
+Then relaunch the URL activity and report the cleanup in the steps_summary of your required output.
