@@ -40,5 +40,5 @@
     <string name="ad_blocking_disabled_popup_description">Send en anonym feilrapport til DuckDuckGo. Bidra til å gjøre annonseblokkering bedre for alle!</string>
     <string name="ad_blocking_disabled_primary_action">Send feilrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
-    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktiver til neste oppstart</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til neste oppstart</string>
 </resources>
