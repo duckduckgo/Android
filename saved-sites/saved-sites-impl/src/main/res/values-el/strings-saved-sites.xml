@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Κοινοποιήστε τα Αγαπημένα</string>
-    <string name="sync_enable_option_favorites_subtitle">Χρησιμοποιήστε τα ίδια αγαπημένα σε όλες τις συσκευές. Διακόψτε τη διαδικασία για να διατηρήσετε τα Αγαπημένα σας για κινητά και υπολογιστές ξεχωριστά.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Κοινοποίηση αγαπημένων σε όλες τις συσκευές</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Χρησιμοποιήστε τους ίδιους σελιδοδείκτες αγαπημένων σε κινητό και υπολογιστή.</string>
     <string name="saved_site_limit_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό σελιδοδεικτών. Διαγράψτε ορισμένους για να συνεχίσετε τον συγχρονισμό.<annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Ο συγχρονισμός σελιδοδεικτών έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό σελιδοδεικτών. Διαγράψτε ορισμένους σελιδοδείκτες για να συνεχίσετε τον συγχρονισμό.</string>
     <string name="saved_site_invalid_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΟρισμένοι σελιδοδείκτες δεν έχουν μορφοποιηθεί σωστά ή είναι πολύ μεγάλοι και δεν συγχρονίστηκαν.\n\n<annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
@@ -99,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Θέλετε σίγουρα να διαγράψετε τον σελιδοδείκτη σας για το &lt;b&gt;%1$s&lt;/b&gt;;</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
-    <string name="sync_fetch_icons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες σας.</string>
+    <string name="sync_simplified_fetch_icons_title">Φόρτωση εικονιδίων σελιδοδείκτη</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Φορτώνει εικονίδια από ιστότοπους που έχετε προσθέσει σελιδοδείκτες. Οι λήψεις εικονιδίων αποκαλύπτονται στο δίκτυό σας.</string>
     <string name="faviconsPromptTitle">Λήψη των εικονιδίων που λείπουν;</string>
     <string name="faviconsPromptMessage">Θέλετε αυτή η συσκευή να πραγματοποιεί αυτόματη λήψη εικονιδίων για συγχρονισμένους σελιδοδείκτες από τους ιστότοπους με σελιδοδείκτες;</string>
     <string name="faviconsPromptPrimaryCta">Διατηρήστε ενημερωμένα τα εικονίδια σελιδοδείκτη</string>

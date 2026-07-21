@@ -28,6 +28,7 @@
     <string name="sync_settings_v2_download_recovery_code_item">Download Your Recovery Code</string>
     <string name="sync_settings_v2_copy_recovery_code_item">Copy Your Recovery Code</string>
     <string name="sync_settings_v2_delete_account_item">Turn Off and Delete Server Data</string>
+    <string name="sync_settings_v2_bookmarks_section_header">Bookmarks</string>
     <string name="sync_setup_v2_header_headline">Sync this device with a nearby computer.</string>
     <string name="sync_setup_v2_header_body">We’ll help you sync your devices.</string>
     <string name="sync_setup_v2_this_device_cta_title">Sync This Device Only</string>
