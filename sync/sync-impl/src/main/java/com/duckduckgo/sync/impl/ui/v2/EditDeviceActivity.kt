@@ -51,9 +51,9 @@ import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskRemoveDevic
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ResetTurnOffSyncToggle
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetEditDeviceResult
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetRemoveDeviceResult
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetTurnOffSyncResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetDeviceEditedResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetDeviceRemovedResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetSyncTurnedOffResult
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Factory.Provider
@@ -156,7 +156,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                 askEditDevice()
             }
 
-            is SetEditDeviceResult -> {
+            is SetDeviceEditedResult -> {
                 setResult(RESULT_DEVICE_EDITED, EditDeviceContract.resultIntent(currentDevice))
             }
 
@@ -164,7 +164,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                 askRemoveDevice()
             }
 
-            is SetRemoveDeviceResult -> {
+            is SetDeviceRemovedResult -> {
                 setResult(RESULT_DEVICE_REMOVED, EditDeviceContract.resultIntent(currentDevice))
             }
 
@@ -172,7 +172,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                 askTurnOffSync()
             }
 
-            is SetTurnOffSyncResult -> {
+            is SetSyncTurnedOffResult -> {
                 setResult(RESULT_SYNC_TURNED_OFF, EditDeviceContract.resultIntent(currentDevice))
             }
 

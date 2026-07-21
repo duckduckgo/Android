@@ -28,8 +28,9 @@ import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskRemoveDevic
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ResetTurnOffSyncToggle
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetRemoveDeviceResult
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetTurnOffSyncResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetDeviceEditedResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetDeviceRemovedResult
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.SetSyncTurnedOffResult
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceViewModel.Command.ShowError
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -100,6 +101,18 @@ class EditDeviceViewModelTest {
     }
 
     @Test
+    fun `when renaming the device succeeds then the edited result is set`() = runTest {
+        whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
+
+        testee.commands.test {
+            testee.confirmNewDeviceName("New Device Name")
+            assertIs<SetDeviceEditedResult>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
     fun `when renaming the device fails then the toggle is reset and an error is shown`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Error(reason = "boom"))
 
@@ -138,7 +151,7 @@ class EditDeviceViewModelTest {
     fun `when turning off sync is confirmed then the result is set and the screen closes`() = runTest {
         testee.commands.test {
             testee.onTurnOffSyncConfirmed()
-            assertIs<SetTurnOffSyncResult>(awaitItem())
+            assertIs<SetSyncTurnedOffResult>(awaitItem())
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -169,7 +182,7 @@ class EditDeviceViewModelTest {
     fun `when removing the device is confirmed then the result is set and the screen closes`() = runTest {
         testee.commands.test {
             testee.onRemoveDeviceConfirmed()
-            assertIs<SetRemoveDeviceResult>(awaitItem())
+            assertIs<SetDeviceRemovedResult>(awaitItem())
             assertIs<Close>(awaitItem())
 
             cancel()

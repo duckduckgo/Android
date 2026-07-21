@@ -67,6 +67,7 @@ class EditDeviceViewModel @AssistedInject constructor(
             when (val result = syncAccountRepository.renameDevice(editedDevice)) {
                 is Success -> {
                     _viewState.update { it.copy(device = editedDevice) }
+                    _commands.send(Command.SetDeviceEditedResult)
                 }
 
                 is Error -> {
@@ -85,7 +86,7 @@ class EditDeviceViewModel @AssistedInject constructor(
 
     fun onTurnOffSyncConfirmed() {
         viewModelScope.launch {
-            _commands.send(Command.SetTurnOffSyncResult)
+            _commands.send(Command.SetSyncTurnedOffResult)
             _commands.send(Command.Close)
         }
     }
@@ -104,7 +105,7 @@ class EditDeviceViewModel @AssistedInject constructor(
 
     fun onRemoveDeviceConfirmed() {
         viewModelScope.launch {
-            _commands.send(Command.SetRemoveDeviceResult)
+            _commands.send(Command.SetDeviceRemovedResult)
             _commands.send(Command.Close)
         }
     }
@@ -123,17 +124,17 @@ class EditDeviceViewModel @AssistedInject constructor(
     sealed interface Command {
         data object AskEditDevice : Command
 
-        data object SetEditDeviceResult : Command
+        data object SetDeviceEditedResult : Command
 
         data object AskRemoveDevice : Command
 
-        data object SetRemoveDeviceResult : Command
+        data object SetDeviceRemovedResult : Command
 
         data object AskTurnOffSync : Command
 
         data object ResetTurnOffSyncToggle : Command
 
-        data object SetTurnOffSyncResult : Command
+        data object SetSyncTurnedOffResult : Command
 
         data class ShowError(
             @StringRes val message: Int,
