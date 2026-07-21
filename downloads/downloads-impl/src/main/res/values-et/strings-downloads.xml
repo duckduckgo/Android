@@ -50,4 +50,5 @@
     <string name="downloadsShareTitle">Jaga…</string>
     <string name="downloadsStateInProgress">Pooleli…</string>
     <string name="downloadsUndoActionName">Võta tagasi</string>
+    <string name="downloadsSearchHint">Otsi</string>
 </resources>
