@@ -118,8 +118,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                val intent = Intent(this, RecoveryCodeActivity::class.java).putExtra("device", result.device.deviceName)
-                startActivity(intent)
+                startActivity(Intent(this, RecoveryCodeActivity::class.java))
             }
 
             is SyncThisDeviceContract.Output.Canceled -> {

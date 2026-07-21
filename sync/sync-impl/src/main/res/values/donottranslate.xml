@@ -48,4 +48,8 @@
     <string name="sync_device_v2_turn_off_sync_dialog_body">This device will no longer be able to access your synced data on other devices.</string>
     <string name="sync_device_v2_turn_off_sync_dialog_primary_button">Turn Off</string>
     <string name="sync_device_v2_turn_off_sync_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_recovery_codes_headline" instruction="Placeholder is a device name">%1$s has been added to Sync &amp; Backup.</string>
+    <string name="sync_device_v2_recovery_codes_body">Use this code to restore your data if you lose access to this device. Keep it safe.</string>
+    <string name="sync_device_v2_download_code_button">Download Your Recovery Code</string>
+    <string name="sync_device_v2_done_button">Done</string>
 </resources>

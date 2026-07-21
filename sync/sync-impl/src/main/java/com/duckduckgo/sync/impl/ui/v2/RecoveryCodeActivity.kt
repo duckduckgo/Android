@@ -16,54 +16,43 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
-import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity.CENTER_HORIZONTAL
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.view.updateMargins
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2RecoveryCodesBinding
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class RecoveryCodeActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncV2RecoveryCodesBinding>()
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        @SuppressLint("SetTextI18n")
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            setBackgroundColor(Color.WHITE)
-
-            addView(
-                TextView(context).apply {
-                    layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, CENTER_HORIZONTAL).apply {
-                        updateMargins(top = 60, bottom = 60)
-                    }
-                    setTextColor(Color.BLACK)
-                    text = "Connected device: ${intent.getStringExtra("device")}"
-                },
-            )
-
-            addView(
-                Button(context).apply {
-                    layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, CENTER_HORIZONTAL)
-                    setBackgroundColor(Color.BLACK)
-                    setTextColor(Color.WHITE)
-                    text = "Done"
-                    setOnClickListener { finish() }
-                },
-            )
+        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (isEdgeToEdge) {
+            enableTransparentEdgeToEdge()
         }
+        setContentView(binding.root)
+        if (isEdgeToEdge) {
+            configureEdgeToEdgeInsets()
+        }
+    }
 
-        setContentView(container)
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.contentScrollView)
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.doneButton)
     }
 }
