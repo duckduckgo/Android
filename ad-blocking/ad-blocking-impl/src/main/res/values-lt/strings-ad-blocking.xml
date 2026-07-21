@@ -24,9 +24,9 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus neblaškančiu kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
     <string name="ad_blocking_settings_title_v2">Reklamų blokavimas</string>
-    <string name="ad_blocking_settings_header_description">Blokuoja įkyrias sekimo priemones dar prieš jas įkeliant, todėl veiksmingai pašalina sekimu pagrįstas reklamas</string>
+    <string name="ad_blocking_settings_header_description">Blokuoja įkyrius sekiklius dar jiems neįsikėlus ir veiksmingai pašalina sekimu paremtus skelbimus.</string>
     <string name="contingencyMessageTitle">„YouTube“ reklamų blokavimas nepasiekiamas</string>
-    <string name="contingencyMessageContent">Naujausi „YouTube“ pakeitimai paveikė reklamų blokavimą. Sprendžiame šias problemas ir dėkojame už supratingumą</string>
+    <string name="contingencyMessageContent">Dėl pastarųjų „YouTube“ pakeitimų sutriko skelbimų blokavimas. Stengiamės išspręsti šiuos nesklandumus ir dėkojame už supratingumą.</string>
     <string name="contingencyMessagePrimaryButton">Supratau</string>
     <string name="contingencyMessageCloseContentDescription">Uždaryti</string>
     <string name="ad_blocking_menu_disable">Išjungti „YouTube“ reklamų blokavimą</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Išjungti iki paleidimo iš naujo</string>
     <string name="ad_blocking_menu_always_off">Visada išjungta</string>
     <string name="ad_blocking_disabled_popup_title">Neveikia „YouTube“ reklamų blokavimas?</string>
-    <string name="ad_blocking_disabled_popup_description">Siųsk anoniminį pranešimą apie triktį „DuckDuckGo“. Padėk patobulinti reklamų blokavimą visiems!</string>
+    <string name="ad_blocking_disabled_popup_description">Siųsk anoniminį pranešimą „DuckDuckGo“ ir padėk tobulinti skelbimų blokavimą visiems!</string>
     <string name="ad_blocking_disabled_primary_action">Siųsti pranešimą apie triktį</string>
     <string name="ad_blocking_disabled_secondary_action">Atšaukti</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Išjungta iki paleidimo iš naujo</string>
-    <string name="ad_blocking_omnibar_badge_text">„YouTube“ reklamų blokavimas įjungtas</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Skelbimų blokavimas įjungtas</string></resources>

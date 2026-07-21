@@ -24,9 +24,9 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Åpner videoer i en distraksjonsfri kinomodus som hindrer at det du ser på påvirker YouTube-feeden din.</string>
     <string name="ad_blocking_settings_title_v2">Annonseblokkering</string>
-    <string name="ad_blocking_settings_header_description">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing</string>
+    <string name="ad_blocking_settings_header_description">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing.</string>
     <string name="contingencyMessageTitle">Annonseblokkering på YouTube er ikke tilgjengelig</string>
-    <string name="contingencyMessageContent">Annonseblokkering har blitt påvirket av nylige endringer på YouTube. Vi jobber med å løse disse problemene og takker for tålmodigheten</string>
+    <string name="contingencyMessageContent">Annonseblokkering har blitt påvirket av nylige endringer på YouTube. Vi jobber med å løse disse problemene og takker for tålmodigheten.</string>
     <string name="contingencyMessagePrimaryButton">Den er grei</string>
     <string name="contingencyMessageCloseContentDescription">Lukk</string>
     <string name="ad_blocking_menu_disable">Deaktiver annonseblokkering på YouTube</string>
@@ -37,9 +37,10 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Deaktiver til neste oppstart</string>
     <string name="ad_blocking_menu_always_off">Alltid av</string>
     <string name="ad_blocking_disabled_popup_title">Fungerer ikke annonseblokkering på YouTube?</string>
-    <string name="ad_blocking_disabled_popup_description">Send en anonym feilrapport til DuckDuckGo. Bidra til å gjøre annonseblokkering bedre for alle!</string>
+    <string name="ad_blocking_disabled_popup_description">Send en anonym rapport til DuckDuckGo og bidra til å gjøre annonseblokkering bedre for alle!</string>
     <string name="ad_blocking_disabled_primary_action">Send feilrapport</string>
     <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til neste oppstart</string>
-    <string name="ad_blocking_omnibar_badge_text">Annonseblokkering på YouTube er på</string>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Annonseblokkering på</string>
 </resources>

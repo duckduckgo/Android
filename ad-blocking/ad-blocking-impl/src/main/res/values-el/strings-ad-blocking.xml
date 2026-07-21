@@ -24,9 +24,9 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Ανοίγει βίντεο σε λειτουργία κινηματογράφου χωρίς περισπάσεις, η οποία εμποδίζει το περιεχόμενο που παρακολουθείς να επηρεάσει τη ροή σου στο YouTube.</string>
     <string name="ad_blocking_settings_title_v2">Αποκλεισμός διαφημίσεων</string>
-    <string name="ad_blocking_settings_header_description">Αποκλείει επεμβατικά προγράμματα παρακολούθησης προτού φορτώσουν, εξαλείφοντας αποτελεσματικά διαφημίσεις που βασίζονται σε παρακολούθηση</string>
+    <string name="ad_blocking_settings_header_description">Αποκλείει επεμβατικά προγράμματα παρακολούθησης προτού φορτώσουν, εξαλείφοντας αποτελεσματικά διαφημίσεις που βασίζονται σε παρακολούθηση.</string>
     <string name="contingencyMessageTitle">Ο αποκλεισμός διαφημίσεων στο YouTube δεν είναι διαθέσιμος</string>
-    <string name="contingencyMessageContent">Ο αποκλεισμός διαφημίσεων έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σου</string>
+    <string name="contingencyMessageContent">Ο αποκλεισμός διαφημίσεων έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σας.</string>
     <string name="contingencyMessagePrimaryButton">Κατάλαβα</string>
     <string name="contingencyMessageCloseContentDescription">Κλείσιμο</string>
     <string name="ad_blocking_menu_disable">Απενεργοποίηση αποκλεισμού διαφημίσεων στο YouTube</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Απενεργοποίηση μέχρι την επανεκκίνηση</string>
     <string name="ad_blocking_menu_always_off">Πάντα ανενεργός</string>
     <string name="ad_blocking_disabled_popup_title">Ο αποκλεισμός διαφημίσεων στο YouTube δεν λειτουργεί;</string>
-    <string name="ad_blocking_disabled_popup_description">Στείλε μια ανώνυμη αναφορά βλάβης στο DuckDuckGo. Βοήθησε να κάνουμε τον αποκλεισμό διαφημίσεων καλύτερο για όλους!</string>
+    <string name="ad_blocking_disabled_popup_description">Στείλτε μια ανώνυμη αναφορά στο DuckDuckGo και βοηθήστε να κάνουμε τον αποκλεισμό διαφημίσεων καλύτερο για όλους!</string>
     <string name="ad_blocking_disabled_primary_action">Αποστολή Αναφοράς βλάβης</string>
     <string name="ad_blocking_disabled_secondary_action">Ακύρωση</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Απενεργοποιήθηκε μέχρι την επανεκκίνηση</string>
-    <string name="ad_blocking_omnibar_badge_text">Αποκλεισμός διαφημίσεων YouTube ενεργός</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Αποκλεισμός διαφημίσεων ενεργός</string></resources>
