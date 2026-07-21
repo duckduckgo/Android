@@ -18,16 +18,18 @@ package com.duckduckgo.common.ui.compose.snackbar
 
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.DaxAction
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -90,9 +92,9 @@ fun DaxSnackbar(
  * Reads the message and optional action label from [snackbarData] and delegates to the visual
  * [DaxSnackbar] overload; tapping the action invokes [SnackbarData.performAction]. Trigger snackbars
  * via [SnackbarHostState.showSnackbar]. A dismiss action ([SnackbarData]'s `withDismissAction`) is
- * not rendered. The DDG snackbar design exposes only the message and an optional action. Unlike the                                                                                                                                                                                                              
- * View `Snackbar`, a Compose `SnackbarHost` has no swipe-to-dismiss, so a `SnackbarDuration.Indefinite`                                                                                                                                                                                                          
- * snackbar with no `actionLabel` can only be dismissed in code via [SnackbarHostState.currentSnackbarData].                                                                                                                                                                                                      
+ * not rendered. The DDG snackbar design exposes only the message and an optional action. Unlike the
+ * View `Snackbar`, a Compose `SnackbarHost` has no swipe-to-dismiss, so a `SnackbarDuration.Indefinite`
+ * snackbar with no `actionLabel` can only be dismissed in code via [SnackbarHostState.currentSnackbarData].
  *
  * @param snackbarData The data provided by the host's [SnackbarHostState].
  * @param modifier The [Modifier] to be applied to this snackbar.
@@ -194,4 +196,45 @@ private fun DaxSnackbarTruncatedToTwoLinesPreview() {
             action = DaxAction(text = "Action", onClick = {}),
         )
     }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSnackbarFromSnackbarDataPreview() {
+    PreviewBox {
+        DaxSnackbar(
+            snackbarData = previewSnackbarData(
+                snackbarMessage = "This is a Snackbar message",
+            ),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSnackbarFromSnackbarDataWithActionPreview() {
+    PreviewBox {
+        DaxSnackbar(
+            snackbarData = previewSnackbarData(
+                snackbarMessage = "This is a Snackbar message",
+                snackbarActionLabel = "Undo",
+            ),
+        )
+    }
+}
+
+private fun previewSnackbarData(
+    snackbarMessage: String,
+    snackbarActionLabel: String? = null,
+) = object : SnackbarData {
+    override val visuals = object : SnackbarVisuals {
+        override val message = snackbarMessage
+        override val actionLabel = snackbarActionLabel
+        override val withDismissAction = false
+        override val duration = SnackbarDuration.Short
+    }
+
+    override fun performAction() {}
+
+    override fun dismiss() {}
 }

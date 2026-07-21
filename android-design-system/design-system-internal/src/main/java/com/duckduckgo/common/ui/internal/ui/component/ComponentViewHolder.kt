@@ -52,13 +52,13 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
-import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -662,11 +662,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     )
                     DaxSnackbar(
                         message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
-                                "truncated with an ellipsis rather than growing unbounded beside the action.",
+                            "truncated with an ellipsis rather than growing unbounded beside the action.",
                     )
                     DaxSnackbar(
                         message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
-                                "truncated with an ellipsis rather than growing unbounded beside the action.",
+                            "truncated with an ellipsis rather than growing unbounded beside the action.",
                         action = DaxAction(
                             text = "Action",
                             onClick = { Toast.makeText(context, "Action pressed", Toast.LENGTH_SHORT).show() },
