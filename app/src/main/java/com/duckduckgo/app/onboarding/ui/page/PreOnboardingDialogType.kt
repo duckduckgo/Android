@@ -27,4 +27,5 @@ enum class PreOnboardingDialogType {
     INPUT_SCREEN,
     INPUT_SCREEN_PREVIEW,
     QUICK_SETUP,
+    WIDGET_PROMPT,
 }

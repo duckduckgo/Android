@@ -130,6 +130,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private var notificationPermissionGranted: Boolean? = null
 
+    private var addWidgetPromptFlowStarted = false
+
     init {
         start()
     }
@@ -212,7 +214,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW, QUICK_SETUP, SKIP_ONBOARDING_OPTION -> Unit
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP, SKIP_ONBOARDING_OPTION, WIDGET_PROMPT -> Unit
         }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
@@ -239,6 +241,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 val state = _viewState.value
                 emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
             }
+            WIDGET_PROMPT -> emit(NewUserOnboardingEvent.AddWidgetRequested)
             SKIP_ONBOARDING_OPTION -> Unit
         }
     }
@@ -247,6 +250,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             INITIAL_REINSTALL_USER, SYNC_RESTORE -> emit(NewUserOnboardingEvent.SkipRequested)
+            WIDGET_PROMPT -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
             INITIAL,
             COMPARISON_CHART,
             AI_COMPARISON_CHART,
@@ -379,6 +383,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         viewModelScope.launch {
             val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
             _commands.send(Command.SyncAddWidgetSwitch(isChecked = hasWidget))
+        }
+    }
+
+    fun checkAddWidgetPromptResult() {
+        if (addWidgetPromptFlowStarted) {
+            viewModelScope.launch {
+                val hasWidget = withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }
+                addWidgetPromptFlowStarted = false
+                orchestrator.onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = hasWidget))
+            }
         }
     }
 
@@ -520,6 +534,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INPUT_SCREEN, stepIndicator = progress)
             is NewUserOnboardingActivityDialog.InputScreenPreview ->
                 setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, stepIndicator = progress)
+            NewUserOnboardingActivityDialog.WidgetPrompt ->
+                setCurrentDialog(WIDGET_PROMPT, stepIndicator = progress)
+            NewUserOnboardingActivityDialog.AddWidget -> {
+                addWidgetPromptFlowStarted = true
+                _commands.send(Command.LaunchAddWidgetPrompt)
+            }
             is NewUserOnboardingActivityDialog.QuickSetup -> {
                 _viewState.update {
                     it.copy(

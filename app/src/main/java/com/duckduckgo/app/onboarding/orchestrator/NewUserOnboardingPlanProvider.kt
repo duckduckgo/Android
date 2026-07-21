@@ -27,6 +27,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -93,6 +94,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
 ) {
 
     suspend fun buildRootPlan(
@@ -111,12 +113,19 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
-            buildDefaultPlan(onCompleted, onSkipped)
+            val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+            val variant = if (isReinstall) {
+                null
+            } else {
+                onboardingPromptsExperimentManager.enroll()
+            }
+            buildDefaultPlan(onCompleted, onSkipped, variant)
         }
 
-    private fun buildDefaultPlan(
+    private suspend fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant?,
     ): LinearOnboardingPlan {
         val ctx = NewUserOnboardingPlanContext()
 
@@ -126,22 +135,31 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         val quickSetupPlan = quickSetupPlan(ctx)
 
+        val variantAllowsWidget = onboardingPromptExperimentVariant ==
+            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
+            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+        val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
+
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
             onSkipped = onSkipped,
-            steps = listOf(
-                introAnimationStep(),
-                notificationPermissionStep(),
-                syncRestoreStep(firstDialog, quickSetupPlan),
-                initialReinstallUserStep(firstDialog, quickSetupPlan),
-                initialStep(firstDialog),
-                comparisonChartStep(),
-                defaultBrowserPromptStep(),
-                addressBarPositionStep(),
-                inputScreenStep(ctx),
-                inputScreenPreviewStep(ctx, duckAiEnabled),
-            ),
+            steps = buildList {
+                add(introAnimationStep())
+                add(notificationPermissionStep())
+                add(syncRestoreStep(firstDialog, quickSetupPlan))
+                add(initialReinstallUserStep(firstDialog, quickSetupPlan))
+                add(initialStep(firstDialog))
+                add(comparisonChartStep())
+                add(defaultBrowserPromptStep())
+                if (showWidget) {
+                    add(widgetPromptStep(ctx))
+                    add(addWidgetStep(ctx))
+                }
+                add(addressBarPositionStep())
+                add(inputScreenStep(ctx))
+                add(inputScreenPreviewStep(ctx, duckAiEnabled))
+            },
         )
     }
 
@@ -449,6 +467,55 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         },
     )
+
+    private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.WIDGET_PROMPT,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.AddWidgetRequested -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    is NewUserOnboardingEvent.WidgetPromptSkipped -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        ctx.skipAddWidget = true
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun addWidgetStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        // No shown pixel of its own; the confirmed result belongs to the widget-prompt pixel
+        // (shown on the widget_prompt page). Skipped when the user opted out or already has a widget.
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_WIDGET,
+            pixelName = null,
+            precondition = {
+                !ctx.skipAddWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddWidget },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.AddWidgetFinished -> {
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_WIDGET_PROMPT,
+                            OnboardingPixelAction.WidgetConfirmed(added = event.widgetAdded),
+                        )
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION

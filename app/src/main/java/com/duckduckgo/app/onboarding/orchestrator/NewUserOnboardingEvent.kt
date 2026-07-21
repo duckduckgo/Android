@@ -45,4 +45,10 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
      * See [NewUserOnboardingPlanProvider.abortingOnDevSkip].
      */
     data object SkipNewUserOnboardingDevOptionClicked : NewUserOnboardingEvent
+
+    data object AddWidgetRequested : NewUserOnboardingEvent
+
+    data object WidgetPromptSkipped : NewUserOnboardingEvent
+
+    data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
 }
