@@ -58,7 +58,7 @@ import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
-import com.duckduckgo.common.ui.compose.message.DaxAction
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
