@@ -109,9 +109,22 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private var fullModeUrl: String = ""
-    var updatedPageContext: String = ""
-    private var attachedPageContext: String = ""
-    var sheetTabId: String = ""
+
+    private data class PageContextState(
+        // The current page reported by the browser — what a manual attach grabs.
+        val currentPage: String = "",
+        // The frozen snapshot actually submitted for the current attachment, so passive navigation
+        // doesn't change what an existing attachment sends.
+        val attachedPage: String = "",
+    )
+
+    private var pageContextState = PageContextState()
+
+    var currentPageContext: String
+        get() = pageContextState.currentPage
+        set(value) {
+            pageContextState = pageContextState.copy(currentPage = value)
+        }
 
     // Chat id currently shown in the contextual webview, derived from the URL query param.
     // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
@@ -272,7 +285,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
 
-        contextualNativeInputManager.onContextualReopened(sheetTabId)
+        contextualNativeInputManager.onContextualReopened(_viewState.value.tabId)
 
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
@@ -344,7 +357,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 isPageContextRequested = true
                 commandChannel.trySend(Command.RequestPageContext)
             }
-            sheetTabId = tabId
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {
@@ -498,7 +510,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val viewState = _viewState.value
         val pageContext =
             if (viewState.showContext) {
-                attachedPageContext
+                pageContextState.attachedPage
                     .takeIf { it.isNotBlank() }
                     ?.let { runCatching { JSONObject(it) }.getOrNull() }
                     ?: run {
@@ -557,8 +569,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generatePageContextEventData(): SubscriptionEventData {
-        val pageContext = if (isContextValid(updatedPageContext)) {
-            updatedPageContext
+        val pageContext = if (isContextValid(currentPageContext)) {
+            currentPageContext
                 .takeIf { it.isNotBlank() }
                 ?.let { runCatching { JSONObject(it) }.getOrNull() }
                 ?: run {
@@ -566,7 +578,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     null
                 }
 
-            val json = JSONObject(updatedPageContext)
+            val json = JSONObject(currentPageContext)
             val url = json.optString("url")
             logcat { "Duck.ai: generatePageContextEventData for url $url" }
             json
@@ -610,7 +622,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
-        contextualNativeInputManager.onContextualClosed(sheetTabId)
+        contextualNativeInputManager.onContextualClosed(_viewState.value.tabId)
     }
 
     private fun persistTabClosed() {
@@ -653,13 +665,13 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPlaceholderContextTapped()
         }
         viewModelScope.launch {
-            val isContextValid = isContextValid(updatedPageContext, reportInvalidPixels = true)
+            val isContextValid = isContextValid(currentPageContext, reportInvalidPixels = true)
             if (isContextValid) {
-                attachedPageContext = updatedPageContext
-                val json = JSONObject(updatedPageContext)
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+                val json = JSONObject(currentPageContext)
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
                 _viewState.update { current ->
-                    logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
+                    logcat { "Duck.ai Contextual: addPageContext $current context $currentPageContext" }
                     current.copy(
                         showContext = true,
                         userRemovedContext = false,
@@ -715,9 +727,9 @@ class DuckChatContextualViewModel @Inject constructor(
             } else {
                 input.plus(" ").plus(prompt)
             }
-            val hasValidContext = isContextValid(updatedPageContext)
+            val hasValidContext = isContextValid(currentPageContext)
             if (hasValidContext) {
-                attachedPageContext = updatedPageContext
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
             }
             _viewState.update { current ->
                 current.copy(
@@ -736,7 +748,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
 
             QuickActionState.ASK_ABOUT_PAGE -> {
-                if (!isContextValid(updatedPageContext)) {
+                if (!isContextValid(currentPageContext)) {
                     // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
                     return
                 }
@@ -763,7 +775,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onAskAboutTabClicked() {
-        if (!isContextValid(updatedPageContext)) {
+        if (!isContextValid(currentPageContext)) {
             // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
             return
         }
@@ -830,7 +842,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isStorePageContextEnabled: Boolean = false,
     ) {
         if (isContextValid(pageContext)) {
-            updatedPageContext = pageContext
+            currentPageContext = pageContext
         }
         val inputMode = _viewState.value
         if (inputMode.sheetMode == SheetMode.INPUT &&
@@ -862,7 +874,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 val newlyAutoAttached = showContext && !inputMode.showContext
                 if (showContext) {
-                    attachedPageContext = pageContext
+                    pageContextState = pageContextState.copy(attachedPage = pageContext)
                 }
                 val updatedState =
                     inputMode.copy(
@@ -985,7 +997,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
                 withContext(dispatchers.main()) {
                     clearSheetUrl()
-                    attachedPageContext = ""
+                    pageContextState = pageContextState.copy(attachedPage = "")
                     val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
                         QuickActionState.ASK_ABOUT_PAGE
                     } else {

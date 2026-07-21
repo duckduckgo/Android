@@ -211,7 +211,7 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when prompt sent without updated page context then without-context pixel fired`() = runTest {
-        testee.updatedPageContext = ""
+        testee.currentPageContext = ""
 
         testee.onPromptSent("Hello Duck.ai")
 
@@ -556,7 +556,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with missing content then context stays hidden`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -578,7 +578,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with empty context then invalid empty pixel fired`() =
         runTest {
-            testee.updatedPageContext = ""
+            testee.currentPageContext = ""
 
             testee.addPageContext()
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -589,7 +589,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with missing title then invalid no title pixel fired`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "url": "https://ctx.com",
@@ -606,7 +606,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with both title and content missing then both invalid pixels fired`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "url": "https://ctx.com"
@@ -623,7 +623,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with valid context then context shown`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -660,7 +660,7 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextTitle)
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -678,7 +678,7 @@ class DuckChatContextualViewModelTest {
 
             testee.onPageContextReceived("tab-1", serializedPageData)
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -688,7 +688,7 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.onPageContextReceived("tab-1", "")
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -698,7 +698,7 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.onPageContextReceived("tab-1", "{not valid json")
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
             verify(duckChatPixels, never()).reportContextualPageContextInvalidNoTitle()
             verify(duckChatPixels, never()).reportContextualPageContextInvalidNoContent()
@@ -879,7 +879,7 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextTitle)
             assertEquals("", state.contextUrl)
             // ...but the latest page is tracked so a later manual attach can use the current page.
-            assertEquals(serializedPageData, testee.updatedPageContext)
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -921,7 +921,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertEquals("Ctx Title", state.contextTitle)
             assertEquals("https://ctx.com", state.contextUrl)
-            assertEquals(serializedPageData, testee.updatedPageContext)
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -943,7 +943,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertEquals("Ctx Title", state.contextTitle)
             assertEquals("https://ctx.com", state.contextUrl)
-            assertEquals(serializedPageData, testee.updatedPageContext)
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -973,7 +973,7 @@ class DuckChatContextualViewModelTest {
                 // initial emission
                 awaitItem()
 
-                testee.updatedPageContext =
+                testee.currentPageContext =
                     """
                     {
                         "title": "Ctx Title",
@@ -1178,7 +1178,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when prompt cleared then context state unchanged`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -2662,7 +2662,7 @@ class DuckChatContextualViewModelTest {
     fun `when ask about tab clicked without valid context then showContext stays false`() =
         runTest {
             testee.onSheetOpened("tab-1")
-            testee.updatedPageContext = ""
+            testee.currentPageContext = ""
 
             testee.onAskAboutTabClicked()
 
