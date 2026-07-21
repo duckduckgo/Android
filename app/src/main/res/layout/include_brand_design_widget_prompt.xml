@@ -81,7 +81,7 @@
             <ImageView
                 android:id="@+id/widgetPromptMediaImage"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginStart="@dimen/keyline_1"
                 android:layout_marginTop="@dimen/keyline_1"
                 android:layout_marginEnd="@dimen/keyline_1"
