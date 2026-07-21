@@ -29,8 +29,6 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data object ContinueClicked : NewUserOnboardingEvent
     data object RestoreRequested : NewUserOnboardingEvent
     data object SkipRequested : NewUserOnboardingEvent
-    data object SkipConfirmed : NewUserOnboardingEvent
-    data object ResumeRequested : NewUserOnboardingEvent
     data class DefaultBrowserPromptFinished(val isDefaultBrowser: Boolean) : NewUserOnboardingEvent
     data class AddressBarConfirmed(val type: OmnibarType) : NewUserOnboardingEvent
     data class InputModeConfirmed(val withAi: Boolean) : NewUserOnboardingEvent

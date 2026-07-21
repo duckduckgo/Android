@@ -27,6 +27,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface CustomAiOnboardingFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

@@ -170,7 +170,7 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     // Starts the real orchestrator on a single QUICK_SETUP step so the view model actually renders QUICK_SETUP.
-    private suspend fun createViewModelAtQuickSetup(): BrandDesignUpdatePageViewModel {
+    private suspend fun createViewModelAtQuickSetup(hideAddressBarRow: Boolean = false): BrandDesignUpdatePageViewModel {
         val plan = LinearOnboardingPlan(
             id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
             steps = listOf(
@@ -183,6 +183,7 @@ class BrandDesignUpdatePageViewModelTest {
                             showSplitOption = false,
                             hideSetDefaultBrowserRow = false,
                             hideAddWidgetRow = false,
+                            hideAddressBarRow = hideAddressBarRow,
                             isReinstallUser = false,
                         )
                     },
@@ -581,6 +582,24 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
+    // region Quick setup address bar row visibility
+
+    @Test
+    fun whenQuickSetupDialogHidesAddressBarRowThenViewStateHideAddressBarRowIsTrue() = runTest {
+        val testee = createViewModelAtQuickSetup(hideAddressBarRow = true)
+        advanceUntilIdle()
+        assertTrue(testee.viewState.value.hideAddressBarRow)
+    }
+
+    @Test
+    fun whenQuickSetupDialogShowsAddressBarRowThenViewStateHideAddressBarRowIsFalse() = runTest {
+        val testee = createViewModelAtQuickSetup(hideAddressBarRow = false)
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.hideAddressBarRow)
+    }
+
+    // endregion
+
     // region checkQuickSetupSwitchesState
 
     @Test
@@ -818,21 +837,6 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun `when skip confirmed then resume on skip option then emits skip confirmed then resume requested`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
-        advanceUntilIdle()
-
-        testee.onPrimaryCtaClicked()
-        testee.onSecondaryCtaClicked()
-        advanceUntilIdle()
-
-        assertEquals(
-            listOf(NewUserOnboardingEvent.SkipConfirmed, NewUserOnboardingEvent.ResumeRequested),
-            recordedEvents,
-        )
-    }
-
-    @Test
     fun `when demo query submitted then forwards event`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
         advanceUntilIdle()
@@ -891,12 +895,19 @@ class BrandDesignUpdatePageViewModelTest {
     @Test
     fun `when run aborted then sends onboarding skipped`() = runTest {
         val testee = startAt(
-            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption,
+            NewUserOnboardingActivityDialog.QuickSetup(
+                showSplitOption = false,
+                hideSetDefaultBrowserRow = false,
+                hideAddWidgetRow = false,
+                hideAddressBarRow = false,
+                isReinstallUser = false,
+            ),
             transition = { LinearOnboardingTransition.AbortPlan },
         )
         testee.commands.test {
             advanceUntilIdle()
-            realOrchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
+            // -> AbortPlan -> run skipped
+            realOrchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
             advanceUntilIdle()
             assertEquals(Command.OnboardingSkipped, awaitItem())
         }
