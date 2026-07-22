@@ -33,6 +33,25 @@ develocity {
         def diFrameworkTag = providers.gradleProperty('ddg.di').getOrElse('AnvilDagger')
         tag(diFrameworkTag)
         value('ddg.di', diFrameworkTag)
+
+        // Runner metadata, populated on CI by the develocity-runner-info action.
+        // Captured as custom values (not tags) so each dimension stays named and
+        // independently queryable when correlating Artifact Cache overhead with the
+        // runner hardware/region. Each is guarded so local builds emit nothing and so
+        // a runner without Azure IMDS (self-hosted) simply omits what it can't detect.
+        [
+            'Runner Type'       : 'DDG_RUNNER_TYPE',        // optional human label, if the CI step set one
+            'Runner Name'       : 'DDG_RUNNER_NAME',        // runner name from the runner context
+            'Runner Environment': 'DDG_RUNNER_ENVIRONMENT', // github-hosted vs self-hosted (runner context)
+            'Runner VM Size'    : 'DDG_RUNNER_VM_SIZE',     // authoritative Azure SKU from IMDS
+            'Runner CPU Count'  : 'DDG_RUNNER_CPU_COUNT',   // from nproc; works everywhere
+            'Runner Region'     : 'DDG_RUNNER_REGION',      // Azure region from IMDS
+        ].each { name, envVar ->
+            def v = System.getenv(envVar)
+            if (v) {
+                value(name, v)
+            }
+        }
     }
 }
 
