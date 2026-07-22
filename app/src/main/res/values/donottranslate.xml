@@ -101,6 +101,6 @@
 
     <!-- Add to Dock (onboarding) -->
     <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
-    <string name="preOnboardingAddToDockBody">Just find the DuckDuckGo icon, press and hold it, then drag it into place.</string>
+    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 </resources>
