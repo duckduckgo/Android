@@ -327,6 +327,6 @@ interface DuckChatFeature {
      * the legacy input for INPUT mode while still using the native widget in WEBVIEW (in-chat) mode.
      * When native chat input is off, this has no effect (everything falls back to legacy/web input).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
 }
