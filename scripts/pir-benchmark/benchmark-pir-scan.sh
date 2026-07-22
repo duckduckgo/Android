@@ -9,7 +9,11 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$DIR/lib/parse.sh"
 
 # ---- Config (run matrix; see spec §8) ----
-COUNTS=(1 10 20 40)
+# count=1 (fully serial) is omitted by default: at ~1 WebView it takes ~20x a 20-WebView
+# scan (~100-200 min/run), which dominates the sweep. {10,20,40} captures the
+# memory-vs-count trend and the 20-vs-40 comparison. Add 1 back for an overnight
+# serial-baseline / per-WebView-floor run if needed.
+COUNTS=(10 20 40)
 REPS=3
 SAMPLE_INTERVAL="${SAMPLE_INTERVAL:-1}"     # seconds between memory samples
 DETAIL_INTERVAL="${DETAIL_INTERVAL:-10}"    # seconds between detailed per-pid captures
