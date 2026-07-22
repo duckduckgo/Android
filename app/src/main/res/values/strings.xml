@@ -978,6 +978,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
+    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
+    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT and Claude, a secure VPN, and more.</string>

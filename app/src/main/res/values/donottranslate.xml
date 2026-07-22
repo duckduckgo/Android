@@ -92,15 +92,4 @@
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
-
-    <!-- Widget prompt (onboarding) -->
-    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
-    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
-    <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
-    <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
-
-    <!-- Add to Dock (onboarding) -->
-    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
-    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 </resources>
