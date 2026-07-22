@@ -21,6 +21,6 @@ import com.duckduckgo.common.ui.internal.ui.component.ComponentFragment
 
 class ComponentLayoutsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.CARD, Component.TOP_APP_BAR)
+        return listOf(Component.CARD, Component.TOP_APP_BAR, Component.SCAFFOLD)
     }
 }
