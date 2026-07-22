@@ -40,8 +40,7 @@ class RealEventHubRepositoryTest {
             period = TelemetryPeriodConfig(days = 1),
         ),
         parameters = mapOf(
-            "count" to TelemetryParameterConfig(
-                template = "counter",
+            "count" to CounterParameterConfig(
                 source = "adwall.detected",
                 buckets = linkedMapOf(
                     "0" to BucketConfig(gte = 0, lt = 1),

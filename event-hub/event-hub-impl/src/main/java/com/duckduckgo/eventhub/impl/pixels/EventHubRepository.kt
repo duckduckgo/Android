@@ -58,6 +58,7 @@ class RealEventHubRepository @Inject constructor(
                 periodEndMillis = state.periodEndMillis,
                 paramsJson = serializeParams(state.params),
                 configJson = configJson,
+                experimentsJson = state.experiments?.let { serializeExperiments(it) },
             ),
         )
     }
@@ -73,14 +74,20 @@ class RealEventHubRepository @Inject constructor(
             periodEndMillis = entity.periodEndMillis,
             config = config,
             params = parseParamsJson(entity.paramsJson),
+            experiments = entity.experimentsJson?.let { parseExperimentsJson(it) },
         )
     }
 
     companion object {
+        private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).build() }
+
         private val paramsAdapter by lazy {
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
             val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
             moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
+        }
+
+        private val experimentsAdapter by lazy {
+            moshi.adapter(ExperimentPeriodState::class.java).lenient()
         }
 
         fun parseParamsJson(json: String): Map<String, ParamState> {
@@ -93,6 +100,18 @@ class RealEventHubRepository @Inject constructor(
 
         fun serializeParams(params: Map<String, ParamState>): String {
             return paramsAdapter.toJson(params)
+        }
+
+        fun parseExperimentsJson(json: String): ExperimentPeriodState? {
+            return try {
+                experimentsAdapter.fromJson(json)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        fun serializeExperiments(state: ExperimentPeriodState): String {
+            return experimentsAdapter.toJson(state)
         }
     }
 }

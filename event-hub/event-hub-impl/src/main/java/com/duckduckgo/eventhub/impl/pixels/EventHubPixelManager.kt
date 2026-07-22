@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,6 +72,7 @@ class RealEventHubPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val eventHubFeature: EventHubFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : EventHubPixelManager {
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
@@ -135,7 +137,7 @@ class RealEventHubPixelManager @Inject constructor(
                 var changed = false
 
                 for ((paramName, paramConfig) in pixelState.config.parameters) {
-                    if (paramConfig.isCounter && paramConfig.source == eventType) {
+                    if (paramConfig is CounterParameterConfig && paramConfig.source == eventType) {
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
                         if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
@@ -171,7 +173,7 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    private fun processPixelStates(): Long {
+    private suspend fun processPixelStates(): Long {
         val nowMillis = timeProvider.currentTimeMillis()
         var nextDeadline = Long.MAX_VALUE
 
@@ -189,7 +191,7 @@ class RealEventHubPixelManager @Inject constructor(
         return nextDeadline
     }
 
-    private fun initMissingPixels(): Long {
+    private suspend fun initMissingPixels(): Long {
         var nextDeadline = Long.MAX_VALUE
         for (pixelConfig in getTelemetryConfigs()) {
             if (repository.getPixelState(pixelConfig.name) == null) {
@@ -216,6 +218,10 @@ class RealEventHubPixelManager @Inject constructor(
 
             val telemetry = getTelemetryConfigs()
             logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+
+            // A config-persisted event is our best-effort opportunity to observe enrolment changes
+            // (join/leave/cohort-change) that happened within a running period.
+            refreshExperimentChanges()
 
             var nextDeadline = Long.MAX_VALUE
             for (pixelState in repository.getAllPixelStates()) {
@@ -253,24 +259,17 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun fireTelemetry(pixelState: PixelState): Long? {
-        val pixelData = buildPixel(pixelState)
+    private suspend fun fireTelemetry(pixelState: PixelState): Long? {
+        val output = buildPixelOutput(pixelState)
 
-        if (pixelData.isNotEmpty()) {
-            val additionalParams = mapOf(
-                PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
-                    pixelState.periodStartMillis,
-                    pixelState.config.trigger.period,
-                ).toString(),
-            )
-            val allParams = pixelData + additionalParams
-            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams" }
+        if (output.fires) {
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=${output.params}" }
             pixel.enqueueFire(
                 pixelName = pixelState.pixelName,
-                parameters = allParams,
+                parameters = output.params,
             )
         } else {
-            logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no params" }
+            logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no measurement params populated" }
         }
 
         repository.deletePixelState(pixelState.pixelName)
@@ -279,7 +278,7 @@ class RealEventHubPixelManager @Inject constructor(
         return if (latestPixelConfig != null) startNewPeriod(latestPixelConfig) else null
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
+    private suspend fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
         if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
@@ -287,6 +286,14 @@ class RealEventHubPixelManager @Inject constructor(
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
         val periodEndMillis = nowMillis + periodMillis
+
+        // Snapshot the enrolment baseline at period start so we can derive cohort parameters — and
+        // detect within-period changes — at fire time, without depending on when the pixel fires.
+        val experiments = if (pixelConfig.hasExperiments()) {
+            ExperimentPeriodState(baseline = snapshotActiveExperiments(), changed = emptySet())
+        } else {
+            null
+        }
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
         repository.savePixelState(
@@ -296,30 +303,96 @@ class RealEventHubPixelManager @Inject constructor(
                 periodEndMillis = periodEndMillis,
                 config = pixelConfig,
                 params = pixelConfig.parameters.keys.associateWith { ParamState(0) },
+                experiments = experiments,
             ),
         )
 
         return periodEndMillis
     }
 
-    private fun buildPixel(pixelState: PixelState): Map<String, String> {
-        val pixelData = mutableMapOf<String, String>()
+    /** Snapshot all active experiment enrolments: experiment name -> cohort + enrolment timestamp. */
+    private suspend fun snapshotActiveExperiments(): Map<String, ExperimentCohort> {
+        return featureTogglesInventory.getAllActiveExperimentToggles().mapNotNull { toggle ->
+            val cohort = toggle.getCohort() ?: return@mapNotNull null
+            toggle.featureName().name to ExperimentCohort(
+                cohort = cohort.name,
+                enrollmentDateET = cohort.enrollmentDateET,
+            )
+        }.toMap()
+    }
 
-        for ((paramName, paramConfig) in pixelState.config.parameters) {
-            if (paramConfig.isCounter) {
-                val value = (pixelState.params[paramName] ?: ParamState(0)).value
-                val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
-                if (bucketName != null) {
-                    pixelData[paramName] = bucketName
-                }
+    /**
+     * Best-effort detection of enrolment changes within running periods. Compares the current active
+     * enrolments against each period's baseline; any experiment whose cohort differs (joined, left,
+     * or changed cohort) is flagged so its period is reported as a partial enrolment.
+     */
+    private suspend fun refreshExperimentChanges() {
+        val nowMillis = timeProvider.currentTimeMillis()
+        val current = snapshotActiveExperiments()
+
+        for (pixelState in repository.getAllPixelStates()) {
+            val experiments = pixelState.experiments ?: continue
+            if (nowMillis >= pixelState.periodEndMillis) continue
+
+            val newlyChanged = (experiments.baseline.keys + current.keys).filter { name ->
+                experiments.baseline[name]?.cohort != current[name]?.cohort
+            }.toSet()
+
+            if (!experiments.changed.containsAll(newlyChanged)) {
+                val updated = experiments.copy(changed = experiments.changed + newlyChanged)
+                repository.savePixelState(pixelState.copy(experiments = updated))
             }
         }
-
-        return pixelData
     }
+
+    private fun TelemetryPixelConfig.hasExperiments(): Boolean =
+        parameters.values.any { it is ExperimentsParameterConfig }
 
     companion object {
         const val PARAM_ATTRIBUTION_PERIOD = "attributionPeriod"
+
+        /**
+         * Pure builder: derive the pixel output for a completed period.
+         *
+         * Firing is driven by measurement parameters only — a counter that matched a bucket. The
+         * dimensional experiments parameter is always emitted (including the empty object) but never
+         * causes or suppresses a fire. The attributionPeriod is added only when firing.
+         */
+        fun buildPixelOutput(pixelState: PixelState): PixelOutput {
+            val paramData = mutableMapOf<String, String>()
+            var hasMeasurement = false
+
+            for ((paramName, paramConfig) in pixelState.config.parameters) {
+                when (paramConfig) {
+                    is CounterParameterConfig -> {
+                        val value = (pixelState.params[paramName] ?: ParamState(0)).value
+                        val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
+                        if (bucketName != null) {
+                            paramData[paramName] = bucketName
+                            hasMeasurement = true
+                        }
+                    }
+                    is ExperimentsParameterConfig -> {
+                        val experiments = pixelState.experiments ?: ExperimentPeriodState(emptyMap(), emptySet())
+                        paramData[paramName] = ExperimentParamBuilder.build(
+                            periodState = experiments,
+                            config = paramConfig,
+                            periodEndMillis = pixelState.periodEndMillis,
+                        )
+                    }
+                }
+            }
+
+            if (!hasMeasurement) return PixelOutput(fires = false, params = emptyMap())
+
+            val allParams = paramData + (
+                PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
+                    pixelState.periodStartMillis,
+                    pixelState.config.trigger.period,
+                ).toString()
+                )
+            return PixelOutput(fires = true, params = allParams)
+        }
 
         fun calculateAttributionPeriod(periodStartMillis: Long, period: TelemetryPeriodConfig): Long {
             return toStartOfInterval(periodStartMillis, period.periodSeconds)

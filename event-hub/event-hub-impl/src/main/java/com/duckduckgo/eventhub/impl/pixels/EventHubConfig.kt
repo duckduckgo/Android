@@ -39,12 +39,39 @@ data class TelemetryPeriodConfig(
         get() = seconds.toLong() + minutes.toLong() * 60 + hours.toLong() * 3600 + days.toLong() * 86400
 }
 
-data class TelemetryParameterConfig(
-    val template: String,
+const val TEMPLATE_COUNTER = "counter"
+const val TEMPLATE_EXPERIMENTS = "experiments"
+
+/**
+ * A single parameter within a telemetry pixel. Each template has its own strongly-typed config.
+ */
+sealed interface TelemetryParameterConfig {
+    val template: String
+}
+
+/**
+ * Counts web events whose type matches [source], reported as a bucket name at fire time.
+ */
+data class CounterParameterConfig(
     val source: String,
     val buckets: Map<String, BucketConfig>,
-) {
-    val isCounter: Boolean get() = template == "counter"
+) : TelemetryParameterConfig {
+    override val template: String = TEMPLATE_COUNTER
+}
+
+/**
+ * Conveys the experiment cohorts the user was enrolled in during the period.
+ *
+ * [matchExperiments] optional regex (already compiled to a client-ready pattern by remote config);
+ *   when null, all active experiments match.
+ * [enrollmentBuckets] optional map of bucket name -> enrollment-age window in seconds; when null,
+ *   no enrollment-timing information is included.
+ */
+data class ExperimentsParameterConfig(
+    val matchExperiments: String?,
+    val enrollmentBuckets: Map<String, EnrollmentBucketConfig>?,
+) : TelemetryParameterConfig {
+    override val template: String = TEMPLATE_EXPERIMENTS
 }
 
 data class BucketConfig(
@@ -52,7 +79,33 @@ data class BucketConfig(
     val lt: Int?,
 )
 
+/**
+ * Enrollment-age bucket window, in seconds (compiled form). Selected bucket is the first where
+ * gte <= elapsedSeconds < lt (or gte <= elapsedSeconds when lt is null).
+ */
+data class EnrollmentBucketConfig(
+    val gte: Long,
+    val lt: Long?,
+)
+
 data class ParamState(val value: Int, val stopCounting: Boolean = false)
+
+/**
+ * The enrollment baseline + observed changes for a single running period.
+ *
+ * [baseline] active matching experiments at period start: experiment name -> cohort snapshot.
+ * [changed] experiment names whose enrollment state changed (join/leave/cohort-change) during the
+ *   period. Membership here means the period is a partial enrollment for that experiment.
+ */
+data class ExperimentPeriodState(
+    val baseline: Map<String, ExperimentCohort>,
+    val changed: Set<String>,
+)
+
+data class ExperimentCohort(
+    val cohort: String,
+    val enrollmentDateET: String?,
+)
 
 data class PixelState(
     val pixelName: String,
@@ -60,4 +113,18 @@ data class PixelState(
     val periodEndMillis: Long,
     val config: TelemetryPixelConfig,
     val params: Map<String, ParamState>,
+    val experiments: ExperimentPeriodState? = null,
+)
+
+/**
+ * The result of building a pixel for a completed period.
+ *
+ * [fires] whether the pixel should fire — true iff at least one measurement parameter (counter/data)
+ *   produced output. Dimensional parameters (experiments) never cause or suppress a fire.
+ * [params] the parameters to send when firing (including the derived attributionPeriod); empty when
+ *   [fires] is false.
+ */
+data class PixelOutput(
+    val fires: Boolean,
+    val params: Map<String, String>,
 )

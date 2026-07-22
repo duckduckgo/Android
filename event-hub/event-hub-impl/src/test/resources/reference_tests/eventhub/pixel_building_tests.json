@@ -1,0 +1,515 @@
+{
+    "$schema": "./event-hub-pixel-building-schema.json",
+    "counter": {
+        "name": "Counter template building and firing",
+        "desc": "Counter params map an accumulated count to a bucket name and drive firing. Runs on Android and Windows.",
+        "tests": [
+            {
+                "name": "count within a bounded bucket",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 2 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "count": "1-2", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "count on the lower bound is inclusive",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 1 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "count": "1-2", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "zero count with a zero bucket fires (DAU denominator)",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "count": "0", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "count in the unbounded top bucket",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 5 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "count": "3+", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "zero count without a zero bucket does not fire",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": false,
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "multiple counters each emit their own bucket",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "countA": {
+                            "template": "counter",
+                            "source": "a",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        },
+                        "countB": {
+                            "template": "counter",
+                            "source": "b",
+                            "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } }
+                        }
+                    }
+                },
+                "parameterState": { "countA": { "count": 2 }, "countB": { "count": 0 } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "countA": "1-2", "countB": "0", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            }
+        ]
+    },
+    "data": {
+        "name": "Data template building and firing",
+        "desc": "Data params forward the captured JSON value and drive firing. Windows only today.",
+        "tests": [
+            {
+                "name": "captured value is forwarded to the output parameter",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "state": { "template": "data", "source": "x", "dataKey": "loginState" }
+                    }
+                },
+                "parameterState": { "state": { "value": "loggedIn" } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "state": "loggedIn", "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "android-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "captured object value is forwarded structurally",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "meta": { "template": "data", "source": "x", "dataKey": "meta" }
+                    }
+                },
+                "parameterState": { "meta": { "value": { "a": 1, "b": "two" } } },
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": { "meta": { "a": 1, "b": "two" }, "attributionPeriod": "999993600" },
+                "exceptPlatforms": ["ios-browser", "android-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "absent data value does not fire",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "state": { "template": "data", "source": "x", "dataKey": "loginState" }
+                    }
+                },
+                "parameterState": {},
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": false,
+                "exceptPlatforms": ["ios-browser", "android-browser", "macos-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            }
+        ]
+    },
+    "experiments": {
+        "name": "Experiments template building",
+        "desc": "Dimensional experiments param, observed on a pixel that fires via a paired counter. Android only today.",
+        "tests": [
+            {
+                "name": "stable enrolment reports cohort (no enrollment buckets)",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": { "template": "experiments", "matchExperiments": "^tdsNextExperiment" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "stable enrolment selects the enrollment bucket (2 days -> 1-2)",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1-2": { "gte": 86400, "lt": 259200 }, "3+": { "gte": 259200 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999913600 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment", "enrollmentBucket": "1-2" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "minimum stable tenure equals the period, landing in 1-2 not 0",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1-2": { "gte": 86400, "lt": 259200 }, "3+": { "gte": 259200 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "control", "enrollmentUnixSeconds": 1000000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "control", "enrollmentBucket": "1-2" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "long tenure lands in the unbounded top bucket",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1-2": { "gte": 86400, "lt": 259200 }, "3+": { "gte": 259200 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999786400 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment", "enrollmentBucket": "3+" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "tenure below the lowest configured bucket omits enrollmentBucket",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "2+": { "gte": 172800 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 1000000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "partial enrolment reports enrollmentChanged only",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1+": { "gte": 86400 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "enrollmentChanged": true }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "enrollmentChanged": true } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "matchExperiments filters out non-matching candidates",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": { "template": "experiments", "matchExperiments": "^tdsNextExperiment" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 },
+                    { "name": "contentScopeExperiment01", "cohort": "control", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "anchored exact match includes only the exact experiment",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": { "template": "experiments", "matchExperiments": "^tdsNextExperiment007$" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment007", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 },
+                    { "name": "tdsNextExperiment0071", "cohort": "control", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": { "tdsNextExperiment007": { "cohort": "treatment" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "alternation matches multiple experiment families",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": { "template": "experiments", "matchExperiments": "^(tdsNextExperiment|contentScopeExperiment)" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "control", "enrollmentUnixSeconds": 999000000 },
+                    { "name": "contentScopeExperiment01", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 },
+                    { "name": "someOtherExperiment", "cohort": "control", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": {
+                        "tdsNextExperiment008": { "cohort": "control" },
+                        "contentScopeExperiment01": { "cohort": "treatment" }
+                    },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "no matching experiments yields an empty object",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": { "template": "experiments", "matchExperiments": "^tdsNextExperiment" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "contentScopeExperiment01", "cohort": "control", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": {},
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "multiple experiments mix stable and partial entries",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "experiments": {
+                            "template": "experiments",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1-2": { "gte": 86400, "lt": 259200 }, "3+": { "gte": 259200 } }
+                        }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999913600 },
+                    { "name": "contentScopeExperiment01", "enrollmentChanged": true }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "experiments": {
+                        "tdsNextExperiment008": { "cohort": "treatment", "enrollmentBucket": "1-2" },
+                        "contentScopeExperiment01": { "enrollmentChanged": true }
+                    },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            }
+        ]
+    },
+    "firing": {
+        "name": "Dimensional firing rule",
+        "desc": "Experiments are dimensional: they never cause or suppress a fire. Android only (experiments template).",
+        "tests": [
+            {
+                "name": "experiments-only pixel does not fire",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "experiments": { "template": "experiments" }
+                    }
+                },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": false,
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "counter and experiments both emit when the pixel fires",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1-2": { "gte": 1, "lt": 3 }, "3+": { "gte": 3 } } },
+                        "experiments": { "template": "experiments" }
+                    }
+                },
+                "parameterState": { "count": { "count": 2 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "1-2",
+                    "experiments": { "tdsNextExperiment008": { "cohort": "treatment" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            }
+        ]
+    }
+}

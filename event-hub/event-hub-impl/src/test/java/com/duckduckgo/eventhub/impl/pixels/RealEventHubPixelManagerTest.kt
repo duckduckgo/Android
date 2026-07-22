@@ -23,6 +23,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -54,6 +55,7 @@ class RealEventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
+    private val featureTogglesInventory: FeatureTogglesInventory = mock()
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -71,6 +73,7 @@ class RealEventHubPixelManagerTest {
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
+            featureTogglesInventory,
         )
         manager.onAppForegrounded()
         eventHubFeature.self().setRawStoredState(savedState ?: Toggle.State(enable = false))
@@ -1393,9 +1396,10 @@ class RealEventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
 
         val storedConfig = captor.firstValue.config
-        assertEquals("test", storedConfig.parameters["count"]!!.source)
+        val storedCounter = storedConfig.parameters["count"] as CounterParameterConfig
+        assertEquals("test", storedCounter.source)
         assertEquals(86400L, storedConfig.trigger.period.periodSeconds)
-        assertEquals(7, storedConfig.parameters["count"]!!.buckets.size)
+        assertEquals(7, storedCounter.buckets.size)
     }
 
     // --- multi-pixel config lifecycle ---
@@ -1576,8 +1580,8 @@ class RealEventHubPixelManagerTest {
         assertEquals(pixelConfig.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
         assertEquals(pixelConfig.parameters.size, restored.parameters.size)
 
-        val originalParam = pixelConfig.parameters["count"]!!
-        val restoredParam = restored.parameters["count"]!!
+        val originalParam = pixelConfig.parameters["count"] as CounterParameterConfig
+        val restoredParam = restored.parameters["count"] as CounterParameterConfig
         assertEquals(originalParam.template, restoredParam.template)
         assertEquals(originalParam.source, restoredParam.source)
         assertEquals(originalParam.buckets.size, restoredParam.buckets.size)

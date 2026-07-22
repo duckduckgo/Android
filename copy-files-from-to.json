@@ -143,6 +143,10 @@
     {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/user-allowlist-reference.json",
       "to": "app/src/androidTest/resources/reference_tests/request-blocklist/user-allowlist-reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/event-hub/pixel_building_tests.json",
+      "to": "event-hub/event-hub-impl/src/test/resources/reference_tests/eventhub/pixel_building_tests.json"
     }
   ],
   "copyFilesSettings": {

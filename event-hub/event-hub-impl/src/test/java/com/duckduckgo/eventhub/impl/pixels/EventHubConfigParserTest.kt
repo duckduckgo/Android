@@ -68,17 +68,104 @@ class EventHubConfigParserTest {
         val telemetry = EventHubConfigParser.parseTelemetry(settingsJson)
         val param = telemetry[0].parameters["count"]!!
 
-        assertTrue(param.isCounter)
-        assertEquals("test", param.source)
-        assertEquals(7, param.buckets.size)
+        assertTrue(param is CounterParameterConfig)
+        val counter = param as CounterParameterConfig
+        assertEquals("test", counter.source)
+        assertEquals(7, counter.buckets.size)
 
-        val first = param.buckets["0"]!!
+        val first = counter.buckets["0"]!!
         assertEquals(0, first.gte)
         assertEquals(1, first.lt)
 
-        val last = param.buckets["40+"]!!
+        val last = counter.buckets["40+"]!!
         assertEquals(40, last.gte)
         assertNull(last.lt)
+    }
+
+    @Test
+    fun `experiments parameter with matchExperiments and enrollmentBuckets parsed correctly`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_adwalls_week": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 7 } },
+                        "parameters": {
+                            "blocklistExperiments": {
+                                "template": "experiments",
+                                "matchExperiments": "^tdsNextExperiment",
+                                "enrollmentBuckets": {
+                                    "0":   {"gte": 0,      "lt": 86400},
+                                    "1-2": {"gte": 86400,  "lt": 259200},
+                                    "3+":  {"gte": 259200}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val param = EventHubConfigParser.parseTelemetry(json)[0].parameters["blocklistExperiments"]!!
+        assertTrue(param is ExperimentsParameterConfig)
+        val experiments = param as ExperimentsParameterConfig
+        assertEquals("^tdsNextExperiment", experiments.matchExperiments)
+        assertEquals(3, experiments.enrollmentBuckets!!.size)
+        assertEquals(259200L, experiments.enrollmentBuckets!!["3+"]!!.gte)
+        assertNull(experiments.enrollmentBuckets!!["3+"]!!.lt)
+    }
+
+    @Test
+    fun `experiments parameter without optional keys parses to match-all with no buckets`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_experiments": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "experiments": { "template": "experiments" }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val param = EventHubConfigParser.parseTelemetry(json)[0].parameters["experiments"]!!
+        assertTrue(param is ExperimentsParameterConfig)
+        val experiments = param as ExperimentsParameterConfig
+        assertNull(experiments.matchExperiments)
+        assertNull(experiments.enrollmentBuckets)
+    }
+
+    @Test
+    fun `experiments parameter round-trips through serialize and parse`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_experiments": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 7 } },
+                        "parameters": {
+                            "exp": {
+                                "template": "experiments",
+                                "matchExperiments": "^tdsNextExperiment",
+                                "enrollmentBuckets": { "0": {"gte": 0, "lt": 86400}, "1+": {"gte": 86400} }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val original = EventHubConfigParser.parseTelemetry(json)[0]
+        val serialized = EventHubConfigParser.serializePixelConfig(original)!!
+        val restored = EventHubConfigParser.parseSinglePixelConfig(original.name, serialized)!!
+
+        val originalExp = original.parameters["exp"] as ExperimentsParameterConfig
+        val restoredExp = restored.parameters["exp"] as ExperimentsParameterConfig
+        assertEquals(originalExp.matchExperiments, restoredExp.matchExperiments)
+        assertEquals(originalExp.enrollmentBuckets, restoredExp.enrollmentBuckets)
     }
 
     @Test
@@ -275,8 +362,10 @@ class EventHubConfigParserTest {
         assertEquals(original.state, restored.state)
         assertEquals(original.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
         assertEquals(original.parameters.size, restored.parameters.size)
-        assertEquals(original.parameters["count"]!!.source, restored.parameters["count"]!!.source)
-        assertEquals(original.parameters["count"]!!.buckets.size, restored.parameters["count"]!!.buckets.size)
+        val originalCounter = original.parameters["count"] as CounterParameterConfig
+        val restoredCounter = restored.parameters["count"] as CounterParameterConfig
+        assertEquals(originalCounter.source, restoredCounter.source)
+        assertEquals(originalCounter.buckets.size, restoredCounter.buckets.size)
     }
 
     @Test
@@ -286,8 +375,7 @@ class EventHubConfigParserTest {
             state = "enabled",
             trigger = TelemetryTriggerConfig(period = TelemetryPeriodConfig(days = 1)),
             parameters = mapOf(
-                "c" to TelemetryParameterConfig(
-                    template = "counter",
+                "c" to CounterParameterConfig(
                     source = "e",
                     buckets = linkedMapOf("0+" to BucketConfig(gte = 0, lt = null)),
                 ),

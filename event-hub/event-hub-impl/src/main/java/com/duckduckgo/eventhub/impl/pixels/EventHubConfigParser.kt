@@ -46,11 +46,18 @@ private data class TelemetryParameterJson(
     val template: String,
     val source: String? = null,
     val buckets: Map<String, BucketJson>? = null,
+    val matchExperiments: String? = null,
+    val enrollmentBuckets: Map<String, EnrollmentBucketJson>? = null,
 )
 
 private data class BucketJson(
     val gte: Int,
     val lt: Int? = null,
+)
+
+private data class EnrollmentBucketJson(
+    val gte: Long,
+    val lt: Long? = null,
 )
 
 object EventHubConfigParser {
@@ -93,13 +100,22 @@ object EventHubConfigParser {
                 ),
             ),
             parameters = config.parameters.mapValues { (_, paramConfig) ->
-                TelemetryParameterJson(
-                    template = paramConfig.template,
-                    source = paramConfig.source,
-                    buckets = paramConfig.buckets.mapValues { (_, bucket) ->
-                        BucketJson(gte = bucket.gte, lt = bucket.lt)
-                    },
-                )
+                when (paramConfig) {
+                    is CounterParameterConfig -> TelemetryParameterJson(
+                        template = paramConfig.template,
+                        source = paramConfig.source,
+                        buckets = paramConfig.buckets.mapValues { (_, bucket) ->
+                            BucketJson(gte = bucket.gte, lt = bucket.lt)
+                        },
+                    )
+                    is ExperimentsParameterConfig -> TelemetryParameterJson(
+                        template = paramConfig.template,
+                        matchExperiments = paramConfig.matchExperiments,
+                        enrollmentBuckets = paramConfig.enrollmentBuckets?.mapValues { (_, bucket) ->
+                            EnrollmentBucketJson(gte = bucket.gte, lt = bucket.lt)
+                        },
+                    )
+                }
             },
         )
         return runCatching { pixelAdapter.toJson(pixelJson) }
@@ -134,7 +150,14 @@ object EventHubConfigParser {
     }
 
     private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
-        if (json.template != "counter") return null
+        return when (json.template) {
+            TEMPLATE_COUNTER -> toCounterConfig(json)
+            TEMPLATE_EXPERIMENTS -> toExperimentsConfig(json)
+            else -> null
+        }
+    }
+
+    private fun toCounterConfig(json: TelemetryParameterJson): CounterParameterConfig? {
         val source = json.source ?: return null
         val bucketsJson = json.buckets ?: return null
 
@@ -143,6 +166,18 @@ object EventHubConfigParser {
         }
         if (buckets.isEmpty()) return null
 
-        return TelemetryParameterConfig(template = json.template, source = source, buckets = buckets)
+        return CounterParameterConfig(source = source, buckets = buckets)
+    }
+
+    private fun toExperimentsConfig(json: TelemetryParameterJson): ExperimentsParameterConfig {
+        val enrollmentBuckets = json.enrollmentBuckets
+            ?.takeIf { it.isNotEmpty() }
+            ?.mapValuesTo(linkedMapOf()) { (_, bucketJson) ->
+                EnrollmentBucketConfig(gte = bucketJson.gte, lt = bucketJson.lt)
+            }
+        return ExperimentsParameterConfig(
+            matchExperiments = json.matchExperiments,
+            enrollmentBuckets = enrollmentBuckets,
+        )
     }
 }
