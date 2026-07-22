@@ -421,12 +421,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         deviceAuthenticator.launchDeviceAuthEnrollment(this@SyncActivity)
                     }
 
-                    override fun onNegativeButtonClicked() {
+                    override fun onDialogDismissed() {
                         // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
-                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
-                    }
-
-                    override fun onDialogCancelled() {
                         if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
                 },
