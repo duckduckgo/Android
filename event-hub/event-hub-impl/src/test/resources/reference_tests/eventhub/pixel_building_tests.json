@@ -2,7 +2,7 @@
     "$schema": "./event-hub-pixel-building-schema.json",
     "counter": {
         "name": "Counter template building and firing",
-        "desc": "Counter params map an accumulated count to a bucket name and drive firing. Runs on Android and Windows.",
+        "desc": "Counter params map an accumulated count to a bucket name and drive firing.",
         "tests": [
             {
                 "name": "count within a bounded bucket",
@@ -126,7 +126,7 @@
     },
     "data": {
         "name": "Data template building and firing",
-        "desc": "Data params forward the captured JSON value and drive firing. Windows only today.",
+        "desc": "Data params forward the captured JSON value and drive firing.",
         "tests": [
             {
                 "name": "captured value is forwarded to the output parameter",
@@ -176,7 +176,7 @@
     },
     "experiments": {
         "name": "Experiments template building",
-        "desc": "Dimensional experiments param, observed on a pixel that fires via a paired counter. Android only today.",
+        "desc": "Dimensional experiments param, observed on a pixel that fires via a paired counter.",
         "tests": [
             {
                 "name": "stable enrolment reports cohort (no enrollment buckets)",
@@ -499,7 +499,7 @@
     },
     "firing": {
         "name": "Dimensional firing rule",
-        "desc": "Experiments are dimensional: they never cause or suppress a fire. Android only (experiments template).",
+        "desc": "Experiments are dimensional: they never cause or suppress a fire.",
         "tests": [
             {
                 "name": "experiments-only pixel does not fire",
