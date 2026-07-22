@@ -72,7 +72,12 @@ runs:
         fi
 
         # The CLI requires Java 21; reference it explicitly so the build's own JDK is unaffected.
-        echo "ARTIFACT_CACHE_CMD=${{ env[format('JAVA_HOME_21_{0}', runner.arch)] }}/bin/java -jar $JAR_PATH" >> "$GITHUB_ENV"
+        # DIAGNOSTIC (do not merge): record a Java Flight Recorder profile of each AC CLI
+        # invocation so we can see where the restore/store wall-clock goes (network socket
+        # waits vs CPU vs unpack/disk). %p keeps restore and store in separate files; the
+        # flag is scoped to the CLI only, so the much larger Gradle JVM is not profiled.
+        JFR_OPTS="-XX:StartFlightRecording=filename=$RUNNER_TEMP/ac-cache-%p.jfr,dumponexit=true,settings=profile,name=ac-cache"
+        echo "ARTIFACT_CACHE_CMD=${{ env[format('JAVA_HOME_21_{0}', runner.arch)] }}/bin/java $JFR_OPTS -jar $JAR_PATH" >> "$GITHUB_ENV"
 
         # Honour a custom Gradle User Home; default to the conventional location so this
         # works on both GitHub-hosted and self-hosted runners (not just /home/runner).
@@ -116,4 +121,16 @@ runs:
         name: artifact-cache-log-${{ inputs.image-name }}
         path: '~/.develocity/artifact-cache/artifact-cache.log'
         if-no-files-found: ignore
+        retention-days: 7
+
+    # DIAGNOSTIC (do not merge): upload the JFR recordings produced by the restore and
+    # store invocations. Runs on 'store' (the final AC step) so both files are collected
+    # in one artifact. Open the .jfr files in JDK Mission Control.
+    - name: Persist Artifact Cache JFR recordings
+      if: always() && inputs.command == 'store'
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifact-cache-jfr-${{ inputs.image-name }}
+        path: '${{ runner.temp }}/ac-cache-*.jfr'
+        if-no-files-found: warn
         retention-days: 7
