@@ -62,40 +62,8 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     val commands = _commands.receiveAsFlow()
 
     init {
-        viewModelScope.launch(dispatchers.io()) {
-            suspend fun getAndShowRecoveryCode() {
-                when (val result = syncAccountRepository.getRecoveryCode()) {
-                    is Success<AuthCode> -> {
-                        syncSetupWideEvent.onRecoveryCodeShown()
-                        _viewState.update { it.copy(recoveryCode = result.data.rawCode) }
-                    }
-
-                    is Error -> {
-                        syncSetupWideEvent.onRecoveryCodeGenerationFailed()
-                        _commands.send(Command.ShowError(R.string.sync_device_v2_recovery_code_get_code_error, result.reason))
-                    }
-                }
-            }
-
-            if (syncAccountRepository.isSignedIn()) {
-                getAndShowRecoveryCode()
-            } else {
-                when (syncAccountRepository.createAccount()) {
-                    is Success<*> -> {
-                        getAndShowRecoveryCode()
-                    }
-
-                    is Error -> {
-                        _commands.send(Command.ShowError(R.string.sync_create_account_generic_error))
-                    }
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            val isAutoRestoreAvailable = syncAutoRestoreManager.isAutoRestoreAvailable()
-            _viewState.update { it.copy(isAutoRestoreAvailable = isAutoRestoreAvailable) }
-        }
+        initializeRecoveryCode()
+        initializeAutoRestoreAvailability()
     }
 
     // Deliberately a suspend function instead of launching in the ViewModel scope and holding onto a Context.
@@ -150,6 +118,45 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     fun onErrorDialogDismissed() {
         viewModelScope.launch {
             _commands.send(Command.Close)
+        }
+    }
+
+    private fun initializeRecoveryCode() {
+        suspend fun getAndShowRecoveryCode() {
+            when (val result = syncAccountRepository.getRecoveryCode()) {
+                is Success<AuthCode> -> {
+                    syncSetupWideEvent.onRecoveryCodeShown()
+                    _viewState.update { it.copy(recoveryCode = result.data.rawCode) }
+                }
+
+                is Error -> {
+                    syncSetupWideEvent.onRecoveryCodeGenerationFailed()
+                    _commands.send(Command.ShowError(R.string.sync_device_v2_recovery_code_get_code_error, result.reason))
+                }
+            }
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                getAndShowRecoveryCode()
+            } else {
+                when (syncAccountRepository.createAccount()) {
+                    is Success<*> -> {
+                        getAndShowRecoveryCode()
+                    }
+
+                    is Error -> {
+                        _commands.send(Command.ShowError(R.string.sync_create_account_generic_error))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initializeAutoRestoreAvailability() {
+        viewModelScope.launch {
+            val isAutoRestoreAvailable = syncAutoRestoreManager.isAutoRestoreAvailable()
+            _viewState.update { it.copy(isAutoRestoreAvailable = isAutoRestoreAvailable) }
         }
     }
 
