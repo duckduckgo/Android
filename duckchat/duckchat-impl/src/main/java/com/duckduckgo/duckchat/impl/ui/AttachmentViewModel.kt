@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -108,6 +109,10 @@ class AttachmentViewModel @Inject constructor(
         .map { it.inputContext != NativeInputState.InputContext.BROWSER }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    private val surface: StateFlow<DuckChatPixelSurface> = nativeInputStateProvider.state
+        .map { DuckChatPixelSurface.from(it.inputContext) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
+
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments, _pageContextAttachment) { images, files, pageContext ->
             Triple(images, files, pageContext)
@@ -148,7 +153,7 @@ class AttachmentViewModel @Inject constructor(
             uris.forEach { uri ->
                 val attachment = withContext(dispatchers.io()) { processImage(uri) }
                 if (attachment == null) {
-                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER)
+                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER, surface.value)
                     return@forEach
                 }
                 imageAttachments.update { it + attachment }
@@ -162,7 +167,7 @@ class AttachmentViewModel @Inject constructor(
             for (uri in uris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
@@ -180,7 +185,7 @@ class AttachmentViewModel @Inject constructor(
             imageUris.forEach { uri ->
                 val attachment = withContext(dispatchers.io()) { processImage(uri) }
                 if (attachment == null) {
-                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER)
+                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER, surface.value)
                     return@forEach
                 }
                 imageAttachments.update { it + attachment }
@@ -189,7 +194,7 @@ class AttachmentViewModel @Inject constructor(
             for (uri in fileUris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
@@ -206,9 +211,9 @@ class AttachmentViewModel @Inject constructor(
     private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment) {
         val reason = resolveFileValidationReason(added)
         if (reason != null) {
-            duckChatPixels.fireFileValidationFailed(reason)
+            duckChatPixels.fireFileValidationFailed(reason, surface.value)
         } else {
-            duckChatPixels.fireFileAttached()
+            duckChatPixels.fireFileAttached(surface.value)
         }
     }
 
@@ -220,9 +225,9 @@ class AttachmentViewModel @Inject constructor(
     private fun fireImageAcceptedOrRejectedPixel(source: ImageSource) {
         val reason = resolveImageValidationReason()
         if (reason != null) {
-            duckChatPixels.fireImageValidationFailed(reason)
+            duckChatPixels.fireImageValidationFailed(reason, surface.value)
         } else {
-            duckChatPixels.fireImageAttached(source.pixelValue)
+            duckChatPixels.fireImageAttached(source.pixelValue, surface.value)
         }
     }
 
@@ -263,7 +268,7 @@ class AttachmentViewModel @Inject constructor(
             removed = match != null
             list.filter { it.id != id }
         }
-        if (removed) duckChatPixels.fireImageRemoved()
+        if (removed) duckChatPixels.fireImageRemoved(surface.value)
         viewModelScope.launch { toRecycle?.recycle() }
     }
 
@@ -273,7 +278,7 @@ class AttachmentViewModel @Inject constructor(
             removed = list.any { it.id == id }
             list.filter { it.id != id }
         }
-        if (removed) duckChatPixels.fireFileRemoved()
+        if (removed) duckChatPixels.fireFileRemoved(surface.value)
     }
 
     fun setPageContext(attachment: PageContextAttachment) {

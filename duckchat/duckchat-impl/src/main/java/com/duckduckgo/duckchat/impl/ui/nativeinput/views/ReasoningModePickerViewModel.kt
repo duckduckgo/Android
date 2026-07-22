@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -74,6 +75,10 @@ class ReasoningModePickerViewModel @Inject constructor(
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
 
+    // The pixel surface for the active tab, tracked from the published input context.
+    // Named distinctly from the [PickerSurface] param on [onModeTapped] to avoid shadowing.
+    private var pixelSurface: DuckChatPixelSurface = DuckChatPixelSurface.ADDRESS_BAR
+
     init {
         viewModelScope.launch {
             // collectLatest: cancel in-flight lookup on chatId flip to avoid stale currentChat.
@@ -83,6 +88,9 @@ class ReasoningModePickerViewModel @Inject constructor(
                 .collectLatest { chatId ->
                     currentChat.value = if (chatId == null) null else duckAiChatStore.getChatById(chatId)
                 }
+        }
+        viewModelScope.launch {
+            nativeInputStateProvider.state.collect { pixelSurface = DuckChatPixelSurface.from(it.inputContext) }
         }
     }
 
@@ -137,7 +145,7 @@ class ReasoningModePickerViewModel @Inject constructor(
             // Mirror the model picker: only report a selection when it actually changes, not on
             // re-tapping the already-selected effort. The persisted selection still updates below.
             if (mode != state.value.displayedMode) {
-                duckChatPixels.fireReasoningEffortSelected(mode.toEffortParam())
+                duckChatPixels.fireReasoningEffortSelected(mode.toEffortParam(), pixelSurface)
             }
             if (chatResolution != null) {
                 viewModelScope.launch { modelManager.setChatScopedReasoningMode(mode) }

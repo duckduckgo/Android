@@ -906,140 +906,140 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_generation_selected_daily": {
         "description": "(Daily Pixel) User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_generation_deselected_count": {
         "description": "User deselected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_generation_deselected_daily": {
         "description": "(Daily Pixel) User deselected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_generation_submitted_count": {
         "description": "User submitted a prompt with the image generation tool selected in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_generation_submitted_daily": {
         "description": "(Daily Pixel) User submitted a prompt with the image generation tool selected in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_selected_count": {
         "description": "User selected the web search tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_selected_daily": {
         "description": "(Daily Pixel) User selected the web search tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_deselected_count": {
         "description": "User deselected the web search tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_deselected_daily": {
         "description": "(Daily Pixel) User deselected the web search tool in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_submitted_count": {
         "description": "User submitted a prompt with the web search tool selected in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_web_search_submitted_daily": {
         "description": "(Daily Pixel) User submitted a prompt with the web search tool selected in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_customize_responses_selected_count": {
         "description": "User selected the Customize Responses action in the Unified Input options menu",
         "owners": ["joshliebe"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_customize_responses_selected_daily": {
         "description": "(Daily Pixel) User selected the Customize Responses action in the Unified Input options menu",
         "owners": ["joshliebe"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_removed_count": {
         "description": "User removed an attached image from the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_removed_daily": {
         "description": "(Daily Pixel) User removed an attached image from the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_file_attached_count": {
         "description": "User attached a file in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_file_attached_daily": {
         "description": "(Daily Pixel) User attached a file in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_file_removed_count": {
         "description": "User removed an attached file from the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_file_removed_daily": {
         "description": "(Daily Pixel) User removed an attached file from the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_tapped_count": {
         "description": "User tapped the voice button in the Unified Input",
@@ -1062,6 +1062,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "source",
                 "type": "string",
@@ -1077,6 +1078,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "source",
                 "type": "string",
@@ -1107,6 +1109,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "reason",
                 "type": "string",
@@ -1122,6 +1125,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "reason",
                 "type": "string",
@@ -1137,6 +1141,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "reason",
                 "type": "string",
@@ -1152,6 +1157,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "reason",
                 "type": "string",
@@ -1167,6 +1173,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "selected_tool",
                 "type": "string",
@@ -1192,6 +1199,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "selected_tool",
                 "type": "string",
@@ -1229,14 +1237,18 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_model_selected": {
         "description": "User selected a model in the Unified Input model picker",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", { "key": "model_id", "type": "string", "description": "Identifier of the selected model" }]
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "Identifier of the selected model" }
+        ]
     },
     "m_aichat_unified_input_reasoning_effort_selected": {
         "description": "User selected a reasoning effort level in the Unified Input",
@@ -1245,6 +1257,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             {
                 "key": "effort_level",
                 "type": "string",
@@ -1286,7 +1299,7 @@
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "aichat_unified_input_submit_change_model": {
         "description": "FE recovery flow: the user's chosen model was reported to the FE via submitChangeModelAction",
@@ -1295,6 +1308,7 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
+            "unifiedInputSurface",
             { "key": "model_id", "type": "string", "description": "Identifier of the model the user recovered to" }
         ]
     },
@@ -1303,7 +1317,7 @@
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_contextual_quick_action_ask_about_page_selected_count": {
         "description": "User tapped the Ask About Page quick action in the Contextual sheet",

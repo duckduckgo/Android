@@ -58,6 +58,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -729,7 +730,7 @@ class AttachmentViewModelTest {
         viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireImageAttached("photo_library")
+        verify(duckChatPixels).fireImageAttached(eq("photo_library"), any())
     }
 
     @Test
@@ -739,7 +740,7 @@ class AttachmentViewModelTest {
         viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.CAMERA)
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireImageAttached("camera")
+        verify(duckChatPixels).fireImageAttached(eq("camera"), any())
     }
 
     @Test
@@ -752,7 +753,7 @@ class AttachmentViewModelTest {
         viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
         advanceUntilIdle()
 
-        verify(duckChatPixels, never()).fireImageAttached(any())
+        verify(duckChatPixels, never()).fireImageAttached(any(), any())
     }
 
     @Test
@@ -764,8 +765,8 @@ class AttachmentViewModelTest {
         viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireImageValidationFailed("count_exceeded")
-        verify(duckChatPixels, never()).fireImageAttached(any())
+        verify(duckChatPixels).fireImageValidationFailed(eq("count_exceeded"), any())
+        verify(duckChatPixels, never()).fireImageAttached(any(), any())
     }
 
     @Test
@@ -778,8 +779,8 @@ class AttachmentViewModelTest {
         viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireImageValidationFailed("other")
-        verify(duckChatPixels, never()).fireImageAttached(any())
+        verify(duckChatPixels).fireImageValidationFailed(eq("other"), any())
+        verify(duckChatPixels, never()).fireImageAttached(any(), any())
     }
 
     @Test
@@ -789,7 +790,7 @@ class AttachmentViewModelTest {
 
         viewModel.removeImageAttachment(id)
 
-        verify(duckChatPixels).fireImageRemoved()
+        verify(duckChatPixels).fireImageRemoved(any())
     }
 
     @Test
@@ -798,7 +799,7 @@ class AttachmentViewModelTest {
 
         viewModel.removeFileAttachment("file-1")
 
-        verify(duckChatPixels).fireFileRemoved()
+        verify(duckChatPixels).fireFileRemoved(any())
     }
 
     @Test
@@ -806,7 +807,7 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileAttached()
+        verify(duckChatPixels).fireFileAttached(any())
     }
 
     @Test
@@ -814,7 +815,7 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels, never()).fireFileValidationFailed(any())
+        verify(duckChatPixels, never()).fireFileValidationFailed(any(), any())
     }
 
     @Test
@@ -825,8 +826,8 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment(sizeBytes = maxBytes + 1))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed("size_exceeded")
-        verify(duckChatPixels, never()).fireFileAttached()
+        verify(duckChatPixels).fireFileValidationFailed(eq("size_exceeded"), any())
+        verify(duckChatPixels, never()).fireFileAttached(any())
     }
 
     @Test
@@ -840,8 +841,8 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed("count_exceeded")
-        verify(duckChatPixels, never()).fireFileAttached()
+        verify(duckChatPixels).fireFileValidationFailed(eq("count_exceeded"), any())
+        verify(duckChatPixels, never()).fireFileAttached(any())
     }
 
     @Test
@@ -851,8 +852,8 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment(pageCount = 11))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed("page_count_exceeded")
-        verify(duckChatPixels, never()).fireFileAttached()
+        verify(duckChatPixels).fireFileValidationFailed(eq("page_count_exceeded"), any())
+        verify(duckChatPixels, never()).fireFileAttached(any())
     }
 
     @Test
@@ -862,8 +863,8 @@ class AttachmentViewModelTest {
         viewModel.onFilesPicked(listOf(uri))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed("other")
-        verify(duckChatPixels, never()).fireFileAttached()
+        verify(duckChatPixels).fireFileValidationFailed(eq("other"), any())
+        verify(duckChatPixels, never()).fireFileAttached(any())
     }
 
     private fun givenImageDecodes(): Uri {

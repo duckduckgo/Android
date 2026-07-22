@@ -25,6 +25,7 @@ import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -35,6 +36,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -110,6 +112,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val limitsHandler: LimitsHandler,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val nativeInputStateProvider: NativeInputStateProvider,
     private val appInstall: AppInstall,
     private val appBuildConfig: AppBuildConfig,
     private val subscriptions: Subscriptions,
@@ -215,7 +218,8 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_SHOW_MODEL_PICKER -> {
                 if (tabId.isNotEmpty()) {
                     duckChat.requestShowModelPicker(tabId)
-                    duckChatPixels.fireShowModelPicker()
+                    val surface = DuckChatPixelSurface.from(nativeInputStateProvider.stateForTab(tabId).value.inputContext)
+                    duckChatPixels.fireShowModelPicker(surface)
                 }
                 null
             }
