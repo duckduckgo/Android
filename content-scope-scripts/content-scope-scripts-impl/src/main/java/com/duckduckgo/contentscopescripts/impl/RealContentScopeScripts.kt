@@ -73,6 +73,8 @@ class RealContentScopeScripts @Inject constructor(
 
     private lateinit var cachedContentScopeJS: String
 
+    private var cachedTemplateSegments: List<TemplateSegment>? = null
+
     override val secret: String = getSecret()
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
@@ -169,13 +171,74 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun cacheContentScopeJS() {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
+        val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
 
-        cachedContentScopeJS =
+        cachedContentScopeJS = if (contentScopeScriptsFeature.optimizeContentScopeInjection().isEnabled()) {
+            assembleContentScopeJS(contentScopeJS, messagingParameters)
+        } else {
             contentScopeJS
                 .replace(CONTENT_SCOPE, cachedContentScopeJson)
                 .replace(USER_UNPROTECTED_DOMAINS, cachedUserUnprotectedDomainsJson)
                 .replace(USER_PREFERENCES, cachedUserPreferencesJson)
-                .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+                .replace(MESSAGING_PARAMETERS, messagingParameters)
+        }
+    }
+
+    private fun assembleContentScopeJS(
+        template: String,
+        messagingParameters: String,
+    ): String {
+        val segments = cachedTemplateSegments ?: splitTemplate(template).also { cachedTemplateSegments = it }
+        val builder = StringBuilder(
+            template.length +
+                cachedContentScopeJson.length +
+                cachedUserUnprotectedDomainsJson.length +
+                cachedUserPreferencesJson.length +
+                messagingParameters.length,
+        )
+        segments.forEach { segment ->
+            when (segment) {
+                is TemplateSegment.Literal -> builder.append(segment.text)
+                TemplateSegment.ContentScope -> builder.append(cachedContentScopeJson)
+                TemplateSegment.UserUnprotectedDomains -> builder.append(cachedUserUnprotectedDomainsJson)
+                TemplateSegment.UserPreferences ->
+                    builder.append(cachedUserPreferencesJson.replace(MESSAGING_PARAMETERS, messagingParameters))
+                TemplateSegment.MessagingParameters -> builder.append(messagingParameters)
+            }
+        }
+        return builder.toString()
+    }
+
+    private fun splitTemplate(template: String): List<TemplateSegment> {
+        val tokens = listOf(
+            CONTENT_SCOPE to TemplateSegment.ContentScope,
+            USER_UNPROTECTED_DOMAINS to TemplateSegment.UserUnprotectedDomains,
+            USER_PREFERENCES to TemplateSegment.UserPreferences,
+            MESSAGING_PARAMETERS to TemplateSegment.MessagingParameters,
+        )
+        val segments = mutableListOf<TemplateSegment>()
+        var cursor = 0
+        while (cursor <= template.length) {
+            var matchIndex = -1
+            var matchToken = ""
+            var matchMarker: TemplateSegment? = null
+            for ((token, marker) in tokens) {
+                val index = template.indexOf(token, cursor)
+                if (index != -1 && (matchIndex == -1 || index < matchIndex)) {
+                    matchIndex = index
+                    matchToken = token
+                    matchMarker = marker
+                }
+            }
+            if (matchMarker == null) {
+                if (cursor < template.length) segments.add(TemplateSegment.Literal(template.substring(cursor)))
+                break
+            }
+            if (matchIndex > cursor) segments.add(TemplateSegment.Literal(template.substring(cursor, matchIndex)))
+            segments.add(matchMarker)
+            cursor = matchIndex + matchToken.length
+        }
+        return segments
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
@@ -266,3 +329,11 @@ data class Experiment(
     val subfeature: String,
     val cohort: String?,
 )
+
+private sealed interface TemplateSegment {
+    class Literal(val text: String) : TemplateSegment
+    object ContentScope : TemplateSegment
+    object UserUnprotectedDomains : TemplateSegment
+    object UserPreferences : TemplateSegment
+    object MessagingParameters : TemplateSegment
+}
