@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -208,7 +209,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
             if (isContextualSheetImprovementsEnabled) {
                 observeRecentChats()
-                observeCurrentChatDeletion()
             }
         }
 
@@ -217,35 +217,10 @@ class DuckChatContextualViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
-    // URL) before it is persisted, so "absent from history" only means "deleted" once we've actually
-    // seen it present — this field is what distinguishes the two.
-    private var lastSeenChatId: String? = null
-
-    private fun observeCurrentChatDeletion() {
-        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
-            currentChatId to chats.any { it.chatId == currentChatId }
-        }
-            .flowOn(dispatchers.io())
-            .onEach { (currentChatId, isPresent) ->
-                if (isPresent) {
-                    lastSeenChatId = currentChatId
-                } else if (currentChatId != null && currentChatId == lastSeenChatId && _viewState.value.sheetMode == SheetMode.WEBVIEW) {
-                    // A chat we had seen in history is now gone -> deleted elsewhere. Clear
-                    // synchronously so repeat emissions for the same id don't retrigger before the
-                    // reset propagates to _chatId/sheetMode.
-                    lastSeenChatId = null
-                    handleLoadedChatDeleted()
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun handleLoadedChatDeleted() {
-        logcat { "Duck.ai Contextual: loaded chat deleted elsewhere, resetting sheet" }
-        // Reset session/state but leave the sheet position untouched (sheetState = null):
-        // if visible it swaps to INPUT in place; if hidden it stays hidden and opens fresh next time.
-        renderNewChatState(sheetState = null)
+    private suspend fun isStoredChatMissingFromHistory(url: String?): Boolean {
+        val chatId = extractChatId(url) ?: return false
+        val chats = chatHistoryRepository.observeChats().firstOrNull() ?: return false
+        return chats.none { it.chatId == chatId }
     }
 
     private fun observeRecentChats() {
@@ -316,6 +291,10 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+        if (isStoredChatMissingFromHistory(existingChatUrl)) {
+            renderNewChatState()
+            return
+        }
         withContext(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
         }
@@ -381,7 +360,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 return@launch
             }
 
-            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId)
+            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId) &&
+                !isStoredChatMissingFromHistory(existingChatUrl)
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
                 val hasChatHistory = hasChatId(existingChatUrl)
