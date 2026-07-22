@@ -1099,6 +1099,62 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet opened fresh with improvements enabled then ask about page shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when sheet opened in legacy mode then ask about page shown pixel not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, never()).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when sheet reopened in input mode with improvements enabled then ask about page shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Once when the sheet is opened, once when it is reopened showing the pill again.
+        verify(duckChatPixels, times(2)).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when page context removed reverting to ask about page then shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE, attaches context
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        // Once when the sheet is opened, once when removing the attachment reverts the pill to Ask About Page.
+        verify(duckChatPixels, times(2)).reportContextualAskAboutPageShown()
+    }
+
+    @Test
     fun `when prompt sent then attached page context is cleared from input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
