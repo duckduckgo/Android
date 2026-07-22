@@ -33,6 +33,10 @@ assert_eq "412880|com.duckduckgo.mobile.android|4321" \
   "$(echo "$global_out" | grep -E '\|com\.duckduckgo\.mobile\.android\|')" \
   "global: parses main process, strips '/ activities' suffix and commas"
 
+assert_eq "10120|webview_zygote|3001" \
+  "$(echo "$global_out" | grep 'webview_zygote')" \
+  "global: parses webview_zygote row (excluded from renderer aggregation, still emitted)"
+
 detail_out="$(parse_detail_pss < "$DIR/fixtures/detail_meminfo.txt")"
 assert_eq "45120|88760|23450|65430|198220" "$detail_out" \
   "detail: parses java|native|code|graphics|total from App Summary"

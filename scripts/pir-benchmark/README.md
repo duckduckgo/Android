@@ -14,6 +14,11 @@ Per WebView count in the sweep (`{1, 10, 20, 40}` × 3 reps by default), it reco
 - Periodic per-process breakdown (Java heap / Native heap / Graphics / Code).
 - Scan wall-clock duration (from the `PIR-BENCH: scan_complete` marker).
 
+The timeline's `phase` column is only ever `rampup` (before the `scan_start` marker
+is seen, i.e. before all runners are created) or `steady` — there is no distinct
+teardown phase or `runner_destroyed` marker. WebViews are destroyed per-step inside
+each runner's `stop()`, so there is no single global teardown boundary to mark.
+
 ## Prerequisites
 
 1. **Internal, debuggable build** installed (`./gradlew installInternalDebug`). The

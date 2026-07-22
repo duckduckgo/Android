@@ -67,10 +67,6 @@ app_group_processes() {
     | grep -E "\|($PKG(:[^|]*)?|[^|]*sandboxed_process[^|]*|webview_zygote)\|"
 }
 
-pir_pid() {
-  adb shell pidof "$PKG:pir" 2>/dev/null | tr -d '\r' | awk '{print $1}'
-}
-
 run_once() {
   local count="$1" rep="$2"
   echo "=== count=$count rep=$rep ==="
@@ -116,9 +112,9 @@ run_once() {
 
     while IFS='|' read -r pss name pid; do
       [ -z "$pss" ] && continue
-      total_this_sample=$((total_this_sample + pss))
       case "$name" in
         "$PKG:pir") pir_this=$pss ;;
+        *webview_zygote*) ;;                       # shared fork-template, not a per-scan renderer
         *sandboxed_process*|*webview*) renderer_this=$((renderer_this + pss)); r_count=$((r_count + 1)) ;;
       esac
 
@@ -134,6 +130,8 @@ EOF
     done <<EOF
 $procs
 EOF
+
+    total_this_sample=$((pir_this + renderer_this))
 
     [ "$total_this_sample" -gt "$peak_total" ] && peak_total=$total_this_sample
     [ "$pir_this" -gt "$peak_pir" ] && peak_pir=$pir_this
@@ -169,9 +167,9 @@ echo "=== Summary (peak/mean total PSS in MB, duration in s) ==="
 awk -F, 'NR>1 {
   cnt[$1]++; dur[$1]+=$3; pk[$1]+=$4; mn[$1]+=$5; pir[$1]+=$6; rnd[$1]+=$7
 } END {
-  printf "%-6s %-8s %-12s %-12s %-12s %-12s\n","count","reps","dur_s","peak_MB","pir_peak_MB","rnd_peak_MB"
-  for (c in cnt) printf "%-6s %-8s %-12.1f %-12.1f %-12.1f %-12.1f\n", \
-    c, cnt[c], dur[c]/cnt[c]/1000, pk[c]/cnt[c]/1024, pir[c]/cnt[c]/1024, rnd[c]/cnt[c]/1024
+  printf "%-6s %-8s %-12s %-12s %-12s %-12s %-12s\n","count","reps","dur_s","peak_MB","mean_MB","pir_peak_MB","rnd_peak_MB"
+  for (c in cnt) printf "%-6s %-8s %-12.1f %-12.1f %-12.1f %-12.1f %-12.1f\n", \
+    c, cnt[c], dur[c]/cnt[c]/1000, pk[c]/cnt[c]/1024, mn[c]/cnt[c]/1024, pir[c]/cnt[c]/1024, rnd[c]/cnt[c]/1024
 }' "$SUMMARY" | sort -n
 
 echo ""
