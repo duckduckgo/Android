@@ -21,9 +21,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.v2.RecoveryCodeContract.Input
-import com.duckduckgo.sync.impl.ui.v2.RecoveryCodeContract.Output
 
-class RecoveryCodeContract : ActivityResultContract<Input, Output>() {
+class RecoveryCodeContract : ActivityResultContract<Input, Boolean>() {
     override fun createIntent(
         context: Context,
         input: Input,
@@ -34,37 +33,11 @@ class RecoveryCodeContract : ActivityResultContract<Input, Output>() {
     override fun parseResult(
         resultCode: Int,
         intent: Intent?,
-    ): Output {
-        return when (resultCode) {
-            Activity.RESULT_OK -> {
-                val isAutoRestoreEnabled = intent?.getBooleanExtra(IS_AUTO_RESTORE_ENABLED_KEY, true) ?: true
-                Output.CodeGenerated(isAutoRestoreEnabled)
-            }
-
-            Activity.RESULT_CANCELED -> Output.Failure
-            else -> Output.Failure
-        }
+    ): Boolean {
+        return resultCode == Activity.RESULT_OK
     }
 
     data class Input(
         val deviceName: String,
     )
-
-    sealed interface Output {
-        data class CodeGenerated(
-            val isAutoRestoreEnabled: Boolean,
-        ) : Output
-
-        data object Failure : Output
-    }
-
-    companion object {
-        private const val IS_AUTO_RESTORE_ENABLED_KEY = "is_auto_restore_enabled"
-
-        fun resultIntent(
-            isAutoRestoreEnabled: Boolean,
-        ): Intent {
-            return Intent().putExtra(IS_AUTO_RESTORE_ENABLED_KEY, isAutoRestoreEnabled)
-        }
-    }
 }

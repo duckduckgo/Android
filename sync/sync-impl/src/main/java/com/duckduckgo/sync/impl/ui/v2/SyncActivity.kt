@@ -154,16 +154,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val recoveryCodeLauncher = registerForActivityResult(
         RecoveryCodeContract(),
-    ) { result ->
-        when (result) {
-            is RecoveryCodeContract.Output.CodeGenerated -> {
-                viewModel.onAutoRestoreToggleChanged(result.isAutoRestoreEnabled)
-            }
-
-            is RecoveryCodeContract.Output.Failure -> {
-                viewModel.onSyncThisDeviceCanceled()
-                viewModel.onConnectionCancelled()
-            }
+    ) { isSuccess ->
+        if (!isSuccess) {
+            viewModel.onSyncThisDeviceCanceled()
+            viewModel.onConnectionCancelled()
         }
     }
 
@@ -177,6 +171,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val syncThisDeviceListener = OnCheckedChangeListener { _, isChecked ->
         if (isChecked) viewModel.onSyncThisDevice(launchSource)
+    }
+
+    private val autoRestoreListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutoRestoreToggleChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,6 +193,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureSyncThisDeviceCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
+        configureRecoverySection()
         configureDataExpirationNotice()
         configureDataDeletionItem()
 
@@ -236,7 +235,7 @@ class SyncActivity : DuckDuckGoActivity() {
             )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
-                restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, changeListener = null)
+                restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
                 restoreOnReinstallItem.setLeadingIconResource(
                     if (viewState.autoRestoreEnabled) R.drawable.device_default_24 else R.drawable.device_soft_alert_24,
                 )
@@ -402,6 +401,10 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
         }
+    }
+
+    private fun configureRecoverySection() {
+        binding.includeEnabledView.restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
     }
 
     private fun configureDataExpirationNotice() {

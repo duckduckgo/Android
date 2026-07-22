@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
@@ -35,6 +36,7 @@ import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,6 +56,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val syncSetupWideEvent: SyncSetupWideEvent,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState())
@@ -86,6 +89,21 @@ class RecoveryCodeActivityViewModel @Inject constructor(
                 type = SyncAccountOperation.CREATE_PDF,
             )
             _commands.send(Command.ShowError(R.string.sync_recovery_pdf_error))
+        }
+    }
+
+    fun persistRecoveryPayload() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val state = viewState.value
+            val recoveryCode = state.recoveryCode ?: return@launch
+            if (!state.isAutoRestoreAvailable) return@launch
+            if (state.isAutoRestoreEnabled) {
+                val deviceId = syncAccountRepository.getAccountInfo().deviceId
+                syncAutoRestoreManager.saveAutoRestoreData(recoveryCode, deviceId)
+            } else {
+                syncPixels.fireAutoRestoreSetupToggleOptedOut()
+                syncAutoRestoreManager.clearAutoRestoreData()
+            }
         }
     }
 
@@ -160,6 +178,9 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     private fun initializeAutoRestoreAvailability() {
         viewModelScope.launch {
             val isAutoRestoreAvailable = syncAutoRestoreManager.isAutoRestoreAvailable()
+            if (isAutoRestoreAvailable) {
+                syncPixels.fireAutoRestoreSetupToggleShown()
+            }
             _viewState.update { it.copy(isAutoRestoreAvailable = isAutoRestoreAvailable) }
         }
     }

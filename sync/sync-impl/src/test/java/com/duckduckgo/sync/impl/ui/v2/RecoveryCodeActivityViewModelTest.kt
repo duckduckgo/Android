@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -44,6 +45,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -77,6 +79,7 @@ class RecoveryCodeActivityViewModelTest {
             clipboard = clipboard,
             syncPixels = syncPixels,
             syncSetupWideEvent = syncSetupWideEvent,
+            appCoroutineScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -322,9 +325,88 @@ class RecoveryCodeActivityViewModelTest {
         }
     }
 
+    @Test
+    fun `when the payload is persisted with auto restore disabled then the opted out pixel is fired`() = runTest {
+        givenRecoveryCodeAvailable()
+        givenAutoRestoreAvailable()
+
+        testee.changeRestoreOnReinstall(false)
+        testee.persistRecoveryPayload()
+
+        verify(syncPixels).fireAutoRestoreSetupToggleOptedOut()
+    }
+
+    @Test
+    fun `when the payload is persisted with auto restore enabled then the opted out pixel is not fired`() = runTest {
+        givenRecoveryCodeAvailable()
+        givenAutoRestoreAvailable()
+
+        testee.persistRecoveryPayload()
+
+        verify(syncPixels, never()).fireAutoRestoreSetupToggleOptedOut()
+    }
+
+    @Test
+    fun `when the payload is persisted but auto restore is not available then the opted out pixel is not fired`() = runTest {
+        givenRecoveryCodeAvailable()
+
+        testee.changeRestoreOnReinstall(false)
+        testee.persistRecoveryPayload()
+
+        verify(syncPixels, never()).fireAutoRestoreSetupToggleOptedOut()
+    }
+
+    @Test
+    fun `when the payload is persisted with auto restore enabled then the recovery data is saved`() = runTest {
+        givenRecoveryCodeAvailable()
+        givenAutoRestoreAvailable()
+
+        testee.persistRecoveryPayload()
+
+        verify(syncAutoRestoreManager).saveAutoRestoreData("raw-code", "device-id")
+    }
+
+    @Test
+    fun `when the payload is persisted with auto restore disabled then the recovery data is cleared`() = runTest {
+        givenRecoveryCodeAvailable()
+        givenAutoRestoreAvailable()
+
+        testee.changeRestoreOnReinstall(false)
+        testee.persistRecoveryPayload()
+
+        verify(syncAutoRestoreManager).clearAutoRestoreData()
+        verify(syncAutoRestoreManager, never()).saveAutoRestoreData(any(), any())
+    }
+
+    @Test
+    fun `when the payload is persisted but auto restore is not available then nothing is written`() = runTest {
+        givenRecoveryCodeAvailable()
+
+        testee.persistRecoveryPayload()
+
+        verify(syncAutoRestoreManager, never()).saveAutoRestoreData(any(), any())
+        verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
+    }
+
+    @Test
+    fun `when the payload is persisted without a recovery code then nothing is saved`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "boom"))
+        givenAutoRestoreAvailable()
+
+        testee.persistRecoveryPayload()
+
+        verify(syncAutoRestoreManager, never()).saveAutoRestoreData(any(), any())
+    }
+
     private fun givenRecoveryCodeAvailable() {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCode))
+    }
+
+    private suspend fun givenAutoRestoreAvailable() {
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(AccountInfo(deviceId = "device-id"))
     }
 }
 

@@ -204,13 +204,17 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     override fun finish() {
-        val state = viewModel.viewState.value
-        if (state.recoveryCode == null) {
-            setResult(RESULT_CANCELED)
+        // Deliberately committed only when leaving the screen: SyncActivity re-reads this preference
+        // from storage when it returns to the foreground, so it must be written before this activity
+        // finishes, but intermediate toggle flips shouldn't cause repeated Block Store writes.
+        viewModel.persistRecoveryPayload()
+
+        if (viewModel.viewState.value.recoveryCode != null) {
+            setResult(RESULT_OK)
         } else {
-            val useAutoRestore = state.isAutoRestoreAvailable && state.isAutoRestoreEnabled
-            setResult(RESULT_OK, RecoveryCodeContract.resultIntent(useAutoRestore))
+            setResult(RESULT_CANCELED)
         }
+
         super.finish()
     }
 
