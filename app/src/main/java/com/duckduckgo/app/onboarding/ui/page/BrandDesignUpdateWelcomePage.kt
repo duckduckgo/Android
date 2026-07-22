@@ -723,6 +723,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playAddToDockVideo(surfaceTexture: SurfaceTexture) {
+        releaseAddToDockVideo()
         addToDockVideoPlayer = MediaPlayer().apply {
             setSurface(Surface(surfaceTexture))
             resources.openRawResourceFd(R.raw.onboarding_add_to_home_screen_tutorial).use { setDataSource(it) }
