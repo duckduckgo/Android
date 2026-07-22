@@ -44,7 +44,10 @@ for what each screen shows and in what order. The VM stops translating and just 
 spec. A new render engine compares the previous spec with the new one and animates only what
 changed — the same code path snaps everything into place when there is nothing to animate
 (rotation, re-entry). All the per-dialog view wiring that exists today collapses into that
-one engine plus per-screen data.
+one engine plus per-screen data. The engine itself is a set of independent axis controllers —
+background, embellishment, card anchor, content — each seeing only its own previous → next
+value. Nothing branches on a (previous screen, next screen) pair; that single rule is what
+keeps N screens at N transition costs instead of resurrecting the N×N matrix.
 
 ### `DialogSpec`
 
@@ -86,6 +89,9 @@ sealed interface ContentSpec {
 
 View elements, strings, etc. that never vary stay in the include's XML or in
 the binder, as today. Only the title and plan-dependent copy travel through the spec.
+`title` stays non-null while every screen has one; if a titleless screen ever appears,
+making it nullable (engine skips the typing stage) is a one-line change — deliberately
+not pre-built.
 
 The view layer binds a spec and hands the engine a small handle. The handle is how a screen
 declares its views without re-describing the choreography:
@@ -95,10 +101,16 @@ class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
     val intro: Animator? = null,             // bespoke extras only (check-icon stagger, suggestion buttons)
-    val result: (() -> NewUserOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
+    val result: (() -> LinearOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
     val unbind: () -> Unit = {},             // resource release, animation cancels
 )
 ```
+
+The handle is engine-owned, view layer only. The VM never sees it: a handle captures views,
+so a VM-held handle would go stale on rotation. The engine attaches the CTA listeners, builds
+the event (via `result` for stateful screens), and forwards the finished event to the VM.
+`result` is typed against the orchestrator-core `LinearOnboardingEvent`, not the new-user
+event type, so the engine stays flow-agnostic.
 
 **Titles.** Every screen layout today copy-pastes the same title machinery: a
 `TypeAnimationTextView` for the typing effect, an invisible sizing twin (`hiddenTitleText`)
@@ -107,7 +119,8 @@ U+00A0 before the last word). That pattern becomes one `OnboardingDialogTitleVie
 widget, dropped into each layout. The binder sets `content.title` on
 it; the rendering engine tells it when to type or snap. No screen re-implements title behavior.
 
-**Stateful screens** (address bar, input screen, quick setup). User edits inside the screen
+**Stateful screens** (address bar, input screen, quick setup — with more planned as the next
+step of this initiative). User edits inside the screen
 never produce a new spec, so the engine only diffs on real step changes. No holder object is
 needed — two existing mechanisms cover it:
 
@@ -119,8 +132,12 @@ needed — two existing mechanisms cover it:
   constant-cost as screens are added.
 - **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
   event directly from the current selection (`{ AddressBarConfirmed(picker.selected) }`).
-  The CTA click just fires whatever the closure returns — the VM forwards events and never
-  needs to know which screen is showing.
+  The engine's CTA listener fires the closure and forwards the finished event to the VM —
+  the VM forwards events blindly and never needs to know which screen is showing.
+- **External changes.** Some content mirrors system state that changes mid-step: quick setup
+  re-syncs its default-browser and widget switches on resume. That stays on the existing
+  `Command` channel, which this design leaves untouched — the command handler pokes the
+  bound view (via an optional update hook on the handle). Not render state, no new spec.
 
 If a future screen's live state needs to influence *other* steps before submit, the store
 is not the tool: that value should travel through an orchestrator event into the plan's
@@ -184,20 +201,22 @@ Engine -> Binder : unbind(previous content)
 Engine -> Binder : bind(new content)
 Binder --> Engine : ContentHandle
 Engine -> Engine : background ∥ embellishment ∥ card morph\n→ title types → content + CTAs fade in\n→ click listeners attach
-note right : animate = false runs the same\npipeline snapped to end states\n(rotation, re-entry, tap-to-skip)
+note right : animate = false runs the same\npipeline snapped to end states\n(rotation, re-entry, tap-to-skip,\nsystem animations off)
 
 == Interaction ==
 User -> Binder : live edits (picker, toggle)
 Binder -> VM : value into keyed live-value store\n(VM-owned, survives rotation)
 note right : no new spec, no re-render
-User -> VM : CTA click
+User -> Engine : CTA click
 alt action is Emit(event)
-  VM -> Orchestrator : event as-is
+  Engine -> VM : event as-is
 else action is Submit
-  VM -> Binder : handle.result()
-  Binder --> VM : event built from current selection
-  VM -> Orchestrator : event
+  Engine -> Binder : handle.result()
+  Binder --> Engine : event built from current selection
+  Engine -> VM : event
 end
+VM -> Orchestrator : forward event
+note right : VM never sees the handle;\nit forwards events blindly
 
 == Step change ==
 Orchestrator -> Step : transition(event)
@@ -206,6 +225,13 @@ Orchestrator -> VM : state: InProgress(next step)
 note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing spec against the new one
 @enduml
 ```
+
+**Two policies the VM owns explicitly.** `animate` is keyed by step identity: the first render
+of a step animates, re-renders (rotation, re-emission) snap. An empty stage — first dialog,
+return from `BrowserActivity`, migration handoff — always animates its entrance: one global
+policy, replacing today's mixed behaviour where only the comparison chart animates on re-entry
+and everything else snaps. The VM is recreated on every activity entry and the orchestrator is
+in-memory, so step identity is the only durable signal; the POC validates it suffices.
 
 ## Benefits
 
@@ -219,24 +245,32 @@ note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing spec agains
 - Every dialog can enter from an empty stage. "No previous spec" means clear the stage
   and enter — not a special case. This covers the first dialog, returns from
   `BrowserActivity` (today a hand-coded comparison-chart path), and migration handoffs.
-- `ViewState` collapses from ~15 fields to a spec and two flags; the VM's dialog switch
-  reduces to five branches.
+- `ViewState` collapses from 16 fields (one already write-only dead) to a spec and two flags;
+  the VM's dialog switch reduces to five branches — the four command-only steps (intro
+  animation, notification permission, default browser, add widget) plus one for every
+  spec-rendered dialog.
 - `DialogSpec` is the state model a future Compose port would consume unchanged — the
   declarative architecture without the rewrite risk.
+- One place to honor system animation settings: animations-off routes the whole pipeline
+  through its snapped path. Today nothing in this flow respects reduced motion.
+- The orchestrator already supports `GoBack` and a diff is direction-agnostic, so backward
+  transitions come free if the parent project ever wants back navigation. Enabled, not scoped.
 
 ## Risks and mitigations
 
 | Risk | Mitigation |
 |---|---|
-| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
+| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared spec ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
 | Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
 | Regression in a release-critical flow | Strangler migration: one dialog at a time, each step shippable and revertible, legacy and new renderer coexist (legacy stays authoritative for unmigrated screens; the engine clears the stage when taking over). Maestro release-blocker flows plus unit tests gate every step |
 | Two consecutive steps resolve identical specs, `StateFlow` swallows the second | Emitted state is keyed by step id, not spec equality alone |
-| Engine grows dialog-specific logic over time | Hard rule: bespoke behaviour goes into the screen's content spec or its handle, never into the engine |
+| Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content spec or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
 ## Rollout
 
 Scaffolding first (pure data types + engine, no behaviour change), then migrate screens
-simplest-first, then delete the legacy when-blocks, `PreOnboardingDialogType`, and dead
-`ViewState` fields. POC before committing: the three-screen chain above exercises every
+simplest-first, then delete the legacy when-blocks, `PreOnboardingDialogType` (including the
+dead `SKIP_ONBOARDING_OPTION`, never produced by this VM), and dead `ViewState` fields
+(`isReinstallUser` is write-only today — audit during migration whether `QuickSetup` needs
+the flag at all). POC before committing: the three-screen chain above exercises every
 risky mechanism in one pass.
