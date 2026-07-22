@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,8 +78,11 @@ class RecoveryCodeActivityViewModel @Inject constructor(
             val file = withContext(dispatchers.io()) { recoveryCodePDF.generateAndStoreRecoveryCodePDF(context, code) }
             _commands.send(Command.ShareRecoveryCodeFile(file))
         } catch (e: Throwable) {
+            if (e is CancellationException) {
+                throw e
+            }
             syncPixels.fireSyncAccountErrorPixel(
-                result = Error(reason = e.message.toString()),
+                result = Error(reason = e.message.orEmpty()),
                 type = SyncAccountOperation.CREATE_PDF,
             )
             _commands.send(Command.ShowError(R.string.sync_recovery_pdf_error))
