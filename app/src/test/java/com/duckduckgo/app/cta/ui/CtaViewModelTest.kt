@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -166,6 +167,8 @@ class CtaViewModelTest {
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
+    private val mockOnboardingPromptsExperimentManager: OnboardingPromptsExperimentManager = mock()
+
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
@@ -216,6 +219,8 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetOnly()).thenReturn(false)
+        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInDockAndWidget()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -246,6 +251,7 @@ class CtaViewModelTest {
             },
             duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
+            onboardingPromptsExperimentManager = mockOnboardingPromptsExperimentManager,
         )
     }
 
@@ -490,6 +496,36 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is HomePanelCta.AddWidgetInstructions)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUserEnrolledInWidgetOnlyExperimentThenWidgetCtaNotReturned() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetOnly()).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUserEnrolledInDockAndWidgetExperimentThenWidgetCtaNotReturned() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInDockAndWidget()).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUserEnrolledInDockOnlyExperimentThenWidgetCtaReturned() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is HomePanelCta.AddWidgetAutoOnboarding)
     }
 
     @Test
