@@ -176,7 +176,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
         if (isGranted) {
-            lifecycleScope.launch { viewModel.generateRecoveryCode(this@SyncActivity) }
+            viewModel.generateRecoveryCode(this)
         } else {
             Snackbar.make(binding.root, R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
         }
@@ -315,7 +315,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 if (appBuildConfig.sdkInt < 30) {
                     downloadPdfPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 } else {
-                    lifecycleScope.launch { viewModel.generateRecoveryCode(this@SyncActivity) }
+                    viewModel.generateRecoveryCode(this)
                 }
             }
 
