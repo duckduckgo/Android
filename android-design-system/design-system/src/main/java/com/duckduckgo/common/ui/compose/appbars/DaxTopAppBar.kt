@@ -35,6 +35,10 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -51,7 +55,7 @@ import com.duckduckgo.mobile.android.R
  * @param title The title to display in the top app bar.
  * @param modifier Modifier for this top app bar.
  * @param shadow Whether to display a shadow below the top app bar.
- * @param navigationIcon Composable for the navigation icon, if any.
+ * @param navigationIcon The navigation icon to display, or null for none.
  * @param actions Composable for the action icons, if any.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215793353260352
@@ -62,7 +66,7 @@ fun DaxTopAppBar(
     title: String,
     modifier: Modifier = Modifier,
     shadow: Boolean = false,
-    navigationIcon: (@Composable DaxTopAppBarNavigationIconScope.() -> Unit)? = null,
+    navigationIcon: DaxTopAppBarNavigationIcon? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
@@ -77,18 +81,41 @@ fun DaxTopAppBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (navigationIcon != null) {
-            DaxTopAppBarNavigationIconScope.navigationIcon()
+            NavigationIconButton(navigationIcon)
             Spacer(Modifier.width(DaxTopAppBarDefaults.spacing))
         }
         DaxText(
             text = title,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .semantics { heading() },
             style = DaxTopAppBarDefaults.style,
             color = DaxTopAppBarDefaults.colors.titleColor,
             maxLines = 1,
         )
         actions(this)
     }
+}
+
+@Composable
+private fun NavigationIconButton(icon: DaxTopAppBarNavigationIcon) {
+    val iconRes: Int
+    val descriptionRes: Int
+    when (icon) {
+        is DaxTopAppBarNavigationIcon.Back -> {
+            iconRes = R.drawable.ic_arrow_left_24
+            descriptionRes = R.string.dax_top_app_bar_back_content_description
+        }
+        is DaxTopAppBarNavigationIcon.Close -> {
+            iconRes = R.drawable.ic_close_24
+            descriptionRes = R.string.dax_top_app_bar_close_content_description
+        }
+    }
+    DaxIconButton(
+        onClick = icon.onClick,
+        iconPainter = painterResource(iconRes),
+        contentDescription = stringResource(descriptionRes),
+    )
 }
 
 @Immutable
@@ -124,9 +151,7 @@ private fun DaxTopAppBarDefaultPreview() {
     PreviewBox {
         DaxTopAppBar(
             title = "Title",
-            navigationIcon = {
-                Back { }
-            },
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
             actions = {
                 DaxIconButton(
                     onClick = {},
@@ -144,10 +169,26 @@ private fun DaxTopAppBarLongTitlePreview() {
     PreviewBox {
         DaxTopAppBar(
             title = "A very long title that should be truncated with an ellipsis at the end",
-            navigationIcon = {
-                Close { }
-            },
+            navigationIcon = DaxTopAppBarNavigationIcon.Close { },
             shadow = true,
+            actions = {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_find_search_24),
+                    contentDescription = "Search",
+                )
+            },
+        )
+    }
+}
+
+@PreviewFontScale
+@Composable
+private fun DaxTopAppBarFontScalePreview() {
+    PreviewBox {
+        DaxTopAppBar(
+            title = "Title",
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
             actions = {
                 DaxIconButton(
                     onClick = {},

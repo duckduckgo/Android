@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,6 +54,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.appbars.DaxSearchTopAppBar
 import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBar
+import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBarNavigationIcon
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
@@ -104,12 +106,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(id = R.id.composeDaxTopAppBar, isDarkTheme = isDarkTheme) {
                 val searchState = rememberTextFieldState()
                 var searchActive by remember { mutableStateOf(false) }
+
+                BackHandler(enabled = searchActive) { searchActive = false }
+
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     DaxSearchTopAppBar(
                         title = "Search bar",
-                        navigationIcon = {
-                            Back { }
-                        },
+                        navigationIcon = DaxTopAppBarNavigationIcon.Back { },
                         searchActive = searchActive,
                         searchState = searchState,
                         searchPlaceholder = "Search…",
@@ -130,9 +133,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     DaxTopAppBar(
                         title = "Top bar",
                         shadow = true,
-                        navigationIcon = {
-                            Close { }
-                        },
+                        navigationIcon = DaxTopAppBarNavigationIcon.Close { },
                         actions = {
                             DaxIconButton(
                                 onClick = { },
