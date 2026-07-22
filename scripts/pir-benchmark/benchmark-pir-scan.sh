@@ -72,10 +72,13 @@ run_once() {
   echo "=== count=$count rep=$rep ==="
 
   adb shell am force-stop "$PKG"
-  # Write the override via run-as (debuggable builds only).
-  # run-as's cwd is the app data dir; the files/ subdir may not exist yet (nothing has
-  # touched context.filesDir in the :pir process on a fresh install), so create it first.
-  adb shell run-as "$PKG" sh -c "mkdir -p files && printf '%s' '$count' > files/$OVERRIDE_FILE" \
+  # Write the override via run-as (debuggable builds only). run-as chdirs to the app data
+  # dir; create files/ (absent on a fresh install) then write the count.
+  # The whole remote command is ONE double-quoted arg with the sh -c script single-quoted,
+  # so the script (its '&&' and '>') survives intact to the device shell instead of being
+  # re-parsed across the adb -> device-shell boundary. $PKG/$count/$OVERRIDE_FILE still
+  # expand locally (double-quote context); the single quotes pass through as literals.
+  adb shell "run-as $PKG sh -c 'mkdir -p files && printf %s $count > files/$OVERRIDE_FILE'" \
     || die "failed to write override file"
   adb logcat -c
 
