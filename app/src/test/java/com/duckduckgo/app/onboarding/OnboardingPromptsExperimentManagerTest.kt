@@ -112,6 +112,7 @@ class OnboardingPromptsExperimentManagerTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
 
         testee.onPrivacyConfigPersisted()
+        testee.enroll()
 
         assertTrue(testee.isEnrolledInWidgetOnly())
         assertFalse(testee.isEnrolledInDockAndWidget())
@@ -122,6 +123,7 @@ class OnboardingPromptsExperimentManagerTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
 
         testee.onPrivacyConfigPersisted()
+        testee.enroll()
 
         assertTrue(testee.isEnrolledInDockAndWidget())
         assertFalse(testee.isEnrolledInWidgetOnly())
@@ -132,9 +134,21 @@ class OnboardingPromptsExperimentManagerTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY)
 
         testee.onPrivacyConfigPersisted()
+        testee.enroll()
 
         assertFalse(testee.isEnrolledInWidgetOnly())
         assertFalse(testee.isEnrolledInDockAndWidget())
+    }
+
+    @Test
+    fun whenNeverEnrolledThenIsEnrolledInWidgetOnlyAndDockAndWidgetReturnFalseWithoutEnrolling() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
+
+        testee.onPrivacyConfigPersisted()
+
+        assertFalse(testee.isEnrolledInWidgetOnly())
+        assertFalse(testee.isEnrolledInDockAndWidget())
+        assertNull(toggles.addToDockAndWidgetExperimentJul25().getCohort())
     }
 
     private fun givenCohortEnabled(winner: OnboardingPromptsCohorts?) {
