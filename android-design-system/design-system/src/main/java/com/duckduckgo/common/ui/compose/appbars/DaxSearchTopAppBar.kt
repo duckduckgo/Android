@@ -16,9 +16,10 @@
 
 package com.duckduckgo.common.ui.compose.appbars
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -40,14 +42,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,18 +71,27 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
 /**
- * DuckDuckGo themed top app bar with search functionality.
+ * DuckDuckGo themed top app bar with a search mode.
  *
- * @param title The title to display in the top app bar.
+ * The bar is in exactly one mode at a time: title mode (title + navigation icon + actions) or
+ * search mode (a search input). The two modes crossfade; the bar is never composed twice at once.
+ * On entering search mode the input field takes focus and raises the keyboard.
+ *
+ * Search state is caller-owned; this bar does not intercept the system back button. Callers that
+ * want system back to exit search mode should add their own [androidx.activity.compose.BackHandler]
+ * gated on the search-active state.
+ *
+ * @param title The title to display in title mode.
  * @param searchState The state of the search text field.
  * @param modifier Modifier for this top app bar.
  * @param shadow Whether to display a shadow below the top app bar.
- * @param searchActive Whether the search bar is active and visible.
+ * @param searchActive Whether the bar is in search mode.
  * @param searchPlaceholder The placeholder text for the search field, if any.
  * @param onSearchBack Callback when the back button is pressed in search mode.
  * @param onSearch Callback when a search is submitted.
- * @param navigationIcon Composable for the navigation icon, if any.
- * @param actions Composable for the action icons, if any.
+ * @param navigationIcon The navigation icon [com.duckduckgo.common.ui.compose.appbars.DaxTopAppBarNavigationIcon] to display in title mode,
+ * or null for none.
+ * @param actions Composable for the action icons shown in title mode, if any.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215793353260352
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=20800-183716&m=dev
@@ -86,44 +106,63 @@ fun DaxSearchTopAppBar(
     searchPlaceholder: String? = null,
     onSearchBack: () -> Unit = {},
     onSearch: (String) -> Unit = {},
-    navigationIcon: (@Composable DaxTopAppBarNavigationIconScope.() -> Unit)? = null,
+    navigationIcon: DaxTopAppBarNavigationIcon? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    Box(modifier = modifier) {
-        DaxTopAppBar(
-            title = title,
-            shadow = shadow,
-            navigationIcon = navigationIcon,
-            actions = actions,
-        )
-        AnimatedVisibility(
-            visible = searchActive,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it }),
-        ) {
-            SearchBarContent(
+    AnimatedContent(
+        targetState = searchActive,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        modifier = modifier,
+        label = "DaxSearchTopAppBarMode",
+    ) { active ->
+        if (active) {
+            SearchModeBar(
                 searchState = searchState,
                 searchPlaceholder = searchPlaceholder,
+                shadow = shadow,
                 onSearchBack = onSearchBack,
                 onSearch = onSearch,
-                modifier = Modifier
-                    .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-                    .fillMaxWidth()
-                    .background(DaxTopAppBarDefaults.colors.containerColor),
+            )
+        } else {
+            DaxTopAppBar(
+                title = title,
+                shadow = shadow,
+                navigationIcon = navigationIcon,
+                actions = actions,
             )
         }
     }
 }
 
 @Composable
-private fun SearchBarContent(
+private fun SearchModeBar(
     searchState: TextFieldState,
     searchPlaceholder: String?,
+    shadow: Boolean,
     onSearchBack: () -> Unit,
     onSearch: (String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.padding(DaxSearchTopAppBarDefaults.margin)) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val inInspectionMode = LocalInspectionMode.current
+
+    LaunchedEffect(Unit) {
+        if (!inInspectionMode) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.elevation) else Modifier)
+            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+            .clipToBounds()
+            .heightIn(min = DaxTopAppBarDefaults.height)
+            .fillMaxWidth()
+            .background(DaxTopAppBarDefaults.colors.containerColor)
+            .padding(DaxSearchTopAppBarDefaults.margin),
+        contentAlignment = Alignment.Center,
+    ) {
         Surface(
             shape = DaxSearchTopAppBarDefaults.shape,
             color = DaxSearchTopAppBarDefaults.colors.surfaceColor,
@@ -142,11 +181,16 @@ private fun SearchBarContent(
                 Box(modifier = Modifier.weight(1f)) {
                     BasicTextField(
                         state = searchState,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
                         textStyle = DaxSearchTopAppBarDefaults.queryStyle.asTextStyle.copy(color = DaxSearchTopAppBarDefaults.colors.queryColor),
                         lineLimits = TextFieldLineLimits.SingleLine,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        onKeyboardAction = KeyboardActionHandler { _ -> onSearch(searchState.text.toString()) },
+                        onKeyboardAction = KeyboardActionHandler {
+                            keyboardController?.hide()
+                            onSearch(searchState.text.toString())
+                        },
                         cursorBrush = SolidColor(DaxSearchTopAppBarDefaults.colors.cursorColor),
                     )
                     if (searchState.text.isEmpty() && searchPlaceholder != null) {
@@ -209,32 +253,63 @@ internal object DaxSearchTopAppBarDefaults {
 
 @PreviewLightDark
 @Composable
-private fun DaxTopAppBarSearchEmptyPreview() {
+private fun DaxSearchTopAppBarEmptyPreview() {
     PreviewBox {
         DaxSearchTopAppBar(
             title = "Title",
             searchActive = true,
             searchState = rememberTextFieldState(),
             searchPlaceholder = "Search…",
-            navigationIcon = {
-                Back { }
-            },
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
         )
     }
 }
 
 @PreviewLightDark
 @Composable
-private fun DaxTopAppBarSearchTypedPreview() {
+private fun DaxSearchTopAppBarTypedPreview() {
     PreviewBox {
         DaxSearchTopAppBar(
             title = "Title",
             searchActive = true,
             searchState = rememberTextFieldState("query"),
             searchPlaceholder = "Search…",
-            navigationIcon = {
-                Close { }
+            navigationIcon = DaxTopAppBarNavigationIcon.Close { },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSearchTopAppBarTitleModePreview() {
+    PreviewBox {
+        DaxSearchTopAppBar(
+            title = "Title",
+            searchActive = false,
+            searchState = rememberTextFieldState(),
+            searchPlaceholder = "Search…",
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
+            actions = {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_find_search_24),
+                    contentDescription = "Search",
+                )
             },
+        )
+    }
+}
+
+@PreviewFontScale
+@Composable
+private fun DaxSearchTopAppBarFontScalePreview() {
+    PreviewBox {
+        DaxSearchTopAppBar(
+            title = "Title",
+            searchActive = true,
+            searchState = rememberTextFieldState("query"),
+            searchPlaceholder = "Search…",
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
         )
     }
 }
