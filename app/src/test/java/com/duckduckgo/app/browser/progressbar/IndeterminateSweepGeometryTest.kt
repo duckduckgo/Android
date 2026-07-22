@@ -27,14 +27,14 @@ class IndeterminateSweepGeometryTest {
 
     @Test
     fun `seeded cycle starts exactly at the current fill`() {
-        val e = IndeterminateSweepGeometry.edges(cycleProgress = 0f, seedLeading = 0.5f)
+        val e = IndeterminateSweepGeometry.calculateEdges(cycleProgress = 0f, seedLeading = 0.5f)
         assertEquals(0f, e.trailing, 0.0001f)
         assertEquals(0.5f, e.leading, 0.0001f)
     }
 
     @Test
     fun `unseeded cycle starts at zero width`() {
-        val e = IndeterminateSweepGeometry.edges(cycleProgress = 0f, seedLeading = 0f)
+        val e = IndeterminateSweepGeometry.calculateEdges(cycleProgress = 0f, seedLeading = 0f)
         assertEquals(0f, e.trailing, 0.0001f)
         assertEquals(0f, e.leading, 0.0001f)
     }
@@ -44,7 +44,7 @@ class IndeterminateSweepGeometryTest {
         var s = 0f
         while (s < 1f) {
             for (seed in seeds) {
-                val e = IndeterminateSweepGeometry.edges(s, seed)
+                val e = IndeterminateSweepGeometry.calculateEdges(s, seed)
                 assertTrue("s=$s seed=$seed", e.leading >= e.trailing - 0.0001f)
             }
             s += 0.01f
@@ -56,7 +56,7 @@ class IndeterminateSweepGeometryTest {
         var s = 0f
         while (s < 1f) {
             for (seed in seeds) {
-                val e = IndeterminateSweepGeometry.edges(s, seed)
+                val e = IndeterminateSweepGeometry.calculateEdges(s, seed)
                 val spansFull = e.trailing < 0.02f && e.leading > 0.98f
                 assertFalse("full bar at s=$s seed=$seed", spansFull)
             }
@@ -69,7 +69,7 @@ class IndeterminateSweepGeometryTest {
         var prev = -1f
         var s = 0f
         while (s <= 1f) {
-            val leading = IndeterminateSweepGeometry.edges(s, 0f).leading
+            val leading = IndeterminateSweepGeometry.calculateEdges(s, 0f).leading
             assertTrue("regressed at s=$s", leading >= prev - 0.0001f)
             prev = leading
             s += 0.02f
@@ -82,5 +82,26 @@ class IndeterminateSweepGeometryTest {
         assertEquals(0.5f, IndeterminateSweepGeometry.seedForCycle(1999L, 2000L, 0.5f), 0.0001f)
         assertEquals(0f, IndeterminateSweepGeometry.seedForCycle(2000L, 2000L, 0.5f), 0.0001f)
         assertEquals(0f, IndeterminateSweepGeometry.seedForCycle(5000L, 2000L, 0.5f), 0.0001f)
+    }
+
+    @Test
+    fun `cycleEnd returns the end of the first cycle when finishing within it`() {
+        assertEquals(3000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 1000L, cycleMs = 2000L))
+        assertEquals(3000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 2500L, cycleMs = 2000L))
+    }
+
+    @Test
+    fun `cycleEnd rolls to the next boundary exactly on a boundary`() {
+        assertEquals(5000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 3000L, cycleMs = 2000L))
+    }
+
+    @Test
+    fun `cycleEnd returns the end of the current cycle when finishing in a later cycle`() {
+        assertEquals(7000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 5500L, cycleMs = 2000L))
+    }
+
+    @Test
+    fun `cycleEnd finishes immediately for a non-positive cycle`() {
+        assertEquals(5500L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 5500L, cycleMs = 0L))
     }
 }

@@ -24,6 +24,7 @@ data class ProgressBarConfig(
     val creepVelocity: Float = 0.04f,
     val stallTimeoutMs: Long = 5000L,
     val indeterminateCycleMs: Long = 2000L,
+    val resumeDuration: Long = 2000L,
     val endDuration: Long = 300L,
     val fadeInDuration: Long = 100L,
     val fadeOutDuration: Long = 100L,

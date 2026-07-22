@@ -94,19 +94,25 @@ class PageLoadProgressBar @JvmOverloads constructor(
             }
             lastFrameTimeNanos = frameTimeNanos
 
+            val now = SystemClock.elapsedRealtime()
             val state = engine.tick(dtSeconds)
 
-            if (state.phase == Phase.INDETERMINATE && !indeterminateSweepRenderer.isActive) {
-                indeterminateSweepRenderer.start(SystemClock.elapsedRealtime(), state.displayProgress / 100f)
-            } else if (state.phase != Phase.INDETERMINATE && indeterminateSweepRenderer.isActive) {
+            if (state.phase == Phase.INDETERMINATE) {
+                if (!indeterminateSweepRenderer.isActive) {
+                    indeterminateSweepRenderer.start(now, state.displayProgress / 100f)
+                } else if (indeterminateSweepRenderer.hasFinished(now)) {
+                    indeterminateSweepRenderer.stop()
+                    engine.onSweepFinished()
+                }
+            } else if (indeterminateSweepRenderer.isActive) {
                 indeterminateSweepRenderer.stop()
             }
 
             invalidate()
 
-            if (state.phase == Phase.DONE) {
+            if (engine.phase == Phase.DONE) {
                 onDone()
-            } else if (state.shouldInvalidate) {
+            } else if (engine.phase != Phase.IDLE) {
                 Choreographer.getInstance().postFrameCallback(this)
             }
         }
@@ -121,6 +127,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         engine.reset()
         engine.start()
         _isStarted = true
+        indeterminateSweepRenderer.stop()
 
         lastReportedProgress = 0f
         shimmerRenderer.start(SystemClock.elapsedRealtime())
@@ -143,12 +150,21 @@ class PageLoadProgressBar @JvmOverloads constructor(
             // Progress went backward — new navigation, restart fresh
             start()
         }
+        val resumedFromStall = engine.phase == Phase.INDETERMINATE && progress > lastReportedProgress
         lastReportedProgress = progress
         engine.onProgressUpdate(progress)
+        if (resumedFromStall) {
+            indeterminateSweepRenderer.requestFinish(SystemClock.elapsedRealtime())
+        }
     }
 
     fun triggerCompletion() {
+        val wasIndeterminate = engine.phase == Phase.INDETERMINATE
         engine.triggerCompletion()
+        if (wasIndeterminate) {
+            // Page finished while the sweep shows — let it finish the current cycle before completing.
+            indeterminateSweepRenderer.requestFinish(SystemClock.elapsedRealtime())
+        }
     }
 
     fun reset() {

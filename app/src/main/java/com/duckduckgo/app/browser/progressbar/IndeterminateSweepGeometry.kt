@@ -38,7 +38,7 @@ object IndeterminateSweepGeometry {
      * @param cycleProgress 0..1 within the current cycle.
      * @param seedLeading leading-edge start value; the current fill P for the first cycle, 0 otherwise.
      */
-    fun edges(cycleProgress: Float, seedLeading: Float): SweepEdges {
+    fun calculateEdges(cycleProgress: Float, seedLeading: Float): SweepEdges {
         val s = cycleProgress.coerceIn(0f, 1f)
         val seed = seedLeading.coerceIn(0f, 1f)
         val leading = seed + (1f - seed) * easeInOutCubic(s)
@@ -53,4 +53,14 @@ object IndeterminateSweepGeometry {
     /** The seed applies only to the first cycle; every later cycle starts empty. */
     fun seedForCycle(elapsedMs: Long, cycleMs: Long, seedLeading: Float): Float =
         if (cycleMs > 0L && elapsedMs / cycleMs == 0L) seedLeading else 0f
+
+    /**
+     * The next cycle boundary at or after [now] — where the segment has fully exited and the bar is
+     * empty. Used to finish the current cycle gracefully when leaving the indeterminate state.
+     */
+    fun cycleEnd(startTime: Long, now: Long, cycleMs: Long): Long {
+        if (cycleMs <= 0L) return now
+        val elapsedCycles = (now - startTime).coerceAtLeast(0L) / cycleMs
+        return startTime + (elapsedCycles + 1) * cycleMs
+    }
 }
