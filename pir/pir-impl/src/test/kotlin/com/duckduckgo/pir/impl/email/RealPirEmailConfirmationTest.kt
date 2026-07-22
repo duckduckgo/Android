@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.Broker
@@ -62,10 +63,13 @@ class RealPirEmailConfirmationTest {
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
     private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
+    private val mockPirWebViewCountProvider: PirWebViewCountProvider = mock()
 
     @Before
     fun setUp() {
         whenever(mockCallbacks.getPlugins()).thenReturn(emptyList())
+
+        kotlinx.coroutines.runBlocking { whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20) }
 
         testee = RealPirEmailConfirmation(
             repository = mockRepository,
@@ -75,6 +79,7 @@ class RealPirEmailConfirmationTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
             webViewDataCleaner = mockWebViewDataCleaner,
+            pirWebViewCountProvider = mockPirWebViewCountProvider,
         )
     }
 

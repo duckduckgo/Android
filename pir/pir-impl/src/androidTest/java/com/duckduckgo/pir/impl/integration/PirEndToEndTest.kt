@@ -33,6 +33,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
 import com.duckduckgo.pir.impl.common.RealEmailDataResolver
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
+import com.duckduckgo.pir.impl.common.RealPirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerStepCompletedEventHandler
 import com.duckduckgo.pir.impl.common.actions.CaptchaInfoReceivedEventHandler
@@ -322,6 +323,11 @@ class PirEndToEndTest {
 
         val pirCallbacksPluginPoint = FakePluginPoint<PirCallbacks>()
 
+        val pirWebViewCountProvider = RealPirWebViewCountProvider(
+            pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+            dispatcherProvider = dispatcherProvider,
+        )
+
         pirScan = RealPirScan(
             repository = pirRepository,
             eventsRepository = pirEventsRepository,
@@ -332,6 +338,7 @@ class PirEndToEndTest {
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
+            pirWebViewCountProvider = pirWebViewCountProvider,
         )
 
         pirOptOut = RealPirOptOut(
@@ -344,6 +351,7 @@ class PirEndToEndTest {
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
+            pirWebViewCountProvider = pirWebViewCountProvider,
         )
 
         eligibleScanJobProvider = RealEligibleScanJobProvider(
@@ -374,6 +382,7 @@ class PirEndToEndTest {
             pirScanWideEvent = NoOpPirScanWideEvent,
             pirInitialScanCompletionWideEvent = NoOpPirInitialScanCompletionWideEvent,
             networkProtectionState = fakeNetworkProtectionState,
+            pirWebViewCountProvider = pirWebViewCountProvider,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -384,6 +393,7 @@ class PirEndToEndTest {
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
+            pirWebViewCountProvider = pirWebViewCountProvider,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(

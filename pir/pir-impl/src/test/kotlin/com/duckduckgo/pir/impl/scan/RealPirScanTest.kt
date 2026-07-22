@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.Broker
@@ -63,10 +64,12 @@ class RealPirScanTest {
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
     private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
+    private val mockPirWebViewCountProvider: PirWebViewCountProvider = mock()
 
     @Before
     fun setUp() {
         whenever(mockCallbacks.getPlugins()).thenReturn(emptyList())
+        kotlinx.coroutines.runBlocking { whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20) }
 
         testee = RealPirScan(
             repository = mockRepository,
@@ -78,6 +81,7 @@ class RealPirScanTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
             webViewDataCleaner = mockWebViewDataCleaner,
+            pirWebViewCountProvider = mockPirWebViewCountProvider,
         )
     }
 

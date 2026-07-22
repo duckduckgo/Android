@@ -19,7 +19,10 @@ package com.duckduckgo.pir.impl.common
 object PirJobConstants {
     const val DBP_INITIAL_URL = "dbp://blank"
     const val RECOVERY_URL = "https://duckduckgo.com/"
-    const val MAX_DETACHED_WEBVIEW_COUNT = 20
+
+    const val DEFAULT_MAX_DETACHED_WEBVIEW_COUNT = 20
+    const val MIN_DETACHED_WEBVIEW_COUNT = 1
+    const val MAX_DETACHED_WEBVIEW_COUNT_CEILING = 40
     const val SCHEDULED_SCAN_INTERVAL_HOURS = 4L
     const val EMAIL_CONFIRMATION_INTERVAL_HOURS = 8L
     const val CUSTOM_PIXEL_INTERVAL_HOURS = 5L
