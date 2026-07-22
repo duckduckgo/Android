@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Olá.</string>
     <string name="preOnboardingWelcomeDialogBody1">Pronto para um navegador mais rápido que te coloca no controlo?</string>
     <string name="preOnboardingWelcomeDialogBody2">A IA é sempre opcional, e a proteção de privacidade está sempre ativa.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d de %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">como dizer \"pato\" em inglês</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">como dizer \"pato\" em espanhol</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Agora, experimenta um chat privado de IA!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Queres tornar o DuckDuckGo o teu navegador predefinido?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Experimenta o nosso widget do ecrã inicial.</string>
+    <string name="preOnboardingWidgetPromptBody">Adiciona o nosso widget de pesquisa ao teu ecrã inicial para obter acesso rápido e fácil.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Adicionar widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Ignorar</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Adiciona-me à parte inferior do teu ecrã.</string>
+    <string name="preOnboardingAddToDockBody">Encontra o ícone do DuckDuckGo no ecrã inicial. Em seguida, prime e arrasta para o lugar certo. Está feito!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Entendi!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Inicia um chat privado de IA com o Duck.ai ou muda para \"Pesquisar\" para uma navegação protegida.<br/><br/>Podes usar o Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Também oferecemos uma subscrição paga com modelos avançados de IA com limites de chat mais elevados do GPT e Claude, uma VPN segura e muito mais.</string>
