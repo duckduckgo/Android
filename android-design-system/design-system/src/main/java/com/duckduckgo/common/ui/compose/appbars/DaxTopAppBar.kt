@@ -71,18 +71,18 @@ fun DaxTopAppBar(
 ) {
     Row(
         modifier = modifier
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.elevation) else Modifier)
+            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
             .clipToBounds()
-            .heightIn(min = DaxTopAppBarDefaults.height)
+            .heightIn(min = DaxTopAppBarDefaults.Height)
             .fillMaxWidth()
             .background(DaxTopAppBarDefaults.colors.containerColor)
-            .padding(paddingValues = DaxTopAppBarDefaults.contentPadding),
+            .padding(paddingValues = DaxTopAppBarDefaults.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (navigationIcon != null) {
             NavigationIconButton(navigationIcon)
-            Spacer(Modifier.width(DaxTopAppBarDefaults.spacing))
+            Spacer(Modifier.width(DaxTopAppBarDefaults.Spacing))
         }
         DaxText(
             text = title,
@@ -136,13 +136,13 @@ internal object DaxTopAppBarDefaults {
         @Composable
         get() = DuckDuckGoTheme.typography.h2
 
-    val contentPadding: PaddingValues = PaddingValues(start = 6.dp, end = 2.dp, top = 8.dp, bottom = 8.dp)
+    val ContentPadding: PaddingValues = PaddingValues(start = 6.dp, end = 2.dp, top = 8.dp, bottom = 8.dp)
 
-    val spacing: Dp = 24.dp
+    val Spacing: Dp = 24.dp
 
-    val elevation: Dp = 2.dp
+    val Elevation: Dp = 2.dp
 
-    val height: Dp = 56.dp
+    val Height: Dp = 56.dp
 }
 
 @PreviewLightDark

@@ -154,13 +154,13 @@ private fun SearchModeBar(
 
     Box(
         modifier = Modifier
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.elevation) else Modifier)
+            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
             .clipToBounds()
-            .heightIn(min = DaxTopAppBarDefaults.height)
+            .heightIn(min = DaxTopAppBarDefaults.Height)
             .fillMaxWidth()
             .background(DaxTopAppBarDefaults.colors.containerColor)
-            .padding(DaxSearchTopAppBarDefaults.margin),
+            .padding(DaxSearchTopAppBarDefaults.Margin),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
@@ -169,7 +169,7 @@ private fun SearchModeBar(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
-                modifier = Modifier.padding(DaxSearchTopAppBarDefaults.contentPadding),
+                modifier = Modifier.padding(DaxSearchTopAppBarDefaults.ContentPadding),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 DaxIconButton(
@@ -177,7 +177,7 @@ private fun SearchModeBar(
                     iconPainter = painterResource(R.drawable.ic_arrow_left_24),
                     contentDescription = stringResource(R.string.dax_top_app_bar_exit_search_content_description),
                 )
-                Spacer(Modifier.width(DaxSearchTopAppBarDefaults.spacing))
+                Spacer(Modifier.width(DaxSearchTopAppBarDefaults.Spacing))
                 Box(modifier = Modifier.weight(1f)) {
                     BasicTextField(
                         state = searchState,
@@ -244,11 +244,11 @@ internal object DaxSearchTopAppBarDefaults {
         @Composable
         get() = DuckDuckGoTheme.shapes.large
 
-    val margin: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    val Margin: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
 
-    val contentPadding: PaddingValues = PaddingValues(start = 4.dp, end = 8.dp)
+    val ContentPadding: PaddingValues = PaddingValues(start = 4.dp, end = 8.dp)
 
-    val spacing: Dp = 16.dp
+    val Spacing: Dp = 16.dp
 }
 
 @PreviewLightDark
