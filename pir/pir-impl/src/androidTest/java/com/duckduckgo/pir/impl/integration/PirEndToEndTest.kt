@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
+import com.duckduckgo.pir.impl.common.PirBenchmarkConfig
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
 import com.duckduckgo.pir.impl.common.RealEmailDataResolver
@@ -326,6 +327,9 @@ class PirEndToEndTest {
         val pirWebViewCountProvider = RealPirWebViewCountProvider(
             pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
             dispatcherProvider = dispatcherProvider,
+            pirBenchmarkConfig = object : PirBenchmarkConfig {
+                override fun getWebViewCountOverride(): Int? = null
+            },
         )
 
         pirScan = RealPirScan(
