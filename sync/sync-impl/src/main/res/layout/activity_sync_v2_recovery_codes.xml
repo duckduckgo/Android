@@ -62,32 +62,58 @@
                 app:textType="secondary"
                 app:typography="body1" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_5"
-                android:layout_marginTop="@dimen/keyline_5"
-                android:background="@drawable/background_card_container"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:layout_marginTop="@dimen/keyline_5">
 
-                <com.duckduckgo.sync.impl.ui.v2.RecoveryCodeView
+                <LinearLayout
                     android:id="@+id/recoveryCodeContainer"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_4" />
+                    android:background="@drawable/background_card_container"
+                    android:orientation="vertical"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                    android:id="@+id/downloadCodeButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_3"
-                    android:layout_marginVertical="@dimen/keyline_4"
-                    android:text="@string/sync_device_v2_recovery_code_download_code_button"
-                    app:daxButtonSize="small" />
+                    <com.duckduckgo.sync.impl.ui.v2.RecoveryCodeView
+                        android:id="@+id/recoveryCodeView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_4"
+                        android:layout_marginTop="@dimen/keyline_4" />
 
-            </LinearLayout>
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:id="@+id/downloadCodeButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_3"
+                        android:layout_marginVertical="@dimen/keyline_4"
+                        android:text="@string/sync_device_v2_recovery_code_download_code_button"
+                        app:daxButtonSize="small" />
+
+                </LinearLayout>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/loadingShimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintEnd_toEndOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintStart_toStartOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintTop_toTopOf="@+id/recoveryCodeContainer">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card_container" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/restoreOnReinstallToggle"

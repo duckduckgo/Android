@@ -22,6 +22,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -115,10 +117,17 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.recoveryCodeContainer.setRecoveryCode(viewState.recoveryCode)
+        val hasRecoveryCode = viewState.recoveryCode != null
+
+        binding.recoveryCodeContainer.isInvisible = !hasRecoveryCode
+        binding.recoveryCodeView.setRecoveryCode(viewState.recoveryCode)
         binding.restoreOnReinstallToggle.apply {
             isVisible = viewState.isAutoRestoreAvailable
             quietlySetIsChecked(viewState.isAutoRestoreEnabled, autoRestoreListener)
+        }
+        binding.loadingShimmer.apply {
+            isGone = hasRecoveryCode
+            if (hasRecoveryCode) stopShimmer() else startShimmer()
         }
     }
 
