@@ -79,10 +79,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.DeviceEdited
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.NoOp
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.RemoveDeviceConfirmed
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Output.TurnOffSyncConfirmed
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -141,10 +137,19 @@ class SyncActivity : DuckDuckGoActivity() {
         EditDeviceContract(),
     ) { result ->
         when (result) {
-            is DeviceEdited -> viewModel.onDevicesUpdated()
-            is RemoveDeviceConfirmed -> viewModel.onRemoveDeviceConfirmed(result.device)
-            is TurnOffSyncConfirmed -> viewModel.onTurnOffSyncConfirmed(result.device)
-            is NoOp -> Unit
+            is EditDeviceContract.Output.DeviceEdited -> {
+                viewModel.onDevicesUpdated()
+            }
+
+            is EditDeviceContract.Output.RemoveDeviceConfirmed -> {
+                viewModel.onRemoveDeviceConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.TurnOffSyncConfirmed -> {
+                viewModel.onTurnOffSyncConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.NoOp -> Unit
         }
     }
 
