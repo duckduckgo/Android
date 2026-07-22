@@ -113,7 +113,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
-            val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+            val isReinstall = false // withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
             val variant = if (isReinstall) {
                 null
             } else {
