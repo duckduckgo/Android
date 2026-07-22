@@ -29,18 +29,27 @@ import org.junit.Test
 class NativeInputModeWidgetBackButtonsTest {
 
     @Test
-    fun `toggle row back is shown when toggle visible and context is browser`() {
+    fun `toggle row back is shown when toggle visible, context is browser and nav bar is hidden`() {
         val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER)
 
-        assertTrue(state.shouldShowToggleRowBack())
+        assertTrue(state.shouldShowToggleRowBack(isNavBarVisible = false))
         assertFalse(state.shouldShowCardRowBack())
+    }
+
+    @Test
+    fun `toggle row back is hidden when toggle visible and context is browser but the nav bar is visible`() {
+        // The nav bar carries its own back arrow, so this one hides to avoid two at once.
+        val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER)
+
+        assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = true))
     }
 
     @Test
     fun `toggle row back is hidden when toggle visible and context is duck ai`() {
         val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI)
 
-        assertFalse(state.shouldShowToggleRowBack())
+        assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = false))
+        assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = true))
         assertFalse(state.shouldShowCardRowBack())
     }
 
@@ -48,14 +57,14 @@ class NativeInputModeWidgetBackButtonsTest {
     fun `toggle row back is hidden when toggle hidden and context is browser`() {
         val state = stateOf(InputMode.SEARCH_ONLY, InputContext.BROWSER)
 
-        assertFalse(state.shouldShowToggleRowBack())
+        assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = false))
     }
 
     @Test
     fun `toggle row back is hidden when toggle hidden and context is duck ai`() {
         val state = stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI)
 
-        assertFalse(state.shouldShowToggleRowBack())
+        assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = false))
     }
 
     @Test
@@ -80,8 +89,10 @@ class NativeInputModeWidgetBackButtonsTest {
 
     @Test
     fun `toggle row back is hidden in duck ai contextual context`() {
-        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack())
-        assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack())
+        assertFalse(
+            stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack(isNavBarVisible = false),
+        )
+        assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack(isNavBarVisible = false))
     }
 
     @Test

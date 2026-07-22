@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Guardar em Transferências</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">De: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Eliminar tudo</string>
+    <string name="downloadsActivityNoItemsDescription">Ainda não foram transferidos ficheiros</string>
+    <string name="downloadsActivityTitle">Transferências</string>
+    <string name="downloadsAllFilesDeletedMessage">Todos os ficheiros eliminados</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Eliminar %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">O ficheiro já não existe</string>
+    <string name="downloadsItemMenuCancel">Cancelar</string>
+    <string name="downloadsItemMenuDelete">Eliminar</string>
+    <string name="downloadsItemMenuShare">Partilhar</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mais opções para %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>
+    <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>
+    <string name="downloadsShareTitle">Partilhar com...</string>
+    <string name="downloadsStateInProgress">Em curso…</string>
+    <string name="downloadsUndoActionName">Anular</string>
+    <string name="downloadsSearchHint">Pesquisar</string>
 </resources>

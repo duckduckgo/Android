@@ -27,6 +27,7 @@
                     "nongranular_fire_dialog",
                     "single_tab_fire_dialog",
                     "app_shortcut",
+                    "fire_tabs_emptied",
                     "auto_foreground",
                     "auto_background",
                     "legacy_fire_dialog",
@@ -39,6 +40,21 @@
                 "key": "feature.data.ext.clear_options",
                 "description": "Comma-separated list of data types being cleared. Values: tabs,data,duckai_chats",
                 "type": "string"
+            },
+            {
+                "key": "feature.data.ext.browser_mode",
+                "description": "Whether this clear applies to Fire Mode or Regular Mode. Absent for flows that clear both in one pass (automatic foreground/background clearing).",
+                "enum": ["regular", "fire"]
+            },
+            {
+                "key": "feature.data.ext.tab_type",
+                "description": "Type of the active tab when the burn was confirmed. Only present for dialog-driven flows (granular/nongranular/single-tab fire dialogs).",
+                "enum": ["web", "ai"]
+            },
+            {
+                "key": "feature.data.ext.tab_count",
+                "description": "Number of open tabs when the burn was confirmed, bucketed like the tab_count pixel parameter. Only present for dialog-driven flows.",
+                "enum": ["1", "2-5", "6-10", "11-20", "21-40", "41-60", "61-80", "81+"]
             },
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",

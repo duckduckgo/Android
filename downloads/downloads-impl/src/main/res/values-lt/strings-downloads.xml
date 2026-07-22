@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Iš: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Ištrinti viską</string>
+    <string name="downloadsActivityNoItemsDescription">Nėra atsisiųstų failų</string>
+    <string name="downloadsActivityTitle">Atsisiuntimai</string>
+    <string name="downloadsAllFilesDeletedMessage">Visi failai ištrinti</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Ištrinta %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Failo nebėra</string>
+    <string name="downloadsItemMenuCancel">Atšaukti</string>
+    <string name="downloadsItemMenuDelete">Trinti</string>
+    <string name="downloadsItemMenuShare">Bendrinti</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Daugiau parinkčių, skirtų %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
+    <string name="downloadsNotifyMeTitle">Sužinokite, kada atsisiuntimai bus paruošti</string>
+    <string name="downloadsShareTitle">Dalintis su...</string>
+    <string name="downloadsStateInProgress">Vykdoma...</string>
+    <string name="downloadsUndoActionName">Anuliuoti</string>
+    <string name="downloadsSearchHint">Paieška</string>
 </resources>

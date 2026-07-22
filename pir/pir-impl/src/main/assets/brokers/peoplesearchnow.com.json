@@ -1,7 +1,7 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
   "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
@@ -17,11 +17,11 @@
         },
         {
           "actionType": "expectation",
-          "_comment": "detect Cloudflare verification UI - challenge pages expose Cloudflare challenge scripts, Turnstile controls, or captcha response fields instead of normal result cards",
+          "_comment": "detect Cloudflare verification UI - challenge pages expose Cloudflare challenge scripts (the _cf_chl_opt inline script is present in the static HTML before the challenge-platform script is injected), Turnstile controls, or captcha response fields, and hard block pages render div#cf-error-details",
           "expectations": [
             {
               "type": "element",
-              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')])]"
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
             }
           ],
           "id": "b00ba411-0253-42ad-bbc4-b4b0940df3a7"

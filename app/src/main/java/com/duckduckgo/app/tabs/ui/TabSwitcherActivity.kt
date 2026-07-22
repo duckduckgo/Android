@@ -48,6 +48,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -59,10 +61,9 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
@@ -106,6 +107,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -142,9 +145,6 @@ class TabSwitcherActivity :
     lateinit var webViewPreviewPersister: WebViewPreviewPersister
 
     @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
     lateinit var faviconManager: FaviconManager
 
     @Inject
@@ -173,6 +173,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -259,6 +262,8 @@ class TabSwitcherActivity :
     private var fadingInAfterRecreate = false
     private var fadeInAnimationStarted = false
     private var switchedModeFromDrag = false
+
+    private var finishingAfterModeSwitch = false
 
     private var lastSnackbar: DefaultSnackbar? = null
 
@@ -350,7 +355,7 @@ class TabSwitcherActivity :
         val requestedMode = intent.getActivityParams(TabSwitcherScreenWithParams::class.java)?.browserMode ?: return false
         if (requestedMode == currentBrowserMode) return false
 
-        viewModel.onBrowserModeToggled(requestedMode)
+        viewModel.onBrowserModeToggled(requestedMode, BrowserModeSwitchSource.PROMOTION)
 
         // only recreate when it actually switched, otherwise we'd pointlessly recreate into the same mode.
         if (viewModel.currentMode.value != requestedMode) return false
@@ -366,7 +371,7 @@ class TabSwitcherActivity :
             viewModel.currentMode
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect { mode ->
-                    if (mode != currentBrowserMode) {
+                    if (mode != currentBrowserMode && !finishingAfterModeSwitch) {
                         recreate()
                     }
                 }
@@ -597,7 +602,7 @@ class TabSwitcherActivity :
         // Just toggle the mode; observeBrowserModeChanges() recreates as a consequence. The recreated
         // activity still fades the new mode's tabs in via the saved fadingInAfterRecreate flag.
         if (tabsRecycler.visibility != View.VISIBLE) {
-            viewModel.onBrowserModeToggled(newMode)
+            viewModel.onBrowserModeToggled(newMode, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
             return
         }
 
@@ -606,9 +611,20 @@ class TabSwitcherActivity :
             .setDuration(MODE_SWITCH_FADE_OUT_MS)
             .withEndAction {
                 tabsRecycler.visibility = View.INVISIBLE
-                viewModel.onBrowserModeToggled(newMode)
+                viewModel.onBrowserModeToggled(newMode, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
             }
             .start()
+    }
+
+    private fun showFireTabsEmptyState() {
+        val emptyState = binding.fireTabsEmptyState.root
+        if (emptyState.isVisible) return
+
+        if (tabsRecycler.isVisible && tabsAdapter.itemCount > 0) {
+            TransitionManager.beginDelayedTransition(binding.tabsContainer, Fade())
+        }
+        emptyState.show()
+        tabsRecycler.gone()
     }
 
     private fun updateToolbarTitle(
@@ -672,8 +688,7 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 if (it.showFireTabsEmptyState && !fadingOutForRecreate) {
-                    binding.fireTabsEmptyState.root.show()
-                    tabsRecycler.gone()
+                    showFireTabsEmptyState()
 
                     // No fade-in runs in the empty state, so settle the post-recreate flags here; otherwise
                     // fadingInAfterRecreate stays true forever and the mode toggle (guarded on it) is stuck disabled.
@@ -916,7 +931,11 @@ class TabSwitcherActivity :
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
             Command.ShowFireBottomSheet -> onFireButtonClicked()
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
-            Command.SwitchToRegularMode -> fadeOutTabsThenRecreate(BrowserMode.REGULAR, fromUser = false)
+            Command.SwitchToRegularModeAndClose -> {
+                finishingAfterModeSwitch = true
+                viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
+                finishAfterTransition()
+            }
         }
     }
 
@@ -948,6 +967,13 @@ class TabSwitcherActivity :
             toolbar = toolbar,
             dynamicMenu = viewState.dynamicInterface,
             navigationBar = binding.navigationBar,
+        )
+
+        menu.findItem(R.id.newTabToolbarButton).setTitle(
+            when (currentBrowserMode) {
+                BrowserMode.FIRE -> R.string.fireTabsNewTabButton
+                BrowserMode.REGULAR -> R.string.newTabMenuItem
+            },
         )
 
         return true
@@ -1119,7 +1145,7 @@ class TabSwitcherActivity :
     }
 
     private fun showDownloads() {
-        startActivity(DownloadsActivity.intent(this))
+        globalActivityStarter.start(this, DownloadsScreenNoParams)
         viewModel.onDownloadsMenuPressed()
     }
 

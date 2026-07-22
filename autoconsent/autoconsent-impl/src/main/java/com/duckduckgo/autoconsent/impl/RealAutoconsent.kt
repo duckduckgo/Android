@@ -86,8 +86,16 @@ class RealAutoconsent @Inject constructor(
         settingsRepository.userSetting = setting
     }
 
+    override fun changeClickAcceptEnabled(enabled: Boolean) {
+        settingsRepository.clickAcceptEnabled = enabled
+    }
+
     override fun isSettingEnabled(): Boolean {
         return settingsRepository.userSetting
+    }
+
+    override fun isClickAcceptEnabled(): Boolean {
+        return settingsRepository.clickAcceptEnabled
     }
 
     override fun isAutoconsentEnabled(): Boolean {

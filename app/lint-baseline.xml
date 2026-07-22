@@ -282,8 +282,8 @@
         errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelOrchestratorTest.kt"
-            line="38"
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
+            line="59"
             column="1"/>
     </issue>
 
@@ -3981,38 +3981,6 @@
             column="58"/>
     </issue>
 
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {"
-        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsFileActions.kt"
-            line="94"
-            column="46"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
-            line="64"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
-            line="66"
-            column="13"/>
-    </issue>
 
     <issue
         id="DenyListedApi"
@@ -11448,28 +11416,6 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInput.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/brokensite/BrokenSiteNegativeFeedbackFragment.kt"
-            line="63"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/brokensite/BrokenSiteNegativeFeedbackFragment.kt"
-            line="64"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
         message="Custom view ``DuckDuckGoWebView`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="            it.setOnTouchListener { webView, event ->"
         errorLine2="            ^">
@@ -11488,17 +11434,6 @@
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
             line="3813"
             column="35"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/openended/ShareOpenEndedFeedbackFragment.kt"
-            line="130"
-            column="17"/>
     </issue>
 
     <issue

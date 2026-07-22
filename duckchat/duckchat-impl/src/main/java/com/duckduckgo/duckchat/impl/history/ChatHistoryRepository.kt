@@ -17,8 +17,9 @@
 package com.duckduckgo.duckchat.impl.history
 
 import android.content.Context
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.toChatType
@@ -50,8 +51,8 @@ interface ChatHistoryRepository {
     suspend fun exportChats(requests: List<ChatExportRequest>): List<File>
 }
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(ActivityScope::class)
+@SingleInstanceIn(ActivityScope::class)
 class RealChatHistoryRepository @Inject constructor(
     private val chatStore: DuckAiChatStore,
     private val dispatchers: DispatcherProvider,
@@ -59,6 +60,7 @@ class RealChatHistoryRepository @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val chatExportWriter: ChatExportWriter,
+    private val browserMode: BrowserMode,
 ) : ChatHistoryRepository {
 
     private val chatExporter = ChatExporter()
@@ -85,7 +87,7 @@ class RealChatHistoryRepository @Inject constructor(
     override suspend fun setPinned(chatId: String, pinned: Boolean) {
         withContext(dispatchers.io()) {
             if (pinned) chatStore.pinChat(chatId) else chatStore.unpinChat(chatId)
-            duckChatSyncRepository.recordSingleChatUpdate(chatId)
+            duckChatSyncRepository.recordSingleChatUpdate(chatId, browserMode)
             syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
         }
     }

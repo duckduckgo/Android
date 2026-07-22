@@ -380,6 +380,42 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenNativeChatInputAndContextualNativeInputEnabledThenObserveContextualNativeInputEmitsTrue() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.isContextualNativeInputEnabled())
+    }
+
+    @Test
+    fun whenNativeChatInputEnabledButContextualNativeInputDisabledThenObserveContextualNativeInputEmitsFalse() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.isContextualNativeInputEnabled())
+    }
+
+    @Test
+    fun whenContextualNativeInputEnabledButNativeChatInputDisabledThenObserveContextualNativeInputEmitsFalse() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.isContextualNativeInputEnabled())
+    }
+
+    @Test
     fun whenSetChatSuggestionsUserSettingThenRepositorySetCalled() = runTest {
         testee.setChatSuggestionsUserSetting(true)
         verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(true)

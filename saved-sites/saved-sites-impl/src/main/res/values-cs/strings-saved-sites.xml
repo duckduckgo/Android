@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Sdílet oblíbené</string>
-    <string name="sync_enable_option_favorites_subtitle">Používej na všech zařízeních stejné oblíbené položky. Nech volbu vypnutou, pokud chceš mít záložky na mobilu a na počítači oddělené.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Sdílej oblíbené položky na různých zařízeních</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Používej stejné oblíbené záložky na mobilu i počítači.</string>
     <string name="saved_site_limit_warning"><b>Synchronizace je pozastavená</b>\nUž máš maximální počet záložek. Jestli chceš synchronizaci obnovit, některé smaž.\n\n<annotation type="manage_bookmarks">Spravovat záložky</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synchronizace záložek je pozastavená</b>\nUž máš maximální počet záložek. Jestli chceš synchronizaci obnovit, některé záložky smaž.</string>
     <string name="saved_site_invalid_warning"><b>Synchronizace je pozastavená</b>\nNěkteré záložky jsou nesprávně naformátované nebo moc dlouhé, takže jsme je nemohli synchronizovat.\n\n<annotation type="manage_bookmarks">Spravovat záložky</annotation></string>
@@ -107,8 +107,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Opravdu chceš smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Načíst ikony záložek</string>
-    <string name="sync_fetch_icons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
+    <string name="sync_simplified_fetch_icons_title">Načíst ikony záložek</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Načte ikony z webových stránek uložených do záložek. Stažené ikony jsou vidět ve tvé síti.</string>
     <string name="faviconsPromptTitle">Stáhnout chybějící ikony?</string>
     <string name="faviconsPromptMessage">Chceš, aby tohle zařízení automaticky stahovalo ikony webů, které máš v záložkách?</string>
     <string name="faviconsPromptPrimaryCta">Nechat ikony záložek aktualizované</string>

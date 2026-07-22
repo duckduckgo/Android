@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Търсене с DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Споделяне на отзив</string>
-    <string name="missingBrowserFeaturesTitleLong">Липсват някои функции на браузъра или са объркващи</string>
-    <string name="missingBrowserFeaturesTitleShort">Проблеми с функция на браузъра</string>
-    <string name="missingBrowserFeaturesSubtitle">Коя функция за сърфиране можем да добавим или да подобрим?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Придвижване напред, назад и/или опресняване</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Създаване и управление на раздели</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Блокиране на реклами и изскачащи прозорци</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Гледане на видео</string>
-    <string name="missingBrowserFeatureSubReasonImages">Интерактивно гледане на изображения</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Създаване и управление на отметки</string>
-    <string name="missingBrowserFeatureSubReasonOther">Никое от тези</string>
-
-    <string name="websiteNotLoadingTitleLong">Проблеми със зареждането на уебсайтове</string>
-    <string name="websiteNotLoadingTitleShort">Проблеми със зареждането на уебсайтове</string>
-    <string name="websiteNotLoadingSubtitle">Кой уебсайт е повреден?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Търсенето с DuckDuckGo не е достатъчно добро</string>
-    <string name="searchNotGoodEnoughTitleShort">Проблеми при търсенето с DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Коя функция за търсене можем да добавим или да подобрим?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Програмиращо/техническо търсене</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Оформлението трябва да бъде повече като Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">По-бързо зареждане</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Търсене на специфичен език или в специфичен район</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">По-добро автозавършване</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Никое от тези</string>
-
-    <string name="needMoreCustomizationTitleLong">Няма достатъчно начини за персонализиране на приложението</string>
-    <string name="needMoreCustomizationTitleShort">Проблеми с персонализирането</string>
-    <string name="needMoreCustomizationSubtitle">Коя опция за персонализиране можем да добавим или да подобрим?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Конфигурацията на началния екран</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Как са изобразени разделите</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Как изглежда приложението</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Кои данни са изчистени</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Кога са изчистени данните</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Как са изобразени отметките</string>
-    <string name="needMoreCustomizationSubReasonOther">Никое от тези</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Приложението е бавно, има бъгове или се срива</string>
-    <string name="appIsSlowOrBuggyTitleShort">Проблеми с работата</string>
-    <string name="appIsSlowOrBuggySubtitle">Кой проблем имате?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Уеб страниците или резултатите от търсене се зареждат бавно</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Срив или замръзване на приложението</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Бъгове при възпроизвеждане на видео или мултимедийни файлове</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Никое от тези</string>
-
-    <string name="otherMainReasonTitleLong">Никое от тези</string>
-    <string name="otherMainReasonTitleShort">Други проблеми</string>
-
-    <string name="openEndedInputHint">Моля, бъдете колкото може по-конкретни</string>
-    <string name="submitFeedback">Изпрати</string>
-
-    <string name="tellUsHowToImprove">Моля, кажете ни какво можем да подобрим.</string>
-    <string name="thanksForTheFeedback">Благодарим за отзивите!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">С какво най-вече са свързани отрицателните Ви впечатления?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Съжаляваме да чуем това</string>
-    <string name="feedbackShareDetails">Споделете подробности</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Има ли някакви подробности, които искате да споделите с екипа?</string>
-    <string name="whatHaveYouBeenEnjoying">Кое Ви беше най-приятно?</string>
-    <string name="awesomeToHear">Страхотно е да чуем това!</string>
-    <string name="shareTheLoveWithARating">Моля, споделете вашето харесване като оцените в Play Store.</string>
-    <string name="rateTheApp">Оценка на приложението</string>
-    <string name="declineFurtherFeedback">Не, благодаря, приключих</string>
-    <string name="whichBrokenSites">Къде виждате тези проблеми?</string>
-    <string name="whichBrokenSitesHint">В кой уебсайт има проблеми?</string>
-    <string name="feedbackSpecificAsPossible">Моля, бъдете колкото може по-конкретни</string>
-    <string name="feedbackInitialDisambiguationTitle">Да започваме!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Как бихте категоризирали отзивите си?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
-    <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Уеб страницата не може да бъде показана."</string>
     <string name="crashedWebViewErrorAction">"Презареждане"</string>
@@ -680,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Изтеглени файлове</string>
-    <string name="downloadsActivityTitle">Изтеглени файлове</string>
-    <string name="downloadsActivityNoItemsDescription">Все още няма изтеглени файлове</string>
-    <string name="downloadsShareTitle">Споделяне с…</string>
     <string name="downloadsDownloadFinishedActionName">Отваряне</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Файлът вече не съществува</string>
-    <string name="downloadsItemMenuShare">Споделяне</string>
-    <string name="downloadsItemMenuDelete">Изтриване</string>
-    <string name="downloadsItemMenuCancel">Отмени</string>
-    <string name="downloadsActivityMenuDeleteAll">Изтриване на всички</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Изтрито %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Всички файлове са изтрити</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Още опции за %1$s</string>
-    <string name="downloadsUndoActionName">Отмяна</string>
-    <string name="downloadsStateInProgress">В процес на изпълнение…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Защита от проследяване в приложения</string>
@@ -716,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
-    <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Използвайте ChatGPT поверително с вграден Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Блокиране на целенасочени реклами и изскачащи прозорци за „бисквитки“</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Гледане на видеоклипове в YouTube без реклами</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
@@ -903,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Искате лесен достъп до поверителен чат с AI в адресната лента?</string>
     <string name="preOnboardingInputScreenButton">Следващ</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
@@ -1029,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Здравейте.</string>
     <string name="preOnboardingWelcomeDialogBody1">Готови ли сте за по-бърз браузър, който осигурява контрол?</string>
     <string name="preOnboardingWelcomeDialogBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d от %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d от %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва “патица“ на английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва \"патица\" на испански</string>
 
@@ -1051,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Искате ли да разговаряте поверително и безплатно с ChatGPT, Claude и други AI в браузър, който осигурява активна защита?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Не забравяйте: Можете да използвате Duck.ai от всяко място, където видите иконата за чат</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Започнете чат с AI</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI защити активирани!</string>
@@ -1076,6 +989,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Потвърждаване</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Благодарим за отзивите!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Отваряне в раздел Fire</string>
     <string name="openInBackgroundTab">Отваряне във фонов режим</string>
@@ -1092,4 +1008,6 @@
     <string name="fireTabsNewTabButton">Нов раздел Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>НОВО!</b> Изпробвайте разделите Fire, в които сърфирате, без да запазвате локална история.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
 </resources>

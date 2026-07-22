@@ -26,6 +26,7 @@
         layout="@layout/include_default_toolbar" />
 
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -86,6 +87,17 @@
                 app:primaryText="@string/ad_blocking_settings_toggle_title"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/blockAdsToggleUntilRelaunch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:visibility="gone"
+                app:primaryText="@string/ad_blocking_settings_toggle_title"
+                app:secondaryText="@string/ad_blocking_settings_disabled_until_relaunch"
+                app:showSwitch="true"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/adBlockingDescription"
                 android:layout_width="match_parent"
@@ -95,6 +107,17 @@
                 android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/contingencyModeItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:visibility="gone"
+                app:primaryText="@string/ad_blocking_settings_toggle_title"
+                app:secondaryText="@string/contingencyMessageContent"
+                app:trailingIcon="@drawable/ic_exclamation_yellow_24"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckPlayerEntry"

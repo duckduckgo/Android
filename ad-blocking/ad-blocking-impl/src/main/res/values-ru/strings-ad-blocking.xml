@@ -23,4 +23,23 @@
     <string name="ad_blocking_settings_description">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Проигрыватель Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра без отвлекающих элементов, чтобы просмотренные видео не влияли на вашу ленту YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Блокировка рекламы</string>
+    <string name="ad_blocking_settings_header_description">Блокирует навязчивые трекеры до их загрузки, устраняя рекламу с отслеживанием</string>
+    <string name="contingencyMessageTitle">Блокировка рекламы на YouTube недоступна</string>
+    <string name="contingencyMessageContent">Недавние изменения на YouTube повлияли на работу блокировки рекламы. Мы занимаемся решением этой проблемы и благодарим вас за понимание.</string>
+    <string name="contingencyMessagePrimaryButton">Понятно</string>
+    <string name="contingencyMessageCloseContentDescription">Закрыть</string>
+    <string name="ad_blocking_menu_disable">Отключить блокировку рекламы на YouTube</string>
+    <string name="ad_blocking_menu_enable">Включить блокировку рекламы на YouTube</string>
+    <string name="ad_blocking_menu_title">Блокировка рекламы на YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Закрыть</string>
+    <string name="ad_blocking_menu_always_on">Всегда включено</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Отключить до перезапуска</string>
+    <string name="ad_blocking_menu_always_off">Всегда выключено</string>
+    <string name="ad_blocking_disabled_popup_title">Блокировка рекламы на YouTube не работает?</string>
+    <string name="ad_blocking_disabled_popup_description">Отправьте анонимное сообщение о проблеме в DuckDuckGo. Помогите улучшить блокировку рекламы для всех!</string>
+    <string name="ad_blocking_disabled_primary_action">Сообщить о проблеме</string>
+    <string name="ad_blocking_disabled_secondary_action">Отменить</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Отключено до перезапуска</string>
+    <string name="ad_blocking_omnibar_badge_text">Блокировка рекламы на YouTube включена</string>
 </resources>

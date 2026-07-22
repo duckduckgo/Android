@@ -17,17 +17,34 @@
 package com.duckduckgo.app.global.install
 
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AppInstallRepository @Inject constructor(
     private val appInstallStore: AppInstallStore,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AppInstall {
     override fun getInstallationTimestamp(): Long {
         return appInstallStore.installTimestamp
+    }
+
+    override suspend fun getInstallAge(): Duration? = withContext(dispatcherProvider.io()) {
+        val installTimestamp = appInstallStore.installTimestamp
+        val now = currentTimeProvider.currentTimeMillis()
+        if (installTimestamp <= 0L || installTimestamp > now) {
+            null
+        } else {
+            (now - installTimestamp).milliseconds
+        }
     }
 }

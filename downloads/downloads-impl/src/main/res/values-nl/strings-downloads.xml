@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Opslaan in downloads</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Van: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Alles verwijderen</string>
+    <string name="downloadsActivityNoItemsDescription">Nog geen bestanden gedownload</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsAllFilesDeletedMessage">Alle bestanden verwijderd</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s verwijderd</string>
+    <string name="downloadsFileNotFoundErrorMessage">Bestand bestaat niet meer</string>
+    <string name="downloadsItemMenuCancel">Annuleren</string>
+    <string name="downloadsItemMenuDelete">Verwijderen</string>
+    <string name="downloadsItemMenuShare">Delen</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Meer opties voor %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
+    <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>
+    <string name="downloadsShareTitle">Delen met...</string>
+    <string name="downloadsStateInProgress">Bezig...</string>
+    <string name="downloadsUndoActionName">Ongedaan maken</string>
+    <string name="downloadsSearchHint">Zoeken</string>
 </resources>

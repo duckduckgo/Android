@@ -71,7 +71,7 @@ class CardItemAdapter {
                     titleText = json.titleText,
                     descriptionText = json.descriptionText ?: "",
                     placeholder = json.placeholder?.let { Content.Placeholder.from(it) } ?: Content.Placeholder.ANNOUNCE,
-                    primaryAction = json.primaryAction ?: throw IllegalArgumentException("ListItem requires primaryAction"),
+                    primaryAction = json.primaryAction,
                     primaryActionText = json.primaryActionText ?: "",
                     matchingRules = json.matchingRules ?: emptyList(),
                     exclusionRules = json.exclusionRules ?: emptyList(),

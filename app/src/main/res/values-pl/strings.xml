@@ -423,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Szukaj w DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podziel się opinią</string>
-    <string name="missingBrowserFeaturesTitleLong">Brakuje funkcji przeglądarki lub nie działają one poprawnie</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemy funkcji przeglądarki</string>
-    <string name="missingBrowserFeaturesSubtitle">Jaką funkcję przeglądania stron powinniśmy dodać lub usprawnić?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Przejście do przodu, wstecz i/lub odświeżenie</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tworzenie kart i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokowanie reklam i wyskakujących okienek</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Oglądanie filmów</string>
-    <string name="missingBrowserFeatureSubReasonImages">Obsługa obrazów</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tworzenie zakładek i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonOther">Żadne z powyższych</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingSubtitle">Która witryna nie działa poprawnie?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Jaką funkcję wyszukiwania powinniśmy dodać lub usprawnić?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Wyszukiwanie techniczne/programistyczne</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Układ graficzny powinien być zbliżony do Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Szybszy czas wczytywania</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Wyszukiwanie w konkretnym języku bądź regionie</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepsza funkcja autouzupełniania</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Żadne z powyższych</string>
-
-    <string name="needMoreCustomizationTitleLong">Liczba możliwości spersonalizowania aplikacji jest niewystarczająca</string>
-    <string name="needMoreCustomizationTitleShort">Problemy z personalizacją</string>
-    <string name="needMoreCustomizationSubtitle">Jaką opcję personalizacji powinniśmy dodać lub usprawnić?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguracja ekranu głównego</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Sposób wyświetlania kart</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Wygląd aplikacji</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Rodzaje usuwanych danych</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Czas usuwania danych</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Sposób wyświetlania zakładek</string>
-    <string name="needMoreCustomizationSubReasonOther">Żadne z powyższych</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikacja działa wolno, zawiera błędy lub przestaje działać</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemy dotyczące poprawnego działania</string>
-    <string name="appIsSlowOrBuggySubtitle">Jakie problemy napotkałeś(-aś)?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Strony lub wyniki wyszukiwania wczytują się powoli</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacja przestaje działać lub zawiesza się</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Błędy podczas odtwarzania filmów i mediów</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Żadne z powyższych</string>
-
-    <string name="otherMainReasonTitleLong">Żadne z powyższych</string>
-    <string name="otherMainReasonTitleShort">Inne problemy</string>
-
-    <string name="openEndedInputHint">Podaj jak najdokładniejsze informacje</string>
-    <string name="submitFeedback">Wyślij</string>
-
-    <string name="tellUsHowToImprove">Powiedz nam, co możemy poprawić.</string>
-    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Co najbardziej przyprawia Cię o frustrację?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Przykro nam z tego powodu</string>
-    <string name="feedbackShareDetails">Przekaż informacje</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Czy chciał(a)byś przekazać naszemu zespołowi jakieś informacje?</string>
-    <string name="whatHaveYouBeenEnjoying">Co Ci się podoba?</string>
-    <string name="awesomeToHear">Świetnie!</string>
-    <string name="shareTheLoveWithARating">Podziel się swoimi wrażeniami, oceniając nas w Play Store.</string>
-    <string name="rateTheApp">Oceń aplikację</string>
-    <string name="declineFurtherFeedback">Nie, dziękuję, skończyłem(-am)</string>
-    <string name="whichBrokenSites">Gdzie dostrzegasz te problemy?</string>
-    <string name="whichBrokenSitesHint">Z jaką stroną związane są problemy?</string>
-    <string name="feedbackSpecificAsPossible">Podaj jak najdokładniejsze informacje</string>
-    <string name="feedbackInitialDisambiguationTitle">Zaczynajmy!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Do jakiej kategorii zaliczysz swoją opinię?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Przycisk pozytywnej opinii</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Przycisk negatywnej opinii</string>
-    <string name="feedbackIsImportantToUs">Twoja anonimowa opinia ma dla nas ogromne znaczenie.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nie można wyświetlić strony internetowej."</string>
     <string name="crashedWebViewErrorAction">"Załaduj ponownie"</string>
@@ -690,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
-    <string name="downloadsActivityTitle">Pobrane</string>
-    <string name="downloadsActivityNoItemsDescription">Nie pobrano jeszcze żadnych plików</string>
-    <string name="downloadsShareTitle">Udostępnij…</string>
     <string name="downloadsDownloadFinishedActionName">Otwórz</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Plik już nie istnieje</string>
-    <string name="downloadsItemMenuShare">Udostępnij</string>
-    <string name="downloadsItemMenuDelete">Usuń</string>
-    <string name="downloadsItemMenuCancel">Anuluj</string>
-    <string name="downloadsActivityMenuDeleteAll">Usuń wszystko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Usunięto %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Wszystkie pliki usunięte</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Więcej opcji dla %1$s</string>
-    <string name="downloadsUndoActionName">Cofnij</string>
-    <string name="downloadsStateInProgress">W trakcie…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
@@ -726,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
-    <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
     <!-- Windows Settings -->
 
@@ -880,7 +792,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Używaj ChatGPT prywatnie z wbudowanym Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj ukierunkowane reklamy i wyskakujące okienka dotyczące plików cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Odtwarzaj filmy na YouTube bez reklam</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
@@ -943,7 +857,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chcesz mieć łatwy dostęp do prywatnego czatu AI na pasku adresu?</string>
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
 
@@ -1069,7 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Cześć!</string>
     <string name="preOnboardingWelcomeDialogBody1">Chcesz skorzystać z szybszej przeglądarki, która daje Ci kontrolę?</string>
     <string name="preOnboardingWelcomeDialogBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
 
@@ -1091,7 +1005,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Chcesz bezpłatnie rozmawiać z ChatGPT, Claude i innymi AI w przeglądarce, która aktywnie chroni Twoją prywatność?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Pamiętaj: z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Uruchom czat AI</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Ochrona AI aktywowana</string>
@@ -1116,6 +1029,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potwierdź</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Otwórz w karcie Fire</string>
     <string name="openInBackgroundTab">Otwórz w tle</string>
@@ -1132,4 +1048,6 @@
     <string name="fireTabsNewTabButton">Nowa karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOWOŚĆ!</b> Wypróbuj karty Fire, aby przeglądać bez lokalnego zapisywania historii.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
 </resources>

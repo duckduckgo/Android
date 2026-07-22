@@ -423,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Pretraži DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podijeli povratne informacije</string>
-    <string name="missingBrowserFeaturesTitleLong">Značajke preglednika nedostaju ili su frustrirajuće</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemi sa značajkama preglednika</string>
-    <string name="missingBrowserFeaturesSubtitle">Koju značajku pregledavanja možemo dodati ili poboljšati?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Kretanje naprijed, natrag i/ili osvježavanje</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Stvaranje kartica i upravljanje karticama</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokiranje oglasa i skočnih prozora</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Gledanje videozapisa</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interakcija sa slikama</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Stvaranje knjiških oznaka i upravljanje oznakama</string>
-    <string name="missingBrowserFeatureSubReasonOther">Ništa od navedenog</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemi s učitavanjem web-mjesta</string>
-    <string name="websiteNotLoadingTitleShort">Problemi s učitavanjem web-mjesta</string>
-    <string name="websiteNotLoadingSubtitle">Koje je web-mjesto neispravno?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Pretraživanje u DuckDuckGo nije dovoljno dobro</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemi s pretraživanjem u DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Koju značajku pretraživanja možemo dodati ili poboljšati?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programiranje/tehničko pretraživanje</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Izgled bi trebao biti više nalik Googleu</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Brže vrijeme učitavanja</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Pretraživanje na određenom jeziku ili području</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bolje automatsko ispunjavanje</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Ništa od navedenog</string>
-
-    <string name="needMoreCustomizationTitleLong">Nema dovoljno načina za prilagodbu aplikacije</string>
-    <string name="needMoreCustomizationTitleShort">Problemi s opcijama prilagodbe</string>
-    <string name="needMoreCustomizationSubtitle">Koju opciju prilagodbe možemo dodati ili poboljšati?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguracija početnog zaslona</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Kako se prikazuju kartice</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Kako aplikacija izgleda</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Koji su podaci obrisani</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kada se obrišu podaci</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kako se prikazuju knjižne oznake</string>
-    <string name="needMoreCustomizationSubReasonOther">Ništa od navedenog</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikacija je spora, neispravna, ili se ruši</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemi s izvedbom</string>
-    <string name="appIsSlowOrBuggySubtitle">Koji problem imaš?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Web-stranice ili rezultati pretraživanja učitavaju se sporo</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacija se ruši ili zamrzava</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Pogreške u reprodukciji videozapisa ili medija</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Ništa od navedenog</string>
-
-    <string name="otherMainReasonTitleLong">Ništa od navedenog</string>
-    <string name="otherMainReasonTitleShort">Ostali problemi</string>
-
-    <string name="openEndedInputHint">Budi što precizniji/a</string>
-    <string name="submitFeedback">Pošalji</string>
-
-    <string name="tellUsHowToImprove">Reci nam što možemo poboljšati.</string>
-    <string name="thanksForTheFeedback">Hvala na povratnim informacijama!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Što te najviše frustrira?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Žao nam je to čuti</string>
-    <string name="feedbackShareDetails">Podijeli pojedinosti</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Želiš li s timom podijeliti neke pojedinosti?</string>
-    <string name="whatHaveYouBeenEnjoying">Što ti se sviđalo?</string>
-    <string name="awesomeToHear">Divno je to čuti!</string>
-    <string name="shareTheLoveWithARating">Pokaži ljubav ocjenom u trgovini Play.</string>
-    <string name="rateTheApp">Ocijeni aplikaciju</string>
-    <string name="declineFurtherFeedback">Ne, hvala, to je sve</string>
-    <string name="whichBrokenSites">Gdje vidiš te probleme?</string>
-    <string name="whichBrokenSitesHint">Koje web-mjesto ima problema?</string>
-    <string name="feedbackSpecificAsPossible">Budi što precizniji/a</string>
-    <string name="feedbackInitialDisambiguationTitle">Započnimo!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Kamo bi svrstao/la svoje povratne informacije?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb za pozitivne povratne informacije</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb za negativne povratne informacije</string>
-    <string name="feedbackIsImportantToUs">Tvoje anonimne povratne informacije važne su za nas.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Web-stranica nije mogla biti prikazana."</string>
     <string name="crashedWebViewErrorAction">"Ponovno učitaj"</string>
@@ -690,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
-    <string name="downloadsActivityTitle">Preuzimanja</string>
-    <string name="downloadsActivityNoItemsDescription">Još nema preuzetih datoteka</string>
-    <string name="downloadsShareTitle">Podijeli s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvori</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Datoteka više ne postoji</string>
-    <string name="downloadsItemMenuShare">Podijeli</string>
-    <string name="downloadsItemMenuDelete">Izbriši</string>
-    <string name="downloadsItemMenuCancel">Otkaži</string>
-    <string name="downloadsActivityMenuDeleteAll">Izbriši sve</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="downloadsAllFilesDeletedMessage">Sve su datoteke izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Više opcija za %1$s</string>
-    <string name="downloadsUndoActionName">Poništi</string>
-    <string name="downloadsStateInProgress">U tijeku...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Zaštita od praćenja aplikacija</string>
@@ -726,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
-    <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
     <!-- Windows Settings -->
 
@@ -880,7 +792,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Koristi ChatGPT privatno s ugrađenim Duck.ai-jem</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokiraj ciljane oglase i skočne prozore kolačića</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Reproduciraj YouTube videozapise bez oglasa</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
@@ -943,7 +857,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Želiš li jednostavan pristup privatnom AI čavrljanju u adresnoj traci?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 
@@ -1069,7 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Pozdrav!</string>
     <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji te stavlja za upravljač?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
 
@@ -1091,7 +1005,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Spreman za privatno čavrljanje s ChatGPT-om, Claudeom i drugim umjetnim inteligencijama besplatno, u pregledniku koji te aktivno štiti?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Zapamti: Duck.ai možeš koristiti na svakom mjestu na kojem se nalazi ikona za čavrljanje</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Pokreni AI čavrljanje</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI zaštite aktivirane!</string>
@@ -1116,6 +1029,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potvrdi</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Hvala na povratnim informacijama!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Otvori na Fire kartici</string>
     <string name="openInBackgroundTab">Otvori u pozadini</string>
@@ -1132,4 +1048,6 @@
     <string name="fireTabsNewTabButton">Nova Fire kartica</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Isprobaj Fire kartice za pregledavanje bez spremanja lokalne povijesti.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Želiš li izbrisati Fire kartice i njihove podatke?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
 </resources>

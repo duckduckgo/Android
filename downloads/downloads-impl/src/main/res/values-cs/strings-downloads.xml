@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Uložit do Stahování</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Ze stránky %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Smazat vše</string>
+    <string name="downloadsActivityNoItemsDescription">Zatím žádný stažený soubor</string>
+    <string name="downloadsActivityTitle">Stahování</string>
+    <string name="downloadsAllFilesDeletedMessage">Všechny soubory smazány</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Soubor nejde otevřít. Zkus vyhledat kompatibilní aplikaci.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Odstraněno %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Soubor už neexistuje</string>
+    <string name="downloadsItemMenuCancel">Zrušit</string>
+    <string name="downloadsItemMenuDelete">Smazat</string>
+    <string name="downloadsItemMenuShare">Sdílet</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Další volby pro %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
+    <string name="downloadsNotifyMeTitle">Zjisti, až budou soubory ke stažení připraveny</string>
+    <string name="downloadsShareTitle">Sdílet s...</string>
+    <string name="downloadsStateInProgress">Probíhá...</string>
+    <string name="downloadsUndoActionName">Vrátit</string>
+    <string name="downloadsSearchHint">Vyhledávání</string>
 </resources>

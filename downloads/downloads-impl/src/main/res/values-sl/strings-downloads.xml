@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Shrani med prenose</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">S spletnega mesta: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Izbriši vse</string>
+    <string name="downloadsActivityNoItemsDescription">Nobena datoteka še ni bila prenesena</string>
+    <string name="downloadsActivityTitle">Prenosi</string>
+    <string name="downloadsAllFilesDeletedMessage">Vse datoteke so bile izbrisane</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Datoteka ne obstaja več</string>
+    <string name="downloadsItemMenuCancel">Preklic</string>
+    <string name="downloadsItemMenuDelete">Izbriši</string>
+    <string name="downloadsItemMenuShare">Deli</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Več možnosti za: %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
+    <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
+    <string name="downloadsShareTitle">Deli s/z …</string>
+    <string name="downloadsStateInProgress">Poteka …</string>
+    <string name="downloadsUndoActionName">Prekliči spremembe</string>
+    <string name="downloadsSearchHint">Iskanje</string>
 </resources>

@@ -284,6 +284,12 @@ interface DuckChatInternal : DuckChat {
     fun isNativeChatInputEnabled(): Boolean
 
     /**
+     * Returns whether the Duck.ai contextual sheet's INPUT mode should use the native unified input.
+     * True only when [isNativeChatInputEnabled] is true AND the [contextualNativeInput] toggle is on.
+     */
+    fun isContextualNativeInputEnabled(): Boolean
+
+    /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
      */
     fun areMultipleContentAttachmentsEnabled(): Boolean
@@ -407,6 +413,7 @@ class RealDuckChat @Inject constructor(
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
+    private val _nativeInputNavBarEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
@@ -448,6 +455,7 @@ class RealDuckChat @Inject constructor(
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
+    private var isContextualNativeInputEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -523,6 +531,8 @@ class RealDuckChat @Inject constructor(
 
     override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
 
+    override fun isContextualNativeInputEnabled(): Boolean = isContextualNativeInputEnabled
+
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
@@ -538,6 +548,8 @@ class RealDuckChat @Inject constructor(
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = _nativeChatInputEnabled.asStateFlow()
+
+    override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = _nativeInputNavBarEnabled.asStateFlow()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -937,6 +949,10 @@ class RealDuckChat @Inject constructor(
             isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
             isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
             _nativeChatInputEnabled.value = isNativeChatInputEnabled
+            // Contextual native INPUT mode is gated by nativeChatInput AND the contextualNativeInput flag.
+            // Read synchronously via isContextualNativeInputEnabled() — no flow needed (static per session).
+            isContextualNativeInputEnabled = isNativeChatInputEnabled && duckChatFeature.contextualNativeInput().isEnabled()
+            _nativeInputNavBarEnabled.value = duckChatFeature.nativeInputNavBar().isEnabled()
             val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
 
             // Mirrors NativeInputModeWidgetViewModel.getInputMode: the address bar offers the

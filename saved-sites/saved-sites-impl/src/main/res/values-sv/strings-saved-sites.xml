@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Dela favoriter</string>
-    <string name="sync_enable_option_favorites_subtitle">Använd samma favoriter på alla enheter. Låt bli att använda funktionen om du vill skilja på favoriter för mobil och dator.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Dela favoriter mellan dina enheter</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Använd samma favoritbokmärken på mobilen och datorn.</string>
     <string name="saved_site_limit_warning"><b>Synkroniseringen har pausats</b>\nDu har nått det maximala antalet bokmärken. Ta bort några för att återuppta synkroniseringen.\n\n<annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Bokmärkessynkroniseringen har pausats</b>\nDu har nått det maximala antalet bokmärken. Ta bort några bokmärken för att återuppta synkroniseringen.</string>
     <string name="saved_site_invalid_warning"><b>Synkroniseringen har pausats</b>\nVissa bokmärken är felaktigt formaterade eller för långa och har inte synkroniserats.\n\n<annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
@@ -99,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Är du säker på att du vill ta bort bokmärket för &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Hämta ikoner för bokmärken</string>
-    <string name="sync_fetch_icons_subtitle">Ladda automatiskt ner ikoner för dina synkroniserade bokmärken.</string>
+    <string name="sync_simplified_fetch_icons_title">Hämta ikoner för bokmärken</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Läser in ikoner från webbplatser som du har bokmärkt. Ikonnedladdningar exponeras för ditt nätverk.</string>
     <string name="faviconsPromptTitle">Ladda ner saknade ikoner?</string>
     <string name="faviconsPromptMessage">Vill du att enheten automatiskt ska hämta ikoner för synkroniserade bokmärken från de bokmärkta webbplatserna?</string>
     <string name="faviconsPromptPrimaryCta">Håll ikoner för bokmärken uppdaterade</string>

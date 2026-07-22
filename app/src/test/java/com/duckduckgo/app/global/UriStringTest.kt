@@ -19,7 +19,9 @@ package com.duckduckgo.app.global
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
+import com.duckduckgo.app.browser.UriString.Companion.removePort
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -433,5 +435,35 @@ class UriStringTest {
     @Test
     fun whenUrlContainsSingleQuoteThenIsFalse() {
         assertFalse(isWebUrl("example'.com"))
+    }
+
+    @Test
+    fun whenUrlHasPortThenPortIsRemoved() {
+        assertEquals("http://example.com/path", removePort("http://example.com:8080/path"))
+    }
+
+    @Test
+    fun whenUrlHasPortAndFragmentThenPortIsRemovedAndFragmentKept() {
+        assertEquals("https://example.com/path#section", removePort("https://example.com:443/path#section"))
+    }
+
+    @Test
+    fun whenUrlHasPortAndQueryThenPortIsRemovedAndQueryKept() {
+        assertEquals("https://example.com/path?query=1", removePort("https://example.com:8080/path?query=1"))
+    }
+
+    @Test
+    fun whenUrlHasNoPortThenUrlIsReturnedUnchanged() {
+        assertEquals("http://example.com/path?query=1", removePort("http://example.com/path?query=1"))
+    }
+
+    @Test
+    fun whenUrlHasNoPortAndNoPathThenUrlIsReturnedUnchanged() {
+        assertEquals("https://example.com", removePort("https://example.com"))
+    }
+
+    @Test
+    fun whenUrlIsNotParseableThenOriginalIsReturned() {
+        assertEquals("not a url", removePort("not a url"))
     }
 }

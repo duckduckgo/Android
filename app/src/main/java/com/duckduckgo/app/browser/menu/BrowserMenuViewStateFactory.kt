@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -48,7 +49,7 @@ interface BrowserMenuViewStateFactory {
 @SingleInstanceIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrowserMenuViewStateFactory {
     override fun create(
@@ -107,7 +108,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             vpnMenuState = browserViewState.vpnMenuState,
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             showAutofill = browserViewState.showAutofill,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
+            showDownloadDot = newDownloadState.hasNewDownload(),
             canGoForward = browserViewState.canGoForward,
         )
     }
@@ -121,7 +122,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
+            showDownloadDot = newDownloadState.hasNewDownload(),
             showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
@@ -138,6 +139,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         serpLogoUrl: String? = null,
         siteUrl: String? = null,
     ): BrowserMenuViewState.Browser {
+        val isDuckDuckGoPage = siteUrl?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
@@ -153,7 +155,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canFireproofSite = browserViewState.canFireproofSite,
             isFireproofWebsite = browserViewState.isFireproofWebsite,
             showFireMenuItem = browserViewState.fireButton is HighlightableButton.Visible,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
+            showDownloadDot = newDownloadState.hasNewDownload(),
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             canChangeBrowsingMode = browserViewState.canChangeBrowsingMode && browserViewState.currentPdfCachedUri == null,
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
@@ -161,9 +163,9 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canFindInPage = browserViewState.canFindInPage && browserViewState.currentPdfCachedUri == null,
             addToHomeVisible = browserViewState.addToHomeVisible,
             addToHomeEnabled = browserViewState.addToHomeEnabled,
-            canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
+            canChangePrivacyProtection = browserViewState.canChangePrivacyProtection && !isDuckDuckGoPage,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
-            canReportSite = browserViewState.canReportSite,
+            canReportSite = browserViewState.canReportSite && !isDuckDuckGoPage,
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,

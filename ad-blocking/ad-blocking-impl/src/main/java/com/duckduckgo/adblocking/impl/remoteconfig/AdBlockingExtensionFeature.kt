@@ -48,4 +48,10 @@ interface AdBlockingExtensionFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun adBlockingUXImprovements(): Toggle
+
+    /**
+     * When enabled, ad blocking animation will show on the omnibar if all other conditions met
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun showAdBlockingOmnibarAnimation(): Toggle
 }

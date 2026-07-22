@@ -62,6 +62,10 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
     // Always reassigned wholesale and together with [_state], so the two can't drift.
     private var backStack: List<Frame> = emptyList()
 
+    // One snapshot of the committed [backStack] per step shown, in visit order; powers GoBack.
+    // Reassigned wholesale alongside [backStack] / [_state], and cleared on every terminal state.
+    private var history: List<List<Frame>> = emptyList()
+
     override suspend fun startPlan(plan: LinearOnboardingPlan) {
         // owner = current Job makes the mutex throw on a reentrant call instead of deadlocking; a genuinely
         // concurrent caller has a different Job and waits as usual.
@@ -96,6 +100,8 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
                     advance(caller, fromIndex = caller.last().index + 1)
                 }
 
+                LinearOnboardingTransition.GoBack -> goBack()
+
                 LinearOnboardingTransition.AbortPlan -> terminateSkipped(frames.first().plan)
 
                 LinearOnboardingTransition.Stay -> Unit
@@ -114,16 +120,34 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
             index++
         }
         if (index < top.plan.steps.size) {
-            // Set backStack and _state together (no suspension between) so they can't diverge.
-            backStack = frames.dropLast(1) + top.copy(index = index)
-            _state.value = LinearOnboardingState.InProgress(
-                rootPlanId = frames.first().plan.id,
-                currentPlan = top.plan,
-                currentStepIndex = index,
-            )
+            // Set backStack, history and _state together (no suspension between) so they can't diverge.
+            val committed = frames.dropLast(1) + top.copy(index = index)
+            backStack = committed
+            history = history + listOf(committed)
+            emitInProgress(committed)
         } else {
             terminateCompleted(frames.first().plan)
         }
+    }
+
+    // Returns to the previously shown step by restoring its snapshot. No-op on the first shown step.
+    private fun goBack() {
+        if (history.size <= 1) return
+        history = history.dropLast(1)
+        val previous = history.last()
+        backStack = previous
+        emitInProgress(previous)
+    }
+
+    // Publishes the InProgress position for the top frame; canGoBack is true once history holds an earlier step.
+    private fun emitInProgress(frames: List<Frame>) {
+        val top = frames.last()
+        _state.value = LinearOnboardingState.InProgress(
+            rootPlanId = frames.first().plan.id,
+            currentPlan = top.plan,
+            currentStepIndex = top.index,
+            canGoBack = history.size > 1,
+        )
     }
 
     // Clears the stack and emits the terminal state from a finally, so a throwing or cancelled callback still
@@ -136,6 +160,7 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
             result = rootPlan.result()
         } finally {
             backStack = emptyList()
+            history = emptyList()
             _state.value = LinearOnboardingState.Completed(rootPlanId = rootPlan.id, result = result)
         }
     }
@@ -145,6 +170,7 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
             rootPlan.onSkipped()
         } finally {
             backStack = emptyList()
+            history = emptyList()
             _state.value = LinearOnboardingState.Skipped(rootPlanId = rootPlan.id)
         }
     }

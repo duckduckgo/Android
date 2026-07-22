@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Delite priljubljene</string>
-    <string name="sync_enable_option_favorites_subtitle">Uporabite iste priljubljene v vseh napravah. Če želite ločiti priljubljene strani za mobilne naprave in namizne računalnike, pustite izklopljeno.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Delite priljubljene med napravami</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Uporabljajte iste priljubljene zaznamke v mobilnih napravah in namiznih računalnikih.</string>
     <string name="saved_site_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nDosegli ste največje število zaznamkov. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Sinhronizacija zaznamkov je začasno zaustavljena</b>\nDosegli ste največje število zaznamkov. Izbrišite nekaj zaznamkov, da nadaljujete sinhronizacijo.</string>
     <string name="saved_site_invalid_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nNekateri zaznamki so napačno oblikovani ali predolgi in niso bili sinhronizirani.\n\n<annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
@@ -107,8 +107,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ali ste prepričani, da želite izbrisati zaznamek za &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Pridobivanje ikon zaznamkov</string>
-    <string name="sync_fetch_icons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
+    <string name="sync_simplified_fetch_icons_title">Naloži ikone zaznamkov</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Naloži ikone spletnih mest, ki ste jih dodali med zaznamke. Prenosi ikon so izpostavljeni vašemu omrežju.</string>
     <string name="faviconsPromptTitle">Želite prenesti manjkajoče ikone?</string>
     <string name="faviconsPromptMessage">Ali želite, da naprava samodejno prenese ikone za sinhronizirane zaznamke s spletnih mest z zaznamki?</string>
     <string name="faviconsPromptPrimaryCta">Posodobi ikone zaznamkov</string>

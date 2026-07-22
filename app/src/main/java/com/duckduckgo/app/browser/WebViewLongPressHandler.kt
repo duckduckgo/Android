@@ -26,6 +26,8 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -58,6 +60,7 @@ class WebViewLongPressHandler @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val customTabDetector: CustomTabDetector,
+    private val browserMode: BrowserMode,
 ) : LongPressHandler {
 
     override fun handleLongPress(
@@ -107,7 +110,7 @@ class WebViewLongPressHandler @Inject constructor(
         }
 
         if (menuShown) {
-            pixel.fire(LONG_PRESS)
+            pixel.fire(LONG_PRESS, mapOf(BROWSER_MODE to browserMode.name.lowercase()))
         }
     }
 
@@ -142,14 +145,15 @@ class WebViewLongPressHandler @Inject constructor(
         longPressTarget: LongPressTarget,
         item: MenuItem,
     ): RequiredAction {
+        val browserModeParams = mapOf(BROWSER_MODE to browserMode.name.lowercase())
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
-                pixel.fire(LONG_PRESS_NEW_TAB)
+                pixel.fire(LONG_PRESS_NEW_TAB, browserModeParams)
                 val url = longPressTarget.url ?: return None
                 return OpenInNewTab(url)
             }
             CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB -> {
-                pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB)
+                pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB, browserModeParams)
                 val url = longPressTarget.url ?: return None
                 return OpenInNewBackgroundTab(url)
             }

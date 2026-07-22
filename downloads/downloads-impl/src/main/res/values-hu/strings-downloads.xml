@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Mentés a Letöltések közé</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Innen: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Összes törlése</string>
+    <string name="downloadsActivityNoItemsDescription">Még nincsenek letöltött fájlok</string>
+    <string name="downloadsActivityTitle">Letöltések</string>
+    <string name="downloadsAllFilesDeletedMessage">Összes fájl törölve</string>
+    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Törölve: %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">A fájl már nem létezik</string>
+    <string name="downloadsItemMenuCancel">Mégsem</string>
+    <string name="downloadsItemMenuDelete">Törlés</string>
+    <string name="downloadsItemMenuShare">Megosztás</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">További lehetőségek a következőhöz: %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
+    <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
+    <string name="downloadsShareTitle">Megosztás vele…</string>
+    <string name="downloadsStateInProgress">Folyamatban…</string>
+    <string name="downloadsUndoActionName">Visszavonás</string>
+    <string name="downloadsSearchHint">Keresés</string>
 </resources>

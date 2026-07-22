@@ -22,7 +22,6 @@ import android.content.pm.PackageManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.work.WorkManager
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
@@ -48,6 +47,7 @@ import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -79,12 +79,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
-import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.downloads.impl.AndroidFileDownloader
-import com.duckduckgo.downloads.impl.DataUriDownloader
-import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -134,15 +129,6 @@ class BrowserModule {
             androidBrowserConfigFeature,
             serpSettingsFeature,
         )
-    }
-
-    @Provides
-    fun webViewLongPressHandler(
-        context: Context,
-        pixel: Pixel,
-        customTabDetector: CustomTabDetector,
-    ): LongPressHandler {
-        return WebViewLongPressHandler(context, pixel, customTabDetector)
     }
 
     @Provides
@@ -310,17 +296,6 @@ class BrowserModule {
     }
 
     @Provides
-    fun fileDownloader(
-        dataUriDownloader: DataUriDownloader,
-        callback: FileDownloadCallback,
-        workManager: WorkManager,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, callback, workManager, appCoroutineScope, dispatcherProvider)
-    }
-
-    @Provides
     fun fireproofLoginDialogEventHandler(
         userEventsStore: UserEventsStore,
         pixel: Pixel,
@@ -393,3 +368,6 @@ private interface DuckAiChatDeletionListenerPluginPoint
 
 @ContributesPluginPoint(scope = AppScope::class, boundType = BrowserMenuHighlightPlugin::class)
 private interface BrowserMenuHighlightPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = TopInContextSection::class)
+private interface TopInContextSectionPluginPoint

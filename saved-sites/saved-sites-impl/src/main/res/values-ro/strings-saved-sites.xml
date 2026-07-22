@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Distribuie favoritele</string>
-    <string name="sync_enable_option_favorites_subtitle">Utilizează  aceleași favorite pe toate dispozitivele. Lasă oprit pentru a păstra favoritele pentru mobil și cele pentru desktop separate.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Distribuie favoritele pe toate dispozitivele</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Folosește aceleași marcaje preferate pe mobil și pe desktop.</string>
     <string name="saved_site_limit_warning"><b>Sincronizare întreruptă</b>\nAi atins numărul maxim de marcaje. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Sincronizarea marcajelor este întreruptă</b>\nAi atins numărul maxim de marcaje. Șterge câteva marcaje pentru a relua sincronizarea.</string>
     <string name="saved_site_invalid_warning"><b>Sincronizarea este întreruptă</b>\nUnele marcaje sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.\n\n<annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
@@ -103,8 +103,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Preia pictogramele pentru marcaje</string>
-    <string name="sync_fetch_icons_subtitle">Descarcă automat pictograme pentru marcajele tale sincronizate.</string>
+    <string name="sync_simplified_fetch_icons_title">Încarcă pictogramele pentru marcaje</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Încarcă pictograme de pe site-urile pe care le-ai salvat la favorite. Descărcările de pictograme sunt expuse în rețeaua ta.</string>
     <string name="faviconsPromptTitle">Descarci pictogramele lipsă?</string>
     <string name="faviconsPromptMessage">Dorești ca acest dispozitiv să descarce automat pictogramele pentru marcajele sincronizate de pe site-urile marcate?</string>
     <string name="faviconsPromptPrimaryCta">Păstrează pictogramele de marcaje actualizate</string>

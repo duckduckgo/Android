@@ -34,7 +34,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
-import com.duckduckgo.onboarding.api.LinearOnboardingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -78,10 +77,11 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
         withContext(dispatchers.io()) {
-            // The orchestrator owns the terminal AppStage write when it drives the run; only the
-            // legacy path writes it here. The extended-flow CTA seeding below always runs (it is
+            // The orchestrator owns the terminal AppStage write when it drives the run (BrandDesignUpdate
+            // page). The legacy WelcomePage path (brand design update off) does not touch the orchestrator,
+            // so it writes the terminal state here. The extended-flow CTA seeding below always runs (it is
             // driven by the chosen demo query, not the orchestrator).
-            if (!orchestratorDriven) {
+            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
                 userStageStore.stageCompleted(AppStage.NEW)
             }
 
@@ -105,23 +105,14 @@ class OnboardingViewModel @Inject constructor(
 
     fun onOnboardingSkipped() {
         viewModelScope.launch(dispatchers.io()) {
-            // Orchestrator-driven runs already ran markOnboardingAsCompleted in onSkipped before
-            // emitting Skipped; only the legacy path writes it here.
-            if (!orchestratorDriven) {
+            // The orchestrator owns the skip terminal write when it drives the run (BrandDesignUpdate
+            // page): its onSkipped runs markOnboardingAsCompleted before it emits Skipped. The legacy
+            // WelcomePage path (brand design update off) does not touch the orchestrator, so it writes here.
+            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
                 onboardingSkipper.markOnboardingAsCompleted()
             }
         }
     }
-
-    /**
-     * True once the orchestrator is driving this run (it never returns to NotStarted once started).
-     * When true the orchestrator owns the terminal "onboarding is over" writes — its onCompleted /
-     * onSkipped run before it emits the terminal state — and the active page navigates off that state,
-     * so the legacy code here skips both the writes and the dev-skip navigation. NotStarted means the
-     * orchestrator never engaged: the legacy path owns them.
-     */
-    val orchestratorDriven: Boolean
-        get() = linearOnboardingOrchestrator.state.value !is LinearOnboardingState.NotStarted
 
     fun initializeOnboardingSkipper() {
         if (!appBuildConfig.canSkipOnboarding) return
@@ -135,18 +126,23 @@ class OnboardingViewModel @Inject constructor(
     }
 
     /**
-     * Dev-only "skip all onboarding" shortcut. When [orchestratorDriven], the orchestrator owns the skip
-     * (AbortPlan -> Skipped runs onSkipped, and the active page navigates off Skipped), so the caller
-     * checks [orchestratorDriven] to know it must not also navigate. In the legacy path this writes the
-     * terminal state directly and the caller still owns navigation.
+     * Dev-only "skip all onboarding" shortcut. Returns true when the caller must navigate away itself.
+     *
+     * In the BrandDesignUpdate (orchestrator) path the orchestrator owns the skip: AbortPlan -> Skipped
+     * runs onSkipped and the active page navigates off Skipped, so the caller must not also navigate
+     * (returns false). In the legacy WelcomePage path this writes the terminal state directly and nothing
+     * navigates automatically, so the caller still owns navigation (returns true).
      */
-    suspend fun devOnlyFullyCompleteAllOnboarding() {
-        // Apply the dev-only extra first so it lands before an orchestrator-driven page navigates.
-        if (orchestratorDriven) {
+    suspend fun devOnlyFullyCompleteAllOnboarding(): Boolean {
+        val brandDesignUpdateEnabled = withContext(dispatchers.io()) {
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        }
+        if (brandDesignUpdateEnabled) {
             linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
         } else {
             onboardingSkipper.markOnboardingAsCompleted()
         }
+        return !brandDesignUpdateEnabled
     }
 
     companion object {

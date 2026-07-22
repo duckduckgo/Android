@@ -47,7 +47,12 @@
         android:fullBackupContent="@xml/backup_rules_android_11_and_older"
         android:theme="@style/Theme.DuckDuckGo.App"
         android:requestLegacyExternalStorage="true"
+        android:enableOnBackInvokedCallback="false"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -328,6 +333,25 @@
 
         </activity>
 
+        <!--
+          Registers DuckDuckGo as a PDF handler so already-downloaded PDFs can be opened in the
+          browser. Disabled by default; PdfHandlerComponentToggler enables it at runtime only on
+          Android 12+ (androidx.pdf requirement) when the pdfViewer remote flag is on.
+        -->
+        <activity-alias
+            android:name="com.duckduckgo.app.dispatchers.PdfViewerHandler"
+            android:enabled="false"
+            android:exported="true"
+            android:targetActivity="com.duckduckgo.app.dispatchers.IntentDispatcherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
@@ -367,11 +391,6 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:exported="false"
-            android:label="@string/feedbackActivityTitle"
-            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
@@ -508,9 +527,8 @@
             android:parentActivityName=".BrowserActivity" />
 
         <activity
-            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
+            android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
             android:exported="false"
-            android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name=".threatprotection.ThreatProtectionSettingsActivity"

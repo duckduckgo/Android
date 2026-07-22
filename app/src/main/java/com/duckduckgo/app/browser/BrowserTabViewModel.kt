@@ -46,6 +46,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
+import com.duckduckgo.adblocking.api.AdBlockingAnimation
+import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
@@ -194,7 +196,6 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -336,6 +337,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
@@ -349,6 +351,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -363,6 +366,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -570,10 +574,11 @@ class BrowserTabViewModel @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
+    private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
@@ -582,6 +587,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
+    private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -742,6 +748,11 @@ class BrowserTabViewModel @Inject constructor(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private var adBlockingAnimationClaimed = false
+    private var pendingAdBlockingAnimation: PendingAdBlockingBadge? = null
+    private var adBlockingAnimationJob: Job? = null
+
+    private var adBlockingNavToken = 0
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var faviconRequestedForDomain: String? = null
@@ -755,6 +766,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
+    private var brokenSiteReportTriggerJob: Job? = null
 
     /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
      * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
@@ -879,6 +891,7 @@ class BrowserTabViewModel @Inject constructor(
 
         observeAccessibilitySettings()
         observeRefreshTriggers()
+        observeBrokenSiteReportTriggers()
 
         savedSitesRepository
             .getFavorites()
@@ -1037,6 +1050,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onViewRecreated() {
         observeAccessibilitySettings()
         observeRefreshTriggers()
+        observeBrokenSiteReportTriggers()
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
@@ -1112,6 +1126,20 @@ class BrowserTabViewModel @Inject constructor(
             .debounce(REFRESH_TRIGGER_DEBOUNCE_MILLIS)
             .flatMapLatest { refreshOnViewVisible.asStateFlow().filter { it }.take(1) }
             .onEach { command.value = NavigationCommand.Refresh }
+            .launchIn(viewModelScope)
+    }
+
+    fun observeBrokenSiteReportTriggers() {
+        brokenSiteReportTriggerJob?.cancel()
+        brokenSiteReportTriggerJob = brokenSiteReportTriggerPlugins.getPlugins()
+            .map { plugin ->
+                plugin.observeReportRequests()
+                    .catch { logcat(WARN) { "Broken site report trigger failed: ${it.asLog()}" } }
+            }
+            .merge()
+            // The trigger flow fires in every tab's ViewModel; only the visible tab should report.
+            .filter { refreshOnViewVisible.value }
+            .onEach { reportFlow -> onBrokenSiteSelected(reportFlow) }
             .launchIn(viewModelScope)
     }
 
@@ -1221,7 +1249,20 @@ class BrowserTabViewModel @Inject constructor(
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
+        val previousUrl = site?.uri
+        val previousCertificate = site?.certificate
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
+        if (androidBrowserConfig.preserveCertificateOnSameOrigin().isEnabled() &&
+            previousUrl != null &&
+            sameOrigin(previousUrl, url)
+        ) {
+            /* An in-page (same-origin) navigation can be reported by WebView as a new page, rebuilding the
+            Site with a null certificate. Unlike a real load, no progress callback follows to re-capture it,
+            so the Privacy Dashboard would wrongly report an invalid certificate. Seed the new Site with the
+            previous certificate as a fallback; if a certificate callback does arrive it overwrites this value.
+             */
+            site?.certificate = previousCertificate
+        }
         if (updateMaliciousSiteStatus) {
             site?.maliciousSiteStatus = maliciousSiteStatus
         }
@@ -1783,7 +1824,7 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
-    fun closeAndReturnToSourceIfBlankTab() {
+    override fun closeAndReturnToSourceIfBlankTab() {
         if (url == null) {
             closeAndSelectSourceTab()
         }
@@ -1934,9 +1975,6 @@ class BrowserTabViewModel @Inject constructor(
             }
             return true
         } else if (!skipHome && !isCustomTab) {
-            if (!duckAiFeatureState.showInputScreen.value) {
-                command.value = ShowKeyboard
-            }
             navigateHome()
             return true
         }
@@ -2033,6 +2071,7 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 logcat { "WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
+                adBlockingNavToken++
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -2115,11 +2154,63 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
+    private data class PendingAdBlockingBadge(
+        val command: Command.StartAdBlockingAnimation,
+        val token: Int,
+    )
+
+    private fun handleAdBlockingAnimation(
+        animation: AdBlockingAnimation,
+        isPageLoad: Boolean,
+    ) {
+        when (animation) {
+            is AdBlockingAnimation.Show -> {
+                adBlockingAnimationClaimed = true
+                val badge = Command.StartAdBlockingAnimation(animation.icon, animation.text)
+                if (isPageLoad && currentLoadingViewState().isLoading) {
+                    pendingAdBlockingAnimation = PendingAdBlockingBadge(badge, adBlockingNavToken)
+                } else {
+                    command.value = badge
+                    pendingAdBlockingAnimation = null
+                }
+            }
+            is AdBlockingAnimation.Skip -> {
+                adBlockingAnimationClaimed = false
+                pendingAdBlockingAnimation = null
+            }
+            is AdBlockingAnimation.Retain -> Unit
+        }
+    }
+
+    private fun resetAdBlockingAnimationState() {
+        adBlockingAnimationJob?.cancel()
+    }
+
+    private fun flushPendingAdBlockingAnimation() {
+        pendingAdBlockingAnimation?.let {
+            if (it.token == adBlockingNavToken) {
+                command.value = it.command
+            }
+        }
+        pendingAdBlockingAnimation = null
+    }
+
+    fun onAdBlockingAnimationSuppressed() {
+        adBlockingAnimationClaimed = false
+    }
+
     private fun pageChanged(
         url: String,
         title: String?,
     ) {
         logcat(VERBOSE) { "Page changed: $url" }
+        resetAdBlockingAnimationState()
+        adBlockingAnimationJob = viewModelScope.launch {
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = true),
+                isPageLoad = true,
+            )
+        }
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -2365,6 +2456,14 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
+        // SPA url change: the page is already loaded, so decide and show immediately
+        resetAdBlockingAnimationState()
+        adBlockingAnimationJob = viewModelScope.launch {
+            handleAdBlockingAnimation(
+                adBlockingOmnibarAnimationProvider.getAnimation(url, pageChanged = false),
+                isPageLoad = false,
+            )
+        }
         site?.url = url
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -2468,6 +2567,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) return
+
+        if (newProgress == 100) {
+            flushPendingAdBlockingAnimation()
+        }
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
@@ -3211,8 +3314,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = MENU))
+    fun onBrokenSiteSelected(reportFlow: BrokenSiteData.ReportFlow = MENU) {
+        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = reportFlow))
     }
 
     fun onPrivacyProtectionMenuClicked(clickedFromCustomTab: Boolean = false) {
@@ -3592,21 +3695,30 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+    fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
+        val state = currentBrowserViewState()
+        val isOnNewTabPage = !state.browserShowing && !state.maliciousSiteBlocked && state.sslError == NONE
+        if (longPress && isOnNewTabPage) {
+            return false
+        }
+
         openNewTab()
 
+        val browserModeParams = mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
         if (longPress) {
-            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED, browserModeParams)
         } else {
             val url = site?.url
             if (url != null) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP, browserModeParams)
                 } else {
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE, browserModeParams)
                 }
             }
         }
+
+        return true
     }
 
     fun onNavigationBarNewTabButtonClicked() {
@@ -3957,7 +4069,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
         browserInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
 
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
+        val browserModeParams = mapOf(PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED, browserModeParams)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED_DAILY, type = Daily())
         fireDailyLaunchPixel()
@@ -3968,7 +4081,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is Omnibar.ViewMode.NewTab -> {
-                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString()) + browserModeParams
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
 
@@ -3976,9 +4089,9 @@ class BrowserTabViewModel @Inject constructor(
                 val url = site?.url
                 if (url != null) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP, browserModeParams)
                     } else {
-                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE, browserModeParams)
                     }
                 }
             }
@@ -4006,6 +4119,7 @@ class BrowserTabViewModel @Inject constructor(
                     PixelParameter.TAB_INACTIVE_1W to inactive1w.await(),
                     PixelParameter.TAB_INACTIVE_2W to inactive2w.await(),
                     PixelParameter.TAB_INACTIVE_3W to inactive3w.await(),
+                    PixelParameter.BROWSER_MODE to browserMode.name.lowercase(),
                 )
             pixel.fire(TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
         }
@@ -4194,7 +4308,7 @@ class BrowserTabViewModel @Inject constructor(
                         filePath = savedFilePath,
                     ),
                 )
-                downloadMenuStateProvider.onDownloadComplete()
+                newDownloadState.onDownloadComplete()
                 pdfDownloadCommandFlow.emit(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadFinishedMessage,
@@ -4246,9 +4360,17 @@ class BrowserTabViewModel @Inject constructor(
         firstUrl: String,
         secondUrl: String,
     ): Boolean {
+        return runCatching {
+            sameOrigin(Uri.parse(firstUrl), secondUrl)
+        }.getOrNull() ?: return false
+    }
+
+    private fun sameOrigin(
+        firstUri: Uri,
+        secondUrl: String,
+    ): Boolean {
         return kotlin
             .runCatching {
-                val firstUri = Uri.parse(firstUrl)
                 val secondUri = Uri.parse(secondUrl)
 
                 firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
@@ -5436,6 +5558,8 @@ class BrowserTabViewModel @Inject constructor(
                 cta.backgroundRes,
                 useRebrandBackground = true,
                 backgroundColorAttr = com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop,
+                fillHeightDp = cta.backgroundFillSpec?.heightDpFor(cta.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = cta.backgroundFillSpec?.maxHeightFraction ?: 1f,
             )
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
@@ -5653,6 +5777,7 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
+            if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
             // TODO remove launch once address bar trackers animation is enabled permanently
             viewModelScope.launch {
                 if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
@@ -5724,6 +5849,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStartTrackersAnimation() {
+        if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive for this page
         val site = siteLiveData.value
         val trackerEvents = site?.orderedTrackerBlockedEntities()
         command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)

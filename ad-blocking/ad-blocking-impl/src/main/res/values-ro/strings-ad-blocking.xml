@@ -23,4 +23,23 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blochează reclamele video pe YouTube, astfel încât să poți viziona videoclipuri fără întrerupere. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Deschide videoclipurile într-un mod cinematografic fără distrageri, care te împiedică să influențezi fluxul de YouTube prin ceea ce vizionezi.</string>
+    <string name="ad_blocking_settings_title_v2">Blocarea reclamelor</string>
+    <string name="ad_blocking_settings_header_description">Blochează tehnologiile de urmărire invazive înainte de a se încărca, eliminând eficient reclamele care se bazează pe urmărire</string>
+    <string name="contingencyMessageTitle">Blocarea reclamelor pe YouTube este indisponibilă</string>
+    <string name="contingencyMessageContent">Blocarea reclamelor a fost afectată de modificările recente aduse YouTube. Lucrăm pentru a remedia aceste probleme și apreciem înțelegerea ta</string>
+    <string name="contingencyMessagePrimaryButton">Am înțeles</string>
+    <string name="contingencyMessageCloseContentDescription">Închide</string>
+    <string name="ad_blocking_menu_disable">Dezactivează blocarea reclamelor pe YouTube</string>
+    <string name="ad_blocking_menu_enable">Activează blocarea reclamelor pe YouTube</string>
+    <string name="ad_blocking_menu_title">Blocarea reclamelor pe YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Închide</string>
+    <string name="ad_blocking_menu_always_on">Întotdeauna activat</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Dezactivează până la relansare</string>
+    <string name="ad_blocking_menu_always_off">Întotdeauna dezactivat</string>
+    <string name="ad_blocking_disabled_popup_title">Blocarea reclamelor YouTube nu funcționează?</string>
+    <string name="ad_blocking_disabled_popup_description">Trimite un raport anonim despre erori către DuckDuckGo. Ajută la îmbunătățirea blocării reclamelor pentru toată lumea!</string>
+    <string name="ad_blocking_disabled_primary_action">Trimite raportul de erori</string>
+    <string name="ad_blocking_disabled_secondary_action">Anulează</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Dezactivat până la relansare</string>
+    <string name="ad_blocking_omnibar_badge_text">Blocarea reclamelor pe YouTube este activată</string>
 </resources>

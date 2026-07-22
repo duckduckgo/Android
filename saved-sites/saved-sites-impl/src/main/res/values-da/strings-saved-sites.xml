@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Del favoritter</string>
-    <string name="sync_enable_option_favorites_subtitle">Brug de samme favoritter på alle enheder. Slå fra for at holde mobil- og computerfavoritter adskilt.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Del favoritter på tværs af enheder</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Brug de samme favoritbogmærker på mobil og computer.</string>
     <string name="saved_site_limit_warning"><b>Synkronisering sat på pause</b>\nDu har nået det maksimale antal adgangskoder. Slet nogle af dem for at genoptage synkroniseringen.\n\n<annotation type="manage_bookmarks">Administrer bogmærker</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Bogmærkesynkronisering er sat på pause</b>\nDu har nået det maksimale antal adgangskoder. Slet nogle bogmærker for at genoptage synkroniseringen.</string>
     <string name="saved_site_invalid_warning"><b>Synkronisering sat på pause</b>\nNogle bogmærker er formateret forkert eller er for lange og blev ikke synkroniseret.\n\n<annotation type="manage_bookmarks">Administrer bogmærker</annotation></string>
@@ -99,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på, at du vil slette dit bogmærke &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Hent bogmærkeikoner</string>
-    <string name="sync_fetch_icons_subtitle">Download automatisk ikoner for dine synkroniserede bogmærker.</string>
+    <string name="sync_simplified_fetch_icons_title">Hent bogmærkeikoner</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Indlæser ikoner fra hjemmesider, du har bogmærket. Ikon-downloads eksponeres for dit netværk.</string>
     <string name="faviconsPromptTitle">Download manglende ikoner?</string>
     <string name="faviconsPromptMessage">Vil du have enheden til automatisk at downloade ikoner til synkroniserede bogmærker fra hjemmesiderne på listen?</string>
     <string name="faviconsPromptPrimaryCta">Hold bogmærkeikoner opdaterede</string>

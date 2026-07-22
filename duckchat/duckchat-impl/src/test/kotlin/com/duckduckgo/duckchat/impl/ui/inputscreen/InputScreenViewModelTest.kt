@@ -22,6 +22,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -119,7 +120,7 @@ class InputScreenViewModelTest {
     fun setup() =
         runTest {
             whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
-            whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
+            whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
             whenever(autoComplete.autoComplete(any())).thenReturn(
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
@@ -144,6 +145,7 @@ class InputScreenViewModelTest {
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
             autoCompleteFactory = autoCompleteFactory,
+            browserMode = BrowserMode.REGULAR,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
             appCoroutineScope = coroutineRule.testScope,
@@ -2024,7 +2026,7 @@ class InputScreenViewModelTest {
             whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
             val viewModel = createViewModel("test query")
 
-            verify(autoCompleteFactory).create(expectedConfig)
+            verify(autoCompleteFactory).create(eq(expectedConfig), any())
 
             advanceTimeBy(301)
             verify(autoComplete).autoComplete("test query")
@@ -2037,7 +2039,7 @@ class InputScreenViewModelTest {
             whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
             val viewModel = createViewModel("test query")
 
-            verify(autoCompleteFactory).create(expectedConfig)
+            verify(autoCompleteFactory).create(eq(expectedConfig), any())
 
             advanceTimeBy(301)
             verify(autoComplete).autoComplete("test query")

@@ -36,6 +36,8 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -45,6 +47,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.transition.doOnEnd as doOnTransitionEnd
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -66,12 +69,21 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
     private var hasCookiesAnimationBeenCanceled = false
+    private var cookieUseLightAnimation: Boolean? = null
 
     private val conflatedJob = ConflatedJob()
     private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.main())
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
+
+    private lateinit var adBlockingView: LottieAnimationView
+    private lateinit var adBlockingScene: ViewGroup
+    private lateinit var adBlockingViewBackground: View
+    private var isAdBlockingAnimationRunning = false
+    private var hasAdBlockingAnimationBeenCanceled = false
+    private lateinit var adBlockingFirstScene: Scene
+    private lateinit var adBlockingSecondScene: Scene
 
     override fun startTrackersAnimation(
         context: Context,
@@ -81,20 +93,20 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>?,
         useLightAnimation: Boolean?,
     ) {
-        if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
+        if (isCookiesAnimationRunning || isAdBlockingAnimationRunning) return // let an in-flight badge/cookie animation finish to avoid glitches
         if (trackersAnimationView.isAnimating) return
 
         this.trackersAnimation = trackersAnimationView
         this.shieldAnimation = shieldAnimationView
 
         if (entities.isNullOrEmpty()) { // no badge nor tracker animations
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(omnibarViews)
             return
         }
 
         val logos = getLogos(context, entities)
         if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(omnibarViews)
             return
         }
 
@@ -115,7 +127,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
                     override fun onAnimationEnd(animation: Animator) {
                         commonAddressBarAnimationHelper.animateViewsIn(omnibarViews).start()
-                        tryToStartCookiesAnimation(context, omnibarViews)
+                        tryToStartCookiesAnimation(omnibarViews)
                         listener?.onAnimationFinished()
                     }
 
@@ -145,7 +157,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         customBackgroundColor: Int?,
         useSoftwareRenderingMode: Boolean,
     ) {
-        if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
+        if (isCookiesAnimationRunning || isAdBlockingAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
         addressBarTrackersAnimator.startAnimation(
             context = context,
@@ -161,7 +173,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 conflatedJob +=
                     coroutineScope.launch {
                         delay(DELAY_BETWEEN_ANIMATIONS_DURATION)
-                        tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
+                        tryToStartCookiesAnimation(omnibarViews + shieldViews)
                     }
             },
         )
@@ -176,18 +188,131 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
         enqueueCookieAnimation: Boolean,
+        useLightAnimation: Boolean?,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
         this.cookieCosmeticHide = cookieCosmeticHide
+        this.cookieUseLightAnimation = useLightAnimation
 
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
         } else if (this.trackersAnimation?.isAnimating != true && !addressBarTrackersAnimator.isAnimationRunning) {
-            startCookiesAnimation(context, omnibarViews + shieldViews)
+            startCookiesAnimation(omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
+        }
+    }
+
+    override fun createAdBlockingAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        shieldViews: List<View>,
+        badgeBackground: View,
+        badgeAnimationView: LottieAnimationView,
+        badgeScene: ViewGroup,
+        icon: Int,
+        text: Int,
+    ) {
+        // Ad-blocking is exclusive: cancel any in-flight tracker/cookie animation before showing.
+        conflatedJob.cancel()
+        addressBarTrackersAnimator.cancelAnimation()
+        stopTrackersAnimation()
+        stopCookiesAnimation()
+
+        this.adBlockingScene = badgeScene
+        this.adBlockingViewBackground = badgeBackground
+        this.adBlockingView = badgeAnimationView
+        startAdBlockingAnimation(context, omnibarViews + shieldViews, icon, text)
+    }
+
+    private fun startAdBlockingAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        iconRes: Int,
+        textRes: Int,
+    ) {
+        if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
+        isAdBlockingAnimationRunning = true
+
+        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, context)
+        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, context)
+
+        hasAdBlockingAnimationBeenCanceled = false
+        val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
+        adBlockingView.show()
+        adBlockingView.alpha = 0F
+        adBlockingView.setImageResource(iconRes)
+        // The static player icon has no built-in inset (unlike the cookie/tracker Lottie compositions,
+        // whose artwork fills the badge chip), so pad it to center the glyph in the chip and match their
+        // spacing to the text.
+        adBlockingView.setPaddingRelative(AD_BLOCKING_ICON_START_PADDING_DP.toPx(), 0, 0, 0)
+
+        val slideInTransition: Transition = createSlideTransition()
+        val slideOutTransition: Transition = createSlideTransition()
+
+        slideInTransition.doOnTransitionEnd {
+            AnimatorSet().apply {
+                play(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView, 0L))
+                startDelay = COOKIES_ANIMATION_DELAY
+                addListener(
+                    doOnEnd {
+                        if (!hasAdBlockingAnimationBeenCanceled) {
+                            AnimatorSet().apply {
+                                TransitionManager.go(adBlockingFirstScene, slideOutTransition)
+                                play(commonAddressBarAnimationHelper.animateFadeOut(adBlockingView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                    .with(
+                                        commonAddressBarAnimationHelper.animateFadeOut(
+                                            adBlockingViewBackground,
+                                            COOKIES_ANIMATION_FADE_OUT_DURATION,
+                                        ),
+                                    )
+                                addListener(
+                                    doOnEnd {
+                                        adBlockingView.gone()
+                                        isAdBlockingAnimationRunning = false
+                                        listener?.onAnimationFinished()
+                                    },
+                                )
+                                start()
+                            }
+                        } else {
+                            isAdBlockingAnimationRunning = false
+                            listener?.onAnimationFinished()
+                        }
+                    },
+                )
+                start()
+            }
+        }
+
+        slideOutTransition.doOnTransitionEnd {
+            if (!hasAdBlockingAnimationBeenCanceled) {
+                AnimatorSet().apply {
+                    play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
+                    start()
+                }
+                adBlockingScene.gone()
+            } else {
+                isAdBlockingAnimationRunning = false
+                listener?.onAnimationFinished()
+            }
+        }
+
+        AnimatorSet().apply {
+            play(commonAddressBarAnimationHelper.animateViewsOut(allOmnibarViews))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(adBlockingViewBackground))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(adBlockingView))
+            addListener(
+                onEnd = {
+                    adBlockingScene.show()
+                    adBlockingScene.alpha = 1F
+                    TransitionManager.go(adBlockingSecondScene, slideInTransition)
+                    adBlockingScene.findViewById<DaxTextView>(R.id.adBlockingText)?.setText(textRes)
+                },
+            )
+            start()
         }
     }
 
@@ -206,39 +331,41 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
+        stopAdBlockingAnimation()
         omnibarViews.forEach { it.alpha = 1f }
     }
 
     private fun tryToStartCookiesAnimation(
-        context: Context,
         omnibarViews: List<View>,
     ) {
         if (enqueueCookiesAnimation) {
-            startCookiesAnimation(context, omnibarViews)
+            startCookiesAnimation(omnibarViews)
             enqueueCookiesAnimation = false
         }
     }
 
     private fun startCookiesAnimation(
-        context: Context,
         omnibarViews: List<View>,
     ) {
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
+        // Inflate the scene with the scene root's own themed context so the animation follows the
+        // omnibar theme overlay (e.g. the dark omnibar island used in light Fire mode).
+        val sceneContext = cookieScene.context
         if (cookieCosmeticHide) {
-            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, context)
-            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, context)
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, sceneContext)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, sceneContext)
         } else {
-            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
-            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, sceneContext)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, sceneContext)
         }
 
         hasCookiesAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
         cookieView.show()
         cookieView.alpha = 0F
-        if (theme.isLightModeEnabled()) {
+        if (cookieUseLightAnimation ?: theme.isLightModeEnabled()) {
             cookieView.setAnimation(R.raw.cookie_icon_animated_light)
         } else {
             cookieView.setAnimation(R.raw.cookie_icon_animated_dark)
@@ -420,6 +547,19 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieView.gone()
     }
 
+    private fun stopAdBlockingAnimation() {
+        if (!::adBlockingViewBackground.isInitialized || !::adBlockingView.isInitialized) return
+
+        hasAdBlockingAnimationBeenCanceled = true
+        if (this::adBlockingFirstScene.isInitialized) {
+            TransitionManager.go(adBlockingFirstScene)
+        }
+        shieldAnimation?.alpha = 1f
+        adBlockingViewBackground.alpha = 0f
+        adBlockingScene.gone()
+        adBlockingView.gone()
+    }
+
     private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
@@ -433,6 +573,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         // Allows enough time for the tracker animation to finish and the address bar to settle
         // before starting the cookies animation
         private const val DELAY_BETWEEN_ANIMATIONS_DURATION = 1500L
+
+        private const val AD_BLOCKING_ICON_START_PADDING_DP = 9
     }
 }
 

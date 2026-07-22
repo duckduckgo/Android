@@ -211,6 +211,7 @@ class ReasoningModePickerViewModelTest {
     fun whenPlusUserTapsGatedModeRequiringProThenUpsellPixelFiredAndNoEffortPixel() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.PLUS,
+            isSubscriptionEligible = true,
             availableReasoningModes = listOf(
                 AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
                 gatedExtended(requires = listOf("pro")),
@@ -234,6 +235,7 @@ class ReasoningModePickerViewModelTest {
     fun whenFreeUserTapsGatedModeRequiringPlusFromAddressBarThenLaunchPurchaseEmitted() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.FREE,
+            isSubscriptionEligible = true,
             availableReasoningModes = listOf(
                 AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
                 gatedExtended(requires = listOf("plus", "pro")),
@@ -256,6 +258,7 @@ class ReasoningModePickerViewModelTest {
     fun whenFreeUserTapsGatedModeRequiringProFromDuckAiTabThenLaunchPurchaseEmittedWithDuckAiOrigin() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.FREE,
+            isSubscriptionEligible = true,
             availableReasoningModes = listOf(
                 AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
                 gatedExtended(requires = listOf("pro")),
@@ -278,6 +281,7 @@ class ReasoningModePickerViewModelTest {
     fun whenPlusUserTapsGatedModeRequiringProFromAddressBarThenLaunchUpgradeEmitted() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.PLUS,
+            isSubscriptionEligible = true,
             availableReasoningModes = listOf(
                 AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
                 gatedExtended(requires = listOf("pro")),
@@ -300,6 +304,7 @@ class ReasoningModePickerViewModelTest {
     fun whenPlusUserTapsGatedModeRequiringProFromDuckAiTabThenLaunchUpgradeEmittedWithDuckAiOrigin() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.PLUS,
+            isSubscriptionEligible = true,
             availableReasoningModes = listOf(
                 AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
                 gatedExtended(requires = listOf("pro")),
@@ -316,6 +321,27 @@ class ReasoningModePickerViewModelTest {
             )
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNotEligibleUserTapsGatedModeThenNoCommandEmittedAndNoUpsellPixel() = runTest {
+        modelState.value = ModelState(
+            userTier = UserTier.FREE,
+            isSubscriptionEligible = false,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedExtended(requires = listOf("plus", "pro")),
+            ),
+        )
+        runCurrent()
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any())
     }
 
     @Test

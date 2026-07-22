@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Søg på DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Del feedback</string>
-    <string name="missingBrowserFeaturesTitleLong">Browserfunktioner mangler eller gør mig frustreret</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemer med browserfunktioner</string>
-    <string name="missingBrowserFeaturesSubtitle">Hvilken browserfunktion kan vi tilføje eller forbedre?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigering fremad, tilbage, og/eller opdatere</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Oprettelse og håndtering af faner</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokering af annoncer og pop op-vinduer</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Visning af videoer</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interaktion med billeder</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Oprettelse og håndtering af bogmærker</string>
-    <string name="missingBrowserFeatureSubReasonOther">Ingen af disse</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemer med indlæsning af websted</string>
-    <string name="websiteNotLoadingTitleShort">Problemer med indlæsning af websted</string>
-    <string name="websiteNotLoadingSubtitle">Hvilket websted er ødelagt?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søgningen er ikke god nok</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søgeproblemer</string>
-    <string name="searchNotGoodEnoughSubtitle">Hvilken søgefunktion kan vi tilføje eller forbedre?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk søgning</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layoutet bør være mere som Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Hurtigere indlæsningstid</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Søgning på et bestemt sprog eller en bestemt region</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bedre autoudfyld</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Ingen af disse</string>
-
-    <string name="needMoreCustomizationTitleLong">Der er ikke nok måder at tilpasse appen på</string>
-    <string name="needMoreCustomizationTitleShort">Problemer med tilpasning</string>
-    <string name="needMoreCustomizationSubtitle">Hvilken tilpasningsmulighed kan vi tilføje eller forbedre?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Startskærmens konfiguration</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Hvordan faner vises</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Hvordan appen ser ud</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hvilke data der bliver ryddet</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Hvornår data bliver ryddet</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hvordan bogmærker vises</string>
-    <string name="needMoreCustomizationSubReasonOther">Ingen af disse</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Appen er langsom, fejlfyldt eller bryder sammen</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemer med ydeevnen</string>
-    <string name="appIsSlowOrBuggySubtitle">Hvilket problem oplever du?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Websider eller søgeresultater indlæses langsomt</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen går ned eller fryser</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Fejl ved video- eller medieafspilning</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Ingen af disse</string>
-
-    <string name="otherMainReasonTitleLong">Ingen af disse</string>
-    <string name="otherMainReasonTitleShort">Andre problemer</string>
-
-    <string name="openEndedInputHint">Vær så specifik som muligt</string>
-    <string name="submitFeedback">Indsend</string>
-
-    <string name="tellUsHowToImprove">Fortæl os, hvad vi kan forbedre.</string>
-    <string name="thanksForTheFeedback">Tak for din feedback!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Hvad handler din frustration mest om?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Det er vi kede af at høre</string>
-    <string name="feedbackShareDetails">Del oplysninger</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Er der nogen detaljer, du gerne vil dele med teamet?</string>
-    <string name="whatHaveYouBeenEnjoying">Hvad har du haft glæde af?</string>
-    <string name="awesomeToHear">Fantastisk at høre!</string>
-    <string name="shareTheLoveWithARating">Del kærligheden ved at bedømme os i Play Store.</string>
-    <string name="rateTheApp">Bedøm appen</string>
-    <string name="declineFurtherFeedback">Nej tak, jeg er færdig</string>
-    <string name="whichBrokenSites">Hvor oplever du disse problemer?</string>
-    <string name="whichBrokenSitesHint">Hvilket websted har problemer?</string>
-    <string name="feedbackSpecificAsPossible">Vær så specifik som muligt</string>
-    <string name="feedbackInitialDisambiguationTitle">Lad os komme i gang!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hvordan vil du kategorisere din feedback?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knap til positiv feedback</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
-    <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Websiden kunne ikke vises."</string>
     <string name="crashedWebViewErrorAction">"Genindlæs"</string>
@@ -680,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">Der er ikke downloadet nogen filer endnu</string>
-    <string name="downloadsShareTitle">Del med ...</string>
     <string name="downloadsDownloadFinishedActionName">Åben</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Filen findes ikke længere</string>
-    <string name="downloadsItemMenuShare">Del</string>
-    <string name="downloadsItemMenuDelete">Slet</string>
-    <string name="downloadsItemMenuCancel">Afbestil</string>
-    <string name="downloadsActivityMenuDeleteAll">Slet alle</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Flere muligheder for %1$s</string>
-    <string name="downloadsUndoActionName">Fortryd</string>
-    <string name="downloadsStateInProgress">I gang ...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">App-sporingsbeskyttelse</string>
@@ -716,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
-    <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Brug ChatGPT privat med indbygget Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloker målrettede annoncer og pop op-vinduer om cookies</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Afspil YouTube-videoer uden annoncer</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
     <string name="preOnboardingAddressBarOkButton">Næste</string>
@@ -903,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vil du have nem adgang til privat AI-chat i adresselinjen?</string>
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
@@ -1029,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hej</string>
     <string name="preOnboardingWelcomeDialogBody1">Er du klar til en hurtigere browser, der sætter dig i førersædet?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er altid valgfrit, og beskyttelse af privatlivet er altid aktiveret.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d af %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d af %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">sådan siger man \"and\" på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">sådan siger man \"and\" på spansk</string>
 
@@ -1051,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Er du klar til at chatte privat med ChatGPT, Claude og andre AI\'er gratis i en browser, der aktivt beskytter dig?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Husk: Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI-chat</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI-beskyttelse aktiveret!</string>
@@ -1076,6 +989,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekræft</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Tak for din feedback!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Åbn i en Fire-fane</string>
     <string name="openInBackgroundTab">Åbn i baggrunden</string>
@@ -1092,4 +1008,6 @@
     <string name="fireTabsNewTabButton">Ny Fire-fane</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYT!</b> Prøv Fire-faner for at surfe uden at gemme lokal historik.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Slet Fire-faner og deres data?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
 </resources>

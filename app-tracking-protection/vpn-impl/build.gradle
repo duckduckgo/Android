@@ -54,6 +54,7 @@ dependencies {
     implementation project(':app-tracking-api')
     implementation project(':app-store')
     implementation project(':browser-api')
+    implementation project(':feedback-api')
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':design-system')

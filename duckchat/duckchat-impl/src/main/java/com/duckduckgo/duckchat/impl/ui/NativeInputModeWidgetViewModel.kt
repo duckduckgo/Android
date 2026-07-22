@@ -32,6 +32,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
@@ -100,6 +101,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val chatSuggestionsReader: ChatSuggestionsReader,
     private val nativeInputPlugins: ActivePluginPoint<NativeInputPlugin>,
     autoCompleteFactory: AutoCompleteFactory,
+    private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val dispatchers: DispatcherProvider,
@@ -116,6 +118,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+        browserMode,
     )
 
     // Captures the URL list returned from the most recent fetchChatTabSuggestions so that
@@ -370,6 +373,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }
+
+    val isSubscriptionEligible: Flow<Boolean> = modelManager.modelState
+        .map { it.isSubscriptionEligible }
+        .distinctUntilChanged()
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 

@@ -65,6 +65,7 @@ import javax.inject.Inject
 class DataClearing @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val clearDataAction: ClearDataAction,
+    private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val settingsDataStore: SettingsDataStore,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val duckAiFeatureState: DuckAiFeatureState,
@@ -167,18 +168,19 @@ class DataClearing @Inject constructor(
             BrowserMode.REGULAR -> {
                 performFireModeClear()
                 clearRegularDataUsingManualFireOptions(shouldRestartIfRequired)
+                clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
             }
             BrowserMode.FIRE -> {
-                performFireModeClear()
+                if (performFireModeClear()) {
+                    unsentForgetAllPixelStore.incrementCount(BrowserMode.FIRE)
+                }
 
                 if (shouldRestartIfRequired) {
-                    dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
+                    dataClearingWideEvent.finishSuccess()
                     clearDataAction.killAndRestartProcess(notifyDataCleared = false)
                 }
             }
         }
-
-        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
     }
 
     private suspend fun clearRegularDataUsingManualFireOptions(
@@ -213,7 +215,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (killProcessIfNeeded && wasDataCleared) {
-            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
+            dataClearingWideEvent.finishSuccess()
             clearDataAction.killProcess()
             return false
         } else {
@@ -309,11 +311,14 @@ class DataClearing @Inject constructor(
 
     /**
      * Performs the full Fire mode data clearing.
+     *
+     * @return whether the Fire-mode clear actually ran (i.e. Fire mode is available).
      */
-    private suspend fun performFireModeClear() {
+    private suspend fun performFireModeClear(): Boolean {
         logcat { "Performing Fire mode data clear" }
 
-        if (fireModeAvailability.isAvailable()) {
+        val fireModeCleared = fireModeAvailability.isAvailable()
+        if (fireModeCleared) {
             val fireTypes = setOf(
                 ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
                 ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
@@ -323,5 +328,6 @@ class DataClearing @Inject constructor(
         }
 
         logcat { "Fire mode clear completed" }
+        return fireModeCleared
     }
 }

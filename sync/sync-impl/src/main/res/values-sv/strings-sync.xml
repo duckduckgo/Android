@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Du måste ha åtkomst till lagring för att spara PDF för återställning</string>
     <string name="sync_share_title">Dela med …</string>
     <string name="sync_pdf_title">Återställningskod för synkronisering</string>
-    <string name="sync_pdf_description">Med återställningskoden kan du synkronisera dina bokmärken på flera enheter och återställa dina synkroniserade data om du förlorar åtkomst till en enhet.</string>
+    <string name="sync_pdf_description">Återställningskoden låter dig synkronisera dina lösenord, data för automatisk ifyllning och Duck.ai-chattar mellan flera enheter samt återställa dina synkroniserade data om du förlorar åtkomst till en enhet.</string>
     <string name="sync_code_box_title">Skydda denna information.</string>
-    <string name="sync_instructions_title">Hur fungerar detta?</string>
-    <string name="sync_instructions_step1">Öppna DuckDuckGo på en annan enhet och gå till Synkronisera i Inställningar.</string>
-    <string name="sync_instructions_step2">Skanna QR-koden eller kopiera och klistra in textkoden i en annan DuckDuckGo-app.</string>
+    <string name="sync_instructions_title">Hur fungerar den här koden?</string>
+    <string name="sync_instructions_step1">Öppna DuckDuckGo på enheten du vill synkronisera och gå till Sync &amp; Backup bland inställningar.</string>
+    <string name="sync_instructions_step2">Välj \"Synkronisera med en annan enhet\" och skanna QR-koden eller ange textkoden.</string>
     <string name="sync_instructions_step3">Synkroniseringen aktiveras och du har åter tillgång till alla dina data.</string>
+    <string name="sync_pdf_retention_notice">Om du inte använder en DuckDuckGo-webbläsare med Sync &amp; Backup aktiverat på mer än 18 månader kommer dina data att raderas från servern och kan inte återställas.</string>
     <string name="remove_device_dialog_title">Vill du ta bort enheten?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">”%1$s” kommer inte längre att få tillgång till dina synkroniserade data.</string>
     <string name="remove_device_dialog_primary_button">Ta bort</string>
@@ -249,4 +250,31 @@
     <string name="sync_chat_bottom_sheet_description">Hitta QR-koden i DuckDuckGo-appen på din andra enhet genom att gå till Inställningar › Sync &amp; Backup › Synkronisera med en annan enhet.</string>
     <string name="sync_chat_bottom_sheet_positive">Skanna QR-kod</string>
     <string name="sync_chat_bottom_sheet_negative">Inte nu</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Synkronisera dina data?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Synkronisera nu</string>
+    <string name="sync_v2_joiner_confirmation_negative">Avbryt</string>
+
+    <string name="sync_v2_host_confirmation_title">Synkronisera dina data?</string>
+    <string name="sync_v2_host_confirmation_positive">Synkronisera nu</string>
+    <string name="sync_v2_host_confirmation_negative">Avbryt</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">%1$s kommer att kunna komma åt dina synkroniserade DuckDuckGo-lösenord, automatiskt ifyllda data och Duck.ai-chattar.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">%1$s kommer att kunna komma åt dina synkroniserade Duck.ai-chattar.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Den andra enheten kommer att kunna komma åt dina synkroniserade DuckDuckGo-lösenord, automatiskt ifyllda data och Duck.ai-chattar.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Den andra enheten kommer att kunna komma åt dina synkade Duck.ai-chattar.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synkroniseringen misslyckades.</string>
+    <string name="sync_v2_error_pairing_rejected">Synkroniseringen avbröts från din andra enhet.</string>
+    <string name="sync_v2_error_pairing_canceled">Synkroniseringen avbröts.</string>
+    <string name="sync_v2_error_upgrade_required">Uppdatera DuckDuckGo-webbläsaren och försök igen.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Synkronisera den här enheten från en redan ansluten DuckDuckGo-webbläsare på en annan enhet</string>
+    <string name="sync_v2_error_try_again">Försök igen.</string>
+    <string name="sync_v2_error_got_it">Jag förstår</string>
+    <string name="sync_v2_already_paired_title">Redan synkroniserat.</string>
+    <string name="sync_v2_already_paired_message">Enheterna är redan anslutna till Sync &amp; Backup.</string>
+
 </resources>

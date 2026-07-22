@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 
 interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
+    var clickAcceptEnabled: Boolean
     var firstPopupHandled: Boolean
     fun invalidateCache()
 }
@@ -38,7 +39,8 @@ class RealAutoconsentSettingsDataStore constructor(
 ) : AutoconsentSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    private var cachedInternalUserSetting: Boolean? = null
+    private var cachedUserSetting: Boolean? = null
+    private var cachedClickAcceptEnabled: Boolean? = null
 
     private var _defaultValue: Boolean? = null
     private val defaultValue: Boolean
@@ -51,21 +53,36 @@ class RealAutoconsentSettingsDataStore constructor(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cachedInternalUserSetting = preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
+            cachedUserSetting = readUserSetting()
+            cachedClickAcceptEnabled = readClickAcceptEnabled()
         }
     }
 
     override var userSetting: Boolean
         get() {
-            return cachedInternalUserSetting ?: preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue).also {
-                cachedInternalUserSetting = it
+            return cachedUserSetting ?: readUserSetting().also {
+                cachedUserSetting = it
             }
         }
         set(value) {
             preferences.edit(commit = true) {
                 putBoolean(AUTOCONSENT_USER_SETTING, value)
             }.also {
-                cachedInternalUserSetting = value
+                cachedUserSetting = value
+            }
+        }
+
+    override var clickAcceptEnabled: Boolean
+        get() {
+            return cachedClickAcceptEnabled ?: readClickAcceptEnabled().also {
+                cachedClickAcceptEnabled = it
+            }
+        }
+        set(value) {
+            preferences.edit(commit = true) {
+                putBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, value)
+            }.also {
+                cachedClickAcceptEnabled = value
             }
         }
 
@@ -80,13 +97,23 @@ class RealAutoconsentSettingsDataStore constructor(
     override fun invalidateCache() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
-            cachedInternalUserSetting = null // invalidate cache
+            cachedUserSetting = null
+            cachedClickAcceptEnabled = null
         }
+    }
+
+    private fun readUserSetting(): Boolean {
+        return preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
+    }
+
+    private fun readClickAcceptEnabled(): Boolean {
+        return preferences.getBoolean(AUTOCONSENT_CLICK_ACCEPT_ENABLED, false)
     }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.autoconsent.store.settings"
         private const val AUTOCONSENT_USER_SETTING = "AutoconsentUserSetting"
+        private const val AUTOCONSENT_CLICK_ACCEPT_ENABLED = "AutoconsentClickAcceptEnabled"
         private const val AUTOCONSENT_FIRST_POPUP_HANDLED = "AutoconsentFirstPopupHandled"
     }
 }

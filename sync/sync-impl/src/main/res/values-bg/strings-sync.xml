@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
     <string name="sync_share_title">Споделяне с…</string>
     <string name="sync_pdf_title">Код за възстановяване на синхронизирането</string>
-    <string name="sync_pdf_description">Кодът за възстановяване Ви позволява да синхронизирате отметките на няколко устройства и да възстановявате синхронизираните данни, ако загубите достъп до устройство.</string>
+    <string name="sync_pdf_description">С кода за възстановяване можете да синхронизирате паролите, данните за автоматично попълване и чатовете на Duck.ai на няколко устройства, както и да възстановите синхронизираните данни, ако загубите достъп до някое от устройствата.</string>
     <string name="sync_code_box_title">Съхранявайте тази информация на сигурно място.</string>
-    <string name="sync_instructions_title">Как става това?</string>
-    <string name="sync_instructions_step1">Отворете DuckDuckGo на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
-    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на DuckDuckGo.</string>
+    <string name="sync_instructions_title">Как работи този код?</string>
+    <string name="sync_instructions_step1">Отворете DuckDuckGo на устройството, което искате да синхронизирате, и отидете на Sync &amp; Backup в Настройки.</string>
+    <string name="sync_instructions_step2">Изберете „Синхронизиране с друго устройство“ и сканирайте QR кода или въведете текстовия код.</string>
     <string name="sync_instructions_step3">Синхронизацията ще бъде активирана и отново ще имате достъп до всички свои данни.</string>
+    <string name="sync_pdf_retention_notice">Ако не използвате браузър DuckDuckGo с активирана функция Sync &amp; Backup повече от 18 месеца, данните Ви ще бъдат изтрити от сървъра и няма да могат да бъдат възстановени.</string>
     <string name="remove_device_dialog_title">Премахване на устройство?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>
     <string name="remove_device_dialog_primary_button">Премахване</string>
@@ -249,4 +250,31 @@
     <string name="sync_chat_bottom_sheet_description">Намерете QR кода в приложението DuckDuckGo на другото устройство, като отворите Настройки › Sync &amp; Backup › Синхронизиране с друго устройство.</string>
     <string name="sync_chat_bottom_sheet_positive">Сканиране на QR код</string>
     <string name="sync_chat_bottom_sheet_negative">Не сега</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_joiner_confirmation_negative">Отмяна</string>
+
+    <string name="sync_v2_host_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_host_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_host_confirmation_negative">Отмяна</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Другото устройство ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Другото устройство ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Неуспешно синхронизиране.</string>
+    <string name="sync_v2_error_pairing_rejected">Синхронизирането е прекратено от другото Ви устройство.</string>
+    <string name="sync_v2_error_pairing_canceled">Синхронизирането е прекратено.</string>
+    <string name="sync_v2_error_upgrade_required">Актуализирайте браузъра DuckDuckGo и опитайте отново.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Синхронизирайте това устройство от вече свързан браузър DuckDuckGo на друго устройство</string>
+    <string name="sync_v2_error_try_again">Моля, опитайте отново.</string>
+    <string name="sync_v2_error_got_it">Разбрах</string>
+    <string name="sync_v2_already_paired_title">Вече е синхронизирано.</string>
+    <string name="sync_v2_already_paired_message">Тези устройства вече са свързани към „Sync &amp; Backup“.</string>
+
 </resources>

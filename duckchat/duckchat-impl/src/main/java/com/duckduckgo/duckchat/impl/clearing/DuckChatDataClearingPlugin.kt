@@ -61,6 +61,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         when (mode) {
             BrowserMode.REGULAR -> deleteAllRegularChats()
             BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
+                // Fire deletions bypass the DuckChatDeleter chain deliberately, see DuckChatDeleter's documentation
                 fireChatStore.deleteAllChats()
             }
         }
@@ -90,7 +91,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
             //  ClearPersonalDataAction already records via the DuckAiChatDeletionListener, so this plugin must
             //  also be background-aware to avoid overwriting the correct timestamp with a stale one.
             val timestamp = duckChatFeatureRepository.getAppBackgroundTimestamp() ?: currentTimeProvider.currentTimeMillis()
-            duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp)
+            duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp, BrowserMode.REGULAR)
             duckChatSyncRepository.clearPendingChatDeletions()
             duckChatSyncRepository.clearPendingChatUpdates()
             syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
@@ -104,7 +105,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         chatUrls.forEach { chatUrl ->
             val chatId = chatUrl.toUri().toChatIdOrNull(duckChat) ?: return@forEach
             if (duckChatDeleter.deleteChat(chatId)) {
-                duckChatSyncRepository.recordSingleChatDeletion(chatId)
+                duckChatSyncRepository.recordSingleChatDeletion(chatId, BrowserMode.REGULAR)
                 anyDeleted = true
             }
         }

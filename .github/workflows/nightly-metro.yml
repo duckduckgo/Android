@@ -102,7 +102,7 @@ jobs:
 
       - name: Create Asana task on failure
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}

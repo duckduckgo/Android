@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
     <string name="sync_share_title">Distribuie către...</string>
     <string name="sync_pdf_title">Codul de recuperare a sincronizării</string>
-    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
+    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi parolele, datele de completare automată și chaturile Duck.ai pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
     <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>
-    <string name="sync_instructions_title">Cum funcționează?</string>
-    <string name="sync_instructions_step1">Deschide DuckDuckGo pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
-    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație DuckDuckGo.</string>
+    <string name="sync_instructions_title">Cum funcționează acest cod?</string>
+    <string name="sync_instructions_step1">Deschide DuckDuckGo pe dispozitivul pe care vrei să îl sincronizezi și mergi la Sync &amp; Backup în Setări.</string>
+    <string name="sync_instructions_step2">Selectează „Sincronizează cu un alt dispozitiv” și scanează codul QR sau completează codul text.</string>
     <string name="sync_instructions_step3">Sincronizarea va fi activată și vei avea din nou acces la toate datele tale.</string>
+    <string name="sync_pdf_retention_notice">Dacă trec mai mult de 18 luni fără să folosești un browser DuckDuckGo cu Sync &amp; Backup activat, datele tale vor fi șterse de pe server și nu vor mai putea fi recuperate.</string>
     <string name="remove_device_dialog_title">Elimini dispozitivul?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s„%%@” nu va mai putea accesa datele tale sincronizate.</string>
     <string name="remove_device_dialog_primary_button">Elimină</string>
@@ -249,4 +250,31 @@
     <string name="sync_chat_bottom_sheet_description">Găsește codul QR în aplicația DuckDuckGo de pe celălalt dispozitiv, accesând Setări › Sync &amp; Backup › Sincronizează cu un alt dispozitiv.</string>
     <string name="sync_chat_bottom_sheet_positive">Scanează codul QR</string>
     <string name="sync_chat_bottom_sheet_negative">Nu acum</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_joiner_confirmation_negative">Anulează</string>
+
+    <string name="sync_v2_host_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_host_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_host_confirmation_negative">Anulează</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa parolele tale sincronizate din DuckDuckGo, datele de completare automată și conversațiile din Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa chaturile tale Duck.ai sincronizate.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Celălalt dispozitiv va avea acces la parolele tale sincronizate din DuckDuckGo, la datele de completare automată și la chaturile Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Celălalt dispozitiv va putea accesa chaturile tale Duck.ai sincronizate.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sincronizarea nu a reușit.</string>
+    <string name="sync_v2_error_pairing_rejected">Sincronizarea a fost anulată de pe celălalt dispozitiv.</string>
+    <string name="sync_v2_error_pairing_canceled">Sincronizare anulată.</string>
+    <string name="sync_v2_error_upgrade_required">Actualizează browserul DuckDuckGo și încearcă din nou.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sincronizează acest dispozitiv dintr-un browser DuckDuckGo deja conectat pe un alt dispozitiv</string>
+    <string name="sync_v2_error_try_again">Încearcă din nou.</string>
+    <string name="sync_v2_error_got_it">Am înțeles</string>
+    <string name="sync_v2_already_paired_title">Deja sincronizat.</string>
+    <string name="sync_v2_already_paired_message">Aceste dispozitive sunt deja conectate la Sync &amp; Backup.</string>
+
 </resources>

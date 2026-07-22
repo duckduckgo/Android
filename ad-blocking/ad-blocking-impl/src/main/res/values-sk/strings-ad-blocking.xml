@@ -23,4 +23,23 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokuje videoreklamy na YouTube, takže môžeš sledovať videá bez prerušenia. <annotation type="learn_more_link">Zisti viac</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Otvára videá v režime kina bez rušivých vplyvov, ktorý zabraňuje tomu, aby sledované položky ovplyvňovali tvoj kanál YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Blokovanie reklám</string>
+    <string name="ad_blocking_settings_header_description">Blokuje invazívne sledovače skôr, než sa načítajú, čím efektívne eliminuje reklamy, ktoré sa spoliehajú na sledovanie.</string>
+    <string name="contingencyMessageTitle">Blokovanie reklám na YouTube nie je k dispozícii</string>
+    <string name="contingencyMessageContent">Blokovanie reklám bolo ovplyvnené nedávnymi zmenami na YouTube. Na odstránení týchto problémov pracujeme. Ďakujeme za pochopenie.</string>
+    <string name="contingencyMessagePrimaryButton">Rozumiem</string>
+    <string name="contingencyMessageCloseContentDescription">Zatvoriť</string>
+    <string name="ad_blocking_menu_disable">Vypnúť blokovanie reklám na YouTube</string>
+    <string name="ad_blocking_menu_enable">Zapnúť blokovanie reklám na YouTube</string>
+    <string name="ad_blocking_menu_title">Blokovanie reklám na YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Zatvoriť</string>
+    <string name="ad_blocking_menu_always_on">Vždy zapnuté</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Vypnúť do opätovného spustenia</string>
+    <string name="ad_blocking_menu_always_off">Vždy vypnuté</string>
+    <string name="ad_blocking_disabled_popup_title">Nefunguje blokovanie reklám na YouTube?</string>
+    <string name="ad_blocking_disabled_popup_description">Odošli anonymnú správu o poruche na DuckDuckGo. Pomôž zlepšiť blokovanie reklám pre všetkých!</string>
+    <string name="ad_blocking_disabled_primary_action">Odoslať správu o poruche</string>
+    <string name="ad_blocking_disabled_secondary_action">Zrušiť</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Zakázané až do opätovného spustenia</string>
+    <string name="ad_blocking_omnibar_badge_text">Blokovanie reklám na YouTube je zapnuté</string>
 </resources>

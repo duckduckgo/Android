@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Cerca con DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Condividi feedback</string>
-    <string name="missingBrowserFeaturesTitleLong">Le funzionalità di navigazione sono insufficienti o poco pratiche</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemi nelle funzionalità di navigazione</string>
-    <string name="missingBrowserFeaturesSubtitle">Quale funzionalità di navigazione potremmo aggiungere o migliorare?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigazione alla pagina precedente/successiva e/o aggiornamento della pagina</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Possibilità di creare e gestire schede</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blocco di annunci e popup</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Visualizzazione di video</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interazione con le immagini</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Creazione e gestione di segnalibri</string>
-    <string name="missingBrowserFeatureSubReasonOther">Nessuna di queste opzioni</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemi nel caricamento di siti web</string>
-    <string name="websiteNotLoadingTitleShort">Problemi nel caricamento di siti web</string>
-    <string name="websiteNotLoadingSubtitle">Quale sito web è danneggiato?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">L\'esperienza di ricerca con DuckDuckGo non è abbastanza soddisfacente</string>
-    <string name="searchNotGoodEnoughTitleShort">La ricerca con DuckDuckGo presenta dei problemi</string>
-    <string name="searchNotGoodEnoughSubtitle">Quale funzionalità di ricerca possiamo aggiungere o migliorare?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmazione/ricerca tecnica</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Il layout dovrebbe essere più simile a Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Il tempo di caricamento deve essere velocizzato</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Possibilità di effettuare ricerche in base a una lingua o regione specifica</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Il completamento automatico deve essere migliorato</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Nessuna di queste opzioni</string>
-
-    <string name="needMoreCustomizationTitleLong">Non ci sono abbastanza modi di personalizzare l\'app</string>
-    <string name="needMoreCustomizationTitleShort">Problemi di personalizzazione</string>
-    <string name="needMoreCustomizationSubtitle">Quale opzione di personalizzazione possiamo aggiungere o migliorare?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">La configurazione della schermata iniziale</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Il modo in cui vengono visualizzate le schede</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">L\'aspetto dell\'app</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Quali dati vengono eliminati</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Quando i dati vengono eliminati</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Il modo in cui i segnalibri vengono visualizzati</string>
-    <string name="needMoreCustomizationSubReasonOther">Nessuna di queste opzioni</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">L\'app è lenta, presenta bug o arresti anomali</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemi di performance</string>
-    <string name="appIsSlowOrBuggySubtitle">Quale problema hai riscontrato?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Il caricamento delle pagine web o dei risultati di ricerca è lento</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">L\'app si arresta in modo anomalo o si blocca</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Bug nella riproduzione di video ed elementi multimediali</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Nessuna di queste opzioni</string>
-
-    <string name="otherMainReasonTitleLong">Nessuna di queste opzioni</string>
-    <string name="otherMainReasonTitleShort">Altri problemi</string>
-
-    <string name="openEndedInputHint">Sii quanto più specifico possibile</string>
-    <string name="submitFeedback">Invia</string>
-
-    <string name="tellUsHowToImprove">Dicci cosa potremmo migliorare.</string>
-    <string name="thanksForTheFeedback">Grazie per il tuo feedback!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">A cosa è maggiormente dovuta l\'esperienza negativa?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Ci dispiace</string>
-    <string name="feedbackShareDetails">Condividi maggiori dettagli</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Ci sono informazioni specifiche che desideri condividere con il team?</string>
-    <string name="whatHaveYouBeenEnjoying">Cosa ti è piaciuto?</string>
-    <string name="awesomeToHear">Fantastico!</string>
-    <string name="shareTheLoveWithARating">Condividi il tuo parere positivo valutando l\'app in Play Store.</string>
-    <string name="rateTheApp">Valuta l\'app</string>
-    <string name="declineFurtherFeedback">No grazie</string>
-    <string name="whichBrokenSites">Dove hai notato questi problemi?</string>
-    <string name="whichBrokenSitesHint">Quale sito web presenta problemi?</string>
-    <string name="feedbackSpecificAsPossible">Sii quanto più specifico possibile</string>
-    <string name="feedbackInitialDisambiguationTitle">Iniziamo!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Come classificheresti il tuo feedback?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pulsante feedback positivo</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Pulsante feedback negativo</string>
-    <string name="feedbackIsImportantToUs">Il tuo feedback anonimo è importante per noi.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"La pagina non può essere visualizzata."</string>
     <string name="crashedWebViewErrorAction">"Ricarica"</string>
@@ -680,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
-    <string name="downloadsActivityTitle">Download</string>
-    <string name="downloadsActivityNoItemsDescription">Non è ancora stato scaricato nessun file</string>
-    <string name="downloadsShareTitle">Condividi con…</string>
     <string name="downloadsDownloadFinishedActionName">Apri</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Il file non esiste più</string>
-    <string name="downloadsItemMenuShare">Condividi</string>
-    <string name="downloadsItemMenuDelete">Elimina</string>
-    <string name="downloadsItemMenuCancel">Annulla</string>
-    <string name="downloadsActivityMenuDeleteAll">Elimina tutto</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s eliminato</string>
-    <string name="downloadsAllFilesDeletedMessage">Tutti i file eliminati</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Ulteriori opzioni per %1$s</string>
-    <string name="downloadsUndoActionName">Annulla</string>
-    <string name="downloadsStateInProgress">In corso…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Protezione dal tracciamento delle app</string>
@@ -716,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookie gestiti</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Scopri quando i download sono pronti</string>
-    <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Blocca i popup dei cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blocca gli annunci mirati</string>
     <string name="preOnboardingComparisonChartItem5">Cancella i dati di navigazione con un solo pulsante</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Utilizza ChatGPT in privato con Duck.ai integrato</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blocca annunci mirati e pop-up dei cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Riproduci video di YouTube senza annunci</string>
     <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>
     <string name="preOnboardingAddressBarTitle">Dove devo mettere la barra degli indirizzi?</string>
     <string name="preOnboardingAddressBarOkButton">Successivo</string>
@@ -903,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vuoi un accesso facile alla chat AI privata?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vuoi un accesso facile alla chat AI privata nella barra degli indirizzi?</string>
     <string name="preOnboardingInputScreenButton">Successivo</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Le funzionalità AI sono private e opzionali. Puoi effettuare modifiche in <b>Impostazioni > Funzionalità AI</b>.]]></string>
 
@@ -1029,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Ciao.</string>
     <string name="preOnboardingWelcomeDialogBody1">Vuoi un browser più veloce che ti dia il pieno controllo?</string>
     <string name="preOnboardingWelcomeDialogBody2">L\'AI è sempre opzionale e la protezione della privacy è sempre attiva.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d di %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d di %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">come si dice \"anatra\" in inglese</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">come si dice \"anatra\" in spagnolo</string>
 
@@ -1051,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Sei pronto a chattare privatamente con ChatGPT, Claude e altre IA gratuitamente, in un browser che ti protegge attivamente?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Ricorda: puoi utilizzare Duck.ai da qualsiasi punto in cui vedi l\'icona della chat</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Avvia Chat AI</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Protezioni AI attivate!</string>
@@ -1076,6 +989,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Conferma</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Grazie per il tuo feedback!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Apri in una scheda Fire</string>
     <string name="openInBackgroundTab">Apri in background</string>
@@ -1092,4 +1008,6 @@
     <string name="fireTabsNewTabButton">Nuova scheda Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVITÀ!</b> Prova le schede Fire per navigare senza salvare la cronologia locale.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Eliminare le schede Fire e i relativi dati?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
 </resources>

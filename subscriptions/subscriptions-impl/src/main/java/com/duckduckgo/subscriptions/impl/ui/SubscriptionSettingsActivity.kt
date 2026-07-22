@@ -382,6 +382,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.buyUrl,
+                origin = PURCHASE_VIEW_PLANS_ORIGIN,
             ),
         )
     }
@@ -470,5 +471,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         // const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
+
+        private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
 }

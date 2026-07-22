@@ -413,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Søk med DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Del tilbakemelding</string>
-    <string name="missingBrowserFeaturesTitleLong">Nettleserfunksjoner mangler eller fungerer dårlig</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemer med nettleserfunksjoner</string>
-    <string name="missingBrowserFeaturesSubtitle">Hvilken nettleserfunksjon kan vi legge til eller forbedre?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Gå frem, tilbake og/eller oppdater</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Opprette og håndtere faner</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokkering av reklame og popups</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Se videoer</string>
-    <string name="missingBrowserFeatureSubReasonImages">Bruk av bilder</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Opprette og håndtere bokmerker</string>
-    <string name="missingBrowserFeatureSubReasonOther">Ingen av disse</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemer med innlasting av nettsteder</string>
-    <string name="websiteNotLoadingTitleShort">Problemer med innlasting av nettsteder</string>
-    <string name="websiteNotLoadingSubtitle">Hvilket nettsted fungerer ikke?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søket er ikke bra nok</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søkeproblemer</string>
-    <string name="searchNotGoodEnoughSubtitle">Hvilken søkefunksjon kan vi legge til eller forbedre?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmerings- og tekniske søk</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layout burde ligne mer på Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Raskere innlasting</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Søk på et bestemt språk eller i en bestemt region</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bedre autofullføring</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Ingen av disse</string>
-
-    <string name="needMoreCustomizationTitleLong">Det finnes ikke nok tilpasningsvalg i appen</string>
-    <string name="needMoreCustomizationTitleShort">Tilpasningsproblemer</string>
-    <string name="needMoreCustomizationSubtitle">Hvilket tilpasningsvalg kan vi legge til eller forbedre?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfigurasjon av startskjermen</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Hvordan faner vises</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Hvordan appen ser ut</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hvilke data som slettes</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Når data slettes</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hvordan bokmerker vises</string>
-    <string name="needMoreCustomizationSubReasonOther">Ingen av disse</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Appen er treg, full av feil eller krasjer</string>
-    <string name="appIsSlowOrBuggyTitleShort">Ytelsesproblemer</string>
-    <string name="appIsSlowOrBuggySubtitle">Hvilket problem opplever du?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Nettsider og søkeresultater lastes inn sakte</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen krasjer eller fryser</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Problemer med avspilling av video og medier</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Ingen av disse</string>
-
-    <string name="otherMainReasonTitleLong">Ingen av disse</string>
-    <string name="otherMainReasonTitleShort">Andre problemer</string>
-
-    <string name="openEndedInputHint">Vær så spesifikk som mulig</string>
-    <string name="submitFeedback">Send</string>
-
-    <string name="tellUsHowToImprove">Fortell oss hva vi kan forbedre.</string>
-    <string name="thanksForTheFeedback">Takk for tilbakemeldingen!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Hva er det som er mest frustrerende?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Det var leit å høre</string>
-    <string name="feedbackShareDetails">Del detaljer</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Har du noe mer du ønsker å dele med teamet?</string>
-    <string name="whatHaveYouBeenEnjoying">Hva liker du?</string>
-    <string name="awesomeToHear">Flott å høre!</string>
-    <string name="shareTheLoveWithARating">Vurder oss i Play-butikken – det blir vi glade for!</string>
-    <string name="rateTheApp">Vurder app</string>
-    <string name="declineFurtherFeedback">Nei takk, jeg er ferdig</string>
-    <string name="whichBrokenSites">Når opplever du disse problemene?</string>
-    <string name="whichBrokenSitesHint">Hvilket nettsted har problemer?</string>
-    <string name="feedbackSpecificAsPossible">Vær så spesifikk som mulig</string>
-    <string name="feedbackInitialDisambiguationTitle">Vi setter i gang!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hvordan vil du kategorisere tilbakemeldingen din?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knapp for positiv tilbakemelding</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knapp for negativ tilbakemelding</string>
-    <string name="feedbackIsImportantToUs">Den anonyme tilbakemeldingen din er viktig for oss.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nettstedet kunne ikke vises."</string>
     <string name="crashedWebViewErrorAction">"Last inn på nytt"</string>
@@ -680,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nedlastinger</string>
-    <string name="downloadsActivityTitle">Nedlastinger</string>
-    <string name="downloadsActivityNoItemsDescription">Ingen filer er lastet ned ennå</string>
-    <string name="downloadsShareTitle">Del med …</string>
     <string name="downloadsDownloadFinishedActionName">Åpne</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åpne filen. Se etter kompatibel app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Filen eksisterer ikke lenger</string>
-    <string name="downloadsItemMenuShare">Del</string>
-    <string name="downloadsItemMenuDelete">Slett</string>
-    <string name="downloadsItemMenuCancel">Avbryt</string>
-    <string name="downloadsActivityMenuDeleteAll">Slett alt</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Slettet %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Flere alternativer for %1$s</string>
-    <string name="downloadsUndoActionName">Angre</string>
-    <string name="downloadsStateInProgress">Pågår…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Beskyttelse mot appsporing</string>
@@ -716,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Informasjonskapsler administrert</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Finn ut når nedlastinger er klare</string>
-    <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>
 
     <!-- Windows Settings -->
 
@@ -844,7 +756,9 @@
     <string name="preOnboardingComparisonChartItem3">Blokker popup-vinduer om informasjonskapsler</string>
     <string name="preOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
     <string name="preOnboardingComparisonChartItem5">Slett nettleserdata med én knapp</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Bruk ChatGPT privat med innebygd Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokker målrettede annonser og popup-vinduer om informasjonskapsler</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Vis YouTube-videoer uten annonser</string>
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
     <string name="preOnboardingAddressBarOkButton">Neste</string>
@@ -903,7 +817,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du ha enklere tilgang til privat AI-chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vil du ha enkel tilgang til privat AI-chat i adresselinjen?</string>
     <string name="preOnboardingInputScreenButton">Neste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funksjoner er private og valgfrie. Du kan gjøre endringer i <b>Innstillinger > AI-funksjoner</b>.]]></string>
 
@@ -1029,7 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Heisann.</string>
     <string name="preOnboardingWelcomeDialogBody1">Er du klar for en raskere nettleser som du har kontroll over?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er alltid valgfritt, og personvern er alltid på.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «duck» på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si duck» på spansk</string>
 
@@ -1051,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Er du klar til å chatte privat med ChatGPT, Claude og andre AI-er gratis, i en nettleser som beskytter deg aktivt?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Husk: Du kan bruke Duck.ai overalt der du ser chat-ikonet</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI-chat</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI-beskyttelser er aktivert!</string>
@@ -1076,6 +989,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekreft</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Takk for tilbakemeldingen!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Åpne i Fire-fanen</string>
     <string name="openInBackgroundTab">Åpne i bakgrunnen</string>
@@ -1092,4 +1008,6 @@
     <string name="fireTabsNewTabButton">Ny Fire-fane</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYHET!</b> Prøv Fire-faner for å surfe uten å lagre lokal historikk.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Vil du slette Fire-faner og dataene i dem?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åpne filen. Se etter kompatibel app.</string>
 </resources>

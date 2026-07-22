@@ -23,13 +23,14 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper.OnboardingPlanStartResult
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
@@ -39,13 +40,16 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -63,7 +67,20 @@ class LaunchViewModelTest {
     private val pixel: Pixel = mock()
     private val testScenarioSeeder: TestScenarioSeeder = mock()
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock {
-        onBlocking { startNewUserOnboardingPlanIfEnabled() }.thenReturn(OnboardingPlanStartResult.Disabled)
+        onBlocking { startNewUserOnboardingPlan() }.thenReturn(
+            LinearOnboardingState.InProgress(
+                rootPlanId = "test_plan",
+                currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.OnboardingActivity))),
+                currentStepIndex = 0,
+            ),
+        )
+    }
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
+    // Brand design update on by default -> orchestrator drives onboarding.
+    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock {
+        on { brandDesignUpdate() } doReturn enabledToggle
     }
 
     private lateinit var testee: LaunchViewModel
@@ -81,6 +98,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -99,6 +117,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -117,6 +136,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -135,14 +155,14 @@ class LaunchViewModelTest {
             currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.OnboardingActivity))),
             currentStepIndex = 0,
         )
-        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlanIfEnabled())
-            .thenReturn(OnboardingPlanStartResult.Enabled(currentState = inProgress))
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         testee.command.observeForever(mockCommandObserver)
 
@@ -153,6 +173,97 @@ class LaunchViewModelTest {
     }
 
     @Test
+    fun whenShowOnboardingOrHomeAndOrchestratorStartsWithBrowserActivityHostThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.BrowserActivity))),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.showOnboardingOrHome()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
+    fun whenShowOnboardingOrHomeAndOrchestratorStartsWithUnsupportedHostThenThrows() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(
+                id = "test_plan",
+                steps = listOf(stepHostedIn(LinearOnboardingHost.SubscriptionOnboardingActivity)),
+            ),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+
+        val exception = runCatching { testee.showOnboardingOrHome() }.exceptionOrNull()
+
+        assertTrue(exception is IllegalArgumentException)
+    }
+
+    @Test
+    fun whenShowOnboardingOrHomeAndNotNewUserThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.showOnboardingOrHome()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
+    }
+
+    @Test
+    fun whenNewUserAndBrandDesignUpdateDisabledThenOnboardingCommandAndPlanNotStarted() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Legacy WelcomePage path: the orchestrator is not started.
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
+    }
+
+    @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runTest {
         testee = LaunchViewModel(
             userStageStore,
@@ -160,6 +271,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -177,6 +289,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -194,6 +307,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -211,6 +325,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
 
         testee.start(mock<Intent>())
@@ -227,6 +342,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         val intent = intentWithExtras(
             "isMaestro" to "true",
@@ -260,6 +376,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(testScenarioSeeder.seedIfNeeded(anyOrNull())).thenThrow(RuntimeException("seed failed"))
@@ -279,6 +396,7 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
             newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)

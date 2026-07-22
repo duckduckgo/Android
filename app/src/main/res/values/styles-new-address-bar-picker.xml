@@ -13,9 +13,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Widget.DuckDuckGo.BottomSheetDialog.NewAddressBarPicker" parent="Widget.DuckDuckGo.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle.NewAddressBarPicker</item>
+    </style>
+
+    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: keeps the onboarding-backdrop
+         bottomSheetStyle but draws the sheet behind the transparent system bars. Content clears the nav bar
+         via View.applyBottomSystemBarInsetPadding(). -->
+    <style name="Widget.DuckDuckGo.BottomSheetDialog.NewAddressBarPicker.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialog.NewAddressBarPicker">
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="paddingBottomSystemWindowInsets">false</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ModalBottomSheetStyle.NewAddressBarPicker" parent="Widget.DuckDuckGo.ModalBottomSheetStyle">

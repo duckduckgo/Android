@@ -18,9 +18,9 @@ package com.duckduckgo.app.cta.ui
 
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.ImageView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.BackgroundBanner
+import com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -33,7 +33,7 @@ import org.mockito.kotlin.whenever
 
 class BackgroundBannerTest {
 
-    private val view: ImageView = mock()
+    private val view: OnboardingFillImageView = mock()
     private val viewTreeObserver: ViewTreeObserver = mock()
 
     @Before
@@ -46,7 +46,7 @@ class BackgroundBannerTest {
 
     @Test
     fun show_resIsZero_doesNothing() {
-        BackgroundBanner(view, res = 0).show()
+        BackgroundBanner(view, res = 0, fillHeightPx = 0, maxHeightFraction = 1f).show()
 
         verify(view, never()).setImageResource(0)
         verify(view, never()).visibility = View.VISIBLE
@@ -54,7 +54,7 @@ class BackgroundBannerTest {
 
     @Test
     fun show_resNonZero_setsImageResourceAndMakesVisible() {
-        BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).show()
+        BackgroundBanner(view, res = R.drawable.bg_onboarding_serp, fillHeightPx = 0, maxHeightFraction = 1f).show()
 
         verify(view).setImageResource(R.drawable.bg_onboarding_serp)
         verify(view).visibility = View.VISIBLE
@@ -64,21 +64,21 @@ class BackgroundBannerTest {
     fun isShowing_visibleView_returnsTrue() {
         whenever(view.visibility).thenReturn(View.VISIBLE)
 
-        assertTrue(BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).isShowing)
+        assertTrue(BackgroundBanner(view, res = R.drawable.bg_onboarding_serp, fillHeightPx = 0, maxHeightFraction = 1f).isShowing)
     }
 
     @Test
     fun isShowing_goneView_returnsFalse() {
         whenever(view.visibility).thenReturn(View.GONE)
 
-        assertFalse(BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).isShowing)
+        assertFalse(BackgroundBanner(view, res = R.drawable.bg_onboarding_serp, fillHeightPx = 0, maxHeightFraction = 1f).isShowing)
     }
 
     @Test
     fun slideOut_viewNotVisible_returnsNull() {
         whenever(view.visibility).thenReturn(View.GONE)
 
-        val animator = BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).slideOut()
+        val animator = BackgroundBanner(view, res = R.drawable.bg_onboarding_serp, fillHeightPx = 0, maxHeightFraction = 1f).slideOut()
 
         assertNull(animator)
     }
@@ -87,7 +87,7 @@ class BackgroundBannerTest {
     fun slideOut_resIsZero_returnsNull() {
         whenever(view.visibility).thenReturn(View.VISIBLE)
 
-        val animator = BackgroundBanner(view, res = 0).slideOut()
+        val animator = BackgroundBanner(view, res = 0, fillHeightPx = 0, maxHeightFraction = 1f).slideOut()
 
         assertNull(animator)
     }
@@ -96,7 +96,7 @@ class BackgroundBannerTest {
     fun slideIn_viewNotVisible_doesNotAnimate() {
         whenever(view.visibility).thenReturn(View.GONE)
 
-        BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).slideIn()
+        BackgroundBanner(view, res = R.drawable.bg_onboarding_serp, fillHeightPx = 0, maxHeightFraction = 1f).slideIn()
 
         verify(view, never()).animate()
     }

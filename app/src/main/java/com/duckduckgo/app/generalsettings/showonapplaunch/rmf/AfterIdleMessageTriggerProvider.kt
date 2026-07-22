@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch.rmf
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.remote.messaging.api.MessageTrigger
 import kotlinx.coroutines.flow.Flow
@@ -25,11 +26,16 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Resolves the after-idle NTP context into [MessageTrigger.AFTER_IDLE]
+ * Resolves the after-idle NTP context into [MessageTrigger.AFTER_IDLE].
+ *
+ * Emits the trigger only when the NTP was shown as an after-idle return AND there is a real tab to return
+ * to. Reusing the escape hatch's target resolution ([EscapeHatchTargetResolver.resolve] returns null when
+ * there's nothing to return to).
  */
 class AfterIdleMessageTriggerProvider @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val escapeHatchTargetResolver: EscapeHatchTargetResolver,
 ) {
 
     fun activeTrigger(): Flow<MessageTrigger?> {
@@ -38,7 +44,7 @@ class AfterIdleMessageTriggerProvider @Inject constructor(
         if (!rolloutEnabled) return flowOf(null)
 
         return ntpAfterIdleManager.isAfterIdleReturn.map { afterIdle ->
-            if (afterIdle) MessageTrigger.AFTER_IDLE else null
+            if (afterIdle && escapeHatchTargetResolver.resolve() != null) MessageTrigger.AFTER_IDLE else null
         }
     }
 }

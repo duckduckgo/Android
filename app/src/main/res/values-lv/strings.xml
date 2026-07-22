@@ -418,78 +418,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Meklēt DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Kopīgot atsauksmi</string>
-    <string name="missingBrowserFeaturesTitleLong">Trūkst pārlūka funkcijas vai arī tās nedarbojas</string>
-    <string name="missingBrowserFeaturesTitleShort">Pārlūka funkciju problēmas</string>
-    <string name="missingBrowserFeaturesSubtitle">Kuru pārlūkošanas funkciju mēs varam pievienot vai uzlabot?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigācija uz priekšu, atpakaļ un/vai atsvaidzināšana</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Ciļņu izveide un pārvaldīšana</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklāmu un uznirstošo logu bloķēšana</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Video skatīšanās</string>
-    <string name="missingBrowserFeatureSubReasonImages">Mijiedarbība ar attēliem</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Grāmatzīmju izveide un pārvaldīšana</string>
-    <string name="missingBrowserFeatureSubReasonOther">Neviens no šiem</string>
-
-    <string name="websiteNotLoadingTitleLong">Vietņu ielādes problēmas</string>
-    <string name="websiteNotLoadingTitleShort">Vietņu ielādes problēmas</string>
-    <string name="websiteNotLoadingSubtitle">Kura vietne ir bojāta?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo meklētājs nav pietiekami labs</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo meklēšanas problēmas</string>
-    <string name="searchNotGoodEnoughSubtitle">Kuru meklēšanas funkciju mēs varam pievienot vai uzlabot?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmēšana/tehniskā meklēšana</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Izkārtojumam vajadzētu vairāk līdzināties Google izkārtojumam</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Ātrāks ielādes laiks</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Meklēšana noteiktā valodā vai reģionā</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Labāka automātiskā pabeigšana</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Neviens no šiem</string>
-
-    <string name="needMoreCustomizationTitleLong">Nav pietiekami daudz veidu, kā pielāgot lietotni</string>
-    <string name="needMoreCustomizationTitleShort">Pielāgošanas problēmas</string>
-    <string name="needMoreCustomizationSubtitle">Kuru pielāgošanas opciju mēs varam pievienot vai uzlabot?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Sākuma ekrāna konfigurācija</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Kā tiek parādītas cilnes</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Kā izskatās lietotne</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Kuri dati tiek notīrīti</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kad dati tiek notīrīti</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kā tiek parādītas grāmatzīmes</string>
-    <string name="needMoreCustomizationSubReasonOther">Neviens no šiem</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Lietotne ir lēna, kļūdaina vai avarē</string>
-    <string name="appIsSlowOrBuggyTitleShort">Veiktspējas problēmas</string>
-    <string name="appIsSlowOrBuggySubtitle">Ar kuru problēmu tu saskaries?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Tīmekļa lapas vai meklēšanas rezultāti tiek lēni ielādēti</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Lietotne avarē vai apstājas</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video vai multivides atskaņošanas kļūdas</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Neviens no šiem</string>
-
-    <string name="otherMainReasonTitleLong">Neviens no šiem</string>
-    <string name="otherMainReasonTitleShort">Citas problēmas</string>
-
-    <string name="openEndedInputHint">Lūdzu, norādiet pēc iespējas precīzāk</string>
-    <string name="submitFeedback">Iesniegt</string>
-
-    <string name="tellUsHowToImprove">Lūdzu, pastāsti, ko mēs varam uzlabot.</string>
-    <string name="thanksForTheFeedback">Paldies tev par atsauksmēm!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Ar ko tava vilšanās ir visvairāk saistīta?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Mums žēl to dzirdēt</string>
-    <string name="feedbackShareDetails">Kopīgot informāciju</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Vai vēlies norādīt mūsu komandai papildinformāciju?</string>
-    <string name="whatHaveYouBeenEnjoying">Kas tev patika?</string>
-    <string name="awesomeToHear">Prieks dzirdēt!</string>
-    <string name="shareTheLoveWithARating">Dalies savā priekā, novērtējot to Play veikalā.</string>
-    <string name="rateTheApp">Novērtēt lietotni</string>
-    <string name="declineFurtherFeedback">NĒ, PALDIES! MAN PIETIEK.</string>
-    <string name="whichBrokenSites">Kur tu redzi šīs problēmas?</string>
-    <string name="whichBrokenSitesHint">Kurai vietnei ir problēmas?</string>
-    <string name="feedbackSpecificAsPossible">Lūdzu, norādi pēc iespējas precīzāk</string>
-    <string name="feedbackInitialDisambiguationTitle">Sāksim!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Kā tu klasificētu savu atsauksmi?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitīvas atsauksmes poga</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatīvas atsauksmes poga</string>
-    <string name="feedbackIsImportantToUs">Tavas anonīmās atsauksmes mums ir svarīgas.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Vietni nevarēja parādīt."</string>
     <string name="crashedWebViewErrorAction">"Pārlādēt"</string>
@@ -685,21 +613,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
-    <string name="downloadsActivityTitle">Lejupielādes</string>
-    <string name="downloadsActivityNoItemsDescription">Vēl nav lejupielādēts neviens fails</string>
-    <string name="downloadsShareTitle">Kopīgot ar…</string>
     <string name="downloadsDownloadFinishedActionName">Atvērt</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Fails vairs nepastāv</string>
-    <string name="downloadsItemMenuShare">Kopīgot</string>
-    <string name="downloadsItemMenuDelete">Dzēst</string>
-    <string name="downloadsItemMenuCancel">Atcelt</string>
-    <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izdzēsts %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Citas iespējas %1$s</string>
-    <string name="downloadsUndoActionName">Atsaukt</string>
-    <string name="downloadsStateInProgress">Notiek...</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
@@ -721,8 +635,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
-    <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
 
@@ -862,7 +774,9 @@
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Izmanto ChatGPT privāti ar iebūvēto Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Bloķē mērķētās reklāmas un sīkfailu uznirstošos logus</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Atskaņo YouTube videoklipus bez reklāmām</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
@@ -923,7 +837,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vai vēlies ērti piekļūt privātai mākslīgā intelekta tērzēšanai adreses joslā?</string>
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
@@ -1049,7 +963,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
     <string name="preOnboardingWelcomeDialogBody1">Vai esi gatavs ātrākai pārlūkprogrammai, kas tev sniedz kontroli?</string>
     <string name="preOnboardingWelcomeDialogBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr darbojas.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d no %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
 
@@ -1071,7 +985,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Vai esi gatavs bez maksas tērzēt privāti ar ChatGPT, Claude un citiem MI pārlūkprogrammā, kas tevi aktīvi aizsargā?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Atceries: Duck.ai vari izmantot no jebkuras vietas, kur redzi tērzēšanas ikonu</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Sākt MI tērzēšanu</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">MI aizsardzība ir aktivizēta!</string>
@@ -1096,6 +1009,9 @@
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Apstiprināt</string>
 
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Paldies tev par atsauksmēm!</string>
+
     <!-- Fire mode -->
     <string name="openInFireTab">Atvērt Fire cilnē</string>
     <string name="openInBackgroundTab">Atvērt fonā</string>
@@ -1112,4 +1028,6 @@
     <string name="fireTabsNewTabButton">Jauna Fire cilne</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>JAUNUMS!</b> Izmēģini Fire Tabs, lai pārlūkotu, nesaglabājot vietējo vēsturi.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

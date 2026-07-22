@@ -53,15 +53,23 @@ class RealDuckAiOnboardingDemo @Inject constructor(
     override suspend fun arm() {
         withContext(dispatchers.io()) {
             onboardingStore.setDuckAiOnboardingFlow()
-            listOf(
-                CtaId.DAX_INTRO,
-                CtaId.DAX_DIALOG_SERP,
-                CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                CtaId.DAX_FIRE_BUTTON,
-                CtaId.DAX_END,
-            ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
+            PRE_DISMISSED_CTAS.forEach { dismissedCtaDao.insert(DismissedCta(it)) }
         }
     }
 
     override fun isActive(): Boolean = onboardingStore.isDuckAiOnboardingFlow()
+
+    companion object {
+        /**
+         * Standard DAX onboarding CTAs the Duck.ai flow pre-dismisses when armed, so only the Duck.ai
+         * demo CTAs (and the trailing Privacy Pro bubble) drive the flow.
+         */
+        val PRE_DISMISSED_CTAS = listOf(
+            CtaId.DAX_INTRO,
+            CtaId.DAX_DIALOG_SERP,
+            CtaId.DAX_DIALOG_TRACKERS_FOUND,
+            CtaId.DAX_FIRE_BUTTON,
+            CtaId.DAX_END,
+        )
+    }
 }

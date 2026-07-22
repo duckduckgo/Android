@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.VERBOSE
@@ -32,6 +33,7 @@ interface AutofillRuntimeConfigProvider {
         rawJs: String,
         url: String?,
         reAuthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
     ): String
 }
 
@@ -49,6 +51,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         rawJs: String,
         url: String?,
         reAuthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
     ): String {
         logcat(VERBOSE) { "BrowserAutofill: getRuntimeConfiguration called" }
 
@@ -66,7 +69,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         ).also {
             logcat(VERBOSE) { "autofill-config: userPreferences for $url: \n$it" }
         }
-        val availableInputTypes = generateAvailableInputTypes(url, reAuthenticationDetails)
+        val availableInputTypes = generateAvailableInputTypes(url, reAuthenticationDetails, browserMode)
 
         return StringBuilder(rawJs).apply {
             replacePlaceholder(this, TAG_INJECT_CONTENT_SCOPE, contentScope)
@@ -83,8 +86,12 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         }
     }
 
-    private suspend fun generateAvailableInputTypes(url: String?, reAuthenticationDetails: ReAuthenticationDetails): String {
-        val inputTypes = autofillAvailableInputTypesProvider.getTypes(url, reAuthenticationDetails)
+    private suspend fun generateAvailableInputTypes(
+        url: String?,
+        reAuthenticationDetails: ReAuthenticationDetails,
+        browserMode: BrowserMode,
+    ): String {
+        val inputTypes = autofillAvailableInputTypesProvider.getTypes(url, reAuthenticationDetails, browserMode)
 
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(inputTypes).also {
             logcat(VERBOSE) { "autofill-config: availableInputTypes for $url: \n$it" }

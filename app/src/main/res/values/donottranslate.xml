@@ -43,7 +43,6 @@
     <string name="appearanceNightModeDialogSecondaryCTA">Dismiss</string>
 
     <!-- New Tab -->
-    <string name="newTabPageShortcutDownloads">Downloads</string>
     <string name="newTabPageShortcutSettings">Settings</string>
 
     <!-- Indonesia message -->
@@ -94,7 +93,14 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
-    <!-- After Inactivity: return-to-last-tab hatch setting -->
-    <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
-    <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
+    <!-- Widget prompt (onboarding) -->
+    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
+    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
+
+    <!-- Add to Dock (onboarding) -->
+    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
+    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 </resources>

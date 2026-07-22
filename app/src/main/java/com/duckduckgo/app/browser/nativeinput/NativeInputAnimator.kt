@@ -43,6 +43,12 @@ interface NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit = {},
+        /**
+         * Invoked after the omnibar's on-screen position has been captured and before the morph
+         * starts. Use to hide the omnibar when a nav bar is replacing it, so it doesn't cover the
+         * bar for the duration of the enter.
+         */
+        onStart: () -> Unit = {},
         onCancel: () -> Unit = {},
         onComplete: () -> Unit = {},
     )
@@ -55,7 +61,28 @@ interface NativeInputAnimator {
         onCancel: () -> Unit = {},
         onComplete: () -> Unit,
     )
+
+    /**
+     * @param moveWidgetWithBar top mode only: when true, [widgetView] tracks the bar's translation
+     * (mid-session latch). Pass false while an enter/exit morph is running so the card can morph
+     * from/to the omnibar while the bar (buttons) slides alone. Ignored in bottom mode — the widget
+     * never rides the bar there.
+     */
+    fun animateNavBarVisibility(
+        navBarView: View,
+        widgetView: View,
+        isBottom: Boolean,
+        heightPx: Int,
+        show: Boolean,
+        animate: Boolean,
+        moveWidgetWithBar: Boolean = !isBottom,
+        onFrame: (onScreenHeightPx: Int) -> Unit = {},
+        onComplete: () -> Unit = {},
+    )
     fun cancelAnimation()
+
+    /** Cancels only the enter/exit morph; leaves an in-flight nav-bar slide running. */
+    fun cancelMorphAnimation()
     fun applyLayoutTransitions(widgetView: View)
     fun applyLayoutTransitions(widgetView: View, isBottom: Boolean)
     fun clearLayoutTransitions(widgetView: View)
@@ -65,6 +92,7 @@ interface NativeInputAnimator {
 class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private var transitionAnimator: ValueAnimator? = null
+    private var navBarAnimator: ValueAnimator? = null
     private var animationCleanup: (() -> Unit)? = null
     private var pendingPreDraw: Pair<View, ViewTreeObserver.OnPreDrawListener>? = null
 
@@ -110,10 +138,12 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit,
+        onStart: () -> Unit,
         onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
-        cancelAnimation()
+        // Morph only — a concurrent nav-bar slide (open/close) must keep running.
+        cancelMorphAnimation()
 
         val startWidth = (widgetCard.layoutParams as ViewGroup.MarginLayoutParams).width
         val startHeight = (widgetCard.layoutParams as ViewGroup.MarginLayoutParams).height
@@ -121,6 +151,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
         waitForLayout(widgetCard) {
             val omnibarPosition = visibleSurfacePosition(omnibarCard)
+            // Position is captured — safe to tear down the omnibar (e.g. reveal the nav bar) before
+            // the morph runs.
+            onStart()
             performEnterAnimation(
                 widgetCard,
                 omnibarCard,
@@ -145,7 +178,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
-        cancelAnimation()
+        // Morph only — hideNativeInput may already be sliding the nav bar out in parallel.
+        cancelMorphAnimation()
         clearLayoutTransitions(widgetView)
         (widgetView as? ViewGroup)?.clipChildren = false
         (widgetView.parent as? ViewGroup)?.clipChildren = false
@@ -154,6 +188,81 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
         waitForLayout(widgetCard) {
             performExitAnimation(widgetCard, omnibarCard, snapshot, isBottom, onUpdate, onCancel, onComplete)
+        }
+    }
+
+    override fun animateNavBarVisibility(
+        navBarView: View,
+        widgetView: View,
+        isBottom: Boolean,
+        heightPx: Int,
+        show: Boolean,
+        animate: Boolean,
+        moveWidgetWithBar: Boolean,
+        onFrame: (onScreenHeightPx: Int) -> Unit,
+        onComplete: () -> Unit,
+    ) {
+        navBarAnimator?.cancel()
+        navBarAnimator = null
+
+        val hiddenY = -heightPx.toFloat()
+        // Bottom mode never couples the widget to the bar; top mode only when the caller asks.
+        val ridesWidget = !isBottom && moveWidgetWithBar
+        val endBar = if (show) 0f else hiddenY
+
+        // How much of the bar is currently on screen given its slide translation, used to keep the
+        // content offset in lock-step with the bar every frame.
+        fun onScreenHeight(barTranslationY: Float): Int = (heightPx + barTranslationY).toInt().coerceIn(0, heightPx)
+
+        if (!animate) {
+            navBarView.translationY = endBar
+            navBarView.visibility = if (show) View.VISIBLE else View.GONE
+            if (ridesWidget) widgetView.translationY = endBar
+            onComplete()
+            return
+        }
+
+        navBarView.visibility = View.VISIBLE
+        val endWidget = if (ridesWidget) endBar else 0f
+        // Fresh show often lands with translationY already at the end (0) — e.g. a re-show after a
+        // cancelled slide. Start from off-screen whenever there's no travel so the slide-in is visible.
+        var startBar = navBarView.translationY
+        if (show && startBar == endBar) {
+            startBar = hiddenY
+            navBarView.translationY = hiddenY
+        }
+        if (ridesWidget && show && widgetView.translationY == endWidget && startBar == hiddenY) {
+            // Keep the widget locked to the bar when the bar is forced (or pre-positioned) off-screen.
+            widgetView.translationY = hiddenY
+        }
+        val startWidget = if (ridesWidget) widgetView.translationY else 0f
+
+        navBarAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = ANIMATION_DURATION_MS
+            interpolator = FastOutSlowInInterpolator()
+            addUpdateListener { anim ->
+                val f = anim.animatedFraction
+                val bar = lerpF(startBar, endBar, f)
+                navBarView.translationY = bar
+                if (ridesWidget) widgetView.translationY = lerpF(startWidget, endWidget, f)
+                onFrame(onScreenHeight(bar))
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+                override fun onAnimationEnd(animation: Animator) {
+                    navBarAnimator = null
+                    if (cancelled) return
+                    navBarView.translationY = endBar
+                    if (ridesWidget) widgetView.translationY = endWidget
+                    if (!show) navBarView.visibility = View.GONE
+                    onFrame(onScreenHeight(endBar))
+                    onComplete()
+                }
+            })
+            start()
         }
     }
 
@@ -230,6 +339,12 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     }
 
     override fun cancelAnimation() {
+        cancelMorphAnimation()
+        navBarAnimator?.cancel()
+        navBarAnimator = null
+    }
+
+    override fun cancelMorphAnimation() {
         pendingPreDraw?.let { (view, listener) -> view.viewTreeObserver.removeOnPreDrawListener(listener) }
         pendingPreDraw = null
         animationCleanup?.invoke()
@@ -353,7 +468,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             onCancel = onCancel,
             onEnd = {
                 widgetContent?.alpha = 1f
-                omnibarCard.alpha = 1f
+                // Leave omnibarCard at 0 — [onComplete] hides the omnibar. Restoring alpha here
+                // flashes the card for a frame before hide().
                 animateCornerRadius(card, widgetCornerRadius)
                 restoreLayout(card, params, margins)
                 card.post { applyLayoutTransitions(widgetView) }
@@ -474,7 +590,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         onCancel: () -> Unit = {},
         onEnd: () -> Unit,
     ) {
-        cancelAnimation()
+        cancelMorphAnimation()
         animationCleanup = cleanup
         transitionAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = ANIMATION_DURATION_MS

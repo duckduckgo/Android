@@ -50,6 +50,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val idleThresholdResolver: IdleThresholdResolver,
 ) : ViewModel() {
 
     data class ViewState(
@@ -85,16 +86,11 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             userSelectedThreshold,
             ntpAfterIdleManager.returnToLastTabEnabled,
         ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold, returnToLastTabEnabled ->
-            val effectiveThreshold = userThreshold
-                ?: FirstScreenHandlerImpl.parseDefaultIdleThresholdSeconds(
-                    androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
-                )
-                ?: FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS
             _viewState.value = ViewState(
                 selectedOption = option,
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                selectedIdleThresholdSeconds = effectiveThreshold,
+                selectedIdleThresholdSeconds = idleThresholdResolver.effectiveThresholdSeconds(userThreshold),
                 returnToLastTabEnabled = returnToLastTabEnabled,
             )
         }.flowOn(dispatcherProvider.io())

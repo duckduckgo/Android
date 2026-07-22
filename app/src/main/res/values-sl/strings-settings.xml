@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d min</string>
     <string name="afterInactivityTimeout1Hour">1 uri</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d h</string>
+    <string name="returnToLastTabSettingTitle">Nazaj na zadnji zavihek</string>
+    <string name="returnToLastTabSettingSubtitle">Prikaži povezavo do zadnjega zavihka na strani z novim zavihkom, ko znova odpreš aplikacijo</string>
 </resources>

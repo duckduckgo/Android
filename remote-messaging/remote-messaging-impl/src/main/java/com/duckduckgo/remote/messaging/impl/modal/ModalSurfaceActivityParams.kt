@@ -19,4 +19,8 @@ package com.duckduckgo.remote.messaging.impl.modal
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 
-data class ModalSurfaceActivityFromMessageId(val messageId: String, val messageType: MessageType) : GlobalActivityStarter.ActivityParams
+data class ModalSurfaceActivityFromMessageId(
+    val messageId: String,
+    val messageType: MessageType,
+    val launchedFromSettings: Boolean = false,
+) : GlobalActivityStarter.ActivityParams

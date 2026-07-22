@@ -37,6 +37,12 @@
             app:srcCompat="@drawable/logo_full"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/focusedFireEmptyState"
+            layout="@layout/view_fire_new_tab_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
             android:id="@+id/focusedFavourites"
             android:layout_width="match_parent"

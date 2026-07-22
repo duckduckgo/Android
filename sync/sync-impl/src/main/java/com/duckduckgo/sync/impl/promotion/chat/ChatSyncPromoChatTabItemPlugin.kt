@@ -20,7 +20,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
@@ -50,23 +54,25 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
     private val chatSyncPromotion: ChatSyncPromotion,
     private val duckChatInput: DuckChatInputModeState,
     private val activityStarter: GlobalActivityStarter,
+    private val edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : NativeInputChatTabItemPlugin {
     override fun create(
         context: Context,
         scope: CoroutineScope,
+        browserMode: BrowserMode,
     ): NativeInputChatTabItem {
-        val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter)
+        val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter, edgeToEdgeProvider)
         val adapter = ChatSyncPromoAdapter(listener)
 
-        val showJob = scope.showPromotionBanner(adapter)
+        val showJob = scope.showPromotionBanner(adapter, browserMode)
         scope.hideBannerOnInput(adapter, showJob)
 
         return ChatSyncChatTabItem(adapter)
     }
 
-    private fun CoroutineScope.showPromotionBanner(adapter: ChatSyncPromoAdapter): Job {
+    private fun CoroutineScope.showPromotionBanner(adapter: ChatSyncPromoAdapter, browserMode: BrowserMode): Job {
         return launch {
-            if (chatSyncPromotion.canShowPromotion()) adapter.show()
+            if (chatSyncPromotion.canShowPromotion(browserMode)) adapter.show()
         }
     }
 
@@ -93,6 +99,7 @@ private class ChatTabPluginAdapterListener(
     private val promotion: ChatSyncPromotion,
     private val scope: CoroutineScope,
     private val activityStarter: GlobalActivityStarter,
+    private val edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
     private var isDialogShowing = false
@@ -108,6 +115,7 @@ private class ChatTabPluginAdapterListener(
                 onScanQrCodeClicked = {
                     activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
                 },
+                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             )
             dialog.setOnDismissListener { isDialogShowing = false }
             dialog.show()
@@ -131,7 +139,11 @@ private class ChatTabPluginAdapterListener(
 private class ChatSyncPromoBottomSheetDialog(
     context: Context,
     onScanQrCodeClicked: () -> Unit,
-) : BottomSheetDialog(context) {
+    edgeToEdgeEnabled: Boolean,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
     init {
         val binding = DialogChatSyncPromoBinding.inflate(layoutInflater).apply {
             scanQrCodeButton.setOnClickListener {
@@ -142,6 +154,9 @@ private class ChatSyncPromoBottomSheetDialog(
             closeButton.setOnClickListener { dismiss() }
         }
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isDraggable = false

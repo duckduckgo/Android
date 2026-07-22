@@ -22,6 +22,8 @@ import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 
@@ -45,8 +47,11 @@ class FocusedView @JvmOverloads constructor(
         }
     }
 
-    fun showLogo(show: Boolean) {
-        binding.focusedLogo.isVisible = show
-        binding.focusedFavourites.isVisible = !show
+    fun show(isLogoVisible: Boolean, browserMode: BrowserMode) {
+        val isFireMode = browserMode == BrowserMode.FIRE
+        binding.focusedFireEmptyState.root.isVisible = isFireMode
+        binding.focusedLogo.isVisible = isLogoVisible && !isFireMode
+        binding.focusedFavourites.isVisible = !isLogoVisible && !isFireMode
+        this.show()
     }
 }

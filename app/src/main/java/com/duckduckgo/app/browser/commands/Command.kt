@@ -466,6 +466,8 @@ sealed class Command {
         @DrawableRes val backgroundRes: Int,
         val useRebrandBackground: Boolean = false,
         @AttrRes val backgroundColorAttr: Int = 0,
+        val fillHeightDp: Float = 0f,
+        val fillMaxHeightFraction: Float = 1f,
     ) : Command()
 
     class SetOnboardingDialogBackground(
@@ -531,6 +533,11 @@ sealed class Command {
     data class ShowDuckAIContextualMode(val tabId: String) : Command()
 
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
+
+    data class StartAdBlockingAnimation(
+        @DrawableRes val icon: Int,
+        @StringRes val text: Int,
+    ) : Command()
 
     data class PageContextReceived(
         val tabId: String,

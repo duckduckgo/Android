@@ -29,4 +29,6 @@
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minute</string>
     <string name="afterInactivityTimeout1Hour">1 oră</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d ore</string>
+    <string name="returnToLastTabSettingTitle">Revino la ultima filă</string>
+    <string name="returnToLastTabSettingSubtitle">Afișează un link către ultima filă pe pagina Filă nouă când redeschizi aplicația</string>
 </resources>

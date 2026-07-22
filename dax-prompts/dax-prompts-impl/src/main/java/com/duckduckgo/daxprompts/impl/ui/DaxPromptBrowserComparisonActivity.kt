@@ -22,17 +22,14 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -42,6 +39,9 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
 import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.R
@@ -93,10 +93,31 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            // Full-bleed background on the root, no separate toolbar, everything else constrained to
+            // "parent" - a single root padding call clears the close button (top), the comparison card's
+            // buttons (bottom) and the guideline-percentage content (sides, landscape) all at once.
+            edgeToEdgeHandler.applySystemBarInsets(binding.daxPromptBrowserComparisonContainer)
+        }
+
+        if (SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
+        }
 
         setupListeners()
         setupObservers()
@@ -108,7 +129,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
-        applyFullScreenFlags()
         markAsShown()
     }
 
@@ -117,6 +137,14 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (lockedInPortraitMode && newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (SDK_INT < 34) {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, R.anim.slide_to_bottom)
         }
     }
 
@@ -172,16 +200,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             logcat(WARN) { errorMessage }
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun applyFullScreenFlags() {
-        window?.apply {
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            WindowCompat.setDecorFitsSystemWindows(this, false)
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.BLACK
-        }
-        ViewCompat.requestApplyInsets(binding.daxPromptBrowserComparisonContainer)
     }
 
     private fun markAsShown() {

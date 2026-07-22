@@ -103,6 +103,24 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
 
+                <include
+                    android:id="@+id/addToDockContent"
+                    layout="@layout/include_brand_design_add_to_dock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/widgetPromptContent"
+                    layout="@layout/include_brand_design_widget_prompt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"

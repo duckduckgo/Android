@@ -23,4 +23,23 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. <annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Avab videod segajatevabas kinorežiimis, mis hoiab ära selle, et vaadatav sisu mõjutaks sinu YouTube’i voogu.</string>
+    <string name="ad_blocking_settings_title_v2">Reklaamide blokeerimine</string>
+    <string name="ad_blocking_settings_header_description">Blokeerib invasiivsed jälgijad enne nende laadimist, kõrvaldades tõhusalt reklaamid, mis tuginevad jälgimisele</string>
+    <string name="contingencyMessageTitle">YouTube\'i reklaamiblokeerija pole saadaval</string>
+    <string name="contingencyMessageContent">YouTube\'i hiljutised muudatused on mõjutanud reklaamide blokeerimist. Töötame nende probleemide lahendamise nimel ja täname sind mõistva suhtumise eest</string>
+    <string name="contingencyMessagePrimaryButton">Sain aru</string>
+    <string name="contingencyMessageCloseContentDescription">Sulge</string>
+    <string name="ad_blocking_menu_disable">Keela YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_enable">Luba YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_title">YouTube\'i reklaamide blokeerimine</string>
+    <string name="ad_blocking_menu_close_content_description">Sulge</string>
+    <string name="ad_blocking_menu_always_on">Alati sisse lülitatud</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Inaktiveeri kuni taaskäivitamiseni</string>
+    <string name="ad_blocking_menu_always_off">Alati välja lülitatud</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube\'i reklaamiblokeerija ei tööta?</string>
+    <string name="ad_blocking_disabled_popup_description">Saada DuckDuckGo-le anonüümne rikketeade. Aita muuta reklaamide blokeerimine kõigi jaoks paremaks!</string>
+    <string name="ad_blocking_disabled_primary_action">Saada rikketeade</string>
+    <string name="ad_blocking_disabled_secondary_action">Tühista</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Inaktiveeritud kuni taaskäivitamiseni</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube’i reklaamiblokeerija on sees</string>
 </resources>

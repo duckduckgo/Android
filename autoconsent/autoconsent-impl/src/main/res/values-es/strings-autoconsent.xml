@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Protección contra ventanas emergentes de cookies</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo intentará seleccionar la configuración más privada disponible y ocultar estas ventanas emergentes por ti.<a href=\"\">Más información</a>]]></string>
     <string name="autoconsentToggle">Deja que DuckDuckGo gestione las ventanas emergentes de cookies</string>
+    <string name="autoconsentAutoManageToggle">Gestionar automáticamente las ventanas emergentes de cookies</string>
+    <string name="autoconsentAutoManageDescription">Intentaremos seleccionar solo las opciones de cookies más privadas disponibles para ti y, a continuación, cerrar estas ventanas emergentes.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo puede gestionar automáticamente tus preferencias de cookies para maximizar la privacidad, minimizar las cookies y cerrar estas ventanas emergentes.\n<a href=\"\">Más información</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ventanas emergentes sin opción de rechazarlas</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Deja también que DuckDuckGo te ahorre un clic al aceptar las cookies en tu nombre para cerrar las ventanas emergentes que no te dejan rechazarlas.</string>
 </resources>

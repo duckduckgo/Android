@@ -15,29 +15,26 @@
   -->
 
 <resources>
-    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
-    <string name="sync_v2_joiner_confirmation_title">Sync your data?</string>
-    <string name="sync_v2_joiner_confirmation_positive">Sync Now</string>
-    <string name="sync_v2_joiner_confirmation_negative">Cancel</string>
-
-    <string name="sync_v2_host_confirmation_title">Sync your data?</string>
-    <string name="sync_v2_host_confirmation_positive">Sync Now</string>
-    <string name="sync_v2_host_confirmation_negative">Cancel</string>
-
-    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
-    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
-    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced Duck.ai chats.</string>
-    <string name="sync_v2_confirmation_message_unknown_peer_ddg">The other device will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
-    <string name="sync_v2_confirmation_message_unknown_peer_3p">The other device will be able to access your synced Duck.ai chats.</string>
-
-    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
-    <string name="sync_v2_error_pairing_failed">Sync failed.</string>
-    <string name="sync_v2_error_pairing_rejected">Sync canceled from your other device.</string>
-    <string name="sync_v2_error_pairing_canceled">Sync canceled.</string>
-    <string name="sync_v2_error_upgrade_required">Update the DuckDuckGo browser and try again.</string>
-    <string name="sync_v2_error_third_party_already_upgraded">Please Sync this device from an already-connected DuckDuckGo browser on another device</string>
-    <string name="sync_v2_error_try_again">Please try again.</string>
-    <string name="sync_v2_error_got_it">Got It</string>
-    <string name="sync_v2_already_paired_title">Already synced.</string>
-    <string name="sync_v2_already_paired_message">These devices are already connected to Sync &amp; Backup.</string>
+    <!-- Simplified Sync  -->
+    <string name="sync_settings_v2_header_headline_disabled">Keep DuckDuckGo in sync!</string>
+    <string name="sync_settings_v2_header_headline_enabled">DuckDuckGo is in sync.</string>
+    <string name="sync_settings_v2_header_body_disabled">Sync your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai chats, end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai chats, are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_this_device_cta_title">Sync This Device</string>
+    <string name="sync_settings_v2_devices_section_header">My Devices</string>
+    <string name="sync_settings_v2_download_section_header">Download</string>
+    <string name="sync_settings_v2_download_recovery_code_item">Download Your Recovery Code</string>
+    <string name="sync_settings_v2_copy_recovery_code_item">Copy Your Recovery Code</string>
+    <string name="sync_settings_v2_delete_account_item">Turn Off and Delete Server Data</string>
+    <string name="sync_settings_v2_bookmarks_section_header">Bookmarks</string>
+    <string name="sync_setup_v2_header_headline">Sync this device with a nearby computer.</string>
+    <string name="sync_setup_v2_header_body">We’ll help you sync your devices.</string>
+    <string name="sync_setup_v2_this_device_cta_title">Sync This Device Only</string>
+    <string name="sync_setup_v2_device_synced_status">Synced</string>
+    <string name="sync_setup_v2_remove_device_name_item">Remove Device</string>
+    <string name="sync_setup_v2_edit_device_name_item">Edit Name</string>
+    <string name="sync_setup_v2_remove_this_device_notice">This device will no longer be able to access your synced data if you remove it.</string>
+    <string name="sync_setup_v2_remove_another_device_notice">This device will no longer be able to access your synced data if this is turned off.</string>
 </resources>

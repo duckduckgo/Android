@@ -65,7 +65,7 @@ class Omnibar(
     interface ItemPressedListener {
         fun onTabsButtonPressed()
 
-        fun onTabsButtonLongPressed()
+        fun onTabsButtonLongPressed(): Boolean
 
         fun onFireButtonPressed()
 
@@ -122,6 +122,8 @@ class Omnibar(
         fun onShowSuggestions(state: OmnibarTextState)
 
         fun onTrackersCountFinished()
+
+        fun onAdBlockingAnimationSuppressed()
     }
 
     fun interface InputScreenLaunchListener {
@@ -406,6 +408,13 @@ class Omnibar(
 
     fun enqueueCookiesAnimation(isCosmetic: Boolean) {
         omnibarView.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
+    }
+
+    fun createAdBlockingAnimation(
+        icon: Int,
+        text: Int,
+    ) {
+        omnibarView.decorate(Decoration.LaunchAdBlockingAnimation(icon, text))
     }
 
     fun cancelTrackersAnimation() {

@@ -152,6 +152,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
                         isFreeTrial = it.isFreeTrial,
+                        launchOnboarding = subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled(),
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -776,7 +777,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
     sealed class PurchaseStateView {
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
-        data class Success(val subscriptionEventData: SubscriptionEventData, val isFreeTrial: Boolean) : PurchaseStateView()
+        data class Success(
+            val subscriptionEventData: SubscriptionEventData,
+            val isFreeTrial: Boolean,
+            val launchOnboarding: Boolean,
+        ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
         data object Failure : PurchaseStateView()

@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADD_TO_DOCK
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -38,6 +39,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -282,6 +284,9 @@ class WelcomePageViewModel @Inject constructor(
 
             QUICK_SETUP -> {
             }
+
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
+            }
         }
     }
 
@@ -332,6 +337,9 @@ class WelcomePageViewModel @Inject constructor(
 
             QUICK_SETUP -> {
                 // no-op
+            }
+
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
             }
         }
     }
@@ -396,6 +404,9 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             QUICK_SETUP -> {
+            }
+
+            ADD_TO_DOCK, WIDGET_PROMPT -> {
             }
         }
     }

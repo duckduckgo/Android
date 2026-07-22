@@ -903,4 +903,18 @@ class RealPirRepositoryTest {
         verify(mockBrokerJsonDao, never()).deleteAll()
         verify(mockPirDataStore, never()).reset()
     }
+
+    @Test
+    fun whenClearAllBrokerDataThenClearsEtagsAndBrokerDetailsButKeepsUserData() = runTest {
+        testee.clearAllBrokerData()
+
+        // Both the etag table AND the parsed broker-details tables must be cleared, otherwise a
+        // re-download is version-gated against the stale broker row and silently skipped.
+        verify(mockBrokerJsonDao).deleteAll()
+        verify(mockBrokerDao).deleteAll()
+        // User/profile data must be preserved (this is a broker-config reset, not a full wipe).
+        verify(mockExtractedProfileDao, never()).deleteAllExtractedProfiles()
+        verify(mockUserProfileDao, never()).deleteAllProfiles()
+        verify(mockPirDataStore, never()).reset()
+    }
 }

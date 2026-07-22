@@ -119,7 +119,7 @@ class AppearanceViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private fun canForceDarkMode(): Boolean = themingDataStore.theme != DuckDuckGoTheme.LIGHT
+    private fun canForceDarkMode(theme: DuckDuckGoTheme = themingDataStore.theme): Boolean = theme != DuckDuckGoTheme.LIGHT
 
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
@@ -145,7 +145,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.update { it.copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
+                viewState.update { it.copy(theme = selectedTheme, canForceDarkMode = canForceDarkMode(selectedTheme)) }
                 command.send(Command.UpdateTheme)
             }
         }

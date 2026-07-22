@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -140,13 +141,26 @@ class EnqueuedPixelWorker @Inject constructor(
 
     suspend fun submitUnsentFirePixels() {
         withContext(dispatchers.io()) {
-            val count = unsentForgetAllPixelStore.pendingPixelCountClearData
-            logcat(INFO) { "Found $count unsent clear data pixels" }
-            if (count > 0) {
+            val pendingPixelCounts = unsentForgetAllPixelStore.pendingPixelCountsClearData
+            logcat(INFO) { "Found ${pendingPixelCounts.values.sum()} unsent clear data pixels" }
+            if (pendingPixelCounts.values.any { it > 0 }) {
+                pixel.get().fire(
+                    AppPixelName.FORGET_ALL_EXECUTED_DAILY,
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+            pendingPixelCounts.forEach { (mode, count) ->
+                if (count <= 0) return@forEach
+                val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
                 for (i in 1..count) {
-                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
+                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED, params)
                 }
-                unsentForgetAllPixelStore.resetCount()
+                val dailyPixel = when (mode) {
+                    BrowserMode.REGULAR -> AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY
+                    BrowserMode.FIRE -> AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY
+                }
+                pixel.get().fire(dailyPixel, type = Pixel.PixelType.Daily())
+                unsentForgetAllPixelStore.resetCount(mode)
             }
         }
     }

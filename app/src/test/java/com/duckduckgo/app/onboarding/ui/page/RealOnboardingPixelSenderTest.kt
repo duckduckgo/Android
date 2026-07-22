@@ -28,7 +28,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -151,19 +150,6 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenInstalledMoreThan28DaysAgoThenDaysParamOmitted() = runTest {
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(40))
-
-        testee.fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Shown)
-
-        verify(mockPixel).fire(
-            ONBOARDING_SKIP_ONBOARDING,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "e" to "shown"),
-            type = Unique(tag = "onboarding_skip-onboarding_shown"),
-        )
-    }
-
-    @Test
     fun whenFireAddressBarPositionClickedSplitThenValueSplit() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
@@ -264,15 +250,22 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireSetDefaultClickedThenNoValueAndTagWithoutValue() = runTest {
+    fun whenFireSetDefaultClickedEngagedThenValueEngage() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
+        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked(engaged = true))
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
-            type = Unique(tag = "onboarding_set-default_clicked"),
+            mapOf(
+                "it" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "engage",
+            ),
+            type = Unique(tag = "onboarding_set-default_clicked_engage"),
         )
     }
 
@@ -664,15 +657,22 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireAiComparisonClickedThenNoValueAndTagWithoutValue() = runTest {
+    fun whenFireAiComparisonClickedEngagedThenValueEngage() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+        testee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked(engaged = true))
 
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
-            type = Unique(tag = "onboarding_ai-intro_clicked"),
+            mapOf(
+                "it" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "engage",
+            ),
+            type = Unique(tag = "onboarding_ai-intro_clicked_engage"),
         )
     }
 

@@ -121,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Zum Speichern der Wiederherstellungs-PDF ist eine Speicherberechtigung erforderlich</string>
     <string name="sync_share_title">Teilen mit …</string>
     <string name="sync_pdf_title">Wiederherstellungscode synchronisieren</string>
-    <string name="sync_pdf_description">Mit dem Wiederherstellungscode kannst du deine Lesezeichen auf mehreren Geräten synchronisieren und deine synchronisierten Daten wiederherstellen, falls du den Zugriff auf ein Gerät verlierst.</string>
+    <string name="sync_pdf_description">Mit dem Wiederherstellungscode kannst du deine Passwörter, Autofill-Daten und Duck.ai-Chats über mehrere Geräte hinweg synchronisieren und deine synchronisierten Daten wiederherstellen, falls du den Zugriff auf ein Gerät verlierst.</string>
     <string name="sync_code_box_title">Bewahre diese Informationen sicher und geschützt auf.</string>
-    <string name="sync_instructions_title">Wie funktioniert das?</string>
-    <string name="sync_instructions_step1">Öffne DuckDuckGo auf einem anderen Gerät und gehe in den Einstellungen zu Synchronisieren.</string>
-    <string name="sync_instructions_step2">Scanne den QR-Code oder kopiere ihn und füge ihn in eine andere DuckDuckGo-App ein.</string>
+    <string name="sync_instructions_title">Wie funktioniert dieser Code?</string>
+    <string name="sync_instructions_step1">Öffne DuckDuckGo auf dem Gerät, das du synchronisieren möchtest, und gehe in den Einstellungen zu „Sync &amp; Backup“.</string>
+    <string name="sync_instructions_step2">Wähle „Mit anderem Gerät synchronisieren“ und scanne den QR-Code oder gib den Textcode ein.</string>
     <string name="sync_instructions_step3">Sync wird aktiviert und du wirst wieder Zugriff auf all deine Daten haben.</string>
+    <string name="sync_pdf_retention_notice">Wenn du länger als 18 Monate keinen DuckDuckGo-Browser mit aktiviertem Sync &amp; Backup verwendest, werden deine Daten vom Server gelöscht und können nicht wiederhergestellt werden.</string>
     <string name="remove_device_dialog_title">Gerät entfernen?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ kann nicht mehr auf deine synchronisierten Daten zugreifen.</string>
     <string name="remove_device_dialog_primary_button">Entfernen</string>
@@ -249,4 +250,31 @@
     <string name="sync_chat_bottom_sheet_description">Finde den QR-Code in der DuckDuckGo-App auf deinem anderen Gerät unter Einstellungen › Sync &amp; Backup › Mit anderem Gerät synchronisieren.</string>
     <string name="sync_chat_bottom_sheet_positive">QR-Code scannen</string>
     <string name="sync_chat_bottom_sheet_negative">Jetzt nicht</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Deine Daten synchronisieren?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Jetzt synchronisieren</string>
+    <string name="sync_v2_joiner_confirmation_negative">Abbrechen</string>
+
+    <string name="sync_v2_host_confirmation_title">Deine Daten synchronisieren?</string>
+    <string name="sync_v2_host_confirmation_positive">Jetzt synchronisieren</string>
+    <string name="sync_v2_host_confirmation_negative">Abbrechen</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ kann auf deine synchronisierten DuckDuckGo-Passwörter, Autofill-Daten und Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ kann auf deine synchronisierten Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Das andere Gerät kann auf deine synchronisierten DuckDuckGo-Passwörter, Autofill-Daten und Duck.ai-Chats zugreifen.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Das andere Gerät kann auf deine synchronisierten Duck.ai-Chats zugreifen.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synchronisation fehlgeschlagen.</string>
+    <string name="sync_v2_error_pairing_rejected">Die Synchronisierung auf deinem anderen Gerät wurde abgebrochen.</string>
+    <string name="sync_v2_error_pairing_canceled">Die Synchronisierung wurde abgebrochen.</string>
+    <string name="sync_v2_error_upgrade_required">Aktualisiere den DuckDuckGo-Browser und versuche es erneut.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Bitte synchronisiere dieses Gerät mit einem bereits verbundenen DuckDuckGo-Browser auf einem anderen Gerät</string>
+    <string name="sync_v2_error_try_again">Bitte versuche es noch einmal.</string>
+    <string name="sync_v2_error_got_it">Verstanden</string>
+    <string name="sync_v2_already_paired_title">Bereits synchronisiert.</string>
+    <string name="sync_v2_already_paired_message">Diese Geräte sind bereits mit Sync &amp; Backup verbunden.</string>
+
 </resources>

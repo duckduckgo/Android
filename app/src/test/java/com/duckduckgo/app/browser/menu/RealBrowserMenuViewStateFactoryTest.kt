@@ -26,6 +26,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -51,7 +52,7 @@ class RealBrowserMenuViewStateFactoryTest {
     private val fullscreenModeFlow = MutableStateFlow(false)
     private val popupMenuShortcutFlow = MutableStateFlow(false)
     private val voiceChatEntryFlow = MutableStateFlow(false)
-    private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val newDownloadState: NewDownloadState = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
@@ -61,7 +62,7 @@ class RealBrowserMenuViewStateFactoryTest {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector)
     }
 
     @Test
@@ -594,6 +595,84 @@ class RealBrowserMenuViewStateFactoryTest {
 
         assertTrue(header is PageContextHeaderState.Error)
         assertEquals("example.com", (header as PageContextHeaderState.Error).shortUrl)
+    }
+
+    @Test
+    fun `when browser page is a duckduckgo search results page then privacy protection and report site items are hidden`() = runTest {
+        val serpUrl = "https://duckduckgo.com/?q=cats"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(serpUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(serpUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = serpUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is a non-search duckduckgo page then privacy protection and report site items are hidden`() = runTest {
+        val ddgUrl = "https://duckduckgo.com/about"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(ddgUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = ddgUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is not a duckduckgo page then privacy protection and report site items propagate`() = runTest {
+        val siteUrl = "https://example.com/page"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(siteUrl)).thenReturn(false)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(siteUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = siteUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertTrue(viewState.canChangePrivacyProtection)
+        assertTrue(viewState.canReportSite)
     }
 
     @Test

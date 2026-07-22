@@ -52,6 +52,9 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.launch
@@ -93,6 +96,12 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillProviderCredentialsListViewModel::class.java]
     }
@@ -107,6 +116,9 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.logins)
+        }
         configureRecyclerView()
         observeViewModel()
         configureToolbar()

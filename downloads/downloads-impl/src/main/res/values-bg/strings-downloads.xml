@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Запазване в Изтеглени файлове</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">От: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Изтриване на всички</string>
+    <string name="downloadsActivityNoItemsDescription">Все още няма изтеглени файлове</string>
+    <string name="downloadsActivityTitle">Изтеглени файлове</string>
+    <string name="downloadsAllFilesDeletedMessage">Всички файлове са изтрити</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Изтрито %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Файлът вече не съществува</string>
+    <string name="downloadsItemMenuCancel">Отмени</string>
+    <string name="downloadsItemMenuDelete">Изтриване</string>
+    <string name="downloadsItemMenuShare">Споделяне</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Още опции за %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
+    <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
+    <string name="downloadsShareTitle">Споделяне с…</string>
+    <string name="downloadsStateInProgress">В процес на изпълнение…</string>
+    <string name="downloadsUndoActionName">Отмяна</string>
+    <string name="downloadsSearchHint">Търсене</string>
 </resources>

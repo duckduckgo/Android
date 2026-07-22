@@ -34,6 +34,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -43,6 +45,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
@@ -60,8 +63,13 @@ class AttachmentView(
     var host: NativeInputHost? = null
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    var isContextual: Boolean = false
+    var onAskAboutTab: (() -> Unit)? = null
+    var onAskAboutPage: (() -> Unit)? = null
+    var onPageContextRemoved: (() -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
+    private var faviconManager: FaviconManager? = null
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
@@ -69,6 +77,7 @@ class AttachmentView(
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
+    private var pageContextContainer: PageContextAttachmentView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -76,10 +85,16 @@ class AttachmentView(
         setOnClickListener { showPopupMenu() }
     }
 
-    fun bind(scope: CoroutineScope, factory: ViewViewModelFactory, nativeInputStateProvider: NativeInputStateProvider) {
+    fun bind(
+        scope: CoroutineScope,
+        factory: ViewViewModelFactory,
+        nativeInputStateProvider: NativeInputStateProvider,
+        faviconManager: FaviconManager,
+    ) {
         val owner = findViewTreeViewModelStoreOwner() ?: return
         val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
         viewModel = vm
+        this.faviconManager = faviconManager
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
         scope.launch {
@@ -94,7 +109,7 @@ class AttachmentView(
     }
 
     private fun updateButtonVisibility() {
-        val show = supportsUpload && lastNativeInputState?.shouldShowPluginControls() == true
+        val show = (supportsUpload || isContextual) && lastNativeInputState?.shouldShowPluginControls() == true
         isVisible = show
         (parent as? View)?.isVisible = show
     }
@@ -110,6 +125,12 @@ class AttachmentView(
     fun clearAttachments() = viewModel?.clearAttachments()
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
+
+    fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
+
+    fun clearPageContext() = viewModel?.removePageContext()
+
+    fun getPageContext(): PageContextAttachment? = viewModel?.getPageContext()
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
@@ -158,6 +179,10 @@ class AttachmentView(
         }
         scroll.addView(row)
 
+        val pageContext = PageContextAttachmentView(context)
+        row.addView(pageContext)
+        pageContextContainer = pageContext
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
         }
@@ -185,6 +210,7 @@ class AttachmentView(
         val imagesView = imageAttachmentsContainer ?: return
         syncImages(imagesView, state)
         syncFiles(state)
+        syncPageContext(state)
         val errorMessage =
             state.imageLimitError
                 ?: state.fileLimitError
@@ -215,6 +241,24 @@ class AttachmentView(
         }
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
+        }
+    }
+
+    private fun syncPageContext(state: AttachmentViewModel.AttachmentState) {
+        val view = pageContextContainer ?: return
+        val next = state.pageContext
+        if (next == null) {
+            view.hide()
+        } else if (view.current() != next) {
+            view.show(next) {
+                viewModel?.removePageContext()
+                onPageContextRemoved?.invoke()
+            }
+            view.faviconView()?.let { faviconView ->
+                viewModel?.viewModelScope?.launch {
+                    faviconManager?.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
+                }
+            }
         }
     }
 
@@ -252,7 +296,7 @@ class AttachmentView(
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
 
-        if (!supportsImages && supportedFileTypes.isEmpty()) return
+        if (!supportsImages && supportedFileTypes.isEmpty() && !isContextual) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -303,6 +347,22 @@ class AttachmentView(
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
                 onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+            }
+        }
+
+        if (isContextual) {
+            val pageContextAttached = viewModel?.getPageContext() != null
+            addMenuItem(
+                container = container,
+                iconRes = R.drawable.ic_page_content_attach_24,
+                titleRes = if (pageContextAttached) {
+                    R.string.duckChatContextualAskAboutPage
+                } else {
+                    R.string.duckChatContextualAskAboutTab
+                },
+            ) {
+                popup.dismiss()
+                if (pageContextAttached) onAskAboutPage?.invoke() else onAskAboutTab?.invoke()
             }
         }
 
