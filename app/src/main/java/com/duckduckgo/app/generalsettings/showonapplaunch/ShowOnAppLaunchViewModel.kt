@@ -100,6 +100,16 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
         viewModelScope.launch(dispatcherProvider.io()) {
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
+            val (countPixel, dailyPixel) = when (option) {
+                ShowOnAppLaunchOption.LastOpenedTab ->
+                    ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB to ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY
+                ShowOnAppLaunchOption.NewTabPage ->
+                    ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY
+                is ShowOnAppLaunchOption.SpecificPage ->
+                    ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY
+            }
+            pixel.fire(countPixel, type = Count)
+            pixel.fire(dailyPixel, type = Daily())
         }
     }
 
