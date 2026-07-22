@@ -1274,6 +1274,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("123", "Chat", 1L))
 
         testee.commands.test {
             testee.onSheetOpened(tabId)
@@ -1400,6 +1401,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
 
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -1412,6 +1414,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
@@ -1441,6 +1444,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertEquals("abc-123", testee.chatId.value)
@@ -2527,77 +2531,13 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when loaded chat deleted elsewhere then sheet resets to input without forcing sheet open`() = runTest {
+    fun `when sheet opened and stored chat was deleted while away then sheet resets to input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L), fakeChat("a", "A", 5L))
+        recentChatsFlow.value = listOf(fakeChat("other", "Other", 5L))
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
         val testee = buildViewModel()
+
         testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals("current", testee.chatId.value)
-
-        testee.commands.test {
-            expectMostRecentItem() // drain setup commands
-            recentChatsFlow.value = listOf(fakeChat("a", "A", 5L)) // current chat deleted elsewhere
-            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-            expectNoEvents() // no ChangeSheetState command -> sheet position untouched
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
-        assertNull(testee.chatId.value)
-        assertNull(contextualDataStore.getTabChatUrl("tab-1"))
-        verify(duckChatJSHelper).onNativeAction(NativeAction.NEW_CHAT)
-    }
-
-    @Test
-    fun `when brand new chat not yet persisted then sheet is not reset`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = emptyList()
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=new")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        // List changes but never contained the new chat -> it was never seen, so do not treat as deletion.
-        recentChatsFlow.value = listOf(fakeChat("unrelated", "Unrelated", 1L))
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("new", testee.chatId.value)
-        verify(duckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
-    }
-
-    @Test
-    fun `when a different chat is deleted then loaded chat sheet is not reset`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L), fakeChat("other", "Other", 5L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L)) // a different chat deleted
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("current", testee.chatId.value)
-    }
-
-    @Test
-    fun `when all chats deleted while a chat is loaded then sheet resets to input`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        recentChatsFlow.value = emptyList() // e.g. clear-all / fire button
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
@@ -2606,41 +2546,32 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when chat history keeps updating after a deletion then sheet is reset only once`() = runTest {
+    fun `when sheet opened and stored chat still in history then session is restored to webview`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
         val testee = buildViewModel()
+
         testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        recentChatsFlow.value = emptyList() // loaded chat deleted -> reset
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-        // Further history emissions that still lack the (now cleared) chat must not retrigger the reset.
-        recentChatsFlow.value = listOf(fakeChat("unrelated", "Unrelated", 1L))
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
-        verify(duckChatJSHelper, times(1)).onNativeAction(NativeAction.NEW_CHAT)
+        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+        assertEquals("current", testee.chatId.value)
     }
 
     @Test
-    fun `when improvements disabled and loaded chat deleted then sheet is not reset`() = runTest {
+    fun `when improvements disabled and stored chat was deleted while away then sheet still resets to input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
         recentChatsFlow.value = emptyList()
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        // Deletion observation is gated behind contextualSheetImprovements, so nothing resets when it is off.
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("current", testee.chatId.value)
+        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
+        assertNull(testee.chatId.value)
+        assertNull(contextualDataStore.getTabChatUrl("tab-1"))
     }
 
     @Test
