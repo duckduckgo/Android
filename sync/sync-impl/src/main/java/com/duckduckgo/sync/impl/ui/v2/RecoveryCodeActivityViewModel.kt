@@ -21,10 +21,10 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
@@ -53,7 +53,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val recoveryCodePDF: RecoveryCodePDF,
-    private val clipboard: Clipboard,
+    private val clipboard: ClipboardInteractor,
     private val syncPixels: SyncPixels,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -120,8 +120,10 @@ class RecoveryCodeActivityViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch {
             val code = viewState.first { it.recoveryCode != null }.recoveryCode ?: return@launch
-            clipboard.copyToClipboard(code)
-            showMessage(R.string.sync_code_copied_message)
+            val isNotificationShown = clipboard.copyToClipboard(code, isSensitive = true)
+            if (!isNotificationShown) {
+                showMessage(R.string.sync_code_copied_message)
+            }
         }
     }
 

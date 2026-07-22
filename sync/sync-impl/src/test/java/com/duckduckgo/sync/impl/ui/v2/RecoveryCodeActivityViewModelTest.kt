@@ -18,9 +18,9 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import android.content.Context
 import app.cash.turbine.test
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.AccountInfo
-import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -64,7 +64,7 @@ class RecoveryCodeActivityViewModelTest {
         onBlocking { isAutoRestoreAvailable() } doReturn false
     }
     private val recoveryCodePDF = mock<RecoveryCodePDF>()
-    private val clipboard = mock<Clipboard>()
+    private val clipboard = mock<ClipboardInteractor>()
     private val syncPixels = mock<SyncPixels>()
     private val syncSetupWideEvent = mock<SyncSetupWideEvent>()
     private val context = mock<Context>()
@@ -271,12 +271,13 @@ class RecoveryCodeActivityViewModelTest {
 
         testee.onCopyCodeClicked()
 
-        verify(clipboard).copyToClipboard("raw-code")
+        verify(clipboard).copyToClipboard("raw-code", isSensitive = true)
     }
 
     @Test
-    fun `when the user copies the code then a confirmation message is shown`() = runTest {
+    fun `when the user copies the code and the system shows no notification then a confirmation message is shown`() = runTest {
         givenRecoveryCodeAvailable()
+        whenever(clipboard.copyToClipboard(any(), any())).thenReturn(false)
 
         testee.commands.test {
             testee.onCopyCodeClicked()
@@ -284,6 +285,20 @@ class RecoveryCodeActivityViewModelTest {
             val command = awaitItem()
             assertIs<ShowMessage>(command)
             assertEquals(R.string.sync_code_copied_message, command.message)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user copies the code and the system shows a notification then no confirmation message is shown`() = runTest {
+        givenRecoveryCodeAvailable()
+        whenever(clipboard.copyToClipboard(any(), any())).thenReturn(true)
+
+        testee.commands.test {
+            testee.onCopyCodeClicked()
+
+            expectNoEvents()
 
             cancel()
         }
