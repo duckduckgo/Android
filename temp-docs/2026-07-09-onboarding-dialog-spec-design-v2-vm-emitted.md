@@ -60,11 +60,11 @@ more.
   …); `Command.SkipDialogAnimation`; re-entry snap gated by `hasAnimatedCurrentDialog`;
   re-entry intro guarded by `hasPlayedIntroAnimation`.
 - **Dialog types:** `INITIAL`, `INITIAL_REINSTALL_USER`, `SYNC_RESTORE`, `COMPARISON_CHART`,
-  `AI_COMPARISON_CHART`, `SKIP_ONBOARDING_OPTION`, `ADDRESS_BAR_POSITION`, `INPUT_SCREEN`,
-  `INPUT_SCREEN_PREVIEW`, `QUICK_SETUP`.
+  `AI_COMPARISON_CHART`, `SKIP_ONBOARDING_OPTION`, `ADD_TO_DOCK`, `WIDGET_PROMPT`,
+  `ADDRESS_BAR_POSITION`, `INPUT_SCREEN`, `INPUT_SCREEN_PREVIEW`, `QUICK_SETUP`.
 - **Background already spec-like:** `OnboardingBackgroundAnimator` + `OnboardingBackgroundStep`
-  (`Welcome`, `QuickSetup`, `AddressBar`, `InputType`, `ComparisonChart`) owns its own
-  `transitionTo` / `snapTo`.
+  (`Welcome`, `ComparisonChart`, `AddToDock`, `AddWidget`, `QuickSetup`, `AddressBar`,
+  `InputType`) owns its own `transitionTo` / `snapTo`.
 - **Content already include-based:** six stacked includes in
   `pre_onboarding_dax_dialog_cta_brand_design_update.xml`, toggled by visibility over
   shared `primaryCta` / `secondaryCta` and a `stepIndicator`.
@@ -124,13 +124,15 @@ sealed interface ContentSpec {
     // stateless
     data object Welcome : ContentSpec
     data class ComparisonChart(val config: ComparisonChartConfig) : ContentSpec
+    data object AddToDock : ContentSpec       // "add to dock" promo (title-typing + body + looping video)
+    data object WidgetPrompt : ContentSpec    // "add widget" promo (title-typing + body + image); Add / Skip CTAs
 
     // stateful — carry SEED values; live edits owned by a view-scoped holder,
     // result forwarded to the main VM on submit
     data class AddressBar(val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
     data class InputScreen(val initialWithAi: Boolean) : ContentSpec
     data class InputScreenPreview(val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
-    data class QuickSetup(val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
+    data class QuickSetup(val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
 }
 ```
 
@@ -141,6 +143,8 @@ Renderer side:
 fun ContentBinder.render(content: ContentSpec, view: View): Animator? = when (content) {
     Welcome                  -> { show(welcomeContent); null }
     is ComparisonChart       -> { populate(view, content.config); comparisonChartIntro(view) }
+    AddToDock                -> { startAddToDockVideo(view); titleTypingIntro(view) }
+    WidgetPrompt             -> { bindWidgetPrompt(view); titleTypingIntro(view) }
     is AddressBar            -> { bindAddressBar(view, content); positionPickerIntro(view) }
     is InputScreen           -> { bindInputScreen(view, content); null }
     is InputScreenPreview    -> { bindPreview(view, content); suggestionButtonsIntro(view) }
@@ -173,7 +177,7 @@ Where the old fields go:
 | `selectedAddressBarPosition`, `showSplitOption` | `ContentSpec.AddressBar` (seed) + holder (live) |
 | `inputScreenSelected` | `ContentSpec.InputScreen` (seed) + holder (live) |
 | `inputScreenPreview*` (3 fields) | `ContentSpec.InputScreenPreview` |
-| `hideSetDefaultBrowserRow`, `hideAddWidgetRow` | `ContentSpec.QuickSetup` |
+| `hideSetDefaultBrowserRow`, `hideAddWidgetRow`, `hideAddressBarRow` | `ContentSpec.QuickSetup` |
 | `currentPageNumber`, `maxPageCount` | `DialogSpec.stepIndicator: StepProgress?` |
 | `isReinstallUser`, `isCustomAiOnboardingFlow` | private VM flow inputs; reflected in the built spec (e.g. CTA presence, `ComparisonChartConfig` variant), not exposed on `ViewState` |
 
@@ -222,8 +226,8 @@ the bulk of the 3k lines.
    fields into the spec; (b) route it through `DialogRenderer`; (c) delete its branch from
    both `configureDaxCta` and `showDialogWithoutAnimation`. Order, simplest first:
    `INITIAL` / `INITIAL_REINSTALL_USER` / `SYNC_RESTORE` → `COMPARISON_CHART` /
-   `AI_COMPARISON_CHART` → `SKIP_ONBOARDING_OPTION` → `ADDRESS_BAR_POSITION` →
-   `INPUT_SCREEN` → `INPUT_SCREEN_PREVIEW` → `QUICK_SETUP`.
+   `AI_COMPARISON_CHART` → `ADD_TO_DOCK` / `WIDGET_PROMPT` → `SKIP_ONBOARDING_OPTION` →
+   `ADDRESS_BAR_POSITION` → `INPUT_SCREEN` → `INPUT_SCREEN_PREVIEW` → `QUICK_SETUP`.
 3. **Extract the three state holders** as their stateful contents migrate; result → VM on
    submit (VM callback surface unchanged).
 4. **Delete** the legacy `when` blocks and the now-dead `ViewState` fields once all types
@@ -278,6 +282,8 @@ Derived from `configureDaxCta`. The VM flow encodes this as `DialogSpec` constru
 |---|---|---|---|---|
 | INITIAL / INITIAL_REINSTALL_USER / SYNC_RESTORE | Welcome | WalkingDax | Welcome | optional secondary CTA (skip/restore) |
 | COMPARISON_CHART / AI_COMPARISON_CHART | ComparisonChart | BottomWing | ComparisonChart | fresh-entry snap vs morph; intro (title type + table + checks); custom-AI copy variant |
+| ADD_TO_DOCK | AddToDock (title-typing + body + video) | none (wings dismissed) | AddToDock | Continue CTA; experiment-gated |
+| WIDGET_PROMPT | WidgetPrompt (title-typing + body + image) | LeftWing | AddWidget | Add / Skip CTAs; experiment-gated. The system add-widget flow itself is a `Command`, not a bubble dialog |
 | SKIP_ONBOARDING_OPTION | *fade-swap (confirm)* | — | — | fade-out → swap → fade-in |
 | ADDRESS_BAR_POSITION | AddressBar | BobbingDax (in) | AddressBar | position picker; split option gated |
 | INPUT_SCREEN | InputScreen | BobbingDax (out) + LeftWing (in) | InputType | AI toggle picker |

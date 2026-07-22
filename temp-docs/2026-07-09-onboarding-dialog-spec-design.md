@@ -47,8 +47,7 @@ dialog is described twice and every new ordering touches both.
 **Non-goals (this pass)**
 
 - Rewriting the ViewModel. It already emits `currentDialog: PreOnboardingDialogType` plus
-  interaction state through a clean flow abstraction (`LegacyFlow` / `OrchestratorFlow`).
-  The spec is a **pure view-layer** concern.
+  interaction state, driven by the orchestrator. The spec is a **pure view-layer** concern.
 - Spec-ifying the one-time **intro / outro** animations (logo, title slide-up, background
   reveal). They are preambles, not dialog↔dialog transitions. They stay as-is initially.
 - Shipping a migration. This document establishes feasibility and the target shape.
@@ -63,15 +62,15 @@ Facts the design builds on, from the current code:
   arrives as `Command.SkipDialogAnimation`; re-entry snap is gated by
   `hasAnimatedCurrentDialog`.
 - **Dialog types:** `INITIAL`, `INITIAL_REINSTALL_USER`, `SYNC_RESTORE`, `COMPARISON_CHART`,
-  `AI_COMPARISON_CHART`, `SKIP_ONBOARDING_OPTION`, `ADDRESS_BAR_POSITION`, `INPUT_SCREEN`,
-  `INPUT_SCREEN_PREVIEW`, `QUICK_SETUP`.
+  `AI_COMPARISON_CHART`, `SKIP_ONBOARDING_OPTION`, `ADD_TO_DOCK`, `WIDGET_PROMPT`,
+  `ADDRESS_BAR_POSITION`, `INPUT_SCREEN`, `INPUT_SCREEN_PREVIEW`, `QUICK_SETUP`.
 - **Background is already spec-like:** `OnboardingBackgroundAnimator` +
-  `OnboardingBackgroundStep` (`Welcome`, `QuickSetup`, `AddressBar`, `InputType`,
-  `ComparisonChart`) owns its own `transitionTo` / `snapTo`. The spec only names a target
-  step.
+  `OnboardingBackgroundStep` (`Welcome`, `ComparisonChart`, `AddToDock`, `AddWidget`,
+  `QuickSetup`, `AddressBar`, `InputType`) owns its own `transitionTo` / `snapTo`. The spec
+  only names a target step.
 - **Content is already include-based:** `pre_onboarding_dax_dialog_cta_brand_design_update.xml`
-  stacks six content includes (`welcomeContent`, `comparisonChartContent`,
-  `addressBarContent`, `inputScreenContent`, `inputScreenPreviewContent`,
+  stacks eight content includes (`welcomeContent`, `comparisonChartContent`, `addToDockContent`,
+  `widgetPromptContent`, `addressBarContent`, `inputScreenContent`, `inputScreenPreviewContent`,
   `reinstallerQuickSetupContent`) toggled by visibility, over shared `primaryCta` /
   `secondaryCta` and a `stepIndicator`.
 - **Seed of the idea already exists:** `ComparisonChartConfig` is a sealed class that
@@ -149,6 +148,8 @@ sealed interface ContentSpec {
     // stateless
     data class Welcome(...) : ContentSpec
     data class ComparisonChart(val config: ComparisonChartConfig) : ContentSpec
+    data object AddToDock : ContentSpec        // "add to dock" promo (title-typing + body + video)
+    data object WidgetPrompt : ContentSpec     // "add widget" promo (title-typing + body + image); Add / Skip CTAs
 
     // stateful — own a view-scoped holder; result -> main VM on submit
     data class AddressBar(val holder: AddressBarStateHolder) : ContentSpec
@@ -242,8 +243,8 @@ snapped descriptions of a dialog to drift apart.
 2. **Move one dialog type at a time** into the registry + renderer, deleting its branch
    from `configureDaxCta` and `showDialogWithoutAnimation`. Suggested order, simplest
    first: `INITIAL` / `INITIAL_REINSTALL_USER` / `SYNC_RESTORE` → `COMPARISON_CHART` /
-   `AI_COMPARISON_CHART` → `SKIP_ONBOARDING_OPTION` → `ADDRESS_BAR_POSITION` →
-   `INPUT_SCREEN` → `INPUT_SCREEN_PREVIEW` → `QUICK_SETUP`.
+   `AI_COMPARISON_CHART` → `ADD_TO_DOCK` / `WIDGET_PROMPT` → `SKIP_ONBOARDING_OPTION` →
+   `ADDRESS_BAR_POSITION` → `INPUT_SCREEN` → `INPUT_SCREEN_PREVIEW` → `QUICK_SETUP`.
 3. **Extract state holders** for the three stateful contents as they are migrated,
    forwarding results to the VM on submit (VM interface unchanged).
 4. **Delete** the now-empty legacy `when` blocks once all types are migrated.
@@ -287,6 +288,8 @@ Derived from `configureDaxCta`; the registry encodes this table as data.
 |---|---|---|---|---|
 | INITIAL / INITIAL_REINSTALL_USER / SYNC_RESTORE | welcome | WalkingDax | Welcome | optional secondary CTA (skip/restore) |
 | COMPARISON_CHART / AI_COMPARISON_CHART | comparisonChart | BottomWing | ComparisonChart | fresh-entry snap vs morph transition; content intro (title type + table + checks) |
+| ADD_TO_DOCK | addToDock | none (wings dismissed) | AddToDock | Continue CTA; experiment-gated |
+| WIDGET_PROMPT | widgetPrompt | LeftWing | AddWidget | Add / Skip CTAs; experiment-gated |
 | SKIP_ONBOARDING_OPTION | *fade-swap (confirm)* | — | — | fade-out → swap → fade-in |
 | ADDRESS_BAR_POSITION | addressBar | BobbingDax (in) | AddressBar | position picker; split option gated |
 | INPUT_SCREEN | inputScreen | BobbingDax (out) + LeftWing (in) | InputType | AI toggle picker |

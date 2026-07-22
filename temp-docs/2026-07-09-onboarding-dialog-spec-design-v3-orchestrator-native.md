@@ -38,12 +38,10 @@ NewUserOnboardingActivityDialog   (orchestrator render intent + seed data, built
 
 Every new screen means touching all three layers.
 
-## 2. Starting assumption
+## 2. Starting point
 
-This design assumes **orchestrator-only** onboarding. The
-`linearOnboardingOrchestratorFeature` kill switch, the in-VM `LegacyFlow` state machine, and
-the VM's flow-selection are **removed upfront, separately**, before this work begins. v3
-does not re-derive or migrate those; it takes an orchestrator-only VM as its starting point.
+Onboarding is orchestrator-driven: the `LinearOnboardingOrchestrator` walks the plan's steps
+and the VM renders whatever the current step resolves to. v3 builds on that model.
 
 ## 3. Goals & non-goals
 
@@ -61,7 +59,6 @@ does not re-derive or migrate those; it takes an orchestrator-only VM as its sta
 
 **Non-goals**
 
-- Removing `LegacyFlow` / the feature flag (done upfront — see §2).
 - Rewriting the orchestrator, its plan/step model, or its transition semantics. Steps keep
   deciding what comes next; only their **render output** changes shape.
 - Spec-ifying the one-time **intro / outro** animations. They are preambles, not
@@ -78,18 +75,20 @@ does not re-derive or migrate those; it takes an orchestrator-only VM as its sta
 - **Render intent is already seed data:** `NewUserOnboardingActivityDialog` variants already
   carry per-dialog seeds — `AddressBarPosition(showSplitOption)`,
   `InputScreenPreview(isSearchDefault)`, `QuickSetup(showSplitOption, hideSetDefaultBrowserRow,
-  hideAddWidgetRow, isReinstallUser)`, `IntroAnimation(withDuckAi)`.
+  hideAddWidgetRow, hideAddressBarRow, isReinstallUser)`, `IntroAnimation(withDuckAi)`.
 - **Plan provider builds those closures:** `NewUserOnboardingPlanProvider` declares one
-  factory per step and composes `steps = listOf(...)`. It already forks flows
-  (`buildDefaultPlan` vs `buildCustomAiPlan`) as different step lists, and already resolves
-  async seed inside `resolveDialog` (e.g. `quickSetupStep` reads `isDefaultBrowser()` /
-  `hasInstalledWidgets`; `addressBarPositionStep` reads `isSplitOmnibarEnabled()`).
+  factory per step and composes `steps = buildList { ... }`. It already forks flows
+  (`buildDefaultPlan` vs `buildCustomAiPlan`) as different step lists, conditionally includes
+  steps by experiment variant (`if (showDock) add(addToDockStep())`; `if (showWidget) {
+  add(widgetPromptStep()); add(addWidgetStep()) }`), and resolves async seed inside
+  `resolveDialog` (e.g. `quickSetupStep` reads `isDefaultBrowser()` / `hasInstalledWidgets`;
+  `addressBarPositionStep` reads `isSplitOmnibarEnabled()`).
 - **Step indicator is position-derived:** `LinearOnboardingState.InProgress.stepIndicatorProgress()`
   computes `StepProgress(current, total)` from the position of `showsStepIndicator` steps in
   the plan — no hardcoded page numbers.
 - **Background is already spec-like:** `OnboardingBackgroundAnimator` + `OnboardingBackgroundStep`
-  (`Welcome`, `QuickSetup`, `AddressBar`, `InputType`, `ComparisonChart`) owns its own
-  `transitionTo` / `snapTo`.
+  (`Welcome`, `ComparisonChart`, `AddToDock`, `AddWidget`, `QuickSetup`, `AddressBar`,
+  `InputType`) owns its own `transitionTo` / `snapTo`.
 - **Content is already include-based:** six stacked includes in
   `pre_onboarding_dax_dialog_cta_brand_design_update.xml`, toggled by visibility over shared
   `primaryCta` / `secondaryCta` and a `stepIndicator`.
@@ -106,7 +105,7 @@ does not re-derive or migrate those; it takes an orchestrator-only VM as its sta
 ```
 Orchestrator step ── resolveDialog() ──> NewUserOnboardingActivityDialog
         │                                   ├─ Dialog(spec: DialogSpec)     → rendered in the bubble
-        │                                   └─ IntroAnimation / NotificationPermission / DefaultBrowserPrompt → side-effect commands
+        │                                   └─ IntroAnimation / NotificationPermission / DefaultBrowserPrompt / AddWidget → side-effect commands
         ▼
 VM: emit spec to ViewState.currentSpec (+ enrich with step-indicator position)
         │
@@ -125,9 +124,10 @@ step, *when / what / next / telemetry / indicator*.
 
 ### 5.2 Fold `NewUserOnboardingActivityDialog`
 
-The ten bubble variants collapse into a single `Dialog(spec)`. Only the genuine non-bubble
+The eleven bubble variants collapse into a single `Dialog(spec)`. Only the genuine non-bubble
 side-effects stay as their own variants (they are not dax-bubble dialogs — they play the
-intro Lottie, request a runtime permission, or show the system default-browser dialog):
+intro Lottie, request a runtime permission, show the system default-browser dialog, or launch
+the system add-widget flow):
 
 ```kotlin
 sealed interface NewUserOnboardingActivityDialog {
@@ -136,6 +136,7 @@ sealed interface NewUserOnboardingActivityDialog {
     data class IntroAnimation(val withDuckAi: Boolean) : NewUserOnboardingActivityDialog
     data object NotificationPermission : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
+    data object AddWidget : NewUserOnboardingActivityDialog                     // launches the system add-widget flow
 }
 ```
 
@@ -170,13 +171,15 @@ sealed interface ContentSpec {
     // stateless
     data object Welcome : ContentSpec
     data class ComparisonChart(val config: ComparisonChartConfig) : ContentSpec
+    data object AddToDock : ContentSpec       // "add to dock" promo (title-typing + body + looping video)
+    data object WidgetPrompt : ContentSpec    // "add widget" promo (title-typing + body + image); Add / Skip CTAs
 
     // stateful — carry SEED values; live edits owned by a view-scoped holder,
     // result forwarded to the VM on submit
     data class AddressBar(val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
     data class InputScreen(val initialWithAi: Boolean) : ContentSpec
     data class InputScreenPreview(val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
-    data class QuickSetup(val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
+    data class QuickSetup(val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
 }
 ```
 
@@ -185,6 +188,8 @@ sealed interface ContentSpec {
 fun ContentBinder.render(content: ContentSpec, view: View): Animator? = when (content) {
     Welcome               -> { show(welcomeContent); null }
     is ComparisonChart    -> { populate(view, content.config); comparisonChartIntro(view) }
+    AddToDock             -> { startAddToDockVideo(view); titleTypingIntro(view) }
+    WidgetPrompt          -> { bindWidgetPrompt(view); titleTypingIntro(view) }
     is AddressBar         -> { bindAddressBar(view, content); positionPickerIntro(view) }
     is InputScreen        -> { bindInputScreen(view, content); null }
     is InputScreenPreview -> { bindPreview(view, content); suggestionButtonsIntro(view) }
@@ -219,9 +224,22 @@ object DialogSpecs {
         primaryCta = CtaSpec(R.string.…, Intent.Continue), secondaryCta = null,
     )
     fun aiComparisonChart() = /* content = ComparisonChartConfig.Ai, … */
+    fun addToDock() = DialogSpec(
+        background = AddToDock, embellishment = None,     // video-centric; wings dismissed
+        title = TextSpec(R.string.preOnboardingAddToDockTitle), subtitle = null,
+        content = ContentSpec.AddToDock,
+        primaryCta = CtaSpec(R.string.preOnboardingAddToDockPrimaryCta, Intent.Continue), secondaryCta = null,
+    )
+    fun widgetPrompt() = DialogSpec(
+        background = AddWidget, embellishment = LeftWing,
+        title = TextSpec(R.string.preOnboardingWidgetPromptTitle), subtitle = null,
+        content = ContentSpec.WidgetPrompt,
+        primaryCta = CtaSpec(R.string.preOnboardingWidgetPromptPrimaryCta, Intent.AddWidget),
+        secondaryCta = CtaSpec(R.string.preOnboardingWidgetPromptSecondaryCta, Intent.SkipWidget),
+    )
     fun addressBar(initialPosition: OmnibarType, showSplitOption: Boolean) = /* embellishment = BobbingDax, … */
-    fun quickSetup(showSplitOption: Boolean, hideSetDefaultBrowserRow: Boolean, hideAddWidgetRow: Boolean, isReinstallUser: Boolean) = /* … */
-    // welcome/comparison/input/preview/skip/syncRestore/initialReinstall …
+    fun quickSetup(showSplitOption: Boolean, hideSetDefaultBrowserRow: Boolean, hideAddWidgetRow: Boolean, hideAddressBarRow: Boolean, isReinstallUser: Boolean) = /* … */
+    // welcome/comparison/addToDock/widgetPrompt/input/preview/syncRestore/initialReinstall …
 }
 ```
 
@@ -234,7 +252,7 @@ private fun comparisonChartStep() = NewUserOnboardingActivityStep(
     transition = { event -> /* unchanged */ },
 )
 
-private fun quickSetupStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
+private fun quickSetupStep(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean) = NewUserOnboardingActivityStep(
     id = QUICK_SETUP, pixelName = ONBOARDING_QUICK_SETUP,
     resolveDialog = {
         val (isDefault, hasWidget) = withContext(dispatchers.io()) {
@@ -245,6 +263,7 @@ private fun quickSetupStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardin
                 showSplitOption = isSplitOmnibarEnabled(),
                 hideSetDefaultBrowserRow = isDefault,
                 hideAddWidgetRow = hasWidget,
+                hideAddressBarRow = forceWithAiInput,
                 isReinstallUser = ctx.isReinstall,
             ),
         )
@@ -259,7 +278,7 @@ threaded anywhere.
 
 ### 5.6 VM shrink and `ViewState` collapse
 
-`observeOrchestratorState` reduces to a four-branch dispatch; `applyDialog`,
+`observeOrchestratorState` reduces to a five-branch dispatch; `applyDialog`,
 `setCurrentDialog`, `setInputScreenPreviewDialog`, and `fireDialogShownPixel` are gone:
 
 ```kotlin
@@ -268,6 +287,7 @@ when (val d = step.resolveDialog()) {
     is IntroAnimation       -> command(PlayIntroAnimation(withDuckAi = d.withDuckAi))
     NotificationPermission  -> startNotificationPermissionFlow()
     DefaultBrowserPrompt    -> showDefaultBrowserPromptOrAdvance()
+    AddWidget               -> launchAddWidgetFlow()   // result → AddWidgetFinished on return
 }
 ```
 
@@ -324,9 +344,6 @@ lines) collapses into `snapToEntered/Exited()` calls, and `configureDaxCta` shri
 
 ## 6. What collapses
 
-**Removed upfront, separately (see §2):** `linearOnboardingOrchestratorFeature` flag,
-`LegacyFlow` (~180 lines), VM flow-selection.
-
 **Removed by this design:**
 
 - `configureDaxCta` + `showDialogWithoutAnimation` (~1130 lines of duplicated per-dialog
@@ -347,9 +364,14 @@ permutation means editing the `steps = listOf(...)` in the plan provider — pre
 diffs specs, any ordering animates correctly with no new transition code, and the step
 indicator renumbers automatically from plan position.
 
-## 8. Migration plan (strangler)
+This just played out for real: the merged **add-to-dock** and **add-widget** screens entered
+the flow as a `buildList { … }` edit — `if (showDock) add(addToDockStep())` and
+`if (showWidget) { add(widgetPromptStep()); add(addWidgetStep()) }`, gated by an experiment
+variant. Under this design each new bubble screen is one step factory + one `DialogSpecs`
+builder + one `ContentSpec` (plus its binder line); a side-effect screen like `AddWidget` is
+one step factory + one dispatch branch. No engine, renderer, or `when(dialogType)` changes.
 
-Starting point: orchestrator-only VM (§2 already done).
+## 8. Migration plan (strangler)
 
 1. **Land pure-data scaffolding**, no behaviour change: `DialogSpec`, `ContentSpec`,
    `Embellishment`, `TextSpec`, `CtaSpec`, `DialogSpecs`; view-side `Transitionable`,
@@ -415,9 +437,11 @@ Derived from `configureDaxCta` + the plan provider. Encoded as `DialogSpecs` bui
 |---|---|---|---|---|
 | Initial / InitialReinstallUser / SyncRestore | Welcome | WalkingDax | Welcome | optional secondary CTA (skip/restore) |
 | ComparisonChart / AiComparisonChart | ComparisonChart | BottomWing | ComparisonChart | fresh-entry snap vs morph; intro (title type + table + checks); custom-AI copy = plan-selected builder |
+| AddToDock | AddToDock (title-typing + body + looping video) | None (wings dismissed) | AddToDock | Continue CTA; experiment-gated (`if (showDock)`) |
+| WidgetPrompt | WidgetPrompt (title-typing + body + image) | LeftWing | AddWidget | Add / Skip CTAs; experiment-gated (`if (showWidget)`) |
 | SkipNewUserOnboardingOption | *fade-swap (confirm)* | — | — | fade-out → swap → fade-in |
 | AddressBarPosition | AddressBar | BobbingDax (in) | AddressBar | position picker; split option gated |
 | InputScreen | InputScreen | BobbingDax (out) + LeftWing (in) | InputType | AI toggle picker |
 | InputScreenPreview | InputScreenPreview | wings hidden | (prev) | keyboard input + suggestion-button stagger |
 | QuickSetup | QuickSetup | BottomWing | QuickSetup | ChangeBounds + fade; row visibility from flags |
-| IntroAnimation / NotificationPermission / DefaultBrowserPrompt | — side-effect presentations, not bubble dialogs — |
+| IntroAnimation / NotificationPermission / DefaultBrowserPrompt / AddWidget | — side-effect presentations, not bubble dialogs — |
