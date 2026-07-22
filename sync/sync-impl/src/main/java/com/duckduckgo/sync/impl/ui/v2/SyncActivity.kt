@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -118,7 +117,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                startActivity(Intent(this, RecoveryCodeActivity::class.java))
+                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.deviceName))
             }
 
             is SyncThisDeviceContract.Output.Canceled -> {
@@ -150,6 +149,21 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is EditDeviceContract.Output.NoOp -> Unit
+        }
+    }
+
+    private val recoveryCodeLauncher = registerForActivityResult(
+        RecoveryCodeContract(),
+    ) { result ->
+        when (result) {
+            is RecoveryCodeContract.Output.CodeGenerated -> {
+                viewModel.onAutoRestoreToggleChanged(result.isAutoRestoreEnabled)
+            }
+
+            is RecoveryCodeContract.Output.Failure -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
         }
     }
 
