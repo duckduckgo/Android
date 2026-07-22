@@ -1,0 +1,11 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 1000000 Realtime: 2000000
+
+Total PSS by process:
+    412,880K: com.duckduckgo.mobile.android (pid 4321 / activities)
+    198,220K: com.duckduckgo.mobile.android:pir (pid 5678)
+     96,540K: com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 (pid 9012)
+     10,120K: webview_zygote (pid 3001)
+     42,000K: com.android.systemui (pid 1200)
+
+Total PSS by OOM adjustment:

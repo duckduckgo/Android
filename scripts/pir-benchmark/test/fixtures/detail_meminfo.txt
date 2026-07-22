@@ -1,0 +1,15 @@
+** MEMINFO in pid 5678 [com.duckduckgo.mobile.android:pir] **
+
+ App Summary
+                       Pss(KB)                        Rss(KB)
+                        ------                         ------
+           Java Heap:    45120                        60000
+         Native Heap:    88760                        95000
+                Code:    23450                        30000
+               Stack:     1024                         1100
+            Graphics:    65430                        70000
+       Private Other:     8000
+              System:    12000
+             Unknown:     3000
+
+           TOTAL PSS:   198220            TOTAL RSS: 320000      TOTAL SWAP PSS:  0
