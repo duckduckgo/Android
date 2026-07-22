@@ -955,8 +955,8 @@
             "state": "enabled",
             "cohorts": [
               { "name": "control", "weight": 0 },
-              { "name": "treatmentDockOnly", "weight": 1 },
-              { "name": "treatmentWidgetOnly", "weight": 0 },
+              { "name": "treatmentDockOnly", "weight": 0 },
+              { "name": "treatmentWidgetOnly", "weight": 1 },
               { "name": "treatmentDockAndWidget", "weight": 0 }
             ]
           }
