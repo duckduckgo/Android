@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hei!</string>
     <string name="preOnboardingWelcomeDialogBody1">Oletko valmis nopeampaan selaimeen, joka antaa sinulle hallinnan?</string>
     <string name="preOnboardingWelcomeDialogBody2">Tekoäly on aina valinnainen, ja yksityisyyden suoja on aina päällä.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">miten sanotaan \"ankka\" espanjaksi</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Kokeile nyt yksityistä tekoälykeskustelua!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Asetetaanko DuckDuckGo oletusselaimeksi?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Kokeile aloitusnäytön widgetiä.</string>
+    <string name="preOnboardingWidgetPromptBody">Lisää haku-widgetimme aloitusnäytöllesi, jotta löydät sen nopeasti ja helposti.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Lisää widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Ohita</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Lisää minut näytön alareunaan.</string>
+    <string name="preOnboardingAddToDockBody">Etsi DuckDuckGo-kuvake aloitusnäytöltäsi. Paina ja vedä se sitten paikalleen. Siinä kaikki!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Selvä!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Tarjoamme myös maksullisen tilauksen, joka sisältää edistyneitä tekoälymalleja, joilla on korkeammat GPT:n ja Clauden keskustelurajoitukset, turvallinen VPN ja paljon muuta.</string>
