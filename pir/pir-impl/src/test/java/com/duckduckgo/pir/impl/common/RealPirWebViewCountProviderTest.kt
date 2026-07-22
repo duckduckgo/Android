@@ -34,15 +34,18 @@ class RealPirWebViewCountProviderTest {
 
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockSelfToggle: Toggle = mock()
+    private val mockPirBenchmarkConfig: PirBenchmarkConfig = mock()
 
     private lateinit var testee: RealPirWebViewCountProvider
 
     @Before
     fun setUp() {
         whenever(mockPirRemoteFeatures.self()).thenReturn(mockSelfToggle)
+        whenever(mockPirBenchmarkConfig.getWebViewCountOverride()).thenReturn(null)
         testee = RealPirWebViewCountProvider(
             pirRemoteFeatures = mockPirRemoteFeatures,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            pirBenchmarkConfig = mockPirBenchmarkConfig,
         )
     }
 
@@ -107,5 +110,35 @@ class RealPirWebViewCountProviderTest {
         whenever(mockSelfToggle.getSettings()).thenReturn("""{"detachedWebViewCount": 40}""")
 
         assertEquals(40, testee.getMaxWebViewCount())
+    }
+
+    @Test
+    fun whenOverridePresentThenReturnsOverrideAndIgnoresRemoteConfig() = runTest {
+        whenever(mockPirBenchmarkConfig.getWebViewCountOverride()).thenReturn(1)
+        whenever(mockSelfToggle.getSettings()).thenReturn("""{"detachedWebViewCount": 20}""")
+
+        assertEquals(1, testee.getMaxWebViewCount())
+    }
+
+    @Test
+    fun whenOverrideAboveCeilingThenClampedToCeiling() = runTest {
+        whenever(mockPirBenchmarkConfig.getWebViewCountOverride()).thenReturn(100)
+
+        assertEquals(40, testee.getMaxWebViewCount())
+    }
+
+    @Test
+    fun whenOverrideBelowMinThenClampedToMin() = runTest {
+        whenever(mockPirBenchmarkConfig.getWebViewCountOverride()).thenReturn(0)
+
+        assertEquals(1, testee.getMaxWebViewCount())
+    }
+
+    @Test
+    fun whenOverrideNullThenFallsThroughToRemoteConfig() = runTest {
+        whenever(mockPirBenchmarkConfig.getWebViewCountOverride()).thenReturn(null)
+        whenever(mockSelfToggle.getSettings()).thenReturn("""{"detachedWebViewCount": 8}""")
+
+        assertEquals(8, testee.getMaxWebViewCount())
     }
 }

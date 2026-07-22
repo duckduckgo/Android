@@ -38,9 +38,13 @@ interface PirWebViewCountProvider {
 class RealPirWebViewCountProvider @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
+    private val pirBenchmarkConfig: PirBenchmarkConfig,
 ) : PirWebViewCountProvider {
 
     override suspend fun getMaxWebViewCount(): Int = withContext(dispatcherProvider.io()) {
+        pirBenchmarkConfig.getWebViewCountOverride()?.let { override ->
+            return@withContext override.coerceIn(MIN_DETACHED_WEBVIEW_COUNT, MAX_DETACHED_WEBVIEW_COUNT_CEILING)
+        }
         runCatching {
             val settings = pirRemoteFeatures.self().getSettings() ?: return@runCatching DEFAULT_MAX_DETACHED_WEBVIEW_COUNT
             val json = JSONObject(settings)
