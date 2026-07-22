@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Find Asana Task ID from PR body
         id: find-asana-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
@@ -21,7 +21,7 @@ jobs:
 
       - name: Move task to In Review in Agentic Backlog
         if: ${{ steps.find-asana-task.outputs.asanaTaskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_AGENTIC_BACKLOG_PROJECT_ID }}
