@@ -16,10 +16,12 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import android.Manifest
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -28,6 +30,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
@@ -44,6 +47,7 @@ import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
@@ -79,6 +83,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -106,6 +111,12 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var shareAction: ShareAction
 
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
@@ -158,6 +169,14 @@ class SyncActivity : DuckDuckGoActivity() {
         if (!isSuccess) {
             viewModel.onSyncThisDeviceCanceled()
             viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+        if (isGranted) {
+            lifecycleScope.launch { viewModel.generateRecoveryCode(this@SyncActivity) }
+        } else {
+            Snackbar.make(binding.root, R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -285,7 +304,11 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is CheckIfUserHasStoragePermission -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                if (appBuildConfig.sdkInt < 30) {
+                    downloadPdfPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                } else {
+                    lifecycleScope.launch { viewModel.generateRecoveryCode(this@SyncActivity) }
+                }
             }
 
             is DeepLinkIntoSetup -> {
@@ -331,7 +354,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is RecoveryCodePDFSuccess -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    shareAction.shareFile(this, command.recoveryCodePDFFile)
+                }
             }
 
             is RequestSetupAuthentication -> {
@@ -404,7 +429,12 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecoverySection() {
-        binding.includeEnabledView.restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
+        binding.includeEnabledView.apply {
+            restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
+            downloadRecoveryCodeItem.setOnClickListener {
+                viewModel.onSaveRecoveryCodeClicked()
+            }
+        }
     }
 
     private fun configureDataExpirationNotice() {
