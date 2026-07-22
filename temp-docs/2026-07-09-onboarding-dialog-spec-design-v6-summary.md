@@ -228,7 +228,7 @@ note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing spec agains
 
 **Two policies the VM owns explicitly.** `animate` is keyed by step identity: the first render
 of a step animates, re-renders (rotation, re-emission) snap. An empty stage — first dialog,
-return from `BrowserActivity`, migration handoff — always animates its entrance: one global
+return from `BrowserActivity` — always animates its entrance: one global
 policy, replacing today's mixed behaviour where only the comparison chart animates on re-entry
 and everything else snaps. The VM is recreated on every activity entry and the orchestrator is
 in-memory, so step identity is the only durable signal; the POC validates it suffices.
@@ -243,8 +243,8 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 - One owner for running animations: tap-to-skip and view teardown become one call instead of
   hand-enumerating ~25 animators. This pays off even before any re-ordering does.
 - Every dialog can enter from an empty stage. "No previous spec" means clear the stage
-  and enter — not a special case. This covers the first dialog, returns from
-  `BrowserActivity` (today a hand-coded comparison-chart path), and migration handoffs.
+  and enter — not a special case. This covers the first dialog and returns from
+  `BrowserActivity` (today a hand-coded comparison-chart path).
 - `ViewState` collapses from 16 fields (one already write-only dead) to a spec and two flags;
   the VM's dialog switch reduces to five branches — the four command-only steps (intro
   animation, notification permission, default browser, add widget) plus one for every
@@ -262,15 +262,53 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 |---|---|
 | Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared spec ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
 | Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
-| Regression in a release-critical flow | Strangler migration: one dialog at a time, each step shippable and revertible, legacy and new renderer coexist (legacy stays authoritative for unmigrated screens; the engine clears the stage when taking over). Maestro release-blocker flows plus unit tests gate every step |
+| Regression in a release-critical flow | Whole parallel renderer behind a remote toggle (see Rollout): the flag-off arm stays byte-identical, mixed-renderer sessions never exist, and the kill switch needs no release. Maestro release-blocker flows run in both flag states, plus unit tests off the resolver |
 | Two consecutive steps resolve identical specs, `StateFlow` swallows the second | Emitted state is keyed by step id, not spec equality alone |
 | Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content spec or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
 ## Rollout
 
-Scaffolding first (pure data types + engine, no behaviour change), then migrate screens
-simplest-first, then delete the legacy when-blocks, `PreOnboardingDialogType` (including the
-dead `SKIP_ONBOARDING_OPTION`, never produced by this VM), and dead `ViewState` fields
-(`isReinstallUser` is write-only today — audit during migration whether `QuickSetup` needs
-the flag at all). POC before committing: the three-screen chain above exercises every
-risky mechanism in one pass.
+Behind a remote feature flag from day one: a new toggle on the existing
+`OnboardingBrandDesignUpdateToggles` (e.g. `specDrivenDialogs()`, default INTERNAL). The flag
+selects a whole parallel renderer, not per-screen paths.
+`OnboardingPageManager`/`OnboardingPageBuilder` already choose between welcome-page fragments
+(legacy vs brand-design); the toggle adds one more branch at that seam — a new spec-driven
+fragment when on, the existing `BrandDesignUpdateWelcomePage` untouched when off. Mixed-renderer
+sessions never exist, so no legacy screen ever follows an engine-rendered one (which would trip
+exactly the neighbor assumptions this design deletes), and the flag-off arm stays byte-identical
+throughout. The remote toggle doubles as a no-release kill switch.
+
+Shared vs duplicated while both arms exist:
+
+- **Orchestrator and plan provider: untouched.** Steps keep returning
+  `NewUserOnboardingActivityDialog`; the new path adds one pure `DialogSpecResolver` (a single
+  `when` mapping dialog → `DialogSpec`) — the unit-testable spec source immediately, inlined
+  into the steps at cleanup. That is when "plan provider is the single authority" lands; until
+  then neither the plan nor the legacy VM sees the flag.
+- **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
+  the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
+  in place first, with legacy binding through it — the single legacy edit of the rollout.
+- **New slim VM.** Spec + two flags + live-value store. The shown-pixel map (~15 lines) is
+  duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
+  are directly comparable. Command handling for the command-only steps and the quick-setup
+  syncs ports as-is.
+
+Sequence:
+
+1. `OnboardingDialogTitleView` include refactor in place (only legacy edit; ships alone).
+2. Dark scaffolding: `DialogSpec` types + resolver + engine + binder + new fragment/VM behind
+   the flag at INTERNAL. The POC chain (welcome → comparison → address-bar) exercises every
+   risky mechanism in one pass on internal builds before anything else is built.
+3. Remaining screens, one dark PR each — any order; no coexistence constraints.
+4. Gate: Maestro release-blocker flows run in both flag states; unit tests assert specs
+   straight off the resolver.
+5. Ramp as an experiment with pixel parity between arms; kill switch armed.
+6. 100% plus one release of soak → delete the legacy fragment, VM, when-blocks, and
+   `PreOnboardingDialogType` (including the dead `SKIP_ONBOARDING_OPTION`, never produced by
+   this VM) and dead `ViewState` fields (`isReinstallUser` is write-only today — audit whether
+   `QuickSetup` needs the flag at all); inline the resolver into the steps; retire the flag.
+
+Trade-off, named: nothing user-visible ships until every screen renders in the new path.
+Bounded — 8 binder branches plus the engine; screens still land as small continuous dark PRs,
+not a long-lived branch. Incremental user-visible shipping was the in-place strangler's only
+advantage, and it bought mixed-renderer coexistence to get it.
