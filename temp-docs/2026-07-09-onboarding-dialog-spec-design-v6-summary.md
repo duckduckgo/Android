@@ -76,7 +76,7 @@ sealed interface ContentSpec {
     data class AddToDock(override val title: TextSpec) : ContentSpec
     data class WidgetPrompt(override val title: TextSpec) : ContentSpec
 
-    // stateful: seed in, live edits stay in the view layer, result comes back on submit
+    // stateful: seed in, live edits mirror into a plain VM field, submit event built from the current selection
     data class AddressBar(override val title: TextSpec, val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
     data class InputScreen(override val title: TextSpec, val initialWithAi: Boolean) : ContentSpec
     data class InputScreenPreview(override val title: TextSpec, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
@@ -95,7 +95,7 @@ class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
     val intro: Animator? = null,             // bespoke extras only (check-icon stagger, suggestion buttons)
-    val result: (() -> ContentResult)? = null, // stateful screens: read on Submit
+    val result: (() -> NewUserOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
     val unbind: () -> Unit = {},             // resource release, animation cancels
 )
 ```
@@ -108,18 +108,23 @@ widget, dropped into each layout. The binder sets `content.title` on
 it; the rendering engine tells it when to type or snap. No screen re-implements title behavior.
 
 **Stateful screens** (address bar, input screen, quick setup). User edits inside the screen
-stay in a small, VM-backed holder (to survive config changes), so the engine only diffs on
-real step changes. The result crosses to the orchestrator on submit:
+never produce a new spec, so the engine only diffs on real step changes. No holder object is
+needed — two existing mechanisms cover it:
 
-```kotlin
-// view layer, one per stateful screen
-class AddressBarStateHolder(seed: ContentSpec.AddressBar) {
-    var selected = seed.initialPosition
-        private set
-    fun select(position: OmnibarType) { selected = position }  // live edit, no spec re-emit
-    fun result() = ContentResult.AddressBar(selected)          // read once on Submit
-}
-```
+- **Live value.** The view writes edits into a small typed key-value store owned by the VM
+  (`viewModel.liveValues[AddressBarPosition] = it`). It is not render state, so nothing
+  re-renders; it survives rotation because the VM does, and the binder seeds the picker from
+  it, falling back to the spec's initial value. The VM never reads the store — it just owns
+  it. Adding a stateful screen means a new key, not a new VM field, so the pattern stays
+  constant-cost as screens are added.
+- **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
+  event directly from the current selection (`{ AddressBarConfirmed(picker.selected) }`).
+  The CTA click just fires whatever the closure returns — the VM forwards events and never
+  needs to know which screen is showing.
+
+If a future screen's live state needs to influence *other* steps before submit, the store
+is not the tool: that value should travel through an orchestrator event into the plan's
+context (existing precedent: the pending Duck.ai prompt). Escape valve, not the default.
 
 **The binder** is the only place that knows which layout include belongs to which
 `ContentSpec`. It sets the spec's data on the views and returns the handle:
@@ -138,9 +143,9 @@ class ContentBinder(private val binding: …) {
             ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), intro = checkIconStagger())
         }
         is ContentSpec.AddressBar -> with(binding.addressBarContent) {
-            val holder = AddressBarStateHolder(content)
-            picker.onOptionSelected = holder::select
-            ContentHandle(title = titleView, fadeTargets = listOf(picker), result = holder::result)
+            picker.selected = viewModel.liveValues[AddressBarPosition] ?: content.initialPosition
+            picker.onOptionSelected = { viewModel.liveValues[AddressBarPosition] = it }  // survives rotation
+            ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(picker.selected) })
         }
         is ContentSpec.AddToDock -> with(binding.addToDockContent) {
             ContentHandle(title = titleView, fadeTargets = listOf(body, video), unbind = { releaseVideo() })
@@ -183,14 +188,15 @@ note right : animate = false runs the same\npipeline snapped to end states\n(rot
 
 == Interaction ==
 User -> Binder : live edits (picker, toggle)
-note right : stay in the state holder;\nno new spec, no re-render
+Binder -> VM : value into keyed live-value store\n(VM-owned, survives rotation)
+note right : no new spec, no re-render
 User -> VM : CTA click
-alt state
+alt action is Emit(event)
   VM -> Orchestrator : event as-is
 else action is Submit
   VM -> Binder : handle.result()
-  Binder --> VM : ContentResult
-  VM -> Orchestrator : result mapped to its event
+  Binder --> VM : event built from current selection
+  VM -> Orchestrator : event
 end
 
 == Step change ==

@@ -137,7 +137,7 @@ class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
     val intro: Animator? = null,             // bespoke extras only (check-icon stagger, suggestion buttons)
-    val result: (() -> ContentResult)? = null, // stateful screens: read on Submit
+    val result: (() -> NewUserOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
     val unbind: () -> Unit = {},             // video release, animation cancels
 )
 ```
@@ -150,28 +150,40 @@ widget, dropped into each include in place of the pair. The binder sets `content
 it; the engine tells it when to type or snap. No screen re-implements title behaviour.
 
 **Stateful screens** (address bar, input screen, quick setup). User edits inside the screen
-stay in a small view-layer holder and never produce a new spec, so the engine only diffs on
-real step changes. The result crosses to the VM once, on Submit:
+never produce a new spec, so the engine only diffs on real step changes. No holder object —
+two existing mechanisms cover it:
+
+- **Live value.** The view writes edits into a small typed key-value store owned by the VM.
+  Not render state, so nothing re-renders; survives rotation because the VM does. The binder
+  seeds the picker from it, falling back to the spec's initial value. The VM never reads the
+  store — adding a stateful screen means a new key, not a new VM field, so cost stays
+  constant as screens are added.
+- **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
+  event from the current selection. The VM just forwards it, without knowing which screen
+  is showing.
 
 ```kotlin
-// view layer, one per stateful screen
-class AddressBarStateHolder(seed: ContentSpec.AddressBar) {
-    var selected = seed.initialPosition
-        private set
-    fun select(position: OmnibarType) { selected = position }  // live edit, no spec re-emit
-    fun result() = ContentResult.AddressBar(selected)          // read once on Submit
+class LiveKey<T>(val name: String)
+
+// VM-owned; the VM never reads it
+class LiveValues {
+    private val values = mutableMapOf<LiveKey<*>, Any?>()
+    operator fun <T> get(key: LiveKey<T>): T? = values[key] as T?
+    operator fun <T> set(key: LiveKey<T>, value: T) { values[key] = value }
+    fun clear() { values.clear() }   // when the plan finishes or aborts
 }
 
 // in the binder
 is ContentSpec.AddressBar -> {
-    val holder = AddressBarStateHolder(content)
-    picker.onOptionSelected = holder::select
-    ContentHandle(title = …, fadeTargets = listOf(picker), result = holder::result)
+    picker.selected = viewModel.liveValues[AddressBarPosition] ?: content.initialPosition
+    picker.onOptionSelected = { viewModel.liveValues[AddressBarPosition] = it }  // survives rotation
+    ContentHandle(title = …, fadeTargets = listOf(picker), result = { AddressBarConfirmed(picker.selected) })
 }
 ```
 
-To survive rotation, the holder's live value is backed by a small dedicated VM field; the
-holder is a thin facade over it.
+If a future screen's live state needs to influence *other* steps before submit, the store is
+not the tool: that value should travel through an orchestrator event into the plan's context
+(existing precedent: `ctx.pendingDuckAiPrompt`). Escape valve, not the default.
 
 ### 4.4 CTAs
 
@@ -188,7 +200,7 @@ data class CtaSpec(val label: TextSpec, val action: CtaAction)
 sealed interface CtaAction {
     /** Fire this orchestrator event as-is. */
     data class Emit(val event: NewUserOnboardingEvent) : CtaAction
-    /** Stateful screens: read ContentHandle.result() and map it to its event. */
+    /** Stateful screens: fire the event built by ContentHandle.result(). */
     data object Submit : CtaAction
 }
 ```
@@ -198,12 +210,11 @@ is about *when* the event's payload is known. `Emit` holds a finished event inst
 (`ContinueClicked`, `SkipRequested`, …) baked in when the plan builds the spec — possible
 because nothing in it depends on what the user does on the screen. `Submit` covers events
 whose payload only exists at click time: `AddressBarConfirmed(type)` needs the user's live
-selection, so the click reads the content's `result()` and each sealed `ContentResult` maps
-1:1 to its event (`ContentResult.AddressBar → AddressBarConfirmed`, and so on). The
+selection, so the click fires whatever the content's `result()` closure builds from it. The
 alternative — re-emitting a fresh spec on every in-screen edit so the event could stay
-baked in — would make the renderer diff on every toggle; the holder design exists to avoid
-exactly that. This replaces the `onPrimaryCtaClicked` / `onSecondaryCtaClicked` when-blocks
-in the VM. No dialog-type switch anywhere.
+baked in — would make the renderer diff on every toggle; keeping live edits out of the spec
+exists to avoid exactly that. This replaces the `onPrimaryCtaClicked` /
+`onSecondaryCtaClicked` when-blocks in the VM. No dialog-type switch anywhere.
 
 ### 4.5 `DialogSpecs` catalog
 
@@ -410,7 +421,7 @@ per-screen `ViewState` fields.
    **Interop rule:** legacy branches stay authoritative for their own enter (they already
    defensively reset everything). When the engine takes over from a legacy dialog it sees
    `prev == null` and clears the stage first, per 5.1. No cross-system choreography.
-3. **Extract the stateful holders** as their screens migrate; results flow to the VM on
+3. **Rewire the stateful screens** as they migrate; results flow to the VM on
    Submit through the existing callback surface.
 4. **Pixel parity before deletion.** The legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels fired
    by `fireDialogShownPixel` must be moved onto steps or confirmed superseded by the
