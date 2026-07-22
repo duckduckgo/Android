@@ -87,8 +87,7 @@ sealed interface NewUserOnboardingActivityDialog {
 data class DialogSpec(
     val background: OnboardingBackgroundStep,   // existing enum, reused as-is
     val embellishment: Embellishment,           // enum: WalkingDax, BobbingDax, BottomWing, LeftWing, None
-    val title: TextSpec,                        // @StringRes + args
-    val content: ContentSpec,                   // sealed data, below
+    val content: ContentSpec,                   // sealed data, below; carries the screen's title and copy
     val primaryCta: CtaSpec,
     val secondaryCta: CtaSpec? = null,
     val stepIndicator: StepProgress? = null,    // filled in by the VM from plan position
@@ -99,33 +98,43 @@ Rules that keep it useful:
 
 - **Value-comparable only.** No lambdas, no views, no animators. `equals` drives the diff.
 - **Embellishment and background stay explicit fields**, defaulted per screen inside the
+  `DialogSpecs` builders. Explicit gives the plan full control for permutations; the default
+  keeps the common case a one-liner.
+- **No title or subtitle fields.** The layout shares only the CTAs, the step indicator and
+  the card across screens. Each screen's title and copy live inside its content include, so
+  they are `ContentSpec` data (4.3).
 
 ### 4.3 `ContentSpec` and `ContentHandle`
 
-`ContentSpec` carries only the seed data a screen needs:
+`ContentSpec` carries the screen's title plus whatever seed data varies:
 
 ```kotlin
 sealed interface ContentSpec {
+    val title: TextSpec   // every screen has one; rendered by its include's title view
+
     // stateless
-    data object Welcome : ContentSpec
-    data class ComparisonChart(val config: ComparisonChartConfig) : ContentSpec
-    data object AddToDock : ContentSpec
-    data object WidgetPrompt : ContentSpec
+    data class Welcome(override val title: TextSpec, val body1: TextSpec, val body2: TextSpec?) : ContentSpec
+    data class ComparisonChart(override val title: TextSpec, val config: ComparisonChartConfig) : ContentSpec
+    data class AddToDock(override val title: TextSpec) : ContentSpec
+    data class WidgetPrompt(override val title: TextSpec) : ContentSpec
 
     // stateful: seed in, live edits stay in the view layer, result comes back on submit
-    data class AddressBar(val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
-    data class InputScreen(val initialWithAi: Boolean) : ContentSpec
-    data class InputScreenPreview(val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
-    data class QuickSetup(val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
+    data class AddressBar(override val title: TextSpec, val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
+    data class InputScreen(override val title: TextSpec, val initialWithAi: Boolean) : ContentSpec
+    data class InputScreenPreview(override val title: TextSpec, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
+    data class QuickSetup(override val title: TextSpec, val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
 }
 ```
+
+Copy that never varies (for example the add-to-dock body) stays in the include's XML or in
+the binder, as today. Only the title and plan-dependent copy travel through the spec.
 
 The view layer binds a spec and hands the engine a small handle. The handle is how a screen
 declares its views without re-describing the choreography:
 
 ```kotlin
 class ContentHandle(
-    val title: OnboardingDialogTitleView?,   // engine types spec.title into it
+    val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
     val intro: Animator? = null,             // bespoke extras only (check-icon stagger, suggestion buttons)
     val result: (() -> ContentResult)? = null, // stateful screens: read on Submit
@@ -133,51 +142,91 @@ class ContentHandle(
 )
 ```
 
-**Titles stay inside each content include.** That is the flexible option: the welcome screen's
-big title sits outside the card, add-to-dock's title sits above a video, and future screens keep
-that freedom. The duplication is removed a different way:
+**Titles.** Every include today copy-pastes the same title machinery: a
+`TypeAnimationTextView` for the typing effect, an invisible sizing twin (`hiddenTitleText`)
+that keeps the card from resizing while the text types, and `preventWidows` handling (the
+U+00A0 before the last word). That pattern becomes one `OnboardingDialogTitleView` compound
+widget, dropped into each include in place of the pair. The binder sets `content.title` on
+it; the engine tells it when to type or snap. No screen re-implements title behaviour.
 
-- A new `OnboardingDialogTitleView` compound widget owns the typing animation and the
-  invisible sizing twin (`hiddenTitleText`) that today every include copy-pastes. One widget,
-  used by all eight includes. `preventWidows` handling (the U+00A0 before the last word)
-  lives in one place.
-- The engine, not the screen, decides when the title types and when the fade runs. A screen
-  only points at its views through the handle.
+**Stateful screens** (address bar, input screen, quick setup). User edits inside the screen
+stay in a small view-layer holder and never produce a new spec, so the engine only diffs on
+real step changes. The result crosses to the VM once, on Submit:
 
-**Stateful screens.** Live edits (picking an address bar position, flipping the AI toggle)
-mutate a small view-scoped holder seeded from the `ContentSpec`. They never produce a new
-spec, so the engine only ever diffs on a real step change. On Submit the holder's `result()`
-crosses back to the VM once. To survive rotation, the holder's live value is backed by a
-small dedicated VM field; the holder is a thin facade over it.
+```kotlin
+// view layer, one per stateful screen
+class AddressBarStateHolder(seed: ContentSpec.AddressBar) {
+    var selected = seed.initialPosition
+        private set
+    fun select(position: OmnibarType) { selected = position }  // live edit, no spec re-emit
+    fun result() = ContentResult.AddressBar(selected)          // read once on Submit
+}
+
+// in the binder
+is ContentSpec.AddressBar -> {
+    val holder = AddressBarStateHolder(content)
+    picker.onOptionSelected = holder::select
+    ContentHandle(title = …, fadeTargets = listOf(picker), result = holder::result)
+}
+```
+
+To survive rotation, the holder's live value is backed by a small dedicated VM field; the
+holder is a thin facade over it.
 
 ### 4.4 CTAs
+
+CTAs stay at the `DialogSpec` level, unlike titles, for two reasons. They are one shared
+view pair in the dialog card — the same buttons persist across transitions and just change
+text, which is what keeps the card morph continuous. And they are the step's exit contract:
+they carry orchestrator events, which the plan decides (welcome with or without a skip CTA
+is a plan choice). Everything else interactive belongs to content and reports through the
+handle.
 
 ```kotlin
 data class CtaSpec(val label: TextSpec, val action: CtaAction)
 
 sealed interface CtaAction {
-    data object Continue : CtaAction    // → ContinueClicked
-    data object Restore : CtaAction     // → RestoreRequested
-    data object Skip : CtaAction        // → SkipRequested
-    data object AddWidget : CtaAction   // → AddWidgetRequested
-    data object SkipWidget : CtaAction  // → WidgetPromptSkipped
-    data object Submit : CtaAction      // → read ContentHandle.result(), map to event
+    /** Fire this orchestrator event as-is. */
+    data class Emit(val event: NewUserOnboardingEvent) : CtaAction
+    /** Stateful screens: read ContentHandle.result() and map it to its event. */
+    data object Submit : CtaAction
 }
 ```
 
-A click maps the action straight to an orchestrator event. `Submit` reads the current
-content's result first; each sealed `ContentResult` maps 1:1 to its event
-(`AddressBarResult → AddressBarConfirmed`, and so on). This replaces the
-`onPrimaryCtaClicked` / `onSecondaryCtaClicked` when-blocks in the VM. No dialog-type
-switch anywhere.
+No new action vocabulary: CTAs carry the existing `NewUserOnboardingEvent` type. The split
+is about *when* the event's payload is known. `Emit` holds a finished event instance
+(`ContinueClicked`, `SkipRequested`, …) baked in when the plan builds the spec — possible
+because nothing in it depends on what the user does on the screen. `Submit` covers events
+whose payload only exists at click time: `AddressBarConfirmed(type)` needs the user's live
+selection, so the click reads the content's `result()` and each sealed `ContentResult` maps
+1:1 to its event (`ContentResult.AddressBar → AddressBarConfirmed`, and so on). The
+alternative — re-emitting a fresh spec on every in-screen edit so the event could stay
+baked in — would make the renderer diff on every toggle; the holder design exists to avoid
+exactly that. This replaces the `onPrimaryCtaClicked` / `onSecondaryCtaClicked` when-blocks
+in the VM. No dialog-type switch anywhere.
 
 ### 4.5 `DialogSpecs` catalog
 
-A factory of reusable builders, next to the plan provider that uses them:
+A factory of reusable builders, next to the plan provider that uses them. Shown in full for
+`welcome` to make the mechanics clear, elided for the rest:
 
 ```kotlin
 object DialogSpecs {
-    fun welcome(customAiCopy: Boolean = false, secondaryCta: CtaSpec? = null) = DialogSpec(…)
+    fun welcome(customAiCopy: Boolean = false, secondaryCta: CtaSpec? = null) = DialogSpec(
+        background = OnboardingBackgroundStep.Welcome,
+        embellishment = Embellishment.WalkingDax,
+        content = ContentSpec.Welcome(
+            title = TextSpec(R.string.preOnboardingWelcomeDialogTitle),
+            body1 = if (customAiCopy) {
+                TextSpec(R.string.preOnboardingWelcomeDialogBodyCustomAi)
+            } else {
+                TextSpec(R.string.preOnboardingWelcomeDialogBody1)
+            },
+            body2 = if (customAiCopy) null else TextSpec(R.string.preOnboardingWelcomeDialogBody2),
+        ),
+        primaryCta = CtaSpec(TextSpec(R.string.preOnboardingWelcomeDialogCta), CtaAction.Emit(ContinueClicked)),
+        secondaryCta = secondaryCta,
+    )
     fun comparisonChart() = DialogSpec(…)
     fun aiComparisonChart() = DialogSpec(…)
     fun addToDock() = DialogSpec(…)
@@ -188,10 +237,12 @@ object DialogSpecs {
 }
 ```
 
-Copy variants are builder parameters chosen by the plan, not runtime flags. The Custom AI
-flow today threads `isCustomAiOnboardingFlow` into three screens (welcome body, comparison
-chart copy, quick setup CTA). All three become plan-selected builder arguments, and the flag
-disappears from `ViewState`.
+Note what happens to a flag like `customAiCopy`: it is resolved right here, inside the
+builder, into concrete string resources. Nothing downstream ever sees the flag — the VM
+forwards the spec, the binder sets the resulting `TextSpec`s on the include's views like any
+other seed data. The Custom AI flow today threads `isCustomAiOnboardingFlow` at runtime into
+three screens (welcome body, comparison chart copy, quick setup CTA); all three become
+plan-selected builder arguments, and the flag disappears from `ViewState`.
 
 A step after the fold:
 
@@ -268,13 +319,19 @@ The one boundary case: the welcome dialog entering *while the intro exits* keeps
 choreography (`playOutroAnimation` with the walking Dax). Intro/outro is a non-goal; the
 intro simply ends by handing the engine an empty stage.
 
-### 5.2 One known pair-dependent transition
+### 5.2 Card anchor timing during embellishment exit
 
-`ADD_TO_DOCK` currently keeps the predecessor's bottom-wing card anchor during its morph
-(`keepBottomWingAnchor`). Pure element diffing can't see the pair. Either re-tune that
-transition so it doesn't need the predecessor (preferred), or let `EmbellishmentController`
-carry one small "keep previous anchor during exit" rule. Decide during that screen's
-migration; do not build a pairwise transition table for one case.
+When two consecutive specs use the same embellishment, the diff sees no change and does
+nothing — no exit, no re-enter, no anchor change. That's the normal rule and it needs no
+extra code.
+
+The one subtlety is timing when the embellishment *does* change and the old one anchored
+the card. Today `ADD_TO_DOCK` (no embellishment) keeps the card anchored to the
+predecessor's bottom wing while the wing fades out (`keepBottomWingAnchor`), so the card
+doesn't jump down mid-morph. That generalises into a default engine rule, no pair knowledge
+needed: **hold the card's anchor until the exiting embellishment finishes, then swap
+constraints**. Verify it visually during that screen's migration; if it holds, there are no
+special-cased transitions anywhere.
 
 ## 6. VM after the fold
 
@@ -376,7 +433,7 @@ and background morph-vs-snap under one pipeline.
 |---|---|---|---|---|
 | Initial / Reinstall / SyncRestore | Welcome | WalkingDax | Welcome | optional secondary CTA (skip / restore); custom-AI body variant |
 | ComparisonChart / AiComparisonChart | ComparisonChart | BottomWing | ComparisonChart | check-icon stagger via handle.intro; AI copy = builder |
-| AddToDock | AddToDock (looping video) | None | AddToDock | pair-dependent anchor, see 5.2; unbind releases video |
+| AddToDock | AddToDock (looping video) | None | AddToDock | anchor timing, see 5.2; unbind releases video |
 | WidgetPrompt | WidgetPrompt (image) | LeftWing | AddWidget | Add / Skip CTAs |
 | AddressBarPosition | AddressBar | BobbingDax | AddressBar | stateful; split option gated |
 | InputScreen | InputScreen | LeftWing | InputType | stateful (AI toggle) |
