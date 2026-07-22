@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Szia!</string>
     <string name="preOnboardingWelcomeDialogBody1">Felkészültél egy gyorsabb böngészőre, amely a te kezedbe adja az irányítást?</string>
     <string name="preOnboardingWelcomeDialogBody2">Az MI mindig opcionális, az adatvédelem pedig állandóan be van kapcsolva.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Most próbálj ki egy privát MI-beszélgetést!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Szeretnéd alapértelmezett böngészővé tenni a DuckDuckGót?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Próbáld ki a kezdőképernyő-minialkalmazásunkat.</string>
+    <string name="preOnboardingWidgetPromptBody">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Minialkalmazás hozzáadása</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Adj hozzá a képernyőd aljához.</string>
+    <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Rendben!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Előfizetéses csomagot is kínálunk, amely fejlett AI-modelleket, a GPT és a Claude modelljeihez biztosított magasabb csevegési limiteket, valamint biztonságos VPN-t és további funkciókat is tartalmaz.</string>
