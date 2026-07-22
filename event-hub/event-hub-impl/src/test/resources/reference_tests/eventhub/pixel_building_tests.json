@@ -464,6 +464,36 @@
                     "attributionPeriod": "999993600"
                 },
                 "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
+            },
+            {
+                "name": "multiple experiments parameters are conveyed independently",
+                "config": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": { "template": "counter", "source": "test", "buckets": { "0": { "gte": 0, "lt": 1 }, "1+": { "gte": 1 } } },
+                        "blocklistExperiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^tdsNextExperiment",
+                            "enrollmentBuckets": { "0": { "gte": 0, "lt": 86400 }, "1-2": { "gte": 86400, "lt": 259200 }, "3+": { "gte": 259200 } }
+                        },
+                        "cssExperiments": { "template": "experiments", "matchExperiments": "^contentScopeExperiment" }
+                    }
+                },
+                "parameterState": { "count": { "count": 0 } },
+                "enrolledExperiments": [
+                    { "name": "tdsNextExperiment008", "cohort": "treatment", "enrollmentUnixSeconds": 999913600 },
+                    { "name": "contentScopeExperiment01", "cohort": "control", "enrollmentUnixSeconds": 999000000 }
+                ],
+                "periodStartUnixSeconds": 1000000000,
+                "expectFires": true,
+                "expectParameters": {
+                    "count": "0",
+                    "blocklistExperiments": { "tdsNextExperiment008": { "cohort": "treatment", "enrollmentBucket": "1-2" } },
+                    "cssExperiments": { "contentScopeExperiment01": { "cohort": "control" } },
+                    "attributionPeriod": "999993600"
+                },
+                "exceptPlatforms": ["ios-browser", "macos-browser", "windows-browser", "web-extension", "web-extension-mv3", "safari-extension"]
             }
         ]
     },
