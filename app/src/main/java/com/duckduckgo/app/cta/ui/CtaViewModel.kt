@@ -36,6 +36,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -116,6 +117,7 @@ class CtaViewModel @Inject constructor(
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val onboardingPixelSender: OnboardingPixelSender,
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -568,8 +570,10 @@ class CtaViewModel @Inject constructor(
             isSubscriptionCtaAvailable()
 
     @WorkerThread
-    private fun canShowWidgetCta(): Boolean {
-        return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+    private suspend fun canShowWidgetCta(): Boolean {
+        val excludedFromWidgetCta = onboardingPromptsExperimentManager.isEnrolledInWidgetOnly() ||
+            onboardingPromptsExperimentManager.isEnrolledInDockAndWidget()
+        return !excludedFromWidgetCta && !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     private suspend fun freeTrialCopyAvailable(): Boolean =

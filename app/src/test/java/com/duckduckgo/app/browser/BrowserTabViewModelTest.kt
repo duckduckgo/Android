@@ -208,6 +208,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -609,6 +610,11 @@ class BrowserTabViewModelTest {
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
+    private val mockOnboardingPromptsExperimentManager: OnboardingPromptsExperimentManager = mock {
+        onBlocking { isEnrolledInWidgetOnly() } doReturn false
+        onBlocking { isEnrolledInDockAndWidget() } doReturn false
+    }
+
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
@@ -877,6 +883,7 @@ class BrowserTabViewModelTest {
                     duckAiFeatureState = mockDuckAiFeatureState,
                     onboardingPixelSender = mockOnboardingPixelSender,
                     contextualCtaSuppressorPlugins = mock(),
+                    onboardingPromptsExperimentManager = mockOnboardingPromptsExperimentManager,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
