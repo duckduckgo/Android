@@ -73,7 +73,9 @@ run_once() {
 
   adb shell am force-stop "$PKG"
   # Write the override via run-as (debuggable builds only).
-  adb shell run-as "$PKG" sh -c "printf '%s' '$count' > files/$OVERRIDE_FILE" \
+  # run-as's cwd is the app data dir; the files/ subdir may not exist yet (nothing has
+  # touched context.filesDir in the :pir process on a fresh install), so create it first.
+  adb shell run-as "$PKG" sh -c "mkdir -p files && printf '%s' '$count' > files/$OVERRIDE_FILE" \
     || die "failed to write override file"
   adb logcat -c
 
