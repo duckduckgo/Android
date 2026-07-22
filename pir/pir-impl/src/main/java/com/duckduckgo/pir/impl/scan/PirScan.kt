@@ -170,10 +170,12 @@ class RealPirScan @Inject constructor(
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(processedJobRecords.size, pirWebViewCountProvider.getMaxWebViewCount())
 
+        logcat { "PIR-BENCH: scan_start runType=$runType webViewCount=$maxWebViewCount ts=${currentTimeProvider.currentTimeMillis()}" }
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
         // Initiate runners
-        repeat(maxWebViewCount) {
+        repeat(maxWebViewCount) { index ->
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
+            logcat { "PIR-BENCH: runner_created index=$index ts=${currentTimeProvider.currentTimeMillis()}" }
         }
 
         val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
@@ -197,6 +199,10 @@ class RealPirScan @Inject constructor(
         }.awaitAll()
 
         completeScan(runType)
+        logcat {
+            "PIR-BENCH: scan_complete durationMs=${currentTimeProvider.currentTimeMillis() - startTimeMillis} " +
+                "ts=${currentTimeProvider.currentTimeMillis()}"
+        }
         return@withContext Result.success(Unit)
     }
 
