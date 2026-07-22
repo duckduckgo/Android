@@ -201,6 +201,11 @@ class SyncActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.onScreenExit()
+    }
+
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle)
