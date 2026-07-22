@@ -983,6 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
@@ -1018,6 +1019,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Teď si vyzkoušej soukromý chat s AI!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš si z nastavit DuckDuckGo jako výchozí prohlížeč?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Vyzkoušej náš widget na domovskou obrazovku.</string>
+    <string name="preOnboardingWidgetPromptBody">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Přidat widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Přeskočit</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Přidej si mě do dolní části obrazovky.</string>
+    <string name="preOnboardingAddToDockBody">Najdi ikonu DuckDuckGo na ploše. Pak ji podrž a přetáhni na místo. A je to!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Chápu!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Nabízíme také placené předplatné s pokročilými modely umělé inteligence s vyššími limity pro chat od GPT a Claude, zabezpečenou VPN a dalšími funkcemi.</string>
