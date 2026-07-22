@@ -75,4 +75,27 @@ object PirConstants {
             deprecated = false,
         ),
     )
+
+    /**
+     * Fixed profile used only by the internal benchmark scan path
+     * ([com.duckduckgo.pir.impl.scan.PirScan.executeBenchmarkScan]). Kept deterministic so
+     * repeated benchmark runs scan an identical workload. Not persisted to the database.
+     */
+    val BENCHMARK_PROFILE: ProfileQuery = ProfileQuery(
+        id = -100,
+        firstName = "John",
+        lastName = "Smith",
+        city = "New York",
+        state = "NY",
+        addresses = listOf(
+            Address(
+                city = "New York",
+                state = "NY",
+            ),
+        ),
+        birthYear = 1990,
+        fullName = "John Smith",
+        age = 35,
+        deprecated = false,
+    )
 }

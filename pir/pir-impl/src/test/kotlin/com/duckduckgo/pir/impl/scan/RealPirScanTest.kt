@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.pir.impl.PirConstants.BENCHMARK_PROFILE
 import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
@@ -42,6 +43,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -465,5 +467,29 @@ class RealPirScanTest {
 
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
+    }
+
+    @Test
+    fun whenExecuteBenchmarkScanThenScansAllBrokersWithBenchmarkProfileAndIgnoresDbProfiles() = runTest {
+        whenever(mockRepository.getAllBrokersForScan()).thenReturn(listOf(testBrokerName, testBrokerName2))
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1, testBroker2))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(mockRepository.getBrokerScanSteps(testBrokerName2)).thenReturn(testStepsJson)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockBrokerStepsParser.parseStep(testBroker2, testStepsJson)).thenReturn(listOf(testScanStep2))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
+            .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+
+        testee.executeBenchmarkScan(mockContext)
+
+        verify(mockRepository).getAllBrokersForScan()
+        verify(mockPirActionsRunnerFactory, times(2)).create(mockContext, testScript, RunType.MANUAL)
+        // uses the fixed benchmark profile, never the DB profiles
+        verify(mockRepository, never()).getAllUserProfileQueries()
+        verify(mockPirActionsRunner).start(BENCHMARK_PROFILE, listOf(testScanStep))
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 }

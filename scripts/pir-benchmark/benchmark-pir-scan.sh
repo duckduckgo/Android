@@ -78,7 +78,7 @@ run_once() {
   adb logcat -c
 
   # Trigger the scan directly against the (non-exported, but debuggable) foreground service.
-  adb shell am start-foreground-service -n "$PKG/$SERVICE" --es "$EXTRA_KEY" "$EXECUTION_TYPE" \
+  adb shell am start-foreground-service -n "$PKG/$SERVICE" --ez extra_benchmark true --es "$EXTRA_KEY" "$EXECUTION_TYPE" \
     || die "failed to start $SERVICE"
 
   local start_epoch_ms scan_start_ms="" scan_done=0 elapsed=0 last_detail=-999

@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirConstants.BENCHMARK_PROFILE
 import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
@@ -45,6 +46,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -99,6 +101,14 @@ interface PirScan {
         context: Context,
         runType: RunType,
     ): Result<Unit>
+
+    /**
+     * NOTE: Internal dev / benchmark use only. Scans all active brokers using a fixed built-in
+     * benchmark profile ([com.duckduckgo.pir.impl.PirConstants.BENCHMARK_PROFILE]), bypassing
+     * profile seeding and scan-job eligibility so repeated runs scan an identical workload.
+     * You DO NOT need to set any dispatcher; it already runs on IO.
+     */
+    suspend fun executeBenchmarkScan(context: Context): Result<Unit>
 
     /**
      * This method takes care of stopping the scan and cleaning up resources used.
@@ -170,12 +180,12 @@ class RealPirScan @Inject constructor(
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(processedJobRecords.size, pirWebViewCountProvider.getMaxWebViewCount())
 
-        logcat { "PIR-BENCH: scan_start runType=$runType webViewCount=$maxWebViewCount ts=${currentTimeProvider.currentTimeMillis()}" }
+        benchMarker("scan_start runType=$runType webViewCount=$maxWebViewCount")
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
         // Initiate runners
         repeat(maxWebViewCount) { index ->
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
-            logcat { "PIR-BENCH: runner_created index=$index ts=${currentTimeProvider.currentTimeMillis()}" }
+            benchMarker("runner_created index=$index")
         }
 
         val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
@@ -199,10 +209,7 @@ class RealPirScan @Inject constructor(
         }.awaitAll()
 
         completeScan(runType)
-        logcat {
-            "PIR-BENCH: scan_complete durationMs=${currentTimeProvider.currentTimeMillis() - startTimeMillis} " +
-                "ts=${currentTimeProvider.currentTimeMillis()}"
-        }
+        benchMarker("scan_complete durationMs=${currentTimeProvider.currentTimeMillis() - startTimeMillis}")
         return@withContext Result.success(Unit)
     }
 
@@ -328,29 +335,40 @@ class RealPirScan @Inject constructor(
         context: Context,
         runType: RunType,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
-        onJobStarted()
+        executeScan(brokers, obtainProfiles(), context, runType)
+    }
 
+    override suspend fun executeBenchmarkScan(
+        context: Context,
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        executeScan(repository.getAllBrokersForScan(), listOf(BENCHMARK_PROFILE), context, RunType.MANUAL)
+    }
+
+    private suspend fun executeScan(
+        brokers: List<String>,
+        profileQueries: List<ProfileQuery>,
+        context: Context,
+        runType: RunType,
+    ): Result<Unit> = coroutineScope {
+        onJobStarted()
         emitScanStartPixel(runType)
         cleanPreviousRun()
-
-        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
-        val profileQueries = obtainProfiles()
 
         logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(brokers.size * profileQueries.size, pirWebViewCountProvider.getMaxWebViewCount())
+        val benchStartMs = currentTimeProvider.currentTimeMillis()
 
+        benchMarker("scan_start runType=$runType webViewCount=$maxWebViewCount")
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
-
-        // Initiate runners
-        repeat(maxWebViewCount) {
+        repeat(maxWebViewCount) { index ->
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
+            benchMarker("runner_created index=$index")
         }
 
         val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
 
-        // Prepare a list of all broker steps that need to be run
         val brokerScanSteps = brokers.mapNotNull { brokerName ->
             val broker = activeBrokers[brokerName] ?: return@mapNotNull null
             repository.getBrokerScanSteps(brokerName)?.run {
@@ -360,7 +378,6 @@ class RealPirScan @Inject constructor(
             it.isNotEmpty()
         }.flatten()
 
-        // Combine the broker steps with each profile and split into equal parts
         val stepsPerRunner = profileQueries.map { profileQuery ->
             brokerScanSteps.map { scanStep ->
                 profileQuery to scanStep
@@ -368,9 +385,7 @@ class RealPirScan @Inject constructor(
         }.flatten()
             .splitIntoParts(maxWebViewCount)
 
-        // Execute the steps in parallel
         stepsPerRunner.mapIndexed { index, partSteps ->
-            // We want to run the runners in parallel but wait for everything to complete before we proceed
             async {
                 partSteps.forEach { (profile, step) ->
                     logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
@@ -382,7 +397,12 @@ class RealPirScan @Inject constructor(
         }.awaitAll()
 
         completeScan(runType)
-        return@withContext Result.success(Unit)
+        benchMarker("scan_complete durationMs=${currentTimeProvider.currentTimeMillis() - benchStartMs}")
+        Result.success(Unit)
+    }
+
+    private fun benchMarker(message: String) {
+        logcat { "PIR-BENCH: $message ts=${currentTimeProvider.currentTimeMillis()}" }
     }
 
     private suspend fun cleanPreviousRun() {

@@ -27,6 +27,8 @@ import android.os.IBinder
 import android.os.Process
 import androidx.core.app.ServiceCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
@@ -68,6 +70,12 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var pirScanWideEvent: PirScanWideEvent
 
+    @Inject
+    lateinit var pirScan: PirScan
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -85,6 +93,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
         val executionType = intent?.getStringExtra(EXTRA_EXECUTION_TYPE)?.let { PirExecutionType.valueOf(it) }
             ?: PirExecutionType.MANUAL_INITIAL
+        val isBenchmark = intent?.getBooleanExtra(EXTRA_BENCHMARK, false) ?: false
         val notification: Notification = pirNotificationManager.createScanStatusNotification(
             title = getString(R.string.pirFeatureName),
             message = getString(R.string.pirNotificationMessageInProgress),
@@ -111,6 +120,13 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         }
 
         launch {
+            if (isBenchmark && appBuildConfig.isInternalBuild()) {
+                logcat { "PIR-BENCH: starting benchmark scan (bypassing eligibility) on ${Process.myPid()}" }
+                pirScan.executeBenchmarkScan(this@PirForegroundScanService)
+                stopSelf()
+                return@launch
+            }
+
             val eligibility = pirWorkHandler.canRunPir().firstOrNull()
             if (eligibility is PirEligibility.Disabled) {
                 logcat { "PIR-SCAN: PIR scan not allowed to run!" }
@@ -154,6 +170,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     companion object {
         private const val PIR_SCAN_NOTIFICATION_ID = 8791
         private const val EXTRA_EXECUTION_TYPE = "extra_execution_type"
+        private const val EXTRA_BENCHMARK = "extra_benchmark"
 
         fun intentFor(
             context: Context,

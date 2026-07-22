@@ -24,10 +24,14 @@ each runner's `stop()`, so there is no single global teardown boundary to mark.
 1. **Internal, debuggable build** installed (`./gradlew installInternalDebug`). The
    count override is gated by `isInternalBuild()` and written via `adb run-as`, which
    only works on debuggable builds.
-2. **One device** connected over adb (`adb devices` shows exactly one `device`).
+2. **Launch the app once** so broker data downloads into the database (the benchmark
+   scans all active brokers). No Privacy Pro subscription/entitlement and no profile
+   seeding are needed — the benchmark path is internal-build-only, bypasses the
+   subscription gate, and uses a fixed built-in profile (`PirConstants.BENCHMARK_PROFILE`,
+   "John Smith, 1990, New York, NY"). It also bypasses scan-job eligibility, so every run
+   of the sweep scans all brokers (no reset needed between runs).
+3. **One device** connected over adb (`adb devices` shows exactly one `device`).
    A physical device is recommended; emulator memory is not representative.
-3. **A seeded PIR profile.** Open the app → PIR dev settings → create/seed a profile
-   once, so every run scans the same input. (Automating this is out of scope.)
 4. **Otherwise-idle device.** Other apps using WebView spawn their own renderer
    processes and can pollute renderer attribution — close them first.
 5. macOS/Linux with `bash` and `adb` on PATH.
@@ -60,7 +64,6 @@ printed summary table.
 - Summary shows `renderer_process_count=0` → the device/WebView version may attribute
   renderers differently; inspect the raw timeline for unexpected process names and
   widen the match in `app_group_processes()`.
-- Scan never completes / hits `MAX_SCAN_SECONDS` → confirm a profile is seeded and the
-  service actually started (`adb logcat | grep PIR-`); if direct service start is
-  unreliable on your device, trigger the scan from the PIR dev scan screen instead and
-  re-run with a longer timeout.
+- Scan never completes / hits `MAX_SCAN_SECONDS` → confirm the service actually started
+  (`adb logcat | grep PIR-`); if direct service start is unreliable on your device,
+  trigger the scan from the PIR dev scan screen instead and re-run with a longer timeout.
