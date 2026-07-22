@@ -21,8 +21,8 @@ import android.content.Intent
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -40,6 +40,7 @@ class SetUpSyncHandler @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
     private val deviceSyncState: DeviceSyncState,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -54,7 +55,7 @@ class SetUpSyncHandler @Inject constructor(
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
-                val setupError = validateSetupState()
+                val setupError = validateSetupState(jsMessage.method)
                 if (setupError != null) {
                     responder.sendError(setupError)
                     return
@@ -65,11 +66,11 @@ class SetUpSyncHandler @Inject constructor(
                 }?.let { context.startActivity(it) }
             }
 
-            private fun validateSetupState(): String? {
+            private fun validateSetupState(method: String): String? {
                 if (!deviceSyncState.isFeatureEnabled()) {
                     return ERROR_SETUP_UNAVAILABLE
                 }
-                if (deviceSyncState.getAccountState() is SignedIn) {
+                if (method == METHOD_SETUP_SYNC && deviceSyncState.getAccountState() is SignedIn) {
                     return ERROR_SYNC_ALREADY_ON
                 }
                 return null
@@ -78,14 +79,16 @@ class SetUpSyncHandler @Inject constructor(
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
+                    duckAiHostProvider.getHost(),
                 )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
-            override val methods: List<String> = listOf("sendToSyncSettings", "sendToSetupSync")
+            override val methods: List<String> = listOf(METHOD_SYNC_SETTINGS, METHOD_SETUP_SYNC)
         }
 
     private companion object {
+        private const val METHOD_SYNC_SETTINGS = "sendToSyncSettings"
+        private const val METHOD_SETUP_SYNC = "sendToSetupSync"
         private const val ERROR_SETUP_UNAVAILABLE = "setup unavailable"
         private const val ERROR_SYNC_ALREADY_ON = "sync already on"
     }

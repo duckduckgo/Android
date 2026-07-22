@@ -72,19 +72,19 @@ class CtaTest {
 
     @Test
     fun whenCtaIsAddWidgetAutoReturnEmptyOkParameters() {
-        val testee = HomePanelCta.AddWidgetAuto
+        val testee = HomePanelCta.AddWidgetAutoOnboarding
         assertTrue(testee.pixelOkParameters().isEmpty())
     }
 
     @Test
     fun whenCtaIsAddWidgetAutoReturnEmptyCancelParameters() {
-        val testee = HomePanelCta.AddWidgetAuto
+        val testee = HomePanelCta.AddWidgetAutoOnboarding
         assertTrue(testee.pixelCancelParameters().isEmpty())
     }
 
     @Test
     fun whenCtaIsAddWidgetAutoReturnEmptyShownParameters() {
-        val testee = HomePanelCta.AddWidgetAuto
+        val testee = HomePanelCta.AddWidgetAutoOnboarding
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 

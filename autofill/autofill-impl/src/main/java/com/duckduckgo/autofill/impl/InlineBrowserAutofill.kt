@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.VERBOSE
@@ -41,6 +42,7 @@ class InlineBrowserAutofill @Inject constructor(
         emailProtectionInContextCallback: EmailProtectionUserPromptListener?,
         emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener?,
         tabId: String,
+        browserMode: BrowserMode,
     ) {
         logcat(VERBOSE) { "Injecting BrowserAutofill interface" }
         // Adding the interface regardless if the feature is available or not
@@ -50,6 +52,7 @@ class InlineBrowserAutofill @Inject constructor(
         autofillInterface.emailProtectionInContextCallback = emailProtectionInContextCallback
         autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
         autofillInterface.tabId = tabId
+        autofillInterface.browserMode = browserMode
     }
 
     override fun removeJsInterface() {

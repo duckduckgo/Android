@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Създава криптирано резервно копие на Вашите отметки, пароли и чатове с Duck.ai на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. \n\n Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
-    <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
-    <string name="sync_intro_recover_content">За възстановяване на синхронизираните данни е необходим Кодът за възстановяване, който сте запазили при първата настройка на функцията за синхронизиране. Този код може да е запазен като PDF файл на устройството, което първоначално сте използвали за настройка на функцията за синхронизиране.</string>
-    <string name="sync_intro_recover_cta">Първи стъпки</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Възстановяване на синхронизираните данни</string>
+    <string name="sync_recover_synced_data_content">Ще трябва да въведете кода за възстановяване, който сет получили при настройка на Sync &amp; Backup. Може да сте го запазили като PDF файл на устройството, което сте използвали.</string>
+    <string name="sync_recover_synced_data_cta">Възстановяване на синхронизирани данни</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Сканиране на QR код</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
     <string name="sync_share_title">Споделяне с…</string>
     <string name="sync_pdf_title">Код за възстановяване на синхронизирането</string>
-    <string name="sync_pdf_description">Кодът за възстановяване Ви позволява да синхронизирате отметките на няколко устройства и да възстановявате синхронизираните данни, ако загубите достъп до устройство.</string>
+    <string name="sync_pdf_description">С кода за възстановяване можете да синхронизирате паролите, данните за автоматично попълване и чатовете на Duck.ai на няколко устройства, както и да възстановите синхронизираните данни, ако загубите достъп до някое от устройствата.</string>
     <string name="sync_code_box_title">Съхранявайте тази информация на сигурно място.</string>
-    <string name="sync_instructions_title">Как става това?</string>
-    <string name="sync_instructions_step1">Отворете DuckDuckGo на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
-    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на DuckDuckGo.</string>
+    <string name="sync_instructions_title">Как работи този код?</string>
+    <string name="sync_instructions_step1">Отворете DuckDuckGo на устройството, което искате да синхронизирате, и отидете на Sync &amp; Backup в Настройки.</string>
+    <string name="sync_instructions_step2">Изберете „Синхронизиране с друго устройство“ и сканирайте QR кода или въведете текстовия код.</string>
     <string name="sync_instructions_step3">Синхронизацията ще бъде активирана и отново ще имате достъп до всички свои данни.</string>
+    <string name="sync_pdf_retention_notice">Ако не използвате браузър DuckDuckGo с активирана функция Sync &amp; Backup повече от 18 месеца, данните Ви ще бъдат изтрити от сървъра и няма да могат да бъдат възстановени.</string>
     <string name="remove_device_dialog_title">Премахване на устройство?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>
     <string name="remove_device_dialog_primary_button">Премахване</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Изтриване на данните от сървъра?</string>
-    <string name="sync_delete_server_data_dialog_content">Връзката на всички устройства ще бъде премахната, а синхронизираните данни ще бъдат изтрити от сървъра.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данни</string>
+    <string name="sync_delete_server_data_dialog_content">Резервното копие ще бъде изтрито от сървъра. Синхронизацията на всички устройства ще бъде изключена, но от устройствата няма да бъде изтрито нищо.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данните от сървъра</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отмени</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Синхронизирай отметките между устройства</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Скрий</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Възстановяване</string>
+    <string name="sync_settings_download_recovery_code_item">Изтегляне на кода за възстановяване като PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Използвайте този код, за да възстановите данните си, ако загубите достъп до това устройство - пазете го на сигурно място.</string>
+    <string name="sync_settings_data_expiration">Данните в Sync &amp; Backup не могат да бъдат възстановени след 18 месеца неактивност. <annotation type="learn_more_link">Научете повече</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Възстановяване на данни от предишна инсталация със Sync &amp; Backup?</string>
+    <string name="sync_previous_session_ready_body">Възстановете данните, за да върнете предишни отметки, пароли и други данни в DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Възстановяване със Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Настройка на нова синхронизация</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Лесно възстановяване на данни</string>
+    <string name="sync_recover_data_content">Използвайте този код, за да възстановите данните си, ако загубите достъп до това устройство. Данните в Sync &amp; Backup не могат да бъдат възстановени след 18 месеца неактивност.</string>
+    <string name="sync_recover_data_recovery_code_label">Код за възстановяване</string>
+    <string name="sync_recover_data_download_pdf">Изтегляне като PDF</string>
+    <string name="sync_restore_on_reinstall_title">Възстановяване при преинсталиране на приложението</string>
+    <string name="sync_restore_on_reinstall_description">Ако преинсталирате приложението DuckDuckGo, ще Ви попитаме дали искате да възстановите данните на това устройство.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Можете да отваряте своите чатове на всички устройства, като използвате Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Синхронизиране с друго устройство</string>
+    <string name="sync_chat_bottom_sheet_title">Нека синхронизираме чатовете на всичките устройства!</string>
+    <string name="sync_chat_bottom_sheet_description">Намерете QR кода в приложението DuckDuckGo на другото устройство, като отворите Настройки › Sync &amp; Backup › Синхронизиране с друго устройство.</string>
+    <string name="sync_chat_bottom_sheet_positive">Сканиране на QR код</string>
+    <string name="sync_chat_bottom_sheet_negative">Не сега</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_joiner_confirmation_negative">Отмяна</string>
+
+    <string name="sync_v2_host_confirmation_title">Синхронизиране на данните?</string>
+    <string name="sync_v2_host_confirmation_positive">Синхронизиране сега</string>
+    <string name="sync_v2_host_confirmation_negative">Отмяна</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Другото устройство ще има достъп до синхронизираните Ви пароли в DuckDuckGo, данните за автоматично попълване и чатовете в Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Другото устройство ще има достъп до синхронизираните Ви чатове в Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Неуспешно синхронизиране.</string>
+    <string name="sync_v2_error_pairing_rejected">Синхронизирането е прекратено от другото Ви устройство.</string>
+    <string name="sync_v2_error_pairing_canceled">Синхронизирането е прекратено.</string>
+    <string name="sync_v2_error_upgrade_required">Актуализирайте браузъра DuckDuckGo и опитайте отново.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Синхронизирайте това устройство от вече свързан браузър DuckDuckGo на друго устройство</string>
+    <string name="sync_v2_error_try_again">Моля, опитайте отново.</string>
+    <string name="sync_v2_error_got_it">Разбрах</string>
+    <string name="sync_v2_already_paired_title">Вече е синхронизирано.</string>
+    <string name="sync_v2_already_paired_message">Тези устройства вече са свързани към „Sync &amp; Backup“.</string>
+
 </resources>

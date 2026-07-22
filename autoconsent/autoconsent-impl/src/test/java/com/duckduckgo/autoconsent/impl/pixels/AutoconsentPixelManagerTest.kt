@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -29,6 +30,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -46,17 +48,22 @@ class AutoconsentPixelManagerTest {
     private val mockPixel: Pixel = mock()
     private val mockAutoconsentFeature: AutoconsentFeature = mock()
     private val mockToggle: Toggle = mock()
+    private val mockHeuristicModeProvider: AutoconsentHeuristicModeProvider = mock()
     private lateinit var pixelManager: RealAutoconsentPixelManager
+
+    private val heuristicModeParameters = mapOf("consentHeuristicEnabled" to "tier1")
 
     @Before
     fun setup() {
         whenever(mockAutoconsentFeature.cpmPixels()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockHeuristicModeProvider.getHeuristicMode()).thenReturn("tier1")
         pixelManager = RealAutoconsentPixelManager(
             mockPixel,
             coroutineTestRule.testScope,
             mockAutoconsentFeature,
             coroutineTestRule.testDispatcherProvider,
+            mockHeuristicModeProvider,
         )
     }
 
@@ -67,7 +74,7 @@ class AutoconsentPixelManagerTest {
         pixelManager.fireDailyPixel(pixelName)
         advanceUntilIdle()
 
-        verify(mockPixel).fire(eq(pixelName), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
+        verify(mockPixel).fire(eq(pixelName), eq(heuristicModeParameters), eq(emptyMap()), eq(Daily()))
     }
 
     @Test
@@ -153,8 +160,8 @@ class AutoconsentPixelManagerTest {
         pixelManager.fireDailyPixel(pixel2)
         pixelManager.fireDailyPixel(pixel1)
 
-        verify(mockPixel, times(2)).fire(eq(pixel1), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
-        verify(mockPixel).fire(eq(pixel2), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
+        verify(mockPixel, times(2)).fire(eq(pixel1), eq(heuristicModeParameters), eq(emptyMap()), eq(Daily()))
+        verify(mockPixel).fire(eq(pixel2), eq(heuristicModeParameters), eq(emptyMap()), eq(Daily()))
 
         advanceTimeBy(120000L)
         advanceUntilIdle()
@@ -162,9 +169,12 @@ class AutoconsentPixelManagerTest {
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters ->
-                parameters["init"] == "2" && parameters["popup-found"] == "1"
+                parameters["init"] == "2" &&
+                    parameters["popup-found"] == "1" &&
+                    parameters["consentHeuristicEnabled"] == "tier1"
             },
             eq(emptyMap()),
+            any(),
         )
     }
 
@@ -183,13 +193,19 @@ class AutoconsentPixelManagerTest {
 
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
-            argThat { parameters -> parameters["init"] == "1" },
+            argThat { parameters ->
+                parameters["init"] == "1" && parameters["consentHeuristicEnabled"] == "tier1"
+            },
             eq(emptyMap()),
+            any(),
         )
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
-            argThat { parameters -> parameters["popup-found"] == "1" },
+            argThat { parameters ->
+                parameters["popup-found"] == "1" && parameters["consentHeuristicEnabled"] == "tier1"
+            },
             eq(emptyMap()),
+            any(),
         )
     }
 }

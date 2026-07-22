@@ -1,0 +1,59 @@
+{
+  "name": "Quick People Trace",
+  "url": "quickpeopletrace.com",
+  "version": "0.5.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1674540000000,
+  "optOutUrl": "https://www.quickpeopletrace.com/contact-us/",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "d97db33b-c755-48b1-b751-51541d55b0fe",
+          "url": "https://www.quickpeopletrace.com/search/?addresssearch=1&tabid=1&teaser-firstname=${firstName}&teaser-middlename=&teaser-lastname=${lastName}&teaser-city=${city}&teaser-state=${state|upcase}&teaser-submitted=Search"
+        },
+        {
+          "actionType": "extract",
+          "id": "54cdba05-95bd-4142-b97c-4cafc59059df",
+          "selector": "//table/tbody/tr[position() > 1]",
+          "noResultsSelector": "//div[contains(@class, 'alert') and contains(text(), 'no results')]",
+          "profile": {
+            "name": {
+              "selector": ".//td[2]"
+            },
+            "age": {
+              "selector": ".//td[3]"
+            },
+            "addressCityStateList": {
+              "selector": ".//td[4]"
+            },
+            "relativesList": {
+              "selector": ".//td[7]/a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='btn red-btn']",
+              "identifierType": "param",
+              "identifier": "id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">Blocco degli annunci su YouTube</string>
+    <string name="ad_blocking_settings_toggle_title">Blocca gli annunci su YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni. \n\nQuando questa opzione è attivata, DuckDuckGo rileverà in modo anonimo interferenze nel blocco degli annunci o errori di YouTube per migliorare l\'esperienza di tutti. DuckDuckGo non vede mai quali video visualizzi né alcuna informazione di identificazione personale. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Apre i video in una modalità cinema senza distrazioni che impedisce a ciò che guardi di influenzare il tuo feed di YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Blocco degli annunci</string>
+    <string name="ad_blocking_settings_header_description">Blocca i sistemi di tracciamento prima che vengano caricati, eliminando di fatto gli annunci che si basano sul tracciamento</string>
+    <string name="contingencyMessageTitle">Blocco degli annunci su YouTube non disponibile</string>
+    <string name="contingencyMessageContent">Il blocco degli annunci è stato influenzato dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Grazie per la comprensione</string>
+    <string name="contingencyMessagePrimaryButton">Ho capito</string>
+    <string name="contingencyMessageCloseContentDescription">Chiudi</string>
+    <string name="ad_blocking_menu_disable">Disattiva il blocco annunci su YouTube</string>
+    <string name="ad_blocking_menu_enable">Abilita il blocco degli annunci su YouTube</string>
+    <string name="ad_blocking_menu_title">Blocco degli annunci su YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Chiudi</string>
+    <string name="ad_blocking_menu_always_on">Sempre attiva</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Disattiva fino al rilancio</string>
+    <string name="ad_blocking_menu_always_off">Sempre disattivato</string>
+    <string name="ad_blocking_disabled_popup_title">Il blocco degli annunci di YouTube non funziona?</string>
+    <string name="ad_blocking_disabled_popup_description">Invia una segnalazione anonima di malfunzionamento a DuckDuckGo. Aiuta a migliorare il blocco degli annunci per tutti!</string>
+    <string name="ad_blocking_disabled_primary_action">Invia la segnalazione di malfunzionamento</string>
+    <string name="ad_blocking_disabled_secondary_action">Annulla</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Disattivato fino al rilancio</string>
+    <string name="ad_blocking_omnibar_badge_text">Blocco degli annunci di YouTube attivato</string>
+</resources>

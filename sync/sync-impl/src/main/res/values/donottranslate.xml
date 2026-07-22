@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,23 +15,26 @@
   -->
 
 <resources>
-    <!-- Internal Setting -->
-    <string name="sync_internal_activity_label">Sync Setup Internal</string>
-    <string name="sync_internal_environment_header">Environment Settings</string>
-    <string name="sync_internal_environment_title">Use Dev Environment?</string>
-    <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>
-    <string name="sync_internal_environment_subtitle_dev">https://sync-staging.duckduckgo.com</string>
-    <string name="sync_internal_account_header">Account Settings</string>
-    <string name="sync_internal_device_header">Device Settings</string>
-    <string name="sync_internal_recovery_code">Recovery code</string>
-    <string name="sync_internal_recovery_code_cta">Copy Recovery code</string>
-    <string name="sync_internal_favicons_prompt_cta">Reset Favicons Prompt</string>
-    <string name="userIdSectionHeader">User ID</string>
-    <string name="deviceIdSectionHeader">Device Id</string>
-    <string name="deviceNameSectionHeader">Device Name</string>
-    <string name="sync_internal_promotions_header">Sync Promotions</string>
-    <string name="sync_internal_promotions_clear_history_bookmark_added_promo">Clear history (bookmark added dialog)</string>
-    <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
-    <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
-
+    <!-- Simplified Sync  -->
+    <string name="sync_settings_v2_header_headline_disabled">Keep DuckDuckGo in sync!</string>
+    <string name="sync_settings_v2_header_headline_enabled">DuckDuckGo is in sync.</string>
+    <string name="sync_settings_v2_header_body_disabled">Sync your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai chats, end-to-end encrypted across your DuckDuckGo apps.</string>
+    <string name="sync_settings_v2_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai chats, are being synced with end-to-end encryption.</string>
+    <string name="sync_settings_v2_this_device_cta_title">Sync This Device</string>
+    <string name="sync_settings_v2_devices_section_header">My Devices</string>
+    <string name="sync_settings_v2_download_section_header">Download</string>
+    <string name="sync_settings_v2_download_recovery_code_item">Download Your Recovery Code</string>
+    <string name="sync_settings_v2_copy_recovery_code_item">Copy Your Recovery Code</string>
+    <string name="sync_settings_v2_delete_account_item">Turn Off and Delete Server Data</string>
+    <string name="sync_settings_v2_bookmarks_section_header">Bookmarks</string>
+    <string name="sync_setup_v2_header_headline">Sync this device with a nearby computer.</string>
+    <string name="sync_setup_v2_header_body">We’ll help you sync your devices.</string>
+    <string name="sync_setup_v2_this_device_cta_title">Sync This Device Only</string>
+    <string name="sync_setup_v2_device_synced_status">Synced</string>
+    <string name="sync_setup_v2_remove_device_name_item">Remove Device</string>
+    <string name="sync_setup_v2_edit_device_name_item">Edit Name</string>
+    <string name="sync_setup_v2_remove_this_device_notice">This device will no longer be able to access your synced data if you remove it.</string>
+    <string name="sync_setup_v2_remove_another_device_notice">This device will no longer be able to access your synced data if this is turned off.</string>
 </resources>

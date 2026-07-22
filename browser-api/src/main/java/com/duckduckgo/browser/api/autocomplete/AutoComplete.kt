@@ -23,12 +23,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutoComplete {
     fun autoComplete(query: String): Flow<AutoCompleteResult>
-    suspend fun userDismissedHistoryInAutoCompleteIAM()
-    suspend fun submitUserSeenHistoryIAM()
     suspend fun fireAutocompletePixel(
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean = false,
+        duckAiSurface: Boolean = false,
     )
 
     data class Config(
@@ -84,8 +83,6 @@ interface AutoComplete {
                 override val phrase: String,
                 val isAllowedInTopHits: Boolean,
             ) : AutoCompleteHistoryRelatedSuggestion(phrase)
-
-            data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
         }
 
         data class AutoCompleteDuckAIPrompt(

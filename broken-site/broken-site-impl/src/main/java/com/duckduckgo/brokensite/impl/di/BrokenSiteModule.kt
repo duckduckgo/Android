@@ -16,8 +16,6 @@
 
 package com.duckduckgo.brokensite.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.impl.BrokenSitePromptDataStore
 import com.duckduckgo.brokensite.impl.BrokenSiteRefreshesInMemoryStore
@@ -26,6 +24,8 @@ import com.duckduckgo.brokensite.impl.RealBrokenSiteReportRepository
 import com.duckduckgo.brokensite.store.ALL_MIGRATIONS
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -57,10 +57,14 @@ class BrokenSiteModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideBrokenSiteDatabase(context: Context): BrokenSiteDatabase {
-        return Room.databaseBuilder(context, BrokenSiteDatabase::class.java, "broken_site.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideBrokenSiteDatabase(databaseProvider: DatabaseProvider): BrokenSiteDatabase {
+        return databaseProvider.buildRoomDatabase(
+            BrokenSiteDatabase::class.java,
+            "broken_site.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 }

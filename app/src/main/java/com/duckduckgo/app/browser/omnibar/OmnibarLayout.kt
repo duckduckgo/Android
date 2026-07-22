@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Editable
 import android.transition.ChangeBounds
@@ -37,6 +39,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -56,16 +59,19 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
+import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
 import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
@@ -75,8 +81,10 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -88,18 +96,22 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.model.Decoration.HighlightOmnibarItem
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
@@ -117,6 +129,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogoAnimator
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
@@ -157,6 +170,10 @@ class OmnibarLayout @JvmOverloads constructor(
         val showChatMenu: Boolean,
         val showSpacer: Boolean,
         val showDuckSidebar: Boolean,
+        val showDuckBack: Boolean,
+        val isDuckAiMode: Boolean,
+        val isNativeInputEnabled: Boolean,
+        val isNativeChatInputEnabled: Boolean,
     )
 
     @Inject
@@ -198,7 +215,14 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
 
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
     private var previousTransitionState: TransitionState? = null
+    private var lastAppliedShowContextualSheetIcon: Boolean? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -217,6 +241,8 @@ class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
     private var customTabToolbarColor: Int = 0
+    private var lastAnimatedLogoUrl: String? = null
+    private var easterEggLogoAnimator: ObjectAnimator? = null
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
@@ -226,7 +252,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    private val duckAIFreePill: View by lazy { findViewById(R.id.duckAIFreePill) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
+    private val duckAIBack: View by lazy { findViewById(R.id.duckAiBack) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -270,12 +298,14 @@ class OmnibarLayout @JvmOverloads constructor(
     override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val plusIconMenu: FrameLayout by lazy { findViewById(R.id.plusIconMenu) }
     internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    internal val adBlockingAnimation: LottieAnimationView by lazy { findViewById(R.id.adBlockingAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     override val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
     override val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
@@ -296,6 +326,7 @@ class OmnibarLayout @JvmOverloads constructor(
         findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
     }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    internal val pageLoadProgressBar: PageLoadProgressBar by lazy { findViewById(R.id.pageLoadProgressBar) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
     internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
@@ -320,10 +351,12 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
+                    addTarget(plusIconMenu)
                     addTarget(tabsMenu)
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
                     addTarget(duckAISidebar)
+                    addTarget(duckAIBack)
                 },
             )
         }
@@ -462,7 +495,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 override fun onBackKey(): Boolean {
                     if (isAttachedToWindow) {
                         viewModel.onBackKeyPressed()
-                        omnibarTextListener?.onBackKeyPressed()
+                        return omnibarTextListener?.onBackKeyPressed() ?: false
                     }
                     return false
                 }
@@ -542,14 +575,17 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onTabsButtonPressed()
         }
         tabsMenu.setOnLongClickListener {
-            omnibarItemPressedListener?.onTabsButtonLongPressed()
-            return@setOnLongClickListener true
+            val longPressHandled = omnibarItemPressedListener?.onTabsButtonLongPressed() ?: false
+            return@setOnLongClickListener longPressHandled
         }
         fireIconMenu.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
             omnibarItemPressedListener?.onFireButtonPressed()
+        }
+        plusIconMenu.setOnClickListener {
+            omnibarItemPressedListener?.onPlusButtonPressed(it)
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
@@ -581,6 +617,9 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
+        }
+        duckAIBack.setOnClickListener {
+            omnibarItemPressedListener?.onDuckAIBackButtonPressed()
         }
     }
 
@@ -651,6 +690,13 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
             }
 
+            duckAIBack.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
+                }
+            }
+
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 flipOmnibarMargins()
             }
@@ -679,12 +725,25 @@ class OmnibarLayout @JvmOverloads constructor(
                 createCookiesAnimation(command.isCosmetic)
             }
 
+            is StartAdBlockingAnimation -> {
+                createAdBlockingAnimation(command.icon, command.text)
+            }
+
+            Command.AdBlockingAnimationSuppressed -> {
+                omnibarTextListener?.onAdBlockingAnimationSuppressed()
+            }
+
             MoveCaretToFront -> {
                 moveCaretToFront()
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities, command.isCustomTab, command.isAddressBarTrackersAnimationEnabled)
+                startTrackersAnimation(
+                    command.entities,
+                    command.isCustomTab,
+                    command.isAddressBarTrackersAnimationEnabled,
+                    command.useSoftwareRenderingMode,
+                )
             }
 
             is LaunchInputScreen -> {
@@ -703,6 +762,19 @@ class OmnibarLayout @JvmOverloads constructor(
                     200,
                 )
             }
+
+            is Command.CancelEasterEggLogoAnimation -> cancelEasterEggLogoAnimation()
+
+            is Command.CopyUrlToClipboard -> {
+                copyUrlToClipboardAndShowToast(command)
+            }
+        }
+    }
+
+    private fun copyUrlToClipboardAndShowToast(command: Command.CopyUrlToClipboard) {
+        val notificationShownAutomatically = clipboardInteractor.copyToClipboard(toCopy = command.url, isSensitive = false)
+        if (!notificationShownAutomatically) {
+            Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -752,6 +824,7 @@ class OmnibarLayout @JvmOverloads constructor(
                         .load(CommonR.drawable.ic_ddg_logo)
                         .transition(withCrossFade())
                         .placeholder(daxIcon.drawable)
+                        .listener(null) // Clear any previous listener from EasterEggLogo
                         .into(this)
                 }
                 shieldIcon.gone()
@@ -778,11 +851,13 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is EasterEggLogo -> {
                 daxIcon.show()
+                val logoUrl = leadingIconState.logoUrl
                 Glide
                     .with(daxIcon)
-                    .load(leadingIconState.logoUrl)
+                    .load(logoUrl)
                     .placeholder(daxIcon.drawable)
                     .transition(withCrossFade())
+                    .listener(EasterEggLogoListener(leadingIconState, logoUrl))
                     .into(daxIcon)
                 daxIcon.setOnClickListener {
                     viewModel.onLogoClicked()
@@ -807,11 +882,18 @@ class OmnibarLayout @JvmOverloads constructor(
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
+                showDuckBack = viewState.showDuckAISidebar,
+                isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
+                isNativeInputEnabled = viewState.isNativeInputEnabled,
+                isNativeChatInputEnabled = viewState.isNativeChatInputEnabled,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
+                    newTransitionState.isDuckAiMode != previousTransitionState?.isDuckAiMode ||
+                    newTransitionState.isNativeInputEnabled != previousTransitionState?.isNativeInputEnabled ||
+                    newTransitionState.isNativeChatInputEnabled != previousTransitionState?.isNativeChatInputEnabled ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
                     newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
                     newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
@@ -823,12 +905,28 @@ class OmnibarLayout @JvmOverloads constructor(
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
-        fireIconMenu.isVisible = newTransitionState.showFireIcon
+        // The fire/+ slot is shared: in a Duck.ai chat the + icon takes over from fire as the
+        // leading action, but only when the native input field is enabled. Users with the
+        // nativeInputField flag off keep the fire button even in a Duck.ai view. Driven by
+        // viewMode (plus the flag) rather than a separate state flag so it can't drift out of
+        // sync with other state-update paths.
+        fireIconMenu.isVisible = shouldShowFireIcon(
+            showFireIcon = newTransitionState.showFireIcon,
+            isDuckAiMode = newTransitionState.isDuckAiMode,
+            isNativeChatInputEnabled = newTransitionState.isNativeChatInputEnabled,
+        )
+        plusIconMenu.isVisible = shouldShowPlusIcon(
+            showFireIcon = newTransitionState.showFireIcon,
+            isDuckAiMode = newTransitionState.isDuckAiMode,
+            isNativeChatInputEnabled = newTransitionState.isNativeChatInputEnabled,
+        )
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
+        applyAiChatMenuStyling(viewState.showContextualSheetIcon)
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
         duckAISidebar.isVisible = newTransitionState.showDuckSidebar
+        duckAIBack.isVisible = newTransitionState.showDuckBack
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
@@ -836,7 +934,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         previousTransitionState = newTransitionState
 
-        enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
+        applyEnabledState(viewState)
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
@@ -852,18 +950,27 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
+        // Custom Tab / find-in-page hide the address field. Browser mode must put it back — otherwise
+        // a prior hide leaves an empty toolbar strip with only the trailing icons (especially noticeable
+        // with a bottom omnibar after tab swipe).
+        ensureBrowserAddressFieldVisible()
+
         renderOutline(viewState.hasFocus)
         renderOmnibarText(viewState)
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
         }
 
-        if (viewState.isLoading) {
-            pageLoadingIndicator.show()
-        }
-        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
-            if (!viewState.isLoading) {
-                pageLoadingIndicator.hide()
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            if (viewState.isLoading) {
+                pageLoadingIndicator.show()
+            }
+            smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
+                if (!viewState.isLoading) {
+                    pageLoadingIndicator.hide()
+                }
             }
         }
 
@@ -882,16 +989,47 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState)
+    }
 
-        omnibarTextInput.hint = context.getString(R.string.search)
+    private fun ensureBrowserAddressFieldVisible() {
+        if (!omniBarContainer.isVisible || omniBarContainer.alpha < 1f) {
+            omniBarContainer.alpha = 1f
+            omniBarContainer.show()
+        }
+        if (!omnibarCardShadow.isVisible || omnibarCardShadow.alpha < 1f) {
+            omnibarCardShadow.alpha = 1f
+            omnibarCardShadow.show()
+        }
     }
 
     private fun renderDuckAiMode(viewState: ViewState) {
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
-        pageLoadingIndicator.isVisible = viewState.isLoading
+        // The shield sits outside omnibarIconContainer, so the leadingIconContainer hide in
+        // render() doesn't cover it — clear any shield left over from the previous browser page
+        // so it doesn't show alongside the Duck.ai header.
+        shieldIcon.gone()
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            pageLoadingIndicator.isVisible = viewState.isLoading
+        }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+        renderPulseAnimation(viewState)
+    }
+
+    private fun updatePageLoadProgressBar(viewState: ViewState) {
+        if (viewState.isLoading) {
+            if (!pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.start()
+            }
+            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+        } else {
+            if (pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.triggerCompletion()
+            }
+        }
     }
 
     private fun renderCustomTabMode(
@@ -949,6 +1087,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 createCookiesAnimation(isCosmetic = decoration.isCosmetic, enqueueAnimation = true)
             }
 
+            is LaunchAdBlockingAnimation -> {
+                viewModel.onAnimationStarted(decoration)
+            }
+
             is ChangeCustomTabTitle -> {
                 viewModel.onCustomTabTitleUpdate(decoration)
             }
@@ -960,6 +1102,12 @@ class OmnibarLayout @JvmOverloads constructor(
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
             }
+
+            is Decoration.LockForOnboarding -> {
+                viewModel.setLocked(decoration.locked)
+            }
+
+            is Decoration.CancelEasterEggLogoAnimation -> viewModel.onCancelAddressBarAnimations()
         }
     }
 
@@ -977,8 +1125,9 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
+        val fireIconVisible = shouldShowFireIcon(viewState.showFireIcon, viewState.viewMode is ViewMode.DuckAI, viewState.isNativeChatInputEnabled)
         val targetView =
-            if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
+            if (viewState.highlightFireButton.isHighlighted() && fireIconVisible) {
                 fireIconImageView
             } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
                 placeholder
@@ -1014,6 +1163,25 @@ class OmnibarLayout @JvmOverloads constructor(
                 sceneRoot,
                 isCosmetic,
                 enqueueAnimation,
+                useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
+            )
+        }
+    }
+
+    private fun createAdBlockingAnimation(
+        icon: Int,
+        text: Int,
+    ) {
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.createAdBlockingAnimation(
+                context,
+                omnibarViews(),
+                shieldViews(),
+                animatedIconBackgroundView,
+                adBlockingAnimation,
+                sceneRoot,
+                icon,
+                text,
             )
         }
     }
@@ -1024,10 +1192,17 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun cancelEasterEggLogoAnimation() {
+        easterEggLogoAnimator?.cancel()
+        easterEggLogoAnimator = null
+        daxIcon.rotation = 0f
+    }
+
     private fun startTrackersAnimation(
         events: List<Entity>?,
         isCustomTab: Boolean,
         isAddressBarTrackersAnimationEnabled: Boolean,
+        useSoftwareRenderingMode: Boolean,
     ) {
         if (!isCustomTab) {
             if (isAddressBarTrackersAnimationEnabled) {
@@ -1039,6 +1214,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     omnibarViews = omnibarViews(),
                     shieldViews = shieldViews(),
                     entities = events,
+                    useSoftwareRenderingMode = useSoftwareRenderingMode,
                 )
             } else {
                 animatorHelper.startTrackersAnimation(
@@ -1047,16 +1223,11 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = trackersAnimation,
                     omnibarViews = omnibarViews(),
                     entities = events,
+                    useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
-            val (animationBackgroundColor, useLightAnimation) = if (!isDefaultToolbarColor(customTabToolbarColor)) {
-                val background = calculateAnimationBackgroundColor(customTabToolbarColor)
-                Pair(background, isColorLight(background))
-            } else {
-                Pair(customTabToolbarColor, null)
-            }
-
+            val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
             if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
@@ -1067,6 +1238,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     shieldViews = customTabShieldViews(),
                     entities = events,
                     customBackgroundColor = animationBackgroundColor,
+                    useSoftwareRenderingMode = useSoftwareRenderingMode,
                 )
             } else {
                 animatorHelper.startTrackersAnimation(
@@ -1075,7 +1247,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
                     omnibarViews = customTabViews(),
                     entities = events,
-                    useLightAnimation = useLightAnimation,
+                    useLightAnimation = isColorLight(animationBackgroundColor),
                 )
             }
         }
@@ -1088,7 +1260,7 @@ class OmnibarLayout @JvmOverloads constructor(
         renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShieldState
             val shieldIconView =
-                if (viewMode is ViewMode.Browser) {
+                if (viewMode is ViewMode.Browser || viewMode is ViewMode.Pdf) {
                     shieldIcon
                 } else if (omnibarRepository.isNewCustomTabEnabled) {
                     newCustomTabToolbarContainer.customTabShieldIcon
@@ -1096,16 +1268,14 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabToolbarContainer.customTabShieldIcon
                 }
 
-            // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on secondaryToolbarColor background, so invert: light bg needs dark shield
-            val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
-                omnibarRepository.isNewCustomTabEnabled &&
-                !isDefaultToolbarColor(customTabToolbarColor)
-            ) {
-                val secondaryToolbarColor = calculateAddressBarColor(customTabToolbarColor)
-                isColorLight(secondaryToolbarColor)
-            } else {
-                null // Use default theme-based selection
+            val useLightAnimation = when {
+                // Fire mode forces a dark omnibar even in light app theme — use the dark shield
+                browserMode == BrowserMode.FIRE -> false
+                // For new custom tabs, determine light/dark variant based on container color
+                viewMode is ViewMode.CustomTab &&
+                    omnibarRepository.isNewCustomTabEnabled &&
+                    !isDefaultToolbarColor(customTabToolbarColor) -> isColorLight(customTabToolbarColor)
+                else -> null // Use default theme-based selection
             }
 
             privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
@@ -1127,22 +1297,16 @@ class OmnibarLayout @JvmOverloads constructor(
                         }
                     }
 
-                    val animationBackgroundColor: Int
                     if (customTab.toolbarColor != 0 && !isDefaultToolbarColor(customTab.toolbarColor)) {
                         toolbar.background = customTab.toolbarColor.toDrawable()
                         toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
                         val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
-                        val secondaryToolbarColor = calculateAddressBarColor(customTab.toolbarColor)
                         customTabCloseIcon.setColorFilter(foregroundColor)
-                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
-                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
-
-                        animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
-                    } else {
-                        animationBackgroundColor = customTab.toolbarColor
+                        customTabDomain.setTextColor(foregroundColor)
                     }
+                    val animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
 
                     val iconBackground = newCustomTabToolbarContainer.animatedIconBackgroundView.background
                     if (iconBackground is android.graphics.drawable.GradientDrawable) {
@@ -1164,14 +1328,9 @@ class OmnibarLayout @JvmOverloads constructor(
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
                     }
 
-                    customToolbarContainer.setOnClickListener {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
-                    }
-
-                    daxIcon.setOnClickListener {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
+                    customTabToolbar.setOnLongClickListener {
+                        viewModel.onCustomTabUrlLongClicked()
+                        true
                     }
                 }
             }
@@ -1250,7 +1409,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
-        return ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.12f)
+        val blendColor = if (isColorLight(mainToolbarColor)) Color.BLACK else Color.WHITE
+        return ColorUtils.blendARGB(mainToolbarColor, blendColor, 0.12f)
     }
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
@@ -1367,7 +1527,9 @@ class OmnibarLayout @JvmOverloads constructor(
         translationY = y
     }
 
-    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
+    override var isUiLocked: Boolean = false
+
+    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled && !isUiLocked
 
     override fun isBottomNavEnabled(): Boolean = false
 
@@ -1382,6 +1544,34 @@ class OmnibarLayout @JvmOverloads constructor(
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded)
             OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
+    }
+
+    override fun disableViewStateSaving() {
+        customTabToolbarContainer.customTabDomainOnly.isSaveEnabled = false
+        customTabToolbarContainer.customTabDomain.isSaveEnabled = false
+        customTabToolbarContainer.customTabTitle.isSaveEnabled = false
+        customTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+
+        findInPage.findInPageContainer.isSaveEnabled = false
+        findInPage.findInPageMatches.isSaveEnabled = false
+        findInPage.nextSearchTermButton.isSaveEnabled = false
+        findInPage.previousSearchTermButton.isSaveEnabled = false
+        findInPage.findIcon.isSaveEnabled = false
+
+        newCustomTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.trackersAnimation.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.daxIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDomain.isSaveEnabled = false
+
+        pageLoadingIndicator.isSaveEnabled = false
+        pageLoadProgressBar.isSaveEnabled = false
+        shieldIcon.isSaveEnabled = false
+        omnibarTextInput.isSaveEnabled = false
     }
 
     override fun setExpanded(
@@ -1416,6 +1606,54 @@ class OmnibarLayout @JvmOverloads constructor(
             isFocusable = !enabled
             isFocusableInTouchMode = !enabled
         }
+    }
+
+    private fun applyEnabledState(viewState: ViewState) {
+        val state = viewState.enabledState
+        val isLocked = state != EnabledState.ALL
+        val nonFireEnabled = state == EnabledState.ALL
+        val fireEnabled = state != EnabledState.NONE
+
+        applyEnabled(tabsMenu, nonFireEnabled)
+        applyEnabled(browserMenu, nonFireEnabled)
+        aiChatMenu?.let { applyEnabled(it, nonFireEnabled) }
+        applyEnabled(voiceSearchButton, nonFireEnabled)
+        applyEnabled(clearTextButton, nonFireEnabled)
+        applyEnabled(duckAISidebar, nonFireEnabled)
+        applyEnabled(duckAIHeader, nonFireEnabled)
+        applyEnabled(duckAIFreePill, nonFireEnabled)
+        applyEnabled(duckAIBack, nonFireEnabled)
+        applyEnabled(shieldIcon, nonFireEnabled)
+        applyEnabled(plusIconMenu, nonFireEnabled)
+        applyEnabled(fireIconMenu, fireEnabled)
+        omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
+
+        // Show the click catcher whenever a click catcher is requested OR the omnibar is
+        // locked (so the locked state can intercept and ignore the click).
+        enableTextInputClickCatcher(viewState.showTextInputClickCatcher || isLocked)
+
+        // When locked, the click catcher should not launch the input screen.
+        if (isLocked) {
+            omnibarTextInputClickCatcher.setOnClickListener(null)
+        } else if (omnibarInputScreenLaunchListener != null) {
+            omnibarTextInputClickCatcher.setOnClickListener {
+                viewModel.onTextInputClickCatcherClicked()
+            }
+        }
+    }
+
+    private fun applyEnabled(view: View, enabled: Boolean) {
+        view.isEnabled = enabled
+        view.alpha = if (enabled) 1.0f else LOCKED_INPUT_ALPHA
+    }
+
+    private fun applyAiChatMenuStyling(showContextualSheetIcon: Boolean) {
+        // renderButtons fires on every view-state update; skip the call when the value hasn't
+        // changed so we don't keep triggering requestLayout() via setPaddingRelative,
+        // setImageResource, and updateLayoutParams.
+        if (lastAppliedShowContextualSheetIcon == showContextualSheetIcon) return
+        lastAppliedShowContextualSheetIcon = showContextualSheetIcon
+        (aiChatMenu as? android.widget.ImageView)?.applyDuckAiIconStyling(showContextualSheetIcon)
     }
 
     override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
@@ -1465,4 +1703,70 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun gone() {
         visibility = View.GONE
     }
+
+    /**
+     * Glide listener for Easter Egg logos that plays a wiggle animation once the image loads.
+     * Only animates once per unique logo URL, and skips animation for favourite logos.
+     */
+    private inner class EasterEggLogoListener(
+        private val leadingIconState: EasterEggLogo,
+        private val logoUrl: String,
+    ) : RequestListener<Drawable> {
+
+        override fun onLoadFailed(
+            e: GlideException?,
+            model: Any?,
+            target: Target<Drawable>,
+            isFirstResource: Boolean,
+        ): Boolean = false
+
+        override fun onResourceReady(
+            resource: Drawable,
+            model: Any,
+            target: Target<Drawable>?,
+            dataSource: DataSource,
+            isFirstResource: Boolean,
+        ): Boolean {
+            if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
+                if (serpEasterEggLogosToggles.setFavourite().isEnabled()) {
+                    lastAnimatedLogoUrl = logoUrl
+                    daxIcon.postDelayed(
+                        {
+                            easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+                        },
+                        EASTER_EGG_ANIMATION_DELAY_MS,
+                    )
+                }
+            }
+            return false
+        }
+    }
+
+    companion object {
+        private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
+        private const val LOCKED_INPUT_ALPHA = 0.4f
+    }
 }
+
+/**
+ * Whether the fire icon should occupy the shared fire/+ leading slot in the omnibar.
+ *
+ * Fire is the default leading action. The + icon only replaces it inside a Duck.ai view when the
+ * native chat input is enabled; with nativeChatInput off (the web-input fallback) the user keeps
+ * the fire button even in a Duck.ai view. nativeChatInput already implies nativeInputField.
+ */
+internal fun shouldShowFireIcon(
+    showFireIcon: Boolean,
+    isDuckAiMode: Boolean,
+    isNativeChatInputEnabled: Boolean,
+): Boolean = showFireIcon && !(isDuckAiMode && isNativeChatInputEnabled)
+
+/**
+ * Whether the + icon should occupy the shared fire/+ leading slot in the omnibar. Only shown inside
+ * a Duck.ai view when the native chat input is enabled.
+ */
+internal fun shouldShowPlusIcon(
+    showFireIcon: Boolean,
+    isDuckAiMode: Boolean,
+    isNativeChatInputEnabled: Boolean,
+): Boolean = showFireIcon && isDuckAiMode && isNativeChatInputEnabled

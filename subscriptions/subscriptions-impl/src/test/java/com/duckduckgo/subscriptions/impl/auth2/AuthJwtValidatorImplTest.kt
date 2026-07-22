@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl.auth2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

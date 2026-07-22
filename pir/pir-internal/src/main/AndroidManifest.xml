@@ -26,5 +26,9 @@
             android:name=".settings.PirDevBrokerConfigActivity"
             android:label="@string/pirDevBrokerConfigTitle" />
 
+        <activity
+            android:name=".settings.PirDevEmailActivity"
+            android:label="@string/pirDevEmailTitle" />
+
     </application>
 </manifest>

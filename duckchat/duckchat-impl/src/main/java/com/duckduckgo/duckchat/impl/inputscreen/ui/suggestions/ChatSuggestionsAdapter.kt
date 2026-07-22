@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.duckchat.impl.databinding.ItemChatSuggestionBinding
+import com.duckduckgo.duckchat.impl.models.iconRes
+
+class ChatSuggestionsAdapter(
+    private val showDeleteButton: Boolean = false,
+    private val onChatClicked: (ChatSuggestion) -> Unit,
+    private val onDeleteClicked: (ChatSuggestion) -> Unit = {},
+) : ListAdapter<ChatSuggestion, ChatSuggestionsAdapter.ChatSuggestionViewHolder>(ChatSuggestionsDiffCallback) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatSuggestionViewHolder {
+        val binding = ItemChatSuggestionBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
+        return ChatSuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ChatSuggestionViewHolder, position: Int) {
+        holder.bind(getItem(position), showDeleteButton, onChatClicked, onDeleteClicked)
+    }
+
+    class ChatSuggestionViewHolder(
+        private val binding: ItemChatSuggestionBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(
+            suggestion: ChatSuggestion,
+            showDeleteButton: Boolean,
+            onChatClicked: (ChatSuggestion) -> Unit,
+            onDeleteClicked: (ChatSuggestion) -> Unit,
+        ) {
+            binding.chatSuggestionTitle.text = suggestion.title
+            binding.chatSuggestionIcon.setImageResource(suggestion.type.iconRes(suggestion.pinned))
+
+            binding.root.setOnClickListener {
+                onChatClicked(suggestion)
+            }
+
+            binding.chatSuggestionDeleteButton.isVisible = showDeleteButton
+            binding.chatSuggestionDeleteButton.setOnClickListener {
+                onDeleteClicked(suggestion)
+            }
+        }
+    }
+
+    companion object {
+        private val ChatSuggestionsDiffCallback = object : DiffUtil.ItemCallback<ChatSuggestion>() {
+            override fun areItemsTheSame(oldItem: ChatSuggestion, newItem: ChatSuggestion): Boolean {
+                return oldItem.chatId == newItem.chatId
+            }
+
+            override fun areContentsTheSame(oldItem: ChatSuggestion, newItem: ChatSuggestion): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
+}

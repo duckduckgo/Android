@@ -47,7 +47,10 @@ class VpnLatencyPixelInterceptorTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = VpnLatencyPixelInterceptor(netPGeoswitchingRepository, appBuildConfig)
+        testee = VpnLatencyPixelInterceptor(
+            netPGeoswitchingRepository,
+            appBuildConfig,
+        )
     }
 
     @Test

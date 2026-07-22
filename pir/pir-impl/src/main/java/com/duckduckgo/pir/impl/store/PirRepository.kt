@@ -69,13 +69,27 @@ interface PirRepository {
      */
     suspend fun isRepositoryAvailable(): Boolean
 
+    /**
+     * Returns the time in ms when the feature was first allowed to be run on the user's device. If the feature is not allowed to be run, we get 0L.
+     */
+    suspend fun getFeatureReceivedMs(): Long
+
+    /**
+     * Set the time in ms when the feature was first allowed to be run on the user's device
+     */
+    suspend fun setFeatureReceivedMs(long: Long)
+
     suspend fun getCurrentMainEtag(): String?
 
     suspend fun updateMainEtag(etag: String?)
 
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
-    suspend fun clearAllBrokerJsons()
+    /**
+     * Clears all broker configuration: both the download etags and the parsed broker details
+     * (details, scan/optOut steps, scheduling config, mirror sites).
+     */
+    suspend fun clearAllBrokerData()
 
     suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
@@ -84,6 +98,8 @@ interface PirRepository {
     suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
+
+    suspend fun getAllBrokerObjects(): List<Broker>
 
     suspend fun getBrokerForName(name: String): Broker?
 
@@ -194,6 +210,18 @@ interface PirRepository {
 
     suspend fun setLastPirMauPixelTimeMs(timeMs: Long)
 
+    suspend fun getLastPirInteractionDauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionDauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirInteractionWauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionWauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirInteractionMauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionMauPixelTimeMs(timeMs: Long)
+
     suspend fun getWeeklyStatLastSentMs(): Long
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
@@ -294,6 +322,16 @@ class RealPirRepository(
 
     override suspend fun isRepositoryAvailable(): Boolean = database.await() != null
 
+    override suspend fun getFeatureReceivedMs(): Long = withContext(dispatcherProvider.io()) {
+        pirDataStore.featureReceivedMs
+    }
+
+    override suspend fun setFeatureReceivedMs(long: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.featureReceivedMs = long
+        }
+    }
+
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
     override suspend fun updateMainEtag(etag: String?) {
@@ -314,9 +352,10 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun clearAllBrokerJsons() {
+    override suspend fun clearAllBrokerData() {
         withContext(dispatcherProvider.io()) {
             brokerJsonDao()?.deleteAll()
+            brokerDao()?.deleteAll()
         }
     }
 
@@ -344,32 +383,17 @@ class RealPirRepository(
 
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getAllActiveBrokers()?.map {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }.orEmpty()
+            return@withContext brokerDao()?.getAllActiveBrokers()?.map { it.toBroker() }.orEmpty()
+        }
+
+    override suspend fun getAllBrokerObjects(): List<Broker> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao()?.getAllBrokers()?.map { it.toBroker() }.orEmpty()
         }
 
     override suspend fun getBrokerForName(name: String): Broker? =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getBrokerDetails(name)?.let {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }
+            return@withContext brokerDao()?.getBrokerDetails(name)?.toBroker()
         }
 
     override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> =
@@ -756,6 +780,36 @@ class RealPirRepository(
         }
     }
 
+    override suspend fun getLastPirInteractionDauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionDauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionDauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionDauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirInteractionWauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionWauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionWauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionWauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirInteractionMauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionMauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionMauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionMauLastSentMs = timeMs
+        }
+    }
+
     override suspend fun getWeeklyStatLastSentMs(): Long = withContext(dispatcherProvider.io()) {
         return@withContext pirDataStore.weeklyStatLastSentMs
     }
@@ -883,6 +937,16 @@ class RealPirRepository(
             birthYear = this.birthYear,
             deprecated = this.deprecated,
         )
+
+    private fun BrokerEntity.toBroker() = Broker(
+        name = name,
+        fileName = fileName,
+        url = url,
+        version = version,
+        parent = parent,
+        addedDatetime = addedDatetime,
+        removedAt = removedAt,
+    )
 
     private suspend fun prepareDatabase(): PirDatabase? {
         val database = databaseFactory.getDatabase()

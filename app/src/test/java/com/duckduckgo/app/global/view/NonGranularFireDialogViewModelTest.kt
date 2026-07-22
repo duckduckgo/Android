@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -33,9 +34,12 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -64,6 +68,9 @@ class NonGranularFireDialogViewModelTest {
     private val mockFireButtonStore: FireButtonStore = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockDateProvider: DateProvider = mock()
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
+    private val mockTabRepository: TabRepository = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -74,6 +81,7 @@ class NonGranularFireDialogViewModelTest {
 
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+            whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         }
     }
 
@@ -86,6 +94,10 @@ class NonGranularFireDialogViewModelTest {
         fireButtonStore = mockFireButtonStore,
         dispatcherProvider = mockDispatcherProvider,
         dateProvider = mockDateProvider,
+        dataClearingWideEvent = dataClearingWideEvent,
+        browserMode = BrowserMode.REGULAR,
+        tabRepository = mockTabRepository,
+        duckChat = mockDuckChat,
     )
 
     @Test
@@ -144,6 +156,21 @@ class NonGranularFireDialogViewModelTest {
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
+        )
+    }
+
+    @Test
+    fun `when delete clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
         )
     }
 
@@ -233,7 +260,7 @@ class NonGranularFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -293,7 +320,7 @@ class NonGranularFireDialogViewModelTest {
 
         testee.onShow()
 
-        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -303,7 +330,7 @@ class NonGranularFireDialogViewModelTest {
         testee.onShow()
         testee.onShow()
 
-        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test

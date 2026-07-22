@@ -1,0 +1,75 @@
+{
+  "name": "PublicReports",
+  "url": "publicreports.com",
+  "version": "0.6.0",
+  "parent": "verecor.com",
+  "addedDatetime": 1703052000000,
+  "optOutUrl": "https://persontrust.com/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "cdd6e94e-ad5d-4331-bb0d-8212e52e0efb",
+          "url": "https://persontrust.com/ng/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "64808ea7-0f52-45ef-a374-dafe8b9272e7",
+          "selector": ".tm-search-item",
+          "profile": {
+            "name": {
+              "selector": ".tm-title a"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='tm-item-wrap'][h3[b[normalize-space(.)='Also known as:']]]/div[@class='del-list']",
+              "beforeText": " · ",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "Age: ",
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='tm-item-wrap flx'][h3[@class='lived-in']]/div[@class='del-list']/span",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='tm-item-wrap'][h3[@class='related']]/div[@class='del-list']/span",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://publicreports.com/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763742029895
+}

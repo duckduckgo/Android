@@ -34,7 +34,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -44,10 +43,12 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.EnabledState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -120,12 +121,27 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun setLocked(locked: Boolean) {
+        doOnAttach {
+            viewModel.setLocked(locked)
+        }
+    }
+
     fun setBrowserMenuIcon(@DrawableRes icon: Int) {
         doOnAttach {
             ContextCompat.getDrawable(this.context, icon)?.let {
                 binding.browserMenuImageView.setImageDrawable(it)
             }
         }
+    }
+
+    fun disableViewStateSaving() {
+        binding.browserMenuImageView.isSaveEnabled = false
+        binding.tabsButton.isSaveEnabled = false
+        binding.fireIconImageView.isSaveEnabled = false
+        binding.bookmarksImageView.isSaveEnabled = false
+        binding.autofillButtonImageView.isSaveEnabled = false
+        binding.newTabButtonImageView.isSaveEnabled = false
     }
 
     override fun onAttachedToWindow() {
@@ -166,7 +182,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         binding.tabsButton.setOnLongClickListener {
             viewModel.onTabsButtonLongClicked()
-            true
         }
 
         binding.menuButton.setOnClickListener {
@@ -199,6 +214,24 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.shadowView.isVisible = viewState.showShadow
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
+        applyEnabledState(viewState.enabledState)
+    }
+
+    private fun applyEnabledState(state: EnabledState) {
+        val enabled = state == EnabledState.ALL
+        val fireEnabled = enabled || state == EnabledState.FIRE_BUTTON_ONLY
+
+        applyEnabled(binding.newTabButton, enabled)
+        applyEnabled(binding.autofillButton, enabled)
+        applyEnabled(binding.bookmarksButton, enabled)
+        applyEnabled(binding.tabsButton, enabled)
+        applyEnabled(binding.menuButton, enabled)
+        applyEnabled(binding.fireButton, fireEnabled)
+    }
+
+    private fun applyEnabled(view: View, enabled: Boolean) {
+        view.isEnabled = enabled
+        view.alpha = if (enabled) 1.0f else 0.4f
     }
 
     private fun processCommands(command: Command) {
@@ -229,6 +262,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         CustomTab,
         NewTab,
         Browser,
+        DuckAI,
         TabManager,
     }
 

@@ -20,11 +20,14 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -35,8 +38,11 @@ class RealRemoteMessageModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : RemoteMessageModel {
 
-    override fun getActiveMessage(): RemoteMessage? = remoteMessagingRepository.message()
-    override fun getActiveMessages() = remoteMessagingRepository.messageFlow()
+    override fun getActiveMessage(activeTrigger: MessageTrigger?): RemoteMessage? =
+        remoteMessagingRepository.message()?.takeIf { it.matchesTrigger(activeTrigger) }
+
+    override fun observeActiveMessages(activeTrigger: MessageTrigger?): Flow<RemoteMessage?> =
+        remoteMessagingRepository.messageFlow().map { message -> message?.takeIf { it.matchesTrigger(activeTrigger) } }
 
     override suspend fun onMessageShown(remoteMessage: RemoteMessage) {
         withContext(dispatchers.io()) {
@@ -79,8 +85,16 @@ class RealRemoteMessageModel @Inject constructor(
         return action
     }
 
-    override suspend fun getRemoteMessageImageFile(): String? {
-        return remoteMessagingRepository.getRemoteMessageImageFile()
+    override suspend fun getRemoteMessageImageFile(surface: Surface): String? {
+        return remoteMessagingRepository.getRemoteMessageImageFile(surface)
+    }
+
+    override suspend fun clearMessageImage(surface: Surface) {
+        remoteMessagingRepository.clearMessageImage(surface)
+    }
+
+    override suspend fun isMessageDismissed(id: String): Boolean = withContext(dispatchers.io()) {
+        remoteMessagingRepository.dismissedMessages().contains(id)
     }
 
     private fun Content.getPrimaryAction(): Action? {
@@ -111,5 +125,10 @@ class RealRemoteMessageModel @Inject constructor(
             }
             else -> null
         }
+    }
+
+    private fun RemoteMessage.matchesTrigger(activeTrigger: MessageTrigger?): Boolean {
+        val requiredTrigger = displayConditions?.trigger ?: return true
+        return requiredTrigger == activeTrigger
     }
 }

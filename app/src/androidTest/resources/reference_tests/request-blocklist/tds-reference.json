@@ -1,0 +1,42 @@
+{
+  "trackers": {
+    "tracker.example": {
+      "domain": "tracker.example",
+      "owner": {
+        "name": "Example Entity",
+        "displayName": "Example Entity"
+      },
+      "prevalence": 0,
+      "fingerprinting": 0,
+      "cookies": 0,
+      "categories": [],
+      "default": "ignore",
+      "rules": [
+        {
+          "rule": "tracker.example/analytics.js",
+          "surrogate": "noop.js",
+          "fingerprinting": 0,
+          "cookies": 0
+        },
+        {
+          "rule": "tracker.example/block.js",
+          "fingerprinting": 0,
+          "cookies": 0
+        }
+      ]
+    }
+  },
+  "entities": {
+    "Example Entity": {
+      "domains": ["tracker.example"],
+      "prevalence": 0,
+      "displayName": "Example Entity"
+    }
+  },
+  "domains": {
+    "tracker.example": "Example Entity"
+  },
+  "cnames": {
+    "tracker.example": "tracker-example.cname.example"
+  }
+}

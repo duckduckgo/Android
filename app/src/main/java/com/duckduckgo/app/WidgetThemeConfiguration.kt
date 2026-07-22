@@ -30,6 +30,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.WidgetPreferences
@@ -48,13 +51,27 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     @Suppress("NewApi") // we use appBuildConfig
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityWidgetConfigurationBinding.inflate(layoutInflater)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.widgetConfigPanel, drawBehindGestureNav = false)
+        }
         val extras = intent.extras
         extras?.let {
             appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

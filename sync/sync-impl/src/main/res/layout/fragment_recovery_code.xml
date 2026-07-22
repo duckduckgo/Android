@@ -21,6 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/daxColorSurface"
+    tools:ignore="Overdraw"
     android:orientation="vertical">
 
     <LinearLayout
@@ -143,6 +144,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:textType="primary"
                     app:typography="body1_mono" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonSecondary

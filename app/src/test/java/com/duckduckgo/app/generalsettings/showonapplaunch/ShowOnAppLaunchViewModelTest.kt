@@ -17,16 +17,32 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import app.cash.turbine.test
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class ShowOnAppLaunchViewModelTest {
 
@@ -36,11 +52,26 @@ class ShowOnAppLaunchViewModelTest {
     private lateinit var testee: ShowOnAppLaunchViewModel
     private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val settingsDataStore: SettingsDataStore = mock()
+    private val pixel: Pixel = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
 
     @Before
     fun setup() {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        whenever(ntpAfterIdleManager.returnToLastTabEnabled).thenReturn(flowOf(true))
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter())
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider,
+            fakeDataStore,
+            FakeUrlConverter(),
+            fakeBrowserConfigFeature,
+            settingsDataStore,
+            pixel,
+            ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
     }
 
     @Test
@@ -79,6 +110,185 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val updatedState = awaitItem()
             assertEquals(LastOpenedTab, updatedState.selectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.showNTPAfterIdleReturn)
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.showNTPAfterIdleReturn)
+        }
+    }
+
+    // --- selectedIdleThresholdSeconds resolution ---
+
+    @Test
+    fun whenNoSettingsAndNoUserPrefThenSelectedIsDefaultFiveMinutes() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(300L, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    @Test
+    fun whenRCDefaultSetThenSelectedIsRCDefault() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
+            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":60}"""),
+        )
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(60L, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    @Test
+    fun whenUserPreferenceSetThenSelectedIsUserPreference() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
+            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300}"""),
+        )
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(0L, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    @Test
+    fun whenSettingsHaveInvalidJsonThenDefaultsUsed() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
+            Toggle.State(true, settings = """invalid"""),
+        )
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(300L, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    // --- onTimeoutSelected ---
+
+    @Test
+    fun whenTimeoutSelectedThenSavesPreferenceAndFiresPixel() = runTest {
+        testee.onTimeoutSelected(60L)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(settingsDataStore).userSelectedIdleThresholdSeconds = 60L
+        verify(pixel).fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to "60"))
+    }
+
+    @Test
+    fun whenTimeoutSelectedThenIdleTimeoutSelectedNotified() = runTest {
+        testee.onTimeoutSelected(300L)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).onIdleTimeoutSelected(300L)
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledOffThenSettingPersistedAndDisabledPixelsFired() = runTest {
+        testee.onReturnToLastTabToggled(false)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(false)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledOnThenSettingPersistedAndEnabledPixelsFired() = runTest {
+        testee.onReturnToLastTabToggled(true)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(true)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenTimeoutSelectedThenViewStateUpdated() = runTest {
+        testee.onTimeoutSelected(0L)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(0L, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    // --- idleThresholdOptions ---
+
+    @Test
+    fun whenViewStateCreatedThenDefaultOptionsExposed() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
+        }
+    }
+
+    // --- onTimeoutRowClicked command ---
+
+    @Test
+    fun whenTimeoutRowClickedThenEmitsShowTimeoutDialogCommand() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
+            RealIdleThresholdResolver(fakeBrowserConfigFeature),
+        )
+
+        testee.commands.test {
+            testee.onTimeoutRowClicked()
+            val command = awaitItem()
+            assertTrue(command is ShowTimeoutDialog)
+            val dialog = command as ShowTimeoutDialog
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, dialog.options)
+            assertEquals(300L, dialog.currentSelection)
         }
     }
 

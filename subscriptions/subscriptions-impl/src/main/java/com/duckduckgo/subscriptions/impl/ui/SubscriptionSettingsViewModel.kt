@@ -25,18 +25,21 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -50,6 +53,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import java.util.Date
 import javax.inject.Inject
 
@@ -58,7 +62,8 @@ import javax.inject.Inject
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -84,19 +89,50 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private suspend fun emitChanges() {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
+        logcat {
+            "SubscriptionSettingsViewModel: Subscription found with tier ${subscription.tier}"
+        }
 
         val formatter = DateFormat.getInstanceForSkeleton("ddMMMMyyyy")
         val date = formatter.format(Date(subscription.expiresOrRenewsAt))
+        val monthlyPlans = LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
         val type = when (subscription.productId) {
-            MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> Monthly
+            in monthlyPlans -> Monthly
             else -> Yearly
         }
 
-        val switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
-        val savingsPercentage = if (switchPlanAvailable && type == Monthly) {
-            subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)?.savingsPercentage
+        // Use firstOrNull() for UI display
+        val pendingPlan = if (subscriptionsFeature.showPendingPlanHint().isEnabled()) {
+            subscription.pendingPlans.firstOrNull()
         } else {
             null
+        }
+
+        val pendingEffectiveDate = pendingPlan?.let {
+            formatter.format(Date(it.effectiveAt))
+        }
+        val isPendingDowngrade = pendingPlan?.let {
+            isPendingPlanDowngrade(
+                currentTier = subscription.tier,
+                currentDuration = type,
+                pendingTier = it.tier,
+                pendingBillingPeriod = it.billingPeriod,
+            )
+        }
+        val pendingPlanDisplayNameResId = pendingPlan?.let {
+            getPendingPlanDisplayName(it.tier, it.billingPeriod)
+        }
+        val pendingEffectiveDateShort = pendingPlan?.let {
+            DateFormat.getInstanceForSkeleton("MMMMd").format(Date(it.effectiveAt))
+        }
+        val pendingTierNameResId = pendingPlan?.let {
+            getPendingTierNameResId(it.tier)
+        }
+
+        val effectiveTier = if (subscriptionsFeature.showPendingPlanHint().isEnabled()) {
+            pendingPlan?.tier ?: subscription.tier
+        } else {
+            subscription.tier
         }
 
         _viewState.emit(
@@ -106,10 +142,17 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 status = subscription.status,
                 platform = subscription.platform,
                 email = account.email?.takeUnless { it.isBlank() },
-                showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
+                showFeedback = subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
-                switchPlanAvailable = switchPlanAvailable,
-                savingsPercentage = savingsPercentage,
+                isProTierEnabled = subscriptionsFeature.allowProTierPurchase().isEnabled(),
+                subscriptionTier = subscription.tier,
+                pendingPlan = pendingPlan,
+                pendingEffectiveDate = pendingEffectiveDate,
+                isPendingDowngrade = isPendingDowngrade,
+                pendingPlanDisplayNameResId = pendingPlanDisplayNameResId,
+                pendingEffectiveDateShort = pendingEffectiveDateShort,
+                pendingTierNameResId = pendingTierNameResId,
+                effectiveTier = effectiveTier,
             ),
         )
     }
@@ -142,19 +185,49 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSwitchPlanClicked(currentDuration: SubscriptionDuration) {
-        viewModelScope.launch {
-            val switchType = when (currentDuration) {
-                Monthly -> SwitchPlanType.UPGRADE_TO_YEARLY
-                Yearly -> SwitchPlanType.DOWNGRADE_TO_MONTHLY
+    private fun isPendingPlanDowngrade(
+        currentTier: SubscriptionTier,
+        currentDuration: SubscriptionDuration,
+        pendingTier: SubscriptionTier,
+        pendingBillingPeriod: String,
+    ): Boolean {
+        // Tier downgrade: PRO -> PLUS
+        if (currentTier == SubscriptionTier.PRO && pendingTier == SubscriptionTier.PLUS) {
+            return true
+        }
+        // Tier upgrade: PLUS -> PRO
+        if (currentTier == SubscriptionTier.PLUS && pendingTier == SubscriptionTier.PRO) {
+            return false
+        }
+        // Same tier - check billing period: Yearly -> Monthly is downgrade
+        // This should not happen as replacement mode is not deferred within same product, but we handle it just in case
+        val isPendingMonthly = pendingBillingPeriod.equals("monthly", ignoreCase = true)
+        return currentDuration == Yearly && isPendingMonthly
+    }
+
+    private fun getPendingPlanDisplayName(
+        tier: SubscriptionTier,
+        billingPeriod: String,
+    ): Int {
+        return when (tier) {
+            SubscriptionTier.PLUS -> {
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNamePlusMonthly else R.string.planNamePlusYearly
             }
-            command.send(ShowSwitchPlanDialog(switchType))
+            SubscriptionTier.PRO -> {
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNameProMonthly else R.string.planNameProYearly
+            }
+            SubscriptionTier.UNKNOWN -> {
+                // fallback
+                if (billingPeriod.equals("monthly", ignoreCase = true)) R.string.planNamePlusMonthly else R.string.planNamePlusYearly
+            }
         }
     }
 
-    fun onSwitchPlanSuccess() {
-        viewModelScope.launch {
-            emitChanges()
+    private fun getPendingTierNameResId(tier: SubscriptionTier): Int {
+        return when (tier) {
+            SubscriptionTier.PLUS -> R.string.planTierNamePlus
+            SubscriptionTier.PRO -> R.string.planTierNamePro
+            SubscriptionTier.UNKNOWN -> R.string.planTierNamePlus // fallback
         }
     }
 
@@ -168,12 +241,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToEditEmailScreen : Command()
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
-        data class ShowSwitchPlanDialog(val switchType: SwitchPlanType) : Command()
-    }
-
-    enum class SwitchPlanType {
-        UPGRADE_TO_YEARLY,
-        DOWNGRADE_TO_MONTHLY,
     }
 
     sealed class ViewState {
@@ -187,8 +254,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val email: String?,
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
-            val switchPlanAvailable: Boolean,
-            val savingsPercentage: Int?,
+            val isProTierEnabled: Boolean,
+            val subscriptionTier: SubscriptionTier,
+            val pendingPlan: PendingPlan? = null,
+            val pendingEffectiveDate: String? = null,
+            val isPendingDowngrade: Boolean? = null,
+            val pendingPlanDisplayNameResId: Int? = null,
+            val pendingEffectiveDateShort: String? = null,
+            val pendingTierNameResId: Int? = null,
+            val effectiveTier: SubscriptionTier,
         ) : ViewState()
     }
 }

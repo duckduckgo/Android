@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 @ContributesActivePluginPoint(
     scope = AppScope::class,
+    featureName = "pluginPointMyPlugin",
 )
 interface MyPlugin : ActivePlugin {
     fun doSomething()
@@ -37,6 +38,7 @@ interface TriggeredMyPlugin : ActivePlugin {
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = TriggeredMyPlugin::class,
+    featureName = "pluginPointTriggeredMyPlugin",
 )
 private interface TriggeredMyPluginTrigger
 
@@ -44,6 +46,8 @@ private interface TriggeredMyPluginTrigger
     scope = AppScope::class,
     boundType = TriggeredMyPlugin::class,
     defaultActiveValue = DefaultFeatureValue.FALSE,
+    featureName = "pluginFooActiveTriggeredMyPlugin",
+    parentFeatureName = "pluginPointTriggeredMyPlugin",
 )
 class FooActiveTriggeredMyPlugin @Inject constructor() : TriggeredMyPlugin {
     override fun doSomething() {
@@ -54,6 +58,8 @@ class FooActiveTriggeredMyPlugin @Inject constructor() : TriggeredMyPlugin {
     scope = AppScope::class,
     boundType = MyPlugin::class,
     defaultActiveValue = DefaultFeatureValue.FALSE,
+    featureName = "pluginFooActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class FooActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
@@ -64,6 +70,8 @@ class FooActivePlugin @Inject constructor() : MyPlugin {
     scope = AppScope::class,
     boundType = MyPlugin::class,
     defaultActiveValue = DefaultFeatureValue.INTERNAL,
+    featureName = "pluginFooActiveInternalPlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class FooActiveInternalPlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
@@ -74,6 +82,8 @@ class FooActiveInternalPlugin @Inject constructor() : MyPlugin {
     scope = AppScope::class,
     boundType = MyPlugin::class,
     priority = 1000,
+    featureName = "pluginBarActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class BarActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
@@ -84,6 +94,8 @@ class BarActivePlugin @Inject constructor() : MyPlugin {
     scope = AppScope::class,
     boundType = MyPlugin::class,
     priority = 50,
+    featureName = "pluginBazActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class BazActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
@@ -95,6 +107,8 @@ class BazActivePlugin @Inject constructor() : MyPlugin {
     boundType = MyPlugin::class,
     priority = 50,
     supportExperiments = true,
+    featureName = "pluginExperimentActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class ExperimentActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
@@ -107,8 +121,30 @@ class ExperimentActivePlugin @Inject constructor() : MyPlugin {
     priority = 50,
     internalAlwaysEnabled = true,
     supportExperiments = false,
+    featureName = "pluginInternalAlwaysEnabledActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
 )
 class InternalAlwaysEnabledActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
     }
+}
+
+// Fixtures for explicit featureName / parentFeatureName tests
+
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    featureName = "pluginPointExplicit",
+)
+interface ExplicitNamePlugin : ActivePlugin {
+    fun doSomething()
+}
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = ExplicitNamePlugin::class,
+    featureName = "pluginExplicit",
+    parentFeatureName = "pluginPointExplicit",
+)
+class ExplicitNameActivePlugin @Inject constructor() : ExplicitNamePlugin {
+    override fun doSomething() {}
 }

@@ -30,6 +30,10 @@
             android:name="com.duckduckgo.app.dev.settings.tabs.DevTabsActivity"
             android:label="@string/devSettingsScreenTabs"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.onboarding.OnboardingDevSettingsActivity"
+            android:label="@string/onboardingDevSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 
 </manifest>

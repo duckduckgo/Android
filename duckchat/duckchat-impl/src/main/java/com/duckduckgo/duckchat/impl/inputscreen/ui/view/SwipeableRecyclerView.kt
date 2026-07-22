@@ -53,6 +53,11 @@ class SwipeableRecyclerView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(e: MotionEvent): Boolean {
         val pager = viewPager ?: return super.onTouchEvent(e)
+
+        if (e.action == MotionEvent.ACTION_MOVE && !isHorizontalSwipe) {
+            detectHorizontalSwipe(e)
+        }
+
         if (!isHorizontalSwipe) return super.onTouchEvent(e)
 
         dispatchDownEvent(e, pager)

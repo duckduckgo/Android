@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
@@ -37,6 +38,12 @@ interface AddressBarTrackersAnimationManager {
      * @return true if the feature is enabled, false otherwise
      */
     suspend fun isFeatureEnabled(): Boolean
+
+    /**
+     * Observes the software rendering mode kill-switch.
+     * If the emitted value is true, the shield animation should use Lottie's SOFTWARE render mode; otherwise the default.
+     */
+    val softwareRenderingModeEnabled: Flow<Boolean>
 
     /**
      * Determines if the tracker animation should be shown based on the current URL
@@ -60,6 +67,9 @@ class RealAddressBarTrackersAnimationManager @Inject constructor(
 ) : AddressBarTrackersAnimationManager {
 
     private var cachedFeatureState: Boolean? = null
+
+    override val softwareRenderingModeEnabled: Flow<Boolean> =
+        addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().enabled()
 
     override suspend fun fetchFeatureState() {
         withContext(dispatcherProvider.io()) {

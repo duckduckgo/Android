@@ -21,6 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
+    tools:ignore="Overdraw"
     android:paddingTop="@dimen/twoLineItemVerticalPadding"
     android:paddingBottom="@dimen/twoLineItemVerticalPadding"
     android:minHeight="@dimen/twoLineItemHeight">
@@ -45,6 +46,7 @@
         android:layout_height="@dimen/keyline_2"
         android:src="@drawable/indicator_vpn_disconnected"
         android:layout_marginEnd="@dimen/keyline_2"
+        android:contentDescription="@string/netpVpnIndicatorContentDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/secondaryText"
         app:layout_constraintStart_toStartOf="@+id/primaryText"

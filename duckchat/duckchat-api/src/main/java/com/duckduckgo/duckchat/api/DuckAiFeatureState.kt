@@ -52,7 +52,7 @@ interface DuckAiFeatureState {
     /**
      * Indicates whether the new address bar option choice screen feature is enabled.
      */
-    val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean>
+    val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean>
 
     /**
      * Indicates whether the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
@@ -70,6 +70,12 @@ interface DuckAiFeatureState {
     val showVoiceSearchToggle: StateFlow<Boolean>
 
     /**
+     * Indicates whether the voice chat entry point (e.g. the voice chat button on the chat tab of the input screen)
+     * should be shown.
+     */
+    val showVoiceChatEntry: StateFlow<Boolean>
+
+    /**
      * Indicates whether Duck.ai should be open in FullScreen mode
      */
     val showFullScreenMode: StateFlow<Boolean>
@@ -83,4 +89,15 @@ interface DuckAiFeatureState {
      * Indicates whether Duck.ai should be open in Contextual mode
      */
     val showContextualMode: StateFlow<Boolean>
+
+    /**
+     * Indicates whether Duck.ai should be used as digital assistant
+     */
+    val allowDuckAiAsDigitalAssistant: StateFlow<Boolean>
+
+    /**
+     * True when the native input field is the active input surface. Mutually exclusive with
+     * [showInputScreen] (which is computed with `&& !isNativeInputFieldEnabled`).
+     */
+    val nativeInputFieldEnabled: StateFlow<Boolean>
 }

@@ -27,6 +27,7 @@ import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.domain
@@ -35,6 +36,7 @@ import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.RemoveCookies
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -57,11 +59,12 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-    private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()!!
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
+    private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock())
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private lateinit var testee: WebViewCookieManager
 
     companion object {
@@ -94,7 +97,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
 
-        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
+        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider(), mockDuckAiHostProvider)
 
         fireproofedSites.map { url ->
             val domain = url.toUri().domain() ?: url

@@ -1,0 +1,157 @@
+{
+  "name": "Veriforia",
+  "url": "veriforia.com",
+  "version": "0.8.0",
+  "addedDatetime": 1677736800000,
+  "optOutUrl": "https://veriforia.com/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "7e7f0952-40cf-4cf4-92cb-3d6cc3464219",
+          "url": "https://veriforia.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "e5894fdf-3afb-459e-b1a3-a8852d116346",
+          "selector": ".search-item",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
+          "profile": {
+            "name": {
+              "selector": ".//div[@class='col-sm-24 col-md-19 col-text']"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//li[@itemprop='relatedTo']",
+              "findElements": true,
+              "beforeText": ","
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://veriforia.com/view/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://veriforia.com/ng/control/privacy",
+          "id": "943c387c-9cb2-42d6-afd5-a48cf4c2cf3d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "68bb9203-fa24-4026-8f5d-0521bf4f8967"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "cf78bb16-b608-4a50-975b-844dad3db1db"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf_captcha_token' and @value and @value != '']",
+              "parent": "//form[@id='form-contact']"
+            }
+          ],
+          "id": "dc7fc97c-ba56-4f0f-843a-13a6db6378b6"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "0aaae970-81d9-4d63-86d0-da4d0a3f5cf4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "9b6fad42-babc-4777-92af-d415ea9aef5b"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "d0d5f4d0-7183-40f5-b476-4315c751bcc5"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "434d001d-f6cb-4df9-acf3-e62dc821a25a"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763742029889
+}

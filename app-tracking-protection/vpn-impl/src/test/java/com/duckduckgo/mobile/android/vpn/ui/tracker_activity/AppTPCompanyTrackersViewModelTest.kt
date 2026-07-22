@@ -71,7 +71,7 @@ class AppTPCompanyTrackersViewModelTest {
         )
     }
 
-    @Ignore
+    @Ignore("TODO: fix and re-enable")
     @Test
     fun whenLoadsDataReturnsTrackersForAppFromDate() = runBlocking {
         val date = "2020-10-21"

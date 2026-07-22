@@ -269,8 +269,10 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                             listItems = translatedListItems(
                                 item1TitleText = "Titre de l'élément 1",
                                 item1DescriptionText = "Description de l'élément 1",
+                                item1PrimaryActionText = "Action de l'élément 1",
                                 item2TitleText = "Titre de l'élément 2",
                                 item2DescriptionText = "Description de l'élément 2",
+                                item2PrimaryActionText = "Action de l'élément 2",
                             ),
                         ),
                         surfaces = listOf(NEW_TAB_PAGE),
@@ -405,10 +407,12 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                 "item1" to JsonListItemTranslation(
                     titleText = "Titre de l'élément 1",
                     descriptionText = "Description de l'élément 1",
+                    primaryActionText = "Action de l'élément 1",
                 ),
                 "item2" to JsonListItemTranslation(
                     titleText = "Titre de l'élément 2",
                     descriptionText = "Description de l'élément 2",
+                    primaryActionText = "Action de l'élément 2",
                 ),
             ),
         )

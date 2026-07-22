@@ -16,15 +16,15 @@
 
 package com.duckduckgo.subscriptions.impl.serp_promo
 
-import android.webkit.CookieManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.setCookieForAllModes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -55,25 +55,26 @@ private const val SERP_PPRO_PROMO_COOKIE_NAME = "privacy_pro_access_token"
 class RealSerpPromo @Inject constructor(
     @InternalApi private val cookieManager: CookieManagerWrapper,
     private val dispatcherProvider: DispatcherProvider,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val subscriptions: Lazy<Subscriptions>, // break dep cycle
 ) : SerpPromo, MainProcessLifecycleObserver {
 
-    override suspend fun injectCookie(cookieValue: String?) = withContext(dispatcherProvider.io()) {
-        if (privacyProFeature.get().serpPromoCookie().isEnabled()) {
+    override suspend fun injectCookie(cookieValue: String?) {
+        if (!subscriptionsFeature.get().serpPromoCookie().isEnabled()) return
+
+        withContext(dispatcherProvider.io()) {
             synchronized(cookieManager) {
                 kotlin.runCatching {
                     val cookieString = "$SERP_PPRO_PROMO_COOKIE_NAME=${cookieValue.orEmpty()};HttpOnly;Path=/;"
-                    cookieManager.setCookie(HTTPS_WWW_SUBSCRIPTION_DDG_COM, cookieString)
+                    cookieManager.setCookieOnAllProfiles(HTTPS_WWW_SUBSCRIPTION_DDG_COM, cookieString)
                 }
             }
-            return@withContext
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            if (privacyProFeature.get().serpPromoCookie().isEnabled()) {
+            if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
                 kotlin.runCatching {
                     val accessToken = subscriptions.get().getAccessToken() ?: ""
                     injectCookie(accessToken)
@@ -86,11 +87,10 @@ class RealSerpPromo @Inject constructor(
 // This class is basically a convenience wrapper for easier testing
 interface CookieManagerWrapper {
     /**
-     * @return the cookie stored for the given [url] if any, null otherwise
+     * Sets the given [cookieString] for the given [url] on every browser mode's cookie jar (the
+     * default profile plus any non-default profiles).
      */
-    fun getCookie(url: String): String?
-
-    fun setCookie(url: String, cookieString: String)
+    fun setCookieOnAllProfiles(url: String, cookieString: String)
 }
 
 @Retention(AnnotationRetention.BINARY)
@@ -110,15 +110,8 @@ private class CookieManagerWrapperImpl constructor(
     private val cookieManagerProvider: CookieManagerProvider,
 ) : CookieManagerWrapper {
 
-    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.get() }
-
-    override fun getCookie(url: String): String? {
-        return cookieManager?.getCookie(url)
-    }
-
-    override fun setCookie(domain: String, cookie: String) {
-        logcat { "Setting cookie $cookie for domain $domain" }
-        cookieManager?.setCookie(domain, cookie)
-        cookieManager?.flush()
+    override fun setCookieOnAllProfiles(url: String, cookieString: String) {
+        logcat { "Setting cookie $cookieString for domain $url" }
+        cookieManagerProvider.setCookieForAllModes(url, cookieString)
     }
 }

@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.messaging
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import kotlinx.coroutines.test.runTest
@@ -7,9 +8,13 @@ import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class SubscriptionsContentScopeJsMessageHandlerTest {
-    private val handler = SubscriptionsContentScopeJsMessageHandler().getJsMessageHandler()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
+        whenever(it.getHost()).thenReturn("duck.ai")
+    }
+    private val handler = SubscriptionsContentScopeJsMessageHandler(mockDuckAiHostProvider).getJsMessageHandler()
 
     @Test
     fun `when message sent then callback called`() = runTest {
@@ -27,10 +32,11 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun `only allow duckduckgo dot com domains`() = runTest {
+    fun `only allow duckduckgo dot com or duck dot ai domains`() = runTest {
         val domains = handler.allowedDomains
-        assertTrue(domains.size == 1)
-        assertTrue(domains.first() == "duckduckgo.com")
+        assertTrue(domains.size == 2)
+        assertTrue(domains[0] == "duckduckgo.com")
+        assertTrue(domains[1] == "duck.ai")
     }
 
     @Test
@@ -41,7 +47,7 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() = runTest {
         val methods = handler.methods
-        assertTrue(methods.size == 7)
+        assertTrue(methods.size == 8)
         assertTrue(methods.contains("handshake"))
         assertTrue(methods.contains("subscriptionDetails"))
         assertTrue(methods.contains("getAuthAccessToken"))
@@ -49,6 +55,7 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
         assertTrue(methods.contains("backToSettings"))
         assertTrue(methods.contains("openSubscriptionActivation"))
         assertTrue(methods.contains("openSubscriptionPurchase"))
+        assertTrue(methods.contains("openSubscriptionUpgrade"))
     }
 
     private val callback = object : JsMessageCallback() {

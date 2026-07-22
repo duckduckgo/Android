@@ -37,4 +37,12 @@
     <string name="alwaysOn">Altid aktiv</string>
     <string name="on">Til</string>
     <string name="off">Fra</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Mere info</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Luk</string>
+    <string name="bookmarkFavoriteContentDescription">Favorit</string>
+
 </resources>

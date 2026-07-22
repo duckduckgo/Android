@@ -17,12 +17,16 @@
 package com.duckduckgo.app.browser.menu
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
+import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -46,13 +50,19 @@ class RealBrowserMenuViewStateFactoryTest {
     @Mock
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
+    private val popupMenuShortcutFlow = MutableStateFlow(false)
+    private val voiceChatEntryFlow = MutableStateFlow(false)
+    private val newDownloadState: NewDownloadState = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock)
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
+        whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector)
     }
 
     @Test
@@ -68,7 +78,15 @@ class RealBrowserMenuViewStateFactoryTest {
         )
         val omnibarViewMode = ViewMode.CustomTab(toolbarColor = 100, title = "example")
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = true)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = true,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.CustomTabs
 
         assertFalse(viewState.canGoBack)
@@ -90,7 +108,15 @@ class RealBrowserMenuViewStateFactoryTest {
 
         val omnibarViewMode = ViewMode.DuckAI
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.DuckAi
 
         assertFalse(viewState.canPrintPage)
@@ -108,7 +134,15 @@ class RealBrowserMenuViewStateFactoryTest {
 
         val omnibarViewMode = ViewMode.Error
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.NewTabPage
 
         assertTrue(viewState.showDuckChatOption)
@@ -126,7 +160,15 @@ class RealBrowserMenuViewStateFactoryTest {
 
         val omnibarViewMode = ViewMode.SSLWarning
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.NewTabPage
 
         assertTrue(viewState.showDuckChatOption)
@@ -144,7 +186,15 @@ class RealBrowserMenuViewStateFactoryTest {
 
         val omnibarViewMode = ViewMode.NewTab
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.NewTabPage
 
         assertTrue(viewState.showDuckChatOption)
@@ -162,7 +212,15 @@ class RealBrowserMenuViewStateFactoryTest {
 
         val omnibarViewMode = ViewMode.MaliciousSiteWarning
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.NewTabPage
 
         assertTrue(viewState.showDuckChatOption)
@@ -200,13 +258,20 @@ class RealBrowserMenuViewStateFactoryTest {
         val initialUrl = "https://example.com/page"
         val omnibarViewMode = ViewMode.Browser(initialUrl)
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.Browser
 
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
-        assertFalse(viewState.showNewDuckChatTabOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
@@ -259,13 +324,20 @@ class RealBrowserMenuViewStateFactoryTest {
         val initialUrl = "https://example.com/page"
         val omnibarViewMode = ViewMode.Browser(initialUrl)
 
-        val result = testee.create(omnibarViewMode = omnibarViewMode, viewState = browserViewState, customTabsMode = false)
+        val result = testee.create(
+            omnibarViewMode = omnibarViewMode,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
         val viewState = result as BrowserMenuViewState.Browser
 
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
-        assertFalse(viewState.showDuckChatOption)
-        assertTrue(viewState.showNewDuckChatTabOption)
+        assertTrue(viewState.showDuckChatOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
@@ -284,5 +356,339 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.showAutofill)
         assertFalse(viewState.isSSLError)
         assertTrue(viewState.canPrintPage)
+    }
+
+    @Test
+    fun `when popup menu shortcut is enabled then Duck ai section is shown across browser, new tab and duck ai modes`() = runTest {
+        popupMenuShortcutFlow.emit(true)
+        val browserViewState = BrowserViewState()
+
+        val browser = testee.create(ViewMode.Browser("https://example.com"), browserViewState, false, "", null, null, null)
+        val newTab = testee.create(ViewMode.NewTab, browserViewState, false, "", null, null, null)
+        val duckAi = testee.create(ViewMode.DuckAI, browserViewState, false, "", null, null, null)
+
+        assertTrue((browser as BrowserMenuViewState.Browser).showDuckAiSection)
+        assertTrue((newTab as BrowserMenuViewState.NewTabPage).showDuckAiSection)
+        assertTrue((duckAi as BrowserMenuViewState.DuckAi).showDuckAiSection)
+    }
+
+    @Test
+    fun `when popup menu shortcut is disabled then Duck ai section is hidden`() = runTest {
+        popupMenuShortcutFlow.emit(false)
+
+        val result = testee.create(ViewMode.Browser("https://example.com"), BrowserViewState(), false, "", null, null, null)
+
+        assertFalse((result as BrowserMenuViewState.Browser).showDuckAiSection)
+    }
+
+    @Test
+    fun `when voice chat entry is enabled then voice chat option is shown across browser, new tab and duck ai modes`() = runTest {
+        voiceChatEntryFlow.emit(true)
+        val browserViewState = BrowserViewState()
+
+        val browser = testee.create(ViewMode.Browser("https://example.com"), browserViewState, false, "", null, null, null)
+        val newTab = testee.create(ViewMode.NewTab, browserViewState, false, "", null, null, null)
+        val duckAi = testee.create(ViewMode.DuckAI, browserViewState, false, "", null, null, null)
+
+        assertTrue((browser as BrowserMenuViewState.Browser).showDuckChatVoiceOption)
+        assertTrue((newTab as BrowserMenuViewState.NewTabPage).showDuckChatVoiceOption)
+        assertTrue((duckAi as BrowserMenuViewState.DuckAi).showDuckChatVoiceOption)
+    }
+
+    @Test
+    fun `when chat history available then duck ai mode propagates showDuckChatHistoryOption`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.DuckAI,
+            viewState = BrowserViewState(showDuckChatHistoryOption = true),
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertTrue((result as BrowserMenuViewState.DuckAi).showDuckChatHistoryOption)
+    }
+
+    @Test
+    fun `when an inline PDF is showing then canFindInPage is hidden even if the underlying state allows it`() = runTest {
+        val browserViewState = BrowserViewState(
+            canFindInPage = true,
+            currentPdfCachedUri = mock(),
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/doc.pdf"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertFalse((result as BrowserMenuViewState.Browser).canFindInPage)
+    }
+
+    @Test
+    fun `when no inline PDF is showing then canFindInPage propagates from the underlying state`() = runTest {
+        val browserViewState = BrowserViewState(
+            canFindInPage = true,
+            currentPdfCachedUri = null,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/page"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertTrue((result as BrowserMenuViewState.Browser).canFindInPage)
+    }
+
+    @Test
+    fun `when an inline PDF is showing then canChangeBrowsingMode is hidden even if the underlying state allows it`() = runTest {
+        val browserViewState = BrowserViewState(
+            canChangeBrowsingMode = true,
+            currentPdfCachedUri = mock(),
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/doc.pdf"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertFalse((result as BrowserMenuViewState.Browser).canChangeBrowsingMode)
+    }
+
+    @Test
+    fun `when no inline PDF is showing then canChangeBrowsingMode propagates from the underlying state`() = runTest {
+        val browserViewState = BrowserViewState(
+            canChangeBrowsingMode = true,
+            currentPdfCachedUri = null,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/page"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertTrue((result as BrowserMenuViewState.Browser).canChangeBrowsingMode)
+    }
+
+    @Test
+    fun `when site has url and title then page context header is Visible`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = "Example Site",
+            shortUrl = "example.com",
+            omnibarText = null,
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Visible)
+        val visible = header as PageContextHeaderState.Visible
+        assertEquals("TAB_ID", visible.tabId)
+        assertEquals("example.com", visible.shortUrl)
+        assertEquals("Example Site", visible.title)
+        assertNull(visible.serpLogoUrl)
+    }
+
+    @Test
+    fun `when serpLogoUrl is provided then page context header contains it`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = "Example Site",
+            shortUrl = "example.com",
+            omnibarText = null,
+            serpLogoUrl = "https://duckduckgo.com/logo.png",
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Visible)
+        val visible = header as PageContextHeaderState.Visible
+        assertEquals("https://duckduckgo.com/logo.png", visible.serpLogoUrl)
+    }
+
+    @Test
+    fun `when site has url and null title then page context header is Visible with null title`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = null,
+            shortUrl = "example.com",
+            omnibarText = null,
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Visible)
+        assertNull((header as PageContextHeaderState.Visible).title)
+    }
+
+    @Test
+    fun `when no site then page context header is Hidden`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertEquals(PageContextHeaderState.Hidden, header)
+    }
+
+    @Test
+    fun `when site is duck ai url then page context header is DuckAi`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.DuckAI,
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = "Duck.ai Chat",
+            shortUrl = null,
+            omnibarText = null,
+        )
+        val header = (result as BrowserMenuViewState.DuckAi).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.DuckAi)
+        assertEquals("TAB_ID", (header as PageContextHeaderState.DuckAi).tabId)
+    }
+
+    @Test
+    fun `when site has error then page context header is Error`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(browserError = WebViewErrorResponse.BAD_URL),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = null,
+            shortUrl = "example.com",
+            omnibarText = null,
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Error)
+        assertEquals("example.com", (header as PageContextHeaderState.Error).shortUrl)
+    }
+
+    @Test
+    fun `when browser page is a duckduckgo search results page then privacy protection and report site items are hidden`() = runTest {
+        val serpUrl = "https://duckduckgo.com/?q=cats"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(serpUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(serpUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = serpUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is a non-search duckduckgo page then privacy protection and report site items are hidden`() = runTest {
+        val ddgUrl = "https://duckduckgo.com/about"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(ddgUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = ddgUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertFalse(viewState.canChangePrivacyProtection)
+        assertFalse(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when browser page is not a duckduckgo page then privacy protection and report site items propagate`() = runTest {
+        val siteUrl = "https://example.com/page"
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(siteUrl)).thenReturn(false)
+        val browserViewState = BrowserViewState(
+            canChangePrivacyProtection = true,
+            isPrivacyProtectionDisabled = false,
+            canReportSite = true,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser(siteUrl),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+            siteUrl = siteUrl,
+        )
+        val viewState = result as BrowserMenuViewState.Browser
+
+        assertTrue(viewState.canChangePrivacyProtection)
+        assertTrue(viewState.canReportSite)
+    }
+
+    @Test
+    fun `when error with no site but omnibarText then page context header is Error with omnibarText`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://broken-site.com/"),
+            viewState = BrowserViewState(browserError = WebViewErrorResponse.BAD_URL),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = null,
+            shortUrl = null,
+            omnibarText = "broken-site.com",
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Error)
+        assertEquals("broken-site.com", (header as PageContextHeaderState.Error).shortUrl)
     }
 }

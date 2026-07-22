@@ -69,6 +69,13 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun whenSetShowInVoiceChatThenSetInDataStore() = runTest {
+        testee.setShowInVoiceChat(false)
+
+        verify(mockDataStore).setShowInVoiceChat(false)
+    }
+
+    @Test
     fun `when setInputScreenUserSetting then set in data store`() = runTest {
         testee.setInputScreenUserSetting(false)
 
@@ -133,6 +140,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun whenObserveShowInVoiceChatThenObserveDataStore() = runTest {
+        whenever(mockDataStore.observeShowInVoiceChat()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeShowInVoiceChat().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun `when observeInputScreenUserSettingEnabled then observe data store`() = runTest {
         whenever(mockDataStore.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false, true))
 
@@ -183,6 +199,12 @@ class DuckChatFeatureRepositoryTest {
     fun whenShouldShowInVoiceSearchThenGetFromDataStore() = runTest {
         whenever(mockDataStore.getShowInVoiceSearch()).thenReturn(true)
         assertTrue(testee.shouldShowInVoiceSearch())
+    }
+
+    @Test
+    fun whenShouldShowInVoiceChatThenGetFromDataStore() = runTest {
+        whenever(mockDataStore.getShowInVoiceChat()).thenReturn(true)
+        assertTrue(testee.shouldShowInVoiceChat())
     }
 
     @Test
@@ -286,5 +308,66 @@ class DuckChatFeatureRepositoryTest {
         val result = testee.isAIChatHistoryEnabled()
 
         assertTrue(result)
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting then set in data store`() = runTest {
+        testee.setChatSuggestionsUserSetting(true)
+
+        verify(mockDataStore).setChatSuggestionsUserSetting(true)
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting false then set in data store`() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+
+        verify(mockDataStore).setChatSuggestionsUserSetting(false)
+    }
+
+    @Test
+    fun `when observeChatSuggestionsUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeChatSuggestionsUserSettingEnabled().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun `when setDefaultTogglePosition then set in data store`() = runTest {
+        testee.setDefaultTogglePosition("DUCK_AI")
+
+        verify(mockDataStore).setDefaultTogglePosition("DUCK_AI")
+    }
+
+    @Test
+    fun `when getDefaultTogglePosition then get from data store`() = runTest {
+        whenever(mockDataStore.getDefaultTogglePosition()).thenReturn("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getDefaultTogglePosition())
+    }
+
+    @Test
+    fun `when observeDefaultTogglePosition then observe data store`() = runTest {
+        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+
+        val results = testee.observeDefaultTogglePosition().take(2).toList()
+        assertNull(results[0])
+        assertEquals("DUCK_AI", results[1])
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then set in data store`() = runTest {
+        testee.setLastUsedTogglePosition("SEARCH")
+
+        verify(mockDataStore).setLastUsedTogglePosition("SEARCH")
+    }
+
+    @Test
+    fun `when observeLastUsedTogglePosition then observe data store`() = runTest {
+        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+
+        val results = testee.observeLastUsedTogglePosition().take(2).toList()
+        assertNull(results[0])
+        assertEquals("DUCK_AI", results[1])
     }
 }

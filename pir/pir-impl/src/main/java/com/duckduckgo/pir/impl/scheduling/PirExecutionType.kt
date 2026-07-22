@@ -18,8 +18,19 @@ package com.duckduckgo.pir.impl.scheduling
 
 /**
  * This class tells us if PIR was triggered by a scheduled work or manually run by the user.
+ *
+ * The three manual variants distinguish between the user's initial manual scan
+ * ([MANUAL_INITIAL]), dashboard-triggered resume of an interrupted initial scan ([MANUAL_INITIAL_RESUME]),
+ * and the user having edited an already-saved profile later ([MANUAL_EDIT_PROFILE]).
+ * This is used to attribute foreground-scan pixels to the right source.
  */
 enum class PirExecutionType {
-    MANUAL,
+    MANUAL_INITIAL,
+    MANUAL_EDIT_PROFILE,
+    MANUAL_INITIAL_RESUME,
     SCHEDULED,
+    ;
+
+    val isManual: Boolean
+        get() = this == MANUAL_INITIAL || this == MANUAL_EDIT_PROFILE || this == MANUAL_INITIAL_RESUME
 }

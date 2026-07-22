@@ -27,6 +27,8 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.clickMenuItem
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -44,6 +46,7 @@ class SurrogatesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections/surrogates/",
         ),
     )
@@ -93,10 +96,15 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(ViewActions.click())
-        onView(isRoot()).perform(waitForView(withText("Disable Privacy Protection")))
-        onView(withText("Disable Privacy Protection")).perform(ViewActions.click())
+        // Protections may already be disabled for privacy-test-pages.site if a previous test in
+        // the same run left that state behind — the user allowlist persists across tests and is
+        // only cleared between orchestrated (CI) runs, not local connectedAndroidTest runs. When
+        // already disabled, the menu shows "Enable Privacy Protection" instead, and we're already
+        // in the state under test, so skip the disable click rather than failing to find it.
+        runCatching { clickMenuItem(withText("Disable Privacy Protection")) }
 
-        // handle the privacy protection toggle check screen showing
+        // Dismiss the privacy protection toggle check screen (if we disabled) or the menu (if it
+        // was already disabled).
         onView(isRoot()).perform(ViewActions.pressBack())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)

@@ -96,6 +96,7 @@ class BottomBlurView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        if (!canvas.isHardwareAccelerated) return
         val viewToBlur = targetView ?: return
 
         val w = width

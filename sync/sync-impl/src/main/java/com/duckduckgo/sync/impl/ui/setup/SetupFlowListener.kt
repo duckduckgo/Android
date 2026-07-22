@@ -24,6 +24,8 @@ interface SyncSetupFlowFinishedListener {
 interface SyncSetupNavigationFlowListener {
     fun launchRecoveryCodeScreen()
     fun launchCreateAccountScreen()
+    fun launchRestoreInProgressScreen()
+    fun launchContinueSetupSkippingRestoreCheck()
     fun launchRecoverAccountScreen()
     fun launchDeviceConnectedScreen()
 }

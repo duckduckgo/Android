@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Time se stvara šifrirana sigurnosna kopija tvojih oznaka, lozinki i Duck.ai čavrljanja na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
     <string name="sync_intro_enable_footer">Kasnije možeš sinkronizirati s drugim uređajima.</string>
     <string name="sync_intro_enable_cta">Uključi sinkronizaciju i sigurnosno kopiranje</string>
-    <string name="sync_intro_recover_title">Oporavak sinkroniziranih podataka</string>
-    <string name="sync_intro_recover_content">Za vraćanje sinkroniziranih podataka, trebat će ti šifra za oporavak koju si spremio prilikom prvog postavljanja sinkronizacije. Ta je šifra možda spremljena kao PDF na uređaju koji je izvorno korišten za postavljanje sinkronizacije.</string>
-    <string name="sync_intro_recover_cta">Započnite</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Oporavi sinkronizirane podatke</string>
+    <string name="sync_recover_synced_data_content">Trebat će ti šifra za oporavak dobivena prilikom postavljanja Sync &amp; Backupa. Možda si je spremio kao PDF na uređaju koji si koristio.</string>
+    <string name="sync_recover_synced_data_cta">Oporavak sinkroniziranih podataka</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniraj QR kôd</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Spremanje PDF za oporavak zahtijeva dopuštenje za pohranu</string>
     <string name="sync_share_title">Podijeli s...</string>
     <string name="sync_pdf_title">Šifra za oporavak sinkronizacije</string>
-    <string name="sync_pdf_description">Šifra za oporavak omogućuje ti sinkronizaciju oznaka na više uređaja i oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
+    <string name="sync_pdf_description">Kôd za oporavak omogućuje ti sinkronizaciju lozinki, podataka za automatsko popunjavanje i Duck.ai čavrljanja na više uređaja te oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
     <string name="sync_code_box_title">Čuvaj ove podatke na sigurnom.</string>
-    <string name="sync_instructions_title">Kako to funkcionira?</string>
-    <string name="sync_instructions_step1">Otvori DuckDuckGo na drugom uređaju i idi na Sinkronizaciju u Postavkama.</string>
-    <string name="sync_instructions_step2">Skeniraj QR kod ili kopiraj i zalijepi tekstualnu šifru u drugu aplikaciju DuckDuckGo.</string>
+    <string name="sync_instructions_title">Kako ovaj kôd funkcionira?</string>
+    <string name="sync_instructions_step1">Otvori DuckDuckGo na uređaju koji želiš sinkronizirati i idi na Sync &amp; Backup u Postavkama.</string>
+    <string name="sync_instructions_step2">Odaberi \'Sinkroniziraj s drugim uređajem\' i skeniraj QR kôd ili unesi tekstualni kôd.</string>
     <string name="sync_instructions_step3">Sinkronizacija će se aktivirati i opet ćeš imati pristup svim svojim podacima.</string>
+    <string name="sync_pdf_retention_notice">Ako više od 18 mjeseci ne koristiš DuckDuckGo preglednik s uključenom opcijom Sync &amp; Backup, tvoji podaci će biti izbrisani s poslužitelja i neće se moći vratiti.</string>
     <string name="remove_device_dialog_title">Želiš li ukloniti uređaj?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" više neće moći pristupiti tvojim sinkroniziranim podacima.</string>
     <string name="remove_device_dialog_primary_button">Ukloni</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Izbrisati podatke poslužitelja?</string>
-    <string name="sync_delete_server_data_dialog_content">Svi uređaji bit će isključeni i tvoji sinkronizirani podaci bit će izbrisani s poslužitelja.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Izbriši podatke</string>
+    <string name="sync_delete_server_data_dialog_content">Tvoja sigurnosna kopija bit će izbrisana s poslužitelja. Svi uređaji bit će isključeni iz sinkronizacije, ali ništa se neće izbrisati s bilo kojeg uređaja.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podataka poslužitelja</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Odustani</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sinkroniziraj knjiške oznake na različitim uređajima</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Sakrij</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Oporavak</string>
+    <string name="sync_settings_download_recovery_code_item">Preuzmi kôd za oporavak kao PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Upotrijebi ovaj kôd za oporavak podataka ako izgubiš pristup ovom uređaju — čuvaj ga na sigurnom.</string>
+    <string name="sync_settings_data_expiration">Podaci sinkronizacije i sigurnosne kopije (Sync &amp; Backup) ne mogu se oporaviti nakon 18 (ili više) mjeseci neaktivnosti. <annotation type="learn_more_link">Saznaj više</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Vratiti podatke Sync &amp; Backup iz prethodne instalacije?</string>
+    <string name="sync_previous_session_ready_body">Vrati u svhu vraćanja svojih prethodnih oznaka, lozinki i ostalih podataka u DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Vrati Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Postavljanje nove sinkronizacije</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Jednostavno oporavi svoje podatke</string>
+    <string name="sync_recover_data_content">Upotrijebi ovaj kôd za vraćanje podataka ako izgubiš pristup ovom uređaju. Podaci sinkronizacije i sigurnosne kopije (Sync &amp; Backup) ne mogu se oporaviti nakon 18 (ili više) mjeseci neaktivnosti.</string>
+    <string name="sync_recover_data_recovery_code_label">Kôd za oporavak</string>
+    <string name="sync_recover_data_download_pdf">Preuzmi kao PDF</string>
+    <string name="sync_restore_on_reinstall_title">Vraćanje prilikom ponovne instalacije aplikacije</string>
+    <string name="sync_restore_on_reinstall_description">Ako ponovno instaliraš aplikaciju DuckDuckGo, pitat ćemo te želiš li vratiti podatke na ovom uređaju.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Pristupi svojim čavrljanjima na svim uređajima pomoću opcije Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_chat_bottom_sheet_title">Sinkroniziraj svoje razgovore na\nsvim svojim uređajima!</string>
+    <string name="sync_chat_bottom_sheet_description">Pronađi QR kôd u aplikaciji DuckDuckGo na drugom uređaju tako da odeš na Postavke › Sync &amp; Backup › Sinkroniziraj s drugim uređajem.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skeniraj QR kôd</string>
+    <string name="sync_chat_bottom_sheet_negative">Ne sada</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sinkroniziraj svoje podatke?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sinkroniziraj</string>
+    <string name="sync_v2_joiner_confirmation_negative">Otkaži</string>
+
+    <string name="sync_v2_host_confirmation_title">Sinkroniziraj svoje podatke?</string>
+    <string name="sync_v2_host_confirmation_positive">Sinkroniziraj</string>
+    <string name="sync_v2_host_confirmation_negative">Otkaži</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" će moći pristupiti tvojim sinkroniziranim DuckDuckGo lozinkama, podacima za automatsko popunjavanje i Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" će moći pristupiti tvojim sinkroniziranim Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Drugi uređaj će moći pristupiti tvojim sinkroniziranim DuckDuckGo lozinkama, podacima za automatsko popunjavanje i Duck.ai čavrljanjima.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Drugi uređaj će moći pristupiti tvojim sinkroniziranim Duck.ai čavrljanjima.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sinkronizacija nije uspjela.</string>
+    <string name="sync_v2_error_pairing_rejected">Sinkronizacija je otkazana s tvog drugog uređaja.</string>
+    <string name="sync_v2_error_pairing_canceled">Sinkronizacija je otkazana.</string>
+    <string name="sync_v2_error_upgrade_required">Ažuriraj DuckDuckGo preglednik i pokušaj ponovno.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sinkroniziraj ovaj uređaj s već povezanog DuckDuckGo preglednika na drugom uređaju</string>
+    <string name="sync_v2_error_try_again">Pokušaj ponovno.</string>
+    <string name="sync_v2_error_got_it">Shvatio/la sam</string>
+    <string name="sync_v2_already_paired_title">Već sinkronizirano.</string>
+    <string name="sync_v2_already_paired_message">Ovi su uređaji već povezani s uslugom Sync &amp; Backup.</string>
+
 </resources>

@@ -22,13 +22,16 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,8 +44,10 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PirDashboardWebViewViewModel @Inject constructor(
     private val pirPixelSender: PirPixelSender,
+    private val pirInteractionReporter: PirInteractionReporter,
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -60,6 +65,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         pirPixelSender.reportDashboardOpened()
+        appCoroutineScope.launch {
+            pirInteractionReporter.attemptFirePixel()
+        }
 
         if (appBuildConfig.isInternalBuild()) {
             viewModelScope.launch {

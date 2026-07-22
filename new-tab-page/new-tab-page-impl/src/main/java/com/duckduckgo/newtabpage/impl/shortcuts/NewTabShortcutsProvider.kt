@@ -97,5 +97,6 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
+    featureName = "pluginPointNewTabPageShortcutPlugin",
 )
 private interface NewTabPageShortcutPluginPointTrigger

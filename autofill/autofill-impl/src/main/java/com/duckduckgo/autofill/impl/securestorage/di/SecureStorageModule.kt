@@ -16,14 +16,15 @@
 
 package com.duckduckgo.autofill.impl.securestorage.di
 
-import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.store.RealSecureStorageKeyRepository
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
+import com.duckduckgo.autofill.store.keys.EncryptedPreferencesFactory
 import com.duckduckgo.autofill.store.keys.RealSecureStorageKeyStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -42,15 +43,24 @@ object SecureStorageModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageKeyStore(
-        context: Context,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         autofillFeature: AutofillFeature,
+        autofillServiceFeature: AutofillServiceFeature,
         sharedPreferencesProvider: SharedPreferencesProvider,
         pixel: Pixel,
+        encryptedPreferencesFactory: EncryptedPreferencesFactory,
     ): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(
-            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature, sharedPreferencesProvider, pixel),
+            RealSecureStorageKeyStore(
+                coroutineScope,
+                dispatcherProvider,
+                autofillFeature,
+                autofillServiceFeature,
+                sharedPreferencesProvider,
+                pixel,
+                encryptedPreferencesFactory,
+            ),
         )
 }
 

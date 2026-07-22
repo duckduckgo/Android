@@ -130,7 +130,7 @@ class StatisticsRequester @Inject constructor(
         }
     }
 
-    override fun refreshDuckAiRetentionAtb() {
+    override fun refreshDuckAiRetentionAtb(metadata: Map<String, String?>) {
         val atb = store.atb
 
         if (atb == null) {
@@ -154,7 +154,9 @@ class StatisticsRequester @Inject constructor(
                 },
                 onSuccess = { updatedAtb ->
                     store.duckaiRetentionAtb = updatedAtb.version
-                    plugins.getPlugins().forEach { plugin -> plugin.onDuckAiRetentionAtbRefreshed(oldDuckAiAtb, updatedAtb.version) }
+                    plugins.getPlugins().forEach { plugin ->
+                        plugin.onDuckAiRetentionAtbRefreshed(oldDuckAiAtb, updatedAtb.version, metadata)
+                    }
                 },
             )
         }

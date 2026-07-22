@@ -1,0 +1,160 @@
+{
+  "name": "Councilon",
+  "url": "councilon.com",
+  "version": "0.8.0",
+  "addedDatetime": 1702965600000,
+  "optOutUrl": "https://councilon.com/ex/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ac6caadd-7930-4776-8473-9403b568611e",
+          "url": "https://councilon.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "5629ad0b-1f33-480f-a6ec-5add91b2dce8",
+          "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " ~"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Known as:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "years old",
+              "selector": ".card-title",
+              "afterText": " ~"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Has lived in:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Related to:']]/dd/ul[@class='list-inline m-0']/li",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://councilon.com/doc/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://councilon.com/ex/control/privacy",
+          "id": "9f4ef020-811e-4d02-8622-ebe7a714a0d0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "e16c23c4-2be8-4fa1-a59e-cb534ab48b42"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "8e7adf0a-58fb-4e57-b3b3-79cd99eeb395"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf_captcha_token' and @value and @value != '']",
+              "parent": "//form[@id='control']"
+            }
+          ],
+          "id": "09e65a13-673b-4cec-abd7-eeb28e155a72"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "1d3fe64a-d23d-448c-bf34-aeccf32beb87"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "e6840eae-b334-431d-bbb8-94189e09023d"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "8983034c-211a-4d98-8f31-bdf28a4e5011"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "ffb143e1-a408-456b-9e27-d5b199cd0b52"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763742029892
+}

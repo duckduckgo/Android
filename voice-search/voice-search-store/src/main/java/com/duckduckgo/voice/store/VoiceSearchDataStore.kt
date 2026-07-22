@@ -20,9 +20,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 interface VoiceSearchDataStore {
-    var permissionDeclinedForever: Boolean
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
     var countVoiceSearchDismissed: Int
@@ -30,6 +32,9 @@ interface VoiceSearchDataStore {
 
     fun isVoiceSearchEnabled(default: Boolean): Boolean
     fun setVoiceSearchEnabled(value: Boolean)
+
+    /** Emits the current enabled value immediately, then again on every change to the enabled flag. */
+    fun voiceSearchEnabledFlow(default: Boolean): Flow<Boolean>
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
@@ -37,7 +42,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 ) : VoiceSearchDataStore {
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
-        const val KEY_DECLINED_PERMISSION_FOREVER = "KEY_DECLINED_PERMISSION_FOREVER"
         const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
@@ -46,12 +50,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-
-    override var permissionDeclinedForever: Boolean
-        get() = preferences.getBoolean(KEY_DECLINED_PERMISSION_FOREVER, false)
-        set(declined) {
-            updateValue(KEY_DECLINED_PERMISSION_FOREVER, declined)
-        }
 
     override var userAcceptedRationaleDialog: Boolean
         get() = preferences.getBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, false)
@@ -71,6 +69,17 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 
     override fun setVoiceSearchEnabled(value: Boolean) {
         updateValue(KEY_VOICE_SEARCH_ENABLED, value)
+    }
+
+    override fun voiceSearchEnabledFlow(default: Boolean): Flow<Boolean> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+            if (key == KEY_VOICE_SEARCH_ENABLED) {
+                trySend(prefs.getBoolean(KEY_VOICE_SEARCH_ENABLED, default))
+            }
+        }
+        trySend(preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, default))
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
     override var countVoiceSearchDismissed: Int

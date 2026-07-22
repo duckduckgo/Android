@@ -27,8 +27,10 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
+import com.duckduckgo.remote.messaging.api.DisplayConditions
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
+import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.models.*
@@ -40,6 +42,7 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
 import logcat.logcat
 import java.util.Locale
 
@@ -119,11 +122,11 @@ private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>
         titleText = jsonItem.titleText.failIfEmpty(),
         descriptionText = jsonItem.descriptionText.orEmpty().failIfEmpty(),
         placeholder = jsonItem.placeholder.orEmpty().asPlaceholder(),
-        primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
-            ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+        primaryAction = jsonItem.primaryAction?.toAction(actionMappers),
         primaryActionText = jsonItem.primaryActionText.orEmpty(),
         matchingRules = jsonItem.matchingRules.orEmpty(),
         exclusionRules = jsonItem.exclusionRules.orEmpty(),
+        imageUrl = jsonItem.imageUrl,
     )
 }
 
@@ -161,6 +164,14 @@ private fun JsonRemoteMessage.map(
     locale: Locale,
     actionMappers: Set<MessageActionMapperPlugin>,
 ): RemoteMessage? {
+    // Resolve display conditions up front. An unrecognized trigger means this message targets a
+    // context this client version doesn't understand so we skip it.
+    val displayConditions = this.displayConditions?.let { conditions ->
+        conditions.toDisplayConditionsOrNull() ?: run {
+            logcat(INFO) { "RMF: skipping message id=${this.id}, unknown trigger '${conditions.trigger}'" }
+            return null
+        }
+    }
     return runCatching {
         val remoteMessage = RemoteMessage(
             id = this.id.failIfEmpty(),
@@ -168,6 +179,7 @@ private fun JsonRemoteMessage.map(
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty(),
             surfaces = this.surfaces.toSurfaceList(),
+            displayConditions = displayConditions,
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
@@ -179,6 +191,20 @@ private fun List<String>?.toSurfaceList(): List<Surface> {
     return this?.mapNotNull { value ->
         Surface.entries.firstOrNull { it.jsonValue == value }
     } ?: listOf(Surface.NEW_TAB_PAGE)
+}
+
+// Returns null when a trigger string is present but unrecognized, so the caller can drop the
+// message (forward-compat). A null trigger is valid and means "no trigger" (unrestricted).
+private fun JsonDisplayConditions.toDisplayConditionsOrNull(): DisplayConditions? {
+    val resolvedTrigger = if (trigger == null) {
+        null
+    } else {
+        MessageTrigger.entries.firstOrNull { it.jsonValue == trigger } ?: return null
+    }
+    return DisplayConditions(
+        trigger = resolvedTrigger,
+        dismissAfterDaysShown = dismissAfterDaysShown,
+    )
 }
 
 private fun RemoteMessage.localizeMessage(
@@ -258,16 +284,17 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             listItems = listItems.map { item ->
                 when (item) {
                     is CardItem.ListItem -> {
-                        val (itemTitle, itemDescription) = item.localize(translations)
+                        val translatedItem = item.localize(translations)
                         item.copy(
-                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
-                            descriptionText = itemDescription.takeUnless { it.isEmpty() } ?: item.descriptionText,
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+                            descriptionText = translatedItem?.description.takeUnless { it.isNullOrEmpty() } ?: item.descriptionText,
+                            primaryActionText = translatedItem?.primaryAction.takeUnless { it.isNullOrEmpty() } ?: item.primaryActionText,
                         )
                     }
                     is CardItem.SectionTitle -> {
-                        val (itemTitle, _) = item.localize(translations)
+                        val translatedItem = item.localize(translations)
                         item.copy(
-                            titleText = itemTitle.takeUnless { it.isEmpty() } ?: item.titleText,
+                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
                         )
                     }
                 }
@@ -278,6 +305,16 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
 
 private fun CardItem.localize(
     translations: JsonContentTranslations,
-): Pair<String, String> = translations.listItems?.get(id)?.let {
-    it.titleText to it.descriptionText.orEmpty()
-} ?: ("" to "")
+): CardItemTranslations? = translations.listItems?.get(id)?.let {
+    CardItemTranslations(
+        title = it.titleText,
+        description = it.descriptionText.orEmpty(),
+        primaryAction = it.primaryActionText.orEmpty(),
+    )
+}
+
+private data class CardItemTranslations(
+    val title: String,
+    val description: String,
+    val primaryAction: String,
+)

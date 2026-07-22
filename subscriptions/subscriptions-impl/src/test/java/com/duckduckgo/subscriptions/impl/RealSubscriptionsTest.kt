@@ -23,7 +23,6 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -34,9 +33,9 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
 import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -71,7 +70,7 @@ class RealSubscriptionsTest {
     private val pixel: SubscriptionPixelSender = mock()
     private val subscriptionsUrlProvider = RealSubscriptionsUrlProvider(DefaultSubscriptionsBaseUrl())
     private lateinit var subscriptions: RealSubscriptions
-    private val subscriptionFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private val testSubscriptionOfferList = listOf(
         SubscriptionOffer(
@@ -183,7 +182,23 @@ class RealSubscriptionsTest {
     }
 
     @Test
+    fun whenIsEligibleIfAllowPurchaseDisabledAndNoActiveSubscriptionThenReturnFalse() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfAllowPurchaseDisabledButHasActiveSubscriptionThenReturnTrue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
     fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         assertTrue(subscriptions.isEligible())
@@ -191,24 +206,28 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnFalseIfNotActiveOrWaiting() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         assertFalse(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfWaiting() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(WAITING)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfActive() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotEncryptionThenReturnTrueIfActive() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -217,6 +236,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenIsEligibleIfNotEncryptionAndNotActiveThenReturnFalse() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -224,56 +244,56 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
+    fun whenShouldLaunchSubscriptionForUrlThenReturnCorrectValue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
-        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro?test=test"))
-        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro"))
-        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro?test=test"))
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro/test"))
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.test.com/pro"))
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://example.com"))
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/pro?test=test"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://test.duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://test.duckduckgo.com/pro?test=test"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://test.duckduckgo.com/pro/test"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.test.com/pro"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://example.com"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("duckduckgo.com/pro"))
     }
 
     @Test
-    fun whenShouldLaunchPrivacyProForUrlThenReturnTrue() = runTest {
+    fun whenShouldLaunchSubscriptionForUrlThenReturnTrue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/pro"))
     }
 
     @Test
-    fun whenShouldLaunchPrivacyProForUrlAndNotEligibleThenReturnFalse() = runTest {
+    fun whenShouldLaunchSubscriptionForUrlAndNotEligibleThenReturnFalse() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/pro"))
     }
 
     @Test
-    fun whenLaunchPrivacyProWithOriginThenPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+    fun whenLaunchSubscriptionWithOriginThenPassTheOriginToActivity() = runTest {
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?origin=test".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?origin=test".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 
     @Test
     fun whenLaunchProUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -282,13 +302,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchProWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -297,13 +316,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -312,13 +330,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -326,24 +343,23 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionWithMultipleQueryParametersThenIsPrivacyProUrlReturnsTrue() = runTest {
-        assertTrue(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri()))
+    fun whenSubscriptionWithMultipleQueryParametersThenIsSubscriptionUrlReturnsTrue() = runTest {
+        assertTrue(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri()))
     }
 
     @Test
-    fun whenSubscriptionUrlButNotRootPathThenIsPrivacyProUrlReturnsFalse() = runTest {
-        assertFalse(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions/welcome?usePaidDuckAi=true&featurePage=duckai".toUri()))
+    fun whenSubscriptionUrlButNotRootPathThenIsSubscriptionUrlReturnsFalse() = runTest {
+        assertFalse(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/welcome?usePaidDuckAi=true&featurePage=duckai".toUri()))
     }
 
     @Test
-    fun whenLaunchPrivacyProWithNoOriginThenDoNotPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+    fun whenLaunchSubscriptionWithNoOriginThenDoNotPassTheOriginToActivity() = runTest {
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
-        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro".toUri())
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/pro".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertNull((captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 

@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.messaging
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import org.json.JSONObject
@@ -8,7 +9,8 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 class DuckChatContentScopeJsMessageHandlerTest {
-    private val handler = DuckChatContentScopeJsMessageHandler().getJsMessageHandler()
+    private val duckAiHostProvider = object : DuckAiHostProvider {}
+    private val handler = DuckChatContentScopeJsMessageHandler(duckAiHostProvider).getJsMessageHandler()
 
     @Test
     fun `when message sent then callback called`() {
@@ -40,18 +42,32 @@ class DuckChatContentScopeJsMessageHandlerTest {
 
     @Test
     fun `only contains valid methods`() {
-        val methods = handler.methods
-        assertTrue(methods.size == 10)
-        assertTrue(methods[0] == "getAIChatNativeHandoffData")
-        assertTrue(methods[1] == "getAIChatNativeConfigValues")
-        assertTrue(methods[2] == "openAIChat")
-        assertTrue(methods[3] == "closeAIChat")
-        assertTrue(methods[4] == "openAIChatSettings")
-        assertTrue(methods[5] == "responseState")
-        assertTrue(methods[6] == "hideChatInput")
-        assertTrue(methods[7] == "showChatInput")
-        assertTrue(methods[8] == "reportMetric")
-        assertTrue(methods[9] == "openKeyboard")
+        val expected = listOf(
+            "getAIChatNativeHandoffData",
+            "getAIChatNativeConfigValues",
+            "openAIChat",
+            "closeAIChat",
+            "openAIChatSettings",
+            "responseState",
+            "hideChatInput",
+            "showChatInput",
+            "reportMetric",
+            "openKeyboard",
+            "getAIChatPageContext",
+            "togglePageContextTelemetry",
+            "submitAIChatPageContext",
+            "userDidAcceptTermsAndConditions",
+            "getAIChatNativePrompt",
+            "voiceSessionStarted",
+            "voiceSessionEnded",
+            "responseReceived",
+            "showModelPicker",
+            "disableChatInput",
+            "enableChatInput",
+        )
+        // assert exact membership (size guards against accidental add/remove).
+        assertEquals(expected.size, handler.methods.size)
+        assertTrue(handler.methods.containsAll(expected))
     }
 
     private val callback = object : JsMessageCallback() {

@@ -107,6 +107,7 @@ sealed interface PirWebMessageResponse {
         val relatives: List<String>,
         val foundDate: Long,
         val optOutSubmittedDate: Long?,
+        val optOutFormSubmittedDate: Long?,
         val estimatedRemovalDate: Long?,
         val removedDate: Long?,
         val hasMatchingRecordOnParentBroker: Boolean,
@@ -131,6 +132,7 @@ sealed interface PirWebMessageResponse {
 
     data class GetFeatureConfigResponse(
         val useUnifiedFeedback: Boolean,
+        val isBeta: Boolean,
     ) : PirWebMessageResponse
 
     data class MaintenanceScanStatusResponse(

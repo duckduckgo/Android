@@ -22,9 +22,12 @@ interface OnboardingStore {
     var onboardingDialogJourney: String?
 
     fun getSearchOptions(): List<DaxDialogIntroOption>
+    fun getChatSuggestions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
     fun storeInputScreenSelection(selected: Boolean)
     fun getInputScreenSelection(): Boolean?
     fun isInputScreenSelectionOverriddenByUser(): Boolean
     fun setInputScreenSelectionOverriddenByUser()
+    fun setDuckAiOnboardingFlow()
+    fun isDuckAiOnboardingFlow(): Boolean
 }

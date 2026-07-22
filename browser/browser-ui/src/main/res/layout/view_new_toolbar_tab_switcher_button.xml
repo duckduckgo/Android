@@ -20,17 +20,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/selectable_item_rounded_corner_background"
+    tools:ignore="Overdraw"
     tools:layout_height="@dimen/toolbarIcon"
     tools:layout_width="@dimen/toolbarIcon">
 
     <ImageView
         android:id="@+id/tabsImageView"
-        android:layout_width="@dimen/bottomNavIcon"
-        android:layout_height="@dimen/bottomNavIcon"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
         android:layout_gravity="center"
         android:contentDescription="@string/tabSwitcherContentDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_tab_24" />
+        android:src="?attr/daxIconTabSwitcher" />
 
     <!--
          Below TextViews aren't a DaxTextView, special case for the Tabs icon.

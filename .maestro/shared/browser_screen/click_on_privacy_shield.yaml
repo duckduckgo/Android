@@ -14,9 +14,9 @@ appId: com.duckduckgo.mobile.android
 - runFlow:
       when:
           visible:
-              id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
+              id: "shieldIconPulseAnimationContainer"
       commands:
           - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/shieldIcon"
+                id: "shieldIcon"
           - tapOn:
-                id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
+                id: "shieldIconPulseAnimationContainer"

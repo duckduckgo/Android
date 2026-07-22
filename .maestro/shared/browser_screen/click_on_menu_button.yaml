@@ -1,5 +1,10 @@
 appId: com.duckduckgo.mobile.android
 ---
+# With the native input field enabled, the NTP shows the native input widget
+# over the omnibar (no browser menu visible). Dismiss it first so the menu
+# is exposed before we try to use it.
+- runFlow: ../dismiss_native_input.yaml
+
 - runFlow:
     when:
         notVisible:

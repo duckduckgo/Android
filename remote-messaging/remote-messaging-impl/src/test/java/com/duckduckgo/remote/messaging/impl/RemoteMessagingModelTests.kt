@@ -20,15 +20,20 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
+import com.duckduckgo.remote.messaging.api.DisplayConditions
+import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -45,6 +50,15 @@ class RemoteMessagingModelTests {
     private lateinit var testee: RealRemoteMessageModel
 
     val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+
+    private val triggeredMessage = RemoteMessage(
+        "id1",
+        Content.Small("", ""),
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        DisplayConditions(trigger = MessageTrigger.AFTER_IDLE, dismissAfterDaysShown = null),
+    )
 
     @Before
     fun setup() {
@@ -120,22 +134,79 @@ class RemoteMessagingModelTests {
     }
 
     @Test
+    fun whenGetActiveMessageWithMatchingTriggerThenMessageReturned() = runTest {
+        whenever(remoteMessagingRepository.message()).thenReturn(triggeredMessage)
+
+        assertEquals(triggeredMessage, testee.getActiveMessage(MessageTrigger.AFTER_IDLE))
+    }
+
+    @Test
+    fun whenGetActiveMessageWithNonMatchingTriggerThenHiddenButNotDismissed() = runTest {
+        whenever(remoteMessagingRepository.message()).thenReturn(triggeredMessage)
+
+        assertNull(testee.getActiveMessage(null))
+        // trigger filtering only hides the message for this context; it must never dismiss it (unlike expiry)
+        verify(remoteMessagingRepository, never()).dismissMessage(any())
+    }
+
+    @Test
+    fun whenGetActiveMessageHasNoTriggerThenReturnedForAnyContext() = runTest {
+        whenever(remoteMessagingRepository.message()).thenReturn(remoteMessage)
+
+        assertEquals(remoteMessage, testee.getActiveMessage(MessageTrigger.AFTER_IDLE))
+        assertEquals(remoteMessage, testee.getActiveMessage(null))
+    }
+
+    @Test
+    fun whenGetActiveMessageHasConditionsButNoTriggerThenReturnedForAnyContext() = runTest {
+        val messageWithoutTrigger = remoteMessage.copy(
+            displayConditions = DisplayConditions(trigger = null, dismissAfterDaysShown = 5),
+        )
+        whenever(remoteMessagingRepository.message()).thenReturn(messageWithoutTrigger)
+
+        assertEquals(messageWithoutTrigger, testee.getActiveMessage(MessageTrigger.AFTER_IDLE))
+        assertEquals(messageWithoutTrigger, testee.getActiveMessage(null))
+    }
+
+    @Test
+    fun whenObserveActiveMessagesWithMatchingTriggerThenMessageEmitted() = runTest {
+        whenever(remoteMessagingRepository.messageFlow()).thenReturn(flowOf(triggeredMessage))
+
+        assertEquals(triggeredMessage, testee.observeActiveMessages(MessageTrigger.AFTER_IDLE).first())
+    }
+
+    @Test
+    fun whenObserveActiveMessagesWithNonMatchingTriggerThenNullEmitted() = runTest {
+        whenever(remoteMessagingRepository.messageFlow()).thenReturn(flowOf(triggeredMessage))
+
+        assertNull(testee.observeActiveMessages(null).first())
+    }
+
+    @Test
+    fun whenObserveActiveMessagesHasNoTriggerThenEmittedForAnyContext() = runTest {
+        whenever(remoteMessagingRepository.messageFlow()).thenReturn(flowOf(remoteMessage))
+
+        assertEquals(remoteMessage, testee.observeActiveMessages(MessageTrigger.AFTER_IDLE).first())
+        assertEquals(remoteMessage, testee.observeActiveMessages(null).first())
+    }
+
+    @Test
     fun onGetRemoteImageFileThenReturnFilePathFromRepository() = runTest {
-        whenever(remoteMessagingRepository.getRemoteMessageImageFile()).thenReturn("imageFile")
+        whenever(remoteMessagingRepository.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn("imageFile")
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
-        verify(remoteMessagingRepository).getRemoteMessageImageFile()
+        verify(remoteMessagingRepository).getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
         assertEquals("imageFile", result)
     }
 
     @Test
     fun onGetRemoteImageFileThenReturnNullWhenRepositoryReturnsNull() = runTest {
-        whenever(remoteMessagingRepository.getRemoteMessageImageFile()).thenReturn(null)
+        whenever(remoteMessagingRepository.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn(null)
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
-        verify(remoteMessagingRepository).getRemoteMessageImageFile()
+        verify(remoteMessagingRepository).getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
         assertNull(result)
     }
 }

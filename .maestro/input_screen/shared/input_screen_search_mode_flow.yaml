@@ -29,7 +29,8 @@ appId: com.duckduckgo.mobile.android
 - runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
 - tapOn:
     text: "add bookmark"
-- runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
+- tapOn:
+    id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
 - tapOn:
     text: "bookmarks"
 - tapOn:
@@ -79,26 +80,26 @@ appId: com.duckduckgo.mobile.android
       id: "remoteMessage"
     optional: true
 - assertVisible:
-    text: "reddit at DuckDuckGo"
+    id: "com.duckduckgo.mobile.android:id/quickAccessFavicon"
     childOf:
       id: "focusedFavourites"
 
 # verify that typing shows autocomplete again
-- inputText: "amazo"
+- inputText: "wiki"
 - assertVisible:
     id: "autoCompleteSuggestionsList"
 - assertVisible:
-    text: "amazon.com"
+    text: "wikipedia.org"
 
 # verify that tapping on a suggestion opens the web page
 - tapOn:
-    text: "amazon.com"
+    text: "wikipedia.org"
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    text: ".*amazon.com.*"
+    text: ".*wikipedia.org.*"
     childOf:
       id: "omnibarTextInput"
 

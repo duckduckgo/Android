@@ -39,11 +39,30 @@ data class RemoteMessage(
     val matchingRules: List<Int>,
     val exclusionRules: List<Int>,
     val surfaces: List<Surface>,
+    val displayConditions: DisplayConditions? = null,
 )
 
 enum class Surface(val jsonValue: String) {
     MODAL("modal"),
     NEW_TAB_PAGE("new_tab_page"),
+}
+
+/**
+ * Conditions controlling when and for how long a message is displayed.
+ * Evaluated internally by RMF; null fields mean "no restriction".
+ */
+data class DisplayConditions(
+    val trigger: MessageTrigger?,
+    val dismissAfterDaysShown: Int?,
+)
+
+/**
+ * The context a message targets, supplied by the consumer at read time.
+ * A triggered message is returned only in that context.
+ * A message with no trigger is unrestricted.
+ */
+enum class MessageTrigger(val jsonValue: String) {
+    AFTER_IDLE("after_idle"),
 }
 
 sealed class Content(val messageType: MessageType) {
@@ -109,7 +128,8 @@ sealed class Content(val messageType: MessageType) {
         DDG_ANNOUNCE("DDGAnnounce"),
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
-        MAC_AND_WINDOWS("NewForMacAndWindows"),
+        MAC_AND_WINDOWS_NEW("NewForMacAndWindows"),
+        MAC_AND_WINDOWS("MacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
         DUCK_AI_OLD("Duck.ai"),
         DUCK_AI("DuckAi"),
@@ -118,6 +138,8 @@ sealed class Content(val messageType: MessageType) {
         RADAR("Radar"),
         KEY_IMPORT("KeyImport"),
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
+        BOOKMARKS_IMPORT("BookmarksImport"),
+        NEW_TAB_OPTIONS("NewTabOptions"),
         ;
 
         companion object {
@@ -180,10 +202,11 @@ sealed class CardItem {
         override val titleText: String,
         val descriptionText: String,
         val placeholder: Placeholder,
-        val primaryAction: Action,
+        val primaryAction: Action?,
         val primaryActionText: String = "",
         val matchingRules: List<Int>,
         val exclusionRules: List<Int>,
+        val imageUrl: String? = null,
     ) : CardItem()
 
     /**

@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.core.view.drawToBitmap
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.R
 import kotlinx.coroutines.withContext
@@ -37,7 +36,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
             disableScrollbars(webView)
             val fullSizeBitmap = createBitmap(webView)
 
-            val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeight).toPx()
+            val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeight)
             val scaledWidth = scaledHeight / fullSizeBitmap.height * fullSizeBitmap.width
             return scaleBitmap(fullSizeBitmap, scaledHeight.roundToInt(), scaledWidth.roundToInt())
         } finally {

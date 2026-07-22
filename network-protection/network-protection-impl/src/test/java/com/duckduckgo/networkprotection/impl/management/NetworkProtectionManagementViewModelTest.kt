@@ -71,7 +71,7 @@ import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.wireguard.config.Config
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
@@ -127,7 +127,7 @@ class NetworkProtectionManagementViewModelTest {
     private lateinit var netpVpnSettingsDataStore: NetpVpnSettingsDataStore
 
     @Mock
-    private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
+    private lateinit var subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback
 
     @Mock
     private lateinit var vpnEnableWideEvent: VpnEnableWideEvent
@@ -180,7 +180,7 @@ class NetworkProtectionManagementViewModelTest {
             netpDataVolumeStore,
             netPExclusionListRepository,
             netpVpnSettingsDataStore,
-            privacyProUnifiedFeedback,
+            subscriptionUnifiedFeedback,
             vpnRemoteFeatures,
             localConfig,
             autoExcludePrompt,
@@ -609,7 +609,7 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnReportIssuesClickedThenEmitShowIssueReportingPageCommand() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.onReportIssuesClicked()
 
         testee.commands().test {
@@ -630,7 +630,7 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnReportIssuesClickedWithUnifiedFeedbackEnabledThenEmitShowUnifiedFeedback() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         testee.onReportIssuesClicked()
 
         testee.commands().test {

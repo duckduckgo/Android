@@ -27,6 +27,9 @@
     <string name="cancel">Anuluj</string>
     <string name="search">Szukaj</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Usunięto czat</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Ustaw DuckDuckGo jako domyślny</string>
@@ -74,6 +77,7 @@
     <string name="options">Opcje</string>
     <string name="shareLink">Udostępnij link</string>
     <string name="copyUrl">Skopiuj adres linku</string>
+    <string name="urlCopiedToClipboard">URL skopiowany do schowka</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Znajdź następny element</string>
@@ -120,7 +124,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść karty i dane</string>
+    <string name="fireClearAll">Usuń karty i dane</string>
     <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
@@ -130,6 +134,7 @@
     <string name="settingsMenuItemTitle">Ustawienia</string>
     <string name="settingsHeadingProtections">Ochrona</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
+    <string name="settingsWhatsNew">Co nowego</string>
     <string name="settingsHeadingAbout">Informacje</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Wersja</string>
@@ -137,6 +142,7 @@
     <string name="leaveFeedbackNew">Wyślij opinię</string>
     <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
     <string name="settingsHeadingNextSteps">Dalsze kroki</string>
+    <string name="settingsNextStepsHideItem">Ukryj</string>
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>
@@ -174,9 +180,8 @@
     <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie wyszukiwania podczas wpisywania, łącznie z zakładkami. Wszystkie wyszukiwania są prywatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Ostatnio odwiedzone witryny</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Pokaż ostatnio odwiedzone witryny w sugestiach wyszukiwania. Ostatnio odwiedzane witryny są prywatne, przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą funkcji Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
-    <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestie czatu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Wyświetlaj sugestie z Twojej historii, zakładek i (opcjonalnie) historii czatu Duck.ai podczas wpisywania w pasku wyszukiwania. Wszystkie wyszukiwania są prywatne.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Ogólne</string>
@@ -208,13 +213,24 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globalna Kontrola Prywatności</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Korzysta w Twoim imieniu z prawa do rezygnacji, informując witryny, aby nie sprzedawały ani nie udostępniały Twoich danych osobowych.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Pobierz przeglądarkę komputerową</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo dla komputerów Mac i Windows</string>
+    <string name="getDesktopBrowserTitle">Chroń swoje dane osobowe także na Macu i Windowsie!</string>
+    <string name="getDesktopBrowserBody">Aby pobrać DuckDuckGo na komputer Mac lub Windows, odwiedź stronę:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Udostępnij link pobierania</string>
+    <string name="getDesktopBrowserNoThanks">Nie, dziękuję</string>
+    <string name="getDesktopBrowserHideItem">Ukryj</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Skopiowano łącze</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
     <string name="dataClearingActivityTitle">Czyszczenie danych</string>
-    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie wyczyścić dane, lub skonfiguruj automatyczne czyszczenie.</string>
+    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie usunąć dane, lub skonfiguruj automatyczne usuwanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d witryna wyłączona z czyszczenia</item>
         <item quantity="few">%1$d witryny wyłączone z czyszczenia</item>
@@ -224,8 +240,8 @@
     <string name="dataClearingAutomaticClearingOn">Wł.</string>
     <string name="dataClearingAutomaticClearingOff">Wyłączone</string>
     <string name="dataClearingClearBrowsingData">Wyczyść dane przeglądania</string>
-    <string name="dataClearingAutomaticDataClearing">Automatyczne czyszczenie danych</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne czyszczenie danych</string>
+    <string name="dataClearingAutomaticDataClearing">Automatyczne usuwanie danych</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne usuwanie danych</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zamknij wszystkie otwarte karty</string>
     <string name="dataClearingAutomaticDataOptionDescription">Usuń wszystkie dane witryn, w tym odwiedzone strony. Może nastąpić wylogowanie z kont.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Usuń wszystkie czaty, w tym przypięte</string>
@@ -252,6 +268,25 @@
         <item quantity="other">Usuń z %1$d witryny. Może spowodować wylogowanie z kont.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Usunąć karty i dane witryny?</string>
+    <string name="singleTabFireDialogTitleWithChats">Usunąć karty, dane witryny i czaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Usuń wszystko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Usuń tę kartę</string>
+    <string name="singleTabFireDialogDeleteChat">Usuń czat</string>
+    <string name="singleTabFireDialogDeleteChats">Usuń czaty</string>
+    <string name="singleTabFireDialogTitleDuckAi">Usunąć ten czat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">Usunięto %1$d kartę wraz z danymi</item>
+        <item quantity="few">Usunięto %1$d karty wraz z danymi</item>
+        <item quantity="many">Usunięto %1$d kart wraz z danymi</item>
+        <item quantity="other">Usunięto %1$d karty wraz z danymi</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>
 
@@ -269,15 +304,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Usuń w terminie…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń w terminie…</string>
+    <string name="settingsAutomaticallyClearWhen">Usuń na...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń na...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Wyłącznie zamknięcie aplikacji</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Zamknięcie aplikacji, brak aktywności przez 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Zamknięcie aplikacji, brak aktywności przez 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Zamknięcie aplikacji, brak aktywności przez 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Zamknięcie aplikacji, brak aktywności przez 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
-    <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Usuń czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
     <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
@@ -388,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Szukaj w DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podziel się opinią</string>
-    <string name="missingBrowserFeaturesTitleLong">Brakuje funkcji przeglądarki lub nie działają one poprawnie</string>
-    <string name="missingBrowserFeaturesTitleShort">Problemy funkcji przeglądarki</string>
-    <string name="missingBrowserFeaturesSubtitle">Jaką funkcję przeglądania stron powinniśmy dodać lub usprawnić?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Przejście do przodu, wstecz i/lub odświeżenie</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tworzenie kart i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokowanie reklam i wyskakujących okienek</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Oglądanie filmów</string>
-    <string name="missingBrowserFeatureSubReasonImages">Obsługa obrazów</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tworzenie zakładek i zarządzanie nimi</string>
-    <string name="missingBrowserFeatureSubReasonOther">Żadne z powyższych</string>
-
-    <string name="websiteNotLoadingTitleLong">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingSubtitle">Która witryna nie działa poprawnie?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Jaką funkcję wyszukiwania powinniśmy dodać lub usprawnić?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Wyszukiwanie techniczne/programistyczne</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Układ graficzny powinien być zbliżony do Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Szybszy czas wczytywania</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Wyszukiwanie w konkretnym języku bądź regionie</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepsza funkcja autouzupełniania</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Żadne z powyższych</string>
-
-    <string name="needMoreCustomizationTitleLong">Liczba możliwości spersonalizowania aplikacji jest niewystarczająca</string>
-    <string name="needMoreCustomizationTitleShort">Problemy z personalizacją</string>
-    <string name="needMoreCustomizationSubtitle">Jaką opcję personalizacji powinniśmy dodać lub usprawnić?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguracja ekranu głównego</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Sposób wyświetlania kart</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Wygląd aplikacji</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Rodzaje usuwanych danych</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Czas usuwania danych</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Sposób wyświetlania zakładek</string>
-    <string name="needMoreCustomizationSubReasonOther">Żadne z powyższych</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikacja działa wolno, zawiera błędy lub przestaje działać</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problemy dotyczące poprawnego działania</string>
-    <string name="appIsSlowOrBuggySubtitle">Jakie problemy napotkałeś(-aś)?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Strony lub wyniki wyszukiwania wczytują się powoli</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacja przestaje działać lub zawiesza się</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Błędy podczas odtwarzania filmów i mediów</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Żadne z powyższych</string>
-
-    <string name="otherMainReasonTitleLong">Żadne z powyższych</string>
-    <string name="otherMainReasonTitleShort">Inne problemy</string>
-
-    <string name="openEndedInputHint">Podaj jak najdokładniejsze informacje</string>
-    <string name="submitFeedback">Wyślij</string>
-
-    <string name="tellUsHowToImprove">Powiedz nam, co możemy poprawić.</string>
-    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Co najbardziej przyprawia Cię o frustrację?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Przykro nam z tego powodu</string>
-    <string name="feedbackShareDetails">Przekaż informacje</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Czy chciał(a)byś przekazać naszemu zespołowi jakieś informacje?</string>
-    <string name="whatHaveYouBeenEnjoying">Co Ci się podoba?</string>
-    <string name="awesomeToHear">Świetnie!</string>
-    <string name="shareTheLoveWithARating">Podziel się swoimi wrażeniami, oceniając nas w Play Store.</string>
-    <string name="rateTheApp">Oceń aplikację</string>
-    <string name="declineFurtherFeedback">Nie, dziękuję, skończyłem(-am)</string>
-    <string name="whichBrokenSites">Gdzie dostrzegasz te problemy?</string>
-    <string name="whichBrokenSitesHint">Z jaką stroną związane są problemy?</string>
-    <string name="feedbackSpecificAsPossible">Podaj jak najdokładniejsze informacje</string>
-    <string name="feedbackInitialDisambiguationTitle">Zaczynajmy!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Do jakiej kategorii zaliczysz swoją opinię?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Przycisk pozytywnej opinii</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Przycisk negatywnej opinii</string>
-    <string name="feedbackIsImportantToUs">Twoja anonimowa opinia ma dla nas ogromne znaczenie.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nie można wyświetlić strony internetowej."</string>
     <string name="crashedWebViewErrorAction">"Załaduj ponownie"</string>
@@ -564,6 +527,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacja przycisku ognia</string>
     <string name="settingsHeroFireAnimation">Ogień</string>
+    <string name="settingsHeroFireAnimationClassic">Ogień klasyczny</string>
     <string name="settingsHeroWaterAnimation">Wir wodny</string>
     <string name="settingsHeroAbstractAnimation">Strumień powietrza</string>
     <string name="settingsNoneAnimation">Brak</string>
@@ -654,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
-    <string name="downloadsActivityTitle">Pobrane</string>
-    <string name="downloadsActivityNoItemsDescription">Nie pobrano jeszcze żadnych plików</string>
-    <string name="downloadsShareTitle">Udostępnij…</string>
     <string name="downloadsDownloadFinishedActionName">Otwórz</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Plik już nie istnieje</string>
-    <string name="downloadsItemMenuShare">Udostępnij</string>
-    <string name="downloadsItemMenuDelete">Usuń</string>
-    <string name="downloadsItemMenuCancel">Anuluj</string>
-    <string name="downloadsActivityMenuDeleteAll">Usuń wszystko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Usunięto %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Wszystkie pliki usunięte</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Więcej opcji dla %1$s</string>
-    <string name="downloadsUndoActionName">Cofnij</string>
-    <string name="downloadsStateInProgress">W trakcie…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
@@ -690,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
-    <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
     <!-- Windows Settings -->
 
@@ -829,7 +777,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Zróbmy to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Zaczynajmy!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
     <string name="preOnboardingDaxDialog2Title">Ochrona aktywowana!</string>
     <string name="preOnboardingDaxDialog2Button">Wybierz przeglądarkę</string>
@@ -841,9 +792,15 @@
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
+    <string name="preOnboardingComparisonChartDuckAi">Używaj ChatGPT prywatnie z wbudowanym Duck.ai</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj ukierunkowane reklamy i wyskakujące okienka dotyczące plików cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Odtwarzaj filmy na YouTube bez reklam</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
+    <string name="preOnboardingAddressBarPositionTop">Do góry</string>
+    <string name="preOnboardingAddressBarPositionBottom">Dół</string>
+    <string name="preOnboardingAddressBarPositionSplit">Podziel</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Na górze (domyślnie)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Łatwy dostęp</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dół</string>
@@ -866,6 +823,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Zaskocz mnie!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To <b>DuckDuckGo Search</b>! Prywatna. Szybka. Z mniejszą liczbą reklam.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Prywatna. Szybka. Z mniejszą liczbą reklam.</string>
     <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Następnie spróbuj odwiedzić witrynę!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -892,12 +851,35 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Wypróbuj bez żadnych opłat!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Czy wiesz?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chcesz mieć łatwy dostęp do prywatnego czatu AI na pasku adresu?</string>
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Witamy z powrotem!&lt;br/&gt;Chcesz coś spersonalizować?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ustaw DuckDuckGo jako domyślną przeglądarkę</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj widżet do ekranu głównego</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Pozycja paska adresu</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opcje wyszukiwania na pasku adresowym</string>
+    <string name="preOnboardingReinstallStartBrowsing">Rozpocznij przeglądanie</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Gdzie chcesz mieć pasek adresu?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Możesz dokonać zmian w obszarze <b>Ustawienia > Wygląd</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chcesz mieć dostęp do wyszukiwania i czatu AI na pasku adresu?</string>
+    <string name="quickSetupBottomSheetDone">Gotowe</string>
+    <string name="quickSetupInputScreenSearchOnly">Tylko wyszukiwanie</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Wyszukiwanie i Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Jak usunąć widżet na ekranie głównym</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Przejdź do ekranu głównego</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotknij i przytrzymaj widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Stuknij lub przeciągnij, aby go usunąć</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>
@@ -962,11 +944,16 @@
     <string name="settingsHeadingCompleteSetup">Dokończ swoją konfigurację</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Pokaż liczbę mechanizmów śledzących w przełączniku kart</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s zablokowany mechanizm śledzący&lt;/b&gt; w ciągu ostatnich 7 dni</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ukryć liczbę mechanizmów śledzących?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Możesz to włączyć ponownie, wybierając kolejno Ustawienia &gt; Wygląd.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ukryj</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zachowaj</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacja blokowania mechanizmów śledzących</string>
+    <string name="showTrackerCountInAddressBar">Pokaż na pasku adresu</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Pokaż w Menedżerze kart</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tylko wyszukiwanie</string>
@@ -974,4 +961,93 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Szukaj prywatnie z DuckDuckGo lub pytaj Duck.ai. Wyszukiwanie głosowe i Duck.ai są dostępne, jeśli są włączone.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Prywatnie przeszukuj lub odwiedzaj swoje ulubione witryny za pomocą jednego dotknięcia. Wyszukiwanie głosowe i Duck.ai są dostępne, jeśli są włączone.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Kontynuuj od miejsca zakończenia</string>
+    <string name="syncRestoreDialogDescription">Chcesz przywrócić zakładki, hasła i nie tylko z poprzedniej synchronizacji DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Przywróć moje dane</string>
+    <string name="syncRestoreDialogSecondaryCta">Pomiń</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Kontynuujmy tam, gdzie przerwałeś na DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Twoje zapisane zakładki, hasła i inne są gotowe.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Pobierz PDF</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopiuj tekst linku</string>
+    <string name="linkTextCopied">Skopiowano tekst linku</string>
+    <string name="linkTextCopyFailed">Nie udało się skopiować tekstu linku</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Cześć!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Chcesz skorzystać z szybszej przeglądarki, która daje Ci kontrolę?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To jest Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Prywatne czaty AI, które możesz usunąć w dowolnym momencie za pomocą <b>Fire Button</b>. Spróbuj! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Udało się!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Używaj paska adresu, aby wyszukiwać i odwiedzać witryny lub przełącz się na Duck.ai, aby prowadzić prywatny czat AI.<br/><br/>Możesz korzystać z Duck.ai z dowolnego miejsca, w którym widzisz ikonę czatu]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Piątka!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Chcesz zacząć?&lt;br/&gt;Spróbuj wyszukiwania lub czatu AI.</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Szukaj prywatnie</string>
+    <string name="preOnboardingInputModeDemoChatHint">Zapytaj o cokolwiek prywatnie</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Wyjaśnij działanie giełdy, jakbym miał 10 lat</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Zaplanuj idealny dzień w Londynie</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Zaskocz mnie!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Podaj 10 fascynujących faktów z dziedziny nauki, przyrody i historii</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Chcesz bezpłatnie rozmawiać z ChatGPT, Claude i innymi AI w przeglądarce, która aktywnie chroni Twoją prywatność?</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Uruchom czat AI</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Ochrona AI aktywowana</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popularne AI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Wszystkie czaty są anonimizowane</string>
+    <string name="preOnboardingAiComparisonChartItem2">Nie potrzebujesz konta, aby uzyskać dostęp do wszystkich funkcji AI</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nigdy nie wykorzystuje Twoich rozmów do trenowania AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Dostęp do ChatGPT, Claude i innych AI w jednym miejscu</string>
+    <string name="preOnboardingAiComparisonChartButton">Wypróbuj Duck.ai</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Wypróbuj teraz prywatny czat AI</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Chcesz ustawić DuckDuckGo jako domyślną przeglądarkę?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Rozpocznij prywatny czat AI z Duck.ai lub przełącz się na wyszukiwanie, aby bezpiecznie przeglądać internet.<br/><br/>Z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Oferujemy również płatną subskrypcję obejmującą zaawansowane modele AI z wyższymi limitami czatu od GPT i Claude, bezpieczną sieć VPN i nie tylko.</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Tylko wyszukiwanie</string>
+    <string name="input_screen_user_pref_with_ai_updated">Przełącz między\nwyszukiwaniem a Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potwierdź</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Dzięki za opinię!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otwórz w karcie Fire</string>
+    <string name="openInBackgroundTab">Otwórz w tle</string>
+    <string name="browserModeToggleFireDescription">Przełącz się na karty w trybie Fire</string>
+    <string name="browserModeToggleRegularDescription">Przełącz na zwykłe karty</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Karta Fire</string>
+    <string name="fireTabNewTabPageTitle">Karta Fire</string>
+    <string name="fireTabsEmptyStateTitle">Karty Fire</string>
+    <string name="fireTabsFeatureNoHistory">Przeglądaj bez zapisywania historii lokalnej</string>
+    <string name="fireTabsFeatureDifferentAccount">Zaloguj się do witryny przy użyciu innego konta</string>
+    <string name="fireTabsFeatureTroubleshoot">Rozwiązuj problemy z witrynami</string>
+    <string name="fireTabsExplainer">Karty Fire są izolowane od innych danych przeglądarki. Ich dane zostaną zniszczone, gdy zamkniesz je wszystkie. Zapewniają one taką samą ochronę przed śledzeniem jak inne karty.</string>
+    <string name="fireTabsNewTabButton">Nowa karta Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOWOŚĆ!</b> Wypróbuj karty Fire, aby przeglądać bez lokalnego zapisywania historii.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
 </resources>

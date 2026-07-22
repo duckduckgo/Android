@@ -22,11 +22,16 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.fire.ManualDataClearing
+import com.duckduckgo.app.fire.promo.FireTabsPromos
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -41,9 +46,11 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.TabItems
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.BackButtonType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterface
@@ -52,6 +59,10 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
@@ -62,8 +73,13 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -84,17 +100,25 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.util.Date
 import kotlin.Boolean
 
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@Config(sdk = [34])
 @SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {
@@ -114,7 +138,23 @@ class TabSwitcherViewModelTest {
 
     private val mockTabRepository: TabRepository = mock()
 
+    private val mockFireTabRepository: TabRepository = mock()
+
+    @Suppress("UNCHECKED_CAST")
+    private val mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository> =
+        mock<BrowserModeDataProvider<TabRepository>>()
+
+    private val mockBrowserModeStateHolder: BrowserModeStateHolder = mock()
+
+    private val mockFireModeAvailability: FireModeAvailability = mock()
+
+    private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+
     private val mockPixel: Pixel = mock()
+
+    private val fireTabsPromos: FireTabsPromos = mock()
+
+    private val remoteMessageModel: RemoteMessageModel = mock()
 
     private val statisticsDataStore: StatisticsDataStore = mock()
 
@@ -134,7 +174,11 @@ class TabSwitcherViewModelTest {
 
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
-    private val androidBrowserConfig = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val mockTabTitleResolver: TabTitleResolver = mock()
+
+    private val mockDataClearing: ManualDataClearing = mock()
+
+    private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
 
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -172,6 +216,13 @@ class TabSwitcherViewModelTest {
 
         whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
 
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabTitleResolver.resolveTitle(any(), any())).thenReturn("")
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
+
         initializeMockTabEntitesData()
         initializeViewModel()
         prepareSelectionMode()
@@ -184,8 +235,16 @@ class TabSwitcherViewModelTest {
     }
 
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
-        testee = TabSwitcherViewModel(
-            mockTabRepository,
+        testee = createViewModel(tabSwitcherDataStore)
+        testee.command.observeForever(mockCommandObserver)
+        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
+    }
+
+    private fun createViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore): TabSwitcherViewModel {
+        return TabSwitcherViewModel(
+            mockTabRepositoryProvider,
+            mockBrowserModeStateHolder,
+            mockFireModeAvailability,
             coroutinesTestRule.testDispatcherProvider,
             mockPixel,
             swipingTabsFeatureProvider,
@@ -197,11 +256,30 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
-            androidBrowserConfig,
+            mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
+            coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
         )
-        testee.command.observeForever(mockCommandObserver)
-        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
+
+    private fun fireTabsRemoteMessage(): RemoteMessage = RemoteMessage(
+        id = FireTabsPromos.FIRE_TABS_PROMO_MESSAGE_ID,
+        content = Content.BigTwoActions(
+            titleText = "",
+            descriptionText = "",
+            placeholder = Content.Placeholder.ANNOUNCE,
+            primaryActionText = "",
+            primaryAction = Action.Dismiss,
+            secondaryActionText = "",
+            secondaryAction = Action.Dismiss,
+        ),
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
+        surfaces = emptyList(),
+    )
 
     @After
     fun after() {
@@ -213,7 +291,7 @@ class TabSwitcherViewModelTest {
         testee.onNewTabRequested(fromOverflowMenu = true)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -222,15 +300,14 @@ class TabSwitcherViewModelTest {
         testee.onNewTabRequested(fromOverflowMenu = false)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
 
         val emptyTab = TabEntity("EMPTY_TAB", url = "", sourceTabId = null, position = 0)
         val tabListWithEmptyTab = listOf(
@@ -249,10 +326,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndEmptyTabWithSourceTabExistsThenAddNewTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabWithSourceTabExistsThenAddNewTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
 
         val tabListWithEmptyTabWithSource = listOf(
             TabEntity("1", url = "https://cnn.com", position = 1),
@@ -270,53 +346,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
-
-        val tabListWithoutEmptyTab = listOf(
-            TabEntity("1", url = "https://cnn.com", position = 1),
-            TabEntity("2", url = "https://test.com", position = 2),
-        )
-        tabList = tabListWithoutEmptyTab
-        initializeMockTabEntitesData()
-        initializeViewModel()
-        prepareSelectionMode()
-
-        testee.onNewTabRequested()
-
-        verify(mockTabRepository, never()).select(any())
-        verify(mockTabRepository).add()
-    }
-
-    @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankDisabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = false))
-
-        val emptyTab = TabEntity("EMPTY_TAB", url = "", sourceTabId = "SOURCE_TAB", position = 0)
-        val tabListWithEmptyTab = listOf(
-            TabEntity("1", url = "https://cnn.com", position = 1),
-            emptyTab,
-        )
-        tabList = tabListWithEmptyTab
-        initializeMockTabEntitesData()
-        initializeViewModel()
-        prepareSelectionMode()
-
-        testee.onNewTabRequested()
-
-        verify(mockTabRepository).select("EMPTY_TAB")
-        verify(mockTabRepository, never()).add()
-    }
-
-    @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankDisabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = false))
 
         val tabListWithoutEmptyTab = listOf(
             TabEntity("1", url = "https://cnn.com", position = 1),
@@ -366,7 +398,7 @@ class TabSwitcherViewModelTest {
         testee.onTabSelected("abc")
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -607,7 +639,7 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
@@ -621,7 +653,7 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
@@ -648,32 +680,6 @@ class TabSwitcherViewModelTest {
         testee.purgeDeletableTabs()
 
         verify(mockTabRepository).purgeDeletableTabs()
-    }
-
-    @Test
-    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runTest {
-        val tab = TabEntity("ID", position = 0)
-
-        val expectedTabs = listOf(listOf(), listOf(tab))
-        var index = 0
-        testee.deletableTabs.observeForever {
-            assertEquals(expectedTabs[index++], it)
-        }
-
-        repoDeletableTabs.send(listOf())
-        repoDeletableTabs.send(listOf(tab))
-    }
-
-    @Test
-    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runTest {
-        val tab = TabEntity("ID", position = 0)
-
-        testee.deletableTabs.observeForever {
-            assertEquals(listOf(tab), it)
-        }
-
-        repoDeletableTabs.send(listOf(tab))
-        repoDeletableTabs.send(listOf(tab))
     }
 
     @Test
@@ -720,6 +726,15 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenOnFireButtonTappedThenPixelsSent() {
+        testee.onFireButtonTapped()
+
+        val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING, params)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, params, type = Daily())
+    }
+
+    @Test
     fun whenOnUpButtonPressedCalledThePixelSent() {
         testee.onUpButtonPressed()
 
@@ -731,6 +746,64 @@ class TabSwitcherViewModelTest {
         testee.onBackButtonPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+    }
+
+    @Test
+    fun `when back pressed in regular mode then close`() {
+        testee.onBackButtonPressed()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when back pressed in fire mode with no fire tabs then clears fire data and switches to regular mode`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBackButtonPressed()
+        advanceUntilIdle()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularModeAndClose, commandCaptor.lastValue)
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+    }
+
+    @Test
+    fun `when up pressed in fire mode with no fire tabs then clears fire data and switches to regular mode`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onUpButtonPressed()
+        advanceUntilIdle()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularModeAndClose, commandCaptor.lastValue)
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
     }
 
     @Test
@@ -791,61 +864,6 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        // the default layout type is GRID
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(LIST)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledTheTypeIsChangedToList() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(GRID)
-    }
-
-    @Test
     fun `when Duck Chat menu item clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
@@ -872,7 +890,7 @@ class TabSwitcherViewModelTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        whenever(duckChatMock.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 
         testee.onDuckAIButtonClicked()
 
@@ -884,7 +902,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNormalModeAndNoTabsThenVerifyDynamicInterface() {
-        val viewState = ViewState(tabSwitcherItems = emptyList(), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(emptyList()), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -911,7 +929,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndOneNewTabPageThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -939,7 +957,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -971,7 +989,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1003,7 +1021,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1034,7 +1052,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -1062,7 +1080,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsListThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = LIST,
             isDuckAIButtonVisible = true,
@@ -1096,7 +1114,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), false),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(emptyList()), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(emptyList()), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1126,7 +1144,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1156,7 +1174,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1"), true),
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1187,7 +1205,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", "http://cnn.com"), true),
             SelectableTab(TabEntity("3"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1217,7 +1235,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1246,7 +1264,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNoTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val viewState = ViewState(
-            tabSwitcherItems = emptyList(),
+            tabItems = TabItems.Loaded(emptyList()),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1278,7 +1296,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndOneNewTabPageAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1310,7 +1328,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1342,7 +1360,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1374,7 +1392,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1406,7 +1424,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = GRID,
             isDuckAIButtonVisible = true,
@@ -1438,7 +1456,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsListAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = LIST,
             isDuckAIButtonVisible = true,
@@ -1473,7 +1491,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(emptyList()),
             layoutType = null,
         )
@@ -1507,7 +1525,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
         )
@@ -1541,7 +1559,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
         )
@@ -1575,7 +1593,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
         )
@@ -1609,7 +1627,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
         )
@@ -1681,6 +1699,35 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun `when in fire mode then tab switcher items do not include animation tile`() = runTest {
+        val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
+            setTrackersAnimationInfoTileHidden(false)
+        }
+
+        val fireTab1 = TabEntity("1", position = 1)
+        val fireTab2 = TabEntity("2", position = 2)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(fireTab1, fireTab2)))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab1))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        currentModeFlow.value = BrowserMode.FIRE
+
+        val testee = createViewModel(fakeTabSwitcherDataStore)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        val items = testee.viewState.value.tabSwitcherItems
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assertTrue(item is TabSwitcherItem.Tab)
+        }
+    }
+
+    @Test
     fun `when animated info panel positive button clicked then animated info panel is hidden`() = runTest {
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1746,7 +1793,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndSplitOmnibarEnabledThenMenuButtonHiddenAndBottomBarVisible() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1779,7 +1826,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndSplitOmnibarEnabledAndDuckAIDisabledThenMenuButtonHiddenAndBottomBarVisible() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1815,7 +1862,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1851,7 +1898,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(emptyList()),
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1887,7 +1934,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1962,6 +2009,656 @@ class TabSwitcherViewModelTest {
         assertFalse(viewState.dynamicInterface.isNewTabButtonVisible)
     }
 
+    @Test
+    fun `when tab has duck ai url then item is DuckAiTab`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        tabList = listOf(TabEntity("duckai1", url = duckAiUrl, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(true)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue("Expected DuckAiTab but got: $items", items.any { it is DuckAiTab })
+    }
+
+    @Test
+    fun `when tab has regular url then item is NormalTab`() = runTest {
+        val url = "https://example.com"
+        tabList = listOf(TabEntity("tab1", url = url, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(false)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.any { it is NormalTab })
+        assertTrue(items.none { it is DuckAiTab })
+    }
+
+    @Test
+    fun `when tab has null url then item is NormalTab`() = runTest {
+        tabList = listOf(TabEntity("tab2", url = null, position = 1))
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.any { it is NormalTab })
+        assertTrue(items.none { it is DuckAiTab })
+    }
+
+    @Test
+    fun `when fire mode available and current mode is fire then tab switcher items resolve from fire repo`() = runTest {
+        val fireTabList = listOf(TabEntity("fire-1", url = "https://fire.example", position = 1))
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabList))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabList.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.any { it is NormalTab && it.tabEntity.tabId == "fire-1" })
+        verify(mockTabRepositoryProvider, atLeastOnce()).forMode(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when fire mode and no fire tabs then showFireTabsEmptyState is true`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when fire mode and fire tabs present then showFireTabsEmptyState is false`() = runTest {
+        val fireTabList = listOf(TabEntity("fire-1", url = "https://fire.example", position = 1))
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabList))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabList.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when regular mode then showFireTabsEmptyState is false`() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when closing the last fire tab then shows undo without clearing fire data`() = runTest {
+        val fireTab = TabEntity("fire-1", url = "https://fire.example", position = 1)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(fireTab)))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        val tab = testee.tabs.first { it.id == "fire-1" }
+        testee.onTabCloseInNormalModeRequested(tab)
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).markDeletable(fireTab)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf("fire-1")), commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when closing all fire tabs then shows undo without clearing fire data`() = runTest {
+        val fireTabs = listOf(
+            TabEntity("fire-1", url = "https://fire.example/1", position = 1),
+            TabEntity("fire-2", url = "https://fire.example/2", position = 2),
+        )
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabs))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabs.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onCloseAllTabsConfirmed()
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(fireTabs.map { it.tabId }), commandCaptor.lastValue)
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when undo snackbar dismissed in fire mode and no fire tabs remain then fire data is cleared`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(mockFireTabRepository.getDeletableTabIds()).thenReturn(listOf("fire-1"))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onUndoDeleteSnackbarDismissed(listOf("fire-1"))
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).deleteTabs(listOf("fire-1"))
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+            clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearing).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun `when undo snackbar dismissed in fire mode with fire tabs remaining then fire data is not cleared`() = runTest {
+        val remainingTab = TabEntity("fire-2", url = "https://fire.example/2", position = 2)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(remainingTab)))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(remainingTab))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onUndoDeleteSnackbarDismissed(listOf("fire-1"))
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).deleteTabs(listOf("fire-1"))
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when undo snackbar dismissed in regular mode then fire data is not cleared`() = runTest {
+        testee.onUndoDeleteSnackbarDismissed(listOf("1"))
+        advanceUntilIdle()
+
+        verify(mockTabRepository).deleteTabs(listOf("1"))
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when multiple empty-state triggers fire while empty then fire data is cleared only once`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onUndoDeleteSnackbarDismissed(listOf("fire-1"))
+        advanceUntilIdle()
+        testee.onBackButtonPressed()
+        advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent, times(1)).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, times(1)).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+    }
+
+    @Test
+    fun `when fire is repopulated after clearing then a later empty state clears again`() = runTest {
+        val fireTabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
+        val fireTab = TabEntity("fire-1", url = "https://fire.example", position = 1)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(fireTabsFlow)
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBackButtonPressed()
+        advanceUntilIdle()
+
+        // Fire repopulated then emptied again re-arms the guard
+        fireTabsFlow.value = listOf(fireTab)
+        advanceUntilIdle()
+        fireTabsFlow.value = emptyList()
+        advanceUntilIdle()
+
+        testee.onBackButtonPressed()
+        advanceUntilIdle()
+
+        verify(mockDataClearing, times(2)).clearDataUsingManualFireOptions(
+            shouldRestartIfRequired = false,
+            browserMode = BrowserMode.FIRE,
+        )
+    }
+
+    @Test
+    fun `when deletable tabs purged in fire mode then delegates to fire repo without clearing fire data`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.purgeDeletableTabs()
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).purgeDeletableTabs()
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when deletable tabs purged in regular mode then fire data is not cleared`() = runTest {
+        testee.purgeDeletableTabs()
+        advanceUntilIdle()
+
+        verify(mockTabRepository).purgeDeletableTabs()
+        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when toggling to regular mode with fire tabs present then does not clear fire data`() = runTest {
+        val fireTabs = listOf(
+            TabEntity("fire-1", url = "https://fire.example/1", position = 1),
+            TabEntity("fire-2", url = "https://fire.example/2", position = 2),
+        )
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabs))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabs.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+        advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when fire mode unavailable then disabled viewmodel ignores state holder and only resolves regular repo`() = runTest {
+        // Use isolated mocks so the @Before viewmodel (which subscribed to currentModeFlow) does not interfere.
+        val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
+        val isolatedStateHolder = mock<BrowserModeStateHolder>()
+        val isolatedAvailability = mock<FireModeAvailability>()
+        val isolatedStateFlow = MutableStateFlow(BrowserMode.REGULAR)
+        whenever(isolatedAvailability.isAvailable()).thenReturn(false)
+        whenever(isolatedStateHolder.currentMode).thenReturn(isolatedStateFlow)
+        whenever(isolatedProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+
+        val isolatedViewModel = TabSwitcherViewModel(
+            isolatedProvider,
+            isolatedStateHolder,
+            isolatedAvailability,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            swipingTabsFeatureProvider,
+            duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
+            mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
+            faviconManager,
+            savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
+            coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            isolatedViewModel.viewState.collect()
+        }
+
+        isolatedStateFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        verify(isolatedProvider, never()).forMode(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when fire mode available then isBrowserModeToggleVisible is true`() = runTest {
+        // @Before sets isAvailable() = true
+        assertTrue(testee.viewState.value.isBrowserModeToggleVisible)
+    }
+
+    @Test
+    fun `when fire mode unavailable then isBrowserModeToggleVisible is false`() = runTest {
+        val isolatedAvailability: FireModeAvailability = mock()
+        whenever(isolatedAvailability.isAvailable()).thenReturn(false)
+        val isolatedStateHolder: BrowserModeStateHolder = mock()
+        whenever(isolatedStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+        val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
+        whenever(isolatedProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+
+        val isolatedViewModel = TabSwitcherViewModel(
+            isolatedProvider,
+            isolatedStateHolder,
+            isolatedAvailability,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            swipingTabsFeatureProvider,
+            duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
+            mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
+            faviconManager,
+            savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
+            coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
+        )
+
+        assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to fire then switches mode on state holder`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+        verify(mockPixel).fire(
+            AppPixelName.BROWSER_MODE_SWITCHED,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "fire", Pixel.PixelParameter.SOURCE to "tab_switcher_toggle"),
+        )
+    }
+
+    @Test
+    fun `when onBrowserModeToggled then purges deletable tabs on leaving repo`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+        advanceUntilIdle()
+
+        verify(mockTabRepository).purgeDeletableTabs()
+        verify(mockFireTabRepository, never()).purgeDeletableTabs()
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to current mode then does not call switchTo`() = runTest {
+        // currentModeFlow starts at REGULAR
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+
+        verify(mockBrowserModeStateHolder, never()).switchTo(any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.BROWSER_MODE_SWITCHED), any(), any(), any())
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to current mode then does not purge`() = runTest {
+        testee.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+        advanceUntilIdle()
+
+        verify(mockTabRepository, never()).purgeDeletableTabs()
+    }
+
+    @Test
+    fun `when fire mode unavailable then onBrowserModeToggled is no-op`() = runTest {
+        val isolatedAvailability: FireModeAvailability = mock()
+        whenever(isolatedAvailability.isAvailable()).thenReturn(false)
+        val isolatedStateHolder: BrowserModeStateHolder = mock()
+        whenever(isolatedStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+        val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
+        whenever(isolatedProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+
+        val isolatedViewModel = TabSwitcherViewModel(
+            isolatedProvider,
+            isolatedStateHolder,
+            isolatedAvailability,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            swipingTabsFeatureProvider,
+            duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
+            mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
+            faviconManager,
+            savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
+            mockDataClearing,
+            mockDataClearingWideEvent,
+            coroutinesTestRule.testScope,
+            fireTabsPromos,
+            remoteMessageModel,
+        )
+
+        isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+
+        verify(isolatedStateHolder, never()).switchTo(any())
+    }
+
+    @Test
+    fun `regularTabCount reflects regular repo tab count`() = runTest {
+        // @Before wires mockTabRepository.flowTabs to flowOf(tabList) and forMode(REGULAR) -> mockTabRepository
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertEquals(tabList.size, testee.viewState.value.regularTabCount)
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveAndCanShowPromoThenVisibleAndShownPixelAndMarkedShown() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertTrue(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos).onTabSwitcherPromoShown()
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
+    }
+
+    @Test
+    fun whenNoActiveMessageThenFireTabsPromoNotVisible() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenActiveMessageHasNonFireTabsPlaceholderThenFireTabsPromoNotVisible() = runTest {
+        val nonFireTabsMessage = RemoteMessage(
+            id = "other-promo",
+            content = Content.BigTwoActions(
+                titleText = "",
+                descriptionText = "",
+                placeholder = Content.Placeholder.ANNOUNCE,
+                primaryActionText = "",
+                primaryAction = Action.Dismiss,
+                secondaryActionText = "",
+                secondaryAction = Action.Dismiss,
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = emptyList(),
+        )
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(nonFireTabsMessage)
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveButPromoAlreadyDismissedThenNotVisible() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsMessageActiveButInFireModeThenNotVisible() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+        currentModeFlow.value = BrowserMode.FIRE
+
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.isFireTabsPromoVisible)
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
+    @Test
+    fun whenFireTabsPromoDismissedThenHiddenAndPixelFired() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        advanceUntilIdle() // ensure init coroutine sets isFireTabsPromoVisible = true
+        testee.onFireTabsPromoDismissed()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
+    }
+
+    @Test
+    fun whenBrowserModeToggledThenFireTabsPromoBannerDismissed() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        advanceUntilIdle() // init sets isFireTabsPromoVisible = true
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
+
+        // The ViewModel survives the toggle-triggered recreate, so the banner must be dismissed here,
+        // otherwise it reappears when the user returns to regular mode.
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+    }
+
+    @Test
+    fun whenModeToggledBeforePromoEligibilityResolvesThenBannerNotShown() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(fireTabsRemoteMessage())
+        // Suspend the eligibility read so we can toggle modes while it is still in flight.
+        val eligibility = CompletableDeferred<Boolean>()
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).doSuspendableAnswer { eligibility.await() }
+
+        val testee = createViewModel() // init starts the eligibility read and suspends on it
+        testee.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE) // user dismisses the banner before it resolves
+        eligibility.complete(true) // resolves true, but the promo was already handled by the toggle
+        advanceUntilIdle()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
@@ -2013,6 +2710,10 @@ class TabSwitcherViewModelTest {
         }
 
         override fun defaultBrowser(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun wasEverDefaultBrowser(): Boolean {
             TODO("Not yet implemented")
         }
 

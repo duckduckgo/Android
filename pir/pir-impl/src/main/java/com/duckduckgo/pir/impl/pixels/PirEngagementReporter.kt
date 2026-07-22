@@ -19,10 +19,9 @@ package com.duckduckgo.pir.impl.pixels
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -36,14 +35,14 @@ interface PirEngagementReporter {
 @ContributesBinding(AppScope::class)
 class RealPirEngagementReporter @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val pirWorkHandler: PirWorkHandler,
     private val pirRepository: PirRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
+    private val pirUserUtils: PirUserUtils,
 ) : PirEngagementReporter {
     override suspend fun attemptFirePixel() {
         withContext(dispatcherProvider.io()) {
-            if (!isActiveUser()) return@withContext
+            if (!pirUserUtils.isActiveUser()) return@withContext
 
             val nowMs = currentTimeProvider.currentTimeMillis()
             attemptToFireDauPixel(nowMs)
@@ -77,16 +76,6 @@ class RealPirEngagementReporter @Inject constructor(
 
         pirPixelSender.reportMAU()
         pirRepository.setLastPirMauPixelTimeMs(nowMs)
-    }
-
-    /**
-     * A user is considered active if they:
-     * - Have a valid subscription
-     * - Has PIR enabled
-     * - Has a userprofile set up for scanning
-     */
-    private suspend fun isActiveUser(): Boolean {
-        return pirWorkHandler.canRunPir().firstOrNull() == true && pirRepository.getValidUserProfileQueries().isNotEmpty()
     }
 
     private fun hasDateElapsed(

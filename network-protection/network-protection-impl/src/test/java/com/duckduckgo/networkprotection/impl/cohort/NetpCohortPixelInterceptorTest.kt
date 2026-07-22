@@ -35,7 +35,9 @@ class NetpCohortPixelInterceptorTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = NetpCohortPixelInterceptor(netpCohortStore)
+        testee = NetpCohortPixelInterceptor(
+            netpCohortStore,
+        )
     }
 
     @Test

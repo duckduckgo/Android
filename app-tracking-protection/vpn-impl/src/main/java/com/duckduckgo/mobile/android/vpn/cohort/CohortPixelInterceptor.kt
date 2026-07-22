@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.cohort
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
@@ -37,20 +38,23 @@ class CohortPixelInterceptor @Inject constructor(
     private val cohortStore: CohortStore,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
 
-        val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
-            // IF there is no cohort for ATP we just drop the pixel request
-            // ELSE we add the cohort param
-            cohortStore.getCohortStoredLocalDate()?.let {
-                chain.request().url.newBuilder().addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(it)).build()
-            } ?: return dummyResponse(chain)
-        } else {
-            chain.request().url
+        if (!pixel.startsWith(PIXEL_PREFIX) || EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            return chain.proceed(originalRequest)
         }
 
-        return chain.proceed(request.url(url).build())
+        // IF there is no cohort for ATP we just drop the pixel request
+        val cohortDate = cohortStore.getCohortStoredLocalDate()
+            ?: return dummyResponse(chain)
+
+        // ELSE we add the cohort param
+        val url = originalRequest.url.newBuilder()
+            .addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(cohortDate))
+            .build()
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
     }
 
     private fun dummyResponse(chain: Interceptor.Chain): Response {
@@ -78,6 +82,7 @@ class CohortPixelInterceptor @Inject constructor(
             "m_atp_ev_cpu_usage_above_",
             "m_atp_unprotected_apps_bucket_",
             "m_atp_breakage_report",
+            ATP_REPORT_BLOCKLIST_STATS_DAILY.pixelName,
             ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName,
         )
     }

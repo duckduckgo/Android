@@ -16,6 +16,9 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 class FakeToggleStore : Toggle.Store {
     private val map = mutableMapOf<String, Toggle.State>()
 
@@ -33,12 +36,14 @@ class FakeFeatureToggleFactory {
         fun <T> create(
             toggles: Class<T>,
             store: Toggle.Store = FakeToggleStore(),
+            ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
             appVersionProvider: () -> Int = { Int.MAX_VALUE },
         ): T {
             return FeatureToggles.Builder()
                 .store(store)
                 .appVersionProvider(appVersionProvider)
                 .featureName("fakeFeature")
+                .ioDispatcher(ioDispatcher)
                 .build()
                 .create(toggles)
         }

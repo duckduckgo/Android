@@ -20,12 +20,14 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
@@ -34,8 +36,10 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -76,6 +80,7 @@ class GranularFireDialogViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockDateProvider: DateProvider = mock()
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val selectedOptionsFlow = MutableStateFlow<Set<FireClearOption>>(emptySet())
@@ -108,6 +113,8 @@ class GranularFireDialogViewModelTest {
         duckChat = mockDuckChat,
         navigationHistory = mockNavigationHistory,
         dateProvider = mockDateProvider,
+        dataClearingWideEvent = dataClearingWideEvent,
+        browserMode = BrowserMode.REGULAR,
     )
 
     @Test
@@ -350,10 +357,30 @@ class GranularFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        verify(mockPixel).enqueueFire(
+            FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+            mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+            type = Daily(),
+        )
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
+        )
+    }
+
+    @Test
+    fun `when delete clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
         )
     }
 
@@ -443,7 +470,7 @@ class GranularFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -496,6 +523,11 @@ class GranularFireDialogViewModelTest {
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            verify(mockPixel).enqueueFire(
+                FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+                mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"),
+                type = Daily(),
+            )
             verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             verify(mockPixel).enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
@@ -507,7 +539,7 @@ class GranularFireDialogViewModelTest {
 
             verify(mockFireButtonStore).incrementFireButtonUseCount()
             verify(mockUserEventsStore).registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-            verify(mockDataClearing).clearDataUsingManualFireOptions()
+            verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
 
             assertEquals(Command.ClearingComplete, awaitItem())
 
@@ -534,7 +566,7 @@ class GranularFireDialogViewModelTest {
 
         testee.onShow()
 
-        verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test
@@ -544,7 +576,7 @@ class GranularFireDialogViewModelTest {
         testee.onShow()
         testee.onShow()
 
-        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
+        verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
     }
 
     @Test

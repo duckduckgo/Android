@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Bookmark open and back navigation"
 tags:
     - releaseTest
@@ -24,12 +25,14 @@ tags:
       - pressKey: Enter
       - assertVisible:
             text: "Privacy Test Pages"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
             text: "add bookmark"
       - tapOn:
             text: "add bookmark"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
             text: "bookmarks"
       - tapOn:

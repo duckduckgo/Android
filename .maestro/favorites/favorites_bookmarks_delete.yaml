@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Deleting a favorite does not delete bookmark"
 tags:
   - releaseTest
@@ -16,13 +17,15 @@ tags:
           id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
           text: "add bookmark"
       - tapOn:
           text: "add bookmark"
       # Add favorite from edit saved site
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
           text: "edit bookmark"
       - tapOn:
@@ -33,7 +36,8 @@ tags:
           text: "add to favorites"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
           text: "bookmarks"
       - tapOn:

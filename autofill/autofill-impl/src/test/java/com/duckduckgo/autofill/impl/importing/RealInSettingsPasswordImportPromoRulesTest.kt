@@ -46,6 +46,13 @@ class RealInSettingsPasswordImportPromoRulesTest {
     }
 
     @Test
+    fun whenAllOtherConditionsAllowButCredentialsCountFailsItThenPromoCannotShow() = runTest {
+        // by default, all conditions are set to allow the promo
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.failure(Exception("test"))))
+        assertFalse(testee.canShowPromo())
+    }
+
+    @Test
     fun whenAutofillTopLevelFeatureDisabledThenCannotShowPromo() = runTest {
         autofillFeature.self().setRawStoredState(Toggle.State(enable = false))
         assertFalse(testee.canShowPromo())
@@ -71,7 +78,7 @@ class RealInSettingsPasswordImportPromoRulesTest {
 
     @Test
     fun whenAlreadyHave25PasswordsSavedThenCannotShowPromo() = runTest {
-        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(MAX_CREDENTIALS_FOR_PROMO))
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(MAX_CREDENTIALS_FOR_PROMO)))
         assertFalse(testee.canShowPromo())
     }
 
@@ -90,7 +97,7 @@ class RealInSettingsPasswordImportPromoRulesTest {
         autofillFeature.canShowImportOptionInAppSettings().setRawStoredState(Toggle.State(enable = true))
         whenever(autofillStore.hasEverImportedPasswords).thenReturn(false)
         whenever(autofillStore.hasDismissedMainAppSettingsPromo).thenReturn(false)
-        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(0))
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
         configureWebViewImportSupport(isAvailable = true)
     }
 }

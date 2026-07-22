@@ -15,17 +15,6 @@ jobs:
     name: Sync Feature Critical Path End-to-End tests
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
-        with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
       - name: Create test account for Sync and return the recovery code
         uses: duckduckgo/sync_crypto/action@main
         id: sync-recovery-code
@@ -33,35 +22,23 @@ jobs:
           debug: true
           no-teardown: false # Turn this to true so the account is not deleted after the test
 
-      - name: Create folder
-        if: always()
-        run: mkdir apk
-
-      - name: Decode keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+          submodules: recursive
 
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
         with:
-          secret: ${{ secrets.FAKE_RELEASE_KEY }}
-          fileName: android
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Assemble internal release APK
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+          flavours: 'internal'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: '-Psync-disable-auth-requirement'
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
 
       - name: Run Sync Maestro Tests
         id: maestro-cloud-asana
@@ -72,10 +49,10 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: sync_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: apk/release.apk
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
           maestro_include_tags: syncCriticalPathTest
           test_suite_name: Sync Critical Path
-          maestro_api_level: 30
+          maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
@@ -84,7 +61,7 @@ jobs:
 
       - name: Add Asana task to Browser Sync & Backup project
         if: ${{ failure() && steps.maestro-cloud-asana.outputs.asana_task_id != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}
@@ -94,7 +71,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure'}}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
+import com.duckduckgo.pir.impl.common.PirJobConstants.preSeedList
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
@@ -32,6 +33,7 @@ import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.PreSeedCookies
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -69,6 +71,13 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 sideEffect = CompleteExecution,
             )
         } else {
+            if (shouldPreseedBroker(state)) {
+                return Next(
+                    nextState = state,
+                    nextEvent = PreSeedCookies,
+                )
+            }
+
             // Entry point of execution for a Broker
             val nextStage = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
                 PirStageStatus(
@@ -91,6 +100,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                     actionRetryCount = 0,
                     stageStatus = nextStage,
+                    preseeding = false,
                 ),
                 nextEvent =
                 ExecuteBrokerStepAction(
@@ -141,5 +151,10 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 // No-op
             }
         }
+    }
+
+    private fun shouldPreseedBroker(state: State): Boolean {
+        val currentBrokerStep = state.brokerStepsToExecute.getOrNull(state.currentBrokerStepIndex) ?: return false
+        return !state.preseeding && currentBrokerStep.broker.name in preSeedList
     }
 }

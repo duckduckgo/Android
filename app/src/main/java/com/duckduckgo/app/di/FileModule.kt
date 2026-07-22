@@ -19,10 +19,13 @@ package com.duckduckgo.app.di
 import com.duckduckgo.app.global.file.AndroidFileDeleter
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 
 @Module
+@ContributesTo(AppScope::class)
 object FileModule {
 
     @Provides

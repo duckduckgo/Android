@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.adblocking.impl.ui
+
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.widget.Toolbar
+import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.listitem.DaxListItem
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.scopes.ActivityScope
+
+@InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AdBlockingSettingsNoParams::class)
+class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
+
+    private val binding: ActivityAdBlockingSettingsBinding by viewBinding()
+
+    override val toolbar: Toolbar get() = binding.includeToolbar.toolbar
+    override val blockAdsToggle: OneLineListItem get() = binding.blockAdsToggle
+    override val adBlockingDescription: DaxTextView get() = binding.adBlockingDescription
+    override val duckPlayerEntry: DaxListItem get() = binding.duckPlayerEntry
+    override val duckPlayerDescription: DaxTextView get() = binding.duckPlayerDescription
+
+    override val rootView: View get() = binding.root
+    override val appBarLayout: View get() = binding.includeToolbar.appBarLayout
+    override val contentScrollView: View get() = binding.contentScrollView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        maybeEnableEdgeToEdge()
+        setContentView(binding.root)
+        configure()
+    }
+}

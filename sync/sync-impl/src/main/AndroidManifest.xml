@@ -14,80 +14,100 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.duckduckgo.sync.impl"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <activity
-            android:name=".ui.SyncInternalSettingsActivity"
-            android:exported="false"
-            android:label="@string/sync_internal_activity_label"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
-
-        <activity
             android:name=".ui.SyncActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".promotion.SyncGetOnOtherPlatformsActivity"
-            android:parentActivityName=".ui.SyncActivity"
-            android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
+        <activity
+            android:name=".promotion.SyncGetOnOtherPlatformsActivity"
             android:exported="false"
-            />
+            android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
+            android:parentActivityName=".ui.SyncActivity" />
 
         <activity
             android:name=".ui.setup.SetupAccountActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".ui.SyncActivity"/>
+            android:parentActivityName=".ui.SyncActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.SyncLoginActivity"
             android:exported="false"
             android:label="@string/login_screen_title"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
             android:parentActivityName=".ui.setup.SetupAccountActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
             android:name=".ui.SyncWithAnotherDeviceActivity"
             android:exported="false"
             android:label="@string/login_screen_title"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
             android:parentActivityName=".ui.SyncActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
             android:name=".ui.SyncConnectActivity"
             android:exported="false"
             android:label="@string/connect_screen_title"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
             android:parentActivityName=".ui.setup.SetupAccountActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
             android:name=".ui.EnterCodeActivity"
             android:exported="false"
             android:label="@string/enter_code_screen_title"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:parentActivityName=".ui.setup.SetupAccountActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
             android:name=".ui.DeviceUnsupportedActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
+
+        <activity
+            android:name=".ui.v2.SyncActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.SyncThisDeviceActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.RecoveryCodeActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.EditDeviceActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

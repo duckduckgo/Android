@@ -19,8 +19,11 @@ package com.duckduckgo.app.browser.newtab
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 
@@ -36,5 +39,19 @@ class FocusedView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setOnClickListener { }
+    }
+
+    fun setOnScrollChangeListener(listener: () -> Unit) {
+        binding.focusedScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            listener()
+        }
+    }
+
+    fun show(isLogoVisible: Boolean, browserMode: BrowserMode) {
+        val isFireMode = browserMode == BrowserMode.FIRE
+        binding.focusedFireEmptyState.root.isVisible = isFireMode
+        binding.focusedLogo.isVisible = isLogoVisible && !isFireMode
+        binding.focusedFavourites.isVisible = !isLogoVisible && !isFireMode
+        this.show()
     }
 }

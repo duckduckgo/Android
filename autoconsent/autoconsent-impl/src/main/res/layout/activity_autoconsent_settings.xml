@@ -26,6 +26,7 @@
         layout="@layout/include_default_toolbar" />
 
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -71,7 +72,7 @@
                 android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:gravity="center"
-                android:text="@string/autoconsentDescription"
+                android:text="@string/autoconsentCookiePopUpPreferenceHeaderDescription"
                 app:textType="secondary"
                 app:typography="body2" />
 
@@ -88,6 +89,50 @@
                 app:primaryText="@string/autoconsentToggle"
                 app:primaryTextTruncated="false"
                 app:showSwitch="true" />
+
+            <LinearLayout
+                android:id="@+id/cookiePopUpPreferenceContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/autoManageCookiePopUpsToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/autoconsentAutoManageToggle"
+                    app:primaryTextTruncated="false"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/autoManageCookiePopUpsDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/keyline_4"
+                    android:paddingBottom="@dimen/keyline_4"
+                    android:text="@string/autoconsentAutoManageDescription"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/popUpsWithoutOptOutsToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/autoconsentPopUpsWithoutOptOutsToggle"
+                    app:primaryTextTruncated="false"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/popUpsWithoutOptOutsDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/keyline_4"
+                    android:paddingBottom="@dimen/keyline_4"
+                    android:text="@string/autoconsentPopUpsWithoutOptOutsDescription"
+                    app:textType="secondary"
+                    app:typography="body2" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

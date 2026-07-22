@@ -34,11 +34,11 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
-    implementation project(':duckplayer-api')
+    implementation project(':ad-blocking-api')
     implementation project(':data-store-api')
     implementation AndroidX.webkit
 
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
 
     implementation "com.squareup.logcat:logcat:_"
@@ -51,7 +51,6 @@ dependencies {
 
     // Room
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
     // Testing dependencies

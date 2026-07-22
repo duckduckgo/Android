@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -26,7 +27,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":history-api")
 
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
@@ -44,13 +45,14 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     implementation Square.moshi
 
     implementation AndroidX.work.runtimeKtx
 
 
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.work.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
@@ -68,6 +70,9 @@ dependencies {
 }
 
 android {
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas")
+    }
     namespace "com.duckduckgo.history.impl"
     anvil {
         generateDaggerFactories = true // default is false
@@ -83,6 +88,9 @@ android {
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 

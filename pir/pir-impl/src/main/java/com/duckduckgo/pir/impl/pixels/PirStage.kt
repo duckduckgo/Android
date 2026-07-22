@@ -69,6 +69,11 @@ enum class PirStage(val stageName: String) {
     FILL_FORM("fill-form"),
 
     /**
+     * Stage starts: when getEmailData polling begins, waiting for email-extracted data (e.g. verification codes) to arrive.
+     */
+    EMAIL_DATA_POLL("email-data-poll"),
+
+    /**
      * Catch-all stage
      */
     OTHER("other"),

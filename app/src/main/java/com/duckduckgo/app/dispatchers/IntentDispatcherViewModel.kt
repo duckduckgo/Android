@@ -17,19 +17,26 @@
 package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
+import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
+import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,28 +48,59 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class IntentDispatcherViewModel @Inject constructor(
-    private val customTabDetector: CustomTabDetector,
     private val dispatcherProvider: DispatcherProvider,
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val syncUrlIdentifier: SyncUrlIdentifier,
+    private val duckChat: DuckChat,
     private val appBuildConfig: AppBuildConfig,
+    private val inlinePdfHandler: InlinePdfHandler,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     data class ViewState(
+        // false until onIntentReceived has computed a real routing decision. The initial default state
+        // must not be dispatched (it would otherwise fall through to the browser and finish the dispatcher
+        // before a slower path — e.g. cacheLocalPdf — emits its result).
+        val resolved: Boolean = false,
         val customTabRequested: Boolean = false,
         val intentText: String? = null,
         val activityParams: ActivityParams? = null,
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
+        val localPdfError: Boolean = false,
     )
 
     fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
+                val localPdfUri = localPdfUriOrNull(intent)
+                if (localPdfUri != null) {
+                    when (val result = inlinePdfHandler.cacheLocalPdf(localPdfUri)) {
+                        is LocalPdfResult.Success -> {
+                            _viewState.emit(
+                                viewState.value.copy(
+                                    resolved = true,
+                                    activityParams = PdfViewerActivityParams(
+                                        result.uri.toString(),
+                                        result.displayName,
+                                        PdfViewerSource.EXTERNAL_INTENT,
+                                    ),
+                                    localPdfError = false,
+                                    isExternal = isExternal,
+                                ),
+                            )
+                        }
+                        is LocalPdfResult.Failure -> {
+                            _viewState.emit(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
+                        }
+                    }
+                    return@launch
+                }
+
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
                 val intentText = intent?.intentText
                 val activityParams = if (appBuildConfig.isInternalBuild()) {
@@ -83,15 +121,15 @@ class IntentDispatcherViewModel @Inject constructor(
 
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
-
+                val isDuckAiUrl = intentText?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
                 val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
-                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
+                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl && !isDuckAiUrl
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 
-                customTabDetector.setCustomTab(false)
                 _viewState.emit(
                     viewState.value.copy(
+                        resolved = true,
                         customTabRequested = customTabRequested,
                         intentText = if (customTabRequested) intentText?.sanitize() else intentText,
                         activityParams = activityParams,
@@ -101,8 +139,30 @@ class IntentDispatcherViewModel @Inject constructor(
                 )
             }.onFailure {
                 logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
+                // Resolve to a routable state so the dispatcher doesn't hang on the unresolved default;
+                // fall back to opening the intent's URL in the browser.
+                _viewState.emit(
+                    viewState.value.copy(
+                        resolved = true,
+                        intentText = runCatching { intent?.intentText }.getOrNull(),
+                        isExternal = isExternal,
+                    ),
+                )
             }
         }
+    }
+
+    private fun localPdfUriOrNull(intent: Intent?): Uri? {
+        if (intent?.action != Intent.ACTION_VIEW) return null
+        if (appBuildConfig.sdkInt < 31) return null
+        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return null
+        if (!androidBrowserConfigFeature.externalPdfHandler().isEnabled()) return null
+        val data = intent.data ?: return null
+        val scheme = data.scheme?.lowercase()
+        if (scheme != "content" && scheme != "file") return null
+        val isPdf = intent.type?.lowercase() == "application/pdf" ||
+            data.lastPathSegment?.endsWith(".pdf", ignoreCase = true) == true
+        return if (isPdf) data else null
     }
 
     private fun String.sanitize(): String {

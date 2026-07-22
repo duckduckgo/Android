@@ -1,11 +1,11 @@
 package com.duckduckgo.autofill.impl.importing
 
-import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.RealInBrowserImportPromo.Companion.MAX_PROMO_SHOWN_COUNT
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -21,7 +21,6 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 @RunWith(Parameterized::class)
 class RealInBrowserImportPromoParameterizedTest(
     private val testCase: CanShowPromoTestCase,
@@ -61,7 +60,7 @@ class RealInBrowserImportPromoParameterizedTest(
 
     @Test
     fun inBrowserPromoRules() = runTest {
-        val result = testee.canShowPromo(testCase.credentialsAvailableForCurrentPage, testCase.url)
+        val result = testee.canShowPromo(testCase.credentialsAvailableForCurrentPage, testCase.url, testCase.browserMode)
         assertEquals(testCase.description, testCase.expected, result)
     }
 
@@ -78,7 +77,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = true,
                     description = "eligible: all conditions met",
@@ -90,7 +89,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: credentials available for current page",
@@ -102,7 +101,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: can import password feature disabled",
@@ -114,7 +113,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = false,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: autofill feature disabled",
@@ -126,7 +125,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = true,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: has ever imported passwords",
@@ -138,7 +137,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = true,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: user has declined promo",
@@ -150,7 +149,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO - 1,
+                    credentialCount = Result.success(RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO - 1),
                     promoShownCount = 0,
                     expected = true,
                     description = "eligible: credentialCount just below max",
@@ -162,7 +161,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO,
+                    credentialCount = Result.success(RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: credential count at max limit",
@@ -174,7 +173,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO + 1,
+                    credentialCount = Result.success(RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO + 1),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: credentialCount just above max",
@@ -186,7 +185,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = MAX_PROMO_SHOWN_COUNT - 1,
                     expected = true,
                     description = "eligible: promoShownCount just below max",
@@ -198,7 +197,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = MAX_PROMO_SHOWN_COUNT,
                     expected = false,
                     description = "ineligible: promo shown count at max limit",
@@ -210,7 +209,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = MAX_PROMO_SHOWN_COUNT + 1,
                     expected = false,
                     description = "ineligible: promoShownCount just above max",
@@ -222,7 +221,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: url in never save list",
@@ -234,7 +233,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     expected = false,
                     description = "ineligible: url is null",
@@ -246,7 +245,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = true,
                     hasDeclinedPromo = true,
-                    credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO,
+                    credentialCount = Result.success(RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO),
                     promoShownCount = MAX_PROMO_SHOWN_COUNT,
                     expected = false,
                     description = "ineligible: multiple disqualifying conditions",
@@ -258,7 +257,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     webViewSupportsImportingPasswords = false,
                     expected = false,
@@ -271,7 +270,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     webViewSupportsImportingPasswords = true,
                     promoPreviouslyShownForUrl = true,
@@ -285,7 +284,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     webViewSupportsImportingPasswords = true,
                     promoPreviouslyShownForUrl = false,
@@ -299,12 +298,37 @@ class RealInBrowserImportPromoParameterizedTest(
                     autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
-                    credentialCount = 0,
+                    credentialCount = Result.success(0),
                     promoShownCount = 0,
                     webViewSupportsImportingPasswords = true,
                     promoPreviouslyShownForUrl = false,
                     expected = false,
                     description = "ineligible: promo won't show for Email Protection URLs",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = Result.failure(Exception("test")),
+                    promoShownCount = 0,
+                    expected = false,
+                    description = "ineligible: couldn't retrieve credentials count",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = Result.success(0),
+                    promoShownCount = 0,
+                    browserMode = BrowserMode.FIRE,
+                    expected = false,
+                    description = "ineligible: fire mode active",
                 ),
             )
         }
@@ -325,10 +349,11 @@ data class CanShowPromoTestCase(
     val autofillFeatureEnabled: Boolean,
     val hasEverImportedPasswords: Boolean,
     val hasDeclinedPromo: Boolean,
-    val credentialCount: Int,
+    val credentialCount: Result<Int>,
     val promoShownCount: Int,
     val webViewSupportsImportingPasswords: Boolean = true,
     val promoPreviouslyShownForUrl: Boolean = false,
+    val browserMode: BrowserMode = BrowserMode.REGULAR,
     val expected: Boolean,
     val description: String,
 ) {

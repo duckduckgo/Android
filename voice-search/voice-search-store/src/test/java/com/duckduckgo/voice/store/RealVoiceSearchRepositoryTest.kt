@@ -18,6 +18,8 @@ package com.duckduckgo.voice.store
 
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -42,15 +44,6 @@ class RealVoiceSearchRepositoryTest {
         testee.acceptRationaleDialog()
 
         assertTrue(testee.getHasAcceptedRationaleDialog())
-    }
-
-    @Test
-    fun whenPermissionDeclinedForeverThenGetHasPermissionDeclinedForeverShouldBeTrue() {
-        assertFalse(testee.getHasPermissionDeclinedForever())
-
-        testee.declinePermissionForever()
-
-        assertTrue(testee.getHasPermissionDeclinedForever())
     }
 
     @Test
@@ -98,21 +91,22 @@ class RealVoiceSearchRepositoryTest {
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
-    override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
     override var countVoiceSearchDismissed: Int = 0
     override var lastSelectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
-    private var _voiceSearchEnabled = false
+    private val _voiceSearchEnabled = MutableStateFlow(false)
 
     override fun isVoiceSearchEnabled(default: Boolean): Boolean {
-        return _voiceSearchEnabled
+        return _voiceSearchEnabled.value
     }
 
     override fun setVoiceSearchEnabled(value: Boolean) {
-        _voiceSearchEnabled = value
+        _voiceSearchEnabled.value = value
     }
+
+    override fun voiceSearchEnabledFlow(default: Boolean): Flow<Boolean> = _voiceSearchEnabled
 }
 
 class FakeVoiceSearchStatusListener : VoiceSearchStatusListener {

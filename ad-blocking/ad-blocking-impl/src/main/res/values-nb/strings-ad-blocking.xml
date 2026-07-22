@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">Annonseblokkering på YouTube</string>
+    <string name="ad_blocking_settings_toggle_title">Blokker annonser på YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokkerer videoannonser på YouTube, slik at du kan se videoer uten avbrudd. \n\nNår dette er aktivert, registrerer DuckDuckGo anonymt forstyrrelser i annonseblokkering eller feil i YouTube, for å forbedre opplevelsen for alle. DuckDuckGo ser aldri hvilke videoer du ser på, eller noen personlig identifiserbar informasjon. <annotation type="learn_more_link">Finn ut mer</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokkerer videoannonser på YouTube, slik at du kan se videoer uten avbrudd. <annotation type="learn_more_link">Finn ut mer</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Åpner videoer i en distraksjonsfri kinomodus som hindrer at det du ser på påvirker YouTube-feeden din.</string>
+    <string name="ad_blocking_settings_title_v2">Annonseblokkering</string>
+    <string name="ad_blocking_settings_header_description">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing</string>
+    <string name="contingencyMessageTitle">Annonseblokkering på YouTube er ikke tilgjengelig</string>
+    <string name="contingencyMessageContent">Annonseblokkering har blitt påvirket av nylige endringer på YouTube. Vi jobber med å løse disse problemene og takker for tålmodigheten</string>
+    <string name="contingencyMessagePrimaryButton">Den er grei</string>
+    <string name="contingencyMessageCloseContentDescription">Lukk</string>
+    <string name="ad_blocking_menu_disable">Deaktiver annonseblokkering på YouTube</string>
+    <string name="ad_blocking_menu_enable">Aktiver annonseblokkering på YouTube</string>
+    <string name="ad_blocking_menu_title">Annonseblokkering på YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Lukk</string>
+    <string name="ad_blocking_menu_always_on">Alltid på</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Deaktiver til neste oppstart</string>
+    <string name="ad_blocking_menu_always_off">Alltid av</string>
+    <string name="ad_blocking_disabled_popup_title">Fungerer ikke annonseblokkering på YouTube?</string>
+    <string name="ad_blocking_disabled_popup_description">Send en anonym feilrapport til DuckDuckGo. Bidra til å gjøre annonseblokkering bedre for alle!</string>
+    <string name="ad_blocking_disabled_primary_action">Send feilrapport</string>
+    <string name="ad_blocking_disabled_secondary_action">Avbryt</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Deaktivert til neste oppstart</string>
+    <string name="ad_blocking_omnibar_badge_text">Annonseblokkering på YouTube er på</string>
+</resources>

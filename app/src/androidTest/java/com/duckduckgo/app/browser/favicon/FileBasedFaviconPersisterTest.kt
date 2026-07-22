@@ -28,9 +28,11 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -41,6 +43,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.io.File
 import java.io.FileOutputStream
 
@@ -60,8 +63,9 @@ class FileBasedFaviconPersisterTest {
     private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
         fakeBrowserConfigFeature.storeFaviconSuspend().setRawStoredState(Toggle.State(true))
+        whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
         testee = FileBasedFaviconPersister(context, mockFileDeleter, fakeBrowserConfigFeature, coroutineRule.testDispatcherProvider)
     }
 
@@ -98,6 +102,20 @@ class FileBasedFaviconPersisterTest {
 
         val newFile = testee.faviconFile(secondaryTestDirectory, subFolder, filename)
         verifyDirectoryUse(newFile!!.absolutePath, secondaryTestDirectory)
+    }
+
+    @Test
+    fun whenCopyToDirectoryAndAtomicWritesEnabledThenFileCopiedAndNoTmpFileLeft() = runTest {
+        fakeBrowserConfigFeature.atomicFaviconWrites().setRawStoredState(Toggle.State(true))
+        val filename = "newFileName"
+        createNewFile()
+
+        testee.copyToDirectory(getTestFile(), secondaryTestDirectory, subFolder, filename)
+
+        val newFile = testee.faviconFile(secondaryTestDirectory, subFolder, filename)
+        assertNotNull(newFile)
+        verifyDirectoryUse(newFile!!.absolutePath, secondaryTestDirectory)
+        assertFalse(File(newFile.parent, "${newFile.name}.tmp").exists())
     }
 
     @Test
@@ -143,6 +161,18 @@ class FileBasedFaviconPersisterTest {
         val file = testee.store(testDirectory, subFolder, newBitmap, "filename")
 
         assertNotNull(file)
+    }
+
+    @Test
+    fun whenStoreFaviconSuspendDisabledAndAtomicWritesEnabledThenFileWrittenAndNoTmpFileLeft() = runTest {
+        fakeBrowserConfigFeature.storeFaviconSuspend().setRawStoredState(Toggle.State(false))
+        fakeBrowserConfigFeature.atomicFaviconWrites().setRawStoredState(Toggle.State(true))
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+        val file = testee.store(testDirectory, subFolder, bitmap, "filename")
+
+        assertTrue(file!!.exists())
+        assertFalse(File(file.parent, "${file.name}.tmp").exists())
     }
 
     @Test

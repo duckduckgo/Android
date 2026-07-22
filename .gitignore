@@ -17,6 +17,7 @@ out/
 .gradle/
 build/
 .externalNativeBuild/
+.kotlin/
 
 #Autoconsent
 /node_modules/@duckduckgo/autoconsent/
@@ -104,8 +105,11 @@ report
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/
 
 # Pixel processing results
-PixelDefinitions/pixel_processing_results/*
+PixelDefinitions/pixels/pixel_processing_results/*
 PixelDefinitions/node_modules/
 
 # LLM
 .claude/settings.local.json
+/.claude/worktrees/*
+CLAUDE.local.md
+docs/*

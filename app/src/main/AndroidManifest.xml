@@ -24,6 +24,12 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
+    <!--
+    androidx.pdf library is defining a min version to 31, but our app supports 21 and above.
+    This allows us to use the library while still supporting older versions of Android
+    -->
+    <uses-sdk tools:overrideLibrary="androidx.pdf,androidx.pdf.document.service,androidx.pdf.viewer.fragment" />
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -41,7 +47,12 @@
         android:fullBackupContent="@xml/backup_rules_android_11_and_older"
         android:theme="@style/Theme.DuckDuckGo.App"
         android:requestLegacyExternalStorage="true"
+        android:enableOnBackInvokedCallback="false"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -223,7 +234,7 @@
             android:exported="true"
             android:label="@string/appName"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen.EdgeToEdge"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
@@ -322,6 +333,25 @@
 
         </activity>
 
+        <!--
+          Registers DuckDuckGo as a PDF handler so already-downloaded PDFs can be opened in the
+          browser. Disabled by default; PdfHandlerComponentToggler enables it at runtime only on
+          Android 12+ (androidx.pdf requirement) when the pdfViewer remote flag is on.
+        -->
+        <activity-alias
+            android:name="com.duckduckgo.app.dispatchers.PdfViewerHandler"
+            android:enabled="false"
+            android:exported="true"
+            android:targetActivity="com.duckduckgo.app.dispatchers.IntentDispatcherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
@@ -362,11 +392,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:exported="false"
-            android:label="@string/feedbackActivityTitle"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false"
@@ -384,6 +409,11 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivity"
+            android:exported="false"
+            android:label="@string/getDesktopBrowserSettingItemTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
@@ -393,6 +423,12 @@
             android:exported="false"
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
+        <activity
+            android:name="com.duckduckgo.app.global.shortcut.FireShortcutTrampolineActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
             android:exported="false"
@@ -479,7 +515,7 @@
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen.EdgeToEdge">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -491,9 +527,8 @@
             android:parentActivityName=".BrowserActivity" />
 
         <activity
-            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
+            android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
             android:exported="false"
-            android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name=".threatprotection.ThreatProtectionSettingsActivity"
@@ -501,16 +536,6 @@
             android:label="Threat protection"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             />
-
-        <service
-            android:name="com.duckduckgo.widget.FavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
-            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
             android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
@@ -529,6 +554,10 @@
             tools:ignore="MissingClass" />
 
         <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
+
+        <receiver
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserShareBroadcastReceiver"
+            android:exported="false" />
 
         <receiver
             android:name="com.duckduckgo.widget.SearchWidget"
@@ -593,11 +622,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
         </receiver>
-
-        <receiver
-            android:name=".remotemessage.SharePromoLinkRMFBroadCastReceiver"
-            android:exported="false" />
-
     </application>
 
 </manifest>

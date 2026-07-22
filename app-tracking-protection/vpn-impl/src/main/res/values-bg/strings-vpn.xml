@@ -129,8 +129,6 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection е деактивирана.</b>\nДокоснете, за да продължите да блокирате опитите за проследяване във всичките си приложения.</string>
     <string name="atp_NewTabRevoked"><b>VPN приложение на Вашето устройство деактивира App Tracking Protection.</b>\nДокоснете за повторно активиране.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection е активирана</b> и блокира опитите за проследяване във Вашите приложения.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Безплатна проба</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Всички приложения</string>
@@ -433,5 +431,9 @@
     <string name="apptp_PproUpsellBannerAction">Научете повече</string>
     <string name="apptp_PproUpsellBannerMessage_freeTrial">Абонирайте се за DuckDuckGo и вземете единствената VPN услуга, която е съвместима с App Tracking Protection.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Пробвайте безплатно!</string>
+
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Затваряне</string>
+    <string name="atp_close_button_content_description">Затваряне</string>
 
 </resources>

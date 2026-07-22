@@ -37,4 +37,12 @@
     <string name="alwaysOn">Aina käytössä</string>
     <string name="on">Päällä</string>
     <string name="off">Pois</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Lue lisää</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Sulje</string>
+    <string name="bookmarkFavoriteContentDescription">Suosikki</string>
+
 </resources>

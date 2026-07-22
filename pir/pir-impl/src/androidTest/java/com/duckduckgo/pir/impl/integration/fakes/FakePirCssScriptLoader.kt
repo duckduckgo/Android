@@ -23,4 +23,10 @@ import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
  */
 class FakePirCssScriptLoader : PirCssScriptLoader {
     override suspend fun getScript(): String = ""
+    override val secret: String
+        get() = "secret"
+    override val javascriptInterface: String
+        get() = "javascriptInterface"
+    override val callbackName: String
+        get() = "callbackName"
 }

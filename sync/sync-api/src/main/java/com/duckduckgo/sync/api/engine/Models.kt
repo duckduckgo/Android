@@ -61,7 +61,7 @@ data class SyncChangesResponse(
 }
 
 /**
- * Represents a request to delete a deletable type
+ * Represents a request to bulk-delete all data for a deletable type.
  * @param type The type of deletable data to delete.
  * @param untilTimestamp An optional timestamp to indicate that only items modified before this timestamp should be deleted.
  */
@@ -71,7 +71,7 @@ data class SyncDeletionRequest(
 )
 
 /**
- * Represents a response to a sync deletion request.
+ * Represents a response to a bulk deletion request.
  * @param type The type of deletable data that was deleted.
  * @param untilTimestamp The timestamp provided in @[SyncDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
  */
@@ -102,12 +102,15 @@ interface SyncFeatureType {
 }
 
 /**
- * Features that support bidirectional sync (PATCH/GET operations).
+ * Features that support sync operations (PATCH/GET).
  */
-enum class SyncableType(override val field: String) : SyncFeatureType {
+enum class SyncableType(
+    override val field: String,
+) : SyncFeatureType {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
     SETTINGS("settings"),
+    DUCK_AI_CHATS("ai_chats"),
 }
 
 /**

@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">À partir de : %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Tout supprimer</string>
+    <string name="downloadsActivityNoItemsDescription">Aucun fichier n\'a encore été téléchargé</string>
+    <string name="downloadsActivityTitle">Téléchargements</string>
+    <string name="downloadsAllFilesDeletedMessage">Tous les fichiers sont supprimés.</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
+    <string name="downloadsFileNotFoundErrorMessage">Le fichier n\'existe plus</string>
+    <string name="downloadsItemMenuCancel">Annuler</string>
+    <string name="downloadsItemMenuDelete">Supprimer</string>
+    <string name="downloadsItemMenuShare">Partager</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Plus d\'options pour %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Recevez une notification lorsque les téléchargements sont terminés.</string>
+    <string name="downloadsNotifyMeTitle">Sachez quand les téléchargements sont prêts</string>
+    <string name="downloadsShareTitle">Partager avec…</string>
+    <string name="downloadsStateInProgress">En cours...</string>
+    <string name="downloadsUndoActionName">Annuler</string>
+    <string name="downloadsSearchHint">Rechercher</string>
 </resources>

@@ -31,9 +31,11 @@ android {
 dependencies {
     implementation project(':navigation-api')
     implementation project(':common-utils')
+    api project(':browser-mode-api')
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
+    implementation AndroidX.recyclerView
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 

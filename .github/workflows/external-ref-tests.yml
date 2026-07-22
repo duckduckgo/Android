@@ -45,7 +45,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
-        run: ./gradlew jvm_tests
+        run: ./gradlew jvm_tests -Dpts.enabled=false
 
       - name: Bundle the JVM checks report
         if: always()
@@ -61,6 +61,8 @@ jobs:
   android_tests:
     runs-on: ubuntu-latest
     name: External reference tests android tests
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository

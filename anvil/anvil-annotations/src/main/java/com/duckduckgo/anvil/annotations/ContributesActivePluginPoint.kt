@@ -53,4 +53,13 @@ annotation class ContributesActivePluginPoint(
      * ```
      */
     val boundType: KClass<*> = Unit::class,
+
+    /**
+     * The remote feature flag name for this plugin point.
+     * This is an external contract referenced in remote config — must not change after first release.
+     *
+     * Convention: "pluginPoint" + the plugin interface simple name.
+     * Example: if bound to NewTabPageSectionPlugin, use "pluginPointNewTabPageSectionPlugin".
+     */
+    val featureName: String,
 )

@@ -28,8 +28,13 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.AppShortcutBookmarks
+import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
+import com.duckduckgo.app.browser.mode.AppShortcutNewTab
+import com.duckduckgo.app.browser.mode.FireRestart
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -80,6 +85,7 @@ class AppShortcutCreator @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val dispatchers: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) {
 
     init {
@@ -91,10 +97,12 @@ class AppShortcutCreator @Inject constructor(
 
     fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
+            val trampolineEnabled = androidBrowserConfigFeature.useFireAppShortcutTrampoline().isEnabled()
+
             val shortcutList = mutableListOf<ShortcutInfo>()
 
             shortcutList.add(buildNewTabShortcut(context))
-            shortcutList.add(buildClearDataShortcut(context))
+            shortcutList.add(buildClearDataShortcut(context, trampolineEnabled))
             shortcutList.add(buildBookmarksShortcut(context))
 
             if (duckAiFeatureState.showPopupMenuShortcut.value) {
@@ -123,33 +131,36 @@ class AppShortcutCreator @Inject constructor(
     private fun buildNewTabShortcut(context: Context): ShortcutInfo {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_NEW_TAB)
             .setShortLabel(context.getString(R.string.newTabMenuItem))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab_adaptive))
             .setIntent(
-                Intent(context, BrowserActivity::class.java).also {
-                    it.action = Intent.ACTION_VIEW
-                    it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-                },
+                BrowserActivity.intent(context, launchSource = AppShortcutNewTab, newSearch = true)
+                    .also { it.action = Intent.ACTION_VIEW },
             )
             .build().toShortcutInfo()
     }
 
-    private fun buildClearDataShortcut(context: Context): ShortcutInfo {
+    private fun buildClearDataShortcut(context: Context, trampolineEnabled: Boolean): ShortcutInfo {
+        val intent = if (trampolineEnabled) {
+            Intent(context, FireShortcutTrampolineActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+            }
+        } else {
+            BrowserActivity.intent(context, launchSource = FireRestart).also {
+                it.action = Intent.ACTION_VIEW
+                it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+            }
+        }
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire))
-            .setIntent(
-                Intent(context, BrowserActivity::class.java).also {
-                    it.action = Intent.ACTION_VIEW
-                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-                },
-            )
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_adaptive))
+            .setIntent(intent)
             .build().toShortcutInfo()
     }
 
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
         val browserActivity = BrowserActivity.intent(
             context = context,
-            isLaunchFromBookmarksAppShortcut = true,
+            launchSource = AppShortcutBookmarks,
         ).also { it.action = Intent.ACTION_VIEW }
         val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
@@ -159,19 +170,20 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks_adaptive))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
 
     private fun buildDuckChatShortcut(context: Context): ShortcutInfo {
-        val browserActivity = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
+        val browserActivity = BrowserActivity.intent(context, launchSource = AppShortcutDuckAi, openDuckChat = true)
+            .also { it.action = Intent.ACTION_VIEW }
         val stackBuilder = TaskStackBuilder.create(context)
             .addNextIntent(browserActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai_adaptive))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

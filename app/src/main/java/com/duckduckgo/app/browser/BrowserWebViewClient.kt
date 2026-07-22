@@ -36,6 +36,13 @@ import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.adblocking.impl.duckplayer.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -47,6 +54,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -56,6 +64,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -67,6 +76,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -74,17 +84,12 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
-import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.distinctUntilChanged
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
@@ -92,10 +97,12 @@ import logcat.logcat
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
+private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -120,8 +127,8 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
+    private val pageLoadWideEvent: PageLoadWideEvent,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
-    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
@@ -130,11 +137,37 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
+    private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
+    private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
+    private val browserMode: BrowserMode,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
+    private var lastInterceptedAppSchemeUrl: String? = null
+    private var pageCommitVisibleFired: Boolean = false
+    private var recompositeScheduled: Boolean = false
+
+    private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
+    private val isForceRecompositeEnabled = AtomicBoolean(true)
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appSchemeInterceptionFeature.self().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isAppSchemeInterceptionEnabled.set(enabled)
+                }
+        }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            forceWebViewRecompositeFeature.self().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isForceRecompositeEnabled.set(enabled)
+                }
+        }
+    }
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
@@ -189,7 +222,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
     }
 
     /**
@@ -200,6 +233,7 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
         isRedirect: Boolean,
+        hasGesture: Boolean,
     ): Boolean {
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
@@ -214,9 +248,15 @@ class BrowserWebViewClient @Inject constructor(
                 return false
             }
 
+            // Redirect duck.ai links out of a custom tab into the Duck Chat experience instead of loading them in the custom tab.
+            if (isForMainFrame && duckChat.isDuckChatUrl(url) && webViewClientListener?.handleDuckChatUrlInCustomTab(url) == true) {
+                return true
+            }
+
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
-                is SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink -> {
-                    subscriptions.launchPrivacyPro(webView.context, url)
+                is SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink -> {
+                    subscriptions.launchSubscription(webView.context, url)
+                    webViewClientListener?.closeAndReturnToSourceIfBlankTab()
                     true
                 }
 
@@ -238,7 +278,7 @@ class BrowserWebViewClient @Inject constructor(
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     logcat(INFO) { "Found app link for ${urlType.uriString}" }
                     webViewClientListener?.let { listener ->
-                        return listener.handleAppLink(urlType, isForMainFrame)
+                        return listener.handleAppLink(urlType, isForMainFrame, hasGesture)
                     }
                     false
                 }
@@ -333,7 +373,7 @@ class BrowserWebViewClient @Inject constructor(
                             ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
-                                    listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGesture)
                                 }
 
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -436,10 +476,14 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
+            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                pageLoadWideEvent.onPageVisible(tabId, url, webView.progress)
+            }
         }
     }
 
@@ -471,19 +515,37 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        logcat { "Duck.ai onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
+        logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
+
+        pageCommitVisibleFired = false
+        recompositeScheduled = false
+
+        // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
+        if (url != null && interceptAppSchemeUrl(webView, url)) {
+            logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
+            return
+        }
+
+        lastInterceptedAppSchemeUrl = null
+
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageStarted(tabId, it)
+                }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
+
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
+
+            val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return@let
+            scope.launch(dispatcherProvider.io()) {
+                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri(), browserMode)
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -499,8 +561,54 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    override fun doUpdateVisitedHistory(
+        view: WebView?,
+        url: String?,
+        isReload: Boolean,
+    ) {
+        super.doUpdateVisitedHistory(view, url, isReload)
+        url?.let {
+            if (duckChat.isDuckChatUrl(it.toUri())) {
+                logcat { "doUpdateVisitedHistory url=$it" }
+                if (it != view?.originalUrl) webViewClientListener?.onHistoryUrlChanged(it)
+            }
+        }
+    }
+
+    /**
+     * Intercepts app-scheme URLs (e.g., intent://, tel://, mailto://) that bypass shouldOverrideUrlLoading().
+     * This can happen when window.open() is used with special URLs, as the WebViewTransport mechanism
+     * loads URLs directly without triggering shouldOverrideUrlLoading().
+     *
+     * Delegates to [shouldOverride] so URL-type dispatch logic is not duplicated.
+     *
+     * @return true if the URL was handled and loading should stop, false otherwise
+     */
+    private fun interceptAppSchemeUrl(webView: WebView, url: String): Boolean {
+        if (!isAppSchemeInterceptionEnabled.get()) {
+            return false
+        }
+        val uri = url.toUri()
+        val scheme = uri.scheme ?: return false
+
+        if (scheme in STANDARD_WEB_SCHEMES) {
+            return false
+        }
+
+        if (url == lastInterceptedAppSchemeUrl) {
+            return true
+        }
+        lastInterceptedAppSchemeUrl = url
+
+        logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
+
+        webView.stopLoading()
+        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false, hasGesture = false)
+        return true
     }
 
     private fun handleMediaPlayback(
@@ -520,6 +628,18 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            // Without onPageCommitVisible a recycled WebView keeps drawing the previous
+            // navigation's frame until a re-composite. Only worth doing for a foreground tab.
+            // onPageFinished can fire more than once per load (redirects, subframes), so latch
+            // to force at most one re-composite per navigation (reset in onPageStarted).
+            if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired && !recompositeScheduled) {
+                if (isForceRecompositeEnabled.get() && webViewClientListener?.isTabInForeground() == true) {
+                    logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
+                    recompositeScheduled = true
+                    forceWebViewPresent(webView)
+                }
+            }
+
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(
                     webView,
@@ -537,51 +657,75 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.run {
                 pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
-            flushCookies()
+            flushCookies(webView)
             printInjector.injectPrint(webView)
 
-            url?.let {
-                val uri = url.toUri()
-                if (url != ABOUT_BLANK) {
-                    start?.let { safeStart ->
-                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(
-                            url = it,
-                            title = navigationList.currentItem?.title,
-                            start = safeStart,
-                            end = currentTimeProvider.elapsedRealtime(),
+            if (url != null && url != ABOUT_BLANK) {
+                start?.let { safeStart ->
+                    val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        pageLoadWideEvent.onPageLoadFinished(
+                            tabId = tabId,
+                            url = url,
+                            errorDescription = null,
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                             activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                         )
-                        shouldSendPagePaintedPixel(webView = webView, url = it)
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                                duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
-                                    navigationHistory.saveToHistory(
-                                        it,
-                                        navigationList.currentItem?.title,
-                                    )
-                                }
-                            } else {
-                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(uri)) {
-                                    duckPlayer.duckPlayerNavigatedToYoutube()
-                                }
-                                navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
-                            }
-                        }
-                        uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
-
-                        start = null
                     }
+
+                    // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                    pageLoadedHandler.onPageLoaded(
+                        url = url,
+                        title = navigationList.currentItem?.title,
+                        start = safeStart,
+                        end = currentTimeProvider.elapsedRealtime(),
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                    shouldSendPagePaintedPixel(webView = webView, url = url)
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                            duckPlayer.duckPlayerNavigatedToYoutube()
+                        }
+                    }
+                    uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+
+                    webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
+
+                    start = null
                 }
             }
         }
     }
 
-    private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManagerProvider.get()?.flush()
+    /**
+     * Flush cookies on the WebView's view-tree lifecycleScope (the fragment's
+     * viewLifecycleOwner) instead of appCoroutineScope. When the fragment's view is
+     * destroyed, the scope auto-cancels — preventing a post-destroy flush from SEGV'ing
+     * on the freed native cookie store of this WebView's profile.
+     */
+    private fun flushCookies(webView: WebView) {
+        val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        val cookieManager = cookieManagerProvider.forMode(browserMode)
+        scope.launch(dispatcherProvider.io()) {
+            cookieManager?.flush()
+        }
+    }
+
+    private fun forceWebViewPresent(webView: WebView) {
+        webView.post {
+            // The foreground state checked when this was scheduled can go stale before the
+            // posted runnable runs: the user may switch tabs or move to a PDF / new-tab view,
+            // all of which pause (and hide) the WebView via the fragment lifecycle. Re-check
+            // here so we never resume a WebView the fragment intended to keep paused, which
+            // would leave it running JS/timers/media while hidden.
+            if (webView.isShown && webViewClientListener?.isTabInForeground() == true) {
+                pixel.fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+                webView.onPause()
+                webView.onResume()
+            }
         }
     }
 
@@ -591,9 +735,11 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? =
         runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-            withContext(dispatcherProvider.main()) {
-                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            val documentUrl = withContext(dispatcherProvider.main()) {
+                if (request.method == "POST") {
+                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                }
+                webView.url
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldIntercept(
@@ -609,14 +755,27 @@ class BrowserWebViewClient @Inject constructor(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
-        if (detail?.didCrash() == true) {
+        val didCrash = detail?.didCrash() == true
+        if (didCrash) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
         if (this.start != null) {
-            decrementLoadCountAndGet()
+            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+            view?.url?.let { url ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageLoadFinished(
+                        tabId = tabId,
+                        url = url,
+                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                }
+            }
             this.start = null
         }
 
@@ -719,15 +878,41 @@ class BrowserWebViewClient @Inject constructor(
         error: WebResourceError?,
     ) {
         error?.let { webResourceError ->
+            // Handle unsupported scheme errors for app-scheme URLs (e.g., intent://, tel://, mailto://)
+            // This catches cases where shouldOverrideUrlLoading is bypassed (like window.open)
+            if (webResourceError.errorCode == ERROR_UNSUPPORTED_SCHEME &&
+                request?.isForMainFrame == true &&
+                request.url != null &&
+                view != null
+            ) {
+                logcat { "interceptAppSchemeUrl: ERROR_UNSUPPORTED_SCHEME for main frame in onReceivedError" }
+                if (interceptAppSchemeUrl(view, request.url.toString())) {
+                    return
+                }
+            }
+
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        decrementLoadCountAndGet()
+                        // Trigger Wide Event failure for main frame errors
+                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                        request.url?.toString()?.let { url ->
+                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                                pageLoadWideEvent.onPageLoadFinished(
+                                    tabId = tabId,
+                                    url = url,
+                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                                )
+                            }
+                        }
                         this.start = null
                     }
-                    webViewClientListener?.onReceivedError(parsedError, request.url.toString())
                 }
+                webViewClientListener?.onReceivedError(parsedError, request.url.toString(), webResourceError.errorCode.asStringErrorCode())
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
                     "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}",
@@ -818,6 +1003,7 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
+    WEB_VIEW_FORCED_RECOMPOSITE("m_web_view_forced_recomposite"),
 }
 
 enum class WebViewErrorResponse(

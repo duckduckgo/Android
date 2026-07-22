@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -106,8 +107,10 @@ class SurveyViewModel @Inject constructor(
             withContext(dispatchers.io() + NonCancellable) {
                 surveyRepository.updateSurvey(survey)
             }
-            withContext(dispatchers.main()) {
-                command.value = Command.Close
+            if (survey.surveyId !in DefaultBrowserChangedSurveyManager.SURVEY_IDS) {
+                withContext(dispatchers.main()) {
+                    command.value = Command.Close
+                }
             }
         }
     }

@@ -31,10 +31,13 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
-import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -77,6 +80,12 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
@@ -158,7 +167,14 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
         configureWebView()
 
         val initialScreen = when (params) {
@@ -171,6 +187,12 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
         dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
         configureObservers()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+        // Keep the web content clear of the navigation bar rather than drawing behind the gesture nav.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = false)
     }
 
     private fun configureObservers() {
@@ -190,7 +212,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     private fun processCommands(it: Command) {
         when (it) {
             is LaunchAppFeedback -> {
-                globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
+                globalActivityStarter.startIntent(this, FeedbackScreenNoParams)?.let { startActivity(it) }
             }
             is FetchToggleData -> fetchToggleData(it.toggleData)
             is LaunchToggleReport -> {

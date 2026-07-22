@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_top_corners_onboarding_bottom_sheet_drawable"
+    android:clipToOutline="true"
+    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/keyline_5">
+
+        <ImageView
+            android:id="@+id/quickSetupSearchOptionsCloseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/closeContentDescription"
+            android:padding="@dimen/keyline_2"
+            app:srcCompat="@drawable/ic_close_24" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/quickSetupBottomSheetHorizontalPadding">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/quickSetupSearchOptionsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="@string/quickSetupSearchOptionsTitle"
+                android:textColor="?attr/daxColorPrimaryText"
+                app:typography="onboarding_title" />
+
+            <com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
+                android:id="@+id/inputScreenPicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/quickSetupSearchOptionsCaption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/ducksansproduct_regular"
+                android:gravity="start"
+                app:textType="secondary"
+                app:typography="body1"
+                tools:text="@string/preOnboardingInputScreenDescription" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/quickSetupSearchOptionsDoneButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:paddingHorizontal="@dimen/keyline_5"
+                android:text="@string/quickSetupBottomSheetDone"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -27,6 +27,9 @@
     <string name="cancel">Zrušiť</string>
     <string name="search">Vyhľadávať</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat bol odstránený</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
     <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>
@@ -74,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Zdieľať odkaz</string>
     <string name="copyUrl">Kopírovať adresu odkazu</string>
+    <string name="urlCopiedToClipboard">URL adresa bola skopírovaná do schránky</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Hľadať ďalšie</string>
@@ -120,7 +124,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
-    <string name="fireClearAll">Vymazať karty a údaje</string>
+    <string name="fireClearAll">Odstrániť karty a údaje</string>
     <string name="fireClearAllPlusDuckChats">Vymazať karty, údaje a chaty Duck.ai</string>
     <string name="fireCancel">Zrušiť</string>
     <string name="fireDataCleared">Údaje boli vymazané</string>
@@ -130,6 +134,7 @@
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
+    <string name="settingsWhatsNew">Novinky</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
@@ -137,6 +142,7 @@
     <string name="leaveFeedbackNew">Odoslať spätnú väzbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsHeadingNextSteps">Ďalšie kroky</string>
+    <string name="settingsNextStepsHideItem">Skryť</string>
     <string name="settingsLightTheme">Svetlá</string>
     <string name="settingsTheme">Motív</string>
     <string name="settingsDarkTheme">Tmavý</string>
@@ -174,9 +180,8 @@
     <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
-    <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
+    <string name="privateSearchChatSuggestionsToggle">Návrhy četu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Pri písaní do vyhľadávacieho panela zobrazuj návrhy z histórie, záložiek a (voliteľne) z histórie chatu Duck.ai. Všetky vyhľadávania sú súkromné.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Všeobecné</string>
@@ -208,13 +213,24 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globálna kontrola súkromia</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Vyjadruje právo na explicitný nesúhlas vo vašom mene tým, že webovým lokalitám hovorí, aby nepredávali ani nezdieľali vaše osobné údaje.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Získajte prehliadač pre desktop PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pre Mac a Windows</string>
+    <string name="getDesktopBrowserTitle">Chráň si svoje osobné údaje na Macu aj vo Windows!</string>
+    <string name="getDesktopBrowserBody">Ak si chceš stiahnuť aplikáciu DuckDuckGo v systéme Mac alebo Windows, navštív túto stránku:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Zdieľať odkaz na stiahnutie</string>
+    <string name="getDesktopBrowserNoThanks">Nie, ďakujem</string>
+    <string name="getDesktopBrowserHideItem">Skryť</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz bol skopírovaný</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
     <string name="dataClearingActivityTitle">Vymazanie údajov</string>
-    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Pomocou tlačidla Fire Button môžeš údaje vymazať manuálne alebo nastaviť automatické vymazanie.</string>
+    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Údaje môžeš vymazať manuálne pomocou tlačidla Fire Button alebo si môžeš nastaviť automatické vymazávanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d lokalita bola vylúčená z vymazania</item>
         <item quantity="few">%1$d lokality boli vylúčené z vymazania</item>
@@ -224,8 +240,8 @@
     <string name="dataClearingAutomaticClearingOn">Zapnuté</string>
     <string name="dataClearingAutomaticClearingOff">Vypnuté</string>
     <string name="dataClearingClearBrowsingData">Vymaž údaje o prehliadaní</string>
-    <string name="dataClearingAutomaticDataClearing">Automatické vymazávanie údajov</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automaticky vymazať údaje</string>
+    <string name="dataClearingAutomaticDataClearing">Automatické odstránenie údajov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatické odstránenie údajov</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zatvor všetky otvorené karty</string>
     <string name="dataClearingAutomaticDataOptionDescription">Odstráň všetky údaje stránok vrátane navštívených stránok. Môže ťa to odhlásiť z účtov.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Odstráň všetky čety vrátane pripnutých četov</string>
@@ -252,6 +268,25 @@
         <item quantity="other">Odstrániť z %1$d webov. Môže ťa to odhlásiť z účtov.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Odstrániť karty a údaje stránok?</string>
+    <string name="singleTabFireDialogTitleWithChats">Odstrániť karty, údaje stránok a chaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Odstrániť všetko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Vymazať túto záložku</string>
+    <string name="singleTabFireDialogDeleteChat">Zmazať chat</string>
+    <string name="singleTabFireDialogDeleteChats">Zmazať čety</string>
+    <string name="singleTabFireDialogTitleDuckAi">Zmazať tento chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d karta a jej údaje boli odstránené</item>
+        <item quantity="few">%1$d karty a ich údaje boli odstránené</item>
+        <item quantity="many">%1$d kariet a ich údaje boli odstránené</item>
+        <item quantity="other">%1$d kariet a ich údaje boli odstránené</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
 
@@ -269,15 +304,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, údaje a chaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhen">Odstrániť…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikácie, neaktívnej po dobu 5 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
-    <string name="settingsClearAiDataTitle">Vymazať chaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Odstrániť chaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button tiež vymaže históriu Duck.ai vrátane pripnutých rozhovorov.</string>
     <string name="settingsClearDataActionSecondaryText">Vymaže všetky karty a údaje pre všetky stránky, ktoré si neochránil/-a ochranou Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Zatvorí všetky karty, chaty Duck.ai a vymaže údaje zo všetkých stránok, ktoré si neochránil/-a ochranou Fireproof.</string>
@@ -388,78 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Vyhľadať v DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Zdieľať spätnú väzbu</string>
-    <string name="missingBrowserFeaturesTitleLong">Funkcie prehliadača chýbajú alebo sú mätúce</string>
-    <string name="missingBrowserFeaturesTitleShort">Problémy s funkciami prehliadača</string>
-    <string name="missingBrowserFeaturesSubtitle">Ktorú funkciu prehliadania môžeme pridať alebo zlepšiť?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Prejsť ďalej, späť a/alebo obnoviť</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tvorba a správa kariet</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokovanie reklám a automaticky otváraných okien</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Pozeranie videí</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interakcia s obrázkami</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tvorba a správa záložiek</string>
-    <string name="missingBrowserFeatureSubReasonOther">Nič z uvedeného</string>
-
-    <string name="websiteNotLoadingTitleLong">Problémy s načítavaním webových stránok</string>
-    <string name="websiteNotLoadingTitleShort">Problémy s načítavaním webových stránok</string>
-    <string name="websiteNotLoadingSubtitle">Ktorá webová stránka je nefunkčná?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">Vyhľadávanie DuckDuckGo nie je dosť dobré</string>
-    <string name="searchNotGoodEnoughTitleShort">Problémy s vyhľadávaním DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Ktorú funkciu vyhľadávania môžeme pridať alebo zdokonaliť?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programovanie/technické vyhľadávanie</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Rozloženie by sa malo viac podobať na Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Rýchlejšie načítavanie</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Vyhľadávanie v konkrétnom jazyku alebo geografickej oblasti</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepšie automatické dopĺňanie</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Nič z uvedeného</string>
-
-    <string name="needMoreCustomizationTitleLong">Málo spôsobov, ako si upraviť aplikáciu</string>
-    <string name="needMoreCustomizationTitleShort">Problémy s prispôsobením na mieru</string>
-    <string name="needMoreCustomizationSubtitle">Ktorú možnosť prispôsobenia na mieru môžeme pridať alebo zdokonaliť?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfigurácia domovskej obrazovky</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Zobrazovanie kariet</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Vzhľad aplikácie</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Ktoré údaje sa vymažú</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kedy sa údaje vymažú</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Zobrazovanie záložiek</string>
-    <string name="needMoreCustomizationSubReasonOther">Nič z uvedeného</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Aplikácia je pomalá, chybná alebo zlyháva</string>
-    <string name="appIsSlowOrBuggyTitleShort">Problémy s výkonnosťou</string>
-    <string name="appIsSlowOrBuggySubtitle">Na aký problém ste natrafili?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Pomalé načítavanie webových stránok alebo výsledkov vyhľadávania</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikácia zlyháva alebo mrzne</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Chyby prehrávania videa alebo médií</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Nič z uvedeného</string>
-
-    <string name="otherMainReasonTitleLong">Nič z uvedeného</string>
-    <string name="otherMainReasonTitleShort">Iné problémy</string>
-
-    <string name="openEndedInputHint">Buďte čo najkonkrétnejší</string>
-    <string name="submitFeedback">Odoslať</string>
-
-    <string name="tellUsHowToImprove">Povedzte nám, čo sa dá zdokonaliť.</string>
-    <string name="thanksForTheFeedback">Ďakujeme za spätnú väzbu!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Čo vás najviac frustrovalo?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Mrzí nás to</string>
-    <string name="feedbackShareDetails">Povedzte nám viac detailov</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Chceli by ste tímu povedať podrobnosti?</string>
-    <string name="whatHaveYouBeenEnjoying">Čo sa vám páčilo?</string>
-    <string name="awesomeToHear">Tešíme sa z toho!</string>
-    <string name="shareTheLoveWithARating">Podeľte sa o svoju spokojnosť hodnotením v Obchode Play.</string>
-    <string name="rateTheApp">Hodnotiť aplikáciu</string>
-    <string name="declineFurtherFeedback">Nie, ďakujem. Skončil som.</string>
-    <string name="whichBrokenSites">Kde ste si všimli tieto problémy?</string>
-    <string name="whichBrokenSitesHint">Ktorá webová stránka má problémy?</string>
-    <string name="feedbackSpecificAsPossible">Buďte čo najkonkrétnejší</string>
-    <string name="feedbackInitialDisambiguationTitle">Začnime!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Kam by ste zaradili svoju spätnú väzbu?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačidlo pozitívnej spätnej väzby</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačidlo negatívnej spätnej väzby</string>
-    <string name="feedbackIsImportantToUs">Anonymná spätná väzba je pre nás dôležitá.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Webovú stránku nebolo možné zobraziť."</string>
     <string name="crashedWebViewErrorAction">"Znovu načítať"</string>
@@ -564,6 +527,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
     <string name="settingsHeroFireAnimation">Peklo</string>
+    <string name="settingsHeroFireAnimationClassic">Klasické inferno</string>
     <string name="settingsHeroWaterAnimation">Vodný vír</string>
     <string name="settingsHeroAbstractAnimation">Prúd vzduchu</string>
     <string name="settingsNoneAnimation">Žiadne</string>
@@ -654,21 +618,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stiahnuté</string>
-    <string name="downloadsActivityTitle">Stiahnuté</string>
-    <string name="downloadsActivityNoItemsDescription">Zatiaľ žiadne stiahnuté súbory</string>
-    <string name="downloadsShareTitle">Zdieľať s...</string>
     <string name="downloadsDownloadFinishedActionName">Otvorené</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Súbor už neexistuje</string>
-    <string name="downloadsItemMenuShare">Zdieľať</string>
-    <string name="downloadsItemMenuDelete">Vymazať</string>
-    <string name="downloadsItemMenuCancel">Zrušiť</string>
-    <string name="downloadsActivityMenuDeleteAll">Odstrániť všetko</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Zmazané: %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Všetky súbory sa odstránili</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Viac možností pre %1$s</string>
-    <string name="downloadsUndoActionName">Vrátenie späť</string>
-    <string name="downloadsStateInProgress">Prebieha…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
@@ -690,8 +640,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
-    <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
 
     <!-- Windows Settings -->
 
@@ -829,7 +777,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Dobrý deň.<br/><br/>Si pripravený/-á na rýchlejší prehliadač, ktorý ťa ochráni?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Poďme na to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Začnime!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Bol/-a som tu už predtým</string>
     <string name="preOnboardingDaxDialog2Title">Ochrany boli aktivované!</string>
     <string name="preOnboardingDaxDialog2Button">Vyberte si prehliadač</string>
@@ -841,9 +792,15 @@
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
+    <string name="preOnboardingComparisonChartDuckAi">Používaj ChatGPT súkromne s integrovaným Duck.ai.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blokuj cielené reklamy a vyskakovacie okná o súboroch cookie</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Prehrávaj videá z YouTube bez reklám</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
+    <string name="preOnboardingAddressBarPositionTop">Hore</string>
+    <string name="preOnboardingAddressBarPositionBottom">Spodná časť</string>
+    <string name="preOnboardingAddressBarPositionSplit">Rozdelenie</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Hore (predvolené)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ľahko viditeľné</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodná časť</string>
@@ -866,6 +823,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Prekvapte ma!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo vyhľadávanie</b>! Súkromne. Rýchlo. Menej reklám.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Súkromne. Rýchlo. Menej reklám.</string>
     <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nabudúce skúste navštíviť webovú stránku!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -892,12 +851,35 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má tiež <b>voliteľné platené</b> predplatné, ktoré zahŕňa bezpečnú <b>VPN</b> a <b>pokročilú súkromnú umelú</b> inteligenciu.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyskúšaj zadarmo!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Vyskúšaj zadarmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vieš o tomto?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Chceš mať jednoduchý prístup k súkromnému AI chatu v adresnom riadku?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Vitaj späť!&lt;br/&gt;Chceš si niečo prispôsobiť?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastaviť DuckDuckGo ako predvolený</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pridať miniaplikáciu na úvodnú obrazovku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Poloha riadku s adresou</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti vyhľadávania v adresnom paneli</string>
+    <string name="preOnboardingReinstallStartBrowsing">Začni prehliadať</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kam chceš umiestniť riadok adresy?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Zmeny môžeš vykonať v časti <b>Nastavenia > Vzhľad</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chceš mať vyhľadávanie a AI chat v adresnom riadku?</string>
+    <string name="quickSetupBottomSheetDone">Hotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Len vyhľadávanie</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhľadať a Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Ako odstrániť miniaplikáciu z úvodnej obrazovky</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Prejdi na úvodnú obrazovku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotkni sa a podrž miniaplikáciu</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Klepni alebo potiahni, aby si to odstránil/-a</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
@@ -962,11 +944,16 @@
     <string name="settingsHeadingCompleteSetup">Dokonči svoje nastavenie</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Za posledných 7&amp;nbsp;dní &lt;b&gt;bolo zablokovaných%1$s sledovačov &lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skryť počet sledovaných položiek?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Túto funkciu môžeš znova zapnúť v časti Nastavenia &gt; Vzhľad.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skryť</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechať</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animácia blokovania sledovačov</string>
+    <string name="showTrackerCountInAddressBar">Zobraziť v adresnom riadku</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Zobraziť v Správcovi kariet</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Len vyhľadávanie</string>
@@ -974,4 +961,93 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Vyhľadávaj súkromne s DuckDuckGo alebo sa opýtaj Duck.ai. Hlasové vyhľadávanie a Duck.ai sú k dispozícii, ak sú povolené.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Jedným ťuknutím súkromne vyhľadávaj alebo navštív svoje obľúbené stránky. Hlasové vyhľadávanie a Duck.ai sú k dispozícii, ak sú povolené.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Pokračujme tam, kde si skončil/-a</string>
+    <string name="syncRestoreDialogDescription">Chceš obnoviť záložky, heslá a ďalšie údaje z predchádzajúcej synchronizácie DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Obnoviť moje veci</string>
+    <string name="syncRestoreDialogSecondaryCta">Preskočiť</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Poďme pokračovať tam, kde si na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvoje uložené záložky, heslá a ďalšie údaje sú pripravené.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopírovať text odkazu</string>
+    <string name="linkTextCopied">Skopírovaný text prepojenia</string>
+    <string name="linkTextCopyFailed">Nepodarilo sa skopírovať text odkazu</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Súkromné čety s umelou inteligenciou, ktoré môžeš kedykoľvek odstrániť pomocou <b>Fire Button</b>. Vyskúšaj to! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Hotovo!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použi panel s adresou na vyhľadávanie a otváranie stránok alebo prepni na Duck.ai, ak chceš súkromne četovať s umelou inteligenciou.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Ruku na to!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Si pripravený/-á začať?&lt;br/&gt;Skús vyhľadávanie alebo čet s umelou inteligenciou!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Vyhľadávanie v súkromí</string>
+    <string name="preOnboardingInputModeDemoChatHint">Spýtaj sa na čokoľvek súkromne</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Vysvetli mi akciový trh, akoby som mal 10 rokov.</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Naplánuj perfektný deň v Londýne</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Prekvap ma!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Akých je 10 fascinujúcich faktov z oblasti vedy, prírody a histórie?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Si pripravený/-á súkromne četovať s ChatGPT, Claudom a ďalšími umelými inteligenciami zadarmo v prehliadači, ktorý ťa aktívne chráni?</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Spustiť AI čet</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI ochrany boli aktivované!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Obľúbené AI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Všetky čety sú anonymizované</string>
+    <string name="preOnboardingAiComparisonChartItem2">Na prístup ku všetkým funkciám AI nie je potrebný účet</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nikdy nepoužíva tvoje čety na trénovanie AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Prístup k ChatGPT, Claude a ďalším – to všetko na jednom mieste</string>
+    <string name="preOnboardingAiComparisonChartButton">Vyskúšaj Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Vyskúšaj teraz súkromný AI čet!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš nastaviť DuckDuckGo ako svoj predvolený prehliadač?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni súkromný čet s umelou inteligenciou s Duck.ai alebo prepni na vyhľadávanie pre chránené prehliadanie.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponúkame tiež platené predplatné s pokročilými modelmi umelej inteligencie s vyššími limitmi chatu od GPT a Claude, bezpečnou VPN a ďalšími funkciami.</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Len vyhľadávanie</string>
+    <string name="input_screen_user_pref_with_ai_updated">Prepínať medzi\nvyhľadávaním a Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potvrdiť</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Ďakujeme za spätnú väzbu!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otvoriť na karte Fire</string>
+    <string name="openInBackgroundTab">Otvoriť na pozadí</string>
+    <string name="browserModeToggleFireDescription">Prejdi na karty v režime Fire</string>
+    <string name="browserModeToggleRegularDescription">Prepnúť na bežné karty</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Karta Fire</string>
+    <string name="fireTabNewTabPageTitle">Karta Fire</string>
+    <string name="fireTabsEmptyStateTitle">Karty Fire</string>
+    <string name="fireTabsFeatureNoHistory">Prehliadaj bez lokálneho ukladania histórie</string>
+    <string name="fireTabsFeatureDifferentAccount">Prihlás sa na stránku s iným účtom</string>
+    <string name="fireTabsFeatureTroubleshoot">Riešenie problémov s webovými stránkami</string>
+    <string name="fireTabsExplainer">Karty Fire sú izolované od ostatných údajov prehliadača. Keď ich všetky zatvoríš, ich údaje sa vymažú. Poskytujú ti rovnakú ochranu proti sledovaniu ako ostatné karty.</string>
+    <string name="fireTabsNewTabButton">Nová karta Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyskúšaj karty Fire na prehliadanie bez ukladania do lokálnej histórie.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Chceš vymazať karty Fire a ich údaje?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
 </resources>

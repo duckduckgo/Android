@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">In questo modo viene creato un backup crittografato dei tuoi segnalibri, delle tue password e delle chat di Duck.ai sul server sicuro di DuckDuckGo, che può essere sincronizzato con gli altri tuoi dispositivi. \n\n La chiave di crittografia viene memorizzata solo sul tuo dispositivo e DuckDuckGo non può accedervi.</string>
     <string name="sync_intro_enable_footer">Potrai effettuare la sincronizzazione con gli altri dispositivi in un secondo momento.</string>
     <string name="sync_intro_enable_cta">Attiva Sincronizzazione e backup</string>
-    <string name="sync_intro_recover_title">Recupera i dati sincronizzati</string>
-    <string name="sync_intro_recover_content">Per ripristinare i dati sincronizzati avrai bisogno del codice di ripristino che hai salvato quando hai configurato Sync per la prima volta. Questo codice potrebbe essere stato salvato in formato PDF sul dispositivo che hai usato originariamente per impostare la sincronizzazione.</string>
-    <string name="sync_intro_recover_cta">Iniziamo</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Recupera i tuoi dati sincronizzati</string>
+    <string name="sync_recover_synced_data_content">Ti servirà il codice di ripristino che hai ricevuto quando hai configurato Sync &amp; Backup. Potresti averlo salvato in formato PDF sul dispositivo che hai utilizzato.</string>
+    <string name="sync_recover_synced_data_cta">Recupera i dati sincronizzati</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scansiona il codice QR</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Il salvataggio del PDF di ripristino richiede l\'autorizzazione di archiviazione</string>
     <string name="sync_share_title">Condividi con…</string>
     <string name="sync_pdf_title">Sincronizza codice di ripristino</string>
-    <string name="sync_pdf_description">Il codice di recupero ti permette di sincronizzare i segnalibri su più dispositivi e di recuperare i dati sincronizzati se perdi l\'accesso a un dispositivo.</string>
+    <string name="sync_pdf_description">Il codice di ripristino ti consente di sincronizzare le password, i dati di autocompilazione e le chat di Duck.ai su più dispositivi e di recuperare i dati sincronizzati se perdi l\'accesso a un dispositivo.</string>
     <string name="sync_code_box_title">Mantieni queste informazioni sicure e protette.</string>
-    <string name="sync_instructions_title">Come funziona?</string>
-    <string name="sync_instructions_step1">Apri DuckDuckGo su un altro dispositivo e vai su Sincronizza in Impostazioni.</string>
-    <string name="sync_instructions_step2">Scansiona il codice QR o copia e incolla il codice testo in un\'altra app DuckDuckGo.</string>
+    <string name="sync_instructions_title">Come funziona questo codice?</string>
+    <string name="sync_instructions_step1">Apri DuckDuckGo sul dispositivo da sincronizzare e vai su Sync &amp; Backup nelle Impostazioni.</string>
+    <string name="sync_instructions_step2">Seleziona \"Sincronizza con un altro dispositivo\" e scansiona il codice QR o inserisci il codice testo.</string>
     <string name="sync_instructions_step3">La sincronizzazione sarà attivata e avrai nuovamente accesso a tutti i tuoi dati.</string>
+    <string name="sync_pdf_retention_notice">Se trascorri più di 18 mesi senza utilizzare un browser DuckDuckGo con Sync &amp; Backup abilitato, i tuoi dati saranno eliminati dal server e non potranno essere ripristinati.</string>
     <string name="remove_device_dialog_title">Rimuovere il dispositivo?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" non potrà più accedere ai tuoi dati sincronizzati.</string>
     <string name="remove_device_dialog_primary_button">Rimuovi</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Eliminare i dati del server?</string>
-    <string name="sync_delete_server_data_dialog_content">Tutti i dispositivi saranno disconnessi e i dati sincronizzati verranno eliminati dal server.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Elimina dati</string>
+    <string name="sync_delete_server_data_dialog_content">Il tuo backup verrà eliminato dal server. Tutti i dispositivi verranno disconnessi dalla sincronizzazione, ma nessun dato verrà eliminato da alcun dispositivo.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Elimina i dati del server</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annulla</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sincronizza i segnalibri su tutti i dispositivi</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Nascondi</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Scarica il browser per desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo per Mac e Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recupero</string>
+    <string name="sync_settings_download_recovery_code_item">Scarica il codice di ripristino in formato PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Usa questo codice per recuperare i tuoi dati se perdi l\'accesso a questo dispositivo. Conservalo in un luogo sicuro.</string>
+    <string name="sync_settings_data_expiration">I dati Sync &amp; Backup non possono essere recuperati dopo 18 mesi di inattività. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Ripristinare i dati di Sync &amp; Backup di una precedente installazione?</string>
+    <string name="sync_previous_session_ready_body">Ripristina per recuperare i segnalibri, le password e altri dati precedenti in DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Ripristina Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Configura una nuova sincronizzazione</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Recupera facilmente i tuoi dati</string>
+    <string name="sync_recover_data_content">Usa questo codice per ripristinare i tuoi dati se perdi l\'accesso a questo dispositivo. I dati Sync &amp; Backup non possono essere recuperati dopo 18 mesi di inattività.</string>
+    <string name="sync_recover_data_recovery_code_label">Codice di recupero</string>
+    <string name="sync_recover_data_download_pdf">Scarica come PDF</string>
+    <string name="sync_restore_on_reinstall_title">Ripristino alla reinstallazione dell\'app</string>
+    <string name="sync_restore_on_reinstall_description">Se reinstalli l\'app DuckDuckGo, ti chiederemo se desideri ripristinare i tuoi dati su questo dispositivo.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Accedi alle tue chat su tutti i tuoi dispositivi utilizzando Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sincronizza con un altro dispositivo</string>
+    <string name="sync_chat_bottom_sheet_title">Sincronizziamo le tue chat su tutti i tuoi dispositivi!</string>
+    <string name="sync_chat_bottom_sheet_description">Trova il codice QR nell\'app DuckDuckGo sull\'altro dispositivo andando su Impostazioni › Sync &amp; Backup › Sincronizza con un altro dispositivo.</string>
+    <string name="sync_chat_bottom_sheet_positive">Scansiona il codice QR</string>
+    <string name="sync_chat_bottom_sheet_negative">Non adesso</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sincronizzare i tuoi dati?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sincronizza adesso</string>
+    <string name="sync_v2_joiner_confirmation_negative">Annulla</string>
+
+    <string name="sync_v2_host_confirmation_title">Sincronizzare i tuoi dati?</string>
+    <string name="sync_v2_host_confirmation_positive">Sincronizza adesso</string>
+    <string name="sync_v2_host_confirmation_negative">Annulla</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" potrà accedere alle tue password sincronizzate di DuckDuckGo, ai dati di compilazione automatica e alle chat di Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" potrà accedere alle tue chat sincronizzate di Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">L\'altro dispositivo potrà accedere alle tue password sincronizzate di DuckDuckGo, ai dati di compilazione automatica e alle chat di Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">L\'altro dispositivo potrà accedere alle tue chat sincronizzate di Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sincronizzazione non riuscita.</string>
+    <string name="sync_v2_error_pairing_rejected">Sincronizzazione annullata dall\'altro dispositivo.</string>
+    <string name="sync_v2_error_pairing_canceled">Sincronizzazione annullata.</string>
+    <string name="sync_v2_error_upgrade_required">Aggiorna il browser DuckDuckGo e riprova.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sincronizza questo dispositivo da un browser DuckDuckGo già connesso su un altro dispositivo</string>
+    <string name="sync_v2_error_try_again">Riprova.</string>
+    <string name="sync_v2_error_got_it">Ho capito</string>
+    <string name="sync_v2_already_paired_title">Già sincronizzato.</string>
+    <string name="sync_v2_already_paired_message">Questi dispositivi sono già connessi a Sync &amp; Backup.</string>
+
 </resources>

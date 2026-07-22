@@ -30,6 +30,9 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportRe
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -42,7 +45,7 @@ import javax.inject.Inject
 data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class)
+@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, screenName = "importGoogleBookmarks")
 class ImportGoogleBookmarksWebFlowActivity :
     DuckDuckGoActivity(),
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {
@@ -53,6 +56,12 @@ class ImportGoogleBookmarksWebFlowActivity :
     @Inject
     lateinit var importJourney: ImportGoogleBookmarksJourney
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private var isOverlayCurrentlyShown = false
@@ -60,13 +69,26 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         configureToolbar()
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
         configureResultListeners()
         launchWebFlow()
         if (savedInstanceState == null) {
             importJourney.started(getLaunchSource())
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainer, drawBehindGestureNav = true)
     }
 
     private fun launchWebFlow() {

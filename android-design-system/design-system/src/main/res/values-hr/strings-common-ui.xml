@@ -37,4 +37,12 @@
     <string name="alwaysOn">Uvijek uključeno</string>
     <string name="on">Uključeno</string>
     <string name="off">Isključeno</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Saznajte više</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Zatvori</string>
+    <string name="bookmarkFavoriteContentDescription">Omiljeno</string>
+
 </resources>

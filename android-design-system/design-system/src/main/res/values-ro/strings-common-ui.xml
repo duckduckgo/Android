@@ -37,4 +37,12 @@
     <string name="alwaysOn">Întotdeauna activat</string>
     <string name="on">Activat</string>
     <string name="off">Dezactivat</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Află mai multe</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Închidere</string>
+    <string name="bookmarkFavoriteContentDescription">Preferință</string>
+
 </resources>

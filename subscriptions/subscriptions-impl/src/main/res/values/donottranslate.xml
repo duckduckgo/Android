@@ -14,12 +14,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Personal Information Removal -->
     <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
     <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">Got It</string>
+    <string name="planTierNamePlus">Plus</string>
+    <string name="planTierNamePro">Pro</string>
 
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
@@ -28,5 +30,18 @@
     <string name="vpnReminderNotificationChannelName">VPN Reminders</string>
     <string name="vpnReminderNotificationTitle">Don\'t forget to set up your VPN</string>
     <string name="vpnReminderNotificationDescription">Block harmful sites and scams, hide your location, and shield your online activity now.</string>
+
+    <!-- Subscription Expiration Reminder Notification -->
+    <string name="subscriptionExpirationReminderNotificationChannelName">Subscription Reminders</string>
+    <plurals name="subscriptionExpirationReminderNotificationTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Your trial ends in 1 day</item>
+        <item quantity="other" instruction="Placeholder is the number of days until the free trial ends">Your trial ends in %1$d days</item>
+    </plurals>
+    <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
+
+    <!-- Subscription Onboarding (English only, not translated) -->
+    <string name="subscriptionOnboardingWelcomeTitle">Welcome step</string>
+    <string name="subscriptionOnboardingWelcomeText">Welcome to the new subscription onboarding flow</string>
+    <string name="subscriptionOnboardingWelcomeContinue">Continue</string>
 
 </resources>

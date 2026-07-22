@@ -17,7 +17,9 @@
 package com.duckduckgo.app.browser.autofill
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.browser.autofill.RealSystemAutofillEngagement.Companion.AUTOFILL_AFTER_IDLE_RETURN_PIXEL
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYSTEM_AUTOFILL_USED
@@ -66,5 +68,61 @@ class RealSystemAutofillEngagementTest {
         feature.canDetectSystemAutofillEngagement().setRawStoredState(State(false))
         testee.onSystemAutofillEvent()
         verify(pixel, never()).fire(AUTOFILL_SYSTEM_AUTOFILL_USED, type = Daily())
+    }
+
+    @Test
+    fun whenIdleReturnFlagSetAndAutofillEventThenAutofillAfterIdlePixelFired() = runTest {
+        testee.setIdleReturnTriggered("new_tab_page")
+        testee.onSystemAutofillEvent()
+        verify(pixel).fire(
+            AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
+            mapOf("appLaunchOption" to "new_tab_page"),
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenIdleReturnFlagSetWithSpecificPageAndAutofillEventThenPixelFiredWithCorrectParam() = runTest {
+        testee.setIdleReturnTriggered("specific_page")
+        testee.onSystemAutofillEvent()
+        verify(pixel).fire(
+            AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
+            mapOf("appLaunchOption" to "specific_page"),
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenNoIdleReturnFlagAndAutofillEventThenAutofillAfterIdlePixelNotFired() = runTest {
+        testee.onSystemAutofillEvent()
+        verify(pixel, never()).fire(
+            AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
+            mapOf("appLaunchOption" to "new_tab_page"),
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenIdleReturnFlagSetAndAutofillEventFiredTwiceThenPixelFiredOnlyOnce() = runTest {
+        testee.setIdleReturnTriggered("new_tab_page")
+        testee.onSystemAutofillEvent()
+        testee.onSystemAutofillEvent()
+        verify(pixel).fire(
+            AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
+            mapOf("appLaunchOption" to "new_tab_page"),
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenIdleReturnFlagClearedThenAutofillAfterIdlePixelNotFired() = runTest {
+        testee.setIdleReturnTriggered("new_tab_page")
+        testee.clearIdleReturnTriggered()
+        testee.onSystemAutofillEvent()
+        verify(pixel, never()).fire(
+            AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
+            mapOf("appLaunchOption" to "new_tab_page"),
+            type = Count,
+        )
     }
 }

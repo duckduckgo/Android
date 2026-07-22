@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest, paroolidest ja Duck.ai vestlustest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele ligi.</string>
     <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
     <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
-    <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>
-    <string name="sync_intro_recover_content">Sünkroonitud andmete taastamiseks vajad taastamiskoodi, mille salvestasid sünkroonimise esmakordsel seadistamisel. See kood võis olla salvestatud PDF-vormingus seadmesse, milles sa sünkroonimise algselt seadistasid.</string>
-    <string name="sync_intro_recover_cta">Alustage</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Oma sünkroonitud andmete taastamine</string>
+    <string name="sync_recover_synced_data_content">Sul on vaja taastamiskoodi, mille said funktsiooni Sync &amp; Backup seadistamisel. Võimalik, et salvestasid selle PDF-failina seadmesse, mida kasutasid.</string>
+    <string name="sync_recover_synced_data_cta">Taasta sünkroonitud andmed</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-koodi skannimine</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
     <string name="sync_share_title">Jaga…</string>
     <string name="sync_pdf_title">Sünkroonimise taastamiskood</string>
-    <string name="sync_pdf_description">Taastamiskood võimaldab sünkroonida järjehoidjaid mitmes seadmes ja taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
+    <string name="sync_pdf_description">Taastekood võimaldab sul sünkroonida paroole, automaatse täitmise andmeid ja Duck.ai vestlusi mitme seadme vahel ning taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
     <string name="sync_code_box_title">Hoia seda teavet kindlas kohas.</string>
-    <string name="sync_instructions_title">Kuidas see toimib?</string>
-    <string name="sync_instructions_step1">Ava teises seadmes DuckDuckGo ning ava seadetes käsk Sünkrooni.</string>
-    <string name="sync_instructions_step2">Skanni QR-kood või kopeeri ja kleepi tekstikood teise DuckDuckGo rakendusse.</string>
+    <string name="sync_instructions_title">Kuidas see kood töötab?</string>
+    <string name="sync_instructions_step1">Ava seadmes, mida soovid sünkroonida, DuckDuckGo ja mine seadetes menüüsse Sync &amp; Backup.</string>
+    <string name="sync_instructions_step2">Vali suvand „Sünkrooni teise seadmega“ ja skanni QR-kood või sisesta tekstikood.</string>
     <string name="sync_instructions_step3">Sünkroonimine aktiveeritakse ja sul on uuesti juurdepääs kõikidele oma andmetele.</string>
+    <string name="sync_pdf_retention_notice">Kui sa ei kasuta DuckDuckGo brauserit, millel on Sync &amp; Backup lubatud, rohkem kui 18 kuud, kustutatakse sinu andmed serverist ja neid ei saa taastada.</string>
     <string name="remove_device_dialog_title">Kas seade eemaldada?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s ei pääse enam sinu sünkroonitud andmetele juurde.</string>
     <string name="remove_device_dialog_primary_button">Eemaldage</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>
-    <string name="sync_delete_server_data_dialog_content">Kõigi seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Andmete kustutamine</string>
+    <string name="sync_delete_server_data_dialog_content">Sinu varukoopia kustutatakse serverist. Kõigi seadmete sünkroonimine katkestatakse, kuid ühestki seadmest ei kustutata midagi.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Kustuta serveri andmed</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Järjehoidjate sünkroonimine seadmete vahel</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Peida</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Taastamine</string>
+    <string name="sync_settings_download_recovery_code_item">Laadi taastekood alla PDF-failina</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele – hoia seda turvalises kohas.</string>
+    <string name="sync_settings_data_expiration">Funktsiooni Sync &amp; Backup andmeid ei saa taastada pärast 18-kuulist mitteaktiivsust. <annotation type="learn_more_link">Lisateave</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Kas taastada eelmise installimise Sync &amp; Backup andmed?</string>
+    <string name="sync_previous_session_ready_body">Taasta, et saada oma eelmised järjehoidjad, paroolid ja muud andmed DuckDuckGo-s tagasi.</string>
+    <string name="sync_previous_session_ready_resume_cta">Taasta Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Uue sünkroonimise seadistamine</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Taasta oma andmed hõlpsasti</string>
+    <string name="sync_recover_data_content">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele. Funktsiooni Sync &amp; Backup andmeid ei saa taastada pärast 18-kuulist mitteaktiivsust.</string>
+    <string name="sync_recover_data_recovery_code_label">Taastamiskood</string>
+    <string name="sync_recover_data_download_pdf">Laadi alla PDF-ina</string>
+    <string name="sync_restore_on_reinstall_title">Taasta andmed rakenduse uuesti installimisel</string>
+    <string name="sync_restore_on_reinstall_description">Kui installid DuckDuckGo rakenduse uuesti, küsime, kas soovid oma andmed selles seadmes taastada.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Kasuta funktsiooni „Sync &amp; Backup“, et pääseda oma vestlustele ligi kõikidelt seadmetelt.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sünkrooni teise seadmega</string>
+    <string name="sync_chat_bottom_sheet_title">Sünkroniseerime vestlused\nsinu seadmete vahel!</string>
+    <string name="sync_chat_bottom_sheet_description">Leia QR-kood oma teises seadmes DuckDuckGo rakendusest, minnes menüüsse Seaded › Sync &amp; Backup › Sünkrooni teise seadmega.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skanni QR-kood</string>
+    <string name="sync_chat_bottom_sheet_negative">Mitte praegu</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Kas sünkroonida andmed?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sünkrooni kohe</string>
+    <string name="sync_v2_joiner_confirmation_negative">Tühista</string>
+
+    <string name="sync_v2_host_confirmation_title">Kas sünkroonida andmed?</string>
+    <string name="sync_v2_host_confirmation_positive">Sünkrooni kohe</string>
+    <string name="sync_v2_host_confirmation_negative">Tühista</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” pääseb ligi sinu sünkroonitud DuckDuckGo paroolidele, automaatse täitmise andmetele ja Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s“ pääseb ligi sinu sünkroonitud Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Teine seade pääseb ligi sinu sünkroonitud DuckDuckGo paroolidele, automaatse täitmise andmetele ja Duck.ai vestlustele.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Teine seade pääseb ligi sinu sünkroonitud Duck.ai vestlustele.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sünkroonimine nurjus.</string>
+    <string name="sync_v2_error_pairing_rejected">Sünkroonimine tühistati sinu teisest seadmest.</string>
+    <string name="sync_v2_error_pairing_canceled">Sünkroonimine tühistati.</string>
+    <string name="sync_v2_error_upgrade_required">Värskenda DuckDuckGo brauserit ja proovi uuesti.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sünkrooni see seade juba ühendatud DuckDuckGo brauserist mõnes teises seadmes</string>
+    <string name="sync_v2_error_try_again">Proovi uuesti.</string>
+    <string name="sync_v2_error_got_it">Sain aru</string>
+    <string name="sync_v2_already_paired_title">Juba sünkroonitud.</string>
+    <string name="sync_v2_already_paired_message">Need seadmed on juba Sync &amp; Backupiga ühendatud.</string>
+
 </resources>

@@ -32,6 +32,7 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.impl.brokers.JSONObjectAdapter
+import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirWebJsMessageHandler
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -47,6 +48,7 @@ class PirDashboardWebMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val messageHandlers: PluginPoint<PirWebJsMessageHandler>,
+    pirDashboardUrlProvider: PirDashboardUrlProvider,
 ) : JsMessaging {
 
     private val moshi by lazy {
@@ -58,7 +60,7 @@ class PirDashboardWebMessagingInterface @Inject constructor(
     override val context: String = PirDashboardWebConstants.SCRIPT_CONTEXT_NAME
     override val callbackName: String = PirDashboardWebConstants.MESSAGE_CALLBACK
     override val secret: String = PirDashboardWebConstants.SECRET
-    override val allowedDomains: List<String> = listOf(PirDashboardWebConstants.ALLOWED_DOMAIN)
+    override val allowedDomains: List<String> = pirDashboardUrlProvider.getAllowedDomains()
 
     override fun register(
         webView: WebView,

@@ -20,24 +20,41 @@ import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
 import logcat.logcat
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import kotlin.coroutines.cancellation.CancellationException
+
+sealed class ClearDataResult {
+    data object Success : ClearDataResult()
+    data object FeatureNotSupported : ClearDataResult()
+    data class Error(val exception: Exception) : ClearDataResult()
+}
 
 interface ClearDataAction {
     /**
@@ -73,6 +90,15 @@ interface ClearDataAction {
     suspend fun clearDuckAiChatsOnly()
 
     /**
+     * Clears browsing data for specific domains via WebStorageCompat.
+     * Duck.ai domains (duckduckgo.com, duck.ai) are always excluded — their data is managed separately.
+     * @param domains set of eTLD+1 domains to clear
+     * @return [ClearDataResult.Success] if data was cleared, [ClearDataResult.FeatureNotSupported] if WebView doesn't support this feature,
+     *         or [ClearDataResult.Error] if an exception occurred during deletion
+     */
+    suspend fun clearDataForSpecificDomains(domains: Set<String>): ClearDataResult
+
+    /**
      * Sets the flag indicating whether the app has been used since the last data clear.
      * @param appUsedSinceLastClear true if the app has been used since the last clear, false otherwise
      */
@@ -87,8 +113,9 @@ interface ClearDataAction {
      * Kills and restarts the current process.
      * @param notifyDataCleared whether to notify that data has been cleared
      * @param enableTransitionAnimation whether to enable transition animation during restart
+     * @param deletedTabCount number of tabs that were deleted (shown in the snackbar)
      */
-    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
+    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true, deletedTabCount: Int = 0)
 }
 
 class ClearPersonalDataAction(
@@ -107,11 +134,16 @@ class ClearPersonalDataAction(
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    duckAiHostProvider: DuckAiHostProvider,
+    private val siteDataCleaner: SiteDataCleaner,
+    private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
         logcat(INFO) { "Restarting process" }
-        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount)
     }
 
     override fun killProcess() {
@@ -124,10 +156,7 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean,
     ) {
         withContext(dispatchers.io()) {
-            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-            cookieManager.flush()
-            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
-            thirdPartyCookieManager.clearAllData()
+            clearFireproofExemptData()
 
             // https://app.asana.com/0/69071770703008/1204375817149200/f
             if (!deviceSyncState.isUserSignedInOnDevice()) {
@@ -139,6 +168,7 @@ class ClearPersonalDataAction(
             webTrackersBlockedRepository.deleteAll()
 
             navigationHistory.clearHistory()
+            tabVisitedSitesRepository.clearAll()
         }
 
         clearDataAsync(shouldFireDataClearPixel)
@@ -163,10 +193,7 @@ class ClearPersonalDataAction(
 
     override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.io()) {
-            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-            cookieManager.flush()
-            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
-            thirdPartyCookieManager.clearAllData()
+            clearFireproofExemptData()
 
             // https://app.asana.com/0/69071770703008/1204375817149200/f
             if (!deviceSyncState.isUserSignedInOnDevice()) {
@@ -176,6 +203,7 @@ class ClearPersonalDataAction(
             webTrackersBlockedRepository.deleteAll()
 
             navigationHistory.clearHistory()
+            tabVisitedSitesRepository.clearAll()
         }
 
         clearDataGranularlyAsync(shouldFireDataClearPixel)
@@ -192,14 +220,67 @@ class ClearPersonalDataAction(
                 shouldClearDuckAiData = true,
             )
 
-            logcat(INFO) { "Finished clearing chats" }
+            logcat(INFO) { "Finished clearing chats (web storage)" }
         }
+
+        logcat(INFO) { "Finished clearing chats" }
+    }
+
+    override suspend fun clearDataForSpecificDomains(
+        domains: Set<String>,
+    ): ClearDataResult {
+        if (!webViewCapabilityChecker.isSupported(DeleteBrowsingData)) {
+            logcat(WARN) { "DeleteBrowsingData feature not supported by WebView" }
+            return ClearDataResult.FeatureNotSupported
+        }
+
+        return try {
+            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too.
+            val fireproofDomains = withContext(dispatchers.io()) {
+                fireproofWebsiteRepository.fireproofWebsitesSync()
+                    .map { it.domain.toTldPlusOneOrSelf() }
+                    .toSet()
+            }
+
+            val domainsToClear = domains
+                .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
+                .toSet()
+
+            withContext(dispatchers.main()) {
+                val webStorage = createWebStorage()
+                domainsToClear.forEach { domain ->
+                    siteDataCleaner.deleteSiteData(webStorage, domain)
+                }
+                logcat(INFO) { "Cleared site data for ${domains.size} domains" }
+            }
+
+            sitePreferencesDataClearer.clear(domainsToClear)
+
+            ClearDataResult.Success
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(WARN) { "Failed to clear site data: ${e.message}" }
+            ClearDataResult.Error(e)
+        }
+    }
+
+    // Shared preamble for full-fire paths: clears cookies and the per-site stores that must keep
+    // fireproofed domains. Both take raw fireproof hosts; site permissions match on raw host, while
+    // the site-preferences store normalises each to its site key (eTLD+1, host fallback) internally.
+    private suspend fun clearFireproofExemptData() {
+        val fireproofEntities = fireproofWebsiteRepository.fireproofWebsitesSync()
+        cookieManager.flush()
+        sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
+        sitePreferencesDataClearer.clearAllButFireproofed(fireproofEntities.map { it.domain }.toSet())
+        thirdPartyCookieManager.clearAllData()
     }
 
     private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.main()) {
             if (shouldFireDataClearPixel) {
-                clearingStore.incrementCount()
+                // this is only called in Regular mode
+                clearingStore.incrementCount(BrowserMode.REGULAR)
             }
 
             dataManager.clearData(createWebView(), createWebStorage())
@@ -212,7 +293,8 @@ class ClearPersonalDataAction(
     private suspend fun clearDataGranularlyAsync(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.main()) {
             if (shouldFireDataClearPixel) {
-                clearingStore.incrementCount()
+                // this is only called in Regular mode
+                clearingStore.incrementCount(BrowserMode.REGULAR)
             }
 
             dataManager.clearData(
@@ -232,6 +314,7 @@ class ClearPersonalDataAction(
     }
 
     private fun createWebStorage(): WebStorage {
+        // this is only called in Regular mode
         return WebStorage.getInstance()
     }
 
@@ -240,5 +323,16 @@ class ClearPersonalDataAction(
             settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
             logcat { "Set appUsedSinceClear flag to $appUsedSinceLastClear" }
         }
+    }
+
+    // Domains whose web storage must never be cleared by the fire button.
+    // Entries are normalised to eTLD+1 at runtime so that subdomains (e.g. a custom
+    // internal duck.ai host) are correctly matched against the eTLD+1 values that
+    // clearDataForSpecificDomains receives from the visited-sites repository.
+    // To protect a new domain, add its hostname here — normalisation is handled automatically.
+    private val duckDuckGoDomains: Set<String> by lazy {
+        setOf("duckduckgo.com", duckAiHostProvider.getHost())
+            .map { host -> "https://$host".toHttpUrlOrNull()?.topPrivateDomain() ?: host }
+            .toSet()
     }
 }

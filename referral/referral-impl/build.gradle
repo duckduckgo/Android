@@ -1,0 +1,81 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    namespace 'com.duckduckgo.referral.impl'
+
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+
+    flavorDimensions "store"
+    productFlavors {
+        internal { dimension "store" }
+        fdroid { dimension "store" }
+        play { dimension "store" }
+    }
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (names.contains("fdroid") && variant.buildType.name == "debug") {
+            setIgnore(true)
+        }
+    }
+}
+
+// android-library.gradle registers jvm_tests/jvm_checks against the non-existent
+// `testDebugUnitTest`; a flavored module must point them at a flavored task instead.
+tasks.named('jvm_tests').configure { setDependsOn(['testPlayDebugUnitTest']) }
+tasks.named('jvm_checks').configure { setDependsOn(['spotlessCheck', 'lint', 'testPlayDebugUnitTest']) }
+
+dependencies {
+    ksp project(':anvil-ksp')
+    implementation project(':anvil-annotations')
+
+    implementation project(':di')
+    implementation project(':common-utils')
+    implementation project(':statistics-api')
+    implementation project(':experiments-api')
+    implementation project(':verified-installation-api')
+    implementation project(':referral-api')
+    implementation project(':data-store-api')
+    implementation project(':test-seeder-api')
+
+    implementation Google.dagger
+    implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.core
+    implementation "com.squareup.logcat:logcat:_"
+
+    playImplementation("com.android.installreferrer:installreferrer:_")
+
+    testImplementation project(':common-test')
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation (KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
+}

@@ -27,6 +27,9 @@
     <string name="cancel">Avbryt</string>
     <string name="search">Sökning</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chatt raderad</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
@@ -72,6 +75,7 @@
     <string name="options">Alternativ</string>
     <string name="shareLink">Dela länk</string>
     <string name="copyUrl">Kopia länkadress</string>
+    <string name="urlCopiedToClipboard">URL har kopierats till urklipp</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Hitta nästa</string>
@@ -118,8 +122,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
-    <string name="fireClearAll">Rensa flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Rensa flikar, data och Duck.ai-chattar</string>
+    <string name="fireClearAll">Ta bort flikar och data</string>
+    <string name="fireClearAllPlusDuckChats">Ta bort flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -128,6 +132,7 @@
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingProtections">Skydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsWhatsNew">Vad är nytt?</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -135,6 +140,7 @@
     <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsHeadingNextSteps">Nästa steg</string>
+    <string name="settingsNextStepsHideItem">Dölj</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
@@ -172,9 +178,8 @@
     <string name="privateSearchAutocompleteHint">Visa sökförslag medan du skriver, inklusive dina bokmärken. Alla sökningar är privata.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Senast besökta webbplatser</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Visa nyligen besökta webbplatser i sökförslag. Nyligen besökta webbplatser är privata. De lagras endast på din enhet och kan rensas med Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Komplettera automatiskt-förslag inkluderar nu dina nyligen besökta webbplatser. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
-    <string name="openAutoCompleteSettings">Öppna inställningar</string>
+    <string name="privateSearchChatSuggestionsToggle">Chattförslag</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Visa förslag från din historik, dina bokmärken och (valfritt) chatthistoriken från Duck.ai när du skriver i sökfältet. Alla sökningar är privata.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Allmänt</string>
@@ -206,13 +211,24 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uttrycker rätten att tacka nej för din räkning genom att säga till webbplatser att inte sälja eller dela dina personuppgifter.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
+    <string name="getDesktopBrowserTitle">Skydda din personliga information på Mac och Windows också!</string>
+    <string name="getDesktopBrowserBody">För att ladda ner DuckDuckGo på Mac eller Windows, besök:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Dela nedladdningslänk</string>
+    <string name="getDesktopBrowserNoThanks">Nej tack</string>
+    <string name="getDesktopBrowserHideItem">Dölj</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
-    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att rensa data manuellt eller ställa in automatisk rensning.</string>
+    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställ in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webbplats undantas från rensning</item>
         <item quantity="other">%1$d webbplatser undantas från rensning</item>
@@ -220,8 +236,8 @@
     <string name="dataClearingAutomaticClearingOn">På</string>
     <string name="dataClearingAutomaticClearingOff">Av</string>
     <string name="dataClearingClearBrowsingData">Rensa webbläsardata</string>
-    <string name="dataClearingAutomaticDataClearing">Automatisk datarensning</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Rensa data automatiskt</string>
+    <string name="dataClearingAutomaticDataClearing">Radera data automatiskt</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Radera data automatiskt</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Stäng alla öppna flikar</string>
     <string name="dataClearingAutomaticDataOptionDescription">Radera all webbplatsdata, inklusive besökta webbplatser. Kan logga ut dig från konton.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Ta bort alla chattar, inklusive fästa chattar</string>
@@ -244,6 +260,23 @@
         <item quantity="other">Ta bort från %1$d webbplatser. Kan logga ut dig från konton.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Ta bort flikar och webbplatsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vill du ta bort flikar, webbplatsdata och chattar?</string>
+    <string name="singleTabFireDialogDeleteAll">Radera allt</string>
+    <string name="singleTabFireDialogDeleteThisTab">Ta bort denna flik</string>
+    <string name="singleTabFireDialogDeleteChat">Radera chatt</string>
+    <string name="singleTabFireDialogDeleteChats">Radera chattar</string>
+    <string name="singleTabFireDialogTitleDuckAi">Radera den här chatten?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d flik och dess data raderades</item>
+        <item quantity="other">%1$d flikar och deras data raderades</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Behörigheter</string>
 
@@ -261,15 +294,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Flikar och data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Flikar, data och Duck.ai-chattar</string>
 
-    <string name="settingsAutomaticallyClearWhen">Rensa den …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Rensa den …</string>
+    <string name="settingsAutomaticallyClearWhen">Radera den...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Radera den...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Gå bara ur appen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Avsluta app, inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Avsluta app, inaktiv i 5 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Avsluta app, inaktiv i 15 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Avsluta app, inaktiv i 30 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
-    <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
+    <string name="settingsClearAiDataTitle">Ta bort Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
     <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
@@ -380,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Sök DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Berätta vad du tycker</string>
-    <string name="missingBrowserFeaturesTitleLong">Webbläsarfunktionerna saknas eller hindras</string>
-    <string name="missingBrowserFeaturesTitleShort">Problem med webbläsarfunktionen</string>
-    <string name="missingBrowserFeaturesSubtitle">Vilken webbläsarfunktion kan vi lägga till eller förbättra?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigering framåt och bakåt och/eller uppdatering</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Skapa och hantera flikar</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blockering av annonser och poppuppfönster</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Visning av videoklipp</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interaktion med bilder</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Skapa och hantera bokmärken</string>
-    <string name="missingBrowserFeatureSubReasonOther">Inget av ovanstående</string>
-
-    <string name="websiteNotLoadingTitleLong">Problem med webbplatser som inte laddas korrekt</string>
-    <string name="websiteNotLoadingTitleShort">Problem med webbplatser som inte laddas korrekt</string>
-    <string name="websiteNotLoadingSubtitle">Vilken webbplats är skadad?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-sökning är inte tillräckligt bra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problem med DuckDuckGo-sökning</string>
-    <string name="searchNotGoodEnoughSubtitle">Vilken sökfunktion kan vi lägga till eller förbättra?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk sökning</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layouten borde vara mer lik Googles</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Snabbare laddningstid</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Sökning på ett specifikt språk eller i en viss region</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Förbättring av Komplettera automatiskt</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Inget av ovanstående</string>
-
-    <string name="needMoreCustomizationTitleLong">Det finns inte tillräckligt många sätt att anpassa appen på</string>
-    <string name="needMoreCustomizationTitleShort">Anpassningsproblem</string>
-    <string name="needMoreCustomizationSubtitle">Vilket anpassningsalternativ kan vi lägga till eller förbättra?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Startsidans konfiguration</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Hur flikar visas</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Hur appen ser ut</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Vilka data som rensas</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">När data rensas</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hur bokmärken visas</string>
-    <string name="needMoreCustomizationSubReasonOther">Inget av ovanstående</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Appen är långsam, har många buggar eller kraschar</string>
-    <string name="appIsSlowOrBuggyTitleShort">Prestandaproblem</string>
-    <string name="appIsSlowOrBuggySubtitle">Vilket problem upplever du?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Webbsidor eller sökresultat laddas långsamt</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen kraschar eller låser sig</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video- eller medieuppspelningsfel</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Inget av ovanstående</string>
-
-    <string name="otherMainReasonTitleLong">Inget av ovanstående</string>
-    <string name="otherMainReasonTitleShort">Andra problem</string>
-
-    <string name="openEndedInputHint">Beskriv så noggrant som möjligt</string>
-    <string name="submitFeedback">Skicka</string>
-
-    <string name="tellUsHowToImprove">Berätta vad vi kan förbättra.</string>
-    <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Vad anser du vara mest frustrerande?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Det var tråkigt att höra</string>
-    <string name="feedbackShareDetails">Berätta mer om dina upplevelser</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Finns det några detaljer du vill dela med teamet?</string>
-    <string name="whatHaveYouBeenEnjoying">Vad har du uppskattat med appen?</string>
-    <string name="awesomeToHear">Kul att höra!</string>
-    <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Play Store.</string>
-    <string name="rateTheApp">Betygsätt appen</string>
-    <string name="declineFurtherFeedback">Nej tack, jag är klar</string>
-    <string name="whichBrokenSites">Var ser du dessa problem?</string>
-    <string name="whichBrokenSitesHint">På vilken webbplats finns problemen?</string>
-    <string name="feedbackSpecificAsPossible">Beskriv så noggrant som möjligt</string>
-    <string name="feedbackInitialDisambiguationTitle">Då sätter vi igång!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hur skulle du kategorisera din återkoppling?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
-    <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Webbsidan kunde inte visas."</string>
     <string name="crashedWebViewErrorAction">"Ladda om"</string>
@@ -556,6 +517,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation för brännarknapp</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Klassisk</string>
     <string name="settingsHeroWaterAnimation">Virvel</string>
     <string name="settingsHeroAbstractAnimation">Luftström</string>
     <string name="settingsNoneAnimation">Inga</string>
@@ -646,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nerladdningar</string>
-    <string name="downloadsActivityTitle">Nerladdningar</string>
-    <string name="downloadsActivityNoItemsDescription">Inga filer har laddats ner ännu</string>
-    <string name="downloadsShareTitle">Dela med …</string>
     <string name="downloadsDownloadFinishedActionName">Öppna</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Filen finns inte längre</string>
-    <string name="downloadsItemMenuShare">Dela</string>
-    <string name="downloadsItemMenuDelete">Ta bort</string>
-    <string name="downloadsItemMenuCancel">Avbryt</string>
-    <string name="downloadsActivityMenuDeleteAll">Radera allt</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Raderade %1$s</string>
-    <string name="downloadsAllFilesDeletedMessage">Alla filer raderade</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Fler alternativ för %1$s</string>
-    <string name="downloadsUndoActionName">Återställ</string>
-    <string name="downloadsStateInProgress">Pågår …</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Skydd mot appspårning</string>
@@ -682,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
-    <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
 
@@ -795,7 +741,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Då sätter vi igång!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
     <string name="preOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
@@ -807,9 +756,15 @@
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi">Använd ChatGPT privat med Duck.ai inbyggt</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Blockera riktade annonser och cookie-popup-fönster</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">Spela upp YouTube-videor utan annonser</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
+    <string name="preOnboardingAddressBarPositionTop">Topp</string>
+    <string name="preOnboardingAddressBarPositionBottom">Botten</string>
+    <string name="preOnboardingAddressBarPositionSplit">Dela</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Överst (standard)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lätt att se</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Botten</string>
@@ -832,6 +787,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Överraska mig!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det är <b>DuckDuckGo Search</b>! Privat. Snabbt. Färre annonser.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Det är DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Snabbt. Färre annonser.</string>
     <string name="onboardingSerpDaxDialogButton">Jag förstår!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Prova sedan att besöka en webbplats!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -854,12 +811,35 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratis!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Prova gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Visste du det?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vill du ha enkel tillgång till privat AI-chatt?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Vill du ha enkel tillgång till privat AI-chatt i adressfältet?</string>
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Välkommen tillbaka!&lt;br/&gt;Vill du anpassa något?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ställ in DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lägg till widget på startskärmen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adressfältsläge</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Sökalternativ för adressfält</string>
+    <string name="preOnboardingReinstallStartBrowsing">Börja surfa</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Var vill du ha adressfältet?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan göra ändringar i <b>Inställningar > Utseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vill du ha sökning och AI-chatt i adressfältet?</string>
+    <string name="quickSetupBottomSheetDone">Klart</string>
+    <string name="quickSetupInputScreenSearchOnly">Sök endast</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Sök och Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Så här tar du bort widgeten för startskärmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå till din startskärm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryck och håll kvar på widgeten</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tryck eller dra för att ta bort den</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>
@@ -924,11 +904,16 @@
     <string name="settingsHeadingCompleteSetup">Slutför din inställning</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Visa spårarräknare i flikfäxlare</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s spårare blockerade &lt;/b&gt; under de senaste 7 dagarna</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Dölj spårarräknaren?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå på detta igen i Inställningar &gt; Utseende.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Dölj</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behåll</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animation för blockerade spårare</string>
+    <string name="showTrackerCountInAddressBar">Visa i adressfältet</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Visa i flikhanteraren</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Sök endast</string>
@@ -936,4 +921,93 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Sök privat med DuckDuckGo eller fråga Duck.ai. Röstsökning och Duck.ai kan användas efter aktivering.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Gör sökningar eller besök dina favoritwebbplatser privat med ett tryck. Röstsökning och Duck.ai kan användas efter aktivering.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Vi fortsätter där du slutade</string>
+    <string name="syncRestoreDialogDescription">Vill du återställa dina bokmärken, lösenord med mera från din tidigare DuckDuckGo-synkronisering?</string>
+    <string name="syncRestoreDialogPrimaryCta">Återställ mitt innehåll</string>
+    <string name="syncRestoreDialogSecondaryCta">Hoppa över</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nu fortsätter vi där du slutade på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dina sparade bokmärken, lösenord och mer är redo.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Ladda ner PDF</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopiera länktext</string>
+    <string name="linkTextCopied">Länktext kopierad</string>
+    <string name="linkTextCopyFailed">Kunde inte kopiera länktext</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Hej!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare\nsom ger dig kontroll?</string>
+    <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och integritetsskydd är alltid på.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d av %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Det är Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privata AI-chattar som du kan radera när som helst med <b>Fire Button</b>. Prova! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Det här går bra!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Använd adressfältet för att söka efter och besöka webbplatser eller byt till Duck.ai för privat AI-chatt.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="onboardingDuckAiEndCtaButton">High Five!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Är du redo att komma igång?&lt;br/&gt;Testa en sökning eller AI-chatt!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Sök privat</string>
+    <string name="preOnboardingInputModeDemoChatHint">Fråga vad som helst privat</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Förklara aktiemarknaden som om jag vore 10 år</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planera en perfekt dag i London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Överraska mig!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Vad är 10 fascinerande fakta inom vetenskap, natur och historia?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Är du redo att chatta privat med ChatGPT, Claude och andra AI-modeller gratis, i en webbläsare som aktivt skyddar dig?</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Starta AI-chatt</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI-skydd aktiverat!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populära AI-modeller</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alla chattar är anonymiserade</string>
+    <string name="preOnboardingAiComparisonChartItem2">Inget konto behövs för att få tillgång till alla AI-funktioner</string>
+    <string name="preOnboardingAiComparisonChartItem3">Använder aldrig dina chattar för att träna AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Få tillgång till ChatGPT, Claude och mer, allt på ett ställe</string>
+    <string name="preOnboardingAiComparisonChartButton">Prova Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Prova en privat AI-chatt nu!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vill du göra DuckDuckGo till din standardwebbläsare?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi erbjuder även en betald prenumeration med avancerade AI-modeller med högre chattgränser från GPT och Claude, ett säkert VPN och mer.</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
+    <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Bekräfta</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Öppna på en Fire-flik</string>
+    <string name="openInBackgroundTab">Öppna i bakgrunden</string>
+    <string name="browserModeToggleFireDescription">Växla till Fire-flikar</string>
+    <string name="browserModeToggleRegularDescription">Byt till vanliga flikar</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-flik</string>
+    <string name="fireTabNewTabPageTitle">Fire-flik</string>
+    <string name="fireTabsEmptyStateTitle">Fire-flikar</string>
+    <string name="fireTabsFeatureNoHistory">Surfa utan att spara lokal historik</string>
+    <string name="fireTabsFeatureDifferentAccount">Logga in på en webbplats med ett annat konto</string>
+    <string name="fireTabsFeatureTroubleshoot">Felsöka webbplatser</string>
+    <string name="fireTabsExplainer">Fire-flikar är isolerade från andra webbläsardata. Deras data rensas när du stänger dem alla. De ger dig samma spårningsskydd som andra flikar.</string>
+    <string name="fireTabsNewTabButton">Ny Fire-flik</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYTT!</b> Prova Fire-flikar för att surfa utan att spara lokal historik.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 </resources>

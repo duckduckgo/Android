@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Del favoritter</string>
-    <string name="sync_enable_option_favorites_subtitle">Bruk de samme favorittene på alle enheter. La være av for å holde mobil- og skrivebordsfavoritter adskilt.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Del favoritter fra enhet til enhet</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Bruk de samme favorittbokmerkene på mobil og datamaskin.</string>
     <string name="saved_site_limit_warning"><b>Synkronisering satt på pause</b>\nDu har nådd maksimalt antall bokmerker. Slett noen for å gjenoppta synkronisering.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synkronisering av bokmerker er satt på pause</b>\nDu har nådd maksimalt antall bokmerker. Slett noen bokmerker for å gjenoppta synkronisering.</string>
     <string name="saved_site_invalid_warning"><b>Synkronisering satt på pause</b>\nNoen bokmerker er formatert feil eller for lange og ble ikke synkronisert.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
@@ -28,6 +28,12 @@
         <item quantity="one">Bokmerket for %1$s kan ikke synkroniseres fordi ett av feltene overskrider tegngrensen.</item>
         <item quantity="other">Bokmerkene for %1$s og %2$d andre steder kan ikke synkroniseres fordi noen av feltene overskrider tegngrensen.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Søk i bokmerker</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Legg til mappe</string>
+    <string name="bookmarksMenuContentDescription">Flere alternativer</string>
+    <string name="newTabFavoritesToggleContentDescription">Slå synlighet av favoritter av/på</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -93,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på at du vil slette bokmerket for &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Hent bokmerkeikoner</string>
-    <string name="sync_fetch_icons_subtitle">Last ned ikoner automatisk for dine synkroniserte bokmerker.</string>
+    <string name="sync_simplified_fetch_icons_title">Hent bokmerkeikoner</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Laster inn ikoner fra nettsteder du har bokmerket. Nedlasting av ikoner er synlig på nettverket du er tilkoblet.</string>
     <string name="faviconsPromptTitle">Vil du laste ned manglende ikoner?</string>
     <string name="faviconsPromptMessage">Vil du at denne enheten skal automatisk laste ned ikoner for synkroniserte bokmerker fra bokmerkede nettsteder?</string>
     <string name="faviconsPromptPrimaryCta">Hold bokmerkeikonene oppdatert</string>
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer fra Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Velg bokmerkefil…</string>
     <string name="bookmarksImportDialogClose">Lukk</string>
+
 </resources>

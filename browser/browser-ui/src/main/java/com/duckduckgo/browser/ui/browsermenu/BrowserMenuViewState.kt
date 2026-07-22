@@ -22,13 +22,18 @@ sealed class BrowserMenuViewState {
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
-        val showNewDuckChatTabOption: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
         val canSharePage: Boolean = false,
         val showSelectDefaultBrowserMenuItem: Boolean = false,
         val canSaveSite: Boolean = false,
         val isBookmark: Boolean = false,
+        val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
+        val showFireMenuItem: Boolean = false,
+        val showDownloadDot: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
@@ -42,8 +47,10 @@ sealed class BrowserMenuViewState {
         val showAutofill: Boolean = false,
         val isSSLError: Boolean = false,
         val canPrintPage: Boolean = false,
-
+        val showDownloadPdfMenuItem: Boolean = false,
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
+
     data class CustomTabs(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
@@ -53,28 +60,72 @@ sealed class BrowserMenuViewState {
         val canFindInPage: Boolean = true,
         val canChangePrivacyProtection: Boolean = false,
         val isPrivacyProtectionDisabled: Boolean = false,
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
+
     data class NewTabPage(
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
+        val isEmailSignedIn: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
+        val showDownloadDot: Boolean = false,
     ) : BrowserMenuViewState()
+
     data class DuckAi(
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
+        val showDownloadDot: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 }
 
+sealed class PageContextHeaderState {
+    data object Hidden : PageContextHeaderState()
+
+    data class Visible(
+        val title: String?,
+        val shortUrl: String,
+        val tabId: String,
+        val serpLogoUrl: String? = null,
+        val isDuckDuckGo: Boolean = false,
+    ) : PageContextHeaderState()
+
+    data class DuckAi(
+        val title: String?,
+        val tabId: String,
+    ) : PageContextHeaderState()
+
+    data class Error(
+        val shortUrl: String,
+    ) : PageContextHeaderState()
+}
+
 sealed class VpnMenuState {
-    data object Hidden : VpnMenuState()
+    abstract val pixelParam: String
 
-    data object NotSubscribed : VpnMenuState()
+    data object Hidden : VpnMenuState() {
+        override val pixelParam: String = "hidden"
+    }
 
-    data object NotSubscribedNoPill : VpnMenuState()
+    data object NotSubscribed : VpnMenuState() {
+        override val pixelParam: String = "pill"
+    }
+
+    data object NotSubscribedNoPill : VpnMenuState() {
+        override val pixelParam: String = "no_pill"
+    }
 
     data class Subscribed(
         val isVpnEnabled: Boolean,
-    ) : VpnMenuState()
+    ) : VpnMenuState() {
+        override val pixelParam: String = "subscribed"
+    }
 }

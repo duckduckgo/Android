@@ -1,0 +1,38 @@
+{
+    "webTelemetry_adwallDetection_day": {
+        "description": "Daily bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed adwall detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_adwallDetection_week": {
+        "description": "Weekly bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed adwall detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    }
+}

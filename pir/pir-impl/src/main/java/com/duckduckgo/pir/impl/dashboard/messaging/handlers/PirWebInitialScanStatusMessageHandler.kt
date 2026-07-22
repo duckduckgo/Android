@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
@@ -29,12 +30,15 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 /**
@@ -49,9 +53,13 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val stateProvider: PirDashboardInitialScanStateProvider,
     private val pirRepository: PirRepository,
+    private val pirPixelSender: PirPixelSender,
+    private val pirRemoteFeatures: PirRemoteFeatures,
+    private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
+    private val checkedForResumeScan: AtomicBoolean = AtomicBoolean(false)
 
     override fun process(
         jsMessage: JsMessage,
@@ -67,6 +75,11 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                     response = PirWebMessageResponse.InitialScanResponse.EMPTY,
                 )
                 return@launch
+            }
+
+            // Check once per PirDashboardWebViewActivity launch if we need to resume a scan that was interrupted (e.g., by app kill)
+            if (!checkedForResumeScan.getAndSet(true)) {
+                checkForIncompleteInitialScan()
             }
 
             jsMessaging.sendResponse(
@@ -85,6 +98,28 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
 
     private suspend fun canRunScan(): Boolean {
         return pirRepository.getValidUserProfileQueries().isNotEmpty()
+    }
+
+    /**
+     * Checks if the initial foreground scan should be resumed (was interrupted with remaining brokers).
+     * Emits a pixel to measure how often this scenario occurs, and resumes the scan if the toggle is enabled.
+     */
+    private suspend fun checkForIncompleteInitialScan() {
+        if (!stateProvider.shouldRestartInitialScan()) {
+            logcat { "PIR-WEB: No need to resume scan, it's either not started or already completed" }
+            return
+        }
+
+        // Emit pixel to measure how often interrupted scans could be resumed
+        logcat { "PIR-WEB: Detected opportunity to resume interrupted scan, emitting pixel" }
+        pirPixelSender.reportInitialScanIncomplete()
+
+        if (pirRemoteFeatures.resumeInitialScanOnDashboardOpen().isEnabled()) {
+            logcat { "PIR-WEB: Resuming interrupted initial scan via foreground service" }
+            foregroundScanServiceStarter.startResumeScan()
+        } else {
+            logcat { "PIR-WEB: Resume-on-dashboard-open is disabled; not starting scan" }
+        }
     }
 
     private suspend fun getResultsFound(): List<ScanResult> {
@@ -108,6 +143,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 relatives = it.extractedProfile.relatives,
                 foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
                 optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                optOutFormSubmittedDate = it.optOutFormSubmittedDateInMillis?.convertToSeconds(),
                 estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
                 removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
                 hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,

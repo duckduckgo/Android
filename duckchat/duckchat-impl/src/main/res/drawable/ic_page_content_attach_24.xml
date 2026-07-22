@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M14.609,14.388C14.853,14.144 15.249,14.144 15.493,14.388L20.438,19.333V16.375C20.438,16.029 20.718,15.75 21.063,15.75H21.375C21.72,15.75 22,16.03 22,16.375V21.375C22,21.72 21.72,22 21.375,22H16.375C16.03,22 15.75,21.72 15.75,21.375V21.062C15.75,20.717 16.03,20.437 16.375,20.437L19.332,20.437L14.388,15.493C14.144,15.249 14.144,14.853 14.388,14.609L14.609,14.388ZM17.031,3C19.775,3 22,5.225 22,7.969V13.611C21.569,13.141 21.062,12.741 20.5,12.429V9.859C20.5,9.109 19.891,8.5 19.141,8.5H15.151C13.511,8.5 12.019,7.553 11.321,6.069C10.871,5.111 9.908,4.5 8.849,4.5H6.969C5.053,4.5 3.5,6.053 3.5,7.969V16.031C3.5,17.947 5.053,19.5 6.969,19.5H11.99C12.169,20.038 12.423,20.542 12.74,21H6.969C4.225,21 2,18.775 2,16.031V7.969C2,5.225 4.225,3 6.969,3H17.031ZM10.75,14.5C11.164,14.5 11.5,14.836 11.5,15.25C11.5,15.664 11.164,16 10.75,16H6.75C6.336,16 6,15.664 6,15.25C6,14.836 6.336,14.5 6.75,14.5H10.75ZM13.25,10.5C13.664,10.5 14,10.836 14,11.25C14,11.664 13.664,12 13.25,12H6.75C6.336,12 6,11.664 6,11.25C6,10.836 6.336,10.5 6.75,10.5H13.25ZM12.081,4.5C12.316,4.779 12.519,5.091 12.679,5.431C13.129,6.389 14.092,7 15.151,7H19.141C19.608,7 20.048,7.113 20.437,7.311C20.13,5.71 18.722,4.5 17.031,4.5H12.081Z"
+      android:fillColor="?daxColorSecondaryIcon" />
+</vector>

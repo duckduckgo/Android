@@ -35,6 +35,8 @@ import com.duckduckgo.common.utils.faviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -43,6 +45,7 @@ import org.junit.Test
 import org.mockito.kotlin.*
 import java.io.File
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class DuckDuckGoFaviconManagerTest {
 
     @get:Rule
@@ -217,6 +220,41 @@ class DuckDuckGoFaviconManagerTest {
         testee.loadToViewFromLocalWithPlaceholder(tabId = null, url = url, view = view)
 
         verify(mockFaviconDownloader).getFaviconFromDisk(mockFile)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenLoadToViewFromLocalWithCancellableRetryCalledThenFaviconLoadedFromDisk() = runTest {
+        givenFaviconExistsInDirectory(FAVICON_PERSISTED_DIR)
+        whenever(mockFaviconDownloader.getFaviconFromDisk(mockFile)).thenReturn(asBitmap())
+        val url = "https://example.com"
+        val view = ImageView(context)
+
+        testee.loadToViewFromLocalWithRetry(tabId = null, url = url, view = view)
+
+        verify(mockFaviconDownloader).getFaviconFromDisk(mockFile)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenLoadToViewFromLocalWithCancellableRetryCancelledThenRetriesStop() = runTest {
+        val url = "https://example.com"
+        val view = ImageView(context)
+
+        val job = launch {
+            testee.loadToViewFromLocalWithRetry(tabId = null, url = url, view = view)
+        }
+
+        // Let initial load + first retry complete
+        advanceTimeBy(2100)
+        job.cancel()
+
+        // Advance past all remaining retry delays
+        advanceTimeBy(10000)
+
+        // Each loadFromDisk call with tabId=null makes 1 call to faviconFile(PERSISTED_DIR, ...)
+        // Initial + 1 completed retry = 2 calls. Without cancellation would be 4 (1 initial + 3 retries).
+        verify(mockFaviconPersister, atMost(2)).faviconFile(eq(FAVICON_PERSISTED_DIR), any(), any())
     }
 
     private fun asBitmap(): Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Atšaukti</string>
     <string name="autocompleteRemoveItemRemove">Pašalinti</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Perjungti į skirtuką · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
-    <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
-    <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
 </resources>

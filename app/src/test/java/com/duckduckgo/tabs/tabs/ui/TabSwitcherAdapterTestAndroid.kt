@@ -17,6 +17,7 @@
 package com.duckduckgo.tabs.tabs.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter
@@ -62,6 +63,7 @@ class TabSwitcherAdapterTestAndroid {
             faviconManager = mock<FaviconManager>(),
             dispatchers = mock<DispatcherProvider>(),
             trackerCountAnimator = mock<TrackerCountAnimator>(),
+            addressDisplayFormatter = mock<AddressDisplayFormatter>(),
         )
     }
 }

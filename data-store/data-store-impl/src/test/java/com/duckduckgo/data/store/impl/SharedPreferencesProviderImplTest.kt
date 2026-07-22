@@ -36,6 +36,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import java.util.UUID
 import java.util.concurrent.Executor
 
@@ -65,7 +66,10 @@ class SharedPreferencesProviderImplTest {
         vpnPreferencesProvider = SharedPreferencesProviderImpl(
             context = context,
             dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
-        ) { crashLogger }
+            pixelLazy = { mock() },
+            dataStoreProviderFeatureLazy = { mock() },
+            crashLogger = { crashLogger },
+        )
     }
 
     @After

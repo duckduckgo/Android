@@ -26,6 +26,8 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -47,6 +49,7 @@ interface LongPressHandler {
         data object None : RequiredAction()
         class OpenInNewTab(val url: String) : RequiredAction()
         class OpenInNewBackgroundTab(val url: String) : RequiredAction()
+        class OpenInFireTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
         class ShareLink(val url: String) : RequiredAction()
         class CopyLink(val url: String) : RequiredAction()
@@ -57,6 +60,7 @@ class WebViewLongPressHandler @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val customTabDetector: CustomTabDetector,
+    private val browserMode: BrowserMode,
 ) : LongPressHandler {
 
     override fun handleLongPress(
@@ -84,7 +88,8 @@ class WebViewLongPressHandler @Inject constructor(
                             addImageMenuOpenInTabOptions(menu)
                             addLinkMenuOpenInTabOptions(menu)
                         }
-                        addLinkMenuOtherOptions(menu)
+                        addLinkMenuCopyLinkAddressOption(menu)
+                        addLinkMenuShareLinkOption(menu)
                     }
                 }
             }
@@ -93,7 +98,9 @@ class WebViewLongPressHandler @Inject constructor(
                     if (!customTabDetector.isCustomTab()) {
                         addLinkMenuOpenInTabOptions(menu)
                     }
-                    addLinkMenuOtherOptions(menu)
+                    addLinkMenuCopyLinkAddressOption(menu)
+                    addLinkMenuCopyLinkTextOptions(menu)
+                    addLinkMenuShareLinkOption(menu)
                 }
             }
             else -> {
@@ -103,7 +110,7 @@ class WebViewLongPressHandler @Inject constructor(
         }
 
         if (menuShown) {
-            pixel.fire(LONG_PRESS)
+            pixel.fire(LONG_PRESS, mapOf(BROWSER_MODE to browserMode.name.lowercase()))
         }
     }
 
@@ -120,9 +127,16 @@ class WebViewLongPressHandler @Inject constructor(
         menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, R.string.openInNewBackgroundTab)
     }
 
-    private fun addLinkMenuOtherOptions(menu: ContextMenu) {
+    private fun addLinkMenuCopyLinkAddressOption(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_COPY, CONTEXT_MENU_ID_COPY, R.string.copyUrl)
+    }
+
+    private fun addLinkMenuShareLinkOption(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, CONTEXT_MENU_ID_SHARE_LINK, R.string.shareLink)
+    }
+
+    private fun addLinkMenuCopyLinkTextOptions(menu: ContextMenu) {
+        menu.add(0, CONTEXT_MENU_ID_COPY_TEXT, CONTEXT_MENU_ID_COPY_TEXT, R.string.copyLinkText)
     }
 
     private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
@@ -131,14 +145,15 @@ class WebViewLongPressHandler @Inject constructor(
         longPressTarget: LongPressTarget,
         item: MenuItem,
     ): RequiredAction {
+        val browserModeParams = mapOf(BROWSER_MODE to browserMode.name.lowercase())
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
-                pixel.fire(LONG_PRESS_NEW_TAB)
+                pixel.fire(LONG_PRESS_NEW_TAB, browserModeParams)
                 val url = longPressTarget.url ?: return None
                 return OpenInNewTab(url)
             }
             CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB -> {
-                pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB)
+                pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB, browserModeParams)
                 val url = longPressTarget.url ?: return None
                 return OpenInNewBackgroundTab(url)
             }
@@ -170,9 +185,10 @@ class WebViewLongPressHandler @Inject constructor(
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB = 2
         const val CONTEXT_MENU_ID_COPY = 3
-        const val CONTEXT_MENU_ID_SHARE_LINK = 4
-        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 5
-        const val CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB = 6
+        const val CONTEXT_MENU_ID_COPY_TEXT = 4
+        const val CONTEXT_MENU_ID_SHARE_LINK = 5
+        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 6
+        const val CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB = 7
 
         private const val MAX_TITLE_LENGTH = 100
     }

@@ -1,0 +1,160 @@
+{
+  "name": "Kwold",
+  "url": "kwold.com",
+  "version": "0.8.0",
+  "addedDatetime": 1702965600000,
+  "optOutUrl": "https://kwold.com/ns/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "878e00ab-dbad-4ca9-a303-645702a36ee2",
+          "url": "https://kwold.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "ec9f8ae6-199e-441b-9722-ffc6737b4595",
+          "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " ~"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Known as:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "years old",
+              "selector": ".card-title",
+              "afterText": " ~"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Has lived in:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Related to:']]/dd/ul[@class='list-inline m-0']/li",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://kwold.com/pp/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://kwold.com/ns/control/privacy",
+          "id": "037f7920-b9e7-4214-a937-171ec641d641"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "dadb956d-a4e9-4d35-be1c-591d8e8e1bbd"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "5b9de12f-a52e-4bd0-b6ac-6884377d309b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf_captcha_token' and @value and @value != '']",
+              "parent": "//form[@id='control']"
+            }
+          ],
+          "id": "76149be7-9f40-403d-b630-f501d54e8e90"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "7f2a685e-ddad-4c5a-8e80-a6d3a690851f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "3a8a6e9d-c9a0-4e59-a8a4-fe4a05f3ce68"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "93ccf84a-a5ce-4dcf-8a78-143610723488"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "fcddc35b-6298-4f2b-a04c-08a2d6f7ceaa"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1762974343416
+}

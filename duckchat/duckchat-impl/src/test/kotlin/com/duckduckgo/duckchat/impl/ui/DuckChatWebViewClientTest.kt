@@ -17,14 +17,19 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.webkit.WebView
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class DuckChatWebViewClientTest {
 
     @Test
@@ -40,5 +45,34 @@ class DuckChatWebViewClientTest {
         duckChatWebViewClient.onPageStarted(webView, url, null)
 
         verify(mockPlugin).onPageStarted(webView, url, null)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenListenerInvokedWithUrl() = runTest {
+        val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
+        whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val webView: WebView = mock()
+        val url = "https://example.com"
+        var receivedUrl: String? = null
+        duckChatWebViewClient.onPageFinishedListener = { receivedUrl = it }
+
+        duckChatWebViewClient.onPageFinished(webView, url)
+
+        assertEquals(url, receivedUrl)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledWithoutUrlThenListenerReceivesNull() = runTest {
+        val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
+        whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val webView: WebView = mock()
+        var receivedUrl: String? = "initial"
+        duckChatWebViewClient.onPageFinishedListener = { receivedUrl = it }
+
+        duckChatWebViewClient.onPageFinished(webView, null)
+
+        assertNull(receivedUrl)
     }
 }

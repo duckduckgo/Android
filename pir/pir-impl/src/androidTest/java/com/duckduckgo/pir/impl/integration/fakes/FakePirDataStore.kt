@@ -27,13 +27,22 @@ class FakePirDataStore : PirDataStore {
     override var dauLastSentMs: Long = 0L
     override var wauLastSentMs: Long = 0L
     override var mauLastSentMs: Long = 0L
+    override var interactionDauLastSentMs: Long = 0L
+    override var interactionWauLastSentMs: Long = 0L
+    override var interactionMauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
     override var latestBackgroundScanRunInMs: Long = 0L
+    override var featureReceivedMs: Long = 0L
+    override var hasInitialScanEverStarted: Boolean = false
+    override var initialScanCompletionFlowId: Long = 0L
+    override var initialScanCompletionForegroundRunCount: Int = 0
+    override var initialScanCompletionScheduledRunCount: Int = 0
 
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
         resetUserData()
     }
 
@@ -42,7 +51,14 @@ class FakePirDataStore : PirDataStore {
         dauLastSentMs = 0L
         wauLastSentMs = 0L
         mauLastSentMs = 0L
+        interactionDauLastSentMs = 0L
+        interactionWauLastSentMs = 0L
+        interactionMauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
+        hasInitialScanEverStarted = false
+        initialScanCompletionFlowId = 0L
+        initialScanCompletionForegroundRunCount = 0
+        initialScanCompletionScheduledRunCount = 0
     }
 }

@@ -20,8 +20,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.privacy.db.UserAllowListDao
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -42,24 +41,22 @@ class TrackerDetectorClientTypeTest {
 
     private val mockEntityLookup: EntityLookup = mock()
     private val mockBlockingClient: Client = mock()
-    private val mockUserAllowListDao: UserAllowListDao = mock()
-    private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockAdClickManager: AdClickManager = mock()
 
     private val testee = TrackerDetectorImpl(
         mockEntityLookup,
-        mockUserAllowListDao,
+        mockUserAllowListRepository,
         mockContentBlocking,
         mockTrackerAllowlist,
-        mockWebTrackersBlockedDao,
         mockAdClickManager,
     )
 
     @Before
     fun before() {
-        whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
 
         whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
         whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))

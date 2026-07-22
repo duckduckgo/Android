@@ -18,7 +18,8 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -44,7 +45,9 @@ class DecryptWithSyncMasterKeyHandlerTest {
 
     private val mockCrypto: SyncCrypto = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockJsMessaging: JsMessaging = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
 
     val callbackDataCaptor = argumentCaptor<JsCallbackData>()
 
@@ -52,9 +55,12 @@ class DecryptWithSyncMasterKeyHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         handler = DecryptWithSyncMasterKeyHandler(
             crypto = mockCrypto,
             deviceSyncState = mockDeviceSyncState,
+            duckAiHostProvider = mockDuckAiHostProvider,
+            duckChatPixels = mockDuckChatPixels,
         )
     }
 
@@ -63,7 +69,7 @@ class DecryptWithSyncMasterKeyHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(HOST_DUCK_AI, domains[1])
+        assertEquals("duck.ai", domains[1])
     }
 
     @Test
@@ -188,6 +194,18 @@ class DecryptWithSyncMasterKeyHandlerTest {
         assertEquals(FEATURE_NAME, response.featureName)
         assertEquals(METHOD_NAME, response.method)
         verifySuccessResponse(response.params)
+    }
+
+    @Test
+    fun `when decryption succeeds then ai chat sync active pixel is fired`() {
+        configureSyncEnabled()
+        configureSignedIn()
+        whenever(mockCrypto.decrypt(any<ByteArray>())).thenReturn(DECRYPTED_BYTES)
+        val jsMessage = createJsMessage(TEST_MESSAGE_ID, JSONObject().apply { put("data", ENCRYPTED_BASE64_URL_DATA) })
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockDuckChatPixels).reportChatSyncActive()
     }
 
     private fun configureSyncEnabled() {

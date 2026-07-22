@@ -18,38 +18,67 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ShowOnAppLaunchScreenNoParams::class)
+@ContributeToActivityStarter(ShowOnAppLaunchScreenNoParams::class, screenName = "settingsAfterInactivity")
 class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private val viewModel: ShowOnAppLaunchViewModel by bindViewModel()
     private val binding: ActivityShowOnAppLaunchSettingBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         binding.specificPageUrlInput.setSelectAllOnFocus(true)
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     override fun onPause() {
@@ -88,6 +117,10 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                 )
             }
         }
+
+        binding.afterInactivityTimeoutRow.setClickListener {
+            viewModel.onTimeoutRowClicked()
+        }
     }
 
     private fun observeViewModel() {
@@ -115,11 +148,77 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     }
                 }
 
+                if (viewState.showNTPAfterIdleReturn) {
+                    setTitle(R.string.afterInactivityOptionTitle)
+                    binding.afterInactivityTimeoutRow.setSecondaryText(viewState.selectedIdleThresholdSeconds.toTimeoutLabel())
+                    binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
+                    binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
+                } else {
+                    setTitle(R.string.showOnAppLaunchOptionTitle)
+                    binding.afterInactivityTimeoutRow.visibility = View.GONE
+                    binding.afterInactivityTimeoutDivider.visibility = View.GONE
+                }
+
+                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption == NewTabPage
+                binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                binding.returnToLastTabToggle.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                binding.returnToLastTabToggle.quietlySetIsChecked(viewState.returnToLastTabEnabled) { _, isChecked ->
+                    viewModel.onReturnToLastTabToggled(isChecked)
+                }
+
                 if (binding.specificPageUrlInput.text.isBlank()) {
                     binding.specificPageUrlInput.text = viewState.specificPageUrl
                 }
             }
             .launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    is ShowTimeoutDialog -> showTimeoutDialog(command.options, command.currentSelection)
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun showTimeoutDialog(options: List<Long>, currentSelection: Long) {
+        val labels = options.map { it.toTimeoutLabel() }
+        val selectedIndex = options.indexOf(currentSelection).takeIf { it >= 0 }?.plus(1)
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.afterInactivityOptionTitle)
+            .setOptions(labels, selectedIndex)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        viewModel.onTimeoutSelected(options[selectedItem - 1])
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun Long.toTimeoutLabel(): String = when {
+        this == 0L -> getString(R.string.afterInactivityTimeoutAlways)
+        this < 3600L -> {
+            val minutes = this / 60
+            if (minutes == 1L) {
+                getString(R.string.afterInactivityTimeout1Minute)
+            } else {
+                getString(R.string.afterInactivityTimeoutXMinutes, minutes)
+            }
+        }
+        else -> {
+            val hours = this / 3600
+            if (hours == 1L) {
+                getString(R.string.afterInactivityTimeout1Hour)
+            } else {
+                getString(R.string.afterInactivityTimeoutXHours, hours)
+            }
+        }
     }
 
     private fun uncheckLastOpenedTabCheckListItem() {

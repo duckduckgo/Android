@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser.omnibar.model
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -37,6 +39,11 @@ sealed class Decoration {
         val isCosmetic: Boolean,
     ) : Decoration()
 
+    data class LaunchAdBlockingAnimation(
+        @field:DrawableRes val icon: Int,
+        @field:StringRes val text: Int,
+    ) : Decoration()
+
     data object CancelAnimations : Decoration()
 
     data class ChangeCustomTabTitle(
@@ -55,4 +62,10 @@ sealed class Decoration {
     data class DisableVoiceSearch(
         val url: String,
     ) : Decoration()
+
+    data class LockForOnboarding(
+        val locked: Boolean,
+    ) : Decoration()
+
+    data object CancelEasterEggLogoAnimation : Decoration()
 }

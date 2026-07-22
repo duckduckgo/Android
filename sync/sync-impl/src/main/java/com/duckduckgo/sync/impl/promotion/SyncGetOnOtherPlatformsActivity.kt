@@ -27,6 +27,9 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -35,6 +38,7 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncGetOnOtherDevicesBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,19 +57,45 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         configureUiEventHandlers()
         if (savedInstanceState == null) {
             viewModel.onScreenShownToUser(extractLaunchSource())
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 
     private fun configureUiEventHandlers() {
@@ -74,6 +104,12 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         }
         binding.downloadLinkText.setOnClickListener {
             viewModel.onLinkClicked(extractLaunchSource())
+        }
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        if (viewState.showDesktopBrowserUrl) {
+            binding.downloadLinkText.text = getString(R.string.getDesktopBrowserUrl)
         }
     }
 

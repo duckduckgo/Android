@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.modal
 
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.lifecycle.Lifecycle
@@ -26,13 +27,18 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ModalSurfaceActivityFromMessageId::class)
@@ -41,9 +47,30 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
     private val viewModel: ModalSurfaceViewModel by bindViewModel()
     private val binding: ActivityModalSurfaceBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    private var launchedFromSettings: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.cardsListRemoteMessageView.applyEdgeToEdgeInsets(edgeToEdgeHandler)
+        }
+
+        launchedFromSettings = intent.getActivityParams(ModalSurfaceActivityFromMessageId::class.java)?.launchedFromSettings ?: false
+
+        if (!launchedFromSettings && SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
+        }
 
         initialise()
         setupObservers()
@@ -84,6 +111,10 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
         when (command) {
             is Command.DismissMessage -> {
                 finish()
+                if (!launchedFromSettings && SDK_INT < 34) {
+                    @Suppress("DEPRECATION")
+                    overridePendingTransition(0, R.anim.slide_to_bottom)
+                }
             }
         }
     }

@@ -26,6 +26,7 @@
         layout="@layout/include_default_toolbar" />
 
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -35,6 +36,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_4">
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/afterInactivityTimeoutRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/afterInactivityTimeoutRowTitle"
+                tools:secondaryText="5 minutes"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/afterInactivityTimeoutDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingBottom="@dimen/keyline_2"
+                android:text="@string/afterInactivityScreenSectionHeader"
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/lastOpenedTabCheckListItem"
@@ -67,6 +94,23 @@
                 android:paddingBottom="@dimen/keyline_2"
                 app:type="single_line"
                 tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/returnToLastTabDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/returnToLastTabToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/returnToLastTabSettingTitle"
+                app:secondaryText="@string/returnToLastTabSettingSubtitle"
+                app:showSwitch="true"
+                tools:visibility="visible" />
 
         </LinearLayout>
     </ScrollView>

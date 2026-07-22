@@ -29,5 +29,5 @@ interface StatisticsUpdater {
     /**
      * Refreshes the DuckAI retention ATB value.
      */
-    fun refreshDuckAiRetentionAtb()
+    fun refreshDuckAiRetentionAtb(metadata: Map<String, String?> = mapOf())
 }

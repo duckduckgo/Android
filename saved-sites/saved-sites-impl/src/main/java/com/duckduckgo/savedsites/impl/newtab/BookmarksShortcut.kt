@@ -34,6 +34,8 @@ import javax.inject.Inject
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
     priority = NewTabPageShortcutPlugin.PRIORITY_BOOKMARKS,
+    featureName = "pluginBookmarksNewTabShortcutPlugin",
+    parentFeatureName = "pluginPointNewTabPageShortcutPlugin",
 )
 class BookmarksNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

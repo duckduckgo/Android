@@ -34,7 +34,7 @@
                 app:typography="h2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/drmSiteDialogTitle"/>
+                android:text="@string/drmSitePermissionDialogTitle"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/sitePermissionDialogSubtitle"
@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/drmSiteDialogSubtitle"/>
+                android:text="@string/drmSitePermissionDialogSubtitle"/>
 
         <LinearLayout
                 android:layout_width="match_parent"

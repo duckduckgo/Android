@@ -16,12 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl.notification
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -31,7 +30,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenWithLaunchPixel
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -107,7 +106,6 @@ class VpnReminderNotificationSpecification(context: Context) : NotificationSpec 
 class VpnReminderNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: VpnReminderNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -137,17 +135,16 @@ class VpnReminderNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
-        val intent = globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)
-            ?: return null
-        return taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
+    override suspend fun getLaunchIntent(): Intent? {
+        return globalActivityStarter.startIntent(
+            context,
+            NetworkProtectionManagementScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),
+        )
     }
 
     companion object {
         private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
         private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
+        private const val NOTIFICATION_LAUNCHED_PIXEL = "mnot_l"
     }
 }

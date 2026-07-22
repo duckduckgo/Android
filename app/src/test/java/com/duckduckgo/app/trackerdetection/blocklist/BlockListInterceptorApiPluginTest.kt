@@ -79,7 +79,11 @@ class BlockListInterceptorApiPluginTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        interceptor = BlockListInterceptorApiPlugin(inventory, moshi, fakePixel)
+        interceptor = BlockListInterceptorApiPlugin(
+            inventory,
+            moshi,
+            fakePixel,
+        )
     }
 
     @Test

@@ -20,6 +20,8 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import org.junit.Test
@@ -27,15 +29,17 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SelfTestResultMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val mockPixelManager: AutoconsentPixelManager = mock()
+    private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val selfTestPlugin = SelfTestResultMessageHandlerPlugin(mockPixelManager)
+    private val selfTestPlugin = SelfTestResultMessageHandlerPlugin(mockPixelManager, mockReloadLoopDetector)
 
     @Test
     fun whenProcessIfMessageTypeIsNotSelfTestThenDoNothing() {
@@ -63,7 +67,16 @@ class SelfTestResultMessageHandlerPluginTest {
 
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = true, isCosmetic = null)
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = true,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
+        )
 
         val anotherMessage = """
             {"type":"${selfTestPlugin.supportedTypes}", "cmp": "test", "result": false, "url": "http://example.com"}
@@ -71,7 +84,16 @@ class SelfTestResultMessageHandlerPluginTest {
 
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), anotherMessage, webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = null)
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
+        )
     }
 
     @Test
@@ -83,6 +105,27 @@ class SelfTestResultMessageHandlerPluginTest {
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
+    }
+
+    @Test
+    fun whenReloadLoopDetectedThenSelfTestResultHasReloadLoopTrue() {
+        whenever(mockReloadLoopDetector.isReloadLoopDetected(webView)).thenReturn(true)
+        val message = """
+            {"type":"${selfTestPlugin.supportedTypes.first()}", "cmp": "test", "result": false, "url": "http://example.com"}
+        """.trimIndent()
+
+        selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = true,
+            ),
+        )
     }
 
     @Test

@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.sync
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -34,7 +36,7 @@ interface DuckChatSyncRepository {
      * Records that Duck AI chats were deleted at the current timestamp.
      * @param timestampMillis Effective timestamp when deletion happened.
      */
-    suspend fun recordDuckAiChatsDeleted(timestampMillis: Long)
+    suspend fun recordDuckAiChatsDeleted(timestampMillis: Long, mode: BrowserMode)
 
     /**
      * Returns the timestamp of the last local Duck AI chat deletion, or null if none recorded.
@@ -45,6 +47,16 @@ interface DuckChatSyncRepository {
      * Clears the deletion timestamp only if it matches the provided timestamp.
      */
     suspend fun clearDeletionTimestampIfMatches(timestamp: String)
+
+    suspend fun recordSingleChatDeletion(chatId: String, mode: BrowserMode)
+    suspend fun getPendingChatDeletions(): Set<String>
+    suspend fun removePendingChatDeletions(ids: Set<String>)
+    suspend fun clearPendingChatDeletions()
+
+    suspend fun recordSingleChatUpdate(chatId: String, mode: BrowserMode)
+    suspend fun getPendingChatUpdates(): Set<String>
+    suspend fun removePendingChatUpdates(ids: Set<String>)
+    suspend fun clearPendingChatUpdates()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -54,7 +66,21 @@ class RealDuckChatSyncRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : DuckChatSyncRepository {
 
-    override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long) {
+    /*
+     * Chat activity in a non-syncable mode must never enter the sync pipeline (those chats stay on-device). Every
+     * queue/timestamp writer below guards on [BrowserMode.isSyncable] over the caller-supplied mode — the single write-side
+     * choke point.
+     *
+     * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps non-syncable
+     * chatIds out of the pending queues (write side), while that ensures patch content is read from the Regular store
+     * even if sync runs while the user is in a non-syncable mode (read side). Both are needed — don't drop one as
+     * "redundant".
+     */
+    override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long, mode: BrowserMode) {
+        if (!mode.isSyncable) {
+            logcat { "DuckChat-Sync: skipping deletion timestamp in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val isoTimestamp = DatabaseDateFormatter.parseMillisIso8601(timestampMillis)
             duckChatSyncMetadataStore.deletionTimestamp = isoTimestamp
@@ -76,6 +102,72 @@ class RealDuckChatSyncRepository @Inject constructor(
                 logcat { "DuckChat-Sync: cleared local deletion timestamp $timestamp" }
                 duckChatSyncMetadataStore.deletionTimestamp = null
             }
+        }
+    }
+
+    override suspend fun recordSingleChatDeletion(chatId: String, mode: BrowserMode) {
+        if (!mode.isSyncable) {
+            logcat { "DuckChat-Sync: skipping pending chat deletion for $chatId in non-syncable mode" }
+            return
+        }
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatDeletions
+            duckChatSyncMetadataStore.pendingChatDeletions = current + chatId
+            logcat { "DuckChat-Sync: recorded pending chat deletion for $chatId, queue size: ${current.size + 1}" }
+        }
+    }
+
+    override suspend fun getPendingChatDeletions(): Set<String> {
+        return withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatDeletions
+        }
+    }
+
+    override suspend fun removePendingChatDeletions(ids: Set<String>) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatDeletions
+            duckChatSyncMetadataStore.pendingChatDeletions = current - ids
+            logcat { "DuckChat-Sync: removed ${ids.size} pending chat deletions, remaining: ${(current - ids).size}" }
+        }
+    }
+
+    override suspend fun clearPendingChatDeletions() {
+        withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatDeletions = emptySet()
+            logcat { "DuckChat-Sync: cleared all pending chat deletions" }
+        }
+    }
+
+    override suspend fun recordSingleChatUpdate(chatId: String, mode: BrowserMode) {
+        if (!mode.isSyncable) {
+            logcat { "DuckChat-Sync: skipping pending chat update for $chatId in non-syncable mode" }
+            return
+        }
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatUpdates
+            duckChatSyncMetadataStore.pendingChatUpdates = current + chatId
+            logcat { "DuckChat-Sync: recorded pending chat update for $chatId, queue size: ${current.size + 1}" }
+        }
+    }
+
+    override suspend fun getPendingChatUpdates(): Set<String> {
+        return withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatUpdates
+        }
+    }
+
+    override suspend fun removePendingChatUpdates(ids: Set<String>) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatUpdates
+            duckChatSyncMetadataStore.pendingChatUpdates = current - ids
+            logcat { "DuckChat-Sync: removed ${ids.size} pending chat updates, remaining: ${(current - ids).size}" }
+        }
+    }
+
+    override suspend fun clearPendingChatUpdates() {
+        withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatUpdates = emptySet()
+            logcat { "DuckChat-Sync: cleared all pending chat updates" }
         }
     }
 }

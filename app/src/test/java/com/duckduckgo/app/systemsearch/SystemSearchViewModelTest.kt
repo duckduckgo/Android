@@ -41,20 +41,22 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.*
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
@@ -84,6 +86,7 @@ class SystemSearchViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
+    private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -94,11 +97,13 @@ class SystemSearchViewModelTest {
     fun setup() = runTest {
         whenever(mockAutoComplete.autoComplete(QUERY)).thenReturn(flowOf(autocompleteQueryResult))
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(flowOf(autocompleteBlankResult))
-        whenever(mockAutoCompleteFactory.create(any())).thenReturn(mockAutoComplete)
+        whenever(mockAutoCompleteFactory.create(any(), any())).thenReturn(mockAutoComplete)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList())) // Ensure initial favorites is empty for most tests
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
         whenever(mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(false))
+        fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
 
         testee = SystemSearchViewModel(
             mockDuckAiFeatureState,
@@ -106,6 +111,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -113,6 +119,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            fakeAutocompleteHistoryDeleteFeature,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -422,6 +429,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -429,6 +437,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            fakeAutocompleteHistoryDeleteFeature,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -455,6 +464,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -462,6 +472,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            fakeAutocompleteHistoryDeleteFeature,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -522,6 +533,7 @@ class SystemSearchViewModelTest {
             mockDuckChat,
             mockUserStageStore,
             mockAutoCompleteFactory,
+            BrowserMode.REGULAR,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -529,6 +541,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            fakeAutocompleteHistoryDeleteFeature,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -555,34 +568,52 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserLongPressedOnHistorySuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySuggestionThenRemovedImmediatelyWithoutDialog() = runBlocking {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+        verify(mockHistory).removeHistoryEntryByUrl(suggestion.url)
+        assertCommandIssued<AutocompleteItemRemoved>()
+        assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test
-    fun whenUserLongPressedOnHistorySearchSuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySearchSuggestionThenRemovedImmediatelyWithoutDialog() = runBlocking {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+        verify(mockHistory).removeHistoryEntryByQuery(suggestion.phrase)
+        assertCommandIssued<AutocompleteItemRemoved>()
+        assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test
-    fun whenUserLongPressedOnOtherSuggestionThenDoNothing() {
+    fun whenUserClickedDeleteOnOtherSuggestionThenDoNothing() {
         val suggestion = AutoCompleteDefaultSuggestion(phrase = "phrase")
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
         assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenDeleteButtonDisabledAndUserDeletesHistorySuggestionThenDialogShownButNoDeleteButtonPixelFired() {
+        fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = false))
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+        assertCommandIssued<ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test
@@ -850,6 +881,40 @@ class SystemSearchViewModelTest {
                 issuedCommand,
             )
         }
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and digital assist enabled and duck chat enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onDigitalAssistOpened(mock())
+
+        verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
+        verify(mockPixel).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and duck chat disabled then LaunchAssistSearch command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        val intent = mock<Intent>()
+
+        testee.onDigitalAssistOpened(intent)
+
+        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and kill switch disabled then LaunchAssistSearch command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(false))
+        val intent = mock<Intent>()
+
+        testee.onDigitalAssistOpened(intent)
+
+        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     companion object {

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">Блокиране на реклами в YouTube</string>
+    <string name="ad_blocking_settings_toggle_title">Блокирайте рекламите в YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокира рекламите на видеоклипове в YouTube, за да можете да ги гледате без прекъсване. Когато функцията е включена, DuckDuckGo анонимно ще открива смущения от блокиране на реклами или грешки в YouTube, за да подобри изживяването за всички. DuckDuckGo никога не вижда кои видеоклипове гледате или каквато и да е лична информация. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo премахва рекламите на видеоклипове в YouTube, за да можете да гледате видеоклипове без прекъсване. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Отваря видеоклипове в режим на киносалон без разсейване, който предотвратява влиянието на гледаното съдържание върху емисията в YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Блокиране на реклами</string>
+    <string name="ad_blocking_settings_header_description">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването</string>
+    <string name="contingencyMessageTitle">Блокирането на реклами в YouTube е недостъпно</string>
+    <string name="contingencyMessageContent">Блокирането на реклами е засегнато от скорошни промени в YouTube. Работим за отстраняване на тези проблеми и оценяваме Вашето разбиране</string>
+    <string name="contingencyMessagePrimaryButton">Разбрах</string>
+    <string name="contingencyMessageCloseContentDescription">Затваряне</string>
+    <string name="ad_blocking_menu_disable">Деактивиране на блокирането на реклами в YouTube</string>
+    <string name="ad_blocking_menu_enable">Активиране на блокирането на реклами в YouTube</string>
+    <string name="ad_blocking_menu_title">Блокиране на реклами в YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Затваряне</string>
+    <string name="ad_blocking_menu_always_on">Винаги включено</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Деактивиране до рестартиране</string>
+    <string name="ad_blocking_menu_always_off">Винаги изключено</string>
+    <string name="ad_blocking_disabled_popup_title">Блокирането на реклами в YouTube не работи?</string>
+    <string name="ad_blocking_disabled_popup_description">Изпратете анонимен сигнал за повреда до DuckDuckGo. Помогнете за подобряване на блокирането на реклами за всички!</string>
+    <string name="ad_blocking_disabled_primary_action">Изпращане на сигнал за повреда</string>
+    <string name="ad_blocking_disabled_secondary_action">Отмяна</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Деактивирано до рестартиране</string>
+    <string name="ad_blocking_omnibar_badge_text">Блокирането на рекламите в YouTube е включено</string>
+</resources>

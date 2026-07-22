@@ -23,9 +23,21 @@ import android.content.Intent
  * Public interface to provide navigation Intents related to browser screen
  */
 interface BrowserNav {
-    // opens url on a new tab
-    fun openInNewTab(context: Context, url: String): Intent
+    /**
+     * Returns an Intent that opens [url] in a new browser tab.
+     *
+     * @param context used to build the Intent.
+     * @param url the URL to open in the new tab.
+     * @param sourceTabId When provided, the new tab is anchored to `sourceTabId`, so closing the new tab returns to that tab instead of leaving an orphan tab.
+     */
+    fun openInNewTab(context: Context, url: String, sourceTabId: String? = null): Intent
     fun openInCurrentTab(context: Context, url: String): Intent
     fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
     fun closeDuckChat(context: Context): Intent
+
+    /**
+     * Returns an Intent that brings the browser to the foreground and switches to the tab
+     * identified by [tabId].
+     */
+    fun openExistingTab(context: Context, tabId: String): Intent
 }

@@ -28,11 +28,26 @@ enum class PirPixel(
 ) {
     PIR_FOREGROUND_RUN_STARTED(
         baseName = "m_dbp_foreground-run_started",
-        type = Count,
+        types = setOf(Count, Daily()),
     ),
 
     PIR_FOREGROUND_RUN_COMPLETED(
         baseName = "m_dbp_foreground-run_completed",
+        type = Count,
+    ),
+
+    PIR_FOREGROUND_RUN_START_FAILED(
+        baseName = "m_dbp_foreground-run_start-failed",
+        type = Count,
+    ),
+
+    PIR_FOREGROUND_RUN_LOW_MEMORY(
+        baseName = "m_dbp_foreground-run_low-memory",
+        type = Count,
+    ),
+
+    PIR_INITIAL_SCAN_INCOMPLETE(
+        baseName = "m_dbp_initial-scan_incomplete",
         type = Count,
     ),
 
@@ -151,6 +166,11 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED(
+        baseName = "m_dbp_optoutjob_reappeared",
+        type = Count,
+    ),
+
     PIR_ENGAGEMENT_DAU(
         baseName = "m_dbp_engagement_dau",
         type = Count,
@@ -166,6 +186,26 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_INTERACTION_DAU(
+        baseName = "m_dbp_interaction_dau",
+        type = Count,
+    ),
+
+    PIR_INTERACTION_WAU(
+        baseName = "m_dbp_interaction_wau",
+        type = Count,
+    ),
+
+    PIR_INTERACTION_MAU(
+        baseName = "m_dbp_interaction_mau",
+        type = Count,
+    ),
+
+    PIR_FIRST_SCAN_STARTED(
+        baseName = "m_dbp_first_scan",
+        type = Unique(),
+    ),
+
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
         baseName = "m_dbp_weekly_child-broker_orphaned-optouts",
         type = Count,
@@ -176,6 +216,10 @@ enum class PirPixel(
     ),
     PIR_SCAN_STAGE(
         baseName = "m_dbp_scan_stage",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_EMAIL_GET_DATA(
+        baseName = "m_dbp_scan_stage_email-get-data",
         type = Count,
     ),
     PIR_SCAN_STAGE_RESULT_MATCHES(
@@ -196,6 +240,10 @@ enum class PirPixel(
     ),
     PIR_OPTOUT_STAGE_EMAIL_GENERATE(
         baseName = "m_dbp_optout_stage_email-generate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_EMAIL_GET_DATA(
+        baseName = "m_dbp_optout_stage_email-get-data",
         type = Count,
     ),
     PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
@@ -252,7 +300,11 @@ enum class PirPixel(
     ),
     PIR_DOWNLOAD_MAINCONFIG_FAILURE(
         baseName = "m_dbp_download_mainconfig_failure",
-        type = Count,
+        types = setOf(Count, Daily()),
+    ),
+    PIR_DOWNLOAD_BROKER_JSON_FAILURE(
+        baseName = "m_dbp_download_broker-json_failure",
+        types = setOf(Count, Daily()),
     ),
     PIR_BROKER_ACTION_FAILED(
         baseName = "m_dbp_data_broker_action-failed_error",
@@ -276,6 +328,22 @@ enum class PirPixel(
     ),
     PIR_OPTOUT_INVALID_EVENT(
         baseName = "m_dbp_optout_invalid-event_dropped",
+        type = Daily(),
+    ),
+    PIR_MANUAL_RESET(
+        baseName = "m_dbp_manual_reset",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_BUNDLE_BROKER_JSON_LOADED(
+        baseName = "m_dbp_bundle_broker-json_loaded",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_BUNDLE_BROKER_JSON_FAILURE(
+        baseName = "m_dbp_bundle_broker-json_failure",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_CAN_RUN_PIR(
+        baseName = "m_dbp_user-eligible",
         type = Daily(),
     ),
     ;

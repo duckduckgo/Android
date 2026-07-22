@@ -17,11 +17,14 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
+import android.text.TextUtils.TruncateAt
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
@@ -60,10 +63,34 @@ constructor(
                 setPrimaryTextType(primaryTextType)
             }
 
+            if (hasValue(R.styleable.PopupMenuItemView_leadingIcon)) {
+                setLeadingIconDrawable(getDrawable(R.styleable.PopupMenuItemView_leadingIcon)!!)
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_leadingIconTint)) {
+                setLeadingIconTint(getColor(R.styleable.PopupMenuItemView_leadingIconTint, 0))
+            }
+
             if (hasValue(R.styleable.PopupMenuItemView_trailingIcon)) {
                 setTrailingIconDrawable(getDrawable(R.styleable.PopupMenuItemView_trailingIcon)!!)
             } else {
                 setTrailingIconVisibility(false)
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_primaryTextMaxLines)) {
+                setPrimaryTextMaxLines(getInt(R.styleable.PopupMenuItemView_primaryTextMaxLines, 1))
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_primaryTextEllipsize)) {
+                setPrimaryTextEllipsize(
+                    when (getInt(R.styleable.PopupMenuItemView_primaryTextEllipsize, 0)) {
+                        1 -> TruncateAt.START
+                        2 -> TruncateAt.MIDDLE
+                        3 -> TruncateAt.END
+                        4 -> TruncateAt.MARQUEE
+                        else -> null
+                    },
+                )
             }
 
             binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
@@ -86,6 +113,14 @@ constructor(
         updateContentDescription()
     }
 
+    fun setPrimaryTextMaxLines(maxLines: Int) {
+        binding.label.maxLines = maxLines
+    }
+
+    fun setPrimaryTextEllipsize(ellipsize: TruncateAt?) {
+        binding.label.ellipsize = ellipsize
+    }
+
     fun setPrimaryTextType(type: PopupMenuItemType) {
         when (type) {
             PRIMARY -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
@@ -103,6 +138,28 @@ constructor(
         spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
         setPrimaryText(spannable)
         isEnabled = false
+    }
+
+    fun setLeadingIconDrawable(drawable: Drawable) {
+        binding.leadingIcon.setImageDrawable(drawable)
+        setLeadingIconVisibility(true)
+    }
+
+    fun setLeadingIconResource(@DrawableRes resource: Int) {
+        binding.leadingIcon.setImageResource(resource)
+        setLeadingIconVisibility(true)
+    }
+
+    fun setLeadingIconVisibility(visible: Boolean) {
+        if (visible) {
+            binding.leadingIcon.show()
+        } else {
+            binding.leadingIcon.gone()
+        }
+    }
+
+    fun setLeadingIconTint(@ColorInt color: Int) {
+        binding.leadingIcon.imageTintList = ColorStateList.valueOf(color)
     }
 
     fun setTrailingIconDrawable(drawable: Drawable) {

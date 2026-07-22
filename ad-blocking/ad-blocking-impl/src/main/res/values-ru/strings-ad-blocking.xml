@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">Блокировка рекламы на YouTube</string>
+    <string name="ad_blocking_settings_toggle_title">Блокировать рекламу на YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. \n\nКогда эта функция включена, DuckDuckGo анонимно обнаруживает помехи при блокировке рекламы или ошибки YouTube, чтобы сделать работу удобнее для всех. DuckDuckGo никогда не видит, какие видео вы просматриваете, и не отслеживает никакую личную информацию, по которой вас можно идентифицировать. <annotation type="learn_more_link">Подробнее</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. <annotation type="learn_more_link">Подробнее</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Проигрыватель Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра без отвлекающих элементов, чтобы просмотренные видео не влияли на вашу ленту YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Блокировка рекламы</string>
+    <string name="ad_blocking_settings_header_description">Блокирует навязчивые трекеры до их загрузки, устраняя рекламу с отслеживанием</string>
+    <string name="contingencyMessageTitle">Блокировка рекламы на YouTube недоступна</string>
+    <string name="contingencyMessageContent">Недавние изменения на YouTube повлияли на работу блокировки рекламы. Мы занимаемся решением этой проблемы и благодарим вас за понимание.</string>
+    <string name="contingencyMessagePrimaryButton">Понятно</string>
+    <string name="contingencyMessageCloseContentDescription">Закрыть</string>
+    <string name="ad_blocking_menu_disable">Отключить блокировку рекламы на YouTube</string>
+    <string name="ad_blocking_menu_enable">Включить блокировку рекламы на YouTube</string>
+    <string name="ad_blocking_menu_title">Блокировка рекламы на YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Закрыть</string>
+    <string name="ad_blocking_menu_always_on">Всегда включено</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Отключить до перезапуска</string>
+    <string name="ad_blocking_menu_always_off">Всегда выключено</string>
+    <string name="ad_blocking_disabled_popup_title">Блокировка рекламы на YouTube не работает?</string>
+    <string name="ad_blocking_disabled_popup_description">Отправьте анонимное сообщение о проблеме в DuckDuckGo. Помогите улучшить блокировку рекламы для всех!</string>
+    <string name="ad_blocking_disabled_primary_action">Сообщить о проблеме</string>
+    <string name="ad_blocking_disabled_secondary_action">Отменить</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Отключено до перезапуска</string>
+    <string name="ad_blocking_omnibar_badge_text">Блокировка рекламы на YouTube включена</string>
+</resources>

@@ -34,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.ConflatedJob
@@ -56,7 +57,11 @@ class BookmarkAddedConfirmationDialog(
     context: Context,
     private val bookmarkFolder: BookmarkFolder?,
     private val promoPlugins: PluginPoint<BookmarkAddedDialogPlugin>,
-) : BottomSheetDialog(context) {
+    private val edgeToEdgeEnabled: Boolean,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeEnabled) CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
 
     abstract class EventListener {
         /** Sets a listener to be invoked when favorite state is changed */
@@ -74,6 +79,9 @@ class BookmarkAddedConfirmationDialog(
 
     override fun show() {
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         addInteractionListeners()
 
@@ -138,7 +146,11 @@ class BookmarkAddedConfirmationDialog(
         autoDismissDialogJob += lifecycleScope.launch {
             delay(BOOKMARKS_BOTTOM_SHEET_DURATION)
             if (isShowing && isActive) {
-                dismiss()
+                try {
+                    dismiss()
+                } catch (e: IllegalArgumentException) {
+                    logcat { "Auto-dismiss failed, window already removed: ${e.message}" }
+                }
             }
         }
     }

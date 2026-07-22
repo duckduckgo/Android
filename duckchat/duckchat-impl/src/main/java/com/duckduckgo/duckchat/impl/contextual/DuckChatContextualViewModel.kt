@@ -1,0 +1,1060 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.contextual
+
+import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.logcat
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import javax.inject.Inject
+
+@ContributesViewModel(FragmentScope::class)
+class DuckChatContextualViewModel @Inject constructor(
+    private val dispatchers: DispatcherProvider,
+    private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
+    private val duckChatJSHelper: DuckChatJSHelper,
+    private val contextualDataStore: DuckChatContextualDataStore,
+    private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
+    private val timeProvider: DuckChatContextualTimeProvider,
+    private val duckChatPixels: DuckChatPixels,
+    private val duckChatFeature: DuckChatFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
+    private val modelManager: DuckAiModelManager,
+    private val contextualNativeInputManager: ContextualNativeInputManager,
+    private val chatHistoryRepository: ChatHistoryRepository,
+    private val context: Context,
+) : ViewModel() {
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands = commandChannel.receiveAsFlow()
+
+    private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
+    val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
+
+    enum class SheetMode {
+        INPUT,
+        WEBVIEW,
+    }
+
+    enum class QuickActionState(
+        @field:StringRes val labelResId: Int,
+        @field:DrawableRes val iconResId: Int,
+    ) {
+        LEGACY_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
+        ),
+        ASK_ABOUT_PAGE(
+            labelResId = R.string.duckAIContextualPromptAskAboutPage,
+            iconResId = R.drawable.ic_page_content_attach_16,
+        ),
+        SUBMIT_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = R.drawable.ic_summarize_16,
+        ),
+    }
+
+    private var fullModeUrl: String = ""
+
+    private data class PageContextState(
+        // The current page reported by the browser — what a manual attach grabs.
+        val currentPage: String = "",
+        // The frozen snapshot actually submitted for the current attachment, so passive navigation
+        // doesn't change what an existing attachment sends.
+        val attachedPage: String = "",
+    )
+
+    private var pageContextState = PageContextState()
+
+    var currentPageContext: String
+        get() = pageContextState.currentPage
+        set(value) {
+            pageContextState = pageContextState.copy(currentPage = value)
+        }
+
+    // Chat id currently shown in the contextual webview, derived from the URL query param.
+    // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
+    private val _chatId = MutableStateFlow<String?>(null)
+    val chatId: StateFlow<String?> = _chatId.asStateFlow()
+
+    @VisibleForTesting
+    internal var isPageContextRequested: Boolean = false
+
+    sealed class Command {
+        data class LoadUrl(val url: String) : Command()
+        data object SendSubscriptionAuthUpdateEvent : Command()
+        data class OpenFullscreenMode(val url: String) : Command()
+        data class ChangeSheetState(
+            val newState: Int,
+            val prefillNativeInput: String? = null,
+            // Hide the soft keyboard as part of this transition (e.g. leaving the initial input state for
+            // the chat). Folded into this command rather than a separate one because commandChannel is a
+            // capacity-1 DROP_OLDEST channel: two commands emitted in the same burst would lose the older.
+            val hideKeyboard: Boolean = false,
+        ) : Command()
+        data object RequestPageContext : Command()
+        data object ShowFireConfirmation : Command()
+        data class ShowChatsPopup(
+            val showNewChatHeader: Boolean,
+            val recentChats: List<ChatHistoryItem>,
+        ) : Command()
+        data class OpenChatUrl(
+            val url: String,
+            val sourceTabId: String,
+        ) : Command()
+        data object LaunchChatHistory : Command()
+        data object FocusInput : Command()
+    }
+
+    private val _viewState: MutableStateFlow<ViewState> =
+        MutableStateFlow(
+            ViewState(
+                sheetMode = SheetMode.INPUT,
+                showContext = false,
+                showFullscreen = true,
+                allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                userRemovedContext = false,
+                contextUrl = "",
+                contextTitle = "",
+                tabId = "",
+                prompt = "",
+                isFireButtonEnabled = false,
+                quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                contextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled(),
+            ),
+        )
+    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    private var isContextualSheetImprovementsEnabled: Boolean = false
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val isSingleTabFireEnabled = featureTogglesInventory
+                .getAllTogglesForParent("androidBrowserConfig")
+                .find { it.featureName().name == "singleTabFireDialog" }
+                ?.isEnabled() == true
+            isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
+            val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                QuickActionState.ASK_ABOUT_PAGE
+            } else {
+                QuickActionState.LEGACY_SUMMARIZE
+            }
+            val chatHintResId = if (isContextualSheetImprovementsEnabled) {
+                R.string.contextualSheetImprovedHint
+            } else {
+                R.string.input_screen_chat_hint
+            }
+            _viewState.update {
+                it.copy(
+                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
+                    quickActionState = initialQuickActionState,
+                    chatHintResId = chatHintResId,
+                    showChatsIcon = isContextualSheetImprovementsEnabled,
+                )
+            }
+            if (isContextualSheetImprovementsEnabled) {
+                observeRecentChats()
+            }
+        }
+
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { enabled -> _viewState.update { it.copy(nativeChatInputEnabled = enabled) } }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun isStoredChatMissingFromHistory(url: String?): Boolean {
+        val chatId = extractChatId(url) ?: return false
+        val chats = chatHistoryRepository.observeChats().firstOrNull() ?: return false
+        return chats.none { it.chatId == chatId }
+    }
+
+    private fun observeRecentChats() {
+        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
+            chats
+                .asSequence()
+                .filterNot { it.chatId == currentChatId }
+                .sortedByDescending { it.lastEditMillis }
+                .take(MAX_RECENT_CHATS)
+                .toList()
+        }
+            .flowOn(dispatchers.io())
+            .onEach { recent -> _viewState.update { it.copy(recentChats = recent) } }
+            .launchIn(viewModelScope)
+    }
+
+    data class ViewState(
+        val sheetMode: SheetMode = SheetMode.INPUT,
+        val showFullscreen: Boolean = true,
+        val allowsAutomaticContextAttachment: Boolean = false,
+        val showContext: Boolean = false,
+        val userRemovedContext: Boolean = false,
+        val contextUrl: String = "",
+        val contextTitle: String = "",
+        val tabId: String = "",
+        val prompt: String = "",
+        val isFireButtonEnabled: Boolean = false,
+        val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
+        @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
+        // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
+        val showChatsIcon: Boolean = false,
+        val recentChats: List<ChatHistoryItem> = emptyList(),
+        val nativeChatInputEnabled: Boolean = false,
+        val contextualNativeInputEnabled: Boolean = false,
+    )
+
+    fun onSheetReopened() {
+        logcat { "Duck.ai: onSheetReopened" }
+
+        contextualNativeInputManager.onContextualReopened(_viewState.value.tabId)
+
+        viewModelScope.launch(dispatchers.io()) {
+            withContext(dispatchers.main()) {
+                logcat { "Duck.ai: requesting page context after sheet reopened" }
+                isPageContextRequested = true
+                commandChannel.trySend(Command.RequestPageContext)
+            }
+
+            val currentState = _viewState.value
+            if (currentState.sheetMode == SheetMode.WEBVIEW) {
+                reopenWebViewState(currentState)
+            } else {
+                withContext(dispatchers.main()) {
+                    logcat { "Duck.ai: reopenSheet in Input mode" }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                }
+            }
+        }
+
+        duckChatPixels.reportContextualSheetOpened()
+    }
+
+    private suspend fun reopenWebViewState(currentState: ViewState) {
+        val tabId = currentState.tabId
+        val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
+        if (!shouldReuseSession) {
+            renderNewChatState()
+            return
+        }
+        val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+        if (isStoredChatMissingFromHistory(existingChatUrl)) {
+            renderNewChatState()
+            return
+        }
+        withContext(dispatchers.main()) {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+        }
+        if (existingChatUrl == null) {
+            val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
+            withContext(dispatchers.main()) {
+                setSheetUrl(urlToLoad)
+                commandChannel.trySend(Command.LoadUrl(urlToLoad))
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(urlToLoad),
+                    )
+                }
+            }
+        } else {
+            withContext(dispatchers.main()) {
+                setSheetUrl(existingChatUrl)
+                _viewState.update { state ->
+                    state.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        showFullscreen = hasChatId(existingChatUrl),
+                    )
+                }
+            }
+            _viewState.update {
+                it.copy(
+                    allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                )
+            }
+            duckChatPixels.reportContextualSheetSessionRestored()
+        }
+    }
+
+    fun onSheetOpened(tabId: String) {
+        _viewState.update { it.copy(tabId = tabId) }
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
+            withContext(dispatchers.main()) {
+                isPageContextRequested = true
+                commandChannel.trySend(Command.RequestPageContext)
+            }
+
+            val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            if (existingChatUrl.isNullOrBlank()) {
+                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one $existingChatUrl" }
+                withContext(dispatchers.main()) {
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
+                    commandChannel.trySend(Command.LoadUrl(chatUrl))
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                            tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        )
+                    }
+                }
+                if (_viewState.value.showsAttachContextPlaceholder()) {
+                    duckChatPixels.reportContextualPlaceholderContextShown()
+                }
+                return@launch
+            }
+
+            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId) &&
+                !isStoredChatMissingFromHistory(existingChatUrl)
+            if (shouldReuseUrl) {
+                logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
+                val hasChatHistory = hasChatId(existingChatUrl)
+
+                withContext(dispatchers.main()) {
+                    setSheetUrl(existingChatUrl)
+                    _viewState.update { current ->
+                        current.copy(
+                            sheetMode = SheetMode.WEBVIEW,
+                            showFullscreen = hasChatHistory,
+                            tabId = tabId,
+                            allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                        )
+                    }
+                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                    commandChannel.trySend(Command.LoadUrl(existingChatUrl))
+                }
+            } else {
+                logcat { "Duck.ai: tab=$tabId session expired, starting a new one" }
+                withContext(dispatchers.main()) {
+                    _viewState.update {
+                        it.copy(tabId = tabId)
+                    }
+                }
+                renderNewChatState()
+            }
+        }
+        duckChatPixels.reportContextualSheetOpened()
+    }
+
+    fun onPromptSent(
+        prompt: String,
+        followUpPrefill: String? = null,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            val contextPrompt = generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
+            val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
+            val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
+            withContext(dispatchers.main()) {
+                // Sending from the initial input state leaves the sheet in the chat; hide the keyboard so
+                // the user sees the streaming reply instead of the composer.
+                val wasInInputMode = _viewState.value.sheetMode == SheetMode.INPUT
+                _viewState.value =
+                    _viewState.value.copy(
+                        sheetMode = SheetMode.WEBVIEW,
+                        prompt = "",
+                        // The context has already been captured in contextPrompt above, so drop the
+                        // page-context chip from the input once the prompt is sent — mirroring how image
+                        // attachments are cleared on submit.
+                        showContext = false,
+                    )
+                _subscriptionEventDataChannel.trySend(contextPrompt)
+                prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
+                // Always pass a non-null prefill: a draft preserves the typed text, empty clears the native
+                // chat input so stale text from a previous interaction doesn't reappear.
+                commandChannel.trySend(
+                    Command.ChangeSheetState(
+                        newState = BottomSheetBehavior.STATE_EXPANDED,
+                        prefillNativeInput = prefillText.orEmpty(),
+                        hideKeyboard = wasInInputMode,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun generatePrefillEvent(text: String): SubscriptionEventData {
+        val params = JSONObject().apply {
+            put("platform", "android")
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", text)
+                    put("autoSubmit", false)
+                },
+            )
+        }
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
+    }
+
+    fun onChatPageLoaded(url: String?) {
+        logcat { "Duck.ai: onChatPageLoaded $url" }
+        if (url == null) {
+            return
+        } else {
+            val sheetMode = _viewState.value.sheetMode
+            if (sheetMode == SheetMode.WEBVIEW) {
+                setSheetUrl(url)
+                val hasChatId = hasChatId(url)
+
+                viewModelScope.launch {
+                    _viewState.update { current ->
+                        current.copy(showFullscreen = hasChatId)
+                    }
+                }
+
+                if (hasChatId) {
+                    val tabId = _viewState.value.tabId
+                    if (tabId.isNotBlank()) {
+                        viewModelScope.launch(dispatchers.io()) {
+                            contextualDataStore.persistTabChatUrl(tabId, url)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun generateContextPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ): SubscriptionEventData {
+        val viewState = _viewState.value
+        val pageContext =
+            if (viewState.showContext) {
+                pageContextState.attachedPage
+                    .takeIf { it.isNotBlank() }
+                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                    ?: run {
+                        logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
+                        null
+                    }
+            } else {
+                null
+            }
+
+        if (pageContext == null) {
+            duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
+        } else {
+            duckChatPixels.reportContextualPromptSubmittedWithContextNative()
+        }
+
+        // The unified input widget is the source of truth for model/reasoning/tool/attachments when it
+        // is the composer; fall back to the shared model manager for callers that don't pass them (e.g.
+        // the Summarize/Ask-about-page quick action).
+        val resolvedModelId = modelId ?: modelManager.getSelectedModelId()
+        val resolvedReasoningEffort = reasoningEffort ?: modelManager.getResolvedReasoningEffort()
+        val params =
+            JSONObject().apply {
+                put("platform", "android")
+                put("tool", "query")
+                put(
+                    "query",
+                    JSONObject().apply {
+                        put("prompt", prompt)
+                        put("autoSubmit", true)
+                        if (resolvedModelId != null) {
+                            put("modelId", resolvedModelId)
+                        }
+                        if (resolvedReasoningEffort != null) {
+                            put("reasoningEffort", resolvedReasoningEffort)
+                        }
+                        if (selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(selectedTool) })
+                        }
+                        if (imagesJson != null) {
+                            put("images", imagesJson)
+                        }
+                        if (filesJson != null) {
+                            put("files", filesJson)
+                        }
+                    },
+                )
+                pageContext?.let { put("pageContext", it) }
+            }
+
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
+    }
+
+    private fun generatePageContextEventData(): SubscriptionEventData {
+        val pageContext = if (isContextValid(currentPageContext)) {
+            currentPageContext
+                .takeIf { it.isNotBlank() }
+                ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                ?: run {
+                    logcat { "Duck.ai: no pageContext available" }
+                    null
+                }
+
+            val json = JSONObject(currentPageContext)
+            val url = json.optString("url")
+            logcat { "Duck.ai: generatePageContextEventData for url $url" }
+            json
+        } else {
+            logcat { "Duck.ai: pageContext is not valid" }
+            null
+        }
+
+        return if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            val params =
+                JSONObject().apply {
+                    put("pageContext", pageContext)
+                }
+
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatPageContext",
+                params = params,
+            )
+        } else {
+            val params =
+                JSONObject().apply {
+                    put("pageContext", null)
+                }
+
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatPageContext",
+                params = params,
+            )
+        }
+    }
+
+    fun onContextualClose() {
+        viewModelScope.launch(dispatchers.main()) {
+            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
+        }
+    }
+
+    fun onSheetClosed() {
+        isPageContextRequested = false
+        persistTabClosed()
+        duckChatPixels.reportContextualSheetDismissed()
+        contextualNativeInputManager.onContextualClosed(_viewState.value.tabId)
+    }
+
+    private fun persistTabClosed() {
+        if (_viewState.value.sheetMode != SheetMode.WEBVIEW) {
+            return
+        }
+        viewModelScope.launch(dispatchers.io()) {
+            val tabId = _viewState.value.tabId
+            if (tabId.isNotBlank()) {
+                contextualDataStore.persistTabClosedTimestamp(tabId, timeProvider.currentTimeMillis())
+            }
+        }
+    }
+
+    fun removePageContext() {
+        logcat { "Duck.ai Contextual: removePageContext" }
+        _viewState.update { current ->
+            current.copy(
+                showContext = false,
+                userRemovedContext = true,
+                quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                    QuickActionState.ASK_ABOUT_PAGE
+                } else {
+                    current.quickActionState
+                },
+            )
+        }
+        if (_viewState.value.showsAttachContextPlaceholder()) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
+        }
+        duckChatPixels.reportContextualPageContextRemovedNative()
+    }
+
+    // fromPlaceholderTap distinguishes a tap on the duckAiAttachContextLayout placeholder (which
+    // reports the placeholder-tapped pixel) from internal reuse such as the ASK_ABOUT_PAGE quick
+    // action, which attaches the same context but is not a placeholder tap.
+    fun addPageContext(fromPlaceholderTap: Boolean = false) {
+        logcat { "Duck.ai Contextual: addPageContext" }
+        if (fromPlaceholderTap) {
+            duckChatPixels.reportContextualPlaceholderContextTapped()
+        }
+        viewModelScope.launch {
+            val isContextValid = isContextValid(currentPageContext, reportInvalidPixels = true)
+            if (isContextValid) {
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+                val json = JSONObject(currentPageContext)
+                duckChatPixels.reportContextualPageContextManuallyAttachedNative()
+                _viewState.update { current ->
+                    logcat { "Duck.ai Contextual: addPageContext $current context $currentPageContext" }
+                    current.copy(
+                        showContext = true,
+                        userRemovedContext = false,
+                        contextTitle = json.optString("title"),
+                        contextUrl = json.optString("url"),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun isContextValid(
+        pageContext: String,
+        reportInvalidPixels: Boolean = false,
+    ): Boolean {
+        if (pageContext.isEmpty()) {
+            logcat { "Duck.ai: pageContext is empty" }
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
+            return false
+        }
+        val json = try {
+            JSONObject(pageContext)
+        } catch (_: JSONException) {
+            logcat { "Duck.ai: pageContext is not valid JSON" }
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextCollectionEmpty()
+            return false
+        }
+        val title = json.optString("title").takeIf { it.isNotBlank() }
+        val content = json.optString("content").takeIf { it.isNotBlank() }
+        if (reportInvalidPixels) {
+            if (title == null) duckChatPixels.reportContextualPageContextInvalidNoTitle()
+            if (content == null) duckChatPixels.reportContextualPageContextInvalidNoContent()
+        }
+        return title != null && content != null
+    }
+
+    // Mirrors the Fragment's visibility logic for the "attach page content" placeholder
+    // (duckAiAttachContextLayout): it is only shown in INPUT mode, when not in the
+    // ASK_ABOUT_PAGE quick action, and when no context is currently attached.
+    private fun ViewState.showsAttachContextPlaceholder(): Boolean =
+        sheetMode == SheetMode.INPUT &&
+            quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
+            !showContext
+
+    fun replacePrompt(
+        input: String,
+        prompt: String,
+    ) {
+        logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
+        viewModelScope.launch {
+            val newPrompt = if (input.isEmpty()) {
+                prompt
+            } else {
+                input.plus(" ").plus(prompt)
+            }
+            val hasValidContext = isContextValid(currentPageContext)
+            if (hasValidContext) {
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+            }
+            _viewState.update { current ->
+                current.copy(
+                    prompt = newPrompt,
+                    showContext = hasValidContext,
+                )
+            }
+        }
+    }
+
+    fun onQuickActionClicked(currentInput: String) {
+        when (_viewState.value.quickActionState) {
+            QuickActionState.LEGACY_SUMMARIZE -> {
+                duckChatPixels.reportContextualSummarizePromptSelected()
+                replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
+            }
+
+            QuickActionState.ASK_ABOUT_PAGE -> {
+                if (!isContextValid(currentPageContext)) {
+                    // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
+                    return
+                }
+                duckChatPixels.reportContextualAskAboutPageSelected()
+                addPageContext()
+                commandChannel.trySend(Command.FocusInput)
+                viewModelScope.launch {
+                    _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+                }
+            }
+
+            QuickActionState.SUBMIT_SUMMARIZE -> {
+                if (!_viewState.value.showContext) {
+                    // Context was removed before submit; refuse to auto-submit without it.
+                    return
+                }
+                duckChatPixels.reportContextualSummarizePromptSelected()
+                onPromptSent(
+                    prompt = context.getString(R.string.duckAIContextualPromptSummarize),
+                    followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+                )
+            }
+        }
+    }
+
+    fun onAskAboutTabClicked() {
+        if (!isContextValid(currentPageContext)) {
+            // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
+            return
+        }
+        addPageContext()
+        commandChannel.trySend(Command.FocusInput)
+        _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+    }
+
+    fun onAskAboutPageClicked() {
+        if (!_viewState.value.showContext) {
+            // Context not attached; nothing to ask about.
+            return
+        }
+        commandChannel.trySend(Command.FocusInput)
+        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
+    }
+
+    fun onPromptCleared() {
+        logcat { "Duck.ai Contextual: onPromptCleared" }
+        viewModelScope.launch {
+            _viewState.update { current ->
+                current.copy(
+                    prompt = "",
+                )
+            }
+        }
+    }
+
+    fun onFullModeRequested() {
+        logcat { "Duck.ai: request fullmode url $fullModeUrl" }
+        val currentState = _viewState.value
+        val chatUrl = if (currentState.sheetMode == SheetMode.INPUT) {
+            duckChat.getDuckChatUrl("", false, sidebar = false)
+        } else {
+            fullModeUrl.ifEmpty {
+                duckChat.getDuckChatUrl("", false, sidebar = false)
+            }
+        }
+        viewModelScope.launch {
+            commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
+        }
+        duckChatPixels.reportContextualSheetExpanded()
+    }
+
+    fun onKeyboardVisibilityChanged(isVisible: Boolean) {
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        val newState =
+            if (isVisible) {
+                BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ChangeSheetState(newState))
+        }
+    }
+
+    fun onPageContextReceived(
+        tabId: String,
+        pageContext: String,
+        isStorePageContextEnabled: Boolean = false,
+    ) {
+        if (isContextValid(pageContext)) {
+            currentPageContext = pageContext
+        }
+        val inputMode = _viewState.value
+        if (inputMode.sheetMode == SheetMode.INPUT &&
+            !isPageContextRequested &&
+            !duckChatInternal.isAutomaticContextAttachmentEnabled()
+        ) {
+            return
+        }
+
+        if (isContextValid(pageContext, reportInvalidPixels = true)) {
+            val json = JSONObject(pageContext)
+            val title = json.optString("title")
+            val url = json.optString("url")
+
+            logcat { "Duck.ai: onPageContextReceived for url $url" }
+            if (inputMode.sheetMode == SheetMode.INPUT) {
+                val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+
+                val urlChanged = inputMode.contextUrl.isNotEmpty() && url != inputMode.contextUrl
+                val remainsUserRemoved = inputMode.userRemovedContext && !urlChanged
+                val dropStaleAttachment = !allowsAutomaticContextAttachment &&
+                    inputMode.showContext &&
+                    urlChanged
+
+                val showContext = when {
+                    allowsAutomaticContextAttachment -> !remainsUserRemoved
+                    dropStaleAttachment -> false
+                    else -> inputMode.showContext
+                }
+                val newlyAutoAttached = showContext && !inputMode.showContext
+                if (showContext) {
+                    pageContextState = pageContextState.copy(attachedPage = pageContext)
+                }
+                val updatedState =
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                        allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
+                        showContext = showContext,
+                        userRemovedContext = remainsUserRemoved,
+                        quickActionState = when {
+                            isContextualSheetImprovementsEnabled && newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
+                            isContextualSheetImprovementsEnabled && dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
+                            else -> inputMode.quickActionState
+                        },
+                    )
+                if (newlyAutoAttached) {
+                    duckChatPixels.reportContextualPageContextAutoAttached()
+                }
+                _viewState.update { updatedState }
+            } else {
+                _viewState.update {
+                    inputMode.copy(
+                        contextTitle = title,
+                        contextUrl = url,
+                        tabId = tabId,
+                        allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
+                    )
+                }
+                if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+                    val pageContext = generatePageContextEventData()
+                    viewModelScope.launch(dispatchers.main()) {
+                        _subscriptionEventDataChannel.trySend(pageContext)
+                    }
+                }
+            }
+        }
+    }
+
+    fun handleJSCall(method: String): Boolean {
+        when (method) {
+            RealDuckChatJSHelper.METHOD_CLOSE_AI_CHAT -> {
+                logcat { "Duck.ai: $method handled at the VM level" }
+                onContextualClose()
+                return true
+            }
+
+            else -> {
+                return false
+            }
+        }
+    }
+
+    fun onNewChatRequested() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChat()
+    }
+
+    fun onNewChatRequestedFromPopup() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChatFromPopup()
+    }
+
+    fun onChatsIconClicked() {
+        val state = _viewState.value
+        logcat {
+            "Duck.ai Contextual: onChatsIconClicked improvementsEnabled=$isContextualSheetImprovementsEnabled " +
+                "recentChats=${state.recentChats.size} sheetMode=${state.sheetMode}"
+        }
+        if (!isContextualSheetImprovementsEnabled) {
+            onNewChatRequested()
+            return
+        }
+        duckChatPixels.reportContextualChatsMenuTapped()
+        if (state.recentChats.isEmpty()) {
+            // No recent chats means there's no popup to show, so go straight to chat history.
+            // Don't report a "View All" tap here — that pixel tracks taps from within the popup menu.
+            commandChannel.trySend(Command.LaunchChatHistory)
+        } else {
+            duckChatPixels.reportContextualRecentChatsPopupDisplayed()
+            commandChannel.trySend(
+                Command.ShowChatsPopup(
+                    showNewChatHeader = state.sheetMode == SheetMode.WEBVIEW,
+                    recentChats = state.recentChats,
+                ),
+            )
+        }
+    }
+
+    fun onRecentChatClicked(chatId: String) {
+        duckChatPixels.reportContextualRecentChatSelected()
+        val url = duckChatInternal.buildChatUrl(chatId)
+        val sourceTabId = _viewState.value.tabId
+        commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
+    }
+
+    fun onViewAllChatsClicked() {
+        duckChatPixels.reportContextualViewAllChatsTapped()
+        commandChannel.trySend(Command.LaunchChatHistory)
+    }
+
+    fun onFireButtonClicked() {
+        duckChatPixels.reportContextualFireButtonTapped()
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ShowFireConfirmation)
+        }
+    }
+
+    fun onContextualFireConfirmed() {
+        duckChatPixels.reportContextualFireButtonConfirmed()
+        renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+    }
+
+    // sheetState == null leaves the bottom sheet position untouched (used when resetting after the
+    // loaded chat is deleted elsewhere, so we don't pop a dismissed sheet back open).
+    private fun renderNewChatState(sheetState: Int? = BottomSheetBehavior.STATE_HALF_EXPANDED) {
+        viewModelScope.launch(dispatchers.io()) {
+            val currentTabId = _viewState.value.tabId
+            if (currentTabId.isNotBlank()) {
+                contextualDataStore.clearTabChatUrl(currentTabId)
+
+                withContext(dispatchers.main()) {
+                    clearSheetUrl()
+                    pageContextState = pageContextState.copy(attachedPage = "")
+                    val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                        QuickActionState.ASK_ABOUT_PAGE
+                    } else {
+                        QuickActionState.LEGACY_SUMMARIZE
+                    }
+                    _viewState.update {
+                        it.copy(
+                            sheetMode = SheetMode.INPUT,
+                            showFullscreen = true,
+                            prompt = "",
+                            quickActionState = resetQuickActionState,
+                            // Reset the page-context attachment so a fresh chat doesn't silently inherit
+                            // the previous chat's context: generateContextPrompt() keys off showContext, and
+                            // resetQuickActionState hides the attached-context chip, so a stale showContext
+                            // would attach context with no visual indication.
+                            showContext = false,
+                            userRemovedContext = false,
+                        )
+                    }
+                    sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }
+
+                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
+                        duckChatPixels.reportContextualPlaceholderContextShown()
+                    }
+
+                    val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+                    _subscriptionEventDataChannel.trySend(subscriptionEvent)
+                }
+            }
+        }
+    }
+
+    private fun hasChatId(url: String?): Boolean = !extractChatId(url).isNullOrBlank()
+
+    private fun extractChatId(url: String?): String? {
+        val uri = url?.toUri() ?: return null
+        return uri.toChatIdOrNull(duckChat)
+    }
+
+    // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).
+    private fun setSheetUrl(url: String) {
+        fullModeUrl = url
+        _chatId.value = extractChatId(url)
+    }
+
+    private fun clearSheetUrl() {
+        fullModeUrl = ""
+        _chatId.value = null
+    }
+
+    private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
+        val lastClosedTimestamp = contextualDataStore.getTabClosedTimestamp(tabId) ?: return true
+        val timeoutMs = sessionTimeoutProvider.sessionTimeoutMillis()
+        if (timeoutMs <= 0) return false
+        val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
+        return elapsedMs <= timeoutMs
+    }
+
+    fun onMainBrowserPageFinished(isStorePageContextEnabled: Boolean = false) {
+        logcat { "Duck.ai: onMainBrowserPageFinished" }
+        if (isStorePageContextEnabled) {
+            isPageContextRequested = false
+            // When storePageContext is enabled, page context is already collected on page load by the browser
+            return
+        }
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        isPageContextRequested = false
+        viewModelScope.launch(dispatchers.main()) {
+            logcat { "Duck.ai: requesting page context after main browser page change" }
+            commandChannel.trySend(Command.RequestPageContext)
+        }
+    }
+
+    companion object {
+        const val MAX_RECENT_CHATS = 5
+    }
+}

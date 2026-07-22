@@ -1,21 +1,43 @@
 appId: com.duckduckgo.mobile.android
 ---
 - assertVisible:
-    text: ".*Ready for a faster browser that keeps you protected?.*"
-- tapOn: "let's do it!"
+    text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
+- tapOn:
+    text: "(let's get started!|Let's do it!)"
 - assertVisible:
-    text: "Protections activated!"
+    text: "Protections.activated!"
 - scrollUntilVisible:
     element:
       text: "choose your browser"
     direction: DOWN
 - tapOn: "choose your browser"
-- tapOn: "cancel"
+- runFlow:
+    when:
+      true: ${SET_AS_DEFAULT == 'true'}
+    commands:
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+- runFlow:
+    when:
+      true: ${SET_AS_DEFAULT != 'true'}
+    commands:
+      - tapOn: "cancel"
 - assertVisible:
     text: ".*where should I put your address bar?.*"
 - tapOn: "next"
 - assertVisible:
     text: ".*want easy access to private AI chat?.*"
+# Tapping next opens the new Duck.ai onboarding preview. Search is the default mode, so tap a
+# search suggestion to run a demo search — this completes onboarding and lands in the browser
+# on the in-context "That's DuckDuckGo Search!" CTA.
 - tapOn: "next"
 - assertVisible:
-    text: ".*Try a search!.*"
+    id: "suggestion1"
+- tapOn:
+    id: "suggestion1"
+- assertVisible:
+    text: ".*That's DuckDuckGo Search!.*"

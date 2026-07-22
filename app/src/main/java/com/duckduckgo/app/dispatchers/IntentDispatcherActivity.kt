@@ -18,14 +18,21 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.mode.ExternalUrl
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.collectLatest
@@ -41,7 +48,13 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var customTabsSessionRegistry: CustomTabsSessionRegistry
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
+        // Parcelable extras whose classes are absent from our classpath.
+        intent?.sanitize()
         super.onCreate(savedInstanceState)
 
         logcat { "onCreate called with intent $intent" }
@@ -56,8 +69,17 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun dispatch(viewState: ViewState) {
-        if (viewState.activityParams != null) {
+        // Ignore the initial default state: routing hasn't been computed yet. Acting on it would
+        // start the browser and finish() this activity before the real decision (e.g. a cached local
+        // PDF) is emitted from the background dispatcher.
+        if (!viewState.resolved) return
+
+        if (viewState.localPdfError) {
+            Toast.makeText(this, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_LONG).show()
+            finish()
+        } else if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
+            finish()
         } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
@@ -66,14 +88,21 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+        // The verified calling package (non-null only when the launcher bound the
+        // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
+        // apply the trusted-caller carve-out in handleAppLink.
+        val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
+            ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
                 context = this,
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
+                clientPackage = clientPackage,
             ),
         )
 
@@ -84,6 +113,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             BrowserActivity.intent(
                 context = this,
+                launchSource = if (isExternal) ExternalUrl else InAppNavigation,
                 queryExtra = intentText,
                 isExternal = isExternal,
             ),

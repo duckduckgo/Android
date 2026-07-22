@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Aceasta creează o copie de rezervă criptată a marcajelor, parolelor și chaturilor Duck.ai pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive ale tale. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
-    <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>
-    <string name="sync_intro_recover_content">Pentru a restabili datele sincronizate, vei avea nevoie de codul de recuperare pe care l-ai salvat atunci când ai configurat prima dată Sincronizarea. Este posibil ca acest cod să fi fost salvat ca PDF pe dispozitivul pe care l-ai folosit inițial pentru a configura Sincronizarea.</string>
-    <string name="sync_intro_recover_cta">Să începem</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Recuperează-ți datele sincronizate</string>
+    <string name="sync_recover_synced_data_content">Vei avea nevoie de codul de recuperare pe care l-ai primit când ai configurat Sync &amp; Backup. Este posibil să-l fi salvat ca PDF pe dispozitivul pe care l-ai folosit.</string>
+    <string name="sync_recover_synced_data_cta">Recuperează datele sincronizate</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scanează codul QR</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
     <string name="sync_share_title">Distribuie către...</string>
     <string name="sync_pdf_title">Codul de recuperare a sincronizării</string>
-    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
+    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi parolele, datele de completare automată și chaturile Duck.ai pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
     <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>
-    <string name="sync_instructions_title">Cum funcționează?</string>
-    <string name="sync_instructions_step1">Deschide DuckDuckGo pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
-    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație DuckDuckGo.</string>
+    <string name="sync_instructions_title">Cum funcționează acest cod?</string>
+    <string name="sync_instructions_step1">Deschide DuckDuckGo pe dispozitivul pe care vrei să îl sincronizezi și mergi la Sync &amp; Backup în Setări.</string>
+    <string name="sync_instructions_step2">Selectează „Sincronizează cu un alt dispozitiv” și scanează codul QR sau completează codul text.</string>
     <string name="sync_instructions_step3">Sincronizarea va fi activată și vei avea din nou acces la toate datele tale.</string>
+    <string name="sync_pdf_retention_notice">Dacă trec mai mult de 18 luni fără să folosești un browser DuckDuckGo cu Sync &amp; Backup activat, datele tale vor fi șterse de pe server și nu vor mai putea fi recuperate.</string>
     <string name="remove_device_dialog_title">Elimini dispozitivul?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s„%%@” nu va mai putea accesa datele tale sincronizate.</string>
     <string name="remove_device_dialog_primary_button">Elimină</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ștergi datele serverului?</string>
-    <string name="sync_delete_server_data_dialog_content">Toate dispozitivele vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Șterge datele</string>
+    <string name="sync_delete_server_data_dialog_content">Copia de rezervă va fi ștearsă de pe server. Toate dispozitivele vor fi deconectate de la sincronizare, dar nimic nu va fi șters de pe niciun dispozitiv.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Șterge datele serverului</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Anulare</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sincronizează marcajele pe mai multe dispozitive</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Ascunde</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recuperare</string>
+    <string name="sync_settings_download_recovery_code_item">Descarcă codul de recuperare ca PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Folosește acest cod pentru a-ți recupera datele dacă pierzi accesul la acest dispozitiv – păstrează-l în siguranță.</string>
+    <string name="sync_settings_data_expiration">Datele Sync &amp; Backup nu pot fi recuperate după 18 luni de inactivitate. <annotation type="learn_more_link">Află mai multe</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Dorești să restaurezi datele Sync &amp; Backup din instalarea anterioară?</string>
+    <string name="sync_previous_session_ready_body">Restaurează pentru a recupera marcajele, parolele și alte date în DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Restaurează Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Configurează o nouă sincronizare</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Recuperează-ți datele cu ușurință</string>
+    <string name="sync_recover_data_content">Folosește acest cod pentru a restaura datele dacă pierzi accesul la acest dispozitiv. Datele Sync &amp; Backup nu pot fi recuperate după 18 luni de inactivitate.</string>
+    <string name="sync_recover_data_recovery_code_label">Cod de recuperare</string>
+    <string name="sync_recover_data_download_pdf">Descarcă ca PDF</string>
+    <string name="sync_restore_on_reinstall_title">Restaurează la reinstalarea aplicației</string>
+    <string name="sync_restore_on_reinstall_description">Dacă reinstalezi aplicația DuckDuckGo, te vom întreba dacă dorești să restaurezi datele pe acest dispozitiv.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Accesează-ți chaturile pe toate dispozitivele folosind Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_chat_bottom_sheet_title">Haide să-ți sincronizăm chaturile pe toate dispozitivele!</string>
+    <string name="sync_chat_bottom_sheet_description">Găsește codul QR în aplicația DuckDuckGo de pe celălalt dispozitiv, accesând Setări › Sync &amp; Backup › Sincronizează cu un alt dispozitiv.</string>
+    <string name="sync_chat_bottom_sheet_positive">Scanează codul QR</string>
+    <string name="sync_chat_bottom_sheet_negative">Nu acum</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_joiner_confirmation_negative">Anulează</string>
+
+    <string name="sync_v2_host_confirmation_title">Dorești să sincronizezi datele?</string>
+    <string name="sync_v2_host_confirmation_positive">Sincronizează acum</string>
+    <string name="sync_v2_host_confirmation_negative">Anulează</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa parolele tale sincronizate din DuckDuckGo, datele de completare automată și conversațiile din Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” va putea accesa chaturile tale Duck.ai sincronizate.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Celălalt dispozitiv va avea acces la parolele tale sincronizate din DuckDuckGo, la datele de completare automată și la chaturile Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Celălalt dispozitiv va putea accesa chaturile tale Duck.ai sincronizate.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sincronizarea nu a reușit.</string>
+    <string name="sync_v2_error_pairing_rejected">Sincronizarea a fost anulată de pe celălalt dispozitiv.</string>
+    <string name="sync_v2_error_pairing_canceled">Sincronizare anulată.</string>
+    <string name="sync_v2_error_upgrade_required">Actualizează browserul DuckDuckGo și încearcă din nou.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Sincronizează acest dispozitiv dintr-un browser DuckDuckGo deja conectat pe un alt dispozitiv</string>
+    <string name="sync_v2_error_try_again">Încearcă din nou.</string>
+    <string name="sync_v2_error_got_it">Am înțeles</string>
+    <string name="sync_v2_already_paired_title">Deja sincronizat.</string>
+    <string name="sync_v2_already_paired_message">Aceste dispozitive sunt deja conectate la Sync &amp; Backup.</string>
+
 </resources>

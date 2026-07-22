@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.ui
 
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.R as materialR
@@ -28,6 +29,7 @@ class DefaultSnackbar(
     private val anchor: View? = null,
     private val action: String? = null,
     private val showAction: Boolean = false,
+    @ColorInt private val actionTextColor: Int? = null,
     private val onAction: () -> Unit = {},
     private val onDismiss: () -> Unit = {},
 ) {
@@ -42,6 +44,7 @@ class DefaultSnackbar(
                 setAction(action) {
                     // noop, handled in onDismissed callback
                 }
+                actionTextColor?.let { setActionTextColor(it) }
             }
         }
         .addCallback(
@@ -73,5 +76,9 @@ class DefaultSnackbar(
 
     fun show() {
         snackbar.show()
+    }
+
+    fun dismiss() {
+        snackbar.dismiss()
     }
 }

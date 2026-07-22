@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -41,6 +42,8 @@ class DuckChatDailyPixelSenderTest {
     private val mockPixel: Pixel = mock()
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
+    private val duckChatInternal: DuckChatInternal = mock()
+    private val aiFeaturesStateReporter: AiFeaturesStateReporter = mock()
 
     private lateinit var testee: DuckChatDailyPixelSender
 
@@ -49,8 +52,10 @@ class DuckChatDailyPixelSenderTest {
         testee = DuckChatDailyPixelSender(
             pixel = mockPixel,
             duckChatFeatureRepository = mockDuckChatFeatureRepository,
+            aiFeaturesStateReporter = aiFeaturesStateReporter,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             coroutineScope = coroutineRule.testScope,
+            duckChatInternal = duckChatInternal,
         )
     }
 
@@ -60,6 +65,7 @@ class DuckChatDailyPixelSenderTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -85,5 +91,24 @@ class DuckChatDailyPixelSenderTest {
             parameters = mapOf(PixelParameter.IS_ENABLED to "false"),
             type = Daily(),
         )
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DAILY,
+            parameters = mapOf(PixelParameter.IS_ENABLED to "false"),
+            type = Daily(),
+        )
+    }
+
+    @Test
+    fun `when onStart then reports ai features state`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        advanceUntilIdle()
+
+        verify(aiFeaturesStateReporter).reportDailyState()
     }
 }

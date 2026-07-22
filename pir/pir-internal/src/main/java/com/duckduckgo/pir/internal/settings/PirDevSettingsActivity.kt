@@ -17,20 +17,25 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.isEnabled
+import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
-import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEmailResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -54,15 +59,32 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirNotificationManager: PirNotificationManager
 
+    @Inject
+    lateinit var pirInternalSettingsDataStore: PirInternalSettingsDataStore
+
+    @Inject
+    lateinit var pirDashboardUrlProvider: PirDashboardUrlProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         setupViews()
         bindViews()
         pirNotificationManager.createNotificationChannel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun setupViews() {
@@ -75,7 +97,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.pirDebugEmail.setOnClickListener {
-            globalActivityStarter.start(this, PirEmailResultsScreen)
+            globalActivityStarter.start(this, PirDevEmailScreenNoParams)
         }
 
         binding.viewRunEvents.setOnClickListener {
@@ -85,11 +107,30 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         binding.brokerConfig.setOnClickListener {
             globalActivityStarter.start(this, PirBrokerConfigScreenNoParams)
         }
+
+        binding.pirCustomUrlInput.text = pirDashboardUrlProvider.getUrl()
+
+        binding.pirSetCustomUrl.setOnClickListener {
+            val url = binding.pirCustomUrlInput.text
+            if (url.isBlank()) {
+                Toast.makeText(this, getString(R.string.pirDevCustomUrlEmpty), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            pirInternalSettingsDataStore.customDashboardUrl = url
+            Toast.makeText(this, getString(R.string.pirDevCustomUrlSet), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.pirResetCustomUrl.setOnClickListener {
+            pirInternalSettingsDataStore.customDashboardUrl = null
+            binding.pirCustomUrlInput.text = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
+            Toast.makeText(this, getString(R.string.pirDevCustomUrlReset), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun bindViews() {
         lifecycleScope.launch {
-            pirWorkHandler.canRunPir().collectLatest { canRunPir ->
+            pirWorkHandler.canRunPir().collectLatest { eligibility ->
+                val canRunPir = eligibility.isEnabled
                 binding.pirDebugScan.isEnabled = canRunPir
                 binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
             }

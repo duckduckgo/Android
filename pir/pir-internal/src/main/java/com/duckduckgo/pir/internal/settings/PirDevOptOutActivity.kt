@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -58,6 +59,9 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: PirRepository
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var optOutAdapter: ArrayAdapter<String>
     private lateinit var dropDownAdapter: ArrayAdapter<String>
     private val binding: ActivityPirInternalOptoutBinding by viewBinding()
@@ -66,10 +70,18 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         setupViews()
         bindViews()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.optOutList)
     }
 
     private fun setupViews() {
@@ -92,7 +104,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             if (selectedBroker != null) {
                 globalActivityStarter.start(
                     this,
-                    PirDevWebViewResultsScreenParams(listOf(selectedBroker!!)),
+                    PirDevWebViewScreenParams.PirDevOptOutWebViewScreenParams(listOf(selectedBroker!!)),
                 )
             }
         }

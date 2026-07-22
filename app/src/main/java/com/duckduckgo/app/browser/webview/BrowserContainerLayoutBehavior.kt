@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -26,7 +27,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 
 /**
@@ -44,6 +44,15 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
+    private val marginOffsetPx = (MARGIN_OFFSET_DP * context.resources.displayMetrics.density).toInt()
+
+    override fun onRequestChildRectangleOnScreen(
+        parent: CoordinatorLayout,
+        child: View,
+        rectangle: Rect,
+        immediate: Boolean,
+    ): Boolean = false
+
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: View,
@@ -58,8 +67,29 @@ class TopOmnibarBrowserContainerLayoutBehavior(
         if (dependency.isBrowserNavigationBar()) {
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
-            super.onDependentViewChanged(parent, child, dependency)
+            val result = super.onDependentViewChanged(parent, child, dependency)
+            correctBottomMargin(child, dependency)
+            result
         }
+
+    /**
+     * Sets `bottomMargin` based on the visible height of the AppBarLayout ([dependency]).
+     *
+     * [ScrollingViewBehavior] positions [child] below the AppBarLayout, but [child]'s `match_parent` height
+     * causes it to overflow past the parent. The correct margin equals the AppBarLayout's visible portion
+     * minus a small offset ([MARGIN_OFFSET_DP]) to reduce visual flicker during scroll.
+     */
+    internal fun correctBottomMargin(child: View, dependency: View) {
+        if (child.isGone) return
+        val lp = child.layoutParams as? CoordinatorLayout.LayoutParams ?: return
+        val visibleHeight = dependency.height + dependency.top
+        // Only apply the offset during scroll (partially collapsed) to reduce visual stutter.
+        // When fully expanded, use the exact visible height to avoid cutting off content.
+        val newMargin = if (dependency.top < 0) maxOf(0, visibleHeight - marginOffsetPx) else visibleHeight
+        if (lp.bottomMargin != newMargin) {
+            lp.bottomMargin = newMargin
+        }
+    }
 }
 
 /**
@@ -116,6 +146,7 @@ private fun offsetByBottomElementVisibleHeight(
         false
     }
 }
+private const val MARGIN_OFFSET_DP = 7
 
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 

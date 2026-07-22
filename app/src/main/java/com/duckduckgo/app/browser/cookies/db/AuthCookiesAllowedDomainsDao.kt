@@ -35,5 +35,5 @@ interface AuthCookiesAllowedDomainsDao {
     fun getDomain(host: String): AuthCookieAllowedDomainEntity?
 
     @Query("DELETE FROM auth_cookies_allowed_domains WHERE domain NOT IN (:exceptionList)")
-    fun deleteAll(exceptionList: String)
+    fun deleteAll(exceptionList: List<String>)
 }

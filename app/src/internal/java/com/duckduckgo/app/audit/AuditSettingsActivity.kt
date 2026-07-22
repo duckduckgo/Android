@@ -38,14 +38,20 @@ import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_3
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.SURROGATES
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityAuditSettingsBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AuditSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityAuditSettingsBinding by viewBinding()
 
@@ -53,11 +59,19 @@ class AuditSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onDestroy() {
@@ -97,7 +111,7 @@ class AuditSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun goToUrl(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = url))
         finish()
     }
 

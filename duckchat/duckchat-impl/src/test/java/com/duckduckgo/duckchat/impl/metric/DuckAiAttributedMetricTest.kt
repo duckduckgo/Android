@@ -184,11 +184,11 @@ class DuckAiAttributedMetricTest {
             2.2 to 0, // ≤5 -> bucket 0
             4.4 to 0, // ≤5 -> bucket 0
             5.0 to 0, // ≤5 -> bucket 0
-            5.1 to 0, // rounds to 5, ≤5 -> bucket 0
-            5.8 to 1, // rounds to 6, >5 and ≤9 -> bucket 1
+            5.1 to 1, // 5.1 > 5, >5 and ≤9 -> bucket 1
+            5.8 to 1, // >5 and ≤9 -> bucket 1
             6.6 to 1, // >5 and ≤9 -> bucket 1
             9.0 to 1, // >5 and ≤9 -> bucket 1
-            9.3 to 1, // rounds to 9, >5 and ≤9 -> bucket 1
+            9.3 to 2, // 9.3 > 9, >9 -> bucket 2
             10.0 to 2, // >9 -> bucket 2
             14.1 to 2, // >9 -> bucket 2
         )

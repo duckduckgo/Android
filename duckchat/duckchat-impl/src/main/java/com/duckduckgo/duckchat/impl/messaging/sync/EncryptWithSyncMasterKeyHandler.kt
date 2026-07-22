@@ -20,8 +20,9 @@ import android.util.Base64
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -40,6 +41,8 @@ import javax.inject.Inject
 class EncryptWithSyncMasterKeyHandler @Inject constructor(
     private val crypto: SyncCrypto,
     private val deviceSyncState: DeviceSyncState,
+    private val duckChatPixels: DuckChatPixels,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler =
@@ -94,6 +97,7 @@ class EncryptWithSyncMasterKeyHandler @Inject constructor(
                 val encryptedData = Base64.encodeToString(encryptedBytes, Base64.NO_WRAP).applyUrlSafetyFromB64()
 
                 logcat { "DuckChat-Sync: Encrypted data successfully" }
+                duckChatPixels.reportChatSyncActive()
 
                 // send encrypted data back to JS
                 val payload = JSONObject().apply { put(RESPONSE_KEY_ENCRYPTED_DATA, encryptedData) }
@@ -102,7 +106,7 @@ class EncryptWithSyncMasterKeyHandler @Inject constructor(
 
             override val allowedDomains: List<String> = listOf(
                 AppUrl.Url.HOST,
-                HOST_DUCK_AI,
+                duckAiHostProvider.getHost(),
             )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME

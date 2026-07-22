@@ -21,15 +21,22 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
+import dagger.SingleInstanceIn
 import java.util.Locale
 import javax.inject.Inject
 
+@SingleInstanceIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : OnboardingStore {
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     override var onboardingDialogJourney: String?
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
@@ -41,10 +48,18 @@ class OnboardingStoreImpl @Inject constructor(
 
         return listOf(
             DaxDialogIntroOption(
-                optionText = if (language == "en") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1English)
+                optionText = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+                    if (language == "en") {
+                        context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
+                    } else {
+                        context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
+                    }
                 } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1)
+                    if (language == "en") {
+                        context.getString(R.string.onboardingSearchDaxDialogOption1English)
+                    } else {
+                        context.getString(R.string.onboardingSearchDaxDialogOption1)
+                    }
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
@@ -66,6 +81,26 @@ class OnboardingStoreImpl @Inject constructor(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
                 link = "!image ${context.getString(R.string.onboardingSearchQueryOption4)}",
+            ),
+        )
+    }
+
+    override fun getChatSuggestions(): List<DaxDialogIntroOption> {
+        return listOf(
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion1),
+                iconRes = drawable.ic_ai_chat_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion1),
+            ),
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion2),
+                iconRes = drawable.ic_ai_chat_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion2),
+            ),
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3),
+                iconRes = drawable.ic_wand_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3Prompt),
             ),
         )
     }
@@ -183,10 +218,19 @@ class OnboardingStoreImpl @Inject constructor(
         preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, true) }
     }
 
+    override fun setDuckAiOnboardingFlow() {
+        preferences.edit { putBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, true) }
+    }
+
+    override fun isDuckAiOnboardingFlow(): Boolean {
+        return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
+        private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
     }
 }

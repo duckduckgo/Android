@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Tallenna latauksiin</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Sivustolta %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Poista kaikki</string>
+    <string name="downloadsActivityNoItemsDescription">Yhtään tiedostoa ei ole vielä ladattu</string>
+    <string name="downloadsActivityTitle">Lataukset</string>
+    <string name="downloadsAllFilesDeletedMessage">Kaikki tiedostot poistettu</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Tiedoston avaaminen ei onnistu. Tarkista yhteensopiva sovellus.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s poistettiin</string>
+    <string name="downloadsFileNotFoundErrorMessage">Tiedostoa ei enää ole olemassa</string>
+    <string name="downloadsItemMenuCancel">Peruuta</string>
+    <string name="downloadsItemMenuDelete">Poista</string>
+    <string name="downloadsItemMenuShare">Jaa</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s: lisäasetukset</string>
+    <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
+    <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>
+    <string name="downloadsShareTitle">Jaa...</string>
+    <string name="downloadsStateInProgress">Käynnissä…</string>
+    <string name="downloadsUndoActionName">Kumoa</string>
+    <string name="downloadsSearchHint">Hae</string>
 </resources>

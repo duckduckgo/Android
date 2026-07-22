@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">Gem i downloads</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Fra: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Slet alle</string>
+    <string name="downloadsActivityNoItemsDescription">Der er ikke downloadet nogen filer endnu</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="downloadsFileNotFoundErrorMessage">Filen findes ikke længere</string>
+    <string name="downloadsItemMenuCancel">Afbestil</string>
+    <string name="downloadsItemMenuDelete">Slet</string>
+    <string name="downloadsItemMenuShare">Del</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Flere muligheder for %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
+    <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
+    <string name="downloadsShareTitle">Del med ...</string>
+    <string name="downloadsStateInProgress">I gang ...</string>
+    <string name="downloadsUndoActionName">Fortryd</string>
+    <string name="downloadsSearchHint">Søg</string>
 </resources>

@@ -275,32 +275,31 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/bottomSheetMenuSettingDivider"
+                android:id="@+id/trackersAnimationSectionDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/trackersAnimationSettingsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsTrackersBlockedAnimationHeaderTitle" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/useBottomSheetMenuSetting"
+                android:id="@+id/showTrackersCountInAddressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/showExperimentalBrowserMenu"
+                app:primaryText="@string/showTrackerCountInAddressBar"
                 app:primaryTextTruncated="false"
-                app:showSwitch="true"
-                tools:visibility="visible" />
+                app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/trackersAnimationSettingDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="0dp" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/showTrackersCountInTabSwitcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/showTrackerCountInTabSwitcher"
+                app:primaryText="@string/showWeeklyTrackerCountInTabSwitcher"
                 app:primaryTextTruncated="false"
                 app:showSwitch="true" />
 
@@ -308,3 +307,5 @@
 
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

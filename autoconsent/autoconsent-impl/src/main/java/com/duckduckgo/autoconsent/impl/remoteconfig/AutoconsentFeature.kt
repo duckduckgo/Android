@@ -56,4 +56,13 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun cpmPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun heuristicAction(): Toggle
+
+    /**
+     * Gate for the new Cookie Pop-up Preference settings UI and behavior.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpPreferenceSetting(): Toggle
 }

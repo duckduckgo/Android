@@ -2,7 +2,7 @@ name: 'Pull Request opened -> Comment on task and add it to Android Release Boar
 
 on:
   pull_request:
-    types: [opened, reopened, edited, ready_for_review]
+    types: [opened, reopened, edited, synchronize, ready_for_review]
 
 jobs:
   process-internal-pr:
@@ -10,23 +10,24 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Add comment with PR link in Asana task
-        if: ${{ github.actor == github.event.pull_request.user.login && ( github.event.action == 'opened' || github.event.action == 'reopened') }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          trigger-phrase: "Task/Issue URL:"
-          action: 'add-asana-comment'
-          is-pinned: true
-
       - name: Find Asana Task ID
-        if: ${{ github.event.pull_request.base.ref == 'develop' }}
+        if: ${{ github.event.pull_request.base.ref == github.event.repository.default_branch }}
         id: find-asana-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          trigger-phrase: "Task/Issue URL:"
+          trigger-phrase: ${{ vars.ASANA_TASK_TRIGGER_PHRASE }}
           action: 'find-asana-task-id'
+
+      - name: Add comment with PR link in Asana task
+        continue-on-error: true
+        if: ${{ github.actor == github.event.pull_request.user.login && ( github.event.action == 'opened' || github.event.action == 'reopened') }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          trigger-phrase: ${{ vars.ASANA_TASK_TRIGGER_PHRASE }}
+          action: 'add-asana-comment'
+          is-pinned: true
 
       - name: Add task to Asana project section
         if: ${{ steps.find-asana-task.outcome == 'success' && steps.find-asana-task.outputs.asanaTaskId != '' }}

@@ -54,6 +54,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -77,7 +80,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Impor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImportFile
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ReevalutePromotions
@@ -97,7 +99,6 @@ import com.duckduckgo.savedsites.impl.importing.ImportFromGoogleBookmarksPreImpo
 import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -134,6 +135,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     @Inject
     lateinit var importFromGoogle: ImportFromGoogle
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
@@ -175,15 +182,18 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             }
         }
 
-    private val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.userReturnedFromSyncSettings()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         configureToolbar()
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         setupBookmarksRecycler()
         observeViewModel()
@@ -192,6 +202,14 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         configureImportBookmarksDialog()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        // Only one of the two app bars is visible at a time (bookmarks sorting feature flag); insetting both is safe.
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayoutSorting)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(contentBookmarksBinding.recycler)
     }
 
     private fun configureImportBookmarksDialog() {
@@ -423,7 +441,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
                 is ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
-                is LaunchSyncSettings -> launchSyncSettings()
                 is ReevalutePromotions -> configurePromotionsContainer()
                 is ShowBrowserMenu -> showBookmarksPopupMenu(it.buttonsDisabled, it.sortingMode)
                 is LaunchBookmarkImportFile -> launchBookmarkImportChooseFile()
@@ -460,11 +477,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         }.launchIn(lifecycleScope)
     }
 
-    private fun launchSyncSettings() {
-        val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
-        syncActivityLauncher.launch(intent)
-    }
-
     private fun showFaviconsPrompt() {
         val faviconPrompt = FaviconPromptSheet.Builder(this)
             .addEventListener(
@@ -474,6 +486,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     }
                 },
             )
+            .setEdgeToEdgeEnabled(edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
         faviconPrompt.show()
     }
 

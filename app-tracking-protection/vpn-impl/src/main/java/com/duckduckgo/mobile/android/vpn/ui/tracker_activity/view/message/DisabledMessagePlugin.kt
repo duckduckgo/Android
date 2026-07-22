@@ -34,6 +34,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_DISABLED,
+    featureName = "pluginDisabledMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class DisabledMessagePlugin @Inject constructor() : AppTPStateMessagePlugin {
     override fun getView(

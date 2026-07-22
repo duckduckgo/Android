@@ -129,8 +129,6 @@
     <string name="atp_NewTabDisabled"><b>App Tracking Protection er deaktiveret.</b>\nTryk for at fortsætte blokeringen af sporingsforsøg i alle dine apps.</string>
     <string name="atp_NewTabRevoked"><b>En VPN-app på din enhed har deaktiveret App Tracking Protection.</b>\nTryk for at genaktivere.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection er aktiveret</b> og blokerer for sporingsforsøg i alle dine apps.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Prøv gratis</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Alle apps</string>
@@ -433,5 +431,9 @@
     <string name="apptp_PproUpsellBannerAction">Mere info</string>
     <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonner på DuckDuckGo, og få den eneste VPN, der er kompatibel med App Tracking Protection.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Prøv gratis!</string>
+
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Luk</string>
+    <string name="atp_close_button_content_description">Luk</string>
 
 </resources>

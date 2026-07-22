@@ -26,12 +26,15 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -49,6 +52,7 @@ class PirWebDeleteUserProfileHandlerTest {
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
+    private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() {
@@ -58,6 +62,7 @@ class PirWebDeleteUserProfileHandlerTest {
             workHandler = mockWorkHandler,
             pirFeatureDataCleaner = mockPirFeatureDataCleaner,
             pirWebProfileStateHolder = mockPirWebProfileStateHolder,
+            pirPixelSender = mockPirPixelSender,
         )
     }
 
@@ -75,8 +80,9 @@ class PirWebDeleteUserProfileHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
+        verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
-        verify(mockWorkHandler).cancelWork()
+        verify(mockWorkHandler).cancelWork(CancellationReason.PROFILE_DELETED)
         verify(mockPirFeatureDataCleaner).removeUserData()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
@@ -85,7 +91,7 @@ class PirWebDeleteUserProfileHandlerTest {
     fun whenCancelWorkThrowsExceptionThenSendsErrorResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.DELETE_USER_PROFILE_DATA)
-        whenever(mockWorkHandler.cancelWork()).thenThrow(RuntimeException("Cancel work failed"))
+        whenever(mockWorkHandler.cancelWork(any())).thenThrow(RuntimeException("Cancel work failed"))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
@@ -116,8 +122,9 @@ class PirWebDeleteUserProfileHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
+        verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
-        verify(mockWorkHandler).cancelWork()
+        verify(mockWorkHandler).cancelWork(CancellationReason.PROFILE_DELETED)
         verify(mockPirFeatureDataCleaner).removeUserData()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }

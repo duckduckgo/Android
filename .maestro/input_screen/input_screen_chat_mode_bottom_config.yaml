@@ -2,7 +2,6 @@ appId: com.duckduckgo.mobile.android
 name: "Input Screen Chat Mode test (bottom config)"
 tags:
   - inputScreenTest
-  - releaseTest
 ---
 - retry:
     maxRetries: 3

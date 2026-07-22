@@ -16,13 +16,13 @@
 
 package com.duckduckgo.subscriptions.impl.feedback
 
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.UNKNOWN
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
@@ -74,6 +74,7 @@ enum class SubscriptionFeedbackVpnSubCategory : SubscriptionFeedbackSubCategory 
 
 enum class SubscriptionFeedbackSubsSubCategory : SubscriptionFeedbackSubCategory {
     ONE_TIME_PASSWORD,
+    UNABLE_TO_ACCESS_FEATURES,
     OTHER,
 }
 
@@ -98,7 +99,7 @@ enum class SubscriptionFeedbackDuckAiSubCategory : SubscriptionFeedbackSubCatego
     OTHER,
 }
 
-internal fun PrivacyProFeedbackSource.asParams(): String {
+internal fun SubscriptionFeedbackSource.asParams(): String {
     return when (this) {
         DDG_SETTINGS -> "settings"
         SUBSCRIPTION_SETTINGS -> "ppro"
@@ -152,6 +153,7 @@ internal fun SubscriptionFeedbackVpnSubCategory.asParams(): String {
 internal fun SubscriptionFeedbackSubsSubCategory.asParams(): String {
     return when (this) {
         ONE_TIME_PASSWORD -> "otp"
+        SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES -> "unableToAccessFeatures"
         SubscriptionFeedbackSubsSubCategory.OTHER -> "somethingElse"
     }
 }

@@ -23,11 +23,12 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(':anvil-compiler')
 
     implementation project(':navigation-api')
     implementation project(':di')
 
+    implementation AndroidX.activity
+    implementation AndroidX.appCompat
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 

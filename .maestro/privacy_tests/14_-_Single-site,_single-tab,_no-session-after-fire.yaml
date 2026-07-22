@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 tags:
     - privacyTest
 ---
@@ -10,6 +11,8 @@ tags:
             - launchApp:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
+            - tapOn:
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site/#ad-id-5"
             - pressKey: Enter
             - assertVisible:
@@ -56,7 +59,7 @@ tags:
                 id: "omnibarTextInput"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-            - tapOn: "Clear Tabs and Data"
+            - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
             - tapOn:
                 id: "omnibarTextInput"
             - pasteText

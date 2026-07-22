@@ -25,8 +25,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.OPEN_SEND_FEEDBACK_MODAL
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
@@ -47,7 +47,7 @@ class PirOpenSendFeedbackModalMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirOpenSendFeedbackModalMessageHandler: process $jsMessage" }
         val intent = globalActivityStarter.startIntent(
             context,
-            PrivacyProFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
+            SubscriptionFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
         )
         intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)

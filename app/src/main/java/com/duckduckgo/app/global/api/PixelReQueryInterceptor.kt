@@ -32,16 +32,21 @@ import okhttp3.Response
  */
 class PixelReQueryInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        var url = chain.request().url
-        val request = chain.request().newBuilder()
+        val originalRequest = chain.request()
+        val originalUrlString = originalRequest.url.toUrl().toString()
 
-        url = url.toUrl().toString().replace("rq_0_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_0").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_0_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_0").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_1").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_1").toHttpUrl()
+        val modifiedUrlString = originalUrlString
+            .replace("rq_0_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_0")
+            .replace("rq_0_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_0")
+            .replace("rq_1_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_1")
+            .replace("rq_1_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_1")
 
-        logcat { "Pixel interceptor: $url" }
+        if (modifiedUrlString == originalUrlString) {
+            return chain.proceed(originalRequest)
+        }
 
-        return chain.proceed(request.url(url).build())
+        logcat { "Pixel interceptor: $modifiedUrlString" }
+
+        return chain.proceed(originalRequest.newBuilder().url(modifiedUrlString.toHttpUrl()).build())
     }
 }

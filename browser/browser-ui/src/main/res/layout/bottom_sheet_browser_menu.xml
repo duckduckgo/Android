@@ -25,6 +25,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <include
+        android:id="@+id/menuHeader"
+        layout="@layout/view_browser_menu_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,13 +54,14 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_2"
-                android:paddingBottom="@dimen/keyline_3">
+                android:paddingBottom="@dimen/keyline_2">
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/backMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuBack"
                     app:menuActionSrc="@drawable/ic_arrow_left_24" />
 
@@ -61,6 +70,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuForward"
                     app:menuActionSrc="@drawable/ic_arrow_right_24" />
 
@@ -69,45 +80,85 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuNewTab"
                     app:menuActionSrc="@drawable/ic_add_24" />
-
-                <com.duckduckgo.common.ui.view.MenuActionButtonView
-                    android:id="@+id/newDuckChatTabMenuItem"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuNewAIChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newDuckChatMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:layout_marginEnd="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_24" />
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_logo_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_0"
                     app:menuActionLabel="@string/browserMenuSettings"
                     app:menuActionSrc="@drawable/ic_settings_24" />
+
+                <com.duckduckgo.common.ui.view.MenuActionButtonView
+                    android:id="@+id/refreshActionMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    android:visibility="gone"
+                    app:menuActionLabel="@string/browserMenuRefresh"
+                    app:menuActionSrc="@drawable/ic_reload_24"
+                    tools:visibility="visible" />
             </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/urlPageActionsSectionDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:defaultPadding="true"
+                android:layout_marginBottom="@dimen/keyline_2"
+                app:defaultPadding="false"
                 app:fullWidth="false" />
+
+            <LinearLayout
+                android:id="@+id/topInContextSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/topInContextSectionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:visibility="gone"
+                app:defaultPadding="false"
+                app:fullWidth="false"
+                tools:visibility="visible" />
 
             <include
                 android:id="@+id/includeDefaultBrowserMenuItem"
                 layout="@layout/view_menu_item_default_browser_medium" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/downloadPdfMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_document_download_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuDownloadPdf" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/refreshMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_reload_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
@@ -148,14 +199,6 @@
                 app:iconDrawable="@drawable/ic_device_desktop_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDesktopSite" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/refreshMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_reload_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
@@ -209,14 +252,6 @@
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDownloads" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/duckChatHistoryMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_history_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuChatHistory" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/privacyToolsSectionDivider"
                 android:layout_width="match_parent"
@@ -234,7 +269,7 @@
                 android:id="@+id/createAliasMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_email_24"
+                app:iconDrawable="@drawable/ic_email_protection_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuEmailAlias" />
 
@@ -245,6 +280,14 @@
                 app:iconDrawable="@drawable/ic_fireproof_solid_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuFireproofSite" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/fireMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_fire_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuFireTabsData" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/utilitiesSectionDivider"
@@ -275,17 +318,7 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_print_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuPrint" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/chatSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:iconDrawable="@drawable/ic_settings_ai_24"
-                app:primaryText="@string/browserMenuChatSettings"
-                app:menuSize="medium"
-                tools:visibility="visible" />
+                app:primaryText="@string/browserMenuPrintSite" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/customTabsMenuDivider"
@@ -297,8 +330,9 @@
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/runningInDdgBrowserMenuItem"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2"

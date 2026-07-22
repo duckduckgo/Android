@@ -1,0 +1,1461 @@
+// Duck Chat Fullscreen pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
+// Duck Chat Contextual pixels: https://app.asana.com/1/137249556945/project/1174433894299346/task/1211821261289598?focus=true.
+{
+    "m_aichat_settings_menu_opened": {
+        "description": "Duck.ai Browser Menu opened",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_menu_aichat_settings_tapped": {
+        "description": "Duck.ai settings opened from the Duck.ai Browser Menu",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tab_switcher_opened": {
+        "description": "Tab Switcher opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_fire_button_tapped": {
+        "description": "Fire Button opened from Duck.ai",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_addressbar_click_aichat": {
+        "description": "Fires when the user touches the address bar while the Duck.ai chat input is showing",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "browserMode"]
+    },
+    "m_aichat_contextual_sheet_opened_count": {
+        "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_opened_daily": {
+        "description": "(Daily Pixel) User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_dismissed_count": {
+        "description": "User dismissed the Contextual sheet. Dragging or closing directly",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_sheet_dismissed_daily": {
+        "description": "(Daily Pixel) User dismissed the Contextual sheet. Dragging or closing directly",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_session_restored_count": {
+        "description": "A previously saved chat has been restored after opening the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_session_restored_daily": {
+        "description": "(Daily Pixel) A previously saved chat has been restored after opening the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_expand_button_tapped_count": {
+        "description": "User moved the contextual chat to fullscreen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_expand_button_tapped_daily": {
+        "description": "(Daily Pixel) User moved the contextual chat to fullscreen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_button_tapped_count": {
+        "description": "User started a new chat inside the contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_button_tapped_daily": {
+        "description": "(Daily Pixel) User started a new chat inside the contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_menu_tapped_count": {
+        "description": "User started a new chat from the recent chats popup menu in the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_menu_tapped_daily": {
+        "description": "(Daily Pixel) User started a new chat from the recent chats popup menu in the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_summarize_selected_count": {
+        "description": "User used the summarize prompt presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_summarize_selected_daily": {
+        "description": "(Daily Pixel) User used the summarize prompt presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_shown_count": {
+        "description": "User has seen the page context placeholder presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_shown_daily": {
+        "description": "(Daily Pixel) User has seen the page context placeholder presented in the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_tapped_count": {
+        "description": "User has added the page context via the placeholder shown in the native side of the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_placeholder_tapped_daily": {
+        "description": "(Daily Pixel) User has added the page context via the placeholder shown in the native side of the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_empty": {
+        "description": "User attempted to attach page context but the context string was empty",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_title": {
+        "description": "User attempted to attach page context but the extracted title was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_content": {
+        "description": "User attempted to attach page context but the extracted content body was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_auto_attached_count": {
+        "description": "The page context has been automatically attached to the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_auto_attached_daily": {
+        "description": "(Daily Pixel) The page context has been automatically attached to the Contextual sheet",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_native_count": {
+        "description": "The page context has been manually attached to the Contextual sheet in the Native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_native_daily": {
+        "description": "(Daily Pixel) The page context has been manually attached to the Contextual sheet in the Native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_frontend_count": {
+        "description": "The page context has been manually attached to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_manually_attached_frontend_daily": {
+        "description": "(Daily Pixel) The page context has been manually attached to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_native_count": {
+        "description": "The page context has been manually removed from to the Contextual sheet in the native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_native_daily": {
+        "description": "(Daily Pixel) The page context has been manually removed from to the Contextual sheet in the native side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_frontend_count": {
+        "description": "The page context has been manually removed from to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_removed_frontend_daily": {
+        "description": "(Daily Pixel) The page context has been manually removed from to the Contextual sheet in the Frontend side",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_context_native_count": {
+        "description": "The user has submitted a prompt to Contextual Duck.ai with the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_context_native_daily": {
+        "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai with the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_without_context_native_count": {
+        "description": "The user has submitted a prompt to Contextual Duck.ai without the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_without_context_native_daily": {
+        "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai without the page context attached",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_collection_empty": {
+        "description": "The page context collected via content scripts is not valid / is empty",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_enabled_count": {
+        "description": "The user has enabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_enabled_daily": {
+        "description": "(Daily Pixel) The user has enabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_disabled_count": {
+        "description": "The user has disabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context_disabled_daily": {
+        "description": "(Daily Pixel) The user has disabled automatic page context collection in Duck.ai Settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_auto_context": {
+        "description": "(Daily Pixel) Indicates if the user has automatic context collection enabled or not",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_enabled",
+                "description": "whether automatic page context collection is enabled or not"
+            }
+        ]
+    },
+    "m_aichat_settings_chat_suggestions_turned_on_count": {
+        "description": "User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_on_daily": {
+        "description": "(Daily Pixel) User enabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_count": {
+        "description": "User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_chat_suggestions_turned_off_daily": {
+        "description": "(Daily Pixel) User disabled the Chat Suggestions toggle in General Settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_count": {
+        "description": "User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_daily": {
+        "description": "(Daily Pixel) User selected a recent chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_count": {
+        "description": "User selected a pinned chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_selected_pinned_daily": {
+        "description": "(Daily Pixel) User selected a pinned chat suggestion",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_entry_tapped_count": {
+        "description": "User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_entry_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_started": {
+        "description": "Fires when the native layer receives a voiceSessionStarted bridge message from the Duck.ai frontend, indicating a voice session has actually begun",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_digital-assistant_started": {
+        "description": "Fires when Duck.ai voice chat is launched as the digital assistant (e.g. via Google Assistant ACTION_ASSIST intent)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_default_toggle_position_changed": {
+        "description": "User changed the default toggle position setting in AI Features settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "value", "type": "string", "description": "The selected toggle position", "enum": ["search", "duckAI", "lastUsed"] }
+        ]
+    },
+    "m_aichat_new_address_bar_picker_v2_displayed_count": {
+        "description": "Fires every time the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_displayed_daily": {
+        "description": "Fires once per day when the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_count": {
+        "description": "Fires every time the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_daily": {
+        "description": "Fires once per day when the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_duck_ai_direct_navigation_count": {
+        "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "m_aichat_duck_ai_direct_navigation_daily": {
+        "description": "(Daily Pixel) User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "m_aichat_experimental_omnibar_mode_switched": {
+        "description": "User switched between Search and Duck.ai in the native input field",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "direction", "type": "string", "description": "Direction of the toggle switch", "enum": ["to_search", "to_duckai"] },
+            { "key": "had_text", "type": "boolean", "description": "Whether the input field had text" },
+            {
+                "key": "default_position",
+                "type": "string",
+                "description": "The user's default toggle position setting",
+                "enum": ["search", "duckAI", "lastUsed"]
+            }
+        ]
+    },
+    "m_aichat_experimental_omnibar_shown": {
+        "description": "(Daily Pixel) Native input field shown to the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_shown_count": {
+        "description": "Native input field shown to the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_query_submitted_count": {
+        "description": "User submitted a search query from the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "text_length_bucket",
+                "type": "string",
+                "description": "Bucketed length of the submitted query",
+                "enum": ["short", "medium", "long", "very_long"]
+            }
+        ]
+    },
+    "m_aichat_experimental_omnibar_query_submitted_daily": {
+        "description": "(Daily Pixel) User submitted a search query from the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_session_both_modes_count": {
+        "description": "User used both Search and Duck.ai in the same session in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_session_both_modes_daily": {
+        "description": "(Daily Pixel) User used both Search and Duck.ai in the same session in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_session_summary": {
+        "description": "Summary of native input field usage for a session, emitted when the app is backgrounded",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "searches_in_session", "type": "integer", "description": "Number of searches submitted during the session" },
+            { "key": "prompts_in_session", "type": "integer", "description": "Number of Duck.ai prompts submitted during the session" }
+        ]
+    },
+    "m_aichat_experimental_omnibar_first_settings_viewed": {
+        "description": "Discovery funnel: user viewed the Duck.ai settings",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_first_enabled": {
+        "description": "Discovery funnel: native input field first enabled",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_first_interaction": {
+        "description": "Discovery funnel: user first interacted with the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_first_search_submission": {
+        "description": "Discovery funnel: user's first search submission from the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_first_prompt_submission": {
+        "description": "Discovery funnel: user's first Duck.ai prompt submission from the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_full_conversion_user": {
+        "description": "Discovery funnel: user completed full conversion (interaction + search + prompt) in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_text_area_focused": {
+        "description": "Native input field text area focused",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "orientation", "type": "string", "description": "Device orientation when shown", "enum": ["portrait", "landscape"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_clear_button_pressed": {
+        "description": "User pressed the clear button in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "mode", "type": "string", "description": "Which input mode was active", "enum": ["search", "aiChat"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_back_button_pressed": {
+        "description": "User pressed the back button in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "mode", "type": "string", "description": "Which input mode was active", "enum": ["search", "aiChat"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_keyboard_go_pressed": {
+        "description": "User pressed the keyboard Go key in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "mode", "type": "string", "description": "Which input mode was active", "enum": ["search", "aiChat"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_floating_submit_pressed": {
+        "description": "User pressed the floating submit button in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "mode", "type": "string", "description": "Which input mode was active", "enum": ["search", "aiChat"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_floating_return_pressed": {
+        "description": "User pressed the new-line/return button in the native input field",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_experimental_omnibar_daily_retention": {
+        "description": "(Daily Pixel) Fired for users with the native input field active, used to measure retention",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "still_enabled", "type": "boolean", "description": "Whether the native input field is still active" }
+        ]
+    },
+    "m_aichat_duckai_dau_toggle_never_enabled": {
+        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai native input field. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_tapped": {
+        "description": "User tapped the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_confirmed": {
+        "description": "User confirmed chat deletion via the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_reader_native_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the native store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_reader_webview_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the WebView store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_deletion_native_count": {
+        "description": "A Duck.ai chat was deleted via the native store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_deletion_webview_count": {
+        "description": "A Duck.ai chat was deleted via the WebView store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_chats_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_chats_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_entries_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_entries_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_files_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_files_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_blank_count": {
+        "description": "Duck.ai markMigrationDone was called with a blank key — indicates a JS-side bug",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_started": {
+        "description": "Duck.ai native storage: markMigrationDone was called (migration was attempted by the web layer)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_already-done": {
+        "description": "Duck.ai native storage: isMigrationDone returned true (page load found migration already complete)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_error": {
+        "description": "Duck.ai native storage: isMigrationDone or markMigrationDone threw an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-put_error": {
+        "description": "Duck.ai native storage: putEntry or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-get_error": {
+        "description": "Duck.ai native storage: getEntry or getAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-delete_error": {
+        "description": "Duck.ai native storage: deleteEntry, deleteAllEntries, or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-put_error": {
+        "description": "Duck.ai native storage: putChat, putChats, or migrateChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-get_error": {
+        "description": "Duck.ai native storage: getChat or getAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-delete_error": {
+        "description": "Duck.ai native storage: deleteChat or deleteAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-put_error": {
+        "description": "Duck.ai native storage: putFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-get_error": {
+        "description": "Duck.ai native storage: getFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-list_error": {
+        "description": "Duck.ai native storage: listFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-delete_error": {
+        "description": "Duck.ai native storage: deleteFile, deleteFiles, or deleteAllFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_open_chat_tapped": {
+        "description": "User tapped the Open Chat action on the Duck.ai voice session notification, returning to the chat",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_end_chat_tapped": {
+        "description": "User tapped the End Chat action on the Duck.ai voice session notification",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_started": {
+        "description": "The Duck.ai voice microphone foreground service was created (voice session resources active)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_killed": {
+        "description": "The Duck.ai voice microphone foreground service was destroyed (voice session resources released)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_selected_count": {
+        "description": "User selected the image generation tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_selected_daily": {
+        "description": "(Daily Pixel) User selected the image generation tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_deselected_count": {
+        "description": "User deselected the image generation tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_deselected_daily": {
+        "description": "(Daily Pixel) User deselected the image generation tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_submitted_count": {
+        "description": "User submitted a prompt with the image generation tool selected in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_generation_submitted_daily": {
+        "description": "(Daily Pixel) User submitted a prompt with the image generation tool selected in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_selected_count": {
+        "description": "User selected the web search tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_selected_daily": {
+        "description": "(Daily Pixel) User selected the web search tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_deselected_count": {
+        "description": "User deselected the web search tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_deselected_daily": {
+        "description": "(Daily Pixel) User deselected the web search tool in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_submitted_count": {
+        "description": "User submitted a prompt with the web search tool selected in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_web_search_submitted_daily": {
+        "description": "(Daily Pixel) User submitted a prompt with the web search tool selected in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_customize_responses_selected_count": {
+        "description": "User selected the Customize Responses action in the Unified Input options menu",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_customize_responses_selected_daily": {
+        "description": "(Daily Pixel) User selected the Customize Responses action in the Unified Input options menu",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_removed_count": {
+        "description": "User removed an attached image from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_removed_daily": {
+        "description": "(Daily Pixel) User removed an attached image from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_file_attached_count": {
+        "description": "User attached a file in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_file_attached_daily": {
+        "description": "(Daily Pixel) User attached a file in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_file_removed_count": {
+        "description": "User removed an attached file from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_file_removed_daily": {
+        "description": "(Daily Pixel) User removed an attached file from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_voice_tapped_count": {
+        "description": "User tapped the voice button in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_voice_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the voice button in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_image_attached_count": {
+        "description": "User attached an image in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the attached image came from",
+                "enum": ["camera", "photo_library"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_image_attached_daily": {
+        "description": "(Daily Pixel) User attached an image in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the attached image came from",
+                "enum": ["camera", "photo_library"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_chat_header_upgrade_tapped": {
+        "description": "User tapped the Upgrade pill in the Duck.ai omnibar header (shown only while the subscription is inactive)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "user_tier",
+                "type": "string",
+                "description": "The tapper's current tier",
+                "enum": ["free", "plus"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_image_validation_failed_count": {
+        "description": "An image the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the image validation failed",
+                "enum": ["count_exceeded", "other"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_image_validation_failed_daily": {
+        "description": "(Daily Pixel) An image the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the image validation failed",
+                "enum": ["count_exceeded", "other"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_file_validation_failed_count": {
+        "description": "A file the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the file validation failed",
+                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_file_validation_failed_daily": {
+        "description": "(Daily Pixel) A file the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the file validation failed",
+                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_prompt_submitted_count": {
+        "description": "User submitted a prompt from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selected_tool",
+                "type": "string",
+                "description": "Which tool was selected when the prompt was submitted",
+                "enum": ["none", "image_generation", "web_search"]
+            },
+            { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
+            {
+                "key": "reasoning_effort",
+                "type": "string",
+                "description": "The resolved reasoning effort level used for the prompt",
+                "enum": ["none", "minimal", "low", "medium", "high"]
+            },
+            { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
+            { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+        ]
+    },
+    "m_aichat_unified_input_prompt_submitted_daily": {
+        "description": "(Daily Pixel) User submitted a prompt from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selected_tool",
+                "type": "string",
+                "description": "Which tool was selected when the prompt was submitted",
+                "enum": ["none", "image_generation", "web_search"]
+            },
+            { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
+            {
+                "key": "reasoning_effort",
+                "type": "string",
+                "description": "The resolved reasoning effort level used for the prompt",
+                "enum": ["none", "minimal", "low", "medium", "high"]
+            },
+            { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
+            { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+        ]
+    },
+    "m_aichat_unified_input_sent_prompt_in_chat_count": {
+        "description": "User submitted a prompt from the Unified Input while in a Duck.ai chat context. Fires alongside m_aichat_unified_input_prompt_submitted_count.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_sent_prompt_in_chat_daily": {
+        "description": "(Daily Pixel) User submitted a prompt from the Unified Input while in a Duck.ai chat context. Fires alongside m_aichat_unified_input_prompt_submitted_daily.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_stop_generation_tapped": {
+        "description": "User tapped the stop generation button in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_model_selected": {
+        "description": "User selected a model in the Unified Input model picker",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", { "key": "model_id", "type": "string", "description": "Identifier of the selected model" }]
+    },
+    "m_aichat_unified_input_reasoning_effort_selected": {
+        "description": "User selected a reasoning effort level in the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "effort_level",
+                "type": "string",
+                "description": "The selected reasoning effort level",
+                "enum": ["fast", "reasoning", "extended_reasoning"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_subscription_upsell_triggered": {
+        "description": "A subscription upsell was triggered from the Unified Input",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the upsell was triggered from",
+                "enum": ["model_picker", "reasoning_picker"]
+            },
+            { "key": "current_tier", "type": "string", "description": "The user's current subscription tier", "enum": ["free", "plus"] },
+            {
+                "key": "required_tier",
+                "type": "string",
+                "description": "The subscription tier required to access the feature",
+                "enum": ["plus", "pro"]
+            },
+            {
+                "key": "flow_type",
+                "type": "string",
+                "description": "The type of subscription flow offered",
+                "enum": ["purchase", "upgrade"]
+            }
+        ]
+    },
+    "aichat_unified_input_show_model_picker": {
+        "description": "FE recovery flow: the native model picker was opened in response to a showModelPicker message",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_unified_input_submit_change_model": {
+        "description": "FE recovery flow: the user's chosen model was reported to the FE via submitChangeModelAction",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "model_id", "type": "string", "description": "Identifier of the model the user recovered to" }
+        ]
+    },
+    "aichat_unified_input_submit_change_model_prompt_sent": {
+        "description": "FE recovery flow: a prompt was submitted after recovering the chat's model",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_ask_about_page_selected_count": {
+        "description": "User tapped the Ask About Page quick action in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_ask_about_page_selected_daily": {
+        "description": "(Daily Pixel) User tapped the Ask About Page quick action in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_chats_button_tapped_count": {
+        "description": "User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_chats_button_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chats_popup_displayed_count": {
+        "description": "Recent chats popup menu was displayed from the chats icon in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chats_popup_displayed_daily": {
+        "description": "(Daily Pixel) Recent chats popup menu was displayed from the chats icon in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chat_selected_count": {
+        "description": "User selected a recent chat from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chat_selected_daily": {
+        "description": "(Daily Pixel) User selected a recent chat from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_view_all_chats_tapped_count": {
+        "description": "User tapped View All Chats from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_view_all_chats_tapped_daily": {
+        "description": "(Daily Pixel) User tapped View All Chats from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_disabled": {
+        "description": "User tapped the 'Disable AI Features' action, which turns off Duck.ai, sets Search Assist to Never, and hides AI-generated images.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_never": {
+        "description": "User set Search Assist to Never.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_on_demand": {
+        "description": "User set Search Assist to On demand.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_sometimes": {
+        "description": "User set Search Assist to Sometimes.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_often": {
+        "description": "User set Search Assist to Often.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_hide_images_on": {
+        "description": "User turned Hide AI-Generated Images on (images hidden).",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_hide_images_off": {
+        "description": "User turned Hide AI-Generated Images off (images shown).",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_state_daily": {
+        "description": "(Daily Pixel) Distribution of AI-features settings sampled once per daily-active day across the whole active base.",
+        "owners": ["anikiki"],
+        "triggers": ["scheduled"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "duck_ai", "type": "boolean", "description": "true = Duck.ai is on (user setting)" },
+            { "key": "search_assist", "type": "string", "description": "Search Assist kbe raw value", "enum": ["0", "1", "2", "3"] },
+            { "key": "hide_ai_images", "type": "string", "description": "Whether AI-generated images are hidden", "enum": ["on", "off"] },
+            { "key": "no_ai", "type": "boolean", "description": "Derived: duck_ai=false AND search_assist=0 AND hide_ai_images=on" }
+        ]
+    },
+    "m_aichat_recent_chat_delete_button_tapped": {
+        "description": "Fired when user taps the delete (fire) icon on a recent chat row in the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_delete_confirmed": {
+        "description": "Fired when user confirms deletion of a recent chat from the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_recent_chat_delete_cancelled": {
+        "description": "Fired when user cancels deletion of a recent chat from the Duck.ai suggestions list",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

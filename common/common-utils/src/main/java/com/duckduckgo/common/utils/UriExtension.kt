@@ -17,9 +17,11 @@ package com.duckduckgo.common.utils
 
 import android.net.Uri
 import android.net.Uri.parse
+import android.os.Build
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.UrlScheme.Companion.http
 import java.io.UnsupportedEncodingException
+import java.net.InetAddress
 import java.net.URLEncoder
 import java.util.*
 
@@ -63,6 +65,63 @@ val Uri.hasIpHost: Boolean
     get() {
         return baseHost?.matches(IP_REGEX) ?: false
     }
+
+/**
+ * Checks if the URI represents a local or private network address.
+ * This includes:
+ * - file:// URLs (local filesystem)
+ * - localhost hostname
+ * - IPv4/IPv6 loopback addresses (127.0.0.0/8, ::1)
+ * - IPv4/IPv6 private network ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7)
+ * - IPv6 link-local addresses (fe80::/10)
+ *
+ * Note: .local domain names are NOT treated as local (they require mDNS resolution).
+ */
+val Uri.isLocalUrl: Boolean
+    get() {
+        if (scheme == "file") return true
+
+        val host = this.host?.lowercase() ?: return false
+        if (host == "localhost") return true
+
+        // Use InetAddresses.parseNumericAddress (API 29+) which only parses numeric IPs
+        // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only
+        // validation to avoid InetAddress.getByName() which can trigger DNS lookups.
+        val addr = if (Build.VERSION.SDK_INT >= 29) {
+            runCatching { android.net.InetAddresses.parseNumericAddress(host) }.getOrNull()
+        } else {
+            host.parseAsStrictIPv4()
+        } ?: return false
+
+        return addr.isLoopbackAddress || addr.isSiteLocalAddress || addr.isLinkLocalAddress || addr.isIPv6UniqueLocal()
+    }
+
+/**
+ * Strictly parses a string as an IPv4 address without DNS resolution.
+ * Returns null if the string is not a valid IPv4 address (exactly 4 octets, each 0-255).
+ */
+private fun String.parseAsStrictIPv4(): InetAddress? {
+    val parts = split('.')
+    if (parts.size != 4) return null
+    val bytes = ByteArray(4)
+    for (i in parts.indices) {
+        val octet = parts[i].toIntOrNull() ?: return null
+        if (octet !in 0..255) return null
+        bytes[i] = octet.toByte()
+    }
+    return InetAddress.getByAddress(bytes)
+}
+
+/**
+ * Checks if an IPv6 address is a Unique Local Address (ULA) in the fc00::/7 range.
+ * These are the IPv6 equivalent of private IPv4 addresses.
+ * Java's [InetAddress.isSiteLocalAddress] only covers the deprecated fec0::/10 range,
+ * so this is needed to detect the current fc00::/7 ULA range.
+ */
+private fun InetAddress.isIPv6UniqueLocal(): Boolean {
+    val bytes = this.address
+    return bytes.size == 16 && (bytes[0].toInt() and 0xfe) == 0xfc
+}
 
 val Uri.absoluteString: String
     get() {

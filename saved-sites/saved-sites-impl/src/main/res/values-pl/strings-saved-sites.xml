@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Udostępnij ulubione</string>
-    <string name="sync_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych na wszystkich urządzeniach. Wyłącz, aby oddzielić ulubione na urządzenia mobilne i stacjonarne.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Udostępnij ulubione na urządzeniach</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="saved_site_limit_warning"><b>Synchronizacja wstrzymana</b>\nOsiągnięto maksymalną liczbę zakładek. Usuń część z nich, aby wznowić synchronizację.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synchronizacja zakładek wstrzymana</b>\nOsiągnięto maksymalną liczbę zakładek. Usuń część zakładek, aby wznowić synchronizację.</string>
     <string name="saved_site_invalid_warning"><b>Synchronizacja wstrzymana</b>\nNiektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
@@ -30,6 +30,12 @@
         <item quantity="many">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
         <item quantity="other">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innej witryny, ponieważ niektóre ich pola przekraczają limit znaków.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Wyszukaj zakładki</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Dodaj folder</string>
+    <string name="bookmarksMenuContentDescription">Więcej opcji</string>
+    <string name="newTabFavoritesToggleContentDescription">Przełącz widoczność zakładek</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -101,8 +107,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Pobierz ikony zakładek</string>
-    <string name="sync_fetch_icons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
+    <string name="sync_simplified_fetch_icons_title">Pobierz ikony zakładek</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Ładuje ikony ze stron dodanych do zakładek. Pobieranie ikon jest widoczne w Twojej sieci.</string>
     <string name="faviconsPromptTitle">Pobrać brakujące ikony?</string>
     <string name="faviconsPromptMessage">Czy chcesz, aby urządzenie automatycznie pobierało ikony zsynchronizowanych zakładek ze stron internetowych?</string>
     <string name="faviconsPromptPrimaryCta">Aktualizuj ikony zakładek</string>
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
     <string name="bookmarksImportDialogClose">Zamknij</string>
+
 </resources>

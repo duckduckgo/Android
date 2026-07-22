@@ -134,6 +134,13 @@ class WebNavigationStateComparisonTest {
         assertEquals(Other, latestState.compare(previousState))
     }
 
+    @Test
+    fun whenPreviousContainsNullableTitleAndLatestContainsNonNullTitleThenCompareReturnsTitleUpdated() {
+        val previousState = buildState("http://foo.com", "http://subdomain.foo.com", null)
+        val latestState = buildState("http://foo.com", "http://subdomain.foo.com", "Title")
+        assertEquals(WebNavigationStateChange.TitleUpdated("Title"), latestState.compare(previousState))
+    }
+
     private fun buildState(
         originalUrl: String?,
         currentUrl: String?,

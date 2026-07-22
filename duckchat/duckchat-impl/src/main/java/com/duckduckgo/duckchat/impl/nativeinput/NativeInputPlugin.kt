@@ -1,0 +1,64 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.nativeinput
+
+import android.content.Context
+import android.view.View
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePlugin
+import com.duckduckgo.di.scopes.AppScope
+
+/**
+ * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
+ * (e.g. [submit]) without coupling to the widget class directly. State that depends on the active
+ * tab is observed via `NativeInputStateProvider.state` rather than reached for through the host.
+ */
+interface NativeInputHost {
+    /** Submit the current input as a chat message; opens a new chat session if the input is empty. */
+    fun submit()
+
+    /** Stop the active chat stream. Delegates to the host's [NativeInputWidget.onStopTapped] callback. */
+    fun stop()
+
+    fun showAttachmentChooser(showing: Boolean)
+    fun showModelPicker(showing: Boolean)
+    fun showReasoningPicker(showing: Boolean)
+
+    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+
+    /**
+     * Plugins call this whenever the user's tool selection changes. The widget routes this into
+     * `NativeInputStatePublisher.update` for the active tab; observers read [NativeInputState.selectedTool]
+     * via [NativeInputStateProvider].
+     */
+    fun toolSelected(tool: String?)
+    fun customizeResponsesClicked()
+}
+
+interface NativeInputPlugin : ActivePlugin {
+
+    val containerId: Int
+
+    fun createView(context: Context, host: NativeInputHost): View
+}
+
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = NativeInputPlugin::class,
+    featureName = "pluginPointNativeInput",
+)
+private interface NativeInputPluginPointTrigger

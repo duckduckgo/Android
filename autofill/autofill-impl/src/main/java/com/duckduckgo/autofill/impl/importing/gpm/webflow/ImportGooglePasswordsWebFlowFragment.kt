@@ -65,6 +65,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProt
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -305,6 +306,8 @@ class ImportGooglePasswordsWebFlowFragment :
                 this@ImportGooglePasswordsWebFlowFragment,
                 this@ImportGooglePasswordsWebFlowFragment,
                 CUSTOM_FLOW_TAB_ID,
+                // Password import is an independent Regular-mode flow; Fire mode never offers to import.
+                BrowserMode.REGULAR,
             )
         }
 
@@ -350,7 +353,8 @@ class ImportGooglePasswordsWebFlowFragment :
         lifecycleScope.launch(dispatchers.main()) {
             binding?.let {
                 val reauthDetails = url?.let { viewModel.getReauthData(url) } ?: ReAuthenticationDetails()
-                browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails)
+                // Password import is an independent Regular-mode flow; Fire mode never offers to import.
+                browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails, BrowserMode.REGULAR)
             }
         }
     }

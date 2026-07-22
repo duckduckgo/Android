@@ -63,7 +63,10 @@ class CohortPixelInterceptorTest {
 
         cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry, coroutineRule.testDispatcherProvider, appBuildConfig)
         cohortCalculator = RealCohortCalculator()
-        cohortPixelInterceptor = CohortPixelInterceptor(cohortCalculator, cohortStore)
+        cohortPixelInterceptor = CohortPixelInterceptor(
+            cohortCalculator,
+            cohortStore,
+        )
     }
 
     @Test

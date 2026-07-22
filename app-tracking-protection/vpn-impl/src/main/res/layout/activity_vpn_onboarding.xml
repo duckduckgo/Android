@@ -20,10 +20,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/onboardingRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"
-    android:background="?attr/daxColorSurface">
+    android:background="?attr/daxColorSurface"
+    tools:ignore="Overdraw">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_pager"
@@ -40,6 +42,7 @@
         android:layout_width="?attr/actionBarSize"
         android:layout_height="?attr/actionBarSize"
         android:background="?actionBarItemBackground"
+        android:contentDescription="@string/atp_onboarding_close_button_content_description"
         android:src="@drawable/ic_close_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

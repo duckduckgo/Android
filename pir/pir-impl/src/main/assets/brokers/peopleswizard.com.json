@@ -1,0 +1,58 @@
+{
+  "name": "PeoplesWizard",
+  "url": "peopleswizard.com",
+  "version": "0.6.0",
+  "parent": "peoplewhiz.com",
+  "addedDatetime": 1709445600000,
+  "optOutUrl": "https://peopleswizard.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "b92d9477-3e4a-4022-be5d-3a5d02a84c90",
+          "url": "https://www.peopleswizard.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "c538d04e-85ce-46a5-bbbd-3f9bd0fae078",
+          "selector": "[class^='ResultsTable__Record-sc']",
+          "noResultsSelector": "div[class^=ResultNotFound__NoResults]",
+          "profile": {
+            "name": {
+              "selector": "[class^='ResultsTable__Name-sc']"
+            },
+            "age": {
+              "selector": "[class^='ResultsTable__Age-sc']"
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1764648409047
+}

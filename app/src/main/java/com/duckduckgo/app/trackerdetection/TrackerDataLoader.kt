@@ -23,7 +23,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.app.pixels.remoteconfig.PrecompileTdsRegexRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -47,9 +49,13 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PirProcessLifecycleObserver::class,
+)
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val trackerDetector: TrackerDetector,
+    private val trackerDetectorClientProvider: TrackerDetectorClientProvider,
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
@@ -59,11 +65,17 @@ class TrackerDataLoader @Inject constructor(
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
+    private val entityLookupRefresher: EntityLookupRefresher,
     private val dispatcherProvider: DispatcherProvider,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
-) : MainProcessLifecycleObserver {
+    private val precompileTdsRegexRCWrapper: PrecompileTdsRegexRCWrapper,
+) : MainProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
+        appCoroutineScope.launch(dispatcherProvider.io()) { loadData() }
+    }
+
+    override fun onPirProcessCreated() {
         appCoroutineScope.launch(dispatcherProvider.io()) { loadData() }
     }
 
@@ -108,8 +120,15 @@ class TrackerDataLoader @Inject constructor(
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
         logcat { "Loaded ${trackers.size} tds trackers from DB" }
-        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
-        trackerDetector.addClient(client)
+        val client = TdsClient(
+            name = Client.ClientName.TDS,
+            trackers = trackers,
+            urlToTypeMapper = urlToTypeMapper,
+            optimizeTrackerEvaluationV3 = optimizeTrackerEvaluationRCWrapper.enabled,
+            precompileRegex = precompileTdsRegexRCWrapper.enabled,
+        )
+        trackerDetectorClientProvider.addClient(client)
+        entityLookupRefresher.refresh()
     }
 
     companion object {

@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
@@ -56,10 +56,10 @@ class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
-    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
     data class ViewState(
@@ -71,8 +71,8 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
-        val hasExperimentalBrowserMenuOption: Boolean = false,
-        val useBottomSheetMenuEnabled: Boolean = false,
+        val isAddressBarTrackersAnimationEnabled: Boolean = true,
+        val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
@@ -99,27 +99,27 @@ class AppearanceViewModel @Inject constructor(
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
             omnibarType = settingsDataStore.omnibarType,
             shouldShowSplitOmnibarSettings = omnibarRepository.isSplitOmnibarAvailable,
+            isAddressBarTrackersAnimationEnabled = settingsDataStore.showTrackersCountInAddressBar,
         ),
     )
 
     fun viewState() = combine(
         viewState,
         urlDisplayRepository.isFullUrlEnabled,
-        browserMenuDisplayRepository.browserMenuState,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-    ) { currentViewState, isFullUrlEnabled, browserMenuState, isTrackersAnimationTileHidden ->
+    ) { currentViewState, isFullUrlEnabled, isTrackersAnimationTileHidden ->
+        val isAddressBarTrackersAnimationFeatureEnabled = addressBarTrackersAnimationManager.isFeatureEnabled()
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
             isFullUrlEnabled = isFullUrlEnabled,
-            hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
-            useBottomSheetMenuEnabled = browserMenuState.isEnabled,
+            shouldShowAddressBarTrackersAnimationItem = isAddressBarTrackersAnimationFeatureEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private fun canForceDarkMode(): Boolean = themingDataStore.theme != DuckDuckGoTheme.LIGHT
+    private fun canForceDarkMode(theme: DuckDuckGoTheme = themingDataStore.theme): Boolean = theme != DuckDuckGoTheme.LIGHT
 
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
@@ -145,7 +145,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.update { it.copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
+                viewState.update { it.copy(theme = selectedTheme, canForceDarkMode = canForceDarkMode(selectedTheme)) }
                 command.send(Command.UpdateTheme)
             }
         }
@@ -202,9 +202,13 @@ class AppearanceViewModel @Inject constructor(
         }
     }
 
-    fun onUseBottomSheetMenuChanged(checked: Boolean) {
+    fun onShowTrackersCountInAddressBarChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
+            settingsDataStore.showTrackersCountInAddressBar = checked
+            viewState.update { it.copy(isAddressBarTrackersAnimationEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED, params)
         }
     }
 }

@@ -20,5 +20,18 @@
     <dimen name="recyclerViewOneFabBottomPadding">76dp</dimen>
     <dimen name="recyclerViewTwoFabsBottomPadding">136dp</dimen>
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
-    <bool name="show_wing_animation">false</bool>
+    <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
+    <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
+    <dimen name="preOnboardingDaxCtaPaddingTop">40dp</dimen>
+    <dimen name="preOnboardingWidgetPromptMediaMaxHeight">120dp</dimen>
+    <dimen name="preOnboardingWidgetPromptMediaMaxWidth">280dp</dimen>
+    <dimen name="onboardingContextualBackgroundOverlap">90dp</dimen>
+    <dimen name="contextualOptionsCappedHeight">100dp</dimen>
+    <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
+    <dimen name="quickSetupBottomSheetHorizontalPadding">40dp</dimen>
+    <dimen name="quickSetupRemoveWidgetStepNumberSize">28dp</dimen>
+    <dimen name="browserModeToggleSegmentWidth">56dp</dimen>
+    <dimen name="browserModeToggleSegmentHeight">40dp</dimen>
+    <dimen name="longPressMenuWidth">240dp</dimen>
+    <dimen name="longPressMenuLeadingIconSize">24dp</dimen>
 </resources>

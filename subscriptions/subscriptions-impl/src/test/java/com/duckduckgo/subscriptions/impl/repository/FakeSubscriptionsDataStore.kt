@@ -53,4 +53,5 @@ class FakeSubscriptionsDataStore(
     override fun canUseEncryption(): Boolean = supportEncryption
     override var subscriptionFeatures: String? = null
     override var subscriptionEntitlements: String? = null
+    override var pendingPlans: String? = null
 }

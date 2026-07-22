@@ -33,6 +33,9 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -46,9 +49,9 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFra
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -76,6 +79,12 @@ class NetpAppExclusionListActivity :
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var adapter: AppExclusionListAdapter
 
     private val binding: ActivityNetpAppExclusionBinding by viewBinding()
@@ -85,14 +94,28 @@ class NetpAppExclusionListActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         bindViews()
         observeViewModel()
 
         viewModel.applyAppsFilter(AppsFilter.ALL)
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.netpAppExclusionListRecycler, drawBehindGestureNav = true)
     }
 
     override fun onDestroy() {
@@ -227,7 +250,7 @@ class NetpAppExclusionListActivity :
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
             is Command.ShowUnifiedPproAppFeedback -> globalActivityStarter.start(
                 this,
-                PrivacyProAppFeedbackScreenWithParams(
+                SubscriptionAppFeedbackScreenWithParams(
                     appName = command.appName,
                     appPackageName = command.appPackageName,
                 ),
@@ -235,7 +258,7 @@ class NetpAppExclusionListActivity :
 
             is Command.ShowUnifiedPproFeedback -> globalActivityStarter.start(
                 this,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
             )
 
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)

@@ -17,7 +17,9 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -30,7 +32,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -53,10 +54,14 @@ class BrokenSiteDataTest {
     private val mockBrokenSiteContext: BrokenSiteContext = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
+    private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     @Before
     fun setup() {
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+        val mockToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockToggle)
     }
 
     @Test
@@ -269,6 +274,7 @@ class BrokenSiteDataTest {
             coroutineRule.testDispatcherProvider,
             mockBrokenSiteContext,
             mockDuckPlayer,
+            mockStandardizedLeadingIconToggle,
         )
     }
 

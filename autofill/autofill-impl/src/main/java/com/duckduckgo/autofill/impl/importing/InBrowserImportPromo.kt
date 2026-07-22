@@ -20,19 +20,24 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface InBrowserImportPromo {
     suspend fun canShowPromo(
         credentialsAvailableForCurrentPage: Boolean,
         url: String?,
+        browserMode: BrowserMode,
     ): Boolean
 }
+
+private const val TAG = "InBrowserImportPromo"
 
 @ContributesBinding(AppScope::class)
 class RealInBrowserImportPromo @Inject constructor(
@@ -47,9 +52,15 @@ class RealInBrowserImportPromo @Inject constructor(
     override suspend fun canShowPromo(
         credentialsAvailableForCurrentPage: Boolean,
         url: String?,
+        browserMode: BrowserMode,
     ): Boolean {
         return withContext(dispatchers.io()) {
             if (credentialsAvailableForCurrentPage) {
+                return@withContext false
+            }
+
+            // Fire mode is an ephemeral session and never offers to import passwords from Google.
+            if (browserMode == BrowserMode.FIRE) {
                 return@withContext false
             }
 
@@ -73,9 +84,17 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if ((autofillStore.getCredentialCount().firstOrNull() ?: 0) >= MAX_CREDENTIALS_FOR_PROMO) {
-                return@withContext false
-            }
+            autofillStore.getCredentialCount().firstOrNull()?.fold(
+                onSuccess = { value ->
+                    if ((value) >= MAX_CREDENTIALS_FOR_PROMO) {
+                        return@withContext false
+                    }
+                },
+                onFailure = {
+                    logcat(TAG) { "Credential count retrieval failed, fallback to disabled" }
+                    return@withContext false
+                },
+            ) ?: return@withContext false
 
             if (autofillStore.inBrowserImportPromoShownCount >= MAX_PROMO_SHOWN_COUNT) {
                 return@withContext false

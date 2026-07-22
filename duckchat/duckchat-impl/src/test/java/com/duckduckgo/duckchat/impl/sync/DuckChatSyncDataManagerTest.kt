@@ -21,19 +21,27 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.FeatureSyncError
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -50,6 +58,8 @@ class DuckChatSyncDataManagerTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
+    private val duckAiChatStore: DuckAiChatStore = mock()
+
     private lateinit var testee: DuckChatSyncDataManager
 
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
@@ -57,6 +67,8 @@ class DuckChatSyncDataManagerTest {
     @Before
     fun setUp() = runTest {
         whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(emptySet())
         testee = DuckChatSyncDataManager(
             duckChatSyncRepository = duckChatSyncRepository,
             duckChatFeatureRepository = duckChatFeatureRepository,
@@ -64,12 +76,18 @@ class DuckChatSyncDataManagerTest {
             appBuildConfig = appBuildConfig,
             duckChatFeature = duckChatFeature,
             appCoroutineScope = coroutineTestRule.testScope,
+            duckAiChatStore = duckAiChatStore,
         )
     }
 
     @Test
+    fun whenGetDeletableTypeThenReturnsDuckAiChats() {
+        assertEquals(DeletableType.DUCK_AI_CHATS, testee.getDeletableType())
+    }
+
+    @Test
     fun whenGetTypeThenReturnsDuckAiChats() {
-        assertEquals(DeletableType.DUCK_AI_CHATS, testee.getType())
+        assertEquals(SyncableType.DUCK_AI_CHATS, testee.getType())
     }
 
     @Test
@@ -117,7 +135,7 @@ class DuckChatSyncDataManagerTest {
             untilTimestamp = "2025-01-01T12:00:00Z",
         )
 
-        testee.onSuccess(response)
+        testee.onDeleteSuccess(response)
 
         verify(duckChatSyncRepository).clearDeletionTimestampIfMatches("2025-01-01T12:00:00Z")
     }
@@ -129,9 +147,9 @@ class DuckChatSyncDataManagerTest {
             untilTimestamp = null,
         )
 
-        testee.onSuccess(response)
+        testee.onDeleteSuccess(response)
 
-        verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(org.mockito.kotlin.any())
+        verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(any())
     }
 
     @Test
@@ -141,8 +159,227 @@ class DuckChatSyncDataManagerTest {
             featureSyncError = FeatureSyncError.INVALID_REQUEST,
         )
 
+        testee.onDeleteError(error)
+
+        verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(any())
+    }
+
+    @Test
+    fun whenGetChangesAndFeatureDisabledThenReturnsEmpty() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.getChanges()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetChangesAndChatHistoryDisabledThenReturnsEmpty() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(false)
+
+        val result = testee.getChanges()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetChangesAndNoPendingDeletionsThenReturnsEmpty() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+
+        val result = testee.getChanges()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetChangesAndPendingDeletionsExistThenReturnsRequest() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("chat1", "chat2"))
+
+        val result = testee.getChanges()
+
+        assertFalse(result.isEmpty())
+        assertEquals(SyncableType.DUCK_AI_CHATS, result.type)
+        assertTrue(result.jsonString.contains("chat1"))
+        assertTrue(result.jsonString.contains("chat2"))
+    }
+
+    @Test
+    fun whenOnPatchSuccessThenRemovesOnlySentIds() = runTest {
+        val response = SyncChangesResponse(
+            type = SyncableType.DUCK_AI_CHATS,
+            jsonString = """{"ai_chats":{"entries":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"
+                |,"last_modified":"2026-01-01T00:00:00Z"},
+                |{"id":"chat2","deleted":"2026-01-01T00:00:00Z",
+                |"last_modified":"2026-01-01T00:00:00Z"}],
+                |"last_modified":"2026-01-01T00:00:00Z"}}
+            """.trimMargin(),
+        )
+
+        testee.onSuccess(response, SyncConflictResolution.DEDUPLICATION)
+
+        verify(duckChatSyncRepository).removePendingChatDeletions(setOf("chat1", "chat2"))
+    }
+
+    @Test
+    fun whenOnPatchErrorThenPendingQueueIsKept() = runTest {
+        val error = SyncErrorResponse(
+            type = SyncableType.DUCK_AI_CHATS,
+            featureSyncError = FeatureSyncError.INVALID_REQUEST,
+        )
+
         testee.onError(error)
 
-        verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(org.mockito.kotlin.any())
+        verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).removePendingChatDeletions(any())
     }
+
+    @Test
+    fun whenOnDeleteSuccessThenPendingQueueIsCleared() = runTest {
+        val response = SyncDeletionResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            untilTimestamp = "2025-01-01T12:00:00Z",
+        )
+
+        testee.onDeleteSuccess(response)
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
+    }
+
+    @Test
+    fun whenOnSyncDisabledThenPendingQueueIsCleared() = runTest {
+        testee.onSyncDisabled()
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
+        verify(duckChatSyncRepository).clearPendingChatUpdates()
+    }
+
+    @Test
+    fun whenGetChangesAndPendingUpdatesExistThenReturnsRequestWithoutTitle() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("chat1"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "chat1", title = "Hello", pinned = true)),
+        )
+
+        val result = testee.getChanges()
+
+        assertFalse(result.isEmpty())
+        assertEquals(SyncableType.DUCK_AI_CHATS, result.type)
+        assertTrue(result.jsonString.contains("chat1"))
+        assertTrue(result.jsonString.contains("\"pinned\":\"pinned\""))
+        // Title is omitted until JWE encryption lands on native.
+        assertFalse(result.jsonString.contains("\"title\""))
+    }
+
+    @Test
+    fun whenGetChangesAndUpdatedChatIsUnpinnedThenPinnedFieldIsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("chat1"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "chat1", title = "Hello", pinned = false)),
+        )
+
+        val result = testee.getChanges()
+
+        assertTrue(result.jsonString.contains("\"pinned\":null"))
+    }
+
+    @Test
+    fun whenGetChangesProducesUpdateEntryThenIncludesEditTimestampMatchingClientLastModified() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("chat1"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "chat1", title = "Hello")),
+        )
+
+        val result = testee.getChanges()
+
+        val entry = org.json.JSONArray(result.jsonString).getJSONObject(0)
+        assertEquals(entry.getString("client_last_modified"), entry.getString("edit_timestamp"))
+    }
+
+    @Test
+    fun whenGetChangesAndPendingUpdateMissingFromStoreThenEntryIsOmitted() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("ghost"))
+        whenever(duckAiChatStore.getChats()).thenReturn(emptyList())
+
+        val result = testee.getChanges()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetChangesWithBothDeletionsAndUpdatesThenPayloadContainsBoth() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("delMe"))
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("renameMe"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "renameMe", title = "New name")),
+        )
+
+        val result = testee.getChanges()
+
+        assertFalse(result.isEmpty())
+        assertTrue(result.jsonString.contains("delMe"))
+        assertTrue(result.jsonString.contains("\"deleted\":\"true\""))
+        assertTrue(result.jsonString.contains("renameMe"))
+        // Title is omitted from update entries until JWE encryption lands on native.
+        assertFalse(result.jsonString.contains("\"title\""))
+    }
+
+    @Test
+    fun whenChatIdIsInBothQueuesThenDeletionWinsAndUpdateIsDropped() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("dupe"))
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("dupe"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "dupe", title = "Pre-delete rename")),
+        )
+
+        val result = testee.getChanges()
+
+        assertTrue(result.jsonString.contains("\"deleted\":\"true\""))
+        assertFalse(result.jsonString.contains("ENC:Pre-delete rename"))
+    }
+
+    @Test
+    fun whenOnPatchSuccessThenRemovesAcknowledgedUpdateIdsAlongsideDeletions() = runTest {
+        val response = SyncChangesResponse(
+            type = SyncableType.DUCK_AI_CHATS,
+            jsonString = """{"ai_chats":{"entries":[{"id":"chat1"},{"id":"chat2"}],"last_modified":"2026-01-01T00:00:00Z"}}""",
+        )
+
+        testee.onSuccess(response, SyncConflictResolution.DEDUPLICATION)
+
+        verify(duckChatSyncRepository).removePendingChatDeletions(setOf("chat1", "chat2"))
+        verify(duckChatSyncRepository).removePendingChatUpdates(setOf("chat1", "chat2"))
+    }
+
+    private fun stubChat(
+        chatId: String,
+        title: String = chatId,
+        model: String = "gpt-5-mini",
+        lastEdit: String = "2026-04-01T00:00:00.000Z",
+        pinned: Boolean = false,
+    ) = DuckAiChat(
+        chatId = chatId,
+        title = title,
+        model = model,
+        lastEdit = lastEdit,
+        pinned = pinned,
+    )
 }

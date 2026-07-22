@@ -19,15 +19,20 @@ package com.duckduckgo.pir.impl.dashboard.state
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.NOT_STARTED
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface PirDashboardInitialScanStateProvider {
@@ -58,6 +63,12 @@ interface PirDashboardInitialScanStateProvider {
      */
     suspend fun getScanResults(): List<DashboardExtractedProfileResult>
 
+    /**
+     * Checks if the initial foreground scan needs to be restarted. This can happen if
+     * it was interrupted (e.g., by app kill) and there are remaining brokers to scan.
+     */
+    suspend fun shouldRestartInitialScan(): Boolean
+
     data class DashboardBrokerWithStatus(
         val broker: DashboardBroker,
         val status: Status,
@@ -86,18 +97,31 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRepository: PirRepository,
-    pirSchedulingRepository: PirSchedulingRepository,
+    private val pirSchedulingRepository: PirSchedulingRepository,
+    private val brokerStepsParser: BrokerStepsParser,
+    private val pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor,
+    private val pirScanScheduler: PirScanScheduler,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository),
     PirDashboardInitialScanStateProvider {
     override suspend fun getActiveBrokersAndMirrorSitesTotal(): Int = withContext(dispatcherProvider.io()) {
         val currentTime = currentTimeProvider.currentTimeMillis()
-        val activeBrokerNames = pirRepository.getAllActiveBrokers().toHashSet()
-        // Take all extant mirror sites whose parent is currently active
+        val scannableBrokerNames = getScannableActiveBrokerNames()
+        // Take all extant mirror sites whose parent broker can actually be scanned
         val activeMirrorSites = getAllExtantMirrorSites(currentTime).filter {
-            activeBrokerNames.contains(it.parentSite)
+            scannableBrokerNames.contains(it.parentSite)
         }
 
-        return@withContext activeBrokerNames.size + activeMirrorSites.size
+        return@withContext scannableBrokerNames.size + activeMirrorSites.size
+    }
+
+    private suspend fun getScannableActiveBrokerNames(): Set<String> {
+        return pirRepository.getAllActiveBrokerObjects().mapNotNullTo(hashSetOf()) { broker ->
+            // Only count brokers whose scan step can actually be parsed and executed. Brokers with unknown
+            // actions in their scan step are silently skipped at scan time, so including them in the total
+            // would cause the dashboard to report the initial scan as incomplete forever.
+            val stepsJson = pirRepository.getBrokerScanSteps(broker.name) ?: return@mapNotNullTo null
+            if (brokerStepsParser.parseStep(broker, stepsJson).isNotEmpty()) broker.name else null
+        }
     }
 
     override suspend fun getFullyCompletedBrokersTotal(): Int {
@@ -112,5 +136,31 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
 
     override suspend fun getScanResults(): List<DashboardExtractedProfileResult> {
         return getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = false)
+    }
+
+    override suspend fun shouldRestartInitialScan(): Boolean {
+        // Don't resume if a foreground scan is already running
+        if (pirForegroundScanServiceMonitor.isRunning()) {
+            logcat { "PIR-WEB: Scan is already running, no need to resume initial scan" }
+            return false
+        }
+
+        // Don't resume if a scheduled background scan worker is currently running
+        if (pirScanScheduler.isScheduledScanRunning()) {
+            logcat { "PIR-WEB: Scheduled scan worker is running, no need to resume initial scan" }
+            return false
+        }
+
+        val notExecutedJobs = pirSchedulingRepository.getAllValidScanJobRecords().filter { record ->
+            record.status == ScanJobStatus.NOT_EXECUTED && record.lastScanDateInMillis == 0L
+        }
+
+        if (notExecutedJobs.isEmpty()) {
+            logcat { "PIR-WEB: No NOT_EXECUTED jobs found, initial scan is complete" }
+            return false
+        }
+
+        logcat { "PIR-WEB: Found ${notExecutedJobs.size} NOT_EXECUTED jobs, should resume initial scan" }
+        return true
     }
 }

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
@@ -50,11 +49,20 @@ interface DuckChat {
     /**
      * Returns the Duck Chat URL to be used
      */
-    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
+
+    /**
+     * Returns the Duck.ai URL that opens with the settings panel open (e.g. https://duck.ai?settings=open),
+     * using the configured Duck.ai host. Used to reach Duck.ai settings from outside the Duck.ai web view.
+     */
+    fun getDuckChatSettingsUrl(): String
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
-     *
+     * There are two Duck Chat URLs
+     * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
+     * After Migration: https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5&atb=v520-1ru&ko=-1&t=ddg_android&migration=native-import
+     * https://app.asana.com/1/137249556945/task/1210497696306780
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean
@@ -65,14 +73,15 @@ interface DuckChat {
     suspend fun wasOpenedBefore(): Boolean
 
     /**
-     * Displays the new address bar option choice screen.
-     */
-    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
-
-    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — enabled it
+     * explicitly, or had a value written implicitly (e.g. the onboarding selection). Sticky once set.
+     */
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     /**
      * Cosmetically sets the input screen user setting.
@@ -94,4 +103,91 @@ interface DuckChat {
      * Observes the value for the automatic context attachment for Contextual Mode
      */
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes whether the native input field user setting is enabled.
+     */
+    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes whether the Duck.ai native chat input integration is enabled.
+     * Emits `true` only when both the native input widget and the `nativeChatInput`
+     * feature flag are enabled (and the widget is not suppressed). When `false`,
+     * Duck.ai contextual and full modes fall back to the web input.
+     */
+    fun observeNativeChatInputEnabled(): Flow<Boolean>
+
+    /**
+     * Observes whether the native input top nav bar feature flag is enabled.
+     * This is only the flag; callers still gate on the input mode (Search & Duck.ai).
+     */
+    fun observeNativeInputNavBarEnabled(): Flow<Boolean>
+
+    suspend fun isStandaloneMigrationCompleted(): Boolean
+
+    /**
+     * Set user preference for whether chat suggestions are shown in the input screen.
+     */
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    /**
+     * Observes whether the user has enabled chat suggestions.
+     */
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Opens Duck.ai directly in voice mode (duck.ai/?mode=voice-mode).
+     */
+    fun openVoiceDuckChat()
+
+    /**
+     * Returns `true` if a voice session is currently active on the tab with the given [tabId].
+     */
+    fun isVoiceChatSessionActive(tabId: String): Boolean
+
+    /**
+     * Emits the set of tab IDs that currently have an active voice session.
+     */
+    val activeVoiceChatSessions: Flow<Set<String>>
+
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceChatSessionEnd(): Flow<String>
+
+    /**
+     * Requests that the active voice session on the tab with the given [tabId] end. This drives the web
+     * frontend to tear down the session (stop recording, release the mic) and report it ended, which in
+     * turn releases the native voice resources.
+     */
+    fun endVoiceChatSession(tabId: String)
+
+    /**
+     * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
+     * Suspending because the underlying feature-flag reads must not block the main thread.
+     */
+    suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Returns `true` when the user enabled Duck.ai chat history in settings.
+     */
+    suspend fun hasUserEnabledChatHistory(): Boolean
+
+    /**
+     * Emits whether the most recent Chat Tab suggestions fetch returned any entries, reflecting the
+     * currently displayed suggestions for the latest query.
+     *
+     * Caution: the cached value is cleared when the Chat Tab is torn down, so no value is emitted
+     * until the current presentation performs its first fetch.
+     */
+    fun observeHasChatSuggestions(): Flow<Boolean>
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

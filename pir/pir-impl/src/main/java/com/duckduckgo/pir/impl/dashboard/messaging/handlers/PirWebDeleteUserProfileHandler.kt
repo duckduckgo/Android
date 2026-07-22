@@ -28,6 +28,8 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.DELETE_USER_PROFILE_DATA
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -44,6 +46,7 @@ class PirWebDeleteUserProfileHandler @Inject constructor(
     private val workHandler: PirWorkHandler,
     private val pirFeatureDataCleaner: PirFeatureDataCleaner,
     private val pirWebProfileStateHolder: PirWebProfileStateHolder,
+    private val pirPixelSender: PirPixelSender,
 ) : PirWebJsMessageHandler() {
     override fun process(
         jsMessage: JsMessage,
@@ -51,10 +54,11 @@ class PirWebDeleteUserProfileHandler @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         logcat { "PIR-WEB: PirWebDeleteUserProfileHandler: process $jsMessage" }
+        pirPixelSender.reportUserReset()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
                 pirWebProfileStateHolder.clear()
-                workHandler.cancelWork()
+                workHandler.cancelWork(CancellationReason.PROFILE_DELETED)
                 pirFeatureDataCleaner.removeUserData()
             }.onFailure {
                 jsMessaging.sendResponse(

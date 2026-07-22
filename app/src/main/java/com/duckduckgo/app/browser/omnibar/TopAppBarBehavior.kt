@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -44,6 +45,24 @@ class TopAppBarBehavior(
         )
     }
 
+    override fun onInterceptTouchEvent(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        ev: MotionEvent,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onInterceptTouchEvent(parent, child, ev)
+    }
+
+    override fun onTouchEvent(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        ev: MotionEvent,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onTouchEvent(parent, child, ev)
+    }
+
     @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
@@ -59,6 +78,18 @@ class TopAppBarBehavior(
         }
 
         return super.layoutDependsOn(parent, child, dependency)
+    }
+
+    override fun onStartNestedScroll(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        directTargetChild: View,
+        target: View,
+        nestedScrollAxes: Int,
+        type: Int,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onStartNestedScroll(parent, child, directTargetChild, target, nestedScrollAxes, type)
     }
 
     override fun onNestedPreScroll(

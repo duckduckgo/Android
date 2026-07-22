@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.global.view
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.TabType
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -33,7 +36,9 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -55,9 +60,10 @@ import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class GranularFireDialogViewModel @Inject constructor(
-    tabRepository: TabRepository,
+    private val tabRepository: TabRepository,
     private val fireDataStore: FireDataStore,
     private val dataClearing: ManualDataClearing,
+    private val dataClearingWideEvent: DataClearingWideEvent,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
@@ -66,6 +72,7 @@ class GranularFireDialogViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val navigationHistory: NavigationHistory,
     private val dateProvider: DateProvider,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     data class ViewState(
@@ -154,7 +161,7 @@ class GranularFireDialogViewModel @Inject constructor(
             command.send(Command.OnShow)
             if (!hasFiredDialogShownPixel) {
                 hasFiredDialogShownPixel = true
-                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
+                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN, mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()))
             }
         }
     }
@@ -170,6 +177,11 @@ class GranularFireDialogViewModel @Inject constructor(
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            pixel.enqueueFire(
+                AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY,
+                mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()),
+                type = Daily(),
+            )
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
@@ -183,7 +195,21 @@ class GranularFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-                dataClearing.clearDataUsingManualFireOptions()
+                val clearOptions = fireDataStore.getManualClearOptions()
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.GRANULAR_FIRE_DIALOG,
+                    clearOptions = clearOptions,
+                    browserMode = browserMode,
+                    tabType = selectedTabType(),
+                    tabCount = viewState.value.tabCount,
+                )
+                try {
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
 
             command.send(Command.ClearingComplete)
@@ -198,5 +224,11 @@ class GranularFireDialogViewModel @Inject constructor(
             fireButtonStore.storeLastFireButtonClearEventTime(now)
             pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
         }
+    }
+
+    private suspend fun selectedTabType(): TabType? {
+        val selectedTab = tabRepository.getSelectedTab() ?: return null
+        val isDuckAiTab = selectedTab.url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true
+        return if (isDuckAiTab) TabType.AI else TabType.WEB
     }
 }

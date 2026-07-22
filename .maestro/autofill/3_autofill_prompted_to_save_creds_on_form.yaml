@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Autofill: Prompted to save and update credentials on web form"
 tags:
     - autofillNoAuthTests
@@ -13,7 +14,6 @@ tags:
 
         - tapOn:
             id: "omnibarTextInput"
-        - eraseText
         - inputText: "fill.dev/form/login-simple"
         - pressKey: enter
 

@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -45,7 +46,12 @@ class DuckAiPinShortcutActivity : DuckDuckGoActivity() {
     private fun createShortcutInfo(context: Context): ShortcutInfoCompat {
         val shortLabel = getString(R.string.duckAiOnlyPinShortcutLabel)
 
-        val shortcutIntent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).apply {
+        val shortcutIntent = BrowserActivity.intent(
+            context,
+            launchSource = DuckAiPinShortcut,
+            openDuckChat = true,
+            duckChatSessionActive = true,
+        ).apply {
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

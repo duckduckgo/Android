@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Partilhar favoritos</string>
-    <string name="sync_enable_option_favorites_subtitle">Usa os mesmos favoritos em todos os teus dispositivos. Deixa desativado para manter separados os favoritos em dispositivos móveis e computadores.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Partilhar favoritos entre dispositivos</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Usa os mesmos marcadores favoritos no telemóvel e no computador.</string>
     <string name="saved_site_limit_warning"><b>Sincronização em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>A sincronização de marcadores está em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns marcadores para retomar a sincronização.</string>
     <string name="saved_site_invalid_warning"><b>Sincronização em pausa</b>\nAlguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
@@ -28,6 +28,12 @@
         <item quantity="one">Não é possível sincronizar o teu marcador para %1$s porque um dos campos excede o limite de carateres.</item>
         <item quantity="other">Não é possível sincronizar os teus marcadores para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Pesquisar marcadores</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Adicionar pasta</string>
+    <string name="bookmarksMenuContentDescription">Mais opções</string>
+    <string name="newTabFavoritesToggleContentDescription">Alternar a visibilidade dos favoritos</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -93,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Tens a certeza de que queres eliminar o marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">A obter ícones dos marcadores</string>
-    <string name="sync_fetch_icons_subtitle">Transferir automaticamente ícones para os teus marcadores sincronizados.</string>
+    <string name="sync_simplified_fetch_icons_title">Carregar ícones de marcadores</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Carrega ícones de sites que guardaste nos marcadores. As transferências de ícones são expostas à tua rede.</string>
     <string name="faviconsPromptTitle">Transferir ícones em falta?</string>
     <string name="faviconsPromptMessage">Queres que este dispositivo transfira automaticamente os ícones dos marcadores sincronizados dos sites nos marcadores?</string>
     <string name="faviconsPromptPrimaryCta">Manter os ícones dos marcadores atualizados</string>
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importar do Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selecionar ficheiro de marcadores…</string>
     <string name="bookmarksImportDialogClose">Fechar</string>
+
 </resources>

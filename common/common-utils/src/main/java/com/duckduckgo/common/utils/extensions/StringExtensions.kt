@@ -63,6 +63,21 @@ fun String.toTldPlusOne(): String? {
 }
 
 /**
+ * The registrable domain (eTLD+1) for this host, or the host itself when there is none (IPs, `localhost`).
+ * Shared so the per-site key derivation can't drift between call sites.
+ */
+fun String.toTldPlusOneOrSelf(): String = if (isIpv4Literal()) this else toTldPlusOne() ?: this
+
+private fun String.isIpv4Literal(): Boolean {
+    val octets = split('.')
+    if (octets.size != 4) return false
+    return octets.all { octet ->
+        val value = octet.toIntOrNull()
+        value != null && value in 0..255
+    }
+}
+
+/**
  * Compares the current semantic version string with the target semantic version string.
  *
  * The version strings can have an arbitrary number of parts separated by dots (e.g. "x.y.z").
@@ -100,15 +115,14 @@ private const val NON_BREAKING_SPACE = '\u00A0'
  * a non-breaking space (U+00A0) to ensure the last two words stay together on the
  * same line, preventing the final word from becoming orphaned.
  *
- * @return A new string with the last space replaced by a non-breaking space,
- *         or the original string if no space is found or if the space is at the end
+ * @return A new string with the last space replaced by a non-breaking space, or the
+ *         original string if there is no suitable space to replace
  *
  * @see <a href="https://en.wikipedia.org/wiki/Widows_and_orphans">Widows and orphans typography</a>
  */
 fun String.preventWidows(): String {
     val lastSpaceIndex = this.lastIndexOf(' ')
-    // Ensure there is a space and it's not the last character
-    if (lastSpaceIndex > 0 && lastSpaceIndex < this.length - 1) {
+    if (lastSpaceIndex > 0 && lastSpaceIndex < this.length - 1 && this.indexOf(' ') != lastSpaceIndex) {
         val builder = StringBuilder(this)
         builder.setCharAt(lastSpaceIndex, NON_BREAKING_SPACE)
         return builder.toString()

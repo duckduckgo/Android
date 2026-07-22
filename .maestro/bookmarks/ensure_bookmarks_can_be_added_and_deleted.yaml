@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Bookmarks can be added and deleted"
 tags:
   - releaseTest
@@ -16,12 +17,14 @@ tags:
           id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
           text: "add bookmark"
       - tapOn:
           text: "add bookmark"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
           text: "bookmarks"
       - tapOn:

@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Share Favorites</string>
-    <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Share Favorites Across Devices</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Use the same favorite bookmarks on mobile and desktop.</string>
     <string name="saved_site_limit_warning"><b>Sync Paused</b>\nYou\'ve reached the maximum number of bookmarks. Please delete some to resume sync.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Bookmark Sync is Paused</b>\nYou\'ve reached the maximum number of bookmarks. Please delete some bookmarks to resume sync.</string>
     <string name="saved_site_invalid_warning"><b>Sync Paused</b>\nSome bookmarks are formatted incorrectly or too long and were not synced.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
@@ -28,6 +28,12 @@
         <item quantity="one">Your bookmark for %1$s can’t sync because one of its fields exceeds the character limit.\n\n</item>
         <item quantity="other">Your bookmarks for %1$s and %2$d other sites can’t sync because some of their fields exceed the character limit.\n\n</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Search bookmarks</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Add folder</string>
+    <string name="bookmarksMenuContentDescription">More options</string>
+    <string name="newTabFavoritesToggleContentDescription">Toggle favorites visibility</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -93,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Fetch Bookmark Icons</string>
-    <string name="sync_fetch_icons_subtitle">Automatically download icons for your synced bookmarks.</string>
+    <string name="sync_simplified_fetch_icons_title">Load Bookmark Icons</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Loads icons from websites you’ve bookmarked. Icon downloads are exposed to your network.</string>
     <string name="faviconsPromptTitle">Download Missing Icons?</string>
     <string name="faviconsPromptMessage">Do you want this device to automatically download icons for synced bookmarks from the bookmarked websites?</string>
     <string name="faviconsPromptPrimaryCta">Keep Bookmark Icons Updated</string>
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
     <string name="bookmarksImportDialogClose">Close</string>
+
 </resources>

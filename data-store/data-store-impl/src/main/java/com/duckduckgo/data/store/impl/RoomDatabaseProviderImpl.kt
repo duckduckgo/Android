@@ -26,6 +26,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -92,11 +94,24 @@ class RoomDatabaseProviderImpl @Inject constructor(
     }
 
     private fun RoomDatabase.Builder<*>.applyExecutors(executor: com.duckduckgo.data.store.api.DatabaseExecutor) {
-        val databaseExecutorProvider = lazyDatabaseExecutorProvider.get()
-        val queryExecutor = databaseExecutorProvider.createQueryExecutor(executor)
-        val transactionExecutor = databaseExecutorProvider.createTransactionExecutor(executor)
+        // Wrap in lazy-initialising proxies so the feature-flag read (SharedPreferences) inside
+        // RealDatabaseExecutorProvider's constructor is deferred until the first actual DB query,
+        // which Room runs on a background thread — not at DI construction time on the main thread.
+        setQueryExecutor(LazyExecutor { lazyDatabaseExecutorProvider.get().createQueryExecutor(executor) })
+        setTransactionExecutor(LazyExecutor { lazyDatabaseExecutorProvider.get().createTransactionExecutor(executor) })
+    }
+}
 
-        queryExecutor?.let { setQueryExecutor(it) }
-        transactionExecutor?.let { setTransactionExecutor(it) }
+/**
+ * An [Executor] that defers resolving its delegate to the first [execute] call.
+ * This avoids triggering SharedPreferences reads during DI graph construction on the main thread.
+ * When the resolved delegate is null (feature flag disabled for [DatabaseExecutor.Default]),
+ * a cached thread pool is used as a fallback equivalent to Room's own background thread pool.
+ */
+internal class LazyExecutor(init: () -> Executor?) : Executor {
+    internal val delegate: Executor? by lazy { init() }
+    private val fallback: Executor by lazy { Executors.newCachedThreadPool() }
+    override fun execute(command: Runnable) {
+        (delegate ?: fallback).execute(command)
     }
 }

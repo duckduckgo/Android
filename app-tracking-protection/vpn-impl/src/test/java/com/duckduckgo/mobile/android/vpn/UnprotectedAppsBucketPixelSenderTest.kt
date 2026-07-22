@@ -58,7 +58,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, app, app, app, app, app, app))
         val expectedBucketSize = 20
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -69,7 +69,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, app, app, app, app, excludedApp, app))
         val expectedBucketSize = 20
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -80,7 +80,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, app, app, app, app, excludedApp, excludedApp))
         val expectedBucketSize = 40
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -91,7 +91,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, app, excludedApp, app, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 60
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -102,7 +102,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, app, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 80
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -113,7 +113,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(app, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 100
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }
@@ -124,7 +124,7 @@ class UnprotectedAppsBucketPixelSenderTest {
         protectedAppsChannel.send(listOf(excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 100
 
-        testee.onVpnStarted(coroutineRule.testScope)
+        testee.onVpnStarted(backgroundScope)
 
         verify(mockDeviceShieldPixels).reportUnprotectedAppsBucket(expectedBucketSize)
     }

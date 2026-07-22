@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Fire button is dismissed"
 tags:
   - releaseTest
@@ -12,17 +13,19 @@ tags:
 
       - runFlow: ../shared/pre_onboarding.yaml
 
+      # pre_onboarding ends on a search result page; type the test URL into the omnibar
+      # (the native input field only exists on the new-tab page).
       - tapOn:
           id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
-          text: ".*keep browsing.*"
+          text: ".*keep.browsing.*"
       - tapOn:
           text: "got it"
       - assertVisible:
           text: ".*browsing activity with the fire button.*"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*browsing activity with the Fire Button.*"

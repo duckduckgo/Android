@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
@@ -48,6 +49,7 @@ import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
@@ -60,6 +62,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var webContentDebuggingFeature: WebContentDebuggingFeature
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityDevSettingsBinding by viewBinding()
 
@@ -79,11 +84,19 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onStart() {
@@ -139,7 +152,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun goToUrl(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = url))
         finish()
     }
 

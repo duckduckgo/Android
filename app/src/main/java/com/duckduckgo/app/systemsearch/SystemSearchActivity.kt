@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.mode.SystemSearchExternal
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -62,16 +63,17 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DeleteFavor
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DismissKeyboard
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.EditQuery
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchAssistSearch
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowser
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowserAndSwitchToTab
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDeviceApplication
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckAiVoiceChat
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchEditDialog
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowAppNotFoundMessage
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -81,11 +83,15 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -132,6 +138,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -154,6 +166,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -196,13 +211,41 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
     }
 
+    /**
+     * One inset listener per view (each apply* replaces any prior listener on that view), and only on
+     * the views that survive [configureOmnibar] (which removes the unused omnibar app bar):
+     * - top omnibar: sides -> rootView, status -> appBarLayout, nav + IME -> content (scrolling list)
+     * - bottom omnibar: status -> content; sides + nav + IME -> rootView bottom margin (single combined
+     *   listener - rootView can't take both [EdgeToEdgeHandler.applyHorizontalSystemBarInsets] and
+     *   [EdgeToEdgeHandler.applyNavigationBarInsetsAsMargin] separately, the second would drop the first),
+     *   so the whole root (including the fixed-height appBarLayoutBottom) rises above the keyboard/gesture
+     *   nav - padding the fixed-height bar directly would just squeeze its content instead of moving it
+     */
+    private fun configureEdgeToEdgeInsets(isOmnibarAtTop: Boolean) {
+        if (isOmnibarAtTop) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.content)
+        } else {
+            edgeToEdgeHandler.applyStatusBarInsets(binding.content)
+            edgeToEdgeHandler.applyHorizontalInsetsAndNavigationBarMargin(binding.rootView)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
 
         configureViewReferences(viewModel.isOmnibarAtTop)
         configureOmnibar(viewModel.isOmnibarAtTop)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
+        }
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()
@@ -216,9 +259,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             intent?.let {
                 sendLaunchPixels(it)
-                val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = it)
-                if (!inputScreenLaunched) {
-                    handleVoiceSearchLaunch(it)
+                if (launchedFromAssist(it)) {
+                    handleDigitalAssistIntent(it)
+                } else {
+                    val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = it)
+                    if (!inputScreenLaunched) {
+                        handleVoiceSearchLaunch(it)
+                    }
                 }
             }
         }
@@ -251,6 +298,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
         sendLaunchPixels(intent)
+        if (launchedFromAssist(intent)) {
+            handleDigitalAssistIntent(intent)
+            return
+        }
         val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = intent)
         if (!inputScreenLaunched) {
             handleVoiceSearchLaunch(intent)
@@ -260,7 +311,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     /**
      * @return `true` if the Input Screen was successfully launched, `false` otherwise.
      */
-    private fun launchInputScreen(isTopOmnibar: Boolean, intent: Intent): Boolean {
+    private fun launchInputScreen(
+        isTopOmnibar: Boolean,
+        intent: Intent,
+    ): Boolean {
         return if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value && !launchedFromSearchOnlyWidget(intent)) {
             globalActivityStarter.startIntent(
                 this,
@@ -294,6 +348,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (launchVoice(intent)) {
             voiceSearchLauncher.launch(this)
         }
+    }
+
+    private fun handleDigitalAssistIntent(intent: Intent) {
+        viewModel.onDigitalAssistOpened(intent)
     }
 
     private fun configureFlowCollectors() {
@@ -352,16 +410,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteInAppMessageDismissedListener = { viewModel.onUserDismissedAutoCompleteInAppMessage() },
-                autoCompleteOpenSettingsClickListener = {
-                    globalActivityStarter.start(this, PrivateSearchScreenNoParams)
-                },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+        lifecycleScope.launch {
+            autocompleteSuggestionsAdapter.setDeleteButtonVisible(viewModel.isAutocompleteHistoryDeleteButtonEnabled())
+        }
 
         binding.content.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
@@ -423,6 +480,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
                         viewModel.onVoiceSearchResult(result.query)
                     }
+
                     is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
                         viewModel.onDuckAiRequested(result.query)
                     }
@@ -484,10 +542,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
-        if (viewState.autocompleteResults.suggestions.isEmpty()) {
-            viewModel.autoCompleteSuggestionsGone()
-        }
-
         binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
     }
 
@@ -562,6 +616,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             AutocompleteItemRemoved -> autocompleteItemRemoved()
 
             SystemSearchViewModel.Command.ExitSearch -> finish()
+
+            LaunchDuckAiVoiceChat -> {
+                duckChat.openVoiceDuckChat()
+                finish()
+            }
+
+            is LaunchAssistSearch -> launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = command.intent)
         }
     }
 
@@ -662,7 +723,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        startActivity(BrowserActivity.intent(this, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, launchSource = SystemSearchExternal, interstitialScreen = true))
         finish()
     }
 
@@ -673,6 +734,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         startActivity(
             BrowserActivity.intent(
                 context = this,
+                launchSource = SystemSearchExternal,
                 queryExtra = query,
                 interstitialScreen = true,
                 openExistingTabId = openExistingTabId,

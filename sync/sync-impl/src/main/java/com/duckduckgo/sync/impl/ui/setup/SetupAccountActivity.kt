@@ -28,14 +28,19 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.PREVIOUS_SESSION_READY
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RESTORE_IN_PROGRESS
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
@@ -48,6 +53,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveR
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.PreviousSessionReady
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.RestoreInProgress
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
@@ -62,6 +69,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var screen: Screen
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
@@ -72,14 +85,32 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         screen = if (savedInstanceState != null) {
             savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
         } else {
             intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: SETUP_COMPLETE
         }
         setContentView(binding.root)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         observeUiEvents()
         configureListeners()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        // This screen has no toolbar and its content is a full-bleed daxColorSurface fragment container. Pad that
+        // container on every edge so its surface background bleeds behind the transparent system bars: without this
+        // the status-bar scrim (daxColorBackground) would show a colour different from the surface body.
+        edgeToEdgeHandler.applySystemBarInsets(binding.fragmentContainerView)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -142,10 +173,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
                 }
             }
 
-            AskSaveRecoveryCode -> {
+            is AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
+                val fragment = if (viewState.viewMode.useNewScreen) {
+                    RecoverDataFragment.instance()
+                } else {
+                    SaveRecoveryCodeFragment.instance()
+                }
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, fragment, TAG_RECOVER_ACCOUNT)
                 }
             }
 
@@ -160,6 +196,20 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
                 screen = SETUP_COMPLETE
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncDeviceConnectedFragment.instance(), TAG_DEVICE_CONNECTED)
+                }
+            }
+
+            PreviousSessionReady -> {
+                screen = PREVIOUS_SESSION_READY
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SyncPreviousSessionReadyFragment.instance(extractSource()), TAG_PREVIOUS_SESSION_READY)
+                }
+            }
+
+            RestoreInProgress -> {
+                screen = RESTORE_IN_PROGRESS
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SyncRestoreAccountFragment.instance(), TAG_RESTORE_IN_PROGRESS)
                 }
             }
         }
@@ -185,6 +235,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
         viewModel.onCreateAccount()
     }
 
+    override fun launchRestoreInProgressScreen() {
+        viewModel.onRestoreInProgress()
+    }
+
+    override fun launchContinueSetupSkippingRestoreCheck() {
+        setResult(RESULT_CONTINUE_WITHOUT_RESTORE)
+        finish()
+    }
+
     override fun launchRecoverAccountScreen() {
         viewModel.onRecoverAccount()
     }
@@ -202,9 +261,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
         private const val TAG_SYNC_INTRO = "tag_sync_intro"
         private const val TAG_RECOVER_ACCOUNT = "tag_recover_account"
         private const val TAG_DEVICE_CONNECTED = "tag_device_connected"
+        private const val TAG_PREVIOUS_SESSION_READY = "tag_previous_session_ready"
+        private const val TAG_RESTORE_IN_PROGRESS = "tag_restore_in_progress"
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
         const val LAUNCH_SOURCE_EXTRA = "LAUNCH_SOURCE_EXTRA"
+        const val RESULT_CONTINUE_WITHOUT_RESTORE = 2
 
         enum class Screen {
             SYNC_SETUP,
@@ -212,6 +274,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
             RECOVERY_CODE,
             RECOVERY_INTRO,
             SETUP_COMPLETE,
+            PREVIOUS_SESSION_READY,
+            RESTORE_IN_PROGRESS,
         }
 
         internal fun intent(context: Context, screen: Screen, source: String?): Intent {

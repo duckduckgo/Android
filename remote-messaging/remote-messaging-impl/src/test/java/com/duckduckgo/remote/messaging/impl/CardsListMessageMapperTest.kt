@@ -29,6 +29,7 @@ import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.*
@@ -207,7 +208,7 @@ class CardsListMessageMapperTest {
     }
 
     @Test
-    fun whenCardsListMessageWithListItemMissingActionThenMessageIsFiltered() {
+    fun whenCardsListMessageWithListItemMissingActionThenListItemActionIsNull() {
         val listItemsWithNullAction = listOf(
             JsonListItem(
                 id = "item1",
@@ -215,7 +216,7 @@ class CardsListMessageMapperTest {
                 titleText = "Feature",
                 descriptionText = "Description",
                 placeholder = "ImageAI",
-                primaryAction = null, // Null action should cause failure
+                primaryAction = null,
             ),
         )
 
@@ -228,8 +229,52 @@ class CardsListMessageMapperTest {
 
         val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
 
-        // Message should be filtered out due to null action in list item
-        assertEquals(0, remoteMessages.size)
+        // Message is kept; the list item is kept with a null action instead
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(1, content.listItems.size)
+        val listItem = content.listItems.first() as CardItem.ListItem
+        assertNull(listItem.primaryAction)
+    }
+
+    @Test
+    fun whenCardsListMessageWithImageUrlsThenMapCorrectly() {
+        val listItems = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature One",
+                descriptionText = "Description",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+                imageUrl = "https://example.com/image1.png",
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Feature Two",
+                descriptionText = "Description",
+                placeholder = "Radar",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+                imageUrl = null,
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(id = "cards-img", content = cardsListJsonContent(listItems = listItems)),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(2, content.listItems.size)
+
+        val item1 = content.listItems[0] as CardItem.ListItem
+        assertEquals("https://example.com/image1.png", item1.imageUrl)
+
+        val item2 = content.listItems[1] as CardItem.ListItem
+        assertNull(item2.imageUrl)
     }
 
     @Test

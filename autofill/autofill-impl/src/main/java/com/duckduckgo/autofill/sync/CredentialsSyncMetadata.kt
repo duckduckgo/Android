@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow

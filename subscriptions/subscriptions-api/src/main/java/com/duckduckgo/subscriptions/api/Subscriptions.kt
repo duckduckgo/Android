@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.api
 
 import android.content.Context
 import android.net.Uri
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.flow.Flow
 
 interface Subscriptions {
@@ -42,6 +43,7 @@ interface Subscriptions {
      * This method returns a [true] if a  given [product] can be found in the entitlements list or [false] otherwise
      * @return [Boolean]
      */
+    @Deprecated("Use getEntitlements() instead.", ReplaceWith("getEntitlements()"))
     fun getEntitlementStatus(): Flow<List<Product>>
 
     /**
@@ -67,22 +69,28 @@ interface Subscriptions {
     /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
-    fun shouldLaunchPrivacyProForUrl(url: String): Boolean
+    fun shouldLaunchSubscriptionForUrl(url: String): Boolean
 
     /**
-     * Launches Privacy Pro with Settings as the parent activity
+     * Launches the Subscription flow with Settings as the parent activity
      */
-    fun launchPrivacyPro(context: Context, uri: Uri?)
+    fun launchSubscription(context: Context, uri: Uri?)
 
     /**
-     * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
+     * @return `true` if the given Uri leads to the Subscription page, or `false` otherwise
      */
-    fun isPrivacyProUrl(uri: Uri): Boolean
+    fun isSubscriptionUrl(uri: Uri): Boolean
 
     /**
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
     suspend fun isFreeTrialEligible(): Boolean
+
+    /**
+     * Emits the set of [Entitlement]s granted by the current active subscription, and re-emits when it changes.
+     * Emits an empty set when there is no active subscription.
+     */
+    fun getEntitlements(): Flow<Set<Entitlement>>
 }
 
 enum class Product(val value: String) {

@@ -3,10 +3,20 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V1_SIGN_IN_ATTEMPT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_DUCK_AI_PAID_USED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D0
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D14
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D3
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D30
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import org.junit.Assert.*
 import org.junit.Assume.assumeFalse
@@ -20,14 +30,24 @@ class SubscriptionPixelTest(
     private val pixel: SubscriptionPixel,
 ) {
     @Test
-    fun `pixel name has privacy pro namespace prefix`() {
+    fun `pixel name has subscription namespace prefix`() {
         assumeFalse(
             pixel in listOf(
                 PURCHASE_SUCCESS_ORIGIN,
                 SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH,
-                AUTH_V1_SIGN_IN_ATTEMPT,
                 FREE_TRIAL_START,
                 FREE_TRIAL_VPN_ACTIVATION,
+                FREE_TRIAL_DUCK_AI_PAID_USED,
+                PAYWALL_SHOWN_FIRST_TIME,
+                PAYWALL_NOT_SEEN_D0,
+                PAYWALL_NOT_SEEN_D3,
+                PAYWALL_NOT_SEEN_D7,
+                PAYWALL_NOT_SEEN_D14,
+                PAYWALL_NOT_SEEN_D30,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED,
             ),
         )
 
@@ -38,7 +58,15 @@ class SubscriptionPixelTest(
 
     @Test
     fun `pixel name has pixel type suffix`() {
-        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
+        assumeFalse(
+            pixel in listOf(
+                PURCHASE_SUCCESS_ORIGIN,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED,
+                SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,
+                SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED,
+            ),
+        )
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             val expectedSuffix = when (pixelType) {
                 is Count -> "_c"

@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Kopīgot izlasi</string>
-    <string name="sync_enable_option_favorites_subtitle">Izmanto vienu izlasi visās ierīcēs. Atstāj izslēgtu, lai nodalītu mobilās un galddatora izlases.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Kopīgot izlasi visās ierīcēs</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Izmanto vienas izlases grāmatzīmes kā mobilajā ierīcē, tā datorā.</string>
     <string name="saved_site_limit_warning"><b>Sinhronizācija pārtraukta</b>\nTu esi sasniedzis maksimālo grāmatzīmju skaitu. Lūdzu, izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Grāmatzīmju sinhronizācija ir pārtraukta</b>\nTu esi sasniedzis maksimālo grāmatzīmju skaitu. Lūdzu, izdzēs dažas grāmatzīmes, lai atsāktu sinhronizāciju.</string>
     <string name="saved_site_invalid_warning"><b>Sinhronizācija pārtraukta</b>\nDažas grāmatzīmes ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.\n\n<annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
@@ -29,6 +29,12 @@
         <item quantity="one">Tavu grāmatzīmi vietnei %1$s nevar sinhronizēt, jo kāds no tās laukiem pārsniedz rakstzīmju ierobežojumu.</item>
         <item quantity="other">Tavas grāmatzīmes vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Meklēt grāmatzīmes</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pievienot mapi</string>
+    <string name="bookmarksMenuContentDescription">Citas iespējas</string>
+    <string name="newTabFavoritesToggleContentDescription">Pārslēgt izlases redzamību</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -97,8 +103,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Vai tiešām vēlies dzēst savu &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmi?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Ienest grāmatzīmju ikonas</string>
-    <string name="sync_fetch_icons_subtitle">Automātiski lejupielādē sinhronizēto grāmatzīmju ikonas.</string>
+    <string name="sync_simplified_fetch_icons_title">Ielādēt grāmatzīmju ikonas</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Ielādē ikonas no vietnēm, kuras esi pievienojis grāmatzīmēm. Ikonu lejupielādes ir redzamas tavā tīklā.</string>
     <string name="faviconsPromptTitle">Lejupielādēt trūkstošās ikonas?</string>
     <string name="faviconsPromptMessage">Vai vēlies, lai šī ierīce automātiski lejupielādētu sinhronizēto grāmatzīmju ikonas no vietnēm, kuru grāmatzīmes ir saglabātas?</string>
     <string name="faviconsPromptPrimaryCta">Pastāvīgi atjaunināt grāmatzīmju ikonas</string>
@@ -120,4 +126,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
     <string name="bookmarksImportDialogClose">Aizvērt</string>
+
 </resources>

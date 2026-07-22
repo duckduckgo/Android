@@ -20,6 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
+    tools:ignore="Overdraw"
     android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
     android:paddingStart="?attr/autocompleteListItemStartPadding"
     android:paddingEnd="?attr/autocompleteListItemEndPadding">

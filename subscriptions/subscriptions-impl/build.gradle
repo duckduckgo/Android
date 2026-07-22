@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -32,17 +33,19 @@ android {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     testImplementation 'junit:junit:4.13.1'
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
     implementation project(path: ':cookies-api')
+    implementation project(path: ':browser-mode-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':feedback-api')
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
@@ -61,8 +64,10 @@ dependencies {
     implementation project(':vpn-api')
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
+    implementation project(':onboarding-api')
     implementation project(':pir-api')
     implementation project(':attributed-metrics-api')
+    implementation project(':privacy-dashboard-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
@@ -92,6 +97,7 @@ dependencies {
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':data-store-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing

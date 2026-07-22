@@ -24,15 +24,14 @@ import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
-import com.android.billingclient.api.queryPurchaseHistory
 import com.android.billingclient.api.queryPurchasesAsync
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -42,6 +41,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -68,7 +68,11 @@ class RealBillingClientAdapter @Inject constructor(
     ): BillingInitResult {
         reset()
         billingClient = BillingClient.newBuilder(context)
-            .enablePendingPurchases()
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .build(),
+            )
             .setListener { billingResult, purchases ->
                 val purchasesUpdateResult = mapToPurchasesUpdateResult(billingResult, purchases)
                 purchasesListener.invoke(purchasesUpdateResult)
@@ -129,23 +133,6 @@ class RealBillingClientAdapter @Inject constructor(
         } catch (t: Throwable) {
             logcat { "Error getting subscriptions: ${t.asLog()}" }
             return SubscriptionsResult.Failure(billingError = BILLING_CRASH_ERROR)
-        }
-    }
-
-    @Deprecated(message = "check interface")
-    override suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult {
-        val client = billingClient
-        if (client == null || !client.isReady) return SubscriptionsPurchaseHistoryResult.Failure
-
-        val queryParams = QueryPurchaseHistoryParams.newBuilder()
-            .setProductType(ProductType.SUBS)
-            .build()
-
-        val (billingResult, purchaseHistory) = client.queryPurchaseHistory(queryParams)
-
-        return when (billingResult.responseCode) {
-            BillingResponseCode.OK -> SubscriptionsPurchaseHistoryResult.Success(history = purchaseHistory.orEmpty())
-            else -> SubscriptionsPurchaseHistoryResult.Failure
         }
     }
 
@@ -254,7 +241,12 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
+            else -> {
+                logcat(priority = ERROR) {
+                    "Failed to launch subscription update flow: ${result.responseCode} ${result.debugMessage}"
+                }
+                LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
+            }
         }
     }
 

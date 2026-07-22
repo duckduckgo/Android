@@ -21,6 +21,10 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+/**
+ * Shared by `AppDatabase` and `FireModeDatabase`. Any schema change here requires a migration in
+ * BOTH databases — forgetting one will result in a runtime crash for the affected users.
+ */
 @Entity(
     tableName = "tab_selection",
     foreignKeys = [

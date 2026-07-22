@@ -62,7 +62,7 @@ interface MaliciousSiteDao {
     suspend fun insertFilters(items: Set<FilterEntity>)
 
     @Query("SELECT * FROM revisions")
-    suspend fun getLatestRevision(): List<RevisionEntity>?
+    suspend fun getLatestRevision(): List<RevisionEntity>
 
     @Query("SELECT * FROM revisions WHERE feed = :feed AND type = :type")
     suspend fun getLatestRevision(feed: String, type: String): RevisionEntity?

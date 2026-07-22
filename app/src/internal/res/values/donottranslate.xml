@@ -51,6 +51,10 @@
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
+    <string name="devSettingsFireTabsScreenHeader" instruction="Not translated">Current fire tab count: %1$d</string>
+    <string name="devSettingsFireTabsScreenTabsToAdd">Fire tabs to add</string>
+    <string name="devSettingsFireTabsScreenAddTabsButtonText">Add Fire Tabs</string>
+    <string name="devSettingsFireTabsScreenClearTabsButtonText">Clear Fire Tabs</string>
     <string name="devSettingsTabsBookmarksScreenHeader" instruction="Not translated">Current bookmarks count: %1$d</string>
     <string name="devSettingsTabsFavoritesScreenHeader" instruction="Not translated">Current favorites count: %1$d</string>
     <string name="devSettingsTabsScreenBookmarksToAdd">Bookmarks to add</string>
@@ -123,4 +127,11 @@
     <string name="webview_internal_feature_subtitle">WebView dev settings and tools</string>
     <string name="webview_dev_ui_not_available">WebView Developer UI is not available.</string>
     <string name="webview_play_store_unavailable">Play Store unavailable on this device</string>
+
+    <!-- Onboarding Dev Settings -->
+    <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
+    <string name="onboardingDevSettingsStateSection">Onboarding state</string>
+    <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
+    <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
+    <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
 </resources>

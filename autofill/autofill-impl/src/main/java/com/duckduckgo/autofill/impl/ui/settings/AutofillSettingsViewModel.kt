@@ -107,7 +107,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
         viewModelScope.launch {
-            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull()?.getOrThrow() ?: 0) > 0
             pixel.fire(
                 AUTOFILL_SETTINGS_OPENED,
                 parameters = mapOf(
@@ -121,7 +121,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private fun onViewStateFlowStart() {
         viewModelScope.launch(dispatchers.io()) {
             autofillStore.getCredentialCount().collect { count ->
-                _viewState.value = _viewState.value.copy(loginsCount = count)
+                _viewState.value = _viewState.value.copy(loginsCount = count.getOrThrow())
             }
         }
 

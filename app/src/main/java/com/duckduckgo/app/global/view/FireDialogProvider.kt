@@ -18,27 +18,14 @@ package com.duckduckgo.app.global.view
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-/**
- * Provider for creating Fire dialog instances.
- * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
- *
- * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
- * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
- * from GranularFireDialog or LegacyFireDialog.
- */
-interface FireDialogProvider {
-    /**
-     * Creates a Fire dialog instance.
-     * @return Instance of FireDialog (either Simple or Granular variant)
-     */
-    suspend fun createFireDialog(): FireDialog
-}
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)
@@ -46,14 +33,15 @@ class FireDialogProviderImpl @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : FireDialogProvider {
-
-    override suspend fun createFireDialog(): FireDialog = withContext(dispatcherProvider.io()) {
+    override suspend fun createFireDialog(
+        origin: FireDialogOrigin,
+    ): FireDialog = withContext(dispatcherProvider.io()) {
         when {
+            androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
+                SingleTabFireDialog.newInstance(origin)
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
-            androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled() ->
-                NonGranularFireDialog.newInstance()
-            else -> LegacyFireDialog.newInstance()
+            else -> NonGranularFireDialog.newInstance()
         }
     }
 }

@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.DaxYellowPill
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Medium
@@ -53,11 +54,8 @@ class OneLineListItem @JvmOverloads constructor(
     override val trailingSwitch: DaxSwitch
         get() = binding.trailingSwitch
 
-    override val betaPill: ImageView?
-        get() = null
-
-    override val newPill: ImageView
-        get() = binding.newPill
+    override val yellowPill: DaxYellowPill
+        get() = binding.yellowPill
 
     override val itemContainer: View
         get() = binding.itemContainer
@@ -127,11 +125,11 @@ class OneLineListItem @JvmOverloads constructor(
             val switchEnabled = getBoolean(R.styleable.OneLineListItem_switchEnabled, true)
             setSwitchEnabled(switchEnabled)
 
-            if (getBoolean(R.styleable.OneLineListItem_showNewPill, false)) {
-                newPill.setImageResource(R.drawable.ic_new_pill)
-                newPill.show()
+            if (getBoolean(R.styleable.OneLineListItem_pillIcon, false)) {
+                yellowPill.show()
+                yellowPill.text = getString(R.styleable.OneLineListItem_pillText)
             } else {
-                newPill.gone()
+                yellowPill.gone()
             }
 
             recycle()

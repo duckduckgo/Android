@@ -132,14 +132,26 @@ abstract class PirDashboardStateProvider(
         // Consider only active brokers and ignore removed ones
         val activeBrokerMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
         val brokerOptOutUrls = pirRepository.getAllBrokerOptOutUrls()
-        val optOutMap = pirSchedulingRepository.getAllValidOptOutJobRecords().associateBy {
-            it.extractedProfileId
-        }
+        val allValidOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords()
+        val optOutMap = allValidOptOutJobs.associateBy { it.extractedProfileId }
+        // Child brokers don't run their own form submission; they inherit the parent broker's most recent timestamp.
+        // Keyed by broker URL because Broker.parent references the parent's URL, not its name.
+        val mostRecentFormSubmittedByBrokerUrl: Map<String, Long> = allValidOptOutJobs
+            .mapNotNull { job ->
+                val date = job.optOutFormSubmittedDateInMillis ?: return@mapNotNull null
+                val url = activeBrokerMap[job.brokerName]?.url ?: return@mapNotNull null
+                url to date
+            }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, dates) -> dates.max() }
 
         // Transform every extracted profile that is not deprecated and belongs to an active broker
         return extractedProfiles.mapNotNull { extractedProfile ->
             val broker = activeBrokerMap[extractedProfile.brokerName] ?: return@mapNotNull null
             val optOutJob = optOutMap[extractedProfile.dbId]
+            val optOutFormSubmittedDateInMillis = broker.parent?.let { parentUrl ->
+                mostRecentFormSubmittedByBrokerUrl[parentUrl]
+            } ?: optOutJob?.optOutFormSubmittedDateInMillis
 
             DashboardExtractedProfileResult(
                 extractedProfile = extractedProfile,
@@ -150,6 +162,7 @@ abstract class PirDashboardStateProvider(
                     optOutUrl = brokerOptOutUrls[broker.name],
                 ),
                 optOutSubmittedDateInMillis = optOutJob?.optOutRequestedDateInMillis,
+                optOutFormSubmittedDateInMillis = optOutFormSubmittedDateInMillis,
                 optOutRemovedDateInMillis = optOutJob?.optOutRemovedDateInMillis,
                 estimatedRemovalDateInMillis = getEstimatedRemovalDateInMillis(
                     optOutJob?.optOutRequestedDateInMillis ?: 0L,
@@ -176,20 +189,14 @@ abstract class PirDashboardStateProvider(
                 dashboardResultMap[mirrorSite.parentSite] ?: return@mapNotNull null
 
             parentBrokerResults.map { result ->
-                DashboardExtractedProfileResult(
-                    extractedProfile = result.extractedProfile,
+                result.copy(
                     broker = DashboardBroker(
                         name = mirrorSite.name,
                         url = mirrorSite.url,
                         parentUrl = result.broker.url,
                         optOutUrl = mirrorSite.optOutUrl,
                     ),
-                    optOutSubmittedDateInMillis = result.optOutSubmittedDateInMillis,
-                    optOutRemovedDateInMillis = result.optOutRemovedDateInMillis,
-                    estimatedRemovalDateInMillis = result.estimatedRemovalDateInMillis,
-                    hasMatchingRecordOnParentBroker = mirrorSite.parentSite.let {
-                        result.extractedProfile.hasMatchingProfileOnParent(extractedProfiles)
-                    },
+                    hasMatchingRecordOnParentBroker = result.extractedProfile.hasMatchingProfileOnParent(extractedProfiles),
                 )
             }
         }.flatten()

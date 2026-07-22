@@ -31,6 +31,13 @@
                 android:screenOrientation="portrait" />
 
         <activity
+                android:name=".onboarding.SubscriptionOnboardingActivity"
+                android:exported="false"
+                android:label="@string/privacyPro"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+                android:screenOrientation="portrait" />
+
+        <activity
                 android:name=".ui.RestoreSubscriptionActivity"
                 android:exported="false"
                 android:label="@string/activityActivateSubscription"
@@ -47,7 +54,7 @@
         <activity
                 android:name=".pir.PirActivity"
                 android:exported="false"
-                android:label="@string/activityPir"
+                android:label="@string/ddg_subscription"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
 

@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Kedvencek megosztása</string>
-    <string name="sync_enable_option_favorites_subtitle">Használd ugyanazokat a kedvenceket minden eszközön. Hagyd kikapcsolva a mobil és asztali kedvencek különválasztásához.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Kedvencek megosztása az eszközökön</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Használd ugyanazokat a kedvenc könyvjelzőket mobilon és asztali gépen.</string>
     <string name="saved_site_limit_warning"><b>Szinkronizálás szüneteltetve</b>\nElérted a könyvjelzők maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Könyvjelző-szinkronizálás szüneteltetve</b>\nElérted a könyvjelzők maximális számát. A szinkronizálás folytatásához törölj néhány könyvjelzőt.</string>
     <string name="saved_site_invalid_warning"><b>Szinkronizálás szüneteltetve</b>\nEgyes könyvjelzők helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.\n\n<annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
@@ -28,6 +28,12 @@
         <item quantity="one">A(z) %1$s webhely könyvjelzője nem szinkronizálható, mert egyik mezője meghaladja a karakterkorlátot.</item>
         <item quantity="other">A(z) %1$s és %2$d másik webhely könyvjelzői nem szinkronizálhatók, mert egyes mezőik meghaladják a karakterkorlátot.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Könyvjelzők keresése</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Mappa hozzáadása</string>
+    <string name="bookmarksMenuContentDescription">További lehetőségek</string>
+    <string name="newTabFavoritesToggleContentDescription">Kedvencek láthatóságának be-/kikapcsolása</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -93,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Biztosan törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőjét?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Könyvjelző ikonok lekérése</string>
-    <string name="sync_fetch_icons_subtitle">Automatikusan letölti a szinkronizált könyvjelzők ikonjait.</string>
+    <string name="sync_simplified_fetch_icons_title">Könyvjelzőikonok betöltése</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Betölti az ikonokat az általad könyvjelzővel megjelölt webhelyekről. Az ikonletöltések láthatók a hálózaton.</string>
     <string name="faviconsPromptTitle">Hiányzó ikonok letöltése?</string>
     <string name="faviconsPromptMessage">Szeretnéd, hogy az eszköz automatikusan letöltse a szinkronizált könyvjelzők ikonjait a könyvjelzővel ellátott webhelyekről?</string>
     <string name="faviconsPromptPrimaryCta">Könyvjelzőikonok frissítése</string>
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importálás a Google-ból</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Válaszd ki a könyvjelzőfájlt…</string>
     <string name="bookmarksImportDialogClose">Bezárás</string>
+
 </resources>

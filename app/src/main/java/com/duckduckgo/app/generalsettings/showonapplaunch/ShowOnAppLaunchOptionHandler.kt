@@ -18,22 +18,31 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
-    suspend fun handleAppLaunchOption()
+    suspend fun handleAfterInactivityOption(wasIdle: Boolean, currentMode: BrowserMode)
+    suspend fun handleAppLaunchOption(currentMode: BrowserMode)
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
         isRootOfTab: Boolean,
@@ -45,14 +54,64 @@ interface ShowOnAppLaunchOptionHandler {
 class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
-    private val tabRepository: TabRepository,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val settingsDataStore: SettingsDataStore,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
 ) : ShowOnAppLaunchOptionHandler {
 
-    override suspend fun handleAppLaunchOption() {
-        when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
-            LastOpenedTab -> Unit
-            NewTabPage -> tabRepository.add()
-            is SpecificPage -> handleSpecificPageOption(option)
+    override suspend fun handleAfterInactivityOption(wasIdle: Boolean, currentMode: BrowserMode) {
+        logcat { "FirstScreen: Inactivity Timer passed" }
+        applyShowOnAppLaunchOption(fromInactivity = wasIdle, currentMode = currentMode)
+    }
+
+    override suspend fun handleAppLaunchOption(currentMode: BrowserMode) {
+        applyShowOnAppLaunchOption(fromInactivity = false, currentMode = currentMode)
+    }
+
+    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean, currentMode: BrowserMode) {
+        val option = showOnAppLaunchOptionDataStore.optionFlow.first()
+        logcat { "FirstScreen: showing $option on app launch" }
+
+        when (option) {
+            LastOpenedTab -> {
+                if (currentMode != BrowserMode.REGULAR) return
+                if (fromInactivity) {
+                    // Skip when the visible tab is a blank NTP — the NTP path classifies that case.
+                    val selectedTab = tabRepositoryProvider.forMode(BrowserMode.REGULAR).getSelectedTab()
+                    if (selectedTab != null && !selectedTab.url.isNullOrBlank()) {
+                        browserInteractionsPlugins.getPlugins().forEach { it.onLutShownAfterIdle() }
+                    }
+                }
+            }
+            NewTabPage -> {
+                val repo = tabRepositoryProvider.forMode(currentMode)
+                val selectedTab = repo.getSelectedTab()
+                if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
+                    // The hatch (after-idle classification) only ever applies in Regular mode.
+                    if (fromInactivity && currentMode == BrowserMode.REGULAR) {
+                        // Set pendingAfterIdle BEFORE adding the tab so BrowserViewModel's
+                        // flowSelectedTab emit consumes it via onNtpShown for the new NTP.
+                        ntpAfterIdleManager.onIdleReturnTriggered()
+                        notifyAutofillIdleReturn("new_tab_page")
+                    }
+                    repo.add()
+                }
+                // When the user is already on an NTP we deliberately don't trigger here:
+                // - If the prior session classified this NTP as auto-initiated, NtpAfterIdleManager
+                //   has preserved the state across the background; the hatch is still correct.
+                // - Setting pendingAfterIdle here would leak to the next NTP shown (e.g. a
+                //   manually-opened new tab), incorrectly classifying it as auto-initiated.
+            }
+            is SpecificPage -> {
+                // Normal-mode launch preference — never navigate the Fire session.
+                if (currentMode != BrowserMode.REGULAR) return
+                if (fromInactivity) {
+                    notifyAutofillIdleReturn("specific_page")
+                }
+                handleSpecificPageOption(option)
+            }
         }
     }
 
@@ -72,7 +131,14 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         }
     }
 
+    private fun notifyAutofillIdleReturn(optionName: String) {
+        if (settingsDataStore.userSelectedIdleThresholdSeconds == 0L) {
+            systemAutofillEngagement.setIdleReturnTriggered(optionName)
+        }
+    }
+
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
+        val tabRepository = tabRepositoryProvider.forMode(BrowserMode.REGULAR)
         val userUri = option.url.toUri()
         val resolvedUri = option.resolvedUrl?.toUri()
 

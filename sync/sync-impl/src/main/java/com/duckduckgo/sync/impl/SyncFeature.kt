@@ -71,4 +71,38 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useExpandableBarcodeConnectSyncLayout(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun syncAutoRestore(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun recoverDataEasilySetupScreen(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendSyncSetupWideEvent(): Toggle
+
+    /**
+     * Global switch for the v2 connect/exchange stack. When disabled, the device uses the
+     * v1 stack only — no v2 keys, no v2 channel, no scoped credentials.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canUseV2ConnectFlow(): Toggle
+
+    /**
+     * When enabled, this device displays a v2 QR code. No effect unless [canUseV2ConnectFlow]
+     * is also enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canShowV2ConnectCode(): Toggle
+
+    /**
+     * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
+     * always encoded as QR, so other formats only add noise (and false-positive decodes) to
+     * the scanner.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun restrictScannedBarcodesToQrTypes(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useSimplifiedSync(): Toggle
 }

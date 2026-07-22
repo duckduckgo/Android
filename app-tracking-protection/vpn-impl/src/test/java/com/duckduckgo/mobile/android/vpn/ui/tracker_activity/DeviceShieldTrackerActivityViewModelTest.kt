@@ -64,7 +64,9 @@ class DeviceShieldTrackerActivityViewModelTest {
     private val vpnStore = mock<VpnStore>()
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
+        whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
         viewModel = DeviceShieldTrackerActivityViewModel(
             deviceShieldPixels,
             appTrackerBlockingStatsRepository,

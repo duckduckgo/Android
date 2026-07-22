@@ -110,6 +110,26 @@ interface JobRecordUpdater {
     )
 
     /**
+     * This method compares the [newExtractedProfiles] from the ones currently stored locally and
+     * associated to [brokerName] and [profileQueryId]. For every stored [ExtractedProfile] that IS
+     * part of the [newExtractedProfiles] and whose associated [OptOutJobRecord] is currently
+     * [OptOutJobStatus.REMOVED], we treat it as a reappearance: we revert the status back to
+     * [OptOutJobStatus.REQUESTED] and clear [OptOutJobRecord.optOutRemovedDateInMillis].
+     *
+     * This method should be called before we store [newExtractedProfiles] locally.
+     *
+     * @param newExtractedProfiles Newly [ExtractedProfile]s for the [brokerName] and [profileQueryId]
+     * @param brokerName The name of the broker associated with the scan job.
+     * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
+     * @return The list of [OptOutJobRecord]s that were reverted due to reappearance.
+     */
+    suspend fun markReappearedOptOutJobRecords(
+        newExtractedProfiles: List<ExtractedProfile>,
+        brokerName: String,
+        profileQueryId: Long,
+    ): List<OptOutJobRecord>
+
+    /**
      * Updates the [OptOutJobRecord] associated with a given [extractedProfileId].
      *
      * This method should be called when the opt-out attempt has been STARTED.
@@ -125,7 +145,9 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt has been successfully completed.
      * It updates the corresponding all necessary attributes to mark the [OptOutJobRecord] as
-     * requested.
+     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call,
+     * leaving it untouched on subsequent retries so that it always reflects the first
+     * successful form submission.
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
@@ -147,6 +169,8 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt requires email confirmation.
      * Ir updates the [OptOutJobStatus] accordingly and also creates a corresponding [EmailConfirmationJobRecord].
+     * Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call (this represents
+     * the form-submission moment for email-confirming brokers).
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      * @param profileQueryId  The ID of the [ProfileQuery] related to the scan job.
@@ -412,12 +436,70 @@ class RealJobRecordUpdater @Inject constructor(
         }
     }
 
+    override suspend fun markReappearedOptOutJobRecords(
+        newExtractedProfiles: List<ExtractedProfile>,
+        brokerName: String,
+        profileQueryId: Long,
+    ): List<OptOutJobRecord> {
+        return withContext(dispatcherProvider.io()) {
+            if (newExtractedProfiles.isEmpty()) {
+                return@withContext emptyList()
+            }
+
+            val storedExtractedProfiles =
+                repository.getExtractedProfiles(brokerName, profileQueryId)
+
+            if (storedExtractedProfiles.isEmpty()) {
+                return@withContext emptyList()
+            }
+
+            val newKeys =
+                newExtractedProfiles
+                    .asSequence()
+                    .map { it.toKey() }
+                    .toHashSet()
+
+            val reappearedExtractedProfiles =
+                storedExtractedProfiles
+                    .asSequence()
+                    .filter { it.toKey() in newKeys }
+                    .toList()
+
+            logcat { "PIR-JOB-RECORD: Reappeared Profiles $reappearedExtractedProfiles" }
+
+            reappearedExtractedProfiles.mapNotNull { extractedProfile ->
+                revertReappearedOptOutJobRecord(extractedProfile.dbId)
+            }
+        }
+    }
+
+    private suspend fun revertReappearedOptOutJobRecord(extractedProfileId: Long): OptOutJobRecord? {
+        return withContext(dispatcherProvider.io()) {
+            // Only scan-confirmed removals should be reverted. Deprecated records (including
+            // REMOVED_BY_USER, which is always deprecated) are excluded by getValidOptOutJobRecord,
+            // and the status check guards against reverting anything that isn't currently REMOVED.
+            val record = schedulingRepository.getValidOptOutJobRecord(extractedProfileId)
+                ?.takeIf { it.status == OptOutJobStatus.REMOVED }
+                ?: return@withContext null
+
+            val updatedRecord = record.copy(
+                status = OptOutJobStatus.REQUESTED,
+                optOutRemovedDateInMillis = 0L,
+            )
+            schedulingRepository.saveOptOutJobRecord(updatedRecord)
+            logcat { "PIR-JOB-RECORD: OptOutRecord for $extractedProfileId reappeared, reverting to $updatedRecord" }
+            updatedRecord
+        }
+    }
+
     override suspend fun updateOptOutRequested(extractedProfileId: Long): OptOutJobRecord? {
         return withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
+                val now = currentTimeProvider.currentTimeMillis()
                 val updatedRecord = it.copy(
                     status = OptOutJobStatus.REQUESTED,
-                    optOutRequestedDateInMillis = currentTimeProvider.currentTimeMillis(),
+                    optOutRequestedDateInMillis = now,
+                    optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: now,
                 )
                 schedulingRepository.saveOptOutJobRecord(updatedRecord)
 
@@ -466,6 +548,7 @@ class RealJobRecordUpdater @Inject constructor(
                 it
                     .copy(
                         status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                        optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: currentTimeProvider.currentTimeMillis(),
                     ).also {
                         logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
                     },

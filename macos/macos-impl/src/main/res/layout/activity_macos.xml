@@ -27,6 +27,7 @@
             layout="@layout/include_default_toolbar"/>
 
     <ScrollView
+            android:id="@+id/contentScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -41,6 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="18dp"
+                    android:importantForAccessibility="no"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

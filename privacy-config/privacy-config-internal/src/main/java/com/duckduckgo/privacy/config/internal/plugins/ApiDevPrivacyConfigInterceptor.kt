@@ -36,20 +36,18 @@ class ApiDevPrivacyConfigInterceptor @Inject constructor(
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-
-        val url = chain.request().url
+        val originalRequest = chain.request()
         val storedUrl = devSettingsDataStore.remotePrivacyConfigUrl
         val isCustomSettingEnabled = devSettingsDataStore.useCustomPrivacyConfigUrl
         val validHost = runCatching { URI(storedUrl).host.isNotEmpty() }.getOrDefault(false)
         val canUrlBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl) && validHost
 
-        if (url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
-            request.url(storedUrl!!)
-            return chain.proceed(request.build())
+        if (originalRequest.url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
+            val newRequest = originalRequest.newBuilder().url(storedUrl!!).build()
+            return chain.proceed(newRequest)
         }
 
-        return chain.proceed(chain.request())
+        return chain.proceed(originalRequest)
     }
 
     override fun getInterceptor(): Interceptor {

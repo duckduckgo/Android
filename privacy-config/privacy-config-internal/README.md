@@ -1,73 +1,354 @@
 # Internal Privacy Config module
-This module is only available in `internal` build variants of the app. It contains the implementation of some utility functions and dev tools to test, modify, and debug the remote privacy config integration.
+
+Internal-only module with dev tools for testing the remote privacy config integration, including the ability to locally patch feature flag values without deploying changes to the server.
+
+> **Note:** Patches only work in `internal` builds (`installInternalDebug` / `installInternalRelease`). They are silently ignored in `play` and `fdroid` builds.
 
 ## Local remote config patches
-This module provides options to locally patch the remote config. This is useful for testing purposes, allowing to simulate different configurations without needing to deploy changes to the remote server.
 
-For example, you can use this to ensure a build of your app always has a specific feature flag state, while otherwise using the production remote configuration.
+Patches are JSON files in [JSON Patch format](https://jsonpatch.com/) applied at runtime after the remote config is fetched, overriding values from the server. Multiple patches are applied in the order listed — if two patches modify the same path, the last one wins; a failing patch is skipped without aborting the rest.
 
-Patching process leverages the [JSON Patch format](https://jsonpatch.com/), allowing you to specify changes in a structured way. The patches are applied at runtime, overriding the actual remote config values.
+> **Important:** Each patch file name must be unique, regardless of which directory it lives in.
 
-For example, to ensure a feature flag is always enabled, you can create a patch file like this:
+### Quick start
 
-```json
-[
-  {
-    "op": "replace",
-    "path": "/features/myFeature/state",
-    "value": "enabled"
-  }
-]
-```
-
-Optionally, you can also adjust the remote config version and remove the features hash to ensure the updated version of the remote config is picked up by the app even if the remote config is already cached:
+1. Create a patch file (see [Writing a patch file](#writing-a-patch-file)):
 
 ```json
 [
-  {
-    "op": "replace",
-    "path": "/features/myFeature/state",
-    "value": "enabled"
-  },
-  {
-    "op": "remove",
-    "path": "/features/myFeature/hash"
-  },
-  {
-    "op": "replace",
-    "path": "/version",
-    "value": "999999999999999"
-  }
+  { "op": "replace", "path": "/features/myFeature/state", "value": "disabled" }
 ]
 ```
 
-Make sure to provide a version number higher than the one currently used in production, so the app will recognize it as a new version of the remote config.
+2. Add the path to `privacy-config/privacy-config-internal/local.properties` (gitignored):
 
-### Usage
-There are two ways to apply local remote config patches:
-1. Using command line parameters when building the app.
-2. Defining a path in your `local.properties` file.
+```
+config_patches=privacy-config/privacy-config-internal/local-config-patches/my_patch.json
+```
 
-Both methods take a list of comma (`,`) separated paths to JSON patch files. The app will apply all patches in the order they are specified.
+3. Build and install — the patch is applied automatically on every build.
 
-Note: Regardless of the path where each file is, **each file name needs to be unique**.
+The `local-config-patches/` directory is also gitignored, so you can store your personal patch files there freely.
 
-#### Command line parameters
-You can specify the patches to apply when building the app by using the `-Pconfig_patches` parameter. For example:
+### Writing a patch file
+
+The remote config structure looks like this:
+
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": {
+      "state": "enabled",
+      "hash": "49f683b023eea75d907b1c4f3eb3be09",
+      "exceptions": [],
+      "settings": { ... },
+      "features": {
+        "someSubFeature": { "state": "enabled" }
+      }
+    },
+    ...
+  },
+  ...
+}
+```
+
+**Override a feature state:**
+
+```json
+[{ "op": "replace", "path": "/features/myFeature/state", "value": "disabled" }]
+```
+
+**Override a sub-feature:**
+
+```json
+[{ "op": "replace", "path": "/features/myFeature/features/someSubFeature/state", "value": "disabled" }]
+```
+
+**Add a sub-feature that doesn't exist yet** (`add` instead of `replace`):
+
+```json
+[{ "op": "add", "path": "/features/myFeature/features/newSubFeature", "value": { "state": "enabled" } }]
+```
+
+For more complex operations, refer to [JSON Patch format](https://jsonpatch.com/).
+
+#### Working with cached config
+
+The patches above work on a clean install. If the app has already cached the config from a previous run, also remove the feature hash and bump the version number to force re-processing:
+
+```json
+[
+  { "op": "replace", "path": "/features/myFeature/state", "value": "enabled" },
+  { "op": "remove",  "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Use a version number higher than production so the app treats it as newer. Increment it each time you modify the patch without clearing the app cache (e.g. `90000000000001` → `90000000000002`).
+
+> **Note:** Remote config loads asynchronously. Even after applying a patch, you may need to restart the app a second time — depending on how your feature reads the flag and whether it reacts to config changes at runtime.
+
+### Verifying a patch was applied
+
+**Build output** — the `copyConfigPatches` Gradle task prints which patches were detected and copied into the APK assets:
+
+```
+Using config patches from command line parameter: .maestro/my-feature/remote_config_patches/disable_something.json
+Copied config patch to build assets: .../disable_something.json -> .../build/generated/assets/configPatches/disable_something.json
+```
+
+If a patch file path is wrong:
+
+```
+Warning: Config patch file not found: /path/to/disable_something.json
+```
+
+**Logcat** — search for the `DevPrivacyConfigPatchApiInterceptor` tag to monitor the behavior in the runtime:
+
+```
+Applying 2 config patches: [disable_something.json, enable_other.json]
+Successfully applied patch: disable_something.json
+Successfully applied patch: enable_other.json
+Failed to apply patch disable_something.json: Missing field "newSubFeature"
+```
+
+### Using the `-Pconfig_patches` build flag
+
+An alternative to `local.properties` is passing patches directly as a Gradle build flag. This works for local builds too, and is the right choice when patch files need to be committed — for automated tests.
+
 ```bash
-./gradlew installInternalDebug \
--Pconfig_patches=\
-privacy-config/privacy-config-internal/local-config-patches/test_patch.json,\
-privacy-config/privacy-config-internal/local-config-patches/test_patch2.json
-```
-This method is useful, for example, for end-to-end tests, where you can specify different patches for different test scenarios and commit them to repository.
+./gradlew installInternalRelease \
+  -Pconfig_patches=path/to/my_patch.json
 
-#### `local.properties` file
-You can also define the patches in a `privacy-config/privacy-config-internal/local.properties` file (create one if it doesn't exist) using the `config_patches` property. For example:
-```
-config_patches=privacy-config/privacy-config-internal/local-config-patches/test_patch.json,privacy-config/privacy-config-internal/local-config-patches/test_patch2.json
+# Multiple patches — comma-separated
+./gradlew installInternalRelease \
+  -Pconfig_patches=path/to/patch_a.json,path/to/patch_b.json
 ```
 
-This way, you can easily switch between different patch configurations and the modifications will be applied automatically when building the app, even when you build and deploy through Android Studio.
+#### Automated tests (Maestro / Espresso)
 
-For convenience, the `local.properties` file as well as a `local-config-patches` directory in the `privacy-config-internal` module are ignored by Git, so you can safely use it to store your local patches without affecting the repository.
+Store patch files alongside the tests that need them and pass them via the flag when building:
+
+```
+.maestro/
+  my-feature/
+    remote_config_patches/
+      disable_something.json   ← committed patch file
+    my_test.yaml               ← Maestro test that requires the patch
+```
+
+Build and run:
+
+```bash
+./gradlew installInternalRelease \
+  -Pconfig_patches=.maestro/my-feature/remote_config_patches/disable_something.json
+
+maestro test .maestro/my-feature/my_test.yaml
+```
+
+In GitHub Actions, pass the flag via `gradle_flags` on `checkout-and-assemble`:
+
+```yaml
+- name: Assemble APKs
+  id: assemble
+  uses: ./.github/actions/checkout-and-assemble
+  with:
+    flavours: 'internal'
+    release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+    release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+    gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+    develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+    gradle_flags: '-Pconfig_patches=.maestro/my-feature/remote_config_patches/disable_something.json'
+
+- name: Run Maestro Tests
+  uses: ./.github/actions/maestro-cloud-asana-reporter
+  with:
+    maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+    # ... other options
+```
+
+### PR review workflow
+
+If your PR introduces or modifies a feature flag, consider including patch file contents in the PR description so reviewers can verify each state without having to manually enable/disable flags.
+
+Ask reviewers to:
+
+1. Create `privacy-config/privacy-config-internal/local-config-patches/review_patch.json`
+2. Add to `privacy-config/privacy-config-internal/local.properties`:
+   ```
+   config_patches=privacy-config/privacy-config-internal/local-config-patches/review_patch.json
+   ```
+3. Execute verification steps.
+4. Once done, delete or clear `review_patch.json`/`local.properties`, and reinstall to avoid it affecting unrelated work.
+
+For each verification step, provide the content to paste into `review_patch.json` and reinstall the app. Note that the version number must be incremented with each step so the app re-processes the config.
+
+Example steps in a PR description:
+
+> **Step 1 — verify feature enabled**
+>
+> Paste into `review_patch.json` and reinstall:
+> ```json
+> [
+>   { "op": "replace", "path": "/features/myFeature/state", "value": "enabled" },
+>   { "op": "remove",  "path": "/features/myFeature/hash" },
+>   { "op": "replace", "path": "/version", "value": "90000000000001" }
+> ]
+> ```
+
+> **Step 2 — verify feature disabled**
+>
+> Paste into `review_patch.json` and reinstall:
+> ```json
+> [
+>   { "op": "replace", "path": "/features/myFeature/state", "value": "disabled" },
+>   { "op": "remove",  "path": "/features/myFeature/hash" },
+>   { "op": "replace", "path": "/version", "value": "90000000000002" }
+> ]
+> ```
+
+---
+
+## Patch examples
+
+### Disable a feature (clean install)
+
+Patch:
+```json
+[{ "op": "replace", "path": "/features/myFeature/state", "value": "disabled" }]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "disabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+---
+
+### Disable a feature (cached config)
+
+Patch:
+```json
+[
+  { "op": "replace", "path": "/features/myFeature/state", "value": "disabled" },
+  { "op": "remove",  "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": { "state": "disabled", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+---
+
+### Disable a sub-feature (cached config)
+
+Patch:
+```json
+[
+  { "op": "replace", "path": "/features/myFeature/features/someSubFeature/state", "value": "disabled" },
+  { "op": "remove",  "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": {
+      "state": "enabled",
+      "hash": "abc123",
+      "exceptions": [],
+      "settings": {},
+      "features": {
+        "someSubFeature": { "state": "enabled" }
+      }
+    }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": {
+      "state": "enabled",
+      "exceptions": [],
+      "settings": {},
+      "features": {
+        "someSubFeature": { "state": "disabled" }
+      }
+    }
+  }
+}
+```
+
+---
+
+### Add a sub-feature that doesn't exist in the config
+
+Patch:
+```json
+[
+  { "op": "add", "path": "/features/myFeature/features/newSubFeature", "value": { "state": "enabled" } },
+  { "op": "remove", "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {}, "features": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": { "state": "enabled", "exceptions": [], "settings": {}, "features": { "newSubFeature": { "state": "enabled" } } }
+  }
+}
+```

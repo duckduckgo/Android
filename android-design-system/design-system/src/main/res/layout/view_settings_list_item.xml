@@ -41,29 +41,29 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:breakStrategy="balanced"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/betaPill"
+        app:layout_constraintEnd_toStartOf="@id/yellowPill"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constrainedWidth="true"
         app:typography="body1"
         tools:text="Primary Text" />
 
-    <ImageView
-        android:id="@+id/betaPill"
+    <com.duckduckgo.common.ui.view.DaxYellowPill
+        android:id="@+id/yellowPill"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_2"
         android:layout_marginEnd="@dimen/keyline_1"
-        android:src="@drawable/ic_beta_pill"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/primaryText"
         app:layout_constraintEnd_toStartOf="@id/statusIndicator"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/primaryText"
         app:layout_constraintTop_toTopOf="@id/primaryText"
+        tools:text="Beta"
         tools:visibility="visible" />
 
     <com.duckduckgo.common.ui.view.StatusIndicatorView

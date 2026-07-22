@@ -1,0 +1,160 @@
+{
+  "name": "Wellnut",
+  "url": "wellnut.com",
+  "version": "0.8.0",
+  "addedDatetime": 1703052000000,
+  "optOutUrl": "https://wellnut.com/noi/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "673ccaec-2c34-42b9-806c-c453c02d8b94",
+          "url": "https://wellnut.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "2846bcb5-84c4-4f20-8ff8-6118849b9828",
+          "selector": ".card",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " ~"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Known as:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "years old",
+              "selector": ".card-title",
+              "afterText": " ~"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//li[@itemprop='relatedTo']",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://wellnut.com/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://wellnut.com/noi/control/privacy",
+          "id": "af96e7b3-fc16-4eed-9307-32da204941a1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "c7be95d8-bea5-464d-89b0-b6db3cf37714"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "ce8f2fbd-04f7-48fd-8d67-2cf083b48df3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf_captcha_token' and @value and @value != '']",
+              "parent": "//form[@id='control']"
+            }
+          ],
+          "id": "1231644f-23be-4a12-947e-99f029b57014"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "d6b36f44-291b-4951-8444-ea4a08a3c1fc"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "a3a7cf9b-4653-4aac-9004-c2f738121ed7"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "cbafc394-018e-47ff-b95e-fbc521508e3f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "918f6692-c5c4-4072-95c8-795296e1a956"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763742029886
+}

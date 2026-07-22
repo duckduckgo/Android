@@ -27,6 +27,9 @@
     <string name="cancel">Vazgeç</string>
     <string name="search">Arama yap</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Sohbet silindi</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu varsayılan yap</string>
@@ -72,6 +75,7 @@
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
+    <string name="urlCopiedToClipboard">URL panoya kopyalandı</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Sonrakini bul</string>
@@ -118,8 +122,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
+    <string name="fireClearAll">Sekmeleri ve Verileri Sil</string>
+    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Sil</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -128,6 +132,7 @@
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
+    <string name="settingsWhatsNew">Yenilikler</string>
     <string name="settingsHeadingAbout">Hakkında</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
@@ -135,6 +140,7 @@
     <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsHeadingNextSteps">Sonraki Adımlar</string>
+    <string name="settingsNextStepsHideItem">Gizle</string>
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>
@@ -172,9 +178,8 @@
     <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere arama önerilerini gösterin. Tüm aramalar özeldir.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir.</string>
-    <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
-    <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
-    <string name="openAutoCompleteSettings">Ayarları Aç</string>
+    <string name="privateSearchChatSuggestionsToggle">Sohbet Önerileri</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Arama çubuğuna yazarken geçmişinizden, yer işaretlerinizden ve (isteğe bağlı olarak) Duck.ai sohbet geçmişinizden öneriler gösterin. Tüm aramalar gizlidir.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Genel</string>
@@ -206,13 +211,24 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Sitelere kişisel bilgilerinizi satmamalarını veya paylaşmamalarını söyleyerek sizin adınıza devre dışı bırakma haklarını ifade eder.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
+    <string name="getDesktopBrowserTitle">Mac ve Windows\'ta da kişisel bilgilerinizi koruyun!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo\'yu Mac veya Windows\'ta indirmek için şu adresi ziyaret edin:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">İndirme Bağlantısını Paylaş</string>
+    <string name="getDesktopBrowserNoThanks">Hayır Teşekkürler</string>
+    <string name="getDesktopBrowserHideItem">Gizle</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Veri Temizleme</string>
-    <string name="dataClearingDescription">Kişisel verilerini silmek, çevrimiçi gizliliğini korumana yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullan veya otomatik silme işlemini ayarla.</string>
+    <string name="dataClearingDescription">Kişisel verilerinizi silmek, çevrimiçi gizliliğinizi korumanıza yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullanın veya otomatik silmeyi ayarlayın.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site temizleme işleminden hariç tutuldu.</item>
         <item quantity="other">%1$d site temizleme işleminden hariç tutuldu.</item>
@@ -220,8 +236,8 @@
     <string name="dataClearingAutomaticClearingOn">Açık</string>
     <string name="dataClearingAutomaticClearingOff">Kapalı</string>
     <string name="dataClearingClearBrowsingData">Tarama Verilerini Temizle</string>
-    <string name="dataClearingAutomaticDataClearing">Otomatik Veri Temizleme</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Verileri Otomatik Olarak Temizle</string>
+    <string name="dataClearingAutomaticDataClearing">Verileri Otomatik Olarak Sil</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Verileri Otomatik Olarak Sil</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Tüm açık sekmeleri kapatır</string>
     <string name="dataClearingAutomaticDataOptionDescription">Ziyaret edilen siteler dahil olmak üzere tüm site verilerini siler. Hesaplarınızdan çıkış yapılabilir.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Sabitlenmiş sohbetler dahil tüm sohbetleri siler</string>
@@ -244,6 +260,23 @@
         <item quantity="other">%1$d siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Sekmeleri ve site verilerini silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogTitleWithChats">Sekmeleri, site verilerini ve sohbetleri silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogDeleteAll">Tümünü Sil</string>
+    <string name="singleTabFireDialogDeleteThisTab">Bu Sekmeyi Sil</string>
+    <string name="singleTabFireDialogDeleteChat">Sohbeti Sil</string>
+    <string name="singleTabFireDialogDeleteChats">Sohbetleri Sil</string>
+    <string name="singleTabFireDialogTitleDuckAi">Bu sohbet silinsin mi?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d sekme ve verileri silindi</item>
+        <item quantity="other">%1$d sekme ve verileri silindi</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
 
@@ -261,15 +294,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Sekmeler, veriler ve Duck.ai sohbetleri</string>
 
-    <string name="settingsAutomaticallyClearWhen">Temizle…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
+    <string name="settingsAutomaticallyClearWhen">Sil...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Sil...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
-    <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
+    <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Sil</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
     <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
@@ -380,78 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">DuckDuckGo\'da Ara</string>
 
-    <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Geri Bildirim Paylaş</string>
-    <string name="missingBrowserFeaturesTitleLong">Tarayıcı özellikleri eksik veya sinir bozucu</string>
-    <string name="missingBrowserFeaturesTitleShort">Tarayıcı Özelliği Sorunları</string>
-    <string name="missingBrowserFeaturesSubtitle">Hangi tarama özelliğini ekleyebilir veya geliştirebiliriz?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">İleri geri gitme ve/veya yenileme</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Sekmeler oluşturma ve yönetme</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklam ve pop-up engelleme</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Videoları izleme</string>
-    <string name="missingBrowserFeatureSubReasonImages">Görüntülerle etkileşim kurma</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Yer imleri oluşturma ve yönetme</string>
-    <string name="missingBrowserFeatureSubReasonOther">Bunların hiçbiri</string>
-
-    <string name="websiteNotLoadingTitleLong">Web Sitesi Yükleme Sorunları</string>
-    <string name="websiteNotLoadingTitleShort">Web sitesi yükleme Sorunları</string>
-    <string name="websiteNotLoadingSubtitle">Hangi web sitesi hatalı?</string>
-
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo arama özelliği yeterince iyi değil</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo Arama Sorunları</string>
-    <string name="searchNotGoodEnoughSubtitle">Hangi arama özelliğini ekleyebilir veya geliştirebiliriz?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programlama/teknik arama</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Düzen daha çok Google gibi olmalı</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Daha hızlı yükleme süresi</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Belirli bir dilde veya bölgede arama yapma</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Daha iyi otomatik tamamlama</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Bunların hiçbiri</string>
-
-    <string name="needMoreCustomizationTitleLong">Uygulamayı özelleştirmek için yeterli seçenek yok</string>
-    <string name="needMoreCustomizationTitleShort">Özelleştirme Sorunları</string>
-    <string name="needMoreCustomizationSubtitle">Hangi özelleştirme seçeneğini ekleyebilir veya geliştirebiliriz?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Ana ekran yapılandırması</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Sekmelerin görüntülenme şekli</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Uygulamanın görünüşü</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hangi veriler temizlenir</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Veriler temizlendiğinde</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Yer imlerinin görünüşü</string>
-    <string name="needMoreCustomizationSubReasonOther">Bunların hiçbiri</string>
-
-    <string name="appIsSlowOrBuggyTitleLong">Uygulama yavaş, hatalı veya kilitleniyor</string>
-    <string name="appIsSlowOrBuggyTitleShort">Performans Sorunları</string>
-    <string name="appIsSlowOrBuggySubtitle">Hangi sorunu yaşıyorsunuz?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Web sayfaları veya arama sonuçları yavaş yükleniyor</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Uygulama çöküyor veya donuyor</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video veya medya oynatma hataları</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Bunların hiçbiri</string>
-
-    <string name="otherMainReasonTitleLong">Bunların hiçbiri</string>
-    <string name="otherMainReasonTitleShort">Diğer Sorunlar</string>
-
-    <string name="openEndedInputHint">Lütfen mümkün olduğunca spesifik olun</string>
-    <string name="submitFeedback">Gönder</string>
-
-    <string name="tellUsHowToImprove">Lütfen neyi geliştirebileceğimizi bize bildirin.</string>
-    <string name="thanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">En çok ne ile ilgili sıkıntı yaşadınız?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Bunu Duyduğumuza Üzüldük</string>
-    <string name="feedbackShareDetails">Ayrıntıları Paylaşın</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Ekiple paylaşmak istediğiniz ayrıntılar var mı?</string>
-    <string name="whatHaveYouBeenEnjoying">Nelerden hoşlandınız?</string>
-    <string name="awesomeToHear">Bunu Duymak Harika!</string>
-    <string name="shareTheLoveWithARating">Lütfen Play Store\'da değerlendirin.</string>
-    <string name="rateTheApp">Uygulamayı Değerlendir</string>
-    <string name="declineFurtherFeedback">Hayır Teşekkür Ederim</string>
-    <string name="whichBrokenSites">Bu sorunları nerede görüyorsunuz?</string>
-    <string name="whichBrokenSitesHint">Hangi web sitesinde sorunlar var?</string>
-    <string name="feedbackSpecificAsPossible">Lütfen mümkün olduğunca spesifik olun</string>
-    <string name="feedbackInitialDisambiguationTitle">Başlayalım!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Geri bildirimlerinizi nasıl sınıflandırırsınız?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Olumlu geri bildirim düğmesi</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Olumsuz geri bildirim düğmesi</string>
-    <string name="feedbackIsImportantToUs">İsimsiz geri bildiriminiz bizim için önemlidir.</string>
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Web sayfası görüntülenemedi."</string>
     <string name="crashedWebViewErrorAction">"Tekrar yükle"</string>
@@ -556,6 +517,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
     <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Klasik</string>
     <string name="settingsHeroWaterAnimation">Girdap</string>
     <string name="settingsHeroAbstractAnimation">Hava</string>
     <string name="settingsNoneAnimation">Yok</string>
@@ -646,21 +608,7 @@
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
-    <string name="downloadsActivityTitle">İndirilenler</string>
-    <string name="downloadsActivityNoItemsDescription">Henüz indirilen dosya yok</string>
-    <string name="downloadsShareTitle">Paylaş…</string>
     <string name="downloadsDownloadFinishedActionName">Aç</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
-    <string name="downloadsFileNotFoundErrorMessage">Dosya artık mevcut değil</string>
-    <string name="downloadsItemMenuShare">Paylaş</string>
-    <string name="downloadsItemMenuDelete">Sil</string>
-    <string name="downloadsItemMenuCancel">İptal</string>
-    <string name="downloadsActivityMenuDeleteAll">Tümünü Sil</string>
-    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s silindi</string>
-    <string name="downloadsAllFilesDeletedMessage">Tüm dosyalar silindi</string>
-    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s için daha fazla seçenek</string>
-    <string name="downloadsUndoActionName">Geri al</string>
-    <string name="downloadsStateInProgress">Devam ediyor…</string>
 
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">Uygulama İzleme Koruması</string>
@@ -682,8 +630,6 @@
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
     <!-- Notify Me View on Downloads -->
-    <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
-    <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
 
@@ -795,7 +741,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Başlayalım!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
     <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
     <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
@@ -807,9 +756,15 @@
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
     <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
+    <string name="preOnboardingComparisonChartDuckAi">Duck.ai entegrasyonu ile ChatGPT\'yi özel olarak kullanın.</string>
+    <string name="preOnboardingComparisonChartAdAndCookiePopupBlocker">Hedefli reklamları ve çerez açılır pencerelerini engelleyin</string>
+    <string name="preOnboardingComparisonChartYoutubeAdBlocker">YouTube videolarını reklamsız oynatın</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
+    <string name="preOnboardingAddressBarPositionTop">Başa dön</string>
+    <string name="preOnboardingAddressBarPositionBottom">Alt</string>
+    <string name="preOnboardingAddressBarPositionSplit">Böl</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
@@ -832,6 +787,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">İşte DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Gizli. Hızlı. Daha az reklam.</string>
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -854,12 +811,35 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Ücretsiz dene!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Biliyor muydunuz?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
+    <string name="preOnboardingInputScreenTitleUpdated">Adres çubuğundaki özel AI sohbetine kolay erişim ister misiniz?</string>
     <string name="preOnboardingInputScreenButton">Sonraki</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI özellikleri gizli ve isteğe bağlıdır. Değişiklikleri <b>Ayarlar > AI Özellikleri</b> bölümünden yapabilirsiniz.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tekrar hoşgeldiniz!&lt;br/&gt;Özelleştirmek istediğiniz bir var mı?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo\'yu varsayılan olarak ayarla</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Ana ekran widget\'ını ekle</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adres çubuğu konumu</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adres çubuğu arama seçenekleri</string>
+    <string name="preOnboardingReinstallStartBrowsing">Gezinmeye Başla</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Adres çubuğu nerede olsun?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Değişiklikleri <b>Ayarlar > Görünüm</b> bölümünden yapabilirsiniz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Adres çubuğunda Arama ve Yapay Zeka sohbeti olsun mu?</string>
+    <string name="quickSetupBottomSheetDone">Bitti</string>
+    <string name="quickSetupInputScreenSearchOnly">Yalnızca Arama</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Arama ve Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Ana ekran widget\'ı nasıl kaldırılır?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ana ekranınıza gidin</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Widget\'a dokunun ve basılı tutun</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Kaldırmak için dokunun veya sürükleyin</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
@@ -924,11 +904,16 @@
     <string name="settingsHeadingCompleteSetup">Kurulumu Tamamlayın</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Sekme Değiştiricide İzleyici sayısını göster</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">Son 7 günde &lt;b&gt;%1$s izleyici engellendi&lt;/b&gt;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">İzleyici Sayısı Gizlensin mi?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bunu Ayarlar &gt; Görünüm\'den tekrar açabilirsiniz.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Gizle</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Gizleme</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Engellenen İzleyiciler Animasyonu</string>
+    <string name="showTrackerCountInAddressBar">Adres Çubuğunda Göster</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Sekme Yöneticisinde Göster</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Yalnızca Arama</string>
@@ -936,4 +921,93 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">DuckDuckGo ile gizli arama yapın veya Duck.ai\'a sorun. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Kaldığınız yerden devam edelim</string>
+    <string name="syncRestoreDialogDescription">Önceki DuckDuckGo senkronizasyonundan yer işaretleri, şifreler ve daha fazlasını geri yüklemek mi istiyorsunuz?</string>
+    <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
+    <string name="syncRestoreDialogSecondaryCta">Atla</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">DuckDuckGo\'da kaldığınız yerden devam edelim.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Kaydedilmiş yer işaretleriniz, şifreleriniz ve daha fazlası hazır.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF indir</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
+    <string name="linkTextCopied">Bağlantı metni kopyalandı</string>
+    <string name="linkTextCopyFailed">Bağlantı metni kopyalanamadı</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Merhaba.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Kontrolü size verecek daha hızlı bir tarayıcıya hazır mısınız?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Yapay zekâ her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d / %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">İşte Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile istediğiniz zaman silebileceğiniz gizli AI sohbetleri. Hemen deneyin! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">İşte bu kadar!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Tebrikler!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Başlamaya hazır mısınız?&lt;br/&gt;Arama yapmayı veya yapay zekâ sohbetini deneyin!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Gizli olarak arama yapın</string>
+    <string name="preOnboardingInputModeDemoChatHint">Gizli bir şekilde her şeyi sorabilirsiniz</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Borsa piyasasını 10 yaşında bir çocuğa anlatır gibi açıkla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Londra\'da mükemmel bir gün planla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Şaşırt beni!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Bilim, doğa ve tarihle ilgili 10 büyüleyici gerçek nedir?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Sizi aktif olarak koruyan bir tarayıcıda ChatGPT, Claude ve diğer AI\'larla ücretsiz olarak gizlice sohbet etmeye hazır mısınız?</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Yapay Zekâ Sohbeti Başlat</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI korumaları etkinleştirildi!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popüler AI\'lar</string>
+    <string name="preOnboardingAiComparisonChartItem1">Tüm sohbetler anonimleştirilir</string>
+    <string name="preOnboardingAiComparisonChartItem2">Tüm yapay zekâ özelliklerine erişmek için hesap gerekmez</string>
+    <string name="preOnboardingAiComparisonChartItem3">Sohbetlerinizi asla yapay zekâyı eğitmek için kullanmaz</string>
+    <string name="preOnboardingAiComparisonChartItem4">ChatGPT, Claude ve daha fazlasına tek noktadan erişin</string>
+    <string name="preOnboardingAiComparisonChartButton">Duck.ai\'ı hemen deneyin!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Şimdi, gizli yapay zekâ sohbetini deneyin!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
+    <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Onayla</string>
+
+    <!-- App feedback -->
+    <string name="thanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Fire Sekmesinde Aç</string>
+    <string name="openInBackgroundTab">Arka Planda Aç</string>
+    <string name="browserModeToggleFireDescription">Fire modu sekmelerine geçin</string>
+    <string name="browserModeToggleRegularDescription">Normal sekmelere geç</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire Sekmesi</string>
+    <string name="fireTabNewTabPageTitle">Fire Sekmesi</string>
+    <string name="fireTabsEmptyStateTitle">Fire Sekmeleri</string>
+    <string name="fireTabsFeatureNoHistory">Yerel geçmişi kaydetmeden göz atın</string>
+    <string name="fireTabsFeatureDifferentAccount">Bir sitede farklı bir hesapla oturum açın</string>
+    <string name="fireTabsFeatureTroubleshoot">Web sitelerindeki sorunları giderin</string>
+    <string name="fireTabsExplainer">Fire Sekmeleri diğer tarayıcı verilerinden izole edilmiştir. Tüm pencereleri kapattığınızda veriler imha edilir. Diğer sekmelerle aynı izleme korumasını sunarlar.</string>
+    <string name="fireTabsNewTabButton">Yeni Fire Sekmesi</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>YENİ!</b> Yerel geçmişi kaydetmeden göz atmak için Fire Sekmelerini deneyin.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
+
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 </resources>

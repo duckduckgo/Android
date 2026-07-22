@@ -24,8 +24,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.OPEN_SEND_FEEDBACK_MODAL
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -67,7 +67,7 @@ class PirOpenSendFeedbackModalMessageHandlerTest {
         whenever(
             mockGlobalActivityStarter.startIntent(
                 mockContext,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
             ),
         ).thenReturn(mockIntent)
 
@@ -75,7 +75,7 @@ class PirOpenSendFeedbackModalMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        val paramsCaptor = argumentCaptor<PrivacyProFeedbackScreenWithParams>()
+        val paramsCaptor = argumentCaptor<SubscriptionFeedbackScreenWithParams>()
         verify(mockGlobalActivityStarter).startIntent(eq(mockContext), paramsCaptor.capture())
         assertEquals(PIR_DASHBOARD, paramsCaptor.firstValue.feedbackSource)
     }
@@ -88,7 +88,7 @@ class PirOpenSendFeedbackModalMessageHandlerTest {
         whenever(
             mockGlobalActivityStarter.startIntent(
                 mockContext,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
             ),
         ).thenReturn(mockIntent)
 
@@ -107,7 +107,7 @@ class PirOpenSendFeedbackModalMessageHandlerTest {
         whenever(
             mockGlobalActivityStarter.startIntent(
                 mockContext,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = PIR_DASHBOARD),
             ),
         ).thenReturn(mockIntent)
 

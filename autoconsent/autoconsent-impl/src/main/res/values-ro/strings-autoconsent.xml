@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo va încerca să selecteze cele mai private setări disponibile și să ascundă aceste ferestre pop-up pentru tine.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="autoconsentToggle">Lasă DuckDuckGo să se ocupe de ferestrele pop-up aferente modulelor cookie</string>
+    <string name="autoconsentAutoManageToggle">Gestionează automat ferestrele pop-up pentru module cookie</string>
+    <string name="autoconsentAutoManageDescription">Vom încerca să selectăm doar cele mai private opțiuni privind modulele cookie disponibile pentru tine, apoi vom închide aceste ferestre pop-up.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo poate gestiona automat preferințele privind modulele cookie pentru a maximiza confidențialitatea, a minimiza modulele cookie și a închide aceste ferestre pop-up.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ferestre pop-up fără opțiune de renunțare</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">De asemenea, lasă DuckDuckGo să te scutească de un click acceptând modulele cookie în numele tău pentru a închide ferestrele pop-up care nu îți permit să renunți.</string>
 </resources>

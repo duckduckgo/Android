@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stub for strings used in browser-ui layouts but defined in other modules -->
+<resources>
+    <string name="autocompleteDuckAiPrompt">Ask AI</string>
+</resources>

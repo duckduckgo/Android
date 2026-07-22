@@ -25,12 +25,16 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
@@ -42,12 +46,14 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -58,25 +64,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+@OptIn(ExperimentalCoroutinesApi::class)
 class NewTabPageViewModel @AssistedInject constructor(
     @Assisted private val showDaxLogo: Boolean,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
+    private val afterIdleMessageTriggerProvider: AfterIdleMessageTriggerProvider,
     private val playStoreUtils: PlayStoreUtils,
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val settingsDataStore: SettingsDataStore,
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val ctaViewModel: CtaViewModel,
+    browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         private val showDaxLogo: Boolean,
         private val appTpEnabled: Boolean = false,
+        val isFireMode: Boolean = false,
         val message: RemoteMessage? = null,
         val messageImageFilePath: String? = null,
         val newMessage: Boolean = false,
@@ -91,8 +102,11 @@ class NewTabPageViewModel @AssistedInject constructor(
             favourites?.isNotEmpty() == true
         private val hasLowPriorityMessage = lowPriorityMessage != null
 
-        val shouldShowLogo = !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
-        val hasContent = isLoadingContent || (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
+        val showFireTabEmptyState = isFireMode
+        val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
+        val hasContent = isFireMode ||
+            isLoadingContent ||
+            (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
     }
 
     private data class ViewStateSnapshot(
@@ -120,7 +134,9 @@ class NewTabPageViewModel @AssistedInject constructor(
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
-    private val _viewState = MutableStateFlow(ViewState(showDaxLogo = showDaxLogo))
+    private val _viewState = MutableStateFlow(
+        ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
+    )
     val viewState = _viewState.asStateFlow()
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -132,7 +148,10 @@ class NewTabPageViewModel @AssistedInject constructor(
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(
-                    remoteMessagingModel.getActiveMessages()
+                    afterIdleMessageTriggerProvider.activeTrigger()
+                        .flatMapLatest { trigger ->
+                            remoteMessagingModel.observeActiveMessages(trigger)
+                        }
                         .map { message ->
                             if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
                         },
@@ -150,7 +169,7 @@ class NewTabPageViewModel @AssistedInject constructor(
                     }
 
                     withContext(dispatchers.io()) {
-                        val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile()
+                        val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
@@ -176,10 +195,13 @@ class NewTabPageViewModel @AssistedInject constructor(
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
-    private fun isHomeOnboardingComplete(): Boolean {
-        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-        return dismissedCtaDao.exists(CtaId.DAX_END) ||
-            noBrowserCtaExperiment ||
+    private suspend fun isHomeOnboardingComplete(): Boolean {
+        val lastDialogShown = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+            ctaViewModel.areBubbleDaxDialogsCompleted()
+        } else {
+            dismissedCtaDao.exists(CtaId.DAX_END)
+        }
+        return lastDialogShown ||
             settingsDataStore.hideTips ||
             dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
@@ -195,6 +217,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
         }
     }
 
@@ -202,6 +225,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }
@@ -211,6 +235,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }
@@ -220,6 +245,9 @@ class NewTabPageViewModel @AssistedInject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            if (action !is Action.Share) {
+                remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
+            }
             val tabCommand = commandActionMapper.asNewTabCommand(action)
             command.send(tabCommand)
         }

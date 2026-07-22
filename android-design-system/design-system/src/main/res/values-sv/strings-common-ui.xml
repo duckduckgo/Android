@@ -37,4 +37,12 @@
     <string name="alwaysOn">Alltid på</string>
     <string name="on">På</string>
     <string name="off">Av</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Läs mer</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Stäng</string>
+    <string name="bookmarkFavoriteContentDescription">Favorit</string>
+
 </resources>

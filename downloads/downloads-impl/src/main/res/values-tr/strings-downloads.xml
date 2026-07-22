@@ -34,4 +34,21 @@
 
     <string name="downloadConfirmationContinue">İndirilenlere Kaydet</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Şu adresten: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Tümünü Sil</string>
+    <string name="downloadsActivityNoItemsDescription">Henüz indirilen dosya yok</string>
+    <string name="downloadsActivityTitle">İndirilenler</string>
+    <string name="downloadsAllFilesDeletedMessage">Tüm dosyalar silindi</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s silindi</string>
+    <string name="downloadsFileNotFoundErrorMessage">Dosya artık mevcut değil</string>
+    <string name="downloadsItemMenuCancel">İptal</string>
+    <string name="downloadsItemMenuDelete">Sil</string>
+    <string name="downloadsItemMenuShare">Paylaş</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s için daha fazla seçenek</string>
+    <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
+    <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
+    <string name="downloadsShareTitle">Paylaş…</string>
+    <string name="downloadsStateInProgress">Devam ediyor…</string>
+    <string name="downloadsUndoActionName">Geri al</string>
+    <string name="downloadsSearchHint">Arama yap</string>
 </resources>

@@ -20,6 +20,7 @@ plugins {
     id 'com.squareup.anvil'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -29,6 +30,7 @@ ext {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
@@ -37,6 +39,7 @@ dependencies {
     implementation project(path: ':design-system')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':browser-mode-api')
     implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
@@ -46,11 +49,11 @@ dependencies {
     implementation project(':data-store-api')
     testImplementation project(':feature-toggles-test')
     implementation project(path: ':settings-api') // temporary until we release new settings
-    implementation project(':library-loader-api')
+    implementation project(':sqlcipher-loader-api')
     implementation project(':saved-sites-api')
     implementation project(':cookies-api')
+    implementation project(':browser-mode-api')
 
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
     implementation AndroidX.security.crypto
@@ -80,8 +83,8 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.biometric
 
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
-    implementation AndroidX.room.ktx
 
     implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"
@@ -136,12 +139,11 @@ android {
         }
     }
     sourceSets {
-        test.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas")
     }
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 tasks.register('installForAutofillTesting', Exec) {

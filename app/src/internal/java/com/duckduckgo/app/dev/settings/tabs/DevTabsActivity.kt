@@ -32,6 +32,7 @@ import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.ViewState
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -47,11 +48,16 @@ class DevTabsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var factory: NotificationFactory
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityDevTabsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
 
         binding.addTabsButton.setOnClickListener {
@@ -60,6 +66,14 @@ class DevTabsActivity : DuckDuckGoActivity() {
 
         binding.clearTabsButton.setOnClickListener {
             viewModel.clearTabs()
+        }
+
+        binding.addFireTabsButton.setOnClickListener {
+            viewModel.addFireTabs(binding.fireTabCount.text.toInt())
+        }
+
+        binding.clearFireTabsButton.setOnClickListener {
+            viewModel.clearFireTabs()
         }
 
         binding.addBookmarksButton.setOnClickListener {
@@ -82,6 +96,12 @@ class DevTabsActivity : DuckDuckGoActivity() {
         observeCommands()
     }
 
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentLayout, drawBehindGestureNav = false)
+    }
+
     private fun observeViewState() {
         viewModel.viewState.flowWithLifecycle(lifecycle, STARTED).onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -94,6 +114,7 @@ class DevTabsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount)
+        binding.fireTabCountHeader.text = getString(R.string.devSettingsFireTabsScreenHeader, viewState.fireTabCount)
         binding.bookmarksCountHeader.text = getString(R.string.devSettingsTabsBookmarksScreenHeader, viewState.bookmarkCount)
         binding.favoritesCountHeader.text = getString(R.string.devSettingsTabsFavoritesScreenHeader, viewState.favoritesCount)
     }

@@ -38,6 +38,7 @@ interface SyncApi {
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        credentialId: String? = null,
     ): Result<AccountCreatedResponse>
 
     fun login(
@@ -46,6 +47,7 @@ interface SyncApi {
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        scope: String? = null,
     ): Result<LoginResponse>
 
     fun logout(
@@ -72,12 +74,7 @@ interface SyncApi {
 
     fun deleteAccount(token: String): Result<Boolean>
 
-    fun getDevices(token: String): Result<List<Device>>
-
-    fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject?>
+    fun getDevices(token: String): Result<DeviceEntries>
 
     fun getBookmarks(
         token: String,
@@ -99,6 +96,17 @@ interface SyncApi {
         until: String,
     ): Result<Unit>
 
+    fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject>
+
+    fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String? = null,
+    ): Result<JSONObject>
+
     /**
      * Obtain a new "scoped token" for the sync service
      * A scoped token has a reduced range of capabilities, restricted to only the given scope
@@ -107,6 +115,29 @@ interface SyncApi {
         token: String,
         scope: String,
     ): Result<String>
+
+    /** List this account's protected keys across all purposes. */
+    fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
+
+    fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
+
+    fun createAccessCredential(
+        token: String,
+        credentialId: String,
+        request: CreateAccessCredentialRequest,
+    ): Result<Boolean>
+
+    /** Open a relay channel for the v2 pairing flow. Returns Error(code=409) on UUID collision. */
+    fun createExchangeChannel(channelId: String): Result<Unit>
+
+    /** Send a batch of encrypted envelopes to [channelId]. */
+    fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit>
+
+    /** Poll [channelId] for messages with seq > [after]. Returns Error(code=404) if channel is gone. */
+    fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>>
+
+    /** Best-effort DELETE of our own channel — discards relay state. */
+    fun deleteExchangeChannel(channelId: String): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -121,6 +152,7 @@ class SyncServiceRemote @Inject constructor(
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        credentialId: String?,
     ): Result<AccountCreatedResponse> {
         val response = runCatching {
             val call = syncService.signup(
@@ -131,6 +163,7 @@ class SyncServiceRemote @Inject constructor(
                     deviceId = deviceId,
                     deviceName = deviceName,
                     deviceType = deviceType,
+                    credentialId = credentialId,
                 ),
             )
             call.execute()
@@ -170,7 +203,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getDevices(token: String): Result<List<Device>> {
+    override fun getDevices(token: String): Result<DeviceEntries> {
         val response = runCatching {
             val logoutCall = syncService.getDevices("Bearer $token")
             logoutCall.execute()
@@ -179,7 +212,7 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val devices = response.body()?.devices?.entries ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
+            val devices = response.body()?.devices ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
         }
     }
@@ -271,6 +304,7 @@ class SyncServiceRemote @Inject constructor(
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        scope: String?,
     ): Result<LoginResponse> {
         val response = runCatching {
             val call = syncService.login(
@@ -280,6 +314,7 @@ class SyncServiceRemote @Inject constructor(
                     deviceId = deviceId,
                     deviceName = deviceName,
                     deviceType = deviceType,
+                    scope = scope,
                 ),
             )
             call.execute()
@@ -288,38 +323,21 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val token = response.body()?.token ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
-            val protectedEncryptionKey =
-                response.body()?.protected_encryption_key ?: return@onSuccess Result.Error(reason = "Login: empty PEK in Body")
+            val body = response.body() ?: return@onSuccess Result.Error(reason = "Login: empty body")
+            val token = body.token.takeUnless { it.isEmpty() } ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
+            // PEK is absent on 3party logins (server omits the field). Callers downstream are
+            // responsible for null-checking before use on the ddg path.
+            val protectedEncryptionKey = body.protected_encryption_key?.takeUnless { it.isEmpty() }
 
             Result.Success(
                 LoginResponse(
                     token = token,
                     protected_encryption_key = protectedEncryptionKey,
-                    devices = emptyList(),
+                    devices = body.devices,
+                    accessCredentials = body.accessCredentials,
+                    keys = body.keys,
                 ),
             )
-        }
-    }
-
-    override fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject> {
-        logcat(INFO) { "Sync-service: patch request $updates" }
-
-        val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", updates)
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            logcat(INFO) { "Sync-service: patch response: $it" }
-            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
-            Result.Success(data)
         }
     }
 
@@ -410,6 +428,49 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
+    override fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchData request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchData("Bearer $token", updates)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchData error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchData response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchData: empty Body")
+            Result.Success(data)
+        }
+    }
+
+    override fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String?,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchChats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchChats("Bearer $token", body, since)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchChats error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchChats response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchChats: empty Body")
+            Result.Success(data)
+        }
+    }
+
     override fun rescopeToken(
         token: String,
         scope: String,
@@ -473,6 +534,84 @@ class SyncServiceRemote @Inject constructor(
             result.removeKeysIfInvalid()
             return result
         }
+    }
+
+    override fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>> {
+        val response = runCatching {
+            val call = syncService.getProtectedKeys("Bearer $token")
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val keys = response.body()?.keys ?: emptyList()
+            Result.Success(keys)
+        }
+    }
+
+    override fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>> {
+        val response = runCatching {
+            val call = syncService.getAccessCredentials("Bearer $token")
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val credentials = response.body()?.accessCredentials
+                ?: return@onSuccess Result.Error(reason = "GetAccessCredentials: empty body")
+            Result.Success(credentials)
+        }
+    }
+
+    override fun createAccessCredential(
+        token: String,
+        credentialId: String,
+        request: CreateAccessCredentialRequest,
+    ): Result<Boolean> {
+        val response = runCatching {
+            logcat { "Sync-ScopedToken: createAccessCredential for credentialId=$credentialId" }
+            val call = syncService.createAccessCredential("Bearer $token", credentialId, request)
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun createExchangeChannel(channelId: String): Result<Unit> {
+        val response = runCatching {
+            syncService.createExchangeChannel(channelId, ExchangeChannelCreateRequest()).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
+    }
+
+    override fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit> {
+        val response = runCatching {
+            syncService.postExchangeMessages(channelId, ExchangeMessagesRequest(envelopes)).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
+    }
+
+    override fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>> {
+        val response = runCatching {
+            syncService.pollExchangeMessages(channelId, after).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) {
+            val messages = response.body()?.messages ?: emptyList()
+            Result.Success(messages)
+        }
+    }
+
+    override fun deleteExchangeChannel(channelId: String): Result<Unit> {
+        val response = runCatching {
+            syncService.deleteExchangeChannel(channelId).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
     }
 
     private fun Result.Error.removeKeysIfInvalid() {

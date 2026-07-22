@@ -27,18 +27,23 @@ import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityAutoconsentSettingsBinding
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -53,6 +58,15 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var autoconsentFeature: AutoconsentFeature
+
     private val binding: ActivityAutoconsentSettingsBinding by viewBinding()
 
     private val viewModel: AutoconsentSettingsViewModel by bindViewModel()
@@ -60,8 +74,19 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
+    private val showCookiePopUpPreferenceSetting: Boolean
+        get() = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+
     private val autoconsentToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onUserToggleAutoconsent(isChecked)
+    }
+
+    private val autoManageCookiePopUpsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutoManageCookiePopUpsToggled(isChecked)
+    }
+
+    private val popUpsWithoutOptOutsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onPopUpsWithoutOptOutsToggled(isChecked)
     }
 
     private val clickableSpan = object : ClickableSpan() {
@@ -79,16 +104,33 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         configureUiEventHandlers()
         configureClickableLink()
         observeViewModel()
     }
 
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
+
     private fun configureUiEventHandlers() {
         binding.autoconsentToggle.setOnCheckedChangeListener(autoconsentToggleListener)
+        binding.autoManageCookiePopUpsToggle.setOnCheckedChangeListener(autoManageCookiePopUpsToggleListener)
+        binding.popUpsWithoutOptOutsToggle.setOnCheckedChangeListener(popUpsWithoutOptOutsToggleListener)
     }
 
     private fun observeViewModel() {
@@ -103,11 +145,28 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         with(binding) {
+            val isProtectionEnabled = if (showCookiePopUpPreferenceSetting) {
+                viewState.autoManageEnabled
+            } else {
+                viewState.autoconsentEnabled
+            }
             autoconsentHeaderImage.setImageResource(
-                if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
+                if (isProtectionEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
             )
-            autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
+            autoconsentStatusIndicator.setStatus(isProtectionEnabled)
+            autoconsentToggle.isVisible = !showCookiePopUpPreferenceSetting
+            cookiePopUpPreferenceContainer.isVisible = showCookiePopUpPreferenceSetting
             autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
+            autoManageCookiePopUpsToggle.quietlySetIsChecked(
+                viewState.autoManageEnabled,
+                autoManageCookiePopUpsToggleListener,
+            )
+            popUpsWithoutOptOutsToggle.isVisible = viewState.autoManageEnabled
+            popUpsWithoutOptOutsDescription.isVisible = viewState.autoManageEnabled
+            popUpsWithoutOptOutsToggle.quietlySetIsChecked(
+                viewState.popUpsWithoutOptOutsEnabled,
+                popUpsWithoutOptOutsToggleListener,
+            )
         }
     }
 
@@ -123,9 +182,12 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlText = getString(
-            R.string.autoconsentDescription,
-        ).html(this)
+        val descriptionResId = if (showCookiePopUpPreferenceSetting) {
+            R.string.autoconsentCookiePopUpPreferenceHeaderDescription
+        } else {
+            R.string.autoconsentDescription
+        }
+        val htmlText = getString(descriptionResId).html(this)
         val spannableString = SpannableStringBuilder(htmlText)
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {

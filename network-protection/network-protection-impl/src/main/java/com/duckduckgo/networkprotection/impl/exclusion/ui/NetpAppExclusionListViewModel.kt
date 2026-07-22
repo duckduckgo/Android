@@ -57,9 +57,9 @@ import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -85,7 +85,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
     private val autoExcludePrompt: AutoExcludePrompt,
@@ -319,7 +319,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
             netPManualExclusionListRepository.manuallyExcludeApp(packageName)
             if (report) {
                 networkProtectionPixels.reportExclusionListLaunchBreakageReport()
-                if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_EXCLUDED_APPS)) {
+                if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_EXCLUDED_APPS)) {
                     command.send(
                         ShowUnifiedPproAppFeedback(
                             appName = appName,
@@ -368,7 +368,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     fun launchFeedback() {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListLaunchBreakageReport()
-            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(VPN_MANAGEMENT)) {
+            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(VPN_MANAGEMENT)) {
                 command.send(ShowUnifiedPproFeedback)
             } else {
                 command.send(

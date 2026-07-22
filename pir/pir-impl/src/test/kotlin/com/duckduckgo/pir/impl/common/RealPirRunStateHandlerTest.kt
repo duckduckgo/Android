@@ -380,6 +380,8 @@ class RealPirRunStateHandlerTest {
                     email = "john@example.com",
                     fullName = "John Michael Doe",
                 )
+            whenever(mockJobRecordUpdater.markReappearedOptOutJobRecords(any(), any(), any()))
+                .thenReturn(emptyList())
 
             testee.handleState(state)
 
@@ -400,6 +402,69 @@ class RealPirRunStateHandlerTest {
                 testProfileQueryId,
             )
             inOrder.verify(mockRepository).saveNewExtractedProfiles(listOf(expectedExtractedProfile))
+        }
+
+    @Test
+    fun whenHandleBrokerScanActionSucceededWithReappearedProfileThenMarksReappearedAndReportsPixelPerRevertedRecord() =
+        runTest {
+            val extractedResponse =
+                ExtractedResponse(
+                    actionID = "extract123",
+                    actionType = "extract",
+                    response = listOf(testScriptExtractedProfile),
+                )
+            val state =
+                BrokerScanActionSucceeded(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    pirSuccessResponse = extractedResponse,
+                )
+            val expectedExtractedProfile =
+                ExtractedProfile(
+                    profileUrl = "https://example.com/profile/123",
+                    profileQueryId = testProfileQueryId,
+                    brokerName = testBrokerName,
+                    name = "John Doe",
+                    alternativeNames = listOf("Johnny", "J. Doe"),
+                    age = "30",
+                    addresses =
+                    listOf(
+                        AddressCityState(
+                            city = "New York",
+                            state = "NY",
+                            fullAddress = "123 Main St",
+                        ),
+                    ),
+                    phoneNumbers = listOf("555-1234"),
+                    relatives = listOf("Jane Doe"),
+                    identifier = "id123",
+                    reportId = "report123",
+                    email = "john@example.com",
+                    fullName = "John Michael Doe",
+                )
+            val revertedRecord =
+                OptOutJobRecord(
+                    brokerName = testBrokerName,
+                    userProfileId = testProfileQueryId,
+                    extractedProfileId = testExtractedProfileId,
+                    status = OptOutJobStatus.REQUESTED,
+                )
+            whenever(
+                mockJobRecordUpdater.markReappearedOptOutJobRecords(
+                    newExtractedProfiles = listOf(expectedExtractedProfile),
+                    brokerName = testBrokerName,
+                    profileQueryId = testProfileQueryId,
+                ),
+            ).thenReturn(listOf(revertedRecord))
+
+            testee.handleState(state)
+
+            verify(mockJobRecordUpdater).markReappearedOptOutJobRecords(
+                newExtractedProfiles = listOf(expectedExtractedProfile),
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+            )
+            verify(mockPixelSender).reportBrokerOptOutProfileReappeared(testBroker.url)
         }
 
     @Test
@@ -491,7 +556,6 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
-
             testee.handleState(state)
 
             verify(mockJobRecordUpdater).updateOptOutRequested(testExtractedProfileId)
@@ -541,7 +605,6 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
-
             testee.handleState(state)
 
             verify(mockJobRecordUpdater).updateOptOutError(testExtractedProfileId)
@@ -594,6 +657,32 @@ class RealPirRunStateHandlerTest {
                 actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
                 durationMs = testTotalTimeMillis,
                 tries = 1,
+            )
+        }
+
+    @Test
+    fun whenHandleBrokerRecordEmailConfirmationNeededAndExtractedProfileEmailEmptyThenUsesGeneratedEmail() =
+        runTest {
+            val state =
+                BrokerRecordEmailConfirmationNeeded(
+                    broker = testBroker,
+                    extractedProfile = testExtractedProfile.copy(email = ""),
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                    lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
+                    durationMs = testTotalTimeMillis,
+                    currentActionAttemptCount = 1,
+                    generatedEmail = "generated@duck.com",
+                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+
+            testee.handleState(state)
+
+            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "generated@duck.com",
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
             )
         }
 

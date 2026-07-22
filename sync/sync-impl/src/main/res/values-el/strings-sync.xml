@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών, των κωδικών πρόσβασής σας και των συνομιλιών στο Duck.ai στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. \n\n Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
     <string name="sync_intro_enable_footer">Μπορείτε να προβείτε σε συγχρονισμό με τις άλλες συσκευές σας αργότερα.</string>
     <string name="sync_intro_enable_cta">Ενεργοποίηση συγχρονισμού και δημιουργίας αντιγράφων ασφαλείας</string>
-    <string name="sync_intro_recover_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
-    <string name="sync_intro_recover_content">Για να κάνετε επαναφορά των συγχρονισμένων δεδομένων σας, θα χρειαστείτε τον Κωδικό ανάκτησης που αποθηκεύσατε κατά την πρώτη ρύθμιση του Συγχρονισμού. Αυτός ο κωδικός ενδέχεται να έχει αποθηκευτεί ως PDF στη συσκευή που χρησιμοποιήσατε αρχικά για ρύθμιση του Συγχρονισμού.</string>
-    <string name="sync_intro_recover_cta">Ξεκινήστε</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Ανακτήστε τα συγχρονισμένα δεδομένα σας</string>
+    <string name="sync_recover_synced_data_content">Θα χρειαστείτε τον Κωδικό ανάκτησης που λάβατε κατά τη ρύθμιση του Sync &amp; Backup. Ενδέχεται να το έχετε αποθηκεύσει ως PDF στη συσκευή που χρησιμοποιήσατε.</string>
+    <string name="sync_recover_synced_data_cta">Ανάκτηση συγχρονισμένων δεδομένων</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Σάρωση κώδικα QR</string>
@@ -120,12 +121,13 @@
     <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_share_title">Κοινή χρήση με...</string>
     <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
-    <string name="sync_pdf_description">Ο Κωδικός ανάκτησης σάς επιτρέπει να συγχρονίζετε τους σελιδοδείκτες σας σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε μια συσκευή.</string>
+    <string name="sync_pdf_description">Ο κωδικός ανάκτησης σας επιτρέπει να συγχρονίζετε τους κωδικούς πρόσβασής σας, τα δεδομένα αυτόματης συμπλήρωσης και τις συνομιλίες του Duck.ai σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας εάν χάσετε την πρόσβαση σε μια συσκευή.</string>
     <string name="sync_code_box_title">Διατηρήστε αυτές τις πληροφορίες ασφαλείς.</string>
-    <string name="sync_instructions_title">Πώς λειτουργεί αυτό;</string>
-    <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo σε μια άλλη συσκευή και μεταβείτε στον Συγχρονισμό από τις Ρυθμίσεις.</string>
-    <string name="sync_instructions_step2">Σαρώστε τον Κωδικό QR ή αντιγράψτε και επικολλήστε τον κωδικό κειμένου σε μια άλλη εφαρμογή του DuckDuckGo.</string>
+    <string name="sync_instructions_title">Πώς λειτουργεί αυτός ο κώδικας;</string>
+    <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo στη συσκευή που θέλετε να συγχρονίσετε και μεταβείτε στο Sync &amp; Backup στις Ρυθμίσεις.</string>
+    <string name="sync_instructions_step2">Επιλέξτε «Συγχρονισμός με άλλη συσκευή» και σαρώστε τον κωδικό QR ή εισαγάγετε τον κωδικό κειμένου.</string>
     <string name="sync_instructions_step3">Ο Συγχρονισμός θα ενεργοποιηθεί και θα έχετε και πάλι πρόσβαση σε όλα τα δεδομένα σας.</string>
+    <string name="sync_pdf_retention_notice">Εάν περάσουν περισσότεροι από 18 μήνες χωρίς να χρησιμοποιήσετε ένα πρόγραμμα περιήγησης DuckDuckGo με ενεργοποιημένο το Sync &amp; Backup, τα δεδομένα σας θα διαγραφούν από τον διακομιστή και δεν θα μπορούν να ανακτηθούν.</string>
     <string name="remove_device_dialog_title">Αφαίρεση συσκευής;</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
     <string name="remove_device_dialog_primary_button">Αφαίρεση</string>
@@ -174,8 +176,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Διαγραφή δεδομένων διακομιστή;</string>
-    <string name="sync_delete_server_data_dialog_content">Όλες οι συσκευές θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων</string>
+    <string name="sync_delete_server_data_dialog_content">Το αντίγραφο ασφαλείας σου θα διαγραφεί από τον διακομιστή. Όλες οι συσκευές θα αποσυνδεθούν από τον συγχρονισμό, αλλά τίποτα δεν θα διαγραφεί από καμία συσκευή.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων διακομιστή</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +217,64 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Συγχρόνισε σελιδοδείκτες σε όλες τις συσκευές</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Αποκρυψη</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Ανάκτηση</string>
+    <string name="sync_settings_download_recovery_code_item">Κάντε λήψη του κώδικα ανάκτησης σε μορφή PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
+    <string name="sync_settings_data_expiration">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Επαναφορά δεδομένων Sync &amp; Backup από προηγούμενη εγκατάσταση;</string>
+    <string name="sync_previous_session_ready_body">Κάντε επαναφορά για να ανακτήσετε προηγούμενους σελιδοδείκτες, κωδικούς πρόσβασης και άλλα δεδομένα σας στο DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Επαναφορά Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Ρύθμιση νέου συγχρονισμού</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Ανακτήστε τα δεδομένα σας εύκολα</string>
+    <string name="sync_recover_data_content">Χρησιμοποιήστε αυτόν τον κωδικό ώστε να επαναφέρετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή. Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας.</string>
+    <string name="sync_recover_data_recovery_code_label">Κωδικός ανάκτησης</string>
+    <string name="sync_recover_data_download_pdf">Λήψη σε μορφή PDF</string>
+    <string name="sync_restore_on_reinstall_title">Επαναφορά στην Εκ νέου εγκατάσταση εφαρμογής</string>
+    <string name="sync_restore_on_reinstall_description">Εάν εγκαταστήσετε ξανά την εφαρμογή DuckDuckGo, θα σας ρωτήσουμε εάν θέλετε να επαναφέρετε τα δεδομένα σας σε αυτήν τη συσκευή.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Απόκτησε πρόσβαση στις συνομιλίες σου σε όλες τις συσκευές σου χρησιμοποιώντας το Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Συγχρονισμός με άλλη συσκευή</string>
+    <string name="sync_chat_bottom_sheet_title">Ας συγχρονίσουμε τις συνομιλίες σου σε όλες\nτις συσκευές σου!</string>
+    <string name="sync_chat_bottom_sheet_description">Βρες τον κωδικό QR στην εφαρμογή DuckDuckGo στην άλλη συσκευή σου μεταβαίνοντας στις Ρυθμίσεις › Sync &amp; Backup › Συγχρονισμός με άλλη συσκευή.</string>
+    <string name="sync_chat_bottom_sheet_positive">Σάρωση κωδικού QR</string>
+    <string name="sync_chat_bottom_sheet_negative">Όχι τώρα</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Να συγχρονιστούν τα δεδομένα σου;</string>
+    <string name="sync_v2_joiner_confirmation_positive">Συγχρονισμός τώρα</string>
+    <string name="sync_v2_joiner_confirmation_negative">Ακύρωση</string>
+
+    <string name="sync_v2_host_confirmation_title">Να συγχρονιστούν τα δεδομένα σου;</string>
+    <string name="sync_v2_host_confirmation_positive">Συγχρονισμός τώρα</string>
+    <string name="sync_v2_host_confirmation_negative">Ακύρωση</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">Το «%1$s» θα έχει πρόσβαση στους συγχρονισμένους κωδικούς πρόσβασης DuckDuckGo, στα δεδομένα αυτόματης συμπλήρωσης και στις συνομιλίες Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">Το «%1$s» θα έχει πρόσβαση στις συγχρονισμένες συνομιλίες Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Η άλλη συσκευή θα έχει πρόσβαση στους συγχρονισμένους κωδικούς πρόσβασης DuckDuckGo, στα δεδομένα αυτόματης συμπλήρωσης και στις συνομιλίες Duck.ai.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Η άλλη συσκευή θα έχει πρόσβαση στις συγχρονισμένες συνομιλίες Duck.ai.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Ο συγχρονισμός απέτυχε.</string>
+    <string name="sync_v2_error_pairing_rejected">Ο συγχρονισμός ακυρώθηκε από την άλλη συσκευή σου.</string>
+    <string name="sync_v2_error_pairing_canceled">Ο συγχρονισμός ακυρώθηκε.</string>
+    <string name="sync_v2_error_upgrade_required">Ενημέρωσε το πρόγραμμα περιήγησης DuckDuckGo και δοκίμασε ξανά.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Συγχρόνισε αυτήν τη συσκευή από ένα ήδη συνδεδεμένο πρόγραμμα περιήγησης DuckDuckGo σε άλλη συσκευή</string>
+    <string name="sync_v2_error_try_again">Δοκίμασε ξανά.</string>
+    <string name="sync_v2_error_got_it">Κατάλαβα</string>
+    <string name="sync_v2_already_paired_title">Έχει γίνει ήδη συγχρονισμός.</string>
+    <string name="sync_v2_already_paired_message">Αυτές οι συσκευές είναι ήδη συνδεδεμένες στο Sync &amp; Backup.</string>
+
 </resources>

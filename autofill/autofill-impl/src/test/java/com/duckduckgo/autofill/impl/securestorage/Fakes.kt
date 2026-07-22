@@ -27,20 +27,25 @@ class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) :
     SecureStorageKeyRepository {
     private var _password: ByteArray? = null
     override suspend fun getPassword(): ByteArray? = _password
-    override suspend fun setPassword(value: ByteArray?) { _password = value }
+    override suspend fun setPassword(value: ByteArray) { _password = value }
     private var _l1Key: ByteArray? = null
     override suspend fun getL1Key(): ByteArray? = _l1Key
-    override suspend fun setL1Key(value: ByteArray?) { _l1Key = value }
+    override suspend fun setL1Key(value: ByteArray) { _l1Key = value }
     private var _passwordSalt: ByteArray? = null
     override suspend fun getPasswordSalt(): ByteArray? = _passwordSalt
-    override suspend fun setPasswordSalt(value: ByteArray?) { _passwordSalt = value }
+    override suspend fun setPasswordSalt(value: ByteArray) { _passwordSalt = value }
     private var _encryptedL2Key: ByteArray? = null
     override suspend fun getEncryptedL2Key(): ByteArray? = _encryptedL2Key
-    override suspend fun setEncryptedL2Key(value: ByteArray?) { _encryptedL2Key = value }
+    override suspend fun setEncryptedL2Key(value: ByteArray) { _encryptedL2Key = value }
     private var _encryptedL2KeyIV: ByteArray? = null
     override suspend fun getEncryptedL2KeyIV(): ByteArray? = _encryptedL2KeyIV
-    override suspend fun setEncryptedL2KeyIV(value: ByteArray?) { _encryptedL2KeyIV = value }
+    override suspend fun setEncryptedL2KeyIV(value: ByteArray) { _encryptedL2KeyIV = value }
     override suspend fun canUseEncryption(): Boolean = canUseEncryption
+
+    override suspend fun setEncryptedL2Key(value: EncryptedBytes) {
+        _encryptedL2Key = value.data
+        _encryptedL2KeyIV = value.iv
+    }
 }
 
 class FakeEncryptionHelper constructor(

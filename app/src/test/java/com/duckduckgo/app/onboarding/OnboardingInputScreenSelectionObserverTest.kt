@@ -141,6 +141,28 @@ class OnboardingInputScreenSelectionObserverTest {
         }
 
     @Test
+    fun whenAppRestartsWithStageAlreadyEstablishedThenDoNotReApplyOnboardingSelection() =
+        runTest {
+            userAppStageFlow.value = AppStage.ESTABLISHED
+
+            whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
+            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
+            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
+
+            OnboardingInputScreenSelectionObserver(
+                mockAppCoroutineScope,
+                dispatcherProvider,
+                mockUserStageStore,
+                mockOnboardingStore,
+                mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
+            )
+
+            verify(mockDuckChat, never()).setInputScreenUserSetting(any())
+        }
+
+    @Test
     fun whenUserChangesInputScreenSettingBeforeEstablishedThenMarkAsOverriddenByUser() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
@@ -167,6 +189,59 @@ class OnboardingInputScreenSelectionObserverTest {
 
             userAppStageFlow.value = AppStage.ESTABLISHED
 
+            verify(mockDuckChat, never()).setInputScreenUserSetting(any())
+        }
+
+    @Test
+    fun whenDuckAiOnboardingFlowAndSettingEnabledBeforeEstablishedThenDoNotMarkAsOverriddenByUser() =
+        runTest {
+            whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+            whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
+            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
+
+            OnboardingInputScreenSelectionObserver(
+                mockAppCoroutineScope,
+                dispatcherProvider,
+                mockUserStageStore,
+                mockOnboardingStore,
+                mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
+            )
+
+            // AI flows enable the toggle themselves just-in-time before the End CTA, so an early match
+            // is expected rather than a user override.
+            cosmeticInputScreenSettingFlow.value = true
+            inputScreenSettingFlow.value = true
+
+            verify(mockOnboardingStore, never()).setInputScreenSelectionOverriddenByUser()
+            verify(mockInputScreenOnboardingWideEvent, never()).onInputScreenSettingEnabledBeforeInputScreenShown(any())
+        }
+
+    @Test
+    fun whenDuckAiOnboardingFlowAndUserStageIsEstablishedThenDoNotSetInputScreenUserSetting() =
+        runTest {
+            whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+            whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
+            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
+
+            OnboardingInputScreenSelectionObserver(
+                mockAppCoroutineScope,
+                dispatcherProvider,
+                mockUserStageStore,
+                mockOnboardingStore,
+                mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
+            )
+
+            userAppStageFlow.value = AppStage.ESTABLISHED
+
+            // AI flows already applied the real setting just-in-time, so the ESTABLISHED handler must not re-apply it.
             verify(mockDuckChat, never()).setInputScreenUserSetting(any())
         }
 }

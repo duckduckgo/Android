@@ -48,7 +48,10 @@ class VpnMenuStateProviderImpl @Inject constructor(
             subscriptions.getEntitlementStatus(),
             networkProtectionState.getConnectionStateFlow(),
         ) { subscriptionStatus, entitlements, connectionState ->
-            if (!androidBrowserConfigFeature.vpnMenuItem().isEnabled()) {
+            if (!subscriptions.isEligible()) {
+                return@combine VpnMenuState.Hidden
+            }
+            if (!androidBrowserConfigFeature.vpnMenuItem().isEnabled() && !androidBrowserConfigFeature.vpnMenuItemInternational().isEnabled()) {
                 return@combine VpnMenuState.Hidden
             }
 
@@ -59,7 +62,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
                 // User has subscription but no NetP entitlement
                 subscriptionStatus.isActive() -> VpnMenuState.Hidden
                 else -> {
-                    if (vpnMenuStore.canShowVpnMenuForNotSubscribed()) {
+                    if (vpnMenuStore.canShowVpnMenuForNotSubscribed() && subscriptions.isFreeTrialEligible()) {
                         VpnMenuState.NotSubscribed
                     } else {
                         VpnMenuState.NotSubscribedNoPill

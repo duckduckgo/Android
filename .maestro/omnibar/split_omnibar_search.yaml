@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Split omnibar test"
 tags:
   - omnibarTest
@@ -51,7 +52,7 @@ tags:
 - tapOn:
     id: "omnibarTextInput"
 - tapOn:
-    id: "clearTextButton"
+    id: "inputFieldClearText"
 - inputText: "eff.org"
 - pressKey: Enter
 - assertVisible:
@@ -66,7 +67,7 @@ tags:
 - tapOn:
     id: "omnibarTextInput"
 - tapOn:
-    id: "clearTextButton"
+    id: "inputFieldClearText"
 - tapOn:
     id: "quickAccessFavicon"
     childOf:

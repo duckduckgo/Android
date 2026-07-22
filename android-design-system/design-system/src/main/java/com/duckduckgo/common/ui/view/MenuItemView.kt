@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -71,6 +72,7 @@ constructor(
         )
         val attrSizeValue = attributes.getInt(R.styleable.MenuItemView_menuSize, 0)
         setSize(MenuItemViewSize.getMenuItemSize(attrSizeValue))
+        binding.dotIndicator.isVisible = attributes.getBoolean(R.styleable.MenuItemView_showDotIndicator, false)
         updateContentDescription()
         attributes.recycle()
     }
@@ -88,6 +90,10 @@ constructor(
     fun setIcon(@DrawableRes iconResId: Int) {
         binding.icon.setImageResource(iconResId)
     }
+
+    var showDotIndicator: Boolean
+        get() = binding.dotIndicator.isVisible
+        set(value) { binding.dotIndicator.isVisible = value }
 
     fun setSize(size: MenuItemViewSize) {
         val dimensionSize = when (size) {

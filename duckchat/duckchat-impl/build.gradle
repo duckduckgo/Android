@@ -24,12 +24,16 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
+    implementation project(':data-clearing-api')
     implementation project(':settings-api')
     implementation project(':navigation-api')
     implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':feedback-api')
+    implementation project(':browser-mode-api')
     implementation project(':browser-ui')
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
@@ -45,8 +49,10 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':sync-api')
     implementation project(':data-store-api')
+    implementation project(':cookies-api')
+    implementation project(':duckchat-store')
 
-    anvil project(path: ':anvil-compiler')
+    implementation project(':app-build-config-api')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(':statistics-api')
@@ -64,6 +70,9 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
+
+    implementation Square.retrofit2.retrofit
+    implementation Square.moshi
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto

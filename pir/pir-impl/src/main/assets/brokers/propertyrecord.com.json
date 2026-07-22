@@ -1,0 +1,282 @@
+{
+  "name": "PropertyRecord",
+  "url": "propertyrecord.com",
+  "version": "0.4.0",
+  "addedDatetime": 1775736000000,
+  "optOutUrl": "https://dashboard.propertyrecord.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "4e3682bd-cc48-4ebe-9172-0ea3b89fe503",
+          "url": "https://www.propertyrecord.com/"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//a[@title='Remove My Info']"
+            }
+          ],
+          "id": "65e32379-fb7b-42d5-9817-00ba4075c36a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//a[@title='Remove My Info']"
+            }
+          ],
+          "id": "7562499b-cff9-4fb2-a87e-92432a49f827"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Remove My Information')]"
+            }
+          ],
+          "id": "bd6730a0-3381-43b4-8317-1e27f9df05d6"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "form#backgroundCheckForm",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": ".//input[@name='name']"
+            },
+            {
+              "type": "cityState",
+              "selector": ".//input[@name='cityState']"
+            }
+          ],
+          "id": "8fde207e-9e1e-476e-9e6d-184a72d279d4"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ],
+          "id": "d0030ece-5888-40ae-8b93-3f9f157da3cd"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original"
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "#spellcheck-original"
+                }
+              ],
+              "id": "433039ee-c3e7-44c4-9056-e7ad09abe618"
+            }
+          ],
+          "id": "9cbacc8a-2afa-46bb-b72a-d39f46ec9046"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "441dce5c-d29f-4f01-847e-405795aae7d1"
+        },
+        {
+          "actionType": "extract",
+          "id": "8b02aa75-9acb-4f22-9ed5-efda7fd0b2fa",
+          "selector": "//ul[@id='people-search-results']/li",
+          "noResultsSelector": "//h3[contains(text(), 'No results found')]",
+          "profile": {
+            "name": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+            },
+            "addressCityState": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"
+            },
+            "age": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(.,'Years Old') or contains(.,'Deceased')]"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Locations Include']/following-sibling::div",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Possible Relatives']/following-sibling::div",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "9e7126b9-7101-4953-b132-2e5c9668275b",
+          "url": "https://www.propertyrecord.com/"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//a[@title='Remove My Info']"
+            }
+          ],
+          "id": "ce2f0fa7-f9c1-4df3-9e6a-102d27353ea8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Remove My Information')]"
+            }
+          ],
+          "id": "54ca8a38-6900-408d-98ce-151d929ca948"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "form#backgroundCheckForm",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": ".//input[@name='name']"
+            },
+            {
+              "type": "cityState",
+              "selector": ".//input[@name='cityState']"
+            }
+          ],
+          "id": "37b5dae9-35dc-464a-a044-f2e0332efcbc"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ],
+          "id": "ee4a70fa-f0da-4f6b-a5d0-db42a0bca5a0"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original"
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "#spellcheck-original"
+                }
+              ],
+              "id": "672b570b-75d7-42f5-9abb-e767b3901b1e"
+            }
+          ],
+          "id": "8d2d1ab8-54d9-434d-92f1-27175a57b93b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "848b3be4-8d48-440e-8ce0-b640281d8872"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[contains(normalize-space(.), 'Remove My Info')]",
+              "parent": {
+                "profileMatch": {
+                  "selector": "//ul[@id='people-search-results']/li",
+                  "profile": {
+                    "name": {
+                      "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+                    },
+                    "addressCityState": {
+                      "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"
+                    },
+                    "age": {
+                      "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(.,'Years Old') or contains(.,'Deceased')]"
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Locations Include']/following-sibling::div",
+                      "findElements": true
+                    },
+                    "relativesList": {
+                      "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Possible Relatives']/following-sibling::div",
+                      "findElements": true
+                    },
+                    "profileUrl": {
+                      "identifierType": "hash"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "f47133ae-dc60-42ea-a1c7-be42d843ec6e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Success: Information Removed"
+            }
+          ],
+          "id": "eb466716-5675-48c0-adc8-9823099c1c61"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

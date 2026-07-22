@@ -22,12 +22,16 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
+import com.duckduckgo.pir.impl.common.RealEmailDataResolver
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerStepCompletedEventHandler
@@ -53,12 +57,14 @@ import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
 import com.duckduckgo.pir.impl.integration.fakes.FakeNativeBrokerActionHandler
+import com.duckduckgo.pir.impl.integration.fakes.FakeNetworkProtectionState
 import com.duckduckgo.pir.impl.integration.fakes.FakePirCssScriptLoader
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDataStore
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDetachedWebViewProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakePirMessagingInterface
 import com.duckduckgo.pir.impl.integration.fakes.FakePixel
 import com.duckduckgo.pir.impl.integration.fakes.FakePluginPoint
+import com.duckduckgo.pir.impl.integration.fakes.FakeWebViewDataCleaner
 import com.duckduckgo.pir.impl.integration.fakes.TestPirActionsRunnerFactory
 import com.duckduckgo.pir.impl.integration.fakes.TestPirSecureStorageDatabaseFactory
 import com.duckduckgo.pir.impl.models.Address
@@ -100,6 +106,8 @@ import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -165,6 +173,8 @@ class PirEndToEndTest {
     private lateinit var fakePirDetachedWebViewProvider: FakePirDetachedWebViewProvider
     private lateinit var fakeNativeBrokerActionHandler: FakeNativeBrokerActionHandler
     private lateinit var fakePirCssScriptLoader: FakePirCssScriptLoader
+    private lateinit var fakePirWebViewDataCleaner: FakeWebViewDataCleaner
+    private lateinit var fakeNetworkProtectionState: FakeNetworkProtectionState
 
     private val activeBrokerName = "FakeBroker"
     private val removedBrokerName = "FakeRemovedBroker"
@@ -237,7 +247,9 @@ class PirEndToEndTest {
         fakeDbpService = FakeDbpService()
 
         fakePixel = FakePixel()
-        pixelSender = RealPirPixelSender(fakePixel)
+        fakeNetworkProtectionState = FakeNetworkProtectionState()
+        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState, FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
+        fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
 
         pirRepository = RealPirRepository(
             dispatcherProvider = dispatcherProvider,
@@ -303,6 +315,7 @@ class PirEndToEndTest {
             pirDetachedWebViewProvider = fakePirDetachedWebViewProvider,
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = fakeNativeBrokerActionHandler,
+            emailDataResolver = RealEmailDataResolver(fakeDbpService, dispatcherProvider, moshi),
             engineFactory = engineFactory,
             coroutineScope = testScope,
         )
@@ -318,6 +331,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirOptOut = RealPirOptOut(
@@ -329,6 +343,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         eligibleScanJobProvider = RealEligibleScanJobProvider(
@@ -352,6 +367,13 @@ class PirEndToEndTest {
             pirOptOut = pirOptOut,
             currentTimeProvider = fakeTimeProvider,
             pixelSender = pixelSender,
+            brokerJsonUpdater = object : BrokerJsonUpdater {
+                override suspend fun update(): Boolean = true
+            },
+            pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+            pirScanWideEvent = NoOpPirScanWideEvent,
+            pirInitialScanCompletionWideEvent = NoOpPirInitialScanCompletionWideEvent,
+            networkProtectionState = fakeNetworkProtectionState,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -361,6 +383,7 @@ class PirEndToEndTest {
             pirActionsRunnerFactory = pirActionsRunnerFactory,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(
@@ -411,7 +434,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run Eligible Scan and Opt-Out Jobs ====================")
 
         // Run eligible jobs - this will trigger PirScan and PirOptOut
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Verify: Scan jobs created only for active broker
@@ -643,7 +666,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should fail gracefully ====================")
 
         // Run eligible jobs - should not crash even though scan step has unknown action
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed overall (not crash)", scanResult.isSuccess)
 
         // Verify scan job was created
@@ -710,7 +733,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should succeed (scan step is valid) ====================")
 
         // Run scan - should succeed since the scan step is valid
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Check scan job record
@@ -967,4 +990,54 @@ class PirEndToEndTest {
         val schedulingConfig: TestSchedulingConfig,
         val removedAt: Long?,
     )
+
+    /**
+     * No-op implementation of [PirScanWideEvent] used by the integration test. This test asserts on
+     * the discrete pixel stream and on PIR's persistent state, not on wide events; the wide-event
+     * lifecycle is exercised by `PirScanWideEventTest` and `RealPirJobsRunnerTest` (unit-test side).
+     */
+    private object NoOpPirScanWideEvent : PirScanWideEvent {
+        override suspend fun onRunStarted(
+            executionType: PirExecutionType,
+            profileQueriesCount: Int,
+            brokerCount: Int,
+            totalScanJobs: Int,
+            webViewCount: Int,
+            isPowerSavingEnabled: Boolean,
+            isVpnConnected: Boolean,
+            batteryOptimizationsEnabled: Boolean,
+            notificationsPermissionGranted: Boolean,
+            isTrackerBlockingEnabled: Boolean,
+        ) = Unit
+
+        override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) = Unit
+        override suspend fun onScanJobCompleted(executionType: PirExecutionType) = Unit
+        override suspend fun onScanCompleted(executionType: PirExecutionType) = Unit
+        override suspend fun onOptOutStarted(executionType: PirExecutionType) = Unit
+        override suspend fun onOptOutCompleted(executionType: PirExecutionType, totalOptOutJobs: Int) = Unit
+        override suspend fun onOptOutSkipped(executionType: PirExecutionType) = Unit
+        override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) = Unit
+        override suspend fun onRunCancelled(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onWorkCancelled(reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onRunCancelledBeforeStart(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onUserReset() = Unit
+    }
+
+    private object NoOpPirInitialScanCompletionWideEvent : PirInitialScanCompletionWideEvent {
+        override suspend fun onRunStarted(
+            executionType: PirExecutionType,
+            profileQueriesCount: Int,
+            brokerCount: Int,
+            totalScanJobs: Int,
+            webViewCount: Int,
+            isPowerSavingEnabled: Boolean,
+            isVpnConnected: Boolean,
+            batteryOptimizationsEnabled: Boolean,
+            notificationsPermissionGranted: Boolean,
+            isTrackerBlockingEnabled: Boolean,
+        ) = Unit
+
+        override suspend fun onScanCompleted() = Unit
+        override suspend fun onUserReset() = Unit
+    }
 }

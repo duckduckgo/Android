@@ -30,13 +30,16 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.formatWithSpans
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -63,6 +66,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val duckAiHostProvider: DuckAiHostProvider,
+    private val browserMode: BrowserMode,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -116,15 +121,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(
-                    R.string.sitePermissionsMicDialogTitle,
-                    R.string.sitePermissionsMicDialogSubtitle,
-                    url,
-                    SitePermissionsPixelValues.MICROPHONE,
-                    { rememberChoice ->
-                        askForMicPermissions(rememberChoice)
-                    },
-                )
+                if (request.origin.host == duckAiHostProvider.getHost()) {
+                    handleDuckAiAudioCapture()
+                } else {
+                    showSitePermissionsRationaleDialog(
+                        R.string.sitePermissionsMicDialogTitle,
+                        R.string.sitePermissionsMicDialogSubtitle,
+                        url,
+                        SitePermissionsPixelValues.MICROPHONE,
+                        { rememberChoice ->
+                            askForMicPermissions(rememberChoice)
+                        },
+                    )
+                }
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
@@ -265,15 +274,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         TextAlertDialogBuilder(activity)
             .setTitle(
                 String.format(
-                    activity.getString(R.string.drmSiteDialogTitle),
+                    activity.getString(R.string.drmSitePermissionDialogTitle),
                     title,
                 ),
             )
             .setClickableMessage(
-                activity.getText(R.string.drmSiteDialogSubtitle),
+                activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
-                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
@@ -294,7 +302,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
                             storeFavicon(url)
                         } else {
-                            sitePermissionsRepository.saveDrmForSession(domain, true)
+                            // Fire mode grants the in-session WebView permission below but must not write the
+                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
+                            if (browserMode != BrowserMode.FIRE) {
+                                sitePermissionsRepository.saveDrmForSession(domain, true)
+                            }
                             grantPermissions()
                         }
                         sendPositiveDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
@@ -305,7 +317,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         if (rememberChoice) {
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
                             storeFavicon(url)
-                        } else {
+                        } else if (browserMode != BrowserMode.FIRE) {
+                            // Fire mode denied the in-session permission above but must not write the
+                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             sitePermissionsRepository.saveDrmForSession(domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
@@ -323,6 +337,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         domain: String,
         drmPermission: SitePermissionAskSettingType,
     ) {
+        // Fire mode must not persist a per-site DRM choice into the shared store.
+        if (browserMode == BrowserMode.FIRE) return
+
         val sitePermissionsEntity = SitePermissionsEntity(
             domain = domain,
             askDrmSetting = drmPermission.name,
@@ -409,6 +426,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
+    private fun handleDuckAiAudioCapture() {
+        // Grant mic access for this request only — never persist the site permission
+        askForMicPermissions(rememberChoice = false)
+    }
+
     private fun askForMicPermissions(rememberChoice: Boolean = false) {
         permissionRequested = SitePermissionsRequestedType.AUDIO
         permissionPermanent = rememberChoice
@@ -470,12 +492,17 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun systemPermissionGranted() {
         grantPermissions()
-        permissionsHandledByUser.forEach {
-            logcat(WARN) { "Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent" }
-            if (permissionPermanent) {
-                sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
-            } else {
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+
+        // Fire mode grants the in-session WebView permission above so the page works, but must not
+        // persist the grant into the shared site-permissions store.
+        if (browserMode != BrowserMode.FIRE) {
+            permissionsHandledByUser.forEach {
+                logcat(WARN) { "Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent" }
+                if (permissionPermanent) {
+                    sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
+                } else {
+                    sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+                }
             }
         }
         checkIfActionNeeded()
@@ -563,7 +590,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             } else {
                 sitePermissionRequest.deny()
 
-                if (rememberChoice) {
+                // Fire mode denies the in-session permission above but must not persist the choice.
+                if (rememberChoice && browserMode != BrowserMode.FIRE) {
                     sitePermissionRequest.resources.forEach { permission ->
                         sitePermissionsRepository.sitePermissionPermanentlySaved(
                             siteURL,
@@ -613,6 +641,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun storeFavicon(url: String) {
+        // Fire mode must not persist a site favicon: it is a domain-keyed file kept outside the WebView
+        // profile the burn clears, so it would be a cross-session trace of a visited site. The favicon
+        // only ever backs a saved permission, which Fire mode never writes, so it is safe to skip here.
+        if (browserMode == BrowserMode.FIRE) return
+
         appCoroutineScope.launch {
             faviconManager.persistCachedFavicon(tabId, url)
         }

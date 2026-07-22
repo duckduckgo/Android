@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -37,6 +38,7 @@ import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.toFeatureException
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -67,13 +69,14 @@ import kotlin.coroutines.suspendCoroutine
 class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()!!
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
+    private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
     private val userAllowListRepository = mock<UserAllowListRepository>()
     private val fireproofRepository = mock<FireproofRepository>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private lateinit var cookieModifier: FirstPartyCookiesModifier
 
     companion object {
@@ -106,6 +109,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             mock(),
             fireproofRepository,
             DefaultDispatcherProvider(),
+            mockDuckAiHostProvider,
         )
         val host = testCase.siteURL.toUri().host
 

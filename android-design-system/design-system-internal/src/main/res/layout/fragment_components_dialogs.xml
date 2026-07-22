@@ -32,6 +32,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogWithImageButton"
             app:daxButtonSize="large"
@@ -39,6 +46,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDialogWithImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogButton"
@@ -48,6 +76,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDialogButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDestructiveDialogButton"
             app:daxButtonSize="large"
@@ -55,6 +104,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDestructiveDialogButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertSingleDialogButton"
@@ -64,6 +134,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertSingleDialogButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogCancellable"
             app:daxButtonSize="large"
@@ -71,6 +162,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDialogCancellable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogOneButton"
@@ -80,6 +192,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDialogOneButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogCheckbox"
             app:daxButtonSize="large"
@@ -87,6 +220,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeTextAlertDialogCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
@@ -96,6 +250,27 @@
             android:layout_marginTop="16dp"
             android:text="Stacked Text Alert Dialog With Image and 3 buttons" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeStackedAlertDialogWithImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/stackedAlertDialogWithButtons"
             app:daxButtonSize="large"
@@ -103,6 +278,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Stacked Text Alert Dialog With 4 buttons" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeStackedAlertDialogWithButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/stackedAlertDestructiveDialogWithButtons"
@@ -112,6 +308,27 @@
             android:layout_marginTop="16dp"
             android:text="Stacked Text Alert Destructive Dialog With 4 buttons" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeStackedAlertDestructiveDialogWithButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
             android:id="@+id/radioButtonAlertDialog"
@@ -120,6 +337,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeRadioButtonAlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
@@ -129,6 +366,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeRadioButtonDestructiveAlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"

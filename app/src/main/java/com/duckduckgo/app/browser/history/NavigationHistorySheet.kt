@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.databinding.NavigationHistoryPopupViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
@@ -35,7 +36,11 @@ class NavigationHistorySheet(
     private val tabId: String,
     private val history: ShowBackNavigationHistory,
     private val listener: NavigationHistorySheetListener,
-) : BottomSheetDialog(context) {
+    private val edgeToEdgeEnabled: Boolean,
+) : BottomSheetDialog(
+    context,
+    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
 
     private val binding = NavigationHistoryPopupViewBinding.inflate(LayoutInflater.from(context))
 
@@ -47,6 +52,9 @@ class NavigationHistorySheet(
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        if (edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
 
         binding.historyRecycler.also { recycler ->
             NavigationHistoryAdapter(

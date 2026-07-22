@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="ad_blocking_settings_title">YouTube reklāmu bloķēšana</string>
+    <string name="ad_blocking_settings_toggle_title">Bloķēt reklāmas pakalpojumā YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. \n\nKad DuckDuckGo ir ieslēgts, tas anonīmi noteiks reklāmu bloķēšanas traucējumus vai YouTube kļūdas, lai uzlabotu pieredzi visiem. DuckDuckGo nekad neredz, kādus videoklipus skaties, vai jebkādu personu identificējamu informāciju. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
+    <string name="ad_blocking_settings_duck_player_description">Atver videoklipus teātra režīmā bez uzmanības novēršanas, kas neļauj skatītajam ietekmēt tavu YouTube plūsmu.</string>
+    <string name="ad_blocking_settings_title_v2">Reklāmu bloķēšana</string>
+    <string name="ad_blocking_settings_header_description">Bloķē uzmācīgus izsekotājus, pirms tie tiek ielādēti, tādējādi efektīvi novēršot izsekošanā balstītās reklāmas.</string>
+    <string name="contingencyMessageTitle">YouTube reklāmu bloķēšana nav pieejama</string>
+    <string name="contingencyMessageContent">Reklāmu bloķēšanu ir ietekmējušas nesenās izmaiņas pakalpojumā YouTube. Mēs jau strādājam pie šo problēmu novēršanas un novērtējam tavu sapratni.</string>
+    <string name="contingencyMessagePrimaryButton">Sapratu</string>
+    <string name="contingencyMessageCloseContentDescription">Aizvērt</string>
+    <string name="ad_blocking_menu_disable">Atspējot YouTube reklāmu bloķēšanu</string>
+    <string name="ad_blocking_menu_enable">Iespējot YouTube reklāmu bloķēšanu</string>
+    <string name="ad_blocking_menu_title">YouTube reklāmu bloķēšana</string>
+    <string name="ad_blocking_menu_close_content_description">Aizvērt</string>
+    <string name="ad_blocking_menu_always_on">Vienmēr ieslēgts</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Atspējot līdz atkārtotai palaišanai</string>
+    <string name="ad_blocking_menu_always_off">Vienmēr izslēgts</string>
+    <string name="ad_blocking_disabled_popup_title">YouTube reklāmu bloķēšana nedarbojas?</string>
+    <string name="ad_blocking_disabled_popup_description">Nosūti DuckDuckGo anonīmu ziņojumu par traucējumiem. Palīdzi uzlabot reklāmu bloķēšanu visiem!</string>
+    <string name="ad_blocking_disabled_primary_action">Nosūtīt ziņojumu par traucējumiem</string>
+    <string name="ad_blocking_disabled_secondary_action">Atcelt</string>
+    <string name="ad_blocking_settings_disabled_until_relaunch">Atspējots līdz atkārtotai palaišanai</string>
+    <string name="ad_blocking_omnibar_badge_text">YouTube reklāmu bloķēšana ieslēgta</string>
+</resources>

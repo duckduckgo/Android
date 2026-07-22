@@ -35,6 +35,8 @@ class CookiePromptManagementStatusViewStateMapper @Inject constructor() : Autoco
             site.consentOptOutFailed,
             true,
             site.consentCosmeticHide,
+            site.consentRule,
+            site.consentReloadLoop,
         )
     }
 }

@@ -19,13 +19,17 @@ package com.duckduckgo.savedsites.impl.bookmarks
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.saved.sites.impl.databinding.BottomSheetFaviconsPromptBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
 class FaviconPromptSheet(
     builder: Builder,
-) : BottomSheetDialog(builder.context) {
+) : BottomSheetDialog(
+    builder.context,
+    if (builder.edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+) {
 
     private val binding = BottomSheetFaviconsPromptBinding.inflate(LayoutInflater.from(context))
     internal class DefaultEventListener : EventListener()
@@ -36,6 +40,9 @@ class FaviconPromptSheet(
 
     init {
         setContentView(binding.root)
+        if (builder.edgeToEdgeEnabled) {
+            binding.root.applyBottomSystemBarInsetPadding()
+        }
         binding.faviconsPromptPrimaryCta.setOnClickListener {
             builder.listener.onFaviconsFetchingPromptDismissed(true)
             dismiss()
@@ -58,9 +65,15 @@ class FaviconPromptSheet(
     class Builder(val context: Context) {
         var dialog: BottomSheetDialog? = null
         var listener: EventListener = DefaultEventListener()
+        var edgeToEdgeEnabled: Boolean = false
 
         fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
+            return this
+        }
+
+        fun setEdgeToEdgeEnabled(enabled: Boolean): Builder {
+            edgeToEdgeEnabled = enabled
             return this
         }
 

@@ -49,6 +49,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -57,6 +59,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -92,20 +95,24 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
+@HasMemberInjections
 @InjectWith(FragmentScope::class)
 open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
 
@@ -129,7 +136,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
-    lateinit var subscriptionsHandler: SubscriptionsHandler
+    lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
 
     @Inject
     @AppCoroutineScope
@@ -174,9 +181,19 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
+    @Inject
+    lateinit var cookieManagerProvider: CookieManagerProvider
+
+    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.forMode(browserMode) }
 
     private var pendingFileDownload: PendingFileDownload? = null
+
     private val downloadMessagesJob = ConflatedJob()
 
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
@@ -197,6 +214,16 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         simpleWebview.let {
+            webViewModeInitializer.bind(it, browserMode).onFailure { throwable ->
+                logcat(WARN) { "Duck.ai WebView profile bind failed for $browserMode: ${throwable.message}" }
+            }
+
+            // Explicitly enable cookies for this tab's profile
+            cookieManager?.apply {
+                setAcceptCookie(true)
+                setAcceptThirdPartyCookies(it, true)
+            }
+
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -269,7 +296,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                                    duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                                    duckChatJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        browserMode = browserMode,
+                                    )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(
@@ -281,19 +314,30 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                             contentScopeScripts.onResponse(response)
                                         }
                                     }
+                                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                                        // There is a pending subscription event waiting to be sent
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.sendSubscriptionEvent(event)
+                                        }
+                                    }
                                 }
                             }
 
                             SUBSCRIPTIONS_FEATURE_NAME -> {
-                                subscriptionsHandler.handleSubscriptionsFeature(
-                                    featureName,
-                                    method,
-                                    id,
-                                    data,
-                                    requireActivity(),
-                                    appCoroutineScope,
-                                    contentScopeScripts,
-                                )
+                                val activity = requireActivity()
+                                appCoroutineScope.launch(dispatcherProvider.io()) {
+                                    subscriptionsJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        activity,
+                                    )?.let { response ->
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.onResponse(response)
+                                        }
+                                    }
+                                }
                             }
 
                             else -> {}
@@ -639,6 +683,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
+            browserMode = browserMode,
         )
 
         if (hasWriteStoragePermission()) {
@@ -705,16 +750,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
+            cookieManager?.flush()
         }
         super.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
-        }
     }
 
     companion object {

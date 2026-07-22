@@ -16,24 +16,34 @@
 
 package com.duckduckgo.app.global.view
 
+import android.webkit.WebStorage
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -45,8 +55,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class ClearPersonalDataActionTest {
-
-    private lateinit var testee: ClearPersonalDataAction
 
     private val mockDataManager: WebDataManager = mock()
     private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
@@ -61,41 +69,60 @@ class ClearPersonalDataActionTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
+    private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val mockSitePreferencesDataClearer: SitePreferencesDataClearer = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
+    private lateinit var testee: ClearPersonalDataAction
+
     @Before
     fun setup() {
-        testee = ClearPersonalDataAction(
-            context = InstrumentationRegistry.getInstrumentation().targetContext,
-            dataManager = mockDataManager,
-            clearingStore = mockClearingUnsentForgetAllPixelStore,
-            tabRepository = mockTabRepository,
-            settingsDataStore = mockSettingsDataStore,
-            cookieManager = mockCookieManager,
-            appCacheClearer = mockAppCacheClearer,
-            thirdPartyCookieManager = mockThirdPartyCookieManager,
-            fireproofWebsiteRepository = mockFireproofWebsiteRepository,
-            deviceSyncState = mockDeviceSyncState,
-            savedSitesRepository = mockSavedSitesRepository,
-            sitePermissionsManager = mockSitePermissionsManager,
-            navigationHistory = mockNavigationHistory,
-            webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
-        )
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        testee = createTestee()
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
     }
 
+    private fun createTestee(
+        siteDataCleaner: SiteDataCleaner = object : SiteDataCleaner {
+            override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {}
+            override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+        },
+    ) = ClearPersonalDataAction(
+        context = InstrumentationRegistry.getInstrumentation().targetContext,
+        dataManager = mockDataManager,
+        clearingStore = mockClearingUnsentForgetAllPixelStore,
+        tabRepository = mockTabRepository,
+        settingsDataStore = mockSettingsDataStore,
+        cookieManager = mockCookieManager,
+        appCacheClearer = mockAppCacheClearer,
+        thirdPartyCookieManager = mockThirdPartyCookieManager,
+        fireproofWebsiteRepository = mockFireproofWebsiteRepository,
+        deviceSyncState = mockDeviceSyncState,
+        savedSitesRepository = mockSavedSitesRepository,
+        sitePermissionsManager = mockSitePermissionsManager,
+        navigationHistory = mockNavigationHistory,
+        webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
+        tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+        webViewCapabilityChecker = mockWebViewCapabilityChecker,
+        duckAiHostProvider = mockDuckAiHostProvider,
+        siteDataCleaner = siteDataCleaner,
+        sitePreferencesDataClearer = mockSitePreferencesDataClearer,
+    )
+
     @Test
     fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = true)
-        verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore).incrementCount(BrowserMode.REGULAR)
     }
 
     @Test
     fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount(any())
     }
 
     @Test
@@ -120,6 +147,18 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockSitePermissionsManager).clearAllButFireproof(any())
+    }
+
+    @Test
+    fun whenClearTabsAndAllDataThenDesktopPreferencesClearedExceptFireproofed() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
+    }
+
+    @Test
+    fun whenClearBrowserDataOnlyThenDesktopPreferencesClearedExceptFireproofed() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
     }
 
     @Test
@@ -151,6 +190,12 @@ class ClearPersonalDataActionTest {
     fun whenClearTabsAndAllDataAsyncCalledThenNavigationHistoryCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockNavigationHistory).clearHistory()
+    }
+
+    @Test
+    fun whenClearTabsAndAllDataAsyncCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
     }
 
     @Test
@@ -194,19 +239,20 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
         verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 
     @Test
     fun whenClearBrowserDataOnlyCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = true)
-        verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore).incrementCount(BrowserMode.REGULAR)
     }
 
     @Test
     fun whenClearBrowserDataOnlyCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount(any())
     }
 
     @Test
@@ -259,6 +305,12 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearBrowserDataOnlyCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
+    }
+
+    @Test
     fun whenClearBrowserDataOnlyCalledThenTabsNotCleared() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
         verify(mockTabRepository, never()).deleteAll()
@@ -280,7 +332,160 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockThirdPartyCookieManager)
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
+        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenReturnsFeatureNotSupported() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("example.com"))
+        assertTrue(result is ClearDataResult.FeatureNotSupported)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithEmptyDomainsAndFeatureSupportedThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        val result = testee.clearDataForSpecificDomains(domains = emptySet())
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithDuckDuckGoDomainsAndShouldNotClearDuckAiThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledThenFireproofWebsitesAreQueried() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        testee.clearDataForSpecificDomains(domains = setOf("example.com"))
+        verify(mockFireproofWebsiteRepository).fireproofWebsitesSync()
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithFireproofDomainsOnlyThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithSubdomainFireproofDomainThenEtldPlusOneMatchFiltersThem() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("www.facebook.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("facebook.com"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithFireproofAndDuckDuckGoDomainsOnlyThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("www.fireproof.com"), FireproofWebsiteEntity("login.another-fireproof.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "another-fireproof.com", "duckduckgo.com", "duck.ai"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithMixedDomainsThenOnlyNonFireproofDomainsAreCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsWithFireproofedIpOrLocalhostThenThoseAreRetained() = runTest {
+        // A fireproofed IP / localhost must survive a burn (the keep-list uses the host-fallback key).
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("192.168.1.1"), FireproofWebsiteEntity("localhost")),
+        )
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("192.168.1.1", "localhost", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsThenDesktopPreferencesForgottenForNonFireproofDomains() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithMixedDuckDuckGoDomainsThenOnlyNonDdgDomainsAreCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndCleanerThrowsThenReturnsError() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val testeeWithError = createTestee(
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    throw RuntimeException("WebView error")
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
+        )
+        val result = testeeWithError.clearDataForSpecificDomains(domains = setOf("example.com"))
+        assertTrue(result is ClearDataResult.Error)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenFireproofWebsitesNotQueried() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        testee.clearDataForSpecificDomains(domains = setOf("example.com"))
+        verify(mockFireproofWebsiteRepository, never()).fireproofWebsitesSync()
     }
 
     @Test

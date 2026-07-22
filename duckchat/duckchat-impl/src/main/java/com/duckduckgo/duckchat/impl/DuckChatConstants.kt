@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl
 
 object DuckChatConstants {
-    const val HOST_DUCK_AI = "duck.ai"
     const val JS_MESSAGING_FEATURE_NAME = "aiChat"
+    const val DUCK_AI_FEATURE_PAGE = "duckai"
 
     object JsResponseKeys {
         const val OK = "ok"

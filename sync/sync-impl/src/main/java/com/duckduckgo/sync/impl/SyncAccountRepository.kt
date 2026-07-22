@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import android.util.Base64
 import androidx.annotation.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -41,16 +42,20 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -64,9 +69,11 @@ interface SyncAccountRepository {
 
     fun parseSyncAuthCode(stringCode: String): SyncAuthCode
     fun isSyncSupported(): Boolean
+
+    @WorkerThread
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(code: SyncAuthCode): Result<Boolean>
+    fun processCode(code: SyncAuthCode, existingDeviceId: String? = null): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -81,6 +88,54 @@ interface SyncAccountRepository {
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
+
+    /**
+     * Ensures the `3party` credential exists for this account, so [getThirdPartyRecoveryCode]
+     * can later produce a code shareable with a 3rd-party browser.
+     *
+     * If another device on the account has already created it, the existing credential is
+     * adopted locally; otherwise a new one is created on the server. Either path leaves the
+     * local store ready for [getThirdPartyRecoveryCode].
+     */
+    suspend fun createThirdPartyCredential(): Result<Boolean>
+
+    /**
+     * Fetches the 3party credential from the server, decrypts the SP using the account's secretKey,
+     * and stores it locally in [SyncStore.scopedPassword]. Used to recover the SP on a device that
+     * didn't create the credential (e.g. a different device on the same account).
+     *
+     * Returns [Result.Success] with `true` if the credential was fetched and stored, or `false` if
+     * no 3party credential exists on the server. Returns [Result.Error] only for actual failures
+     * (network errors, decrypt failures, etc.).
+     */
+    fun refreshThirdPartyCredential(): Result<Boolean>
+
+    /**
+     * Joins this device to an existing account using a 3party recovery code, executing the
+     * "Native joining a 3party account" upgrade flow per the Unified Algorithm (Asana
+     * 1214739740392701). Three network calls:
+     *
+     *   1. POST /sync/login with scope=ai_chats — authenticates against the existing 3party
+     *      credential and returns a short-lived token + the protected keys to re-wrap.
+     *   2. POST /access-credentials/ddg — mints a fresh DDG credential on the account, attached
+     *      alongside the existing 3party entry (which gets decorated with encrypted_3party_credential
+     *      so future ddg-side logins can re-derive SP).
+     *   3. POST /sync/login (unscoped) — commits the new credential (without this inside the 5-min
+     *      TTL the BE auto-removes it), exchanges the ai_chats-only token for the unrestricted
+     *      ddg-scoped token, and atomically writes the SyncStore via [performLogin].
+     *
+     * On success the device ends in a normal Native signed-in state: full primaryKey / secretKey
+     * populated, credentialId=ddg, scopedPassword populated with SP. SyncStore is written only
+     * after all three network calls succeed; observers never see an intermediate state.
+     */
+    suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean>
+
+    /**
+     * Returns a recovery code that a 3rd-party browser can use to sign in and access this
+     * account's scoped data. Requires the 3party credential to already exist locally — call
+     * [createThirdPartyCredential] (or [refreshThirdPartyCredential]) first.
+     */
+    fun getThirdPartyRecoveryCode(): Result<AuthCode>
 
     data class AuthCode(
         /**
@@ -111,7 +166,14 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
+    private val syncJweCrypto: SyncJweCrypto,
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
+    private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
 ) : SyncAccountRepository {
+
+    // Bounded backoff for the 3party→ddg upgrade network calls.
+    internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
 
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
@@ -140,11 +202,11 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(code: SyncAuthCode): Result<Boolean> {
+    override fun processCode(code: SyncAuthCode, existingDeviceId: String?): Result<Boolean> {
         when (code) {
             is Recovery -> {
                 logcat { "Sync: code is a recovery code" }
-                return login(code.b64Code)
+                return login(code.b64Code, existingDeviceId)
             }
 
             is Connect -> {
@@ -202,9 +264,33 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
+    // `primaryKey` and `userId` are declared non-null but reflection-based Moshi can populate them with null when the JSON keys are missing
+    @Suppress("SENSELESS_COMPARISON")
     private fun canParseAsRecoveryCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
+        ?.takeIf { it.primaryKey != null && it.userId != null }
     private fun canParseAsExchangeCode(decodedCode: String) = Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
     private fun canParseAsConnectCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
+
+    /**
+     * Parse a base64url-encoded 3party recovery code (v2 format per the Recovery Payload Shape
+     * RFC, Asana 1214804486778180). Returns the inner payload if it's a structurally-valid 3party
+     * code, null otherwise. Errors (bad base64, bad JSON, missing fields) are swallowed and turned
+     * into null — callers translate null into a user-facing error.
+     *
+     * Discrimination: `recovery.cid == "3party"` AND `recovery.v` is major version 2 — bare "2"
+     * (the common shorthand) or any "2.x" — AND `secret`/`user_id` are non-empty.
+     */
+    private fun parseThirdPartyRecoveryCode(pastedCode: String): ThirdPartyRecoveryCode? {
+        return kotlin.runCatching {
+            val decodedBytes = Base64.decode(pastedCode, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
+            val decodedJson = decodedBytes.toString(Charsets.UTF_8)
+            val parsed = Adapters.thirdPartyRecoveryCodeAdapter.fromJson(decodedJson)?.recovery ?: return@runCatching null
+            if (parsed.cid != CREDENTIAL_ID_3PARTY) return@runCatching null
+            if (parsed.v.substringBefore(".") != RECOVERY_CODE_MAJOR_V2) return@runCatching null
+            if (parsed.secret.isEmpty() || parsed.userId.isEmpty()) return@runCatching null
+            parsed
+        }.getOrNull()
+    }
 
     private fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
         // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
@@ -287,7 +373,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+    private fun login(recoveryCode: RecoveryCode, existingDeviceId: String? = null): Result<Boolean> {
         var wasUserLogout = false
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
@@ -306,7 +392,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
-        val deviceId = syncDeviceIds.deviceId()
+        val deviceId = existingDeviceId ?: syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
         return performLogin(userId, deviceId, deviceName, primaryKey).onFailure {
@@ -347,6 +433,13 @@ class AppSyncAccountRepository @Inject constructor(
 
         // no additional formatting on the QR code for recovery codes, so qrCode always identical to rawCode
         return Success(AuthCode(qrCode = b64Encoded, rawCode = b64Encoded))
+    }
+
+    override fun getThirdPartyRecoveryCode(): Result<AuthCode> {
+        return when (val result = thirdPartyCredentialManager.getRecoveryCode()) {
+            is Success -> Success(AuthCode(qrCode = result.data, rawCode = result.data))
+            is Error -> result
+        }
     }
 
     override fun generateExchangeInvitationCode(): Result<AuthCode> {
@@ -533,6 +626,245 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun createThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.create()
+
+    override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
+
+    /**
+     * Bundle produced by [buildThirdPartyUpgradePackage] and consumed by the upgrade POST +
+     * SyncStore commit step. Keeps the locally-generated DDG account material together with the
+     * request body and the re-wrapped keys list, so the caller can perform a single atomic write.
+     */
+    private data class ThirdPartyUpgradePackage(
+        val newDdgKeys: AccountKeys,
+        val rewrappedKeys: List<ProtectedKeyEntry>,
+        val request: CreateAccessCredentialRequest,
+    )
+
+    /**
+     * Step 3 + 4 + 5 of the "Native joining a 3party account" upgrade flow. Given a parsed
+     * 3party recovery code and the protected keys returned by the prior /sync/login (encrypted
+     * by FE with the 3party MEK in JWE format), build everything needed for POST
+     * /access-credentials/ddg:
+     *
+     *   - generate a fresh DDG credential locally (new MP/SK/PSK/PH via libsodium)
+     *   - re-wrap each FE-written key with the new DDG secretKey using libsodium (Native pattern,
+     *     encrypted_with="ddg"). Source format is RFC 7516 JWE compact; target is libsodium-secretbox
+     *     base64url-encoded — same asymmetry as the reverse direction in [createThirdPartyCredential].
+     *   - encrypt SP with the new DDG MEK in a JWE-dir-A256GCM envelope with kid="ddg" (the
+     *     `encrypted_3party_credential` field that decorates the *existing* 3party entry so a
+     *     future ddg-side login can derive SP back from MP).
+     *
+     * Reference: Sync API docs POST /access-credentials/{id} ("upgrades a 3party-only account into
+     * a native one") and Encryption Algorithms TD (Asana 1214802412121967).
+     *
+     * No network calls and no SyncStore writes — both are the responsibility of the caller.
+     */
+    private fun buildThirdPartyUpgradePackage(
+        parsed: ThirdPartyRecoveryCode,
+        keysFromLogin: List<ProtectedKeyEntry>,
+    ): Result<ThirdPartyUpgradePackage> {
+        // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect
+        // standard base64. Compute once at the boundary, reuse for all derivations.
+        val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
+            .getOrElse { return Error(reason = "Upgrade: failed to decode SP") }
+        val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
+
+        // SP-derived MEK: used to decrypt FE-written (JWE) keys we received from /sync/login.
+        val spMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(spStandardB64, hkdfSalt, "Main Key", 32) }
+            .getOrElse { return Error(reason = "Upgrade: failed to derive SP MEK") }
+
+        // Fresh DDG credential generated locally. nativeLib.generateAccountKeys returns a tuple
+        // where `primaryKey` is the new account's MP (the seed for all spec-side derivations) and
+        // `secretKey` is the libsodium secretbox key used to wrap encrypted_private_key entries.
+        val newDdgKeys = kotlin.runCatching {
+            nativeLib.generateAccountKeys(userId = parsed.userId).also {
+                it.checkResult("Upgrade: DDG account key generation failed")
+            }
+        }.getOrElse { return it.asErrorResult() }
+
+        // DDG-derived MEK: used to encrypt `encrypted_3party_credential` (the SP-decorates-3party
+        // payload). Per Encryption Algorithms TD §"How do we encrypt the 3party secret using the
+        // DDG's MEK?", this is HKDF(MP, salt=user_id, info="Main Key", 32 bytes) imported as
+        // AES-GCM-256. Pinned against the TD's test3 vector in SyncJweCryptoTdVectorsTest.
+        val ddgMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(newDdgKeys.primaryKey, hkdfSalt, "Main Key", 32) }
+            .getOrElse { return Error(reason = "Upgrade: failed to derive DDG MEK") }
+
+        // encrypted_3party_credential: JWE compact (alg=dir, enc=A256GCM, kid="ddg") of the SP
+        // base64url STRING (matches the reverse direction in createThirdPartyCredential, which
+        // encrypts the base64url SP string — not the raw SP bytes — so the wire is symmetrical).
+        val encryptedThreePartyCredential = kotlin.runCatching {
+            syncJweCrypto.jweEncryptSymmetric(parsed.secret.toByteArray(Charsets.UTF_8), ddgMek, kid = CREDENTIAL_ID_DDG)
+        }.getOrElse { return Error(reason = "Upgrade: failed to encrypt encrypted_3party_credential") }
+
+        // Re-wrap each FE-written key from /sync/login. Decrypt via JWE using SP MEK, then
+        // re-encrypt with libsodium-secretbox using the new DDG secretKey, matching the Native
+        // wire format (base64-encoded encrypted bytes with URL safety applied — mirrors
+        // mintDdgWrappedProtectedKey in ProtectedKeyMinting.kt).
+        val rewrappedKeys = keysFromLogin.map { srcKey ->
+            kotlin.runCatching {
+                // FE-only accounts always write keys with encrypted_with="3party". A defensive
+                // skip-or-fail decision: bail if we see anything else, since re-wrapping a key we
+                // can't decrypt would silently break ai_chats sync after upgrade.
+                if (srcKey.encryptedWith != CREDENTIAL_ID_3PARTY) {
+                    error("Upgrade: cannot re-wrap key kid=${srcKey.kid} encrypted_with=${srcKey.encryptedWith}; expected 3party")
+                }
+                val rawPrivateKeyBytes = syncJweCrypto.jweDecryptSymmetric(srcKey.encryptedPrivateKey, spMek)
+                val encryptedResult = nativeLib.encryptData(rawPrivateKeyBytes, newDdgKeys.secretKey).also {
+                    it.checkResult("Upgrade: libsodium encryption of re-wrapped key kid=${srcKey.kid} failed")
+                }
+                val wireEncryptedPrivateKey =
+                    Base64.encodeToString(encryptedResult.encryptedData, Base64.NO_WRAP).applyUrlSafetyFromB64()
+                ProtectedKeyEntry(
+                    kid = srcKey.kid,
+                    purpose = srcKey.purpose,
+                    encryptedWith = CREDENTIAL_ID_DDG,
+                    encryptedPrivateKey = wireEncryptedPrivateKey,
+                    publicKey = srcKey.publicKey,
+                )
+            }
+        }
+        val firstFailure = rewrappedKeys.firstOrNull { it.isFailure }
+        if (firstFailure != null) {
+            val cause = firstFailure.exceptionOrNull()
+            logcat(ERROR) { "Sync-ScopedToken: failed to re-wrap one or more protected keys for upgrade: ${cause?.message}" }
+            return Error(reason = "Upgrade: re-wrap key failed: ${cause?.message}")
+        }
+        val rewrappedKeysList = rewrappedKeys.map { it.getOrThrow() }
+
+        // hashedPassword (re-auth against the existing 3party credential) — same HKDF derivation
+        // we used at /sync/login. Per Sync API docs, the POST /access-credentials/{id} body carries
+        // hashed_password as a re-auth of ANY existing credential, allowing the server to decrypt
+        // the e2ee_id and accept the new credential atomically.
+        val hashedPasswordForReauth = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(spStandardB64, hkdfSalt, "Password", 32) }
+            .getOrElse { return Error(reason = "Upgrade: failed to derive 3party hashed_password: ${it.message}") }
+
+        // credentialHashedPassword for the new DDG credential — libsodium/Argon2, the same derivation
+        // performCreateAccount uses for standard signup. Keeping every ddg credential libsodium-hashed
+        // means the standard performLogin path works for both signup-created and upgrade-created
+        val request = CreateAccessCredentialRequest(
+            hashedPassword = hashedPasswordForReauth,
+            credentialHashedPassword = newDdgKeys.passwordHash,
+            protectedEncryptionKey = newDdgKeys.protectedSecretKey,
+            encrypted3partyCredential = encryptedThreePartyCredential,
+            keys = rewrappedKeysList.ifEmpty { null },
+        )
+
+        return Success(
+            ThirdPartyUpgradePackage(
+                newDdgKeys = newDdgKeys,
+                rewrappedKeys = rewrappedKeysList,
+                request = request,
+            ),
+        )
+    }
+
+    override suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean> {
+        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
+            return Error(reason = "JoinFrom3party: canUseV2ConnectFlow is disabled")
+        }
+
+        logcat { "Sync-ScopedToken: joining account via 3party recovery code" }
+
+        val parsed = parseThirdPartyRecoveryCode(pastedCode)
+            ?: return Error(reason = "JoinFrom3party: code is not a valid 3party recovery code")
+
+        val deviceId = syncDeviceIds.deviceId()
+        val deviceName = syncDeviceIds.deviceName()
+
+        // Step 2 — authenticate against the 3party credential.
+        val loginResponse = when (val loginResult = performThirdPartyLogin(parsed, deviceId)) {
+            is Error -> return loginResult.copy(reason = "JoinFrom3party: ${loginResult.reason}")
+            is Success -> loginResult.data
+        }
+
+        // Step 2a — "Does it need an upgrade?" check per Unified Algorithm (Asana 1214739740392701,
+        // "Native only - Upgrading 3party account"). The /sync/login response includes the account's
+        // current access_credentials, so we can detect a pre-existing ddg credential without a
+        // separate GET. If ddg already exists, abort with the spec-defined error rather than letting
+        // the flow fail downstream with a misleading message.
+        val accountAlreadyHasDdg = loginResponse.accessCredentials.orEmpty().any { it.id == CREDENTIAL_ID_DDG }
+        if (accountAlreadyHasDdg) {
+            logcat(WARN) { "Sync-ScopedToken: account already has a ddg credential — cannot re-upgrade from 3party" }
+            return Error(
+                code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
+                reason = "JoinFrom3party: account already upgraded. " +
+                    "Please use one of the already connected Native DDG Applications to add another one.",
+            )
+        }
+
+        // Only 3party-encrypted keys are re-wrappable from this login. Defensive filter: the BE
+        // returns every key the account has, including any encrypted_with=ddg entries from a prior
+        // upgrade attempt. Without the Step 2a check above those would be caught here too, but
+        // filtering also future-proofs against unknown credential types appearing in the response.
+        val keysFromLogin = loginResponse.keys.orEmpty().filter { it.encryptedWith == CREDENTIAL_ID_3PARTY }
+        logcat { "Sync-ScopedToken: 3party /sync/login OK, ${keysFromLogin.size} key(s) to re-wrap" }
+
+        // Steps 3 + 4 + 5 — build the upgrade payload locally.
+        val upgradePackage = when (val pkg = buildThirdPartyUpgradePackage(parsed, keysFromLogin)) {
+            is Error -> return pkg.copy(reason = "JoinFrom3party: ${pkg.reason}")
+            is Success -> pkg.data
+        }
+
+        // Step 6 — POST /access-credentials/ddg. If interrupted mid-flight, the BE's 5-minute TTL
+        // on newly-minted credentials cleans up the orphan automatically (Unified Algorithm,
+        // Backend-supported Alternative). No client-side reconcile needed.
+        val postResult = retryingOnTransientError {
+            syncApi.createAccessCredential(loginResponse.token, CREDENTIAL_ID_DDG, upgradePackage.request)
+        }
+        if (postResult is Error) {
+            if (postResult.code == API_CODE.COUNT_LIMIT.code) {
+                // 409 credential_already_exists: either another device beat us to creating a ddg
+                // credential, OR a previous attempt by this device crashed mid-flight and the BE
+                // will auto-remove the orphan after its 5-minute TTL.
+                logcat(WARN) { "Sync-ScopedToken: 409 — account already has a ddg credential" }
+                return Error(
+                    code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
+                    reason = "JoinFrom3party: account already has a ddg credential. " +
+                        "Please use one of the already connected Native DDG Applications to add another one.",
+                )
+            }
+            logcat(ERROR) { "Sync-ScopedToken: /access-credentials/ddg POST failed: ${postResult.reason}" }
+            return postResult.copy(
+                code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code,
+                reason = "JoinFrom3party: ${postResult.reason}",
+            )
+        }
+
+        // Step 7 — Native login as the new ddg credential. Required: without a login inside the
+        // 5-minute TTL the BE auto-removes the credential, and the 3party token from Step 2 is
+        // ai_chats-scoped so it can't drive device-management endpoints.
+        val ddgLoginResult = retryingOnTransientError {
+            performLogin(
+                userId = parsed.userId,
+                deviceId = deviceId,
+                deviceName = deviceName,
+                primaryKey = upgradePackage.newDdgKeys.primaryKey,
+            )
+        }
+        if (ddgLoginResult is Error) {
+            if (ddgLoginResult.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
+                logcat(ERROR) {
+                    "Sync-ScopedToken: ddg login after upgrade returned 401 — credential 5-minute TTL likely expired"
+                }
+            } else {
+                logcat(ERROR) { "Sync-ScopedToken: ddg login after upgrade failed: ${ddgLoginResult.reason}" }
+            }
+            return ddgLoginResult.copy(reason = "JoinFrom3party: post-upgrade ddg login failed: ${ddgLoginResult.reason}")
+        }
+
+        // Defensive: performLogin will also set scopedPassword if the BE echoes back the new
+        // credential's encrypted_3party_credential, but we have the SP in hand from the pasted
+        // recovery code. Writing it locally guarantees scopedPassword is populated independent
+        // of the server response shape.
+        kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
+            .onSuccess { syncStore.scopedPassword = ScopedPassword(it) }
+            .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to write local SP after upgrade: ${it.message}" } }
+
+        logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
+        return Success(true)
+    }
+
     override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Logout: Token Empty").alsoFireLogoutErrorPixel()
@@ -604,46 +936,93 @@ class AppSyncAccountRepository @Inject constructor(
         val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "PrimaryKey not found")
 
-        return when (val result = syncApi.getDevices(token)) {
-            is Error -> {
-                connectedDevicesCached.clear()
-                result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-            }
-
-            is Success -> {
-                return Success(
-                    result.data.mapNotNull { device ->
-                        try {
-                            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
-                            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
-                                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
-                            } ?: DeviceType()
-
-                            ConnectedDevice(
-                                thisDevice = syncStore.deviceId == device.deviceId,
-                                deviceName = decryptedDeviceName,
-                                deviceId = device.deviceId,
-                                deviceType = decryptedDeviceType,
-                            )
-                        } catch (throwable: Throwable) {
-                            throwable.asErrorResult().alsoFireAccountErrorPixel()
-                            if (syncStore.deviceId != device.deviceId) {
-                                logout(device.deviceId)
-                            }
-                            null
-                        }
-                    }.sortedWith { a, b ->
-                        if (a.thisDevice) -1 else 1
-                    }.also { devices ->
-                        connectedDevicesCached.apply {
-                            clear()
-                            addAll(devices)
-                        }
-                        connectedDevicesObserver.onDevicesUpdated(devices)
-                    },
-                )
-            }
+        return if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+            getConnectedDevicesV2(token, primaryKey)
+        } else {
+            getConnectedDevicesLegacy(token, primaryKey)
         }
+    }
+
+    private fun getConnectedDevicesV2(
+        token: String,
+        primaryKey: String,
+    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
+        is Error -> {
+            connectedDevicesCached.clear()
+            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
+        }
+        is Success -> {
+            val entriesV2 = result.data.entriesV2
+            val devices = if (entriesV2 != null) {
+                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2)
+                logoutFailedV2Devices(decryptResult.undecryptable)
+                decryptResult.decrypted.map { it.toConnectedDevice() }
+            } else {
+                // entries_v2 missing
+                decryptLegacyEntries(result.data.entries, primaryKey)
+            }
+            finishWith(devices)
+        }
+    }
+
+    private fun logoutFailedV2Devices(deviceIds: List<String>) {
+        val thisDeviceId = syncStore.deviceId
+        deviceIds.forEach { id ->
+            if (id != thisDeviceId) logout(id)
+        }
+    }
+
+    private fun getConnectedDevicesLegacy(
+        token: String,
+        primaryKey: String,
+    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
+        is Error -> {
+            connectedDevicesCached.clear()
+            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
+        }
+        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey))
+    }
+
+    private fun decryptLegacyEntries(
+        devices: List<Device>,
+        primaryKey: String,
+    ): List<ConnectedDevice> = devices.mapNotNull { device ->
+        try {
+            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
+            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
+                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
+            } ?: DeviceType()
+
+            ConnectedDevice(
+                thisDevice = syncStore.deviceId == device.deviceId,
+                deviceName = decryptedDeviceName,
+                deviceId = device.deviceId,
+                deviceType = decryptedDeviceType,
+            )
+        } catch (throwable: Throwable) {
+            throwable.asErrorResult().alsoFireAccountErrorPixel()
+            if (syncStore.deviceId != device.deviceId) {
+                logout(device.deviceId)
+            }
+            null
+        }
+    }
+
+    private fun DecryptedDevice.toConnectedDevice(): ConnectedDevice = ConnectedDevice(
+        thisDevice = syncStore.deviceId == deviceId,
+        deviceName = name,
+        deviceId = deviceId,
+        deviceType = type?.takeUnless { it.isEmpty() }?.let { DeviceType(it) } ?: DeviceType(),
+    )
+
+    private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> {
+        val sorted = devices.sortedWith { a, _ -> if (a.thisDevice) -1 else 1 }
+        connectedDevicesCached.apply {
+            clear()
+            addAll(sorted)
+        }
+        connectedDevicesObserver.onDevicesUpdated(sorted)
+        return Success(sorted)
     }
 
     override fun isSignedIn() = syncStore.isSignedIn()
@@ -729,14 +1108,22 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
-        val result = syncApi.createAccount(
-            account.userId,
-            account.passwordHash,
-            account.protectedSecretKey,
-            deviceId,
-            encryptedDeviceName,
-            encryptedDeviceType,
-        )
+        val credentialId = if (syncFeature.canUseV2ConnectFlow().isEnabled()) CREDENTIAL_ID_DDG else null
+
+        val result = try {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
+            syncApi.createAccount(
+                account.userId,
+                account.passwordHash,
+                account.protectedSecretKey,
+                deviceId,
+                encryptedDeviceName,
+                encryptedDeviceType,
+                credentialId,
+            )
+        } finally {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
+        }
 
         return when (result) {
             is Error -> {
@@ -745,11 +1132,75 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                syncEngine.triggerSync(ACCOUNT_CREATION)
+                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+                    logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
+                    syncStore.credentialId = CREDENTIAL_ID_DDG
+                }
+                try {
+                    runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
+                    syncEngine.triggerSync(ACCOUNT_CREATION)
+                } finally {
+                    runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
+                }
                 logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)
             }
         }
+    }
+
+    /**
+     * Authenticates against the server using a parsed 3party recovery code
+     * and returns the LoginResponse so the caller can use the token + keys[] to perform the
+     * subsequent POST /access-credentials/ddg upgrade.
+     *
+     * The returned token is short-lived and ONLY used to mint the new ddg credential — it is
+     * never persisted to SyncStore (atomic commit happens after the full upgrade succeeds).
+     *
+     * Wire body per Sync API docs (POST /sync/login):
+     *   hashed_password = HKDF-SHA-256(SP, salt=user_id_utf8, info="Password", 32) → base64url
+     *                     (Encryption Algorithms TD, Asana 1214802412121967, §"Hashed password derivation")
+     *   scope           = "ai_chats" — the canonical scope for 3party-restricted credentials
+     *   device_name,
+     *   device_type     = libsodium-encrypted with SP-as-key (mirrors the existing ddg pattern;
+     *                     server treats these as opaque blobs)
+     *
+     * Response carries token + keys[] for downstream re-wrap. NO protected_encryption_key —
+     * 3party credentials don't carry one (Sync API docs, POST /sync/login Notes).
+     */
+    private fun performThirdPartyLogin(
+        parsed: ThirdPartyRecoveryCode,
+        deviceId: String,
+    ): Result<LoginResponse> {
+        // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect
+        // standard base64 input. Convert at the boundary.
+        val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
+            .getOrElse { return Error(reason = "3party login: failed to decode SP: ${it.message}") }
+
+        val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
+        val hashedPassword = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(spStandardB64, hkdfSalt, "Password", 32) }
+            .getOrElse { return Error(reason = "3party login: failed to derive hashed_password: ${it.message}") }
+
+        val deviceName = syncDeviceIds.deviceName()
+        val deviceType = syncDeviceIds.deviceType()
+        val encryptedDeviceName = kotlin.runCatching {
+            nativeLib.encryptData(deviceName, spStandardB64).also {
+                it.checkResult("3party login: encrypting device name failed")
+            }.encryptedData
+        }.getOrElse { return it.asErrorResult() }
+        val encryptedDeviceType = kotlin.runCatching {
+            nativeLib.encryptData(deviceType.deviceFactor, spStandardB64).also {
+                it.checkResult("3party login: encrypting device type failed")
+            }.encryptedData
+        }.getOrElse { return it.asErrorResult() }
+
+        return syncApi.login(
+            userID = parsed.userId,
+            hashedPassword = hashedPassword,
+            deviceId = deviceId,
+            deviceName = encryptedDeviceName,
+            deviceType = encryptedDeviceType,
+            scope = SYNC_SCOPE_AI_CHATS,
+        )
     }
 
     private fun performLogin(
@@ -787,8 +1238,12 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Success -> {
+                // protectedEncryptionKey is required for ddg logins (it carries the protected secretKey).
+                // Absence here is not recoverable.
+                val protectedEncryptionKey = result.data.protected_encryption_key
+                    ?: return Error(reason = "Login: server returned no protected_encryption_key for ddg credential")
                 val decryptResult = kotlin.runCatching {
-                    nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey).also {
+                    nativeLib.decrypt(protectedEncryptionKey, preLogin.stretchedPrimaryKey).also {
                         it.checkResult("Login: decrypt protection keys failed")
                     }
                 }.getOrElse { throwable ->
@@ -796,6 +1251,34 @@ class AppSyncAccountRepository @Inject constructor(
                 }
 
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
+
+                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+                    logcat { "Sync-ScopedToken: login response has v2 data, storing" }
+                    syncStore.credentialId = CREDENTIAL_ID_DDG
+                    result.data.accessCredentials?.let { credentials ->
+                        logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
+                        val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
+                        val encryptedSp = thirdParty?.encryptedCredential
+                        if (encryptedSp != null) {
+                            // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
+                            val decryptedSp = kotlin.runCatching {
+                                val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
+                                val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
+                                base64UrlStringToStandardBase64(b64Url)
+                            }.getOrElse {
+                                logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
+                                null
+                            }
+                            if (decryptedSp != null) {
+                                syncStore.scopedPassword = ScopedPassword(decryptedSp)
+                            }
+                        }
+                    }
+                    result.data.keys?.let { keys ->
+                        logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
+                    }
+                }
+
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     syncEngine.triggerSync(ACCOUNT_LOGIN)
                 }
@@ -859,10 +1342,37 @@ class AppSyncAccountRepository @Inject constructor(
         return this
     }
 
+    private suspend fun <T> retryingOnTransientError(block: () -> Result<T>): Result<T> {
+        var attempt = 0
+        while (true) {
+            val result = block()
+            val code = (result as? Error)?.code
+            if (code != null && isRetryableTransient(code) && attempt < MAX_UPGRADE_RETRIES) {
+                attempt++
+                logcat { "Sync-ScopedToken: upgrade call transient error (code=$code); retry $attempt/$MAX_UPGRADE_RETRIES" }
+                delay(upgradeRetryDelayMillis * attempt)
+                continue
+            }
+            return result
+        }
+    }
+
+    private fun isRetryableTransient(code: Int): Boolean =
+        code == API_CODE.TOO_MANY_REQUESTS_1.code || // 429
+            code == API_CODE.TOO_MANY_REQUESTS_2.code || // 418
+            code in 500..599 || // server errors
+            code == AccountErrorCodes.GENERIC_ERROR.code // -1 == transport/IO exception in this context
+
+    companion object {
+        const val MAX_UPGRADE_RETRIES = 3
+        private const val DEFAULT_UPGRADE_RETRY_DELAY_MILLIS = 1_000L
+    }
+
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
+            val thirdPartyRecoveryCodeAdapter: JsonAdapter<ThirdPartyRecoveryCodeWrapper> = moshi.adapter(ThirdPartyRecoveryCodeWrapper::class.java)
 
             val invitationCodeAdapter: JsonAdapter<InvitationCodeWrapper> = moshi.adapter(InvitationCodeWrapper::class.java)
             val invitedDeviceAdapter: JsonAdapter<InvitedDeviceDetails> = moshi.adapter(InvitedDeviceDetails::class.java)
@@ -870,20 +1380,37 @@ class AppSyncAccountRepository @Inject constructor(
     }
 }
 
-private fun SyncCryptoResult.checkResult(errorMessage: String) {
+// Credential IDs known to the Sync API. Used in URL paths (e.g. POST /access-credentials/3party),
+// as the local credentialId marker in SyncStore, and as the credential_id field in 3party
+// recovery codes.
+internal const val CREDENTIAL_ID_DDG = "ddg"
+internal const val CREDENTIAL_ID_3PARTY = "3party"
+
+// Scope values for the /sync/login `scope` parameter. Absent / null means unrestricted (defaults
+// to "sync"). Per Sync API docs (POST /sync/login Notes), "ai_chats" is the canonical scope used
+// when authenticating against a 3party-restricted credential.
+internal const val SYNC_SCOPE_AI_CHATS = "ai_chats"
+
+// Recovery code version emitted in v2 recovery codes per the Recovery Payload Shape RFC
+// (Asana 1214804486778180). Format is "major.minor" — clients in major version 2 accept 2.x
+// codes (ignoring unknown fields) and must reject codes with major version >2.
+internal const val RECOVERY_CODE_V2 = "2.0"
+internal const val RECOVERY_CODE_MAJOR_V2 = "2"
+
+internal fun SyncCryptoResult.checkResult(errorMessage: String) {
     if (result != 0) {
         throw SyncAccountException(this.result, errorMessage)
     }
 }
 
-private fun Throwable.asErrorResult(): Error {
+internal fun Throwable.asErrorResult(): Error {
     return when (this) {
         is SyncAccountException -> Error(code = this.code, reason = this.message.toString())
         else -> Error(reason = this.message.toString())
     }
 }
 
-private class SyncAccountException(
+internal class SyncAccountException(
     val code: Int,
     message: String,
 ) : Exception(message)
@@ -905,6 +1432,27 @@ data class LinkCode(
 data class RecoveryCode(
     @field:Json(name = "primary_key") val primaryKey: String,
     @field:Json(name = "user_id") val userId: String,
+)
+
+/**
+ * 3party recovery code envelope. Shares the `recovery` top-level key with [LinkCode];
+ * versions are disambiguated by the inner `v` field per Asana 1214804486778180.
+ */
+data class ThirdPartyRecoveryCodeWrapper(
+    val recovery: ThirdPartyRecoveryCode,
+)
+
+/**
+ * v2 recovery code payload per Asana 1214804486778180, used for both `cid` values. Outer JSON is
+ * base64url-encoded for transport. The `secret` encoding depends on the credential: 3party uses
+ * base64url of the 32 raw SP bytes; ddg carries the v1 primary_key verbatim (standard base64).
+ * Serialized with Moshi (never org.json) so forward slashes in the secret are not escaped to `\/`.
+ */
+data class ThirdPartyRecoveryCode(
+    @field:Json(name = "user_id") val userId: String,
+    val secret: String,
+    val cid: String,
+    val v: String,
 )
 
 data class InvitationCodeWrapper(
@@ -942,6 +1490,28 @@ enum class AccountErrorCodes(val code: Int) {
     CONNECT_FAILED(54),
     INVALID_CODE(55),
     EXCHANGE_FAILED(56),
+    THIRD_PARTY_ALREADY_UPGRADED(57),
+    PAIRING_REJECTED(58),
+    PAIRING_UNAVAILABLE(59),
+    PAIRING_CANCELLED(60),
+    NEGOTIATION_ABORTED(61),
+    NO_RECOVERY_CODE(62),
+    PAIRING_FAILED(63),
+    UNEXPECTED_EVENT(64),
+    SESSION_TIMEOUT(65),
+    ACCOUNT_CREATION_FAILED(66),
+    ACCOUNT_UPGRADE_FAILED(67),
+    RECOVERY_CODE_PREPARATION_FAILED(68),
+    MISSING_3PARTY_CREDENTIAL(69),
+    UNDECRYPTABLE_3PARTY_CREDENTIAL(70),
+    ACCOUNT_EXTEND_FAILED(71),
+    MISSING_3PARTY_KEY(72),
+    LOCAL_STORAGE_FAILED(73),
+    PEER_RECOVERY_CODE_UNAVAILABLE(74),
+    ALREADY_PAIRED(75),
+    UNEXPECTED_SECOND_HELLO(76),
+    PAIRING_SESSION_NOT_READY(77),
+    RELAY_CHANNEL_UNAVAILABLE(78),
 }
 
 sealed interface SyncAuthCode {

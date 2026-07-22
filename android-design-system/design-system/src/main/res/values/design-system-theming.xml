@@ -78,6 +78,7 @@
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>
+        <item name="daxButtonDestructiveSecondary">@style/Widget.DuckDuckGo.DaxButton.DestructiveSecondary</item>
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
         <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt</item>
@@ -89,6 +90,15 @@
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
 
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
+
+        <!-- Global TextInputLayout style for raw TextInputLayout instances (e.g. third-party
+             libraries like pdf-viewer). DaxTextInput is NOT affected — it uses a hardcoded
+             style="@style/Widget.DuckDuckGo.TextInput" and does not resolve textInputStyle.
+             Temporary: needed because pdf-viewer alpha08 creates its password dialog with
+             requireActivity() context, inheriting colorPrimary=daxColorBackground which makes
+             cursor and focused label invisible. Will be removable when upgrading to a newer
+             pdf-viewer version after the Kotlin 2.x migration. -->
+        <item name="textInputStyle">@style/Widget.DuckDuckGo.ThirdPartyTextInput</item>
     </style>
 
     <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />
@@ -126,10 +136,21 @@
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
+        <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
+        <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
+        <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
+        <item name="daxColorFireModeAccentDarkTranslucent">@color/mandarin40_translucent</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorAccentBlue</item>
+        <item name="daxColorOmnibarAccentContent">@color/white</item>
+        <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
+        <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.None</item>
+        <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.None</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
@@ -175,6 +196,7 @@
         <item name="daxColorSurface">@color/background_surface_dark</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
+        <item name="daxColorDuckAiBackground">@color/background_duck_ai_dark</item>
         <item name="daxColorPrimaryText">@color/text_primary_dark</item>
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/text_secondary_dark</item>
@@ -201,6 +223,8 @@
         <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_dark</item>
         <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_dark</item>
         <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_dark</item>
+        <item name="daxColorControlRaisedFillPrimary">@color/white18</item>
+        <item name="daxColorControlRaisedBackdrop">@color/white12</item>
 
         <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
@@ -234,7 +258,7 @@
         <item name="daxColorButtonGhostAltText">@color/white84</item>
         <item name="daxColorButtonGhostAltTextPressed">@color/white84</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkDefault</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
@@ -245,6 +269,8 @@
         <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryText">@color/blue70</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
+        <item name="daxColorAccentAltPrimary">@color/blue60</item>
+        <item name="daxColorAccentAltContentPrimary">@color/blue0</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -311,6 +337,7 @@
         <item name="daxColorSurface">@color/background_surface_light</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/background_window_light</item>
+        <item name="daxColorDuckAiBackground">@color/background_duck_ai_light</item>
         <item name="daxColorPrimaryText">@color/text_primary_light</item>
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/text_secondary_light</item>
@@ -337,6 +364,8 @@
         <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_light</item>
         <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_light</item>
         <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_light</item>
+        <item name="daxColorControlRaisedFillPrimary">@color/white</item>
+        <item name="daxColorControlRaisedBackdrop">@color/black9</item>
 
         <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
@@ -362,7 +391,7 @@
         <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault_18</item>
         <item name="daxColorButtonGhostAltContainerPressed">@color/black6</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
@@ -382,6 +411,8 @@
         <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryText">@color/blue70</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
+        <item name="daxColorAccentAltPrimary">@color/blue0</item>
+        <item name="daxColorAccentAltContentPrimary">@color/blue80</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray60</item>
@@ -445,6 +476,15 @@
         <item name="windowSplashScreenBackground">@color/gray0</item>
         <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Light</item>
     </style>
+
+    <!--
+      Splash-screen theme variant for edge-to-edge screens (e.g. SystemSearchActivity,
+      WidgetThemeConfiguration). Portrait keeps the splash defaults; the values-land override sets
+      layoutInDisplayCutoutMode to "never" so in landscape the cutout renders as a dark letterbox
+      instead of the window background bleeding into it (the base splash theme forces "shortEdges",
+      which otherwise overrides the runtime cutout handling).
+    -->
+    <style name="Theme.DuckDuckGo.SplashScreen.EdgeToEdge" parent="Theme.DuckDuckGo.SplashScreen" />
 
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>

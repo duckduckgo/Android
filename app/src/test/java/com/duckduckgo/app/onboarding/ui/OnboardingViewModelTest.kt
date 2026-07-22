@@ -16,22 +16,39 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
@@ -42,7 +59,7 @@ class OnboardingViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private var userStageStore: UserStageStore = mock()
+    private val userStageStore: UserStageStore = mock()
 
     private val pageLayout: OnboardingPageManager = mock()
 
@@ -50,7 +67,19 @@ class OnboardingViewModelTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
+    private val dismissedCtaDao: DismissedCtaDao = mock()
+
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
+    // Brand design update off by default -> legacy WelcomePage path (orchestrator does not drive the run).
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock {
+        on { brandDesignUpdate() } doReturn disabledToggle
+    }
+
+    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock()
+
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
 
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
@@ -59,14 +88,55 @@ class OnboardingViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
-            newAddressBarOptionManager = newAddressBarOptionManager,
+            dismissedCtaDao = dismissedCtaDao,
+            onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
+            linearOnboardingOrchestrator = linearOnboardingOrchestrator,
+            duckAiOnboardingDemo = duckAiOnboardingDemo,
         )
     }
 
     @Test
-    fun whenOnboardingDoneThenCompleteStage() = runTest {
+    fun whenOnboardingDoneAndBrandDesignUpdateDisabledThenCompleteStage() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.onOnboardingDone()
+
         verify(userStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
+    fun whenOnboardingDoneAndBrandDesignUpdateEnabledThenAppStageNotWrittenButExtendedFlowStillApplied() = runTest {
+        // The orchestrator owns the terminal AppStage write on the BrandDesignUpdate page.
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        testee.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+
+        verify(userStageStore, never()).stageCompleted(any())
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDefaultFlowThenNoCtasDismissedAndDemoNotArmed() = runTest {
+        testee.onOnboardingDone()
+
+        verifyNoInteractions(dismissedCtaDao)
+        verify(duckAiOnboardingDemo, never()).arm()
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDuckAiFocusedFlowThenDemoIsArmed() = runTest {
+        testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+
+        verify(duckAiOnboardingDemo).arm()
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDefaultWithoutIntroCtaFlowThenOnlyIntroCtaIsDismissed() = runTest {
+        testee.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
+        verifyNoMoreInteractions(dismissedCtaDao)
+        verify(duckAiOnboardingDemo, never()).arm()
     }
 
     @Test
@@ -85,17 +155,62 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenOnOnboardingSkippedCalledThenMarkOnboardingAsCompleted() = runTest {
+    fun whenOnOnboardingSkippedAndBrandDesignUpdateDisabledThenMarkOnboardingAsCompleted() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.onOnboardingSkipped()
+
         verify(onboardingSkipper).markOnboardingAsCompleted()
     }
 
     @Test
-    fun whenDevOnlyFullyCompleteAllOnboardingCalledThenMarkOnboardingAsCompletedAndSetAsShown() = runTest {
-        testee.devOnlyFullyCompleteAllOnboarding()
+    fun whenOnOnboardingSkippedAndBrandDesignUpdateEnabledThenSkipperNotInvoked() = runTest {
+        // The orchestrator owns the skip terminal write on the BrandDesignUpdate page.
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
 
+        testee.onOnboardingSkipped()
+
+        verify(onboardingSkipper, never()).markOnboardingAsCompleted()
+    }
+
+    @Test
+    fun whenDevSkipAndBrandDesignUpdateDisabledThenMarkOnboardingAsCompletedAndCallerNavigates() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
+        val callerNavigates = testee.devOnlyFullyCompleteAllOnboarding()
+
+        assertTrue(callerNavigates)
         verify(onboardingSkipper).markOnboardingAsCompleted()
-        verify(newAddressBarOptionManager).setAsShown()
+        verify(linearOnboardingOrchestrator, never()).onEvent(any())
+    }
+
+    @Test
+    fun whenDevSkipAndBrandDesignUpdateEnabledThenAbortsOrchestratorAndCallerDoesNotNavigate() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        val callerNavigates = testee.devOnlyFullyCompleteAllOnboarding()
+
+        assertFalse(callerNavigates)
+        verify(linearOnboardingOrchestrator).onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+        verify(onboardingSkipper, never()).markOnboardingAsCompleted()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndBrandDesignUpdateDisabledThenBuildPageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildPageBlueprints()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndBrandDesignUpdateEnabledThenBuildBrandDesignUpdatePageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildBrandDesignUpdatePageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

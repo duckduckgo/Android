@@ -84,10 +84,6 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc i wsparcie</string>
     <string name="subscriptionSettingSendFeedback">Wyślij opinię</string>
     <string name="subscriptionSettingActivating">Aktywacja</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Zaoszczędź %1$s%% z planem rocznym</string>
-    <!-- smartling.character_limit = 10 -->
-    <string name="subscriptionSettingSwitchUpgradePill">Najlepsza oferta</string>
-    <string name="subscriptionSettingSwitchDowngrade">Zmień plan</string>
     <string name="subscriptionSettingManagePlan">Zarządzaj płatnością</string>
 
     <!--Purchase Subscriptions-->
@@ -108,8 +104,8 @@
     <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Konto Apple &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktywuj Privacy Pro na komputerze, aby skonfigurować usługę Personal Information Removal</string>
-    <string name="pirDescription">W przeglądarce DuckDuckGo na komputerze wybierz kolejno <b>Ustawienia &gt; Privacy Pro</b> i kliknij opcję <b>Mam subskrypcję</b>, aby rozpocząć.</string>
+    <string name="pirTitle">Aktywuj subskrypcję DuckDuckGo na komputerze, aby skonfigurować usługę Personal Information Removal</string>
+    <string name="pirDescription">W przeglądarce DuckDuckGo na komputerze przejdź do <b>Ustawień &gt; Subskrybuj DuckDuckGo</b> i kliknij <b>Mam subskrypcję</b>, aby zacząć.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +148,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Połączenie z doradcą nie pomogło</string>
     <string name="feedbackSubCategoryItrOther">Inne</string>
 
-    <string name="feedbackSubCategorySubsOtp">Hasło jednorazowe</string>
-    <string name="feedbackSubCategorySubsOther">Inne</string>
+    <string name="feedbackSubCategorySubsOtp">Problem z hasłem jednorazowym</string>
+    <string name="feedbackSubCategorySubsOther">Coś innego</string>
 
     <string name="feedbackSubmitVpnHeader">Wystąpił problem, który nie został omówiony w naszym <annotation type="faqs_link">centrum pomocy</annotation>? Zdecydowanie chcemy o tym wiedzieć.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Powiedz nam, co się dzieje…</string>
@@ -169,7 +165,6 @@
     <string name="activitySubscriptions">Subskrypcje</string>
     <string name="activitySubscriptionSettings">Ustawienia subskrypcji</string>
     <string name="activityActivateSubscription">Mam subskrypcję</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Wyślij opinię</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subskrybenci otrzymują VPN, zaawansowane modele sztucznej inteligencji w Duck.ai, usługi Personal Information Removal oraz Identity Theft Restoration.</string>
@@ -185,14 +180,27 @@
 
     <string name="feedbackGeneralSubscription">Subskrypcja</string>
 
-    <!-- Switch plan-->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Zaoszczędź %1$s%%\nz planem rocznym!</string>
-    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Plan roczny kosztuje tylko %1$s/mies., w porównaniu do Twojego obecnego planu miesięcznego za %2$s.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Przełącz na plan roczny (%1$s/rok)</string>
-    <string name="switchBottomSheetSecondaryButtonUpgrade">Zachowaj miesięczny plan</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Oszczędzasz %1$s%% \nz planem rocznym!</string>
-    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Zmiana zwiększy Twoją miesięczną opłatę z %1$s/mies. do %2$s/mies.</string>
-    <string name="switchBottomSheetPrimaryButtonDowngrade">Zachowaj plan roczny</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Przejdź na plan miesięczny (%1$s/miesiąc)</string>
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Brak dostępu do funkcji poziomu Plus lub Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Przejdź na poziom Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Odblokuj bardziej wydajną sztuczną inteligencję</string>
+    <string name="subscriptionSettingSectionManageSubscription">Zarządzaj subskrypcją</string>
+    <string name="subscriptionSettingViewAllPlans">Zobacz wszystkie plany</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Zarządzaj płatnością lub anuluj</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">W dniu %2$s Twój plan zostanie obniżony do poziomu %1$s.</string>
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Twój plan zostanie zaktualizowany do %1$s w dniu %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">W dniu %2$s Twój plan zostanie obniżony do poziomu %1$s.</string>
+    <string name="planNamePlusMonthly">Plus Miesięczny</string>
+    <string name="planNamePlusYearly">Plus roczny</string>
+    <string name="planNameProMonthly">Pro miesięczny</string>
+    <string name="planNameProYearly">Pro roczny</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
+    <!-- Content Descriptions -->
+    <string name="subscriptionExpiredStatusIconContentDescription">Subskrypcja wygasła</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Subskrypcja aktywna</string>
 
 </resources>

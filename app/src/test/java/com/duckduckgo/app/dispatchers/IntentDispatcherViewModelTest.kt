@@ -19,16 +19,24 @@ package com.duckduckgo.app.dispatchers
 import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
+import com.duckduckgo.app.browser.pdf.LocalPdfResult
+import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.customtabs.api.CustomTabDetector
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import kotlinx.coroutines.test.runTest
@@ -43,6 +51,8 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -50,27 +60,36 @@ class IntentDispatcherViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val mockCustomTabDetector: CustomTabDetector = mock()
     private val mockIntent: Intent = mock()
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val syncUrlIdentifier: SyncUrlIdentifier = mock()
+    private val duckChat: DuckChat = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val inlinePdfHandler: InlinePdfHandler = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
 
     @Before
     fun before() {
         testee = IntentDispatcherViewModel(
-            customTabDetector = mockCustomTabDetector,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             emailProtectionLinkVerifier = emailProtectionLinkVerifier,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             syncUrlIdentifier = syncUrlIdentifier,
+            duckChat = duckChat,
             appBuildConfig = mockAppBuildConfig,
+            inlinePdfHandler = inlinePdfHandler,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
+        val pdfViewerToggle = mockToggle(enabled = false)
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(pdfViewerToggle)
+        val externalPdfHandlerToggle = mockToggle(enabled = false)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(externalPdfHandlerToggle)
     }
 
     @Test
@@ -229,6 +248,37 @@ class IntentDispatcherViewModelTest {
     }
 
     @Test
+    fun `when Intent received with session and intent text is a duck ai url then custom tab is not requested`() = runTest {
+        val text = "https://duck.ai/?q=hello"
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckChat.isDuckChatUrl(text.toUri())).thenReturn(true)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
+            assertEquals(text, state.intentText)
+        }
+    }
+
+    @Test
+    fun `when Intent received with session and intent text is not a duck ai url then custom tab is requested`() = runTest {
+        val text = "https://example.com"
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckChat.isDuckChatUrl(text.toUri())).thenReturn(false)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
+        }
+    }
+
+    @Test
     fun whenIntentReceivedForSyncPairingUrlThenCustomTabIsNotRequested() = runTest {
         val intentUrl = SyncBarcodeUrl.URL_BASE
         whenever(mockIntent.intentText).thenReturn(intentUrl)
@@ -270,12 +320,151 @@ class IntentDispatcherViewModelTest {
         }
     }
 
+    @Test
+    fun `when VIEW intent with application pdf type and content URI and flags enabled then activityParams targets PdfViewerActivity`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
+        val cachedUri = Uri.parse("file:///data/user/0/com.example/cache/pdf_cache/doc.pdf")
+        val enabledToggle = mockToggle(enabled = true)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn("application/pdf")
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
+        whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Success(cachedUri, "doc.pdf"))
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "doc.pdf", PdfViewerSource.EXTERNAL_INTENT), state.activityParams)
+            assertFalse(state.localPdfError)
+        }
+    }
+
+    @Test
+    fun `when VIEW intent with pdf path and null type and flags enabled then activityParams targets PdfViewerActivity`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/report.pdf")
+        val cachedUri = Uri.parse("file:///data/user/0/com.example/cache/pdf_cache/report.pdf")
+        val enabledToggle = mockToggle(enabled = true)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn(null)
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
+        whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Success(cachedUri, "report.pdf"))
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(PdfViewerActivityParams(cachedUri.toString(), "report.pdf", PdfViewerSource.EXTERNAL_INTENT), state.activityParams)
+        }
+    }
+
+    @Test
+    fun `when VIEW intent with application pdf type and flags enabled and cacheLocalPdf fails then localPdfError is true`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
+        val enabledToggle = mockToggle(enabled = true)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn("application/pdf")
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
+        whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Failure(PdfErrorType.UNKNOWN))
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.localPdfError)
+            assertNull(state.activityParams)
+        }
+    }
+
+    @Test
+    fun `when VIEW intent with application pdf type and pdfViewer flag disabled then not treated as local PDF`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
+        val disabledToggle = mockToggle(enabled = false)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn("application/pdf")
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(disabledToggle)
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertNull(state.activityParams)
+        }
+        verify(inlinePdfHandler, never()).cacheLocalPdf(any())
+    }
+
+    @Test
+    fun `when VIEW intent with application pdf type and externalPdfHandler flag disabled then not treated as local PDF`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
+        val enabledToggle = mockToggle(enabled = true)
+        val disabledToggle = mockToggle(enabled = false)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn("application/pdf")
+        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
+        whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(disabledToggle)
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertNull(state.activityParams)
+        }
+        verify(inlinePdfHandler, never()).cacheLocalPdf(any())
+    }
+
+    @Test
+    fun `when VIEW intent with application pdf type and sdk below 31 then not treated as local PDF`() = runTest {
+        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(contentUri)
+        whenever(mockIntent.type).thenReturn("application/pdf")
+
+        testee.onIntentReceived(mockIntent, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertNull(state.activityParams)
+        }
+        verify(inlinePdfHandler, never()).cacheLocalPdf(any())
+    }
+
+    @Test
+    fun `when ordinary https VIEW intent received then activityParams is null and normal flow proceeds`() = runTest {
+        val url = "https://example.com"
+        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
+        whenever(mockIntent.data).thenReturn(Uri.parse(url))
+        whenever(mockIntent.type).thenReturn(null)
+        configureHasSession(false)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertNull(state.activityParams)
+            assertEquals(url, state.intentText)
+        }
+    }
+
     private fun configureHasSession(returnValue: Boolean) {
         whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_SESSION)).thenReturn(returnValue)
     }
 
     private fun configureIsEmailProtectionLink(returnValue: Boolean) {
         whenever(emailProtectionLinkVerifier.shouldDelegateToInContextView(anyOrNull(), any())).thenReturn(returnValue)
+    }
+
+    private fun mockToggle(enabled: Boolean): Toggle {
+        val toggle: Toggle = mock()
+        whenever(toggle.isEnabled()).thenReturn(enabled)
+        return toggle
     }
 
     private companion object {

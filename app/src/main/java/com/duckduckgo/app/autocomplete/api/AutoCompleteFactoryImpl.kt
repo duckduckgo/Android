@@ -17,14 +17,14 @@
 package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
-import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -40,9 +40,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
-    private val autoCompleteRepository: AutoCompleteRepository,
-    private val tabRepository: TabRepository,
-    private val userStageStore: UserStageStore,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -52,15 +50,14 @@ class AutoCompleteFactoryImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : AutoCompleteFactory {
 
-    override fun create(config: AutoComplete.Config): AutoComplete {
+    override fun create(config: AutoComplete.Config, browserMode: BrowserMode): AutoComplete {
         return AutoCompleteApi(
             autoCompleteService = autoCompleteService,
             savedSitesRepository = savedSitesRepository,
             navigationHistory = navigationHistory,
             autoCompleteScorer = autoCompleteScorer,
-            autoCompleteRepository = autoCompleteRepository,
-            tabRepository = tabRepository,
-            userStageStore = userStageStore,
+            tabRepositoryProvider = tabRepositoryProvider,
+            browserMode = browserMode,
             autocompleteTabsFeature = autocompleteTabsFeature,
             duckChat = duckChat,
             history = history,
