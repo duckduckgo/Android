@@ -34,6 +34,21 @@
             android:name="com.duckduckgo.app.dev.settings.onboarding.OnboardingDevSettingsActivity"
             android:label="@string/onboardingDevSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
+        <!--
+            Internal-only: export the PIR foreground scan service so the local benchmark
+            harness (scripts/pir-benchmark) can trigger it via `adb shell am
+            start-foreground-service`. The shell cannot start a non-exported component even
+            on debuggable builds. This overlay applies ONLY to the internal flavor; Play and
+            F-Droid keep android:exported="false" (declared in pir-impl). The benchmark scan
+            path is still additionally gated by isInternalBuild() + the extra_benchmark flag.
+        -->
+        <service
+            android:name="com.duckduckgo.pir.impl.scan.PirForegroundScanService"
+            android:exported="true"
+            tools:node="merge"
+            tools:replace="android:exported"
+            tools:ignore="ExportedService" />
     </application>
 
 </manifest>
