@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dsShowcaseCaptionView">View</string>
+    <string name="dsShowcaseCaptionCompose">Compose</string>
+    <string name="dsShowcaseCaptionComposeOnly">Compose-only</string>
+    <string name="dsShowcaseCaptionNoCompose">View (no Compose equivalent)</string>
+</resources>

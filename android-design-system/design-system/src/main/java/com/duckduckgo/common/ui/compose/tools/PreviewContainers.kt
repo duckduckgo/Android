@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
 
@@ -67,5 +68,24 @@ fun PreviewBox(
                 content = content,
             )
         }
+    }
+}
+
+/**
+ * Themed, unpadded preview container backed by [DaxSurface], for edge-to-edge components such as
+ * list items that fill the width and carry their own internal padding. Unlike [PreviewBox] it adds
+ * no padding and renders on a real surface (flat, no elevation).
+ */
+@Composable
+fun PreviewSurface(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    DuckDuckGoTheme {
+        DaxSurface(
+            modifier = modifier,
+            shadowElevation = 0.dp,
+            content = content,
+        )
     }
 }

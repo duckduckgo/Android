@@ -27,6 +27,13 @@ import com.duckduckgo.common.ui.internal.ui.component.ComponentFragment
 
 class ComponentListItemsElementsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(SECTION_HEADER_LIST_ITEM, SINGLE_LINE_LIST_ITEM, TWO_LINE_LIST_ITEM, SETTINGS_LIST_ITEM, MENU_ITEM, POPUP_MENU_ITEM)
+        return listOf(
+            SECTION_HEADER_LIST_ITEM,
+            SINGLE_LINE_LIST_ITEM,
+            TWO_LINE_LIST_ITEM,
+            SETTINGS_LIST_ITEM,
+            MENU_ITEM,
+            POPUP_MENU_ITEM,
+        )
     }
 }

@@ -26,12 +26,33 @@
         android:layout_height="wrap_content"
         app:primaryText="Settings List Item" />
 
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsWithIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemAlwaysOn"
@@ -41,6 +62,19 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item Always On" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsAlwaysOn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemOn"
         android:layout_width="match_parent"
@@ -49,6 +83,19 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item on" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsOn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemOff"
         android:layout_width="match_parent"
@@ -56,6 +103,19 @@
         app:indicatorStatus="off"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item Off" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsOff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithBetaTag"
@@ -67,6 +127,19 @@
         app:pillIcon="false"
         app:pillText="Beta" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsBeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithBetaTagAndLongText"
         android:layout_width="match_parent"
@@ -77,6 +150,19 @@
         app:pillIcon="true"
         app:pillText="Beta" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsBetaLongText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithNewTag"
         android:layout_width="match_parent"
@@ -86,5 +172,15 @@
         app:primaryText="Settings List Item with New Pill"
         app:pillIcon="true"
         app:pillText="New" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsNew"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSettingsExtras"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
