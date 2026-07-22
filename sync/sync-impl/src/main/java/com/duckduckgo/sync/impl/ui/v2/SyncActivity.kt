@@ -116,17 +116,17 @@ class SyncActivity : DuckDuckGoActivity() {
         SyncThisDeviceContract(),
     ) { result ->
         when (result) {
-            SyncThisDeviceContract.Output.BackedUp -> {
+            is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
                 startActivity(Intent(this, RecoveryCodeActivity::class.java))
             }
 
-            SyncThisDeviceContract.Output.Canceled -> {
+            is SyncThisDeviceContract.Output.Canceled -> {
                 viewModel.onSyncThisDeviceCanceled()
                 viewModel.onConnectionCancelled()
             }
 
-            SyncThisDeviceContract.Output.RequestSyncWithAnotherDevice -> {
+            is SyncThisDeviceContract.Output.RequestSyncWithAnotherDevice -> {
                 viewModel.onSyncThisDeviceCanceled()
                 viewModel.onConnectionCancelled()
             }

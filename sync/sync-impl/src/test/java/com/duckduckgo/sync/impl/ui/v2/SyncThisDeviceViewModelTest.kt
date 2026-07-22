@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -27,8 +29,10 @@ import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -42,6 +46,13 @@ class SyncThisDeviceViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
+    private val connectedDevice = ConnectedDevice(
+        thisDevice = true,
+        deviceName = "Device Name",
+        deviceId = "device-id",
+        deviceType = DeviceType(deviceFactor = "phone"),
+    )
+
     private val syncAccountRepository = mock<SyncAccountRepository>()
     private val syncPixels = mock<SyncPixels>()
     private val syncSetupWideEvent = mock<SyncSetupWideEvent>()
@@ -53,6 +64,11 @@ class SyncThisDeviceViewModelTest {
         syncSetupWideEvent,
     )
 
+    @Before
+    fun setup() {
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+    }
+
     @Test
     fun `when the user is already signed in then syncing finishes`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
@@ -60,6 +76,18 @@ class SyncThisDeviceViewModelTest {
         testee.commands.test {
             testee.syncThisDevice(source = null)
             assertIs<FinishSyncing>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when syncing finishes then the connected device is included`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands.test {
+            testee.syncThisDevice(source = null)
+            assertEquals(connectedDevice, (awaitItem() as FinishSyncing).device)
 
             cancel()
         }
@@ -165,6 +193,34 @@ class SyncThisDeviceViewModelTest {
             assertIs<ShowError>(awaitItem())
 
             verifyNoInteractions(syncPixels)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the connected device cannot be retrieved then an error is shown`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
+
+        testee.commands.test {
+            testee.syncThisDevice(source = null)
+            assertIs<ShowError>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the connected device cannot be retrieved then the account creation failed event is tracked`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
+
+        testee.commands.test {
+            testee.syncThisDevice(source = null)
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onAccountCreationFailed()
 
             cancel()
         }
