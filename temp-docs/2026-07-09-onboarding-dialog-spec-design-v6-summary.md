@@ -38,16 +38,13 @@ permutations. The current structure makes each one a hand-wired special case.
 
 ## Strategy
 
-<CLAUDE_INSTRUCTION>make below a plantuml diagram</CLAUDE_INSTRUCTION>
-```
-plan provider    step resolves Dialog(DialogSpecs.comparisonChart())   ← ordering + content authority
-      ▼
-VM               forwards spec into ViewState, fires Presented          ← no translation layer
-      ▼
-render engine    diffs prev vs new spec, runs one fixed phase pipeline
-      ▼
-elements         background · embellishment · card · content · CTAs · indicator
-```
+Each onboarding step describes its screen as a `DialogSpec`: plain data listing the
+background, embellishment, content, and CTAs. The plan provider becomes the single authority
+for what each screen shows and in what order. The VM stops translating and just forwards the
+spec. A new render engine compares the previous spec with the new one and animates only what
+changed — the same code path snaps everything into place when there is nothing to animate
+(rotation, re-entry). All the per-dialog view wiring that exists today collapses into that
+one engine plus per-screen data.
 
 ### `DialogSpec`
 
@@ -122,27 +119,87 @@ class AddressBarStateHolder(seed: ContentSpec.AddressBar) {
     fun select(position: OmnibarType) { selected = position }  // live edit, no spec re-emit
     fun result() = ContentResult.AddressBar(selected)          // read once on Submit
 }
+```
 
-// in the binder
-is ContentSpec.AddressBar -> {
-    val holder = AddressBarStateHolder(content)
-    picker.onOptionSelected = holder::select
-    ContentHandle(title = …, fadeTargets = listOf(picker), result = holder::result)
+**The binder** is the only place that knows which layout include belongs to which
+`ContentSpec`. It sets the spec's data on the views and returns the handle:
+
+```kotlin
+// view layer
+class ContentBinder(private val binding: …) {
+    fun bind(content: ContentSpec): ContentHandle = when (content) {
+        is ContentSpec.Welcome -> with(binding.welcomeContent) {
+            body1.text = content.body1.resolve()
+            content.body2?.let { body2.text = it.resolve() }
+            ContentHandle(title = titleView, fadeTargets = listOfNotNull(body1, content.body2?.let { body2 }))
+        }
+        is ContentSpec.ComparisonChart -> with(binding.comparisonChartContent) {
+            populate(content.config)
+            ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), intro = checkIconStagger())
+        }
+        is ContentSpec.AddressBar -> with(binding.addressBarContent) {
+            val holder = AddressBarStateHolder(content)
+            picker.onOptionSelected = holder::select
+            ContentHandle(title = titleView, fadeTargets = listOf(picker), result = holder::result)
+        }
+        is ContentSpec.AddToDock -> with(binding.addToDockContent) {
+            ContentHandle(title = titleView, fadeTargets = listOf(body, video), unbind = { releaseVideo() })
+        }
+        // one branch per screen …
+    }
 }
 ```
 
-<CLAUDE_INSTRUCTION>we're missing an example of how a binder looks like</CLAUDE_INSTRUCTION>
-
 ### Flow
-<CLAUDE_INSTRUCTION>prepare a PLANTUML diagram of the flow. from step definition, to VM, state, to binding, to rendering, to interaction, to result, to step cahnge, and whatever I'm missing</CLAUDE_INSTRUCTION>
 
-Key decisions:
+One full step lifecycle, from the step becoming current to the next step taking over:
 
-- **Every dialog can enter from an empty stage.** "No previous spec" means clear the stage
-  and enter — not a special case. This covers the first dialog, returns from
-  `BrowserActivity` (today a hand-coded comparison-chart path), and migration handoffs.
-- **Copy variants are builder parameters** chosen by the plan (e.g. Custom AI copy), not
-  runtime flags threaded through `ViewState`.
+```plantuml
+@startuml
+skinparam shadowing false
+participant Orchestrator
+participant "Plan step" as Step
+participant VM
+participant "Render engine" as Engine
+participant ContentBinder as Binder
+actor User
+
+== Step becomes current ==
+Orchestrator -> VM : state: InProgress(step)
+VM -> Step : resolveDialog()
+Step --> VM : Dialog(DialogSpec)
+VM -> VM : ViewState = stepId + spec\n(+ step indicator from plan position)
+VM -> Orchestrator : Presented
+note right : shown pixel fires\nvia the step wrapper
+
+== Render ==
+VM -> Engine : render(spec, animate = first show of this step)
+Engine -> Engine : diff previous vs new spec\n(no previous → clear stage, enter everything)
+Engine -> Binder : unbind(previous content)
+Engine -> Binder : bind(new content)
+Binder --> Engine : ContentHandle
+Engine -> Engine : background ∥ embellishment ∥ card morph\n→ title types → content + CTAs fade in\n→ click listeners attach
+note right : animate = false runs the same\npipeline snapped to end states\n(rotation, re-entry, tap-to-skip)
+
+== Interaction ==
+User -> Binder : live edits (picker, toggle)
+note right : stay in the state holder;\nno new spec, no re-render
+User -> VM : CTA click
+alt state
+  VM -> Orchestrator : event as-is
+else action is Submit
+  VM -> Binder : handle.result()
+  Binder --> VM : ContentResult
+  VM -> Orchestrator : result mapped to its event
+end
+
+== Step change ==
+Orchestrator -> Step : transition(event)
+Step --> Orchestrator : Advance (or Stay / SwitchTo / AbortPlan)
+Orchestrator -> VM : state: InProgress(next step)
+note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing spec against the new one
+@enduml
+```
 
 ## Benefits
 
