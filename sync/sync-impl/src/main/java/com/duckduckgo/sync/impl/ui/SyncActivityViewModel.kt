@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -52,6 +53,7 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
@@ -60,6 +62,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -89,6 +92,7 @@ import javax.inject.Inject
 class SyncActivityViewModel @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,
     private val recoveryCodePDF: RecoveryCodePDF,
+    private val clipboard: ClipboardInteractor,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStateMonitor: SyncStateMonitor,
     private val syncEngine: SyncEngine,
@@ -245,11 +249,16 @@ class SyncActivityViewModel @Inject constructor(
         data object AskDeleteAccount : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
+        data object AskToCopyRecoveryCode : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
+        ) : Command()
+
+        data class ShowMessage(
+            @StringRes val message: Int,
         ) : Command()
 
         data object ShowDeviceUnsupported : Command()
@@ -430,6 +439,31 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch {
             requiresSetupAuthentication {
                 command.send(CheckIfUserHasStoragePermission)
+            }
+        }
+    }
+
+    fun onCopyRecoveryCodeClicked() {
+        viewModelScope.launch {
+            requiresSetupAuthentication {
+                command.send(AskToCopyRecoveryCode)
+            }
+        }
+    }
+
+    fun onCopyRecoveryCodeAuthenticated() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val result = syncAccountRepository.getRecoveryCode()) {
+                is Success -> {
+                    val isNotificationShown = clipboard.copyToClipboard(result.data.rawCode, isSensitive = true)
+                    if (!isNotificationShown) {
+                        command.send(ShowMessage(R.string.sync_code_copied_message))
+                    }
+                }
+
+                is Error -> {
+                    command.send(ShowError(R.string.sync_general_error, result.reason))
+                }
             }
         }
     }

@@ -62,6 +62,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
@@ -75,6 +76,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
@@ -299,6 +301,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
 
+            is AskToCopyRecoveryCode -> {
+                authenticate {
+                    viewModel.onCopyRecoveryCodeAuthenticated()
+                }
+            }
+
             is AskTurnOffSync -> {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
@@ -376,6 +384,10 @@ class SyncActivity : DuckDuckGoActivity() {
                 showError(command)
             }
 
+            is ShowMessage -> {
+                Snackbar.make(binding.root, command.message, Snackbar.LENGTH_LONG).show()
+            }
+
             is ShowPreviousSessionReady -> {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
@@ -433,6 +445,9 @@ class SyncActivity : DuckDuckGoActivity() {
             restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
             downloadRecoveryCodeItem.setOnClickListener {
                 viewModel.onSaveRecoveryCodeClicked()
+            }
+            copyRecoveryCodeItem.setOnClickListener {
+                viewModel.onCopyRecoveryCodeClicked()
             }
         }
     }

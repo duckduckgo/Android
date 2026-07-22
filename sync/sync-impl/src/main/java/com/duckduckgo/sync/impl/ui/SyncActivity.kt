@@ -64,6 +64,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
@@ -77,6 +78,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
@@ -427,12 +429,20 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskRemoveDevice -> askRemoveDevice(command.device)
             is AskEditDevice -> askEditDevice(command.device)
+            is AskToCopyRecoveryCode -> {
+                authenticate {
+                    viewModel.onCopyRecoveryCodeAuthenticated()
+                }
+            }
             is AddAnotherDevice -> {
                 authenticate {
                     syncWithAnotherDeviceFlow.launch(null)
                 }
             }
             is ShowError -> showError(command)
+            is ShowMessage -> {
+                binding.root.makeSnackbarWithNoBottomInset(command.message, Snackbar.LENGTH_LONG).show()
+            }
             is ShowDeviceUnsupported -> {
                 startActivity(DeviceUnsupportedActivity.intent(this))
                 finish()
