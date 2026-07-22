@@ -15,4 +15,15 @@
  */
 package com.duckduckgo.feature.toggles.api
 
-data class FeatureException(val domain: String, val reason: String?)
+import com.duckduckgo.url.DaxUrl
+import com.duckduckgo.url.DaxUrlResolver
+
+data class FeatureException(val domain: String, val reason: String?) {
+    /**
+     * Semantic [DaxUrl] built from [domain], resolved through the process-wide
+     * [DaxUrlResolver] (flag-gated legacy-vs-new). Null until a provider is installed at startup.
+     * Computed, not stored: it has no backing field, so Moshi never (de)serializes it — consumers
+     * don't need any URL adapter.
+     */
+    val url: DaxUrl? get() = DaxUrlResolver.resolve(domain)
+}

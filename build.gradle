@@ -173,6 +173,7 @@ subprojects {
                                 && dependencyPath != ":browser-api"
                                 && dependencyPath != ":browser-mode-api"
                                 && dependencyPath != ":tracker-detection-api"
+                                && dependencyPath != ":unified-url-model-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"

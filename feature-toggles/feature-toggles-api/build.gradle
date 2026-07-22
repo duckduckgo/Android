@@ -39,5 +39,6 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     compileOnly "javax.inject:javax.inject:_"
+    api project(':unified-url-model-api')
 }
 
