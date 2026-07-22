@@ -1,0 +1,148 @@
+@startuml new-model
+title Proposed onboarding model (v4 — post-refactor)
+
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "onboarding-api" {
+  interface LinearOnboardingStep {
+    +id
+    +host
+    +precondition : suspend () -> Boolean
+    +transition : suspend (Event) -> Transition
+  }
+  interface LinearOnboardingOrchestrator {
+    +state : StateFlow<LinearOnboardingState>
+    +startPlan(plan)
+    +onEvent(event)
+  }
+  class LinearOnboardingPlan {
+    +id
+    +steps : List<LinearOnboardingStep>
+    +onCompleted / onSkipped / result
+  }
+}
+
+package "app · orchestrator plan" {
+  class NewUserOnboardingActivityStep {
+    +pixelName
+    +showsStepIndicator
+    +resolveDialog() : NewUserOnboardingActivityDialog
+  }
+  class NewUserOnboardingPlanProvider {
+    +buildDefaultPlan()
+    +buildCustomAiPlan()
+  }
+  interface NewUserOnboardingActivityDialog <<sealed>>
+  class "Dialog(spec: DialogSpec)" as DialogVariant
+  note right of NewUserOnboardingActivityDialog
+    <b>1 bubble variant</b>: Dialog(spec)
+    (all 11 former bubble dialogs fold into it)
+    ----
+    <b>4 side-effect variants</b> (unchanged):
+    IntroAnimation, NotificationPermission,
+    DefaultBrowserPrompt, AddWidget
+  end note
+  class DialogSpecs <<catalog>> {
+    welcome() / comparisonChart() / aiComparisonChart()
+    addToDock() / widgetPrompt()
+    addressBar() / inputScreen() / preview() / quickSetup()
+  }
+}
+
+package "pure data (value-comparable)" {
+  class DialogSpec {
+    +background : OnboardingBackgroundStep
+    +embellishment : Embellishment
+    +title / subtitle : TextSpec
+    +content : ContentSpec
+    +primaryCta / secondaryCta : CtaSpec
+    +stepIndicator : StepProgress?
+  }
+  enum Embellishment {
+    None
+    WalkingDax
+    BobbingDax
+    BottomWing
+    LeftWing
+  }
+  enum OnboardingBackgroundStep {
+    Welcome / ComparisonChart / AddToDock
+    AddWidget / QuickSetup / AddressBar / InputType
+  }
+  class TextSpec
+  class CtaSpec
+  class ContentSpec <<sealed>>
+  note right of ContentSpec
+    <b>stateless seed:</b>
+    Welcome, ComparisonChart(config),
+    AddToDock, WidgetPrompt
+    ----
+    <b>stateful seed</b> (live edits in a holder):
+    AddressBar, InputScreen,
+    InputScreenPreview, QuickSetup
+  end note
+}
+
+package "app · page / view (renderer)" {
+  class BrandDesignUpdatePageViewModel {
+    forwards spec -> ViewState.currentSpec
+    (+ stepIndicator position; no applyDialog)
+  }
+  class DialogRenderer {
+    +render(newSpec, animate)
+    diff(prevSpec, newSpec); ONE path animate + snap
+  }
+  interface Transitionable {
+    +enter() / exit()
+    +snapToEntered() / snapToExited()
+  }
+  class Sequencer
+  class ContentBinder {
+    +render(content, view) : Animator?
+  }
+  class "AddressBar / InputScreen / QuickSetup\nstate holders" as Holders {
+    seed -> live edit -> result() to VM
+  }
+  class OnboardingBackgroundAnimator {
+    +transitionTo(step) / snapTo(step)
+  }
+}
+
+NewUserOnboardingActivityStep ..|> LinearOnboardingStep
+NewUserOnboardingActivityStep --> NewUserOnboardingActivityDialog : resolveDialog()
+NewUserOnboardingActivityDialog +-- DialogVariant
+DialogVariant *-- DialogSpec : spec
+DialogSpecs --> DialogSpec : builds
+NewUserOnboardingPlanProvider --> NewUserOnboardingActivityStep : builds
+NewUserOnboardingPlanProvider ..> DialogSpecs : picks per step
+
+DialogSpec --> OnboardingBackgroundStep
+DialogSpec --> Embellishment
+DialogSpec --> ContentSpec
+DialogSpec --> TextSpec
+DialogSpec --> CtaSpec
+
+BrandDesignUpdatePageViewModel --> DialogSpec : currentSpec (forwards)
+BrandDesignUpdatePageViewModel --> DialogRenderer
+DialogRenderer ..> DialogSpec : diff(prev, new)
+DialogRenderer --> Sequencer
+Sequencer o-- Transitionable : composes
+DialogRenderer --> ContentBinder
+DialogRenderer --> OnboardingBackgroundAnimator
+OnboardingBackgroundAnimator --> OnboardingBackgroundStep
+ContentBinder ..> ContentSpec : render()
+ContentBinder --> Holders : stateful screens
+
+note as N1
+  <b>Single representation of "which dialog":</b>
+  resolveDialog() -> Dialog(DialogSpec)
+    -> VM forwards to currentSpec (+ indicator)
+      -> DialogRenderer diffs -> elements
+  No applyDialog / PreOnboardingDialogType /
+  duplicated when(dialogType) blocks.
+  Reorder / permute = edit steps = buildList { }.
+end note
+N1 .. BrandDesignUpdatePageViewModel
+
+@enduml

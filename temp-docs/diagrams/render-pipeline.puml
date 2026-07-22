@@ -1,0 +1,37 @@
+@startuml render-pipeline
+title Proposed render pipeline (v4)
+
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor<<sideeffect>> #F5F5F5
+}
+top to bottom direction
+
+rectangle "Orchestrator step\nresolveDialog()" as STEP
+rectangle "NewUserOnboardingActivityDialog\n<<sealed>>" as DIALOG
+
+rectangle "Dialog(spec: DialogSpec)\n(the one bubble path)" as SPEC
+rectangle "IntroAnimation\nNotificationPermission\nDefaultBrowserPrompt\nAddWidget" <<sideeffect>> as SIDE
+
+rectangle "VM\nemit spec -> ViewState.currentSpec\n(+ step-indicator position)" as VM
+
+package "DialogRenderer  (== transition engine)" {
+  rectangle "diff(prevSpec, newSpec)\nONE path: animate + snap" as DIFF
+  rectangle "Background\n-> OnboardingBackgroundAnimator" as BG
+  rectangle "Embellishment\nNone | WalkingDax | BobbingDax | BottomWing | LeftWing" as EMB
+  rectangle "Chrome\ntitle / subtitle / CTAs / step indicator" as CHR
+  rectangle "ContentBinder\nContentSpec -> include visibility + bind + intro" as CB
+}
+
+STEP --> DIALOG : resolveDialog()
+DIALOG --> SPEC
+DIALOG --> SIDE
+SPEC --> VM
+SIDE ..> VM : side-effect commands
+VM --> DIFF
+DIFF --> BG
+DIFF --> EMB
+DIFF --> CHR
+DIFF --> CB
+
+@enduml

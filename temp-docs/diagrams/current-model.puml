@@ -1,0 +1,95 @@
+@startuml current-model
+title Current onboarding model (pre-refactor)
+
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "onboarding-api" {
+  interface LinearOnboardingStep {
+    +id
+    +host
+    +precondition : suspend () -> Boolean
+    +transition : suspend (Event) -> Transition
+  }
+  interface LinearOnboardingOrchestrator {
+    +state : StateFlow<LinearOnboardingState>
+    +startPlan(plan)
+    +onEvent(event)
+  }
+  class LinearOnboardingPlan {
+    +id
+    +steps : List<LinearOnboardingStep>
+    +onCompleted / onSkipped / result
+  }
+}
+
+package "app · orchestrator plan" {
+  class NewUserOnboardingActivityStep {
+    +pixelName
+    +showsStepIndicator
+    +resolveDialog() : NewUserOnboardingActivityDialog
+  }
+  class NewUserOnboardingPlanProvider {
+    +buildDefaultPlan()
+    +buildCustomAiPlan()
+  }
+  interface NewUserOnboardingActivityDialog <<sealed>>
+  note right of NewUserOnboardingActivityDialog
+    <b>11 bubble variants</b> (dax bubble), each with per-dialog SEED:
+    Initial, InitialReinstallUser, SyncRestore,
+    ComparisonChart, AiComparisonChart, AddToDock,
+    WidgetPrompt, AddressBarPosition, InputScreen,
+    InputScreenPreview, QuickSetup
+    ----
+    <b>4 side-effect variants</b> (not bubbles):
+    IntroAnimation, NotificationPermission,
+    DefaultBrowserPrompt, AddWidget
+  end note
+}
+
+package "app · page / view" {
+  class BrandDesignUpdatePageViewModel {
+    +applyDialog()
+  }
+  class "configureDaxCta / showDialogWithoutAnimation" as PageWhen {
+    two ~1k-line when(dialogType) blocks -> views
+  }
+  class OnboardingBackgroundAnimator {
+    +transitionTo(step) / snapTo(step)
+  }
+  enum OnboardingBackgroundStep {
+    Welcome
+    ComparisonChart
+    AddToDock
+    AddWidget
+    QuickSetup
+    AddressBar
+    InputType
+  }
+  class ComparisonChartConfig <<sealed>> {
+    @StringRes / @DrawableRes seed -> generic view
+  }
+}
+
+NewUserOnboardingActivityStep ..|> LinearOnboardingStep
+NewUserOnboardingActivityStep --> NewUserOnboardingActivityDialog : resolveDialog()
+NewUserOnboardingPlanProvider --> NewUserOnboardingActivityStep : builds
+NewUserOnboardingPlanProvider --> LinearOnboardingPlan : buildDefault / buildCustomAi
+LinearOnboardingPlan "1" o-- "*" LinearOnboardingStep : steps
+LinearOnboardingOrchestrator --> LinearOnboardingPlan : walks, publishes state
+BrandDesignUpdatePageViewModel --> NewUserOnboardingActivityDialog : applyDialog()
+BrandDesignUpdatePageViewModel --> PageWhen
+PageWhen --> OnboardingBackgroundAnimator
+OnboardingBackgroundAnimator --> OnboardingBackgroundStep
+PageWhen ..> ComparisonChartConfig : uses
+
+note as N1
+  <b>Triple representation of "which dialog":</b>
+  resolveDialog() -> Dialog variant + seed
+    -> applyDialog() -> PreOnboardingDialogType + scattered ViewState fields
+      -> configureDaxCta when -> views
+  Every new screen touches all three layers.
+end note
+N1 .. BrandDesignUpdatePageViewModel
+
+@enduml
