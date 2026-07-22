@@ -115,7 +115,7 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.recoveryCode.text = viewState.recoveryCode
+        binding.recoveryCodeContainer.setRecoveryCode(viewState.recoveryCode)
         binding.restoreOnReinstallToggle.apply {
             isVisible = viewState.isAutoRestoreAvailable
             quietlySetIsChecked(viewState.isAutoRestoreEnabled, autoRestoreListener)

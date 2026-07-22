@@ -71,57 +71,12 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.duckduckgo.sync.impl.ui.v2.RecoveryCodeView
                     android:id="@+id/recoveryCodeContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:background="@drawable/background_dashed_border"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="@dimen/keyline_3">
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/recoveryCodeLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/keyline_4"
-                        android:breakStrategy="balanced"
-                        android:text="@string/sync_recover_data_recovery_code_label"
-                        app:layout_constrainedWidth="true"
-                        app:layout_constraintEnd_toStartOf="@id/copyIcon"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:typography="body1" />
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/recoveryCode"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@+id/recoveryCodeLabel"
-                        app:layout_constraintStart_toStartOf="@+id/recoveryCodeLabel"
-                        app:layout_constraintTop_toBottomOf="@+id/recoveryCodeLabel"
-                        app:textType="secondary"
-                        app:typography="body1_mono" />
-
-                    <ImageView
-                        android:id="@+id/copyIcon"
-                        android:layout_width="@dimen/listItemImageMediumSize"
-                        android:layout_height="@dimen/listItemImageMediumSize"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_copy_24" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:layout_marginTop="@dimen/keyline_4" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                     android:id="@+id/downloadCodeButton"

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/recoveryCodeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:breakStrategy="balanced"
+        android:text="@string/sync_recover_data_recovery_code_label"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/copyIcon"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/recoveryCode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/recoveryCodeLabel"
+        app:layout_constraintStart_toStartOf="@+id/recoveryCodeLabel"
+        app:layout_constraintTop_toBottomOf="@+id/recoveryCodeLabel"
+        app:textType="secondary"
+        app:typography="body1_mono" />
+
+    <ImageView
+        android:id="@+id/copyIcon"
+        android:layout_width="@dimen/listItemImageMediumSize"
+        android:layout_height="@dimen/listItemImageMediumSize"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_copy_24" />
+
+</merge>
