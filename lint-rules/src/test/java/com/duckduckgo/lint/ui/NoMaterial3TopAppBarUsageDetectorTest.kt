@@ -30,6 +30,10 @@ class NoMaterial3TopAppBarUsageDetectorTest {
         fun TopAppBar(title: () -> Unit) {}
 
         fun CenterAlignedTopAppBar(title: () -> Unit) {}
+
+        fun MediumTopAppBar(title: () -> Unit) {}
+
+        fun LargeTopAppBar(title: () -> Unit) {}
         """.trimIndent(),
     ).indented()
 
@@ -92,6 +96,78 @@ class NoMaterial3TopAppBarUsageDetectorTest {
             .issues(NO_MATERIAL3_TOP_APP_BAR_USAGE)
             .run()
             .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenMaterial3MediumTopAppBarUsedThenError() {
+        lint()
+            .files(
+                topAppBarStub,
+                kotlin(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.material3.MediumTopAppBar
+
+                    fun MyScreen() {
+                        MediumTopAppBar(title = {})
+                    }
+                    """.trimIndent(),
+                ).indented(),
+            )
+            .issues(NO_MATERIAL3_TOP_APP_BAR_USAGE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenMaterial3LargeTopAppBarUsedThenError() {
+        lint()
+            .files(
+                topAppBarStub,
+                kotlin(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.material3.LargeTopAppBar
+
+                    fun MyScreen() {
+                        LargeTopAppBar(title = {})
+                    }
+                    """.trimIndent(),
+                ).indented(),
+            )
+            .issues(NO_MATERIAL3_TOP_APP_BAR_USAGE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenNonMaterial3TopAppBarUsedThenNoError() {
+        lint()
+            .files(
+                kotlin(
+                    """
+                    package com.example.widgets
+
+                    fun TopAppBar(title: () -> Unit) {}
+                    """.trimIndent(),
+                ).indented(),
+                kotlin(
+                    """
+                    package com.example.test
+
+                    import com.example.widgets.TopAppBar
+
+                    fun MyScreen() {
+                        TopAppBar(title = {})
+                    }
+                    """.trimIndent(),
+                ).indented(),
+            )
+            .issues(NO_MATERIAL3_TOP_APP_BAR_USAGE)
+            .run()
+            .expectClean()
     }
 
     @Test
