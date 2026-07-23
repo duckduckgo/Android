@@ -124,20 +124,25 @@ it; the rendering engine tells it when to type or snap. No screen re-implements 
 **Stateful screens** (address bar, input screen, quick setup — with more planned as part of the parent project). User edits inside the screen
 never produce a new config, they stay local until submitted:
 
-- **Live value.** The view writes edits into a small typed key-value store owned by the VM
-  (e.g., `viewModel.liveValues[AddressBarPosition] = it`). It is not render state, so nothing
-  re-renders; it survives rotation because the VM does, and the binder seeds the picker from
-  it, falling back to the config's initial value. The VM never reads the store — it just owns
-  it. Adding a stateful screen means a new key, not a new VM field, so the pattern stays
-  constant-cost as screens are added.
+- **Live state.** A stateful screen's working state lives in a small typed key-value store
+  owned by the VM, each key a `StateFlow`. State flows one way: interactions write into the
+  store, the binder observes and renders. Initial key values are seeded from the
+  config. A new stateful screen is a new key, not a new VM field.
+  TODO update below example
+  ```
+  BrandDesignUpdatePageViewModel
+      └─ contentValues: Map<Any, MutableStateFlow<Any>>
+  ```
 - **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
-  event directly from the current selection (`{ AddressBarConfirmed(picker.selected) }`).
+  event from the store (`{ AddressBarConfirmed(contentValues[AddressBarPosition]) }`).
   The engine's CTA listener fires the closure and forwards the finished event to the VM —
   the VM forwards events blindly and never needs to know which screen is showing.
-- **External changes.** Some content mirrors system state that changes mid-step: quick setup
-  re-syncs its default-browser and widget switches on resume. That stays on the existing
-  `Command` channel, which this design leaves untouched — the command handler pokes the
-  bound view (via an optional update hook on the handle).
+- **External changes.** Quick setup re-syncs its default-browser and widget switches on
+  resume. Same path: the VM writes fresh values into the store and the bound screen's
+  observation renders them.
+
+Stateful binders are state-down-events-up, so they port to Compose as directly as the
+configs do (`collectAsState` plus write-back).
 
 **The binder** is the only place that knows which layout include belongs to which
 `ContentConfig`. It sets the config's data on the views and returns the handle:
@@ -156,9 +161,9 @@ class ContentBinder(private val binding: …) {
             ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), entrance = { afterFade { checkIconStagger() } })
         }
         is ContentConfig.AddressBar -> with(binding.addressBarContent) {
-            picker.selected = viewModel.liveValues[AddressBarPosition] ?: content.initialPosition
-            picker.onOptionSelected = { viewModel.liveValues[AddressBarPosition] = it }  // survives rotation
-            ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(picker.selected) })
+            picker.onOptionSelected = { contentValues[AddressBarPosition] = it }                     // events up
+            observe(AddressBarPosition, seed = content.initialPosition) { picker.selected = it }  // state down
+            ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(contentValues[AddressBarPosition]) })
         }
         is ContentConfig.AddToDock -> with(binding.addToDockContent) {
             ContentHandle(title = titleView, fadeTargets = listOf(body, video), unbind = { releaseVideo() })
@@ -286,8 +291,8 @@ Shared vs duplicated while both arms exist:
   in place first, with legacy binding through it — the single legacy edit of the rollout.
 - **New slim VM.** Config + two flags + live-value store. The shown-pixel map (~15 lines) is
   duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
-  are directly comparable. Command handling for the command-only steps and the quick-setup
-  syncs ports as-is.
+  are directly comparable. Command handling for the command-only steps ports as-is; the
+  quick-setup syncs become VM writes into the live-value store.
 
 Sequence:
 
