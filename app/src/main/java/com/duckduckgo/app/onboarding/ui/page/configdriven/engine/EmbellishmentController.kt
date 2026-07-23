@@ -74,6 +74,23 @@ class EmbellishmentController(
      */
     private var pendingDismiss: LottieDismiss? = null
 
+    /**
+     * Bumped on every [transition] call; each call captures its own value and every deferred
+     * continuation of that call (`enterNext`, an exit's `onEnd`, a dismiss's `finish` body) checks
+     * it against the current value before doing anything. A transition superseded by a newer one
+     * before it settled sees a mismatch and no-ops — it never enters its decoration and never
+     * fires its [onSettled] a second (stale) time.
+     */
+    private var generation = 0
+
+    /**
+     * True for the duration of [skipRunning]. While set, [transition]'s enter step must take the
+     * same snap path used for `animate == false` instead of starting a new enter animator/Lottie
+     * playback — otherwise an enter kicked off by a chained exit-onEnd during the skip's drain
+     * would escape the snapshot loop and keep animating after [skipRunning] returns.
+     */
+    private var skipping = false
+
     private val fitCorrector = OnboardingDecorationFitCorrector(
         root = binding.root,
         dialog = binding.daxDialogCta.root,
@@ -108,6 +125,14 @@ class EmbellishmentController(
         animate: Boolean,
         onSettled: (SettledDecoration?) -> Unit,
     ) {
+        generation++
+        val gen = generation
+
+        // Settle-then-supersede: a previous transition's exit may still be in flight (its onEnd is a
+        // now-stale enterNext closure). Drain it now so the stage never has two exits running at once;
+        // the gen check inside that stale enterNext (below) makes sure it no-ops instead of entering.
+        drainInFlight()
+
         if (previous == next) {
             onSettled(applyFit(next))
             return
@@ -116,10 +141,11 @@ class EmbellishmentController(
         val exiting = previous?.let { decorations[it] }
 
         fun enterNext() {
+            if (gen != generation) return // superseded by a newer transition before we got here.
             val settled = applyFit(next)
             if (settled != null) {
                 val entering = decorations.getValue(next)
-                if (animate) {
+                if (animate && !skipping) {
                     trackedAnimators += entering.enter()
                 } else {
                     entering.snap()
@@ -142,9 +168,26 @@ class EmbellishmentController(
     }
 
     fun skipRunning() {
-        // Snapshot-and-remove before ending: an end() listener can synchronously chain into the next
-        // decoration's enter() (exit -> onEnd -> enterNext()), adding fresh animators mid-loop — clearing
-        // the list afterwards would wipe those out from under the animation that just started.
+        // While skipping, transition()'s enterNext takes the snap path instead of starting a new enter
+        // animator, so nothing re-escapes the drain below.
+        skipping = true
+        try {
+            // Loop until settled: draining can chain exit -> onEnd -> enterNext, and — belt-and-braces —
+            // keep draining rather than assume a single pass always empties both slots.
+            while (trackedAnimators.isNotEmpty() || pendingDismiss != null) {
+                drainInFlight()
+            }
+        } finally {
+            skipping = false
+        }
+    }
+
+    // Ends every tracked animator and finishes any pending Lottie dismiss in one pass. Snapshot-and-remove
+    // before ending: an end() listener/finish callback can synchronously chain into the next decoration's
+    // enter() (exit -> onEnd -> enterNext()), adding fresh animators mid-loop — clearing the list afterwards
+    // would wipe those out from under the animation that just started. Shared by [transition] (settle-then-
+    // supersede) and [skipRunning] (full drain).
+    private fun drainInFlight() {
         val animators = trackedAnimators.toList()
         trackedAnimators.removeAll(animators)
         animators.forEach { it.end() }
