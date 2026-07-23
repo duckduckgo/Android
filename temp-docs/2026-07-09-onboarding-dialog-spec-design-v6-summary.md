@@ -38,16 +38,16 @@ permutations. The current structure makes each one a hand-wired special case.
 
 ## Strategy
 
-Each onboarding step describes its screen as a `DialogConfig`: plain data listing the
+1. Each onboarding step describes its screen as a `DialogConfig`: plain data listing the
 background, embellishment, content, and CTAs. The plan provider becomes the single authority
-for what each screen shows and in what order. The VM stops translating and just forwards the
-config. A new render engine compares the previous config with the new one and animates only what
+for what each screen shows and in what order.
+2. The VM stops translating and just forwards the config.
+3. A new render engine compares the previous config with the new one and animates only what
 changed — the same code path snaps everything into place when there is nothing to animate
 (rotation, re-entry). All the per-dialog view wiring that exists today collapses into that
-one engine plus per-screen data. The engine itself is a set of independent axis controllers —
-background, embellishment, card anchor, content — each seeing only its own previous → next
-value. Nothing branches on a (previous screen, next screen) pair; that single rule is what
-keeps N screens at N transition costs instead of resurrecting the N×N matrix.
+one engine plus per-screen data.
+4. The engine itself is a set of independent axis controllers — background, embellishment, card anchor, content — each seeing only its own previous → next
+value.
 
 ### `DialogConfig`
 
@@ -55,7 +55,7 @@ keeps N screens at N transition costs instead of resurrecting the N×N matrix.
 data class DialogConfig(
     val background: OnboardingBackgroundStep,   // existing enum, reused as-is
     val embellishment: Embellishment,           // enum: WalkingDax, BobbingDax, BottomWing, LeftWing, None
-    val content: ContentConfig,                   // sealed data, below; carries the screen's title and variable elements
+    val content: ContentConfig,                 // sealed data, described below
     val primaryCta: CtaConfig,
     val secondaryCta: CtaConfig? = null,
     val stepIndicator: StepProgress? = null,    // existing type, filled in by the VM from plan position
@@ -71,15 +71,12 @@ data class DialogConfig(
 
 ```kotlin
 sealed interface ContentConfig {
-    val title: TextConfig   // every screen has one; rendered by its include's title view
+    val title: TextConfig   // every screen has one; rendered by each layout's title view
 
-    // stateless
     data class Welcome(override val title: TextConfig, val body1: TextConfig, val body2: TextConfig?) : ContentConfig
     data class ComparisonChart(override val title: TextConfig, val config: ComparisonChartConfig) : ContentConfig
     data class AddToDock(override val title: TextConfig) : ContentConfig
     data class WidgetPrompt(override val title: TextConfig) : ContentConfig
-
-    // stateful: seed in, live edits mirror into a plain VM field, submit event built from the current selection
     data class AddressBar(override val title: TextConfig, val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentConfig
     data class InputScreen(override val title: TextConfig, val initialWithAi: Boolean) : ContentConfig
     data class InputScreenPreview(override val title: TextConfig, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentConfig
@@ -87,11 +84,7 @@ sealed interface ContentConfig {
 }
 ```
 
-View elements, strings, etc. that never vary stay in the include's XML or in
-the binder, as today. Only the title and plan-dependent copy travel through the config.
-`title` stays non-null while every screen has one; if a titleless screen ever appears,
-making it nullable (engine skips the typing stage) is a one-line change — deliberately
-not pre-built.
+View elements, strings, etc. that never vary can stay in the XML as today. Only the title and plan-dependent mutations travel through the config.
 
 The view layer binds a config and hands the engine a small handle. The handle is how a screen
 declares its views without re-describing the choreography:
@@ -100,14 +93,13 @@ declares its views without re-describing the choreography:
 class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
-    val intro: Animator? = null,             // bespoke extras only (check-icon stagger, suggestion buttons)
+    val extras: Animator? = null,             // bespoke extras to animate after fade (check-icon stagger, suggestion buttons)
     val result: (() -> LinearOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
     val unbind: () -> Unit = {},             // resource release, animation cancels
 )
 ```
 
-The handle is engine-owned, view layer only. The VM never sees it: a handle captures views,
-so a VM-held handle would go stale on rotation. The engine attaches the CTA listeners, builds
+The handle is engine-owned, view layer only. The engine attaches the CTA listeners, builds
 the event (via `result` for stateful screens), and forwards the finished event to the VM.
 `result` is typed against the orchestrator-core `LinearOnboardingEvent`, not the new-user
 event type, so the engine stays flow-agnostic.
@@ -115,17 +107,15 @@ event type, so the engine stays flow-agnostic.
 **Titles.** Every screen layout today copy-pastes the same title machinery: a
 `TypeAnimationTextView` for the typing effect, an invisible sizing twin (`hiddenTitleText`)
 that keeps the card from resizing while the text types, and `preventWidows` handling (the
-U+00A0 before the last word). That pattern becomes one `OnboardingDialogTitleView` compound
+non-breaking-space before the last word). That pattern becomes one `OnboardingDialogTitleView` compound
 widget, dropped into each layout. The binder sets `content.title` on
 it; the rendering engine tells it when to type or snap. No screen re-implements title behavior.
 
-**Stateful screens** (address bar, input screen, quick setup — with more planned as the next
-step of this initiative). User edits inside the screen
-never produce a new config, so the engine only diffs on real step changes. No holder object is
-needed — two existing mechanisms cover it:
+**Stateful screens** (address bar, input screen, quick setup — with more planned as part of the parent project). User edits inside the screen
+never produce a new config, they stay local until submitted:
 
 - **Live value.** The view writes edits into a small typed key-value store owned by the VM
-  (`viewModel.liveValues[AddressBarPosition] = it`). It is not render state, so nothing
+  (e.g., `viewModel.liveValues[AddressBarPosition] = it`). It is not render state, so nothing
   re-renders; it survives rotation because the VM does, and the binder seeds the picker from
   it, falling back to the config's initial value. The VM never reads the store — it just owns
   it. Adding a stateful screen means a new key, not a new VM field, so the pattern stays
@@ -137,11 +127,7 @@ needed — two existing mechanisms cover it:
 - **External changes.** Some content mirrors system state that changes mid-step: quick setup
   re-syncs its default-browser and widget switches on resume. That stays on the existing
   `Command` channel, which this design leaves untouched — the command handler pokes the
-  bound view (via an optional update hook on the handle). Not render state, no new config.
-
-If a future screen's live state needs to influence *other* steps before submit, the store
-is not the tool: that value should travel through an orchestrator event into the plan's
-context (existing precedent: the pending Duck.ai prompt). Escape valve, not the default.
+  bound view (via an optional update hook on the handle).
 
 **The binder** is the only place that knows which layout include belongs to which
 `ContentConfig`. It sets the config's data on the views and returns the handle:
