@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateDefaultBrowserPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateWelcomePageBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ConfigDrivenWelcomePageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomePageBlueprint
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateDefaultBrowserPage
@@ -28,11 +29,13 @@ import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePage
 
 interface OnboardingPageManager {
     fun pageCount(): Int
     fun buildPageBlueprints()
     fun buildBrandDesignUpdatePageBlueprints()
+    fun buildConfigDrivenPageBlueprints()
     fun buildPage(position: Int): OnboardingPageFragment?
 }
 
@@ -64,12 +67,21 @@ class OnboardingPageManagerWithTrackerBlocking(
         }
     }
 
+    override fun buildConfigDrivenPageBlueprints() {
+        pages.clear()
+        pages += ConfigDrivenWelcomePageBlueprint
+        if (shouldShowDefaultBrowserPage()) {
+            pages += BrandDesignUpdateDefaultBrowserPageBlueprint
+        }
+    }
+
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
             is WelcomePageBlueprint -> buildWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             is BrandDesignUpdateWelcomePageBlueprint -> buildBrandDesignUpdateWelcomePage()
             is BrandDesignUpdateDefaultBrowserPageBlueprint -> buildBrandDesignUpdateDefaultBrowserPage()
+            is ConfigDrivenWelcomePageBlueprint -> buildConfigDrivenWelcomePage()
             else -> null
         }
     }
@@ -94,5 +106,9 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun buildBrandDesignUpdateDefaultBrowserPage(): BrandDesignUpdateDefaultBrowserPage {
         return onboardingPageBuilder.buildBrandDesignUpdateDefaultBrowserPage()
+    }
+
+    private fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePage {
+        return onboardingPageBuilder.buildConfigDrivenWelcomePage()
     }
 }

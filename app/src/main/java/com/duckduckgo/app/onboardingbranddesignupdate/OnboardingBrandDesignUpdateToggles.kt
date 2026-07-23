@@ -54,4 +54,10 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun onboardingImprovementsV2(): Toggle
+
+    /**
+     * Selects the config-driven parallel renderer for brand-design onboarding dialogs (POC).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun configDrivenDialogs(): Toggle
 }

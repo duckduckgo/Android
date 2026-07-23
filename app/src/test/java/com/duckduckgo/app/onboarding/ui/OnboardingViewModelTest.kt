@@ -72,9 +72,11 @@ class OnboardingViewModelTest {
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
-    // Brand design update off by default -> legacy WelcomePage path (orchestrator does not drive the run).
+    // Brand design update and config-driven dialogs off by default -> legacy WelcomePage path
+    // (orchestrator does not drive the run).
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock {
         on { brandDesignUpdate() } doReturn disabledToggle
+        on { configDrivenDialogs() } doReturn disabledToggle
     }
 
     private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock()
