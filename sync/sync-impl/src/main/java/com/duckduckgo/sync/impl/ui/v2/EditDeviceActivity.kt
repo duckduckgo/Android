@@ -226,6 +226,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                     }
                 },
             )
+            .setCancellable(true)
             .show()
     }
 
@@ -250,6 +251,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                     }
                 },
             )
+            .setCancellable(true)
             .show()
     }
 
