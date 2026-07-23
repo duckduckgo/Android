@@ -334,7 +334,16 @@ class OnboardingIntroChoreographer(
     fun playOutro(onEnd: () -> Unit) {
         outroAnimatorSet = buildOutroAnimatorSet().apply {
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) = onEnd()
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    if (cancelled) return
+                    onEnd()
+                }
             })
             start()
         }

@@ -286,9 +286,10 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
 
         if (!hasRenderedOnce) {
             hasRenderedOnce = true
-            if (introPlayedInThisView) {
+            val intro = intro
+            if (introPlayedInThisView && intro != null) {
                 outroInFlight = true
-                intro?.playOutro {
+                intro.playOutro {
                     outroInFlight = false
                     // Re-read the live ViewState rather than trusting the captured `state`/`config`: the plan may
                     // have advanced to a newer step while the outro was fading (the guard above deferred those
