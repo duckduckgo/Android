@@ -93,16 +93,26 @@ declares its views without re-describing the choreography:
 class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
-    val extras: Animator? = null,             // bespoke extras to animate after fade (check-icon stagger, suggestion buttons)
+    val entrance: (EntranceScope.() -> Unit)? = null, // bespoke intro animations, declared via scope hooks
     val result: (() -> LinearOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
-    val unbind: () -> Unit = {},             // resource release, animation cancels
+    val unbind: () -> Unit = {},             // non-animation resource release; engine cancels scope animators itself
 )
+
+interface EntranceScope {
+    fun afterFade(animator: () -> Animator)   // runs once the standard fade lands (check-icon stagger, suggestion buttons)
+    fun afterTitle(animator: () -> Animator)  // runs once title typing finishes
+}
 ```
 
 The handle is engine-owned, view layer only. The engine attaches the CTA listeners, builds
 the event (via `result` for stateful screens), and forwards the finished event to the VM.
-`result` is typed against the orchestrator-core `LinearOnboardingEvent`, not the new-user
-event type, so the engine stays flow-agnostic.
+
+**Binders declare animations, never run them.** Bespoke intros go to the engine through
+`EntranceScope`, as lazy `() -> Animator` since bind runs before layout. The engine owns
+every animator it gets: it plays them at the declared hook, `end()`s them on the snap path
+(end values apply even if never started, so binders write one code path) and `cancel()`s
+them on unbind. An animator a binder starts itself is out of the engine's reach, so
+tap-to-skip and reduced motion break for that screen. Enforced by convention and review.
 
 **Titles.** Every screen layout today copy-pastes the same title machinery: a
 `TypeAnimationTextView` for the typing effect, an invisible sizing twin (`hiddenTitleText`)
@@ -143,7 +153,7 @@ class ContentBinder(private val binding: …) {
         }
         is ContentConfig.ComparisonChart -> with(binding.comparisonChartContent) {
             populate(content.config)
-            ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), intro = checkIconStagger())
+            ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), entrance = { afterFade { checkIconStagger() } })
         }
         is ContentConfig.AddressBar -> with(binding.addressBarContent) {
             picker.selected = viewModel.liveValues[AddressBarPosition] ?: content.initialPosition
