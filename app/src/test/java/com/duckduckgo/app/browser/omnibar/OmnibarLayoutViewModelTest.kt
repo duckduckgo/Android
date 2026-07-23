@@ -3140,4 +3140,16 @@ class OmnibarLayoutViewModelTest {
             assertFalse(viewState.isProgressBarIndeterminateEnabled)
         }
     }
+
+    @Test
+    fun whenUpgradeDisabledButIndeterminateFallbackEnabledThenIndeterminateFlagIsFalse() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = false))
+        fakeProgressBarUpgradeFeature.indeterminateFallback().setRawStoredState(Toggle.State(enable = true))
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isProgressBarIndeterminateEnabled)
+        }
+    }
 }
