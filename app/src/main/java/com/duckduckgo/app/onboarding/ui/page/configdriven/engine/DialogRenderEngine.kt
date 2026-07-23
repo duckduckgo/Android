@@ -81,6 +81,31 @@ class DialogRenderEngine(
     private val runningAnimators = mutableListOf<Animator>()
 
     /**
+     * The [morphCard] `onEnd` continuation for whichever render is currently mid-morph, if any — set when
+     * [morphCard] schedules its `ChangeBounds` transition, cleared the moment it runs. Only one morph is
+     * ever in flight at a time (every [render] settles the previous one via [skipRunningAnimations] before
+     * scheduling its own), so this single slot mirrors [EmbellishmentController]'s own `pendingDismiss` -
+     * one in-flight non-[Animator] continuation, tracked outside [runningAnimators]. Letting
+     * [skipRunningAnimations] run this early (instead of only ever firing from the transition's own
+     * `onTransitionEnd`) is what lets one tap settle a render that's still mid-morph.
+     */
+    private var pendingMorphContinuation: (() -> Unit)? = null
+
+    /**
+     * Bumped at the top of every [render] and in [release]. [morphCard] captures this value when it sets
+     * up the card's `ChangeBounds` transition; that transition's `onTransitionEnd` checks its captured
+     * value against the current one before running its title/fade/entrance continuation. A mismatch means
+     * a newer [render] (or [release]) has already superseded it, so it no-ops instead of replaying a stale
+     * chain (old `handle`/`entrance`/`config`) against the new render's live views. Mirrors
+     * [EmbellishmentController]'s identical `generation` idiom.
+     *
+     * [skipRunningAnimations] deliberately never bumps this: a skip settles the *current* render in place,
+     * it does not supersede it, so [pendingMorphContinuation] must still run from there — just synchronously
+     * instead of at the transition's natural end.
+     */
+    private var generation = 0
+
+    /**
      * True for the duration of [skipRunningAnimations]. While set, [fadeIn] takes the same snap path used by
      * the non-animated branch of [render] instead of starting a new (200ms) fade — otherwise a fade kicked off
      * synchronously by [skipRunningAnimations]'s own `finishTyping()` call would only be addable to
@@ -102,6 +127,8 @@ class DialogRenderEngine(
      */
     fun render(config: DialogConfig, animate: Boolean) {
         if (config == previous && bound != null) return
+
+        generation++ // supersedes any prior render's still in-flight morph continuation - see [generation].
 
         val emptyStage = previous == null
         val animateNow = animate || emptyStage
@@ -165,12 +192,20 @@ class DialogRenderEngine(
      * [EmbellishmentController]'s own drain) to also settle the case where this is called once a fade was
      * already genuinely running in real time before the tap: ending it fires its own onAnimationEnd, which
      * queues fresh afterFade animators outside the first snapshot - the loop's next pass ends those too.
+     *
+     * [settlePendingMorph] covers the earlier case, where typing hasn't even started yet because the
+     * card's `ChangeBounds` morph itself is still running: it runs that render's `onEnd` continuation right
+     * here instead of waiting for `onTransitionEnd`. This method never bumps [generation] itself - doing so
+     * would mark the render this call is settling as superseded, when it is the opposite: this settles the
+     * *current* render (or, from [release], suppresses it) in place, so its own deferred continuations must
+     * still run from here, just synchronously instead of at their natural async completion.
      */
     fun skipRunningAnimations() {
         if (skipping) return
         skipping = true
         try {
             bound?.handle?.title?.finishTyping()
+            settlePendingMorph()
             drainRunningAnimators { it.end() }
             embellishments.skipRunning()
             stepIndicator.skipRunning()
@@ -179,8 +214,28 @@ class DialogRenderEngine(
         }
     }
 
+    /**
+     * Runs [morphCard]'s pending `onEnd` continuation early, if one is still waiting on the transition's
+     * natural `onTransitionEnd`. Invoked under [skipping], so the [fadeIn] this continuation triggers snaps
+     * instead of animating. `type()` starts [DialogTitleController]'s typing coroutine synchronously (its
+     * `Job` is active the instant `launch` returns, before the coroutine's body ever runs), so the
+     * immediate follow-up `finishTyping()` call below finds it already started and finishes it the same
+     * way the top-of-function `finishTyping()` call finishes typing that was already in flight - one tap
+     * fully settles a render that's still mid-morph. [morphCard]'s own `onTransitionEnd` finds
+     * [pendingMorphContinuation] already null (or, if a newer render has since superseded it, a
+     * [generation] mismatch) whenever it eventually fires for real, and no-ops either way.
+     */
+    private fun settlePendingMorph() {
+        val continuation = pendingMorphContinuation ?: return
+        pendingMorphContinuation = null
+        continuation()
+        bound?.handle?.title?.finishTyping()
+    }
+
     /** Fragment onDestroyView: suppress (never apply) anything still pending, then tear down. */
     fun release() {
+        generation++ // supersede any in-flight morph's onTransitionEnd - release suppresses it, it never settles it.
+        pendingMorphContinuation = null
         bound?.handle?.title?.cancel()
         drainRunningAnimators { it.cancel() }
         unbindCurrent()
@@ -190,7 +245,8 @@ class DialogRenderEngine(
     }
 
     private fun unbindCurrent() {
-        bound?.handle?.unbind?.invoke()
+        bound?.handle?.title?.cancel() // stop a still-typing title before its handle is discarded below.
+        bound?.handle?.let { it.unbind() }
         bindScope?.cancel()
         bindScope = null
         bound?.view?.isVisible = false
@@ -239,12 +295,27 @@ class DialogRenderEngine(
         binding.daxDialogCta.secondaryCta.takeIf { config.secondaryCta != null },
     )
 
-    /** ChangeBounds card morph, mirroring legacy's quick-setup expansion (BrandDesignUpdateWelcomePage.kt:998-1040). */
+    /**
+     * ChangeBounds card morph, mirroring legacy's quick-setup expansion (BrandDesignUpdateWelcomePage.kt:998-1040).
+     *
+     * [onEnd] is deferred until the transition's own `onTransitionEnd` fires (naturally, ~[CARD_MORPH_DURATION_MS]
+     * later) or until [skipRunningAnimations] runs it early via [pendingMorphContinuation] - see both for why a
+     * [generation] check alone is not enough (a superseding [render] settles this render's continuation
+     * synchronously rather than merely discarding it, so [pendingMorphContinuation] must also be checked here to
+     * avoid running it a second time when the real `onTransitionEnd` eventually fires).
+     */
     private fun morphCard(onEnd: () -> Unit) {
+        val gen = generation
         val transition: Transition = ChangeBounds().setDuration(CARD_MORPH_DURATION_MS)
         transition.addListener(object : TransitionListenerAdapter() {
-            override fun onTransitionEnd(transition: Transition) = onEnd()
+            override fun onTransitionEnd(transition: Transition) {
+                if (gen != generation) return // superseded by a newer render (or release()) before this morph naturally finished.
+                if (pendingMorphContinuation == null) return // already run synchronously by skipRunningAnimations().
+                pendingMorphContinuation = null
+                onEnd()
+            }
         })
+        pendingMorphContinuation = onEnd
         TransitionManager.beginDelayedTransition(binding.root, transition)
         // Defensive: guarantees a layout pass is observed even if none of this render's view mutations
         // happened to trigger one on their own.
