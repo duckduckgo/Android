@@ -2,7 +2,7 @@
 
 ## Problem
 
-`BrandDesignUpdateWelcomePage` is ~3.1k lines and growing. Three causes:
+`BrandDesignUpdateWelcomePage` is ~3.1k lines and growing. This becomes unmanageable. Three causes:
 
 1. **Every dialog is described twice.** `configureDaxCta` (~720 lines) wires each dialog for
    animated transitions; `showDialogWithoutAnimation` (~620 lines) wires the same dialogs
