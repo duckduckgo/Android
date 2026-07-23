@@ -37,7 +37,6 @@ jobs:
             const repo = context.repo.repo;
             const prNumber = context.payload.pull_request.number;
 
-            // --- Sticky-comment helpers -------------------------------------
             async function findSticky() {
               const comments = await github.paginate(github.rest.issues.listComments, {
                 owner, repo, issue_number: prNumber, per_page: 100,
@@ -63,13 +62,11 @@ jobs:
                   await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
                 }
               } catch (e) {
-                // Fork PRs run with a read-only token — commenting fails but the
-                // pass/fail status check below is still authoritative.
+                // Fork PRs run with a read-only token, so commenting may fail.
                 core.warning(`Could not post check comment: ${e.message}`);
               }
             }
 
-            // --- 1. Did any -api source change? -----------------------------
             const { execFileSync } = require('child_process');
             const baseSha = context.payload.pull_request.base.sha;
             const headSha = context.payload.pull_request.head.sha;
@@ -90,7 +87,6 @@ jobs:
             }
             core.info(`Detected ${apiFiles.length} changed -api source file(s).`);
 
-            // --- 2. Is the "API Proposals" field filled in? -----------------
             // Match the field label up to its colon so it tolerates the
             // "URL(s) (if applicable)" suffix used in the PR template (and stays
             // backward-compatible with a bare "API Proposals:").
@@ -107,7 +103,6 @@ jobs:
             const hasNone = /\b(none|n\/?a)\b/i.test(section);
             const satisfied = hasLink || hasNone;
 
-            // --- 3. Report --------------------------------------------------
             if (satisfied) {
               core.info('API Proposals section is filled in — check passed.');
               await deleteSticky();
