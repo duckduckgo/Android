@@ -1457,5 +1457,12 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_ask_about_page_shown": {
+        "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
