@@ -43,11 +43,13 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.DaggerMap
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
@@ -105,6 +107,12 @@ class SyncActivity : DuckDuckGoActivity() {
     private val viewModel by bindViewModel<SyncActivityViewModel>()
 
     @Inject
+    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+
+    @Inject
+    lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
+
+    @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
@@ -115,9 +123,6 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var syncSetupWideEvent: SyncSetupWideEvent
-
-    @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -222,6 +227,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureSyncThisDeviceCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
+        configureMessageWarnings()
         configureRecoverySection()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
@@ -450,6 +456,19 @@ class SyncActivity : DuckDuckGoActivity() {
             if (hasPlugins) {
                 syncSettingsPlugin.toSortedMap().forEach { (_, plugin) ->
                     bookmarksSectionContainer += plugin.getView(this@SyncActivity)
+                }
+            }
+        }
+    }
+
+    private fun configureMessageWarnings() {
+        binding.includeEnabledView.apply {
+            val hasPlugins = syncMessagesPlugin.isNotEmpty()
+            warningsContainer.isVisible = hasPlugins
+
+            if (hasPlugins) {
+                syncMessagesPlugin.forEach { plugin ->
+                    warningsContainer += plugin.getView(this@SyncActivity)
                 }
             }
         }
