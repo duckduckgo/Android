@@ -18,11 +18,18 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.widget.TextView
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 
 /**
  * One owner for the copy-pasted title machinery: typing animation, invisible sizing twin,
  * preventWidows. POC stand-in for the OnboardingDialogTitleView compound widget.
+ *
+ * [text] is kept raw (post-preventWidows): [type] hands it to [TypeAnimationTextView.startTypingAnimation],
+ * which html-decodes internally, so passing an already-decoded string here would double-decode. [set]'s
+ * sizing twin and [snap]'s visible title are not routed through that method, so they go through [decoded]
+ * instead, using the same `html` extension `TypeAnimationTextView` imports — otherwise a title containing a
+ * literal tag (e.g. `<br/>`) would render un-decoded and mis-size the twin.
  */
 class DialogTitleController(
     private val visibleTitle: TypeAnimationTextView,
@@ -35,7 +42,7 @@ class DialogTitleController(
         // A rebind while a previous typing animation is running would otherwise let the old coroutine repaint stale text and fire the old onFinished.
         visibleTitle.cancelAnimation()
         this.text = text.preventWidows()
-        sizingTwin.text = this.text
+        sizingTwin.text = decoded()
         visibleTitle.text = ""
     }
 
@@ -48,8 +55,11 @@ class DialogTitleController(
     /** Snap path: full text immediately, no animation. */
     fun snap() {
         visibleTitle.cancelAnimation()
-        visibleTitle.text = text
+        visibleTitle.text = decoded()
     }
+
+    /** Html-decoded representation of [text], for consumers that don't go through [TypeAnimationTextView.startTypingAnimation]. */
+    private fun decoded(): CharSequence = text.html(visibleTitle.context)
 
     /**
      * Tap-to-skip: finish a running typing animation.

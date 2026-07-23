@@ -163,7 +163,13 @@ class ComparisonChartBinder(private val binding: IncludeBrandDesignComparisonCha
         return AnimatorSet().apply { playTogether(rowAnimators) }
     }
 
-    /** Zero-duration animator used purely as a delayed trigger for AnimatedVectorDrawable.start(). */
+    /**
+     * Zero-duration animator used purely as a delayed trigger for AnimatedVectorDrawable.start().
+     *
+     * Caveat: "end()/cancel() before start means the animation never begins" only holds for `cancel()`.
+     * `ValueAnimator.end()` on a never-started animator fires `onAnimationStart` synchronously first, so the
+     * engine must `cancel()` — not `end()` — an unstarted entrance animator to suppress this trigger.
+     */
     private fun avdStartTrigger(checkView: ImageView): Animator =
         ValueAnimator.ofInt(0, 1).apply {
             startDelay = CHECK_ICON_AVD_START_DELAY

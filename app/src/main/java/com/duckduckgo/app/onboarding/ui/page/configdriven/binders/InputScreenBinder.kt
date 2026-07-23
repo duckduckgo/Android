@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.T
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -77,7 +78,9 @@ class InputScreenBinder(
         inputScreenPicker.setSelection(state.value.withAi, Transition.NONE)
         inputScreenPicker.setOnSelectionChangedListener { withAi -> state.update { it.copy(withAi = withAi) } }
         scope.coroutineScope.launch {
-            state.collect { inputScreenPicker.setSelection(it.withAi, Transition.CROSSFADE_ANIMATE) }
+            // drop(1): collect() replays the current value immediately, and crossfadeLottie() unconditionally starts Lottie playback, so
+            // without dropping the replay this would crossfade-and-start the loop at bind, defeating the entrance-gated withAiAnimationTrigger().
+            state.drop(1).collect { inputScreenPicker.setSelection(it.withAi, Transition.CROSSFADE_ANIMATE) }
         }
 
         inputScreenDescription.text = content.description.resolve(context).preventWidows().html(context)
@@ -94,7 +97,13 @@ class InputScreenBinder(
         )
     }
 
-    /** Zero-duration animator used purely as a trigger for [BrandDesignInputScreenPicker.startWithAiAnimation]. */
+    /**
+     * Zero-duration animator used purely as a trigger for [BrandDesignInputScreenPicker.startWithAiAnimation].
+     *
+     * Caveat: "end()/cancel() before start means the animation never begins" only holds for `cancel()`.
+     * `ValueAnimator.end()` on a never-started animator fires `onAnimationStart` synchronously first, so the
+     * engine must `cancel()` — not `end()` — an unstarted entrance animator to suppress this trigger.
+     */
     private fun withAiAnimationTrigger(): Animator =
         ValueAnimator.ofInt(0, 1).apply {
             duration = 0L

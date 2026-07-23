@@ -101,7 +101,7 @@ class InputScreenPreviewBinder(
         inputModeToggle.isVisible = content.showModeToggle
 
         val initialTabIndex = if (state.value.isSearchSelected) 0 else 1
-        if (initialTabIndex != 0) {
+        if (content.showModeToggle && initialTabIndex != 0) {
             inputModeToggle.getTabAt(initialTabIndex)?.select()
         }
         applyMode(content, state.value.isSearchSelected, scope)
@@ -216,7 +216,12 @@ class InputScreenPreviewBinder(
      */
     private fun suggestionButtonsAnimator(): Animator = with(binding) {
         if (root.resources.configuration.screenHeightDp >= MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP) {
-            root.post { showKeyboard() }
+            root.post {
+                // Guards against the view having been torn down before this posted runnable executes, mirroring
+                // legacy's `if (view == null) return@post` (BrandDesignUpdateWelcomePage.kt:1518).
+                if (!root.isAttachedToWindow) return@post
+                showKeyboard()
+            }
         }
 
         val buttons = listOf(suggestion1, suggestion2, suggestion3)
