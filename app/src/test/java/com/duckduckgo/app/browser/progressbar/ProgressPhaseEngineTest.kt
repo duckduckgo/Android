@@ -311,6 +311,27 @@ class ProgressPhaseEngineTest {
     }
 
     @Test
+    fun `becoming visible resets the stall timer after time spent in the background`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+
+        time.advance(config.stallTimeoutMs + 1000)
+        engine.onBecameVisible()
+        engine.tick(0.016f)
+
+        assertEquals(Phase.TRACKING, engine.phase)
+        time.advance(config.stallTimeoutMs - 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        time.advance(1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
     fun `equal progress does not reset the stall timer`() {
         engine.stallDetectionEnabled = true
         engine.start()
