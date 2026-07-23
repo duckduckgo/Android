@@ -252,21 +252,28 @@ note right : shown pixel fires\nvia the step wrapper
 VM -> Engine : render(config, animate = first show of this step)
 Engine -> Engine : diff previous vs new config\n(no previous → clear stage, enter everything)
 Engine -> Binder : unbind(previous content)
+note right : cancels running animators\nand the state observation
 Engine -> Binder : bind(new content)
+note right : stateful screens: dispatch seeds the\nMutableStateFlow via contentValues\n(initialState() on first use) and hands\nit to the screen binder
 Binder --> Engine : ContentHandle
 Engine -> Engine : background ∥ embellishment ∥ card morph\n→ title types → content + CTAs fade in\n→ click listeners attach
 note right : animate = false runs the same\npipeline snapped to end states\n(rotation, re-entry, tap-to-skip,\nsystem animations off)
 
 == Interaction ==
 User -> Binder : live edits (picker, toggle)
-Binder -> VM : value into keyed live-value store\n(VM-owned, survives rotation)
-note right : no new config, no re-render
+Binder -> VM : state.update { … }\n(flow in contentValues, survives rotation)
+VM --> Binder : flow emits, binder renders\n(state down)
+note right : no new config, no engine re-render
+opt external change (quick setup resume sync)
+  VM -> VM : contentState(showing config)\n  .update { … }
+  VM --> Binder : flow emits, binder renders
+end
 User -> Engine : CTA click
 alt action is Emit(event)
   Engine -> VM : event as-is
 else action is Submit
   Engine -> Binder : handle.result()
-  Binder --> Engine : event built from current selection
+  Binder --> Engine : event built from state.value
   Engine -> VM : event
 end
 VM -> Orchestrator : forward event
@@ -342,10 +349,10 @@ Shared vs duplicated while both arms exist:
 - **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
   the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
   in place first, with legacy binding through it — the single legacy edit of the rollout.
-- **New slim VM.** Config + two flags + live-value store. The shown-pixel map (~15 lines) is
+- **New slim VM.** Config + two flags + `ContentValueStore`. The shown-pixel map (~15 lines) is
   duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
   are directly comparable. Command handling for the command-only steps ports as-is; the
-  quick-setup syncs become VM writes into the live-value store.
+  quick-setup syncs become VM writes into the content-value store.
 
 Sequence:
 
