@@ -202,8 +202,6 @@ class AddressBarBinder(private val binding: ViewAddressBarContentBinding) : Stat
     }
 }
 
-// dispatch only — the sealed when stays exhaustive, so a new ContentConfig
-// variant fails compilation until it gets a binder
 class ContentBinder(binding: …, private val contentValues: ContentValueStore) {
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val comparisonChart = ComparisonChartBinder(binding.comparisonChartContent)
@@ -220,11 +218,13 @@ class ContentBinder(binding: …, private val contentValues: ContentValueStore) 
 ```
 
 Screen logic can't reach across screens — a binder only sees its own layout, and stateful
-binders receive their seeded state flow instead of the store, so the wrong key or a
-forgotten seed is impossible.
+binders receive their own, already pre-seeded state flow only.
 
-Adding a screen: add the `ContentConfig` variant (implementing `Stateful` if it holds
-state — the compiler then demands `initialState()`). Add the binder. Add one line to `ContentBinder.bind()`. Done.
+Adding a screen:
+1. Add the `ContentConfig` variant (implementing `Stateful` if it holds
+state — the compiler then demands `initialState()`).
+2. Add the binder.
+3. Add one line to `ContentBinder.bind()`
 
 ### Flow
 
