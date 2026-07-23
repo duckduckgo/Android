@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Tere!</string>
     <string name="preOnboardingWelcomeDialogBody1">Kas oled valmis kasutama kiiremat brauserit, mis annab sulle kontrolli?</string>
     <string name="preOnboardingWelcomeDialogBody2">Tehisintellekt on alati valikuline ja privaatsuskaitse on alati sisse lülitatud.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kuidas öelda „part“ inglise keeles</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Proovi nüüd privaatset AI-vestlust!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Kas sa soovid DuckDuckGo oma vaikebrauseriks muuta?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Proovi meie avakuva vidinat.</string>
+    <string name="preOnboardingWidgetPromptBody">Kiire ja hõlpsa juurdepääsu tagamiseks lisa meie meie otsinguvidin avakuvale.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Lisa vidin</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Jäta vahele</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Lisa mind oma ekraani allossa.</string>
+    <string name="preOnboardingAddToDockBody">Leia oma avakuvalt DuckDuckGo ikoon. Seejärel vajuta ja lohista see oma kohale. See ongi kõik!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Sain aru!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Pakume ka tasulist tellimust, mis sisaldab täiustatud tehisintellekti mudeleid, millel on GPT ja Claude kõrgemad vestluspiirangud, turvaline VPN ja palju muud.</string>
