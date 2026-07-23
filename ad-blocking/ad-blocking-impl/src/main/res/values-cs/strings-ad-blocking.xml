@@ -43,5 +43,5 @@
     <string name="ad_blocking_settings_disabled_until_relaunch">Vypnuto do opětovného spuštění</string>
 
     <!-- smartling.character_limit = 19 -->
-    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Blokování reklam zapnuto</string>
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active.">Blokování reklam</string>
 </resources>
