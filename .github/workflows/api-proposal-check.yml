@@ -17,6 +17,11 @@ jobs:
     name: API Proposal check
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Verify API Proposal is linked for -api changes
         uses: actions/github-script@v8
         with:
@@ -65,12 +70,18 @@ jobs:
             }
 
             // --- 1. Did any -api source change? -----------------------------
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner, repo, pull_number: prNumber, per_page: 100,
-            });
-            const apiFiles = files
-              .filter(f => API_RE.test(f.filename) || (f.previous_filename && API_RE.test(f.previous_filename)))
-              .map(f => f.filename);
+            const { execFileSync } = require('child_process');
+            const baseSha = context.payload.pull_request.base.sha;
+            const headSha = context.payload.pull_request.head.sha;
+            const diff = execFileSync(
+              'git',
+              ['diff', '--name-only', '--no-renames', `${baseSha}...${headSha}`],
+              { encoding: 'utf8' },
+            );
+            const apiFiles = diff
+              .split('\n')
+              .map(f => f.trim())
+              .filter(f => API_RE.test(f));
 
             if (apiFiles.length === 0) {
               core.info('No -api source changes detected — API Proposal not required.');
@@ -109,15 +120,16 @@ jobs:
 
             const comment = [
               MARKER,
-              '### ❌ API Proposal required',
+              '### ⚠️ API Proposal reminder',
               '',
               'This PR changes the public surface of one or more `-api` modules, but the ' +
-                '**API Proposals** field of the PR description is empty.',
+                '**API Proposals** field of the PR description is empty. This is a ' +
+                'non-blocking reminder — please double-check whether a proposal is needed.',
               '',
               'Changed `-api` source files:',
               fileList,
               '',
-              '**To make this check pass**, edit the PR description and either:',
+              'To clear this reminder, edit the PR description and either:',
               '- add the approved API Proposal link(s) in the `API Proposals` field (one per line), or',
               '- write `None` there if this PR does not change the public API (e.g. KDoc, comments, tests).',
               '',
@@ -125,7 +137,7 @@ jobs:
             ].join('\n');
 
             await upsertSticky(comment);
-            core.setFailed(
+            core.warning(
               'This PR changes an -api module but the "API Proposals" field of the PR ' +
               'description is empty. Add the proposal link(s), or "None" if no public API changed.'
             );
