@@ -49,7 +49,7 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
                         updateMargins(top = 60, bottom = 60)
                     }
                     setTextColor(Color.BLACK)
-                    text = "Recovery codes placeholder"
+                    text = "Connected device: ${intent.getStringExtra("device")}"
                 },
             )
 

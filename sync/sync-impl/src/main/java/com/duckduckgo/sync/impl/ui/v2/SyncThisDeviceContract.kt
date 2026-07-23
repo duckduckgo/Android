@@ -16,10 +16,11 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.IntentCompat
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Input
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.BackedUp
@@ -39,8 +40,15 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
         intent: Intent?,
     ): Output {
         return when (resultCode) {
-            Activity.RESULT_OK -> BackedUp
-            SyncThisDeviceActivity.RESULT_SYNC_WITH_ANOTHER_DEVICE -> RequestSyncWithAnotherDevice
+            RESULT_DEVICE_BACKED_UP -> {
+                val device = intent
+                    ?.let { IntentCompat.getParcelableExtra(it, DEVICE_KEY, ParcelableDevice::class.java) }
+                    ?.toConnectedDevice()
+                if (device != null) BackedUp(device) else Canceled
+            }
+
+            RESULT_SYNC_WITH_ANOTHER_DEVICE -> RequestSyncWithAnotherDevice
+
             else -> Canceled
         }
     }
@@ -49,9 +57,21 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
         val source: String?,
     )
 
-    enum class Output {
-        BackedUp,
-        Canceled,
-        RequestSyncWithAnotherDevice,
+    sealed interface Output {
+        data class BackedUp(
+            val device: ConnectedDevice,
+        ) : Output
+
+        data object Canceled : Output
+
+        data object RequestSyncWithAnotherDevice : Output
+    }
+
+    companion object {
+        const val DEVICE_KEY = "device"
+        const val RESULT_DEVICE_BACKED_UP = 200
+        const val RESULT_SYNC_WITH_ANOTHER_DEVICE = 201
+
+        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
     }
 }

@@ -34,6 +34,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ThisDeviceBinding
+import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
+import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_SYNC_WITH_ANOTHER_DEVICE
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -117,7 +119,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.FinishSyncing -> {
-                setResult(RESULT_OK)
+                setResult(RESULT_DEVICE_BACKED_UP, SyncThisDeviceContract.resultIntent(command.device))
                 finish()
             }
 
@@ -176,8 +178,6 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val RESULT_SYNC_WITH_ANOTHER_DEVICE = 200
-
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
 
         fun intent(

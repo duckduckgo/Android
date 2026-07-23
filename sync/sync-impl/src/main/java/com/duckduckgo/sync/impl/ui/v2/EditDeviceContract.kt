@@ -18,12 +18,9 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import android.content.Context
 import android.content.Intent
-import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.IntentCompat
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.DeviceType
-import kotlinx.parcelize.Parcelize
 
 class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, EditDeviceContract.Output>() {
     override fun createIntent(
@@ -77,29 +74,5 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
         const val RESULT_SYNC_TURNED_OFF = 202
 
         fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
-    }
-}
-
-@Parcelize
-data class ParcelableDevice(
-    val id: String,
-    val name: String,
-    val factor: String,
-    val isThisDevice: Boolean,
-) : Parcelable {
-    fun toConnectedDevice() = ConnectedDevice(
-        deviceId = id,
-        deviceName = name,
-        deviceType = DeviceType(factor),
-        thisDevice = isThisDevice,
-    )
-
-    companion object {
-        fun fromConnectedDevice(device: ConnectedDevice) = ParcelableDevice(
-            id = device.deviceId,
-            name = device.deviceName,
-            factor = device.deviceType.deviceFactor,
-            isThisDevice = device.thisDevice,
-        )
     }
 }
