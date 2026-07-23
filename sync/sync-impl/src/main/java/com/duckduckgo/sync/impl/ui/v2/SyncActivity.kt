@@ -74,7 +74,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
@@ -137,7 +136,21 @@ class SyncActivity : DuckDuckGoActivity() {
     private val editDeviceLauncher = registerForActivityResult(
         EditDeviceContract(),
     ) { result ->
-        logcat { "Edit device result: $result" }
+        when (result) {
+            is EditDeviceContract.Output.DeviceEdited -> {
+                viewModel.onDevicesUpdated()
+            }
+
+            is EditDeviceContract.Output.RemoveDeviceConfirmed -> {
+                viewModel.onRemoveDeviceConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.TurnOffSyncConfirmed -> {
+                viewModel.onTurnOffSyncConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.NoOp -> Unit
+        }
     }
 
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
@@ -215,6 +228,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun renderDisabledState(viewState: ViewState) {
         binding.includeDisabledView.apply {
             root.isGone = viewState.showAccount
+            syncThisDeviceToggle.quietlySetIsChecked(viewState.isThisDeviceSyncing, syncThisDeviceListener)
             syncOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
@@ -327,10 +341,6 @@ class SyncActivity : DuckDuckGoActivity() {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
 
-            is SyncThisDeviceCanceled -> {
-                binding.includeDisabledView.syncThisDeviceToggle.quietlySetIsChecked(false, syncThisDeviceListener)
-            }
-
             is SyncWithAnotherDevice -> {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
@@ -411,12 +421,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         deviceAuthenticator.launchDeviceAuthEnrollment(this@SyncActivity)
                     }
 
-                    override fun onNegativeButtonClicked() {
+                    override fun onDialogDismissed() {
                         // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
-                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
-                    }
-
-                    override fun onDialogCancelled() {
                         if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
                     }
                 },

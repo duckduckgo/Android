@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.IntentCompat
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import kotlinx.parcelize.Parcelize
@@ -36,17 +37,46 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
         resultCode: Int,
         intent: Intent?,
     ): Output {
-        return Output
+        val device = intent
+            ?.let { IntentCompat.getParcelableExtra(it, DEVICE_KEY, ParcelableDevice::class.java) }
+            ?.toConnectedDevice()
+            ?: return Output.NoOp
+
+        return when (resultCode) {
+            RESULT_DEVICE_EDITED -> Output.DeviceEdited(device)
+            RESULT_DEVICE_REMOVED -> Output.RemoveDeviceConfirmed(device)
+            RESULT_SYNC_TURNED_OFF -> Output.TurnOffSyncConfirmed(device)
+            else -> Output.NoOp
+        }
     }
 
     data class Input(
         val device: ConnectedDevice,
     )
 
-    data object Output
+    sealed interface Output {
+        data class DeviceEdited(
+            val device: ConnectedDevice,
+        ) : Output
+
+        data class TurnOffSyncConfirmed(
+            val device: ConnectedDevice,
+        ) : Output
+
+        data class RemoveDeviceConfirmed(
+            val device: ConnectedDevice,
+        ) : Output
+
+        data object NoOp : Output
+    }
 
     companion object {
         const val DEVICE_KEY = "device"
+        const val RESULT_DEVICE_EDITED = 200
+        const val RESULT_DEVICE_REMOVED = 201
+        const val RESULT_SYNC_TURNED_OFF = 202
+
+        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
     }
 }
 
