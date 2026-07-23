@@ -46,6 +46,7 @@ import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
@@ -360,7 +361,10 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchLearnMore -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                globalActivityStarter.start(
+                    this,
+                    SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
+                )
             }
 
             is LaunchOriginalFlow -> {
@@ -493,7 +497,7 @@ class SyncActivity : DuckDuckGoActivity() {
             spans = listOf(
                 "learn_more_link" to object : DuckDuckGoClickableSpan() {
                     override fun onClick(widget: View) {
-                        logcat { "Learn more clicked" }
+                        viewModel.onLearnMoreClicked()
                     }
                 },
             ),
