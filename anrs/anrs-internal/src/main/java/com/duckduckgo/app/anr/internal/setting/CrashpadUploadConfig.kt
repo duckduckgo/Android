@@ -24,7 +24,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class CrashpadUploadConfig @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
 
-    private val prefs by lazy { sharedPreferencesProvider.getSharedPreferences("crashpad_upload_config") }
+    private val prefs by lazy { sharedPreferencesProvider.getSharedPreferences(CRASHPAD_UPLOAD_CONFIG) }
 
     var uploadUrl: String
         get() = prefs.getString(KEY_UPLOAD_URL, "") ?: ""
@@ -37,5 +37,6 @@ class CrashpadUploadConfig @Inject constructor(sharedPreferencesProvider: Shared
     companion object {
         private const val KEY_UPLOAD_URL = "upload_url"
         private const val KEY_NO_RATE_LIMIT = "no_rate_limit"
+        private const val CRASHPAD_UPLOAD_CONFIG = "crashpad_upload_config"
     }
 }
