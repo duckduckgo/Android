@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hej</string>
     <string name="preOnboardingWelcomeDialogBody1">Er du klar til en hurtigere browser, der sætter dig i førersædet?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er altid valgfrit, og beskyttelse af privatlivet er altid aktiveret.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d af %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">sådan siger man \"and\" på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">sådan siger man \"and\" på spansk</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Prøv nu en privat AI-chat!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vil du gøre DuckDuckGo til din standardbrowser?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Prøv vores widget til startskærmen.</string>
+    <string name="preOnboardingWidgetPromptBody">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Tilføj widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Spring over</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Føj mig til bunden af din skærm.</string>
+    <string name="preOnboardingAddToDockBody">Find DuckDuckGo-ikonet på din startskærm. Tryk og træk den derefter på plads. Det er det!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Forstået</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai, eller vælg Søg efter beskyttet browsing.<br/><br/>Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi tilbyder også et betalt abonnement med avancerede AI-modeller med højere chatgrænser fra GPT og Claude, en sikker VPN og meget mere.</string>
