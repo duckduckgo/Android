@@ -19,7 +19,6 @@ package com.duckduckgo.savedsites.impl.sync
 import android.content.*
 import android.util.*
 import android.widget.*
-import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -59,13 +58,7 @@ class DisplayModeSyncSetting @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.syncSettingsOptionFavourites.setOnCheckedChangeListener(
-            object : OnCheckedChangeListener {
-                override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                    viewModel.onDisplayModeChanged(isChecked)
-                }
-            },
-        )
+        binding.syncSettingsOptionFavourites.setOnCheckedChangeListener { _, isChecked -> viewModel.onDisplayModeChanged(isChecked) }
 
         job += viewModel.viewState()
             .onEach { render(it) }
