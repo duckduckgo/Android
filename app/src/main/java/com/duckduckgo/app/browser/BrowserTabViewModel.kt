@@ -391,7 +391,6 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
-import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -402,6 +401,7 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.promptscoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite

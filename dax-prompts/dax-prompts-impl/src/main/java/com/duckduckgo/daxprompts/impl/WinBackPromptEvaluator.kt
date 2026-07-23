@@ -28,8 +28,8 @@ import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
 import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn

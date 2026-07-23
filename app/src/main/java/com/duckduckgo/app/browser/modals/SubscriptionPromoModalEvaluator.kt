@@ -19,8 +19,8 @@ package com.duckduckgo.app.browser.modals
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalTrigger
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
+import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.delay

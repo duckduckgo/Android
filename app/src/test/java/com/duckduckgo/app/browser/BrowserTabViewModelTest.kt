@@ -325,7 +325,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
-import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -339,6 +338,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.promptscoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite

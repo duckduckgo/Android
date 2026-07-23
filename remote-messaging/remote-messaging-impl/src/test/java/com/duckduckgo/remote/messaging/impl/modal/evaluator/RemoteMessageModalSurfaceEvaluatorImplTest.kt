@@ -26,8 +26,8 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType

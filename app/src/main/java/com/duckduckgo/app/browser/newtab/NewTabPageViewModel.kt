@@ -34,6 +34,8 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
@@ -81,6 +83,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
+    private val promptsCoordinator: PromptsCoordinator,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -163,21 +166,33 @@ class NewTabPageViewModel @AssistedInject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
-                    val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
+                    // The card shares the NTP prompt surface with modals, so it renders only while
+                    // holding a claim, and re-checks on the next render when refused.
+                    val remoteMessage = snapshot.remoteMessage
+                    val message = remoteMessage?.takeIf { promptsCoordinator.tryClaim(PromptType.NTP_CARD) }
+                    if (remoteMessage == null) {
+                        promptsCoordinator.onClaimDone(PromptType.NTP_CARD)
+                    }
+
+                    // A card waiting for the surface has not gone away: clearing the baseline would
+                    // re-report it to RMF as newly shown, and anything filling the slot meanwhile
+                    // would keep it hidden on return.
+                    val awaitingSurface = remoteMessage != null && message == null
+                    val newMessage = !awaitingSurface && message?.id != lastRemoteMessageSeen?.id
                     if (newMessage) {
-                        lastRemoteMessageSeen = snapshot.remoteMessage
+                        lastRemoteMessageSeen = message
                     }
 
                     withContext(dispatchers.io()) {
                         val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
                         _viewState.emit(
                             viewState.value.copy(
-                                message = snapshot.remoteMessage,
+                                message = message,
                                 messageImageFilePath = messageImageFilePath,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
                                 onboardingComplete = isHomeOnboardingComplete(),
-                                lowPriorityMessage = if (!newMessage) lowPriorityMessagingModel.getMessage() else null,
+                                lowPriorityMessage = if (!newMessage && !awaitingSurface) lowPriorityMessagingModel.getMessage() else null,
                             ),
                         )
                     }

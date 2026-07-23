@@ -46,8 +46,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
