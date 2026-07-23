@@ -136,7 +136,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
             alpha = 1f
         } else {
             alpha = 0f
-            animate().alpha(1f).setDuration(config.fadeInDuration).start()
+            animate().alpha(1f).setDuration(config.fadeInDurationMs).start()
         }
         visibility = VISIBLE
         lastFrameTimeNanos = 0L
@@ -186,7 +186,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         isDismissing = true
         animate()
             .alpha(0f)
-            .setDuration(config.fadeOutDuration)
+            .setDuration(config.fadeOutDurationMs)
             .withEndAction {
                 if (isDismissing) {
                     _isStarted = false

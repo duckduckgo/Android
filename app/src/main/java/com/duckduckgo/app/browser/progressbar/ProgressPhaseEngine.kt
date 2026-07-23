@@ -139,7 +139,7 @@ class ProgressPhaseEngine(
 
     private fun tickFastStart() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.fastStartDuration).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / config.fastStartDurationMs).coerceIn(0f, 1f)
         // cubic ease-in
         val eased = t * t * t
         displayProgress = eased * config.fastStartTarget
@@ -188,7 +188,7 @@ class ProgressPhaseEngine(
 
     private fun tickResuming() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.resumeDuration).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / config.resumeDurationMs).coerceIn(0f, 1f)
         // Constant-time cosmetic catch-up (ease-out), independent of the spring.
         val inv = 1f - t
         val eased = 1f - inv * inv * inv
@@ -204,7 +204,7 @@ class ProgressPhaseEngine(
 
     private fun tickCompleting() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.endDuration).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / config.endDurationMs).coerceIn(0f, 1f)
         val eased = t * t * t // cubic ease-in
         displayProgress = completionFrom + (100f - completionFrom) * eased
 

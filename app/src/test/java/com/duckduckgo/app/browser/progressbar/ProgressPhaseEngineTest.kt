@@ -395,7 +395,7 @@ class ProgressPhaseEngineTest {
     fun `resume catch-up is animated, not an instant jump`() {
         enterIndeterminate(real = 60f)
         engine.onSweepFinished()
-        time.advance(config.resumeDuration / 2)
+        time.advance(config.resumeDurationMs / 2)
         engine.tick(0.1f)
         assertEquals(Phase.RESUMING, engine.phase)
         assertTrue("mid catch-up should be partway, was ${engine.displayProgress}", engine.displayProgress > 0f)
@@ -408,7 +408,7 @@ class ProgressPhaseEngineTest {
         assertTrue("displayed ($frozen) should exceed the real progress", frozen > 15f)
         engine.onProgressUpdate(15f) // real resumes but stays below the displayed value
         engine.onSweepFinished()
-        time.advance(config.resumeDuration + 1)
+        time.advance(config.resumeDurationMs + 1)
         engine.tick(0.4f)
         assertEquals(Phase.TRACKING, engine.phase)
         assertEquals(frozen, engine.displayProgress, 0.001f)
@@ -420,7 +420,7 @@ class ProgressPhaseEngineTest {
         val frozen = engine.displayProgress
         engine.onProgressUpdate(frozen + 20f) // real jumped past the displayed value
         engine.onSweepFinished()
-        time.advance(config.resumeDuration + 1)
+        time.advance(config.resumeDurationMs + 1)
         engine.tick(0.4f)
         assertEquals(Phase.TRACKING, engine.phase)
         assertEquals(frozen + 20f, engine.displayProgress, 0.001f)
@@ -432,7 +432,7 @@ class ProgressPhaseEngineTest {
         engine.onProgressUpdate(80f) // far target
         engine.onSweepFinished()
         assertEquals(Phase.RESUMING, engine.phase)
-        time.advance(config.resumeDuration + 1)
+        time.advance(config.resumeDurationMs + 1)
         engine.tick(0.4f)
         assertEquals(Phase.TRACKING, engine.phase)
         assertEquals(80f, engine.displayProgress, 0.001f)
