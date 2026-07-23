@@ -1,16 +1,8 @@
 ---
 name: prepare-sbt-repro
-description: >
-  Build, install, launch, screenshot, and cleanup mechanics for SBT live-site
-  reproduction on Cursor self-hosted Android agents. Use when preparing SBT
-  repro runs or handling emulator and device setup issues.
+description: Build, install, launch, screenshot, and cleanup mechanics for SBT live-site reproduction on Cursor self-hosted Android agents in `ddg-native-android`. Use when setting up a device for SBT repro runs.
 disable-model-invocation: true
 ---
-
-# Prepare SBT Repro
-
-Use this for build, emulator, launch, screenshot, and cleanup mechanics when
-preparing an SBT live-site reproduction on `ddg-native-android`.
 
 ## Build and install
 
