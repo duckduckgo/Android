@@ -74,15 +74,13 @@ class IndeterminateSweepRenderer(
         val elapsed = now - startTime
         val radius = (bottom - top) / 2f
         val lastCycle = finalCycleIndex
-        IndeterminateSweepGeometry.calculateSegments(elapsed, config.indeterminateCycleMs, seedLeading)
-            .asSequence()
-            .filter { segment -> lastCycle == null || segment.cycleIndex <= lastCycle }
-            .forEach { segment ->
-                val left = segment.edges.trailing * trackWidth
-                val right = segment.edges.leading * trackWidth
-                if (right - left > 0f) {
-                    canvas.drawRoundRect(left, top, right, bottom, radius, radius, paint)
-                }
+        for (segment in IndeterminateSweepGeometry.calculateSegments(elapsed, config.indeterminateCycleMs, seedLeading)) {
+            if (lastCycle != null && segment.cycleIndex > lastCycle) continue
+            val left = segment.edges.trailing * trackWidth
+            val right = segment.edges.leading * trackWidth
+            if (right - left > 0f) {
+                canvas.drawRoundRect(left, top, right, bottom, radius, radius, paint)
             }
+        }
     }
 }
