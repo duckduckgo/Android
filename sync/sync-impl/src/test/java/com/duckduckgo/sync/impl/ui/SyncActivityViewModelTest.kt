@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -35,6 +36,7 @@ import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
@@ -47,6 +49,7 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
@@ -55,6 +58,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
@@ -94,6 +98,7 @@ class SyncActivityViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val recoveryPDF: RecoveryCodePDF = mock()
+    private val clipboardInteractor: ClipboardInteractor = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
     private val syncEngine: SyncEngine = mock()
@@ -118,6 +123,7 @@ class SyncActivityViewModelTest {
             syncStateMonitor = syncStateMonitor,
             syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
+            clipboard = clipboardInteractor,
             syncFeatureToggle = syncFeatureToggle,
             settingsPageFeature = fakeSettingsPageFeature,
             syncPixels = syncPixels,
@@ -742,6 +748,77 @@ class SyncActivityViewModelTest {
             testee.generateRecoveryCode(mock())
             val command = awaitItem()
             assertTrue(command is RecoveryCodePDFSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnCopyRecoveryCodeThenEmitAskToCopyRecoveryCodeCommand() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        testee.commands().test {
+            testee.onCopyRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is AskToCopyRecoveryCode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnCopyRecoveryCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onCopyRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is RequestSetupAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCopyRecoveryCodeAuthenticatedThenCodeIsCopiedToClipboard() = runTest {
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+
+        testee.onCopyRecoveryCodeAuthenticated()
+
+        verify(clipboardInteractor).copyToClipboard(authCodeToUse.rawCode, isSensitive = true)
+    }
+
+    @Test
+    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNoNotificationThenEmitShowMessageCommand() = runTest {
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+        whenever(clipboardInteractor.copyToClipboard(any(), any())).thenReturn(false)
+
+        testee.commands().test {
+            testee.onCopyRecoveryCodeAuthenticated()
+            val command = awaitItem()
+            assertTrue(command is ShowMessage)
+            assertEquals(R.string.sync_code_copied_message, (command as ShowMessage).message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNotificationThenNoMessageShown() = runTest {
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+        whenever(clipboardInteractor.copyToClipboard(any(), any())).thenReturn(true)
+
+        testee.commands().test {
+            testee.onCopyRecoveryCodeAuthenticated()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCopyRecoveryCodeAuthenticatedAndGettingRecoveryCodeFailsThenEmitShowErrorCommand() = runTest {
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "error"))
+
+        testee.commands().test {
+            testee.onCopyRecoveryCodeAuthenticated()
+            awaitItem().assertCommandType(Command.ShowError::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
