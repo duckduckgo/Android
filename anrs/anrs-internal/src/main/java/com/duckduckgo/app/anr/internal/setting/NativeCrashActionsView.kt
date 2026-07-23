@@ -18,6 +18,7 @@ package com.duckduckgo.app.anr.internal.setting
 
 import android.content.Context
 import com.duckduckgo.android_crashkit.Crashpad
+import com.duckduckgo.app.anr.internal.R
 import com.duckduckgo.app.anr.internal.feature.CrashAnrDevCapabilityPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -27,8 +28,8 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashDumpPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = "Dump without crash"
-    override fun subtitle(): String = "Capture a Crashpad minidump without terminating"
+    override fun title(): String = R.string.crashpad_crashdump_plugin_title.toString()
+    override fun subtitle(): String = R.string.crashpad_crashdump_plugin_subtitle.toString()
     override fun onCapabilityClicked(activityContext: Context) {
         Crashpad.dumpWithoutCrash()
     }
@@ -37,8 +38,8 @@ class NativeCrashDumpPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashTriggerPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = "Trigger native crash"
-    override fun subtitle(): String = "Force a native crash via Crashpad (app will terminate)"
+    override fun title(): String = R.string.crashpad_trigger_plugin_title.toString()
+    override fun subtitle(): String = R.string.crashpad_trigger_plugin_subtitle.toString()
     override fun onCapabilityClicked(activityContext: Context) {
         Crashpad.crash()
     }
@@ -47,8 +48,8 @@ class NativeCrashTriggerPlugin @Inject constructor() : CrashAnrDevCapabilityPlug
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashUploadPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = "Request upload for pending reports"
-    override fun subtitle(): String = "Marks all pending minidumps for immediate upload by the handler"
+    override fun title(): String = R.string.crashpad_upload_plugin_title.toString()
+    override fun subtitle(): String = R.string.crashpad_upload_plugin_subtitle.toString()
     override fun onCapabilityClicked(activityContext: Context) {
         val count = Crashpad.requestUploadForPendingReports()
         android.widget.Toast.makeText(
