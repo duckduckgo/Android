@@ -30,6 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -339,6 +340,30 @@ class RealContentScopeScriptsTest {
         val js = testee.getScript(null, listOf())
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
+    }
+
+    @Test
+    fun whenOptimizeInjectionEnabledThenOutputIsByteIdenticalToFallbackPath() {
+        // Fallback path (chained String.replace).
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
+        val fallbackJs = testee.getScript(null, listOf())
+
+        // Optimized path (single-pass StringBuilder). Fresh instance so its caches build under the flag.
+        val optimizedTestee = RealContentScopeScripts(
+            mockPluginPoint,
+            mockUserAllowListRepository,
+            mockContentScopeJsReader,
+            mockAppBuildConfig,
+            mockUnprotectedTemporary,
+            mockFingerprintProtectionManager,
+            contentScopeScriptsFeature,
+        )
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val optimizedJs = optimizedTestee.getScript(null, listOf())
+
+        // The three messaging secrets are random per instance; normalise them before the byte comparison.
+        val secret = Regex("[\\da-f]{32}")
+        assertEquals(secret.replace(fallbackJs, "SECRET"), secret.replace(optimizedJs, "SECRET"))
     }
 
     @Test
