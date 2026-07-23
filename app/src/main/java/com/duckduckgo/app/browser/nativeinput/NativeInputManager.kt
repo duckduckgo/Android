@@ -182,6 +182,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
     private val nativeInputEventListener: NativeInputEventListener,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
@@ -283,9 +284,12 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isNativeInputActive(): Boolean {
         if (!isNativeInputFieldEnabled) return false
-        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
+        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only,
+        // unless the search-only feature flag is on.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
-        return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
+        return inDuckAi ||
+            inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY ||
+            nativeInputSearchOnlyFeature.self().isEnabled()
     }
 
     override fun isNativeInputShown(): Boolean {
