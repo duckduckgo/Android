@@ -112,7 +112,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
             if (engine.phase == Phase.DONE) {
                 onDone()
-            } else if (engine.phase != Phase.IDLE) {
+            } else if (state.shouldInvalidate) {
                 Choreographer.getInstance().postFrameCallback(this)
             }
         }
