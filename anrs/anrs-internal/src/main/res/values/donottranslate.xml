@@ -21,4 +21,10 @@
     <string name="crashpad_no_rate_limit">No rate limit</string>
     <string name="crashpad_save_and_restart">Save &amp; Restart</string>
     <string name="crashpad_cancel">Cancel</string>
+    <string name="crashpad_crashdump_plugin_title">Dump without crash</string>
+    <string name="crashpad_crashdump_plugin_subtitle">Capture a Crashpad minidump without terminating</string>
+    <string name="crashpad_trigger_plugin_title">Trigger native crash</string>
+    <string name="crashpad_trigger_plugin_subtitle">Force a native crash via Crashpad (app will terminate)</string>
+    <string name="crashpad_upload_plugin_title">Request upload for pending reports</string>
+    <string name="crashpad_upload_plugin_subtitle">Marks all pending minidumps for immediate upload by the handler</string>
 </resources>
