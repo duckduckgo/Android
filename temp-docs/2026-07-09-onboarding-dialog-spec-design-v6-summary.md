@@ -312,7 +312,7 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 | Risk | Mitigation |
 |---|---|
 | Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared config ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
-| Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
+| Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. While both arms exist the shown-pixel mapping is a single shared `when` both VMs call (see Rollout), so a pixel added to legacy fires from the new arm too. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
 | Regression in a release-critical flow | Whole parallel renderer behind a remote toggle (see Rollout): the flag-off arm stays byte-identical, mixed-renderer sessions never exist, and the kill switch needs no release. Maestro release-blocker flows run in both flag states, plus unit tests off the resolver |
 | Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content config or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
@@ -333,8 +333,11 @@ Shared vs duplicated while both arms exist:
   into the steps at cleanup.
 - **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
   the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
-  in place first, with legacy binding through it — the single legacy edit of the rollout.
-- **New slim VM.** Config + two flags + `ContentValueStore`. The shown-pixel map (~15 lines) is
-  duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
-  are directly comparable. Command handling for the command-only steps ports as-is; the
-  quick-setup syncs become VM writes into the content-value store.
+  in place first, with legacy binding through it — one of two mechanical legacy edits of the
+  rollout (the other is the shown-pixel extraction below).
+- **New slim VM.** Config + two flags + `ContentValueStore`. Shown pixels come from one shared
+  mapping: an exhaustive `when (dialog)` → pixel, extracted from legacy (~15 lines) and called
+  by both VMs. Parity can't drift — a pixel added during ramp fires from both arms, and a new
+  dialog is a compile error until mapped. Both arms emit identical pixel names, so ramp arms are
+  directly comparable. Command handling for the command-only steps ports as-is; the quick-setup
+  syncs become VM writes into the content-value store.
