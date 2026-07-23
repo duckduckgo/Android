@@ -28,6 +28,8 @@ interface ModalEvaluator {
      */
     val priority: Int
 
+    val test: String
+
     /**
      * Unique identifier for this evaluator, used for tracking completion timestamps.
      */
