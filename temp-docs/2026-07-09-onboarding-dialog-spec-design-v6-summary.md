@@ -149,8 +149,9 @@ never produce a new config, they stay local until submitted:
 - **Live state.** A stateful screen's working state is one value class in a store owned by
   the VM, one `MutableStateFlow` per screen, keyed by the config class. State flows one way:
   writes go into the store, the binder observes and renders. The engine seeds the flow from
-  the config's `initialState()` before bind. A new stateful screen is a new state class, not
-  a new VM field.
+  the config's `initialState()` before bind, and the observation is bind-scoped — the engine
+  cancels it at unbind, like animators. A new stateful screen carries its state class, doesn't need a
+  new VM field.
   ```
   BrandDesignUpdatePageViewModel
       └─ contentValues: ContentValueStore
@@ -158,24 +159,22 @@ never produce a new config, they stay local until submitted:
   ```kotlin
   class ContentValueStore {
       private val states = mutableMapOf<KClass<*>, MutableStateFlow<*>>()
-      fun <S : Any> contentState(content: Stateful<S>): ContentState<S>            // seeded from initialState() on first use
-      fun <S : Any, C : Stateful<S>> update(type: KClass<C>, transform: (S) -> S)  // VM-side writes (external syncs)
+      fun <S : Any> contentState(content: Stateful<S>): MutableStateFlow<S>  // seeded from initialState() on first use
   }
   ```
 - **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
-  event from the screen's state (`{ AddressBarConfirmed(state.flow.value.position) }`).
+  event from the screen's state (`{ AddressBarConfirmed(state.value.position) }`).
   The engine's CTA listener fires the closure and forwards the finished event to the VM —
   the VM forwards events blindly and never needs to know which screen is showing.
 - **External changes.** Quick setup re-syncs its default-browser and widget switches on
-  resume. Same path: the VM writes fresh values into the store and the bound screen's
-  observation renders them.
+  resume. Same path: the VM writes fresh values through `contentState(…)` on the showing
+  screen's config and the bound screen's observation renders them.
 
 Stateful binders are state-down-events-up, so they port to Compose as directly as the
 configs do (`collectAsState` plus write-back).
 
-**Binders.** One small binder per screen, in its own file, holding only its own layout's
-binding — it knows how its layout renders its `ContentConfig` and returns the handle.
-`ContentBinder` itself is dispatch only:
+**Binders.** One small binder per screen, holding only its own layout's
+binding — it knows how its layout renders its `ContentConfig` and returns the handle:
 
 ```kotlin
 // view layer — one binder per screen
@@ -183,13 +182,10 @@ interface DialogBinder<C : ContentConfig> {
     fun bind(content: C): ContentHandle
 }
 interface StatefulDialogBinder<C, S : Any> where C : ContentConfig, C : Stateful<S> {
-    fun bind(content: C, state: ContentState<S>): ContentHandle
+    fun bind(content: C, state: MutableStateFlow<S>): ContentHandle  // state seeded from the config's initialState() before bind
 }
-class ContentState<S>(
-    val flow: StateFlow<S>,          // seeded from the config's initialState() before bind
-    val update: ((S) -> S) -> Unit,
-)
 
+// stateless dialog example
 class ComparisonChartBinder(private val binding: ViewComparisonChartContentBinding) : DialogBinder<ContentConfig.ComparisonChart> {
     override fun bind(content: ContentConfig.ComparisonChart): ContentHandle = with(binding) {
         populate(content.config)
@@ -197,11 +193,12 @@ class ComparisonChartBinder(private val binding: ViewComparisonChartContentBindi
     }
 }
 
+// stateful dialog example
 class AddressBarBinder(private val binding: ViewAddressBarContentBinding) : StatefulDialogBinder<ContentConfig.AddressBar, AddressBarContentState> {
-    override fun bind(content: ContentConfig.AddressBar, state: ContentState<AddressBarContentState>): ContentHandle = with(binding) {
+    override fun bind(content: ContentConfig.AddressBar, state: MutableStateFlow<AddressBarContentState>): ContentHandle = with(binding) {
         picker.onOptionSelected = { position -> state.update { it.copy(position = position) } }  // events up
-        observe(state.flow) { picker.selected = it.position }                                    // state down
-        ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(state.flow.value.position) })
+        observe(state) { picker.selected = it.position }                                         // state down
+        ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(state.value.position) })
     }
 }
 
@@ -223,7 +220,7 @@ class ContentBinder(binding: …, private val contentValues: ContentValueStore) 
 ```
 
 Screen logic can't reach across screens — a binder only sees its own layout, and stateful
-binders receive their seeded `ContentState` instead of the store, so the wrong key or a
+binders receive their seeded state flow instead of the store, so the wrong key or a
 forgotten seed is impossible.
 
 Adding a screen: add the `ContentConfig` variant (implementing `Stateful` if it holds
