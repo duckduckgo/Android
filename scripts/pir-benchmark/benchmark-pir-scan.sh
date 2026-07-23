@@ -13,8 +13,9 @@ source "$DIR/lib/parse.sh"
 # scan (~100-200 min/run), which dominates the sweep. {10,20,40} captures the
 # memory-vs-count trend and the 20-vs-40 comparison. Add 1 back for an overnight
 # serial-baseline / per-WebView-floor run if needed.
-COUNTS=(10 20 40)
-REPS=3
+# Override per session with env vars, e.g. BENCH_COUNTS="15 20" BENCH_REPS=3 ./benchmark-pir-scan.sh
+COUNTS=(${BENCH_COUNTS:-10 20 40})
+REPS="${BENCH_REPS:-3}"
 SAMPLE_INTERVAL="${SAMPLE_INTERVAL:-1}"     # seconds between memory samples
 DETAIL_INTERVAL="${DETAIL_INTERVAL:-10}"    # seconds between detailed per-pid captures
 MAX_SCAN_SECONDS="${MAX_SCAN_SECONDS:-1800}"  # safety timeout per run
