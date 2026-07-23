@@ -147,7 +147,7 @@ class DialogRenderEngine(
         bound = newBound
         val handle = newBound.handle
         newBound.view.isVisible = true
-        bindCtas(config, handle)
+        bindCtaAppearance(config)
 
         val entrance = EntranceCollector().also { collector -> handle.entrance?.invoke(collector) }
 
@@ -158,11 +158,22 @@ class DialogRenderEngine(
         if (animateNow) {
             handle.fadeTargets.forEach { it.alpha = 0f }
             ctaViews(config).forEach { it.alpha = 0f }
+            // Captured so the fade's onEnd below (fired async, possibly well after this render() call returns)
+            // can tell whether it's still describing the *current* render before arming CTA listeners for it -
+            // see [attachCtaListeners] call site and [generation]'s own doc.
+            val gen = generation
             morphCard {
                 handle.title?.type {
                     runAndTrack(entrance.afterTitleAnimators)
                     fadeIn(handle.fadeTargets + ctaViews(config)) {
                         runAndTrack(entrance.afterFadeAnimators)
+                        // Finding 2: CTAs are armed only once their fade-in has actually completed (real time,
+                        // or settled early by skipRunningAnimations()/settlePendingMorph()) - never at bind time -
+                        // so a CTA sitting at alpha 0 during the entrance can't be clicked before it's visible.
+                        // The generation check guards against a superseded render's fade being end()ed by a
+                        // newer render's own skipRunningAnimations() call: that must not arm listeners for a
+                        // config/handle this engine has already unbound.
+                        if (gen == generation) attachCtaListeners(config, handle)
                     }
                 }
             }
@@ -177,6 +188,9 @@ class DialogRenderEngine(
             // input-screen Lottie loop playing (BrandDesignUpdateWelcomePage.kt:2130-2131). cancel() would
             // SUPPRESS the trigger instead (that's what release() wants) which would be wrong here.
             (entrance.afterTitleAnimators + entrance.afterFadeAnimators).forEach { it().end() }
+            // Nothing async between here and bind time on this branch, so no generation race to guard against -
+            // arm directly, matching the animate path's end state.
+            attachCtaListeners(config, handle)
         }
 
         previous = config
@@ -268,19 +282,41 @@ class DialogRenderEngine(
     // alone (BrandDesignUpdateWelcomePage.kt:1537/:2230). Documented POC gap carried over from Task 6.
     private fun showArrowFor(content: ContentConfig): Boolean = content !is ContentConfig.InputScreenPreview
 
-    private fun bindCtas(config: DialogConfig, handle: ContentHandle) {
-        bindCta(binding.daxDialogCta.primaryCta, config.primaryCta, handle)
-        bindCta(binding.daxDialogCta.secondaryCta, config.secondaryCta, handle)
+    /**
+     * Finding 2 fix, step 1 of 2: text/visibility only, at bind time. Deliberately leaves both CTA views
+     * unclickable (`isClickable = false`, no listener) - [attachCtaListeners] arms them once the entrance's
+     * fade-in has actually settled, so a CTA still fading in from alpha 0 can never be clicked early (Android
+     * delivers touch events regardless of a view's alpha).
+     */
+    private fun bindCtaAppearance(config: DialogConfig) {
+        bindCtaAppearance(binding.daxDialogCta.primaryCta, config.primaryCta)
+        bindCtaAppearance(binding.daxDialogCta.secondaryCta, config.secondaryCta)
     }
 
-    private fun bindCta(view: DaxButton, cta: CtaConfig?, handle: ContentHandle) {
+    private fun bindCtaAppearance(view: DaxButton, cta: CtaConfig?) {
+        view.setOnClickListener(null) // avoid retaining a listener closure over a now-unbound handle
+        view.isClickable = false
         if (cta == null) {
             view.isGone = true
-            view.setOnClickListener(null) // avoid retaining a listener closure over a now-unbound handle
             return
         }
         view.isVisible = true
         view.text = cta.text.resolve(view.context)
+    }
+
+    /**
+     * Finding 2 fix, step 2 of 2: arms both CTA views' real click behavior. Called only once a render's pipeline
+     * has actually reached its settled/visible end state - see the two call sites in [render] for exactly when
+     * that is for the animate vs. snap paths.
+     */
+    private fun attachCtaListeners(config: DialogConfig, handle: ContentHandle) {
+        attachCtaListener(binding.daxDialogCta.primaryCta, config.primaryCta, handle)
+        attachCtaListener(binding.daxDialogCta.secondaryCta, config.secondaryCta, handle)
+    }
+
+    private fun attachCtaListener(view: DaxButton, cta: CtaConfig?, handle: ContentHandle) {
+        if (cta == null) return
+        view.isClickable = true
         view.setOnClickListener { ctaListener(cta.action, handle)() }
     }
 

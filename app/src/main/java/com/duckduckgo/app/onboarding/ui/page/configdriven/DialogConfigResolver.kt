@@ -42,7 +42,9 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.WalkingDax,
             content = ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
-                body1 = TextConfig.Resource(if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1),
+                body1 = TextConfig.Resource(
+                    if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1,
+                ),
                 body2 = if (isCustomAiFlow) null else TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
             ),
             primaryCta = CtaConfig(
@@ -56,7 +58,9 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.WalkingDax,
             content = ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
-                body1 = TextConfig.Resource(if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1),
+                body1 = TextConfig.Resource(
+                    if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1,
+                ),
                 body2 = if (isCustomAiFlow) null else TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
             ),
             primaryCta = CtaConfig(

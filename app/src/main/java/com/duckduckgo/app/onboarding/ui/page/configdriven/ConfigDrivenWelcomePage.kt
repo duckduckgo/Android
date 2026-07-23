@@ -62,13 +62,13 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
@@ -125,6 +125,18 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
 
     /** A render deferred because [introRunning] was still true when its [ConfigDrivenOnboardingPageViewModel.ViewState] arrived. */
     private var pendingFirstRender: (() -> Unit)? = null
+
+    /**
+     * True for the duration of [renderConfig]'s deferred `intro.playOutro { ... }` path — i.e. from the moment
+     * the outro fade is scheduled until its `onEnd` continuation actually calls [DialogRenderEngine.render].
+     * While set, [renderConfig] returns early instead of rendering: without this guard, a later [ViewState]
+     * emission arriving mid-outro (e.g. the plan advancing to its next step) would call [DialogRenderEngine.render]
+     * immediately -- racing the still-fading outro, since the engine's empty-stage policy always animates a first
+     * bind -- and the outro's own continuation would then render the *same* (already-current) config into a no-op
+     * dedup, silently dropping [ConfigDrivenOnboardingPageViewModel.onDialogRendered]'s one-shot call for it. See
+     * [renderConfig].
+     */
+    private var outroInFlight = false
 
     private val requestNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (view?.windowVisibility == View.VISIBLE) {
@@ -249,38 +261,57 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
      * Renders [state]'s [DialogConfig] through the [engine], handling the intro/first-dialog handshake:
      *  - If the intro played live in this instance ([introPlayedInThisView]), the first render plays the intro's
      *    outro fade first, then renders with `animate = true` — mirroring legacy's intro -> outro -> first-dialog
-     *    chain.
+     *    chain. [outroInFlight] guards this window: any [ConfigDrivenOnboardingPageViewModel.ViewState] emission
+     *    that arrives before the outro's `onEnd` fires returns early here instead of racing [DialogRenderEngine.render] against the still-fading
+     *    outro (see [outroInFlight]'s doc for why). The outro's own continuation re-reads
+     *    [ConfigDrivenOnboardingPageViewModel.viewState] at completion time rather than using the captured
+     *    `state`/`config`, so a plan advance mid-outro still renders exactly once, with the newest config.
      *  - Otherwise (mid-flow re-entry / rotation: this instance never played the intro) the intro-only views are
      *    snapped to their settled end state once, then the config renders with [ConfigDrivenOnboardingPageViewModel.ViewState.animateEntry].
      *
-     * Every subsequent call renders directly with `state.animateEntry`. Note: since a config change always
-     * creates a fresh engine (`previous == null`), [DialogRenderEngine.render]'s own "empty stage always
-     * animates" policy means a rotation's first render animates its entrance regardless of `animateEntry` —
-     * a known, spec-documented tension the engine itself flags, not something resolved here (see
+     * Every subsequent call renders directly with `state.animateEntry`. [ConfigDrivenOnboardingPageViewModel.onDialogRendered]
+     * is only called once [DialogRenderEngine.render] has actually run for a given step on every path — including
+     * the deferred outro one — never merely scheduled, so the one-shot `animateEntry` flip can't outrun the render
+     * it's meant to describe.
+     *
+     * Note: since a config change always creates a fresh engine (`previous == null`), [DialogRenderEngine.render]'s
+     * own "empty stage always animates" policy means a rotation's first render animates its entrance regardless of
+     * `animateEntry` — a known, spec-documented tension the engine itself flags, not something resolved here (see
      * `task-9-report.md`).
      */
     private fun renderConfig(state: ConfigDrivenOnboardingPageViewModel.ViewState) {
+        if (outroInFlight) return // the in-flight outro's own continuation (below) will render the freshest config when it completes.
         val engine = engine ?: return
         val config = state.config ?: return
 
         if (!hasRenderedOnce) {
             hasRenderedOnce = true
             if (introPlayedInThisView) {
-                intro?.playOutro { engine.render(config, animate = true) }
+                outroInFlight = true
+                intro?.playOutro {
+                    outroInFlight = false
+                    // Re-read the live ViewState rather than trusting the captured `state`/`config`: the plan may
+                    // have advanced to a newer step while the outro was fading (the guard above deferred those
+                    // emissions here instead of rendering them directly). Fall back to the originally-captured
+                    // `state` only in the defensive edge case where the live state has since lost its config
+                    // entirely (e.g. a command-only dialog raced in).
+                    val liveState = viewModel.viewState.value
+                    val renderState = if (liveState.config != null) liveState else state
+                    engine.render(renderState.config ?: return@playOutro, animate = true)
+                    renderState.stepId?.let { viewModel.onDialogRendered(it) }
+                }
             } else {
                 // Mirrors legacy's snapToIntroEndState() call at the top of showDialogWithoutAnimation
                 // (BrandDesignUpdateWelcomePage.kt:1706): settle the intro-only views once before the first
                 // real dialog renders, since this fresh instance's views start at their pre-intro XML defaults.
                 intro?.snapToIntroEndState()
                 engine.render(config, state.animateEntry)
+                state.stepId?.let { viewModel.onDialogRendered(it) }
             }
         } else {
             engine.render(config, state.animateEntry)
+            state.stepId?.let { viewModel.onDialogRendered(it) }
         }
-
-        // One-shot: flips animateEntry off for this stepId so a later rotation re-collection of the VM's
-        // (replayed, not recomputed) ViewState snaps instead of replaying this entrance again.
-        state.stepId?.let { viewModel.onDialogRendered(it) }
     }
 
     private fun handleCommand(command: ConfigDrivenOnboardingPageViewModel.Command) {
@@ -377,6 +408,9 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
             logcat(WARN) { "$errorMessage: ${e.asLog()}" }
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            // No activity ever launched, so onResume() (which would normally refresh these) never fires again for
+            // this — resync the quick-setup switches directly, mirroring legacy's catch-block behavior.
+            viewModel.syncQuickSetupSwitches()
         }
     }
 

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
-import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.reflect.KClass
 
 /**
  * VM-owned store of live working state for stateful screens.

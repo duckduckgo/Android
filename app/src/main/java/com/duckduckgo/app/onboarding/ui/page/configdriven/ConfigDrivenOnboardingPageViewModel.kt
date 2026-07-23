@@ -179,13 +179,28 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     }
 
     fun onResume() {
+        syncQuickSetupSwitches()
+        checkAddWidgetPromptResult()
+    }
+
+    /**
+     * Store-write resync of the quick-setup default-browser/add-widget switches from the OS's live state — the
+     * same refresh [onResume] performs while the quick-setup config is on screen (extracted here so it can also be
+     * called directly). Ported from legacy's `checkQuickSetupSwitchesState()`, minus the command hop: this VM
+     * writes straight to [contentValues] since the fragment's quick-setup binder observes that store instead of
+     * a `Command.SyncQuickSetupSwitches`.
+     *
+     * Called from [ConfigDrivenWelcomePage]'s `OpenDefaultBrowserSystemSettings` `ActivityNotFoundException` catch
+     * block: when that intent throws, no activity ever launches, so the fragment's `onResume()` — which would
+     * otherwise pick this resync up naturally — never fires again for it.
+     */
+    fun syncQuickSetupSwitches() {
         val quickSetup = currentQuickSetup() ?: return
         viewModelScope.launch(dispatchers.io()) {
             val isDefault = defaultBrowserDetector.isDefaultBrowser()
             val hasWidget = widgetCapabilities.hasInstalledWidgets
             contentValues.contentState(quickSetup).update { it.copy(defaultBrowserChecked = isDefault, widgetChecked = hasWidget) }
         }
-        checkAddWidgetPromptResult()
     }
 
     fun onIntroAnimationFinished() {
