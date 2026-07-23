@@ -983,6 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Pozdrav!</string>
     <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji te stavlja za upravljač?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
@@ -1018,6 +1019,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Sada isprobaj svoje privatno AI čavrljanje!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Želiš li postaviti DuckDuckGo kao svoj zadani preglednik?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Probaj naš widget za početni zaslon.</string>
+    <string name="preOnboardingWidgetPromptBody">Dodaj naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Dodaj me na dno svog zaslona.</string>
+    <string name="preOnboardingAddToDockBody">Pronađi ikonu DuckDuckGo na početnom zaslonu. Zatim pritisni i povuci na mjesto. To je to!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Shvaćam!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Također nudimo plaćenu pretplatu s naprednim AI modelima s većim količinama dopuštenog čavrljanja od GPT-a i Claudea, siguran VPN i još mnogo toga.</string>

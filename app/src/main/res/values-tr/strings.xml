@@ -943,6 +943,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Merhaba.</string>
     <string name="preOnboardingWelcomeDialogBody1">Kontrolü size verecek daha hızlı bir tarayıcıya hazır mısınız?</string>
     <string name="preOnboardingWelcomeDialogBody2">Yapay zekâ her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d / %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
@@ -978,6 +979,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Şimdi, gizli yapay zekâ sohbetini deneyin!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Ana Ekran widget\'ımızı deneyin.</string>
+    <string name="preOnboardingWidgetPromptBody">Hızlı ve kolay erişim için arama widget\'ımızı Ana Ekranınıza ekleyin.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Widget Ekle</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Beni ekranınızın en altına ekleyin.</string>
+    <string name="preOnboardingAddToDockBody">Ana Ekranınızda DuckDuckGo simgesini bulun. Daha sonra simgeye basıp sürükleyerek yerine sabitleyin. Hepsi bu kadar!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Anladım!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>

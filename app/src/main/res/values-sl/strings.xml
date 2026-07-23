@@ -983,6 +983,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Pozdravljeni.</string>
     <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik, ki daje nadzor vam?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna, zaščita zasebnosti pa je vedno vklopljena.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
@@ -1018,6 +1019,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Zdaj pa preizkusite zasebni klepet z umetno inteligenco!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Želite DuckDuckGo nastaviti kot privzeti brskalnik?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Preizkusite naš pripomoček za domači zaslon.</string>
+    <string name="preOnboardingWidgetPromptBody">Dodajte naš pripomoček za iskanje na domači zaslon za hiter in preprost dostop.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj pripomoček</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Dodaj me na dno zaslona.</string>
+    <string name="preOnboardingAddToDockBody">Poiščite ikono DuckDuckGo na domačem zaslonu. Nato jo pritisnite in povlecite na želeno mesto. To je to!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Razumem!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponujamo tudi plačljivo naročnino z naprednimi modeli umetne inteligence z višjimi omejitvami klepeta GPT in Claude, varnim VPN in še več.</string>
