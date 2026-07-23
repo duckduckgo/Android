@@ -32,6 +32,8 @@ class DialogTitleController(
 
     /** Stages the text: sizing twin reserves final height; visible title stays empty until type()/snap(). */
     fun set(text: String) {
+        // A rebind while a previous typing animation is running would otherwise let the old coroutine repaint stale text and fire the old onFinished.
+        visibleTitle.cancelAnimation()
         this.text = text.preventWidows()
         sizingTwin.text = this.text
         visibleTitle.text = ""
