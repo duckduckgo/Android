@@ -1,1 +1,60 @@
-../../../.cursor/skills/prepare-sbt-repro/SKILL.md
+---
+name: prepare-sbt-repro
+description: >
+  Build, install, launch, screenshot, and cleanup mechanics for SBT live-site
+  reproduction on Cursor self-hosted Android agents. Use when preparing SBT
+  repro runs or handling emulator and device setup issues.
+disable-model-invocation: true
+---
+
+# Prepare SBT Repro
+
+Use this for build, emulator, launch, screenshot, and cleanup mechanics when
+preparing an SBT live-site reproduction on `ddg-native-android`.
+
+## Build and install
+
+- Use `npm run android:build` for build smoke.
+- Use `npm run android:install` when the target AVD does not already have DDG installed.
+- If an emulator restart loses the install but the APK exists, reinstall with:
+
+```sh
+adb install -r android/app/build/outputs/apk/internal/debug/<apk-name>
+```
+
+## Emulator
+
+- Default to `ddg_pixel9_api35` as a known-good AVD.
+- Start headlessly:
+
+```sh
+emulator -avd ddg_pixel9_api35 -no-window -no-snapshot-save -no-boot-anim
+```
+
+## Load URL
+
+Use the debug package explicitly:
+
+```sh
+adb shell am start -W -a android.intent.action.VIEW -d '<url>' com.duckduckgo.mobile.android.debug
+```
+
+## Screenshots
+
+Prefer device-file screenshots; avoid `adb exec-out screencap -p` because it may hang.
+
+```sh
+adb shell screencap -p /sdcard/before.png
+adb pull /sdcard/before.png /opt/cursor/artifacts/<dir>/before.png
+```
+
+## System UI cleanup
+
+If screenshots are blocked by `Application Not Responding: com.google.android.apps.nexuslauncher`, verify DDG is foreground/responsive first.
+
+```sh
+adb shell input keyevent BACK
+adb shell am force-stop com.google.android.apps.nexuslauncher
+```
+
+Then relaunch the URL activity and report the cleanup in the required output.
