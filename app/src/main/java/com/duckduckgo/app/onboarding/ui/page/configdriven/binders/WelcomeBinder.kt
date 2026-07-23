@@ -45,9 +45,9 @@ class WelcomeBinder(private val binding: IncludeBrandDesignDialogWelcomeBinding)
         // Legacy applies preventWidows() to both body lines (:917-920, :1752-1756) and additionally routes
         // body1 through .html() for the sync-restore/custom-AI variants (:909-910, :914-915, :1744-1745,
         // :1749-1750) — body2 is never wrapped in .html() in any branch, since it's always null there.
-        // ContentConfig.Welcome doesn't distinguish those variants from plain copy, so body1's .html() is
-        // applied unconditionally here — it's identity on the current plain-text body1 string resource.
-        binding.bodyText1.text = content.body1.resolve(context).preventWidows().html(context)
+        val body1 = content.body1.resolve(context).preventWidows()
+        // Legacy applies html() only on the sync-restore/custom-AI copy (no body2); the plain copy keeps raw \n line breaks.
+        binding.bodyText1.text = if (content.body2 == null) body1.html(context) else body1
         binding.bodyText2.isVisible = content.body2 != null
         content.body2?.let { binding.bodyText2.text = it.resolve(context).preventWidows() }
 
