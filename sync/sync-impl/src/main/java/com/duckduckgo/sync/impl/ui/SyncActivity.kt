@@ -336,7 +336,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncEnabled.deleteAccountButton.setOnClickListener {
-            viewModel.onDeleteAccountClicked()
+            viewModel.onDeleteAccountClicked(requireAuth = false)
         }
 
         binding.viewSyncEnabled.syncAnotherDeviceItem.setOnClickListener {

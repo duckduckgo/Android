@@ -34,6 +34,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -284,7 +286,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is AskDeleteAccount -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    showDeleteAccountDialog()
+                }
             }
 
             is AskEditDevice -> {
@@ -470,6 +474,7 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.includeEnabledView.deleteAccountItem.apply {
             leadingIcon().imageTintList = color
             setPrimaryTextColorStateList(color)
+            setOnClickListener { viewModel.onDeleteAccountClicked(requireAuth = true) }
         }
     }
 
@@ -491,6 +496,31 @@ class SyncActivity : DuckDuckGoActivity() {
                     override fun onDialogDismissed() {
                         // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
                         if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun showDeleteAccountDialog() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_settings_v2_delete_server_data_dialog_title)
+            .setMessage(getString(R.string.sync_settings_v2_delete_server_data_dialog_body))
+            .setPositiveButton(R.string.sync_delete_server_data_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_delete_server_data_dialog_secondary_button, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteAccountConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteAccountCancelled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteAccountCancelled()
                     }
                 },
             )
