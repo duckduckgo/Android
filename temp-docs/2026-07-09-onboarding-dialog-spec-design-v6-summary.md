@@ -73,21 +73,33 @@ data class DialogConfig(
 sealed interface ContentConfig {
     val title: TextConfig   // every screen has one; rendered by each layout's title view
 
+    // stateless dialogs
     data class Welcome(override val title: TextConfig, val body1: TextConfig, val body2: TextConfig?) : ContentConfig
     data class ComparisonChart(override val title: TextConfig, val config: ComparisonChartConfig) : ContentConfig
     data class AddToDock(override val title: TextConfig) : ContentConfig
     data class WidgetPrompt(override val title: TextConfig) : ContentConfig
+
+    // stateful dialogs
     data class AddressBar(override val title: TextConfig, val initialPosition: OmnibarType, val showSplitOption: Boolean) :
-        ContentConfig, StatefulContent<AddressBarContentState> {
-        override fun initialState() = AddressBarContentState(initialPosition)
+        ContentConfig, Stateful<AddressBarContentState> {
+        // ...
     }
-    data class InputScreen(override val title: TextConfig, val initialWithAi: Boolean) : ContentConfig
-    data class InputScreenPreview(override val title: TextConfig, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentConfig
-    data class QuickSetup(override val title: TextConfig, val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentConfig
+    data class InputScreen(override val title: TextConfig, val initialWithAi: Boolean) :
+        ContentConfig, Stateful<InputScreenContentState> {
+        // ...
+    }
+    data class InputScreenPreview(override val title: TextConfig, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) :
+        ContentConfig, Stateful<InputScreenPreviewContentState> {
+        // ...
+    }
+    data class QuickSetup(override val title: TextConfig, val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) :
+        ContentConfig, Stateful<QuickSetupContentState> {
+        // ...
+    }
 }
 
 // stateful screens declare their working state; the engine seeds it at bind
-interface StatefulContent<S : Any> {
+interface Stateful<S : Any> {
     fun initialState(): S
 }
 
@@ -146,8 +158,8 @@ never produce a new config, they stay local until submitted:
   ```kotlin
   class ContentValueStore {
       private val states = mutableMapOf<KClass<*>, MutableStateFlow<*>>()
-      fun <S : Any> contentState(content: StatefulContent<S>): ContentState<S>            // seeded from initialState() on first use
-      fun <S : Any, C : StatefulContent<S>> update(type: KClass<C>, transform: (S) -> S)  // VM-side writes (external syncs)
+      fun <S : Any> contentState(content: Stateful<S>): ContentState<S>            // seeded from initialState() on first use
+      fun <S : Any, C : Stateful<S>> update(type: KClass<C>, transform: (S) -> S)  // VM-side writes (external syncs)
   }
   ```
 - **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
@@ -170,7 +182,7 @@ binding — it knows how its layout renders its `ContentConfig` and returns the 
 interface DialogBinder<C : ContentConfig> {
     fun bind(content: C): ContentHandle
 }
-interface StatefulDialogBinder<C, S : Any> where C : ContentConfig, C : StatefulContent<S> {
+interface StatefulDialogBinder<C, S : Any> where C : ContentConfig, C : Stateful<S> {
     fun bind(content: C, state: ContentState<S>): ContentHandle
 }
 class ContentState<S>(
@@ -214,7 +226,7 @@ Screen logic can't reach across screens — a binder only sees its own layout, a
 binders receive their seeded `ContentState` instead of the store, so the wrong key or a
 forgotten seed is impossible.
 
-Adding a screen: add the `ContentConfig` variant (implementing `StatefulContent` if it holds
+Adding a screen: add the `ContentConfig` variant (implementing `Stateful` if it holds
 state — the compiler then demands `initialState()`). Add the binder. Add one line to `ContentBinder.bind()`. Done.
 
 ### Flow
