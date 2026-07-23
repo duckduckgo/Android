@@ -332,6 +332,16 @@ class ProgressPhaseEngineTest {
     }
 
     @Test
+    fun `disabling stall detection mid-sweep exits the indeterminate phase`() {
+        enterIndeterminate(real = 50f)
+
+        engine.stallDetectionEnabled = false
+        engine.tick(0.016f)
+
+        assertEquals(Phase.RESUMING, engine.phase)
+    }
+
+    @Test
     fun `equal progress does not reset the stall timer`() {
         engine.stallDetectionEnabled = true
         engine.start()
