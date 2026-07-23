@@ -38,6 +38,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
+import com.duckduckgo.app.onboarding.ui.page.configdriven.OnboardingDialogShownPixels
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
@@ -131,6 +132,7 @@ class BrandDesignUpdatePageViewModelTest {
             defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
             context = mockContext,
             pixel = pixel,
+            shownPixels = OnboardingDialogShownPixels(pixel),
             appInstallStore = mockAppInstallStore,
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingStore = onboardingStore,

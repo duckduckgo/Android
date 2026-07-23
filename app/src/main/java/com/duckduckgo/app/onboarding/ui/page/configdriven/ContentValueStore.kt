@@ -27,6 +27,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class ContentValueStore {
     private val states = mutableMapOf<KClass<*>, MutableStateFlow<*>>()
 
+    // Keyed by config class: the first [content] instance seen for a given class seeds the state, and every
+    // later call for that class returns the same flow regardless of the [content] passed in. This assumes a
+    // stateful screen appears at most once per plan run — true for the current plans.
     @Suppress("UNCHECKED_CAST")
     fun <S : Any> contentState(content: Stateful<S>): MutableStateFlow<S> =
         states.getOrPut(content::class) { MutableStateFlow(content.initialState()) } as MutableStateFlow<S>

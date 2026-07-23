@@ -420,7 +420,22 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 addWidgetPromptFlowStarted = true
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
-            else -> Unit // unreachable: DialogConfigResolver.resolve() returns null only for the four dialogs above
+            // Config-producing dialogs: DialogConfigResolver.resolve() returns non-null for these, so applyStep()
+            // renders them via a DialogConfig and never calls this method for them. Listed exhaustively (no
+            // `else`) so a new NewUserOnboardingActivityDialog variant fails to compile here until it's given an
+            // explicit decision.
+            NewUserOnboardingActivityDialog.SyncRestore,
+            NewUserOnboardingActivityDialog.InitialReinstallUser,
+            NewUserOnboardingActivityDialog.Initial,
+            NewUserOnboardingActivityDialog.ComparisonChart,
+            NewUserOnboardingActivityDialog.AiComparisonChart,
+            NewUserOnboardingActivityDialog.AddToDock,
+            NewUserOnboardingActivityDialog.WidgetPrompt,
+            is NewUserOnboardingActivityDialog.AddressBarPosition,
+            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreenPreview,
+            is NewUserOnboardingActivityDialog.QuickSetup,
+            -> Unit
         }
     }
 
