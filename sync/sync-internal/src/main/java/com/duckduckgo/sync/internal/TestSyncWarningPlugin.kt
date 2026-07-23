@@ -77,8 +77,8 @@ class TestSyncWarningPlugin @Inject constructor() : SyncMessagePlugin {
 
             val lifecycleOwner = findViewTreeLifecycleOwner()!!
             stateJob += stateHolder.isEnabled
-                .onEach { render(it) }
                 .flowWithLifecycle(lifecycleOwner.lifecycle)
+                .onEach { render(it) }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
 
