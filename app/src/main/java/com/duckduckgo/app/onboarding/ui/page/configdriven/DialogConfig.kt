@@ -40,7 +40,8 @@ data class DialogConfig(
     val background: OnboardingBackgroundStep,
     val embellishment: Embellishment,
     val content: ContentConfig,
-    val primaryCta: CtaConfig,
+    /** Null when the screen has no primary CTA (e.g. input screen preview progresses by submitting a query). */
+    val primaryCta: CtaConfig? = null,
     val secondaryCta: CtaConfig? = null,
     val stepIndicator: StepProgress? = null,
 )
