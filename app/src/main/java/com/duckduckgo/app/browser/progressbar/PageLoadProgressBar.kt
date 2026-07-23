@@ -112,7 +112,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
             if (engine.phase == Phase.DONE) {
                 onDone()
-            } else if (state.shouldInvalidate) {
+            } else if (state.shouldInvalidate && windowVisibility == VISIBLE) {
                 Choreographer.getInstance().postFrameCallback(this)
             }
         }
@@ -142,7 +142,9 @@ class PageLoadProgressBar @JvmOverloads constructor(
         lastFrameTimeNanos = 0L
         // Ensure we don't have multiple frame callbacks queued if start() is called multiple times in quick succession
         Choreographer.getInstance().removeFrameCallback(frameCallback)
-        Choreographer.getInstance().postFrameCallback(frameCallback)
+        if (windowVisibility == VISIBLE) {
+            Choreographer.getInstance().postFrameCallback(frameCallback)
+        }
     }
 
     fun onProgressUpdate(progress: Float) {
@@ -218,6 +220,16 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
         if (shimmerRenderer.isActive) {
             shimmerRenderer.draw(canvas, progressWidth, top, height.toFloat(), SystemClock.elapsedRealtime())
+        }
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        Choreographer.getInstance().removeFrameCallback(frameCallback)
+        lastFrameTimeNanos = 0L
+        if (visibility == VISIBLE && isStarted && engine.phase != Phase.DONE) {
+            engine.onBecameVisible()
+            Choreographer.getInstance().postFrameCallback(frameCallback)
         }
     }
 

@@ -79,6 +79,10 @@ class ProgressPhaseEngine(
         lastForwardProgressTime = timeProvider.elapsedRealtime()
     }
 
+    fun onBecameVisible() {
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
+    }
+
     fun triggerCompletion() {
         if (phase == Phase.COMPLETING || phase == Phase.DONE || phase == Phase.IDLE) return
         if (phase == Phase.INDETERMINATE) {
