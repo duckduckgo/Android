@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.ChangeBounds
@@ -327,7 +328,8 @@ class DialogRenderEngine(
             }
         })
         pendingMorphContinuation = onEnd
-        TransitionManager.beginDelayedTransition(binding.root, transition)
+        // ViewBinding types root as View (multiple layout variants); the page root is always a ViewGroup.
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
         // Defensive: guarantees a layout pass is observed even if none of this render's view mutations
         // happened to trigger one on their own.
         binding.root.requestLayout()
