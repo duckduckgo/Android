@@ -472,11 +472,39 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountClickedThenAskDeleteAccount() = runTest {
-        testee.onDeleteAccountClicked()
+    fun whenDeleteAccountClickedWithoutRequireAuthThenAskDeleteAccount() = runTest {
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onDeleteAccountClicked(requireAuth = false)
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.AskDeleteAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountClickedWithRequireAuthAndDeviceAuthenticationThenAskDeleteAccount() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onDeleteAccountClicked(requireAuth = true)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.AskDeleteAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountClickedWithRequireAuthWithoutDeviceAuthenticationThenRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+
+        testee.onDeleteAccountClicked(requireAuth = true)
+
+        testee.commands().test {
+            val command = awaitItem()
+            command.assertCommandType(RequestSetupAuthentication::class)
+            assertFalse((command as RequestSetupAuthentication).forSyncThisDevice)
             cancelAndIgnoreRemainingEvents()
         }
     }

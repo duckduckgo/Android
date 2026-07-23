@@ -409,9 +409,15 @@ class SyncActivityViewModel @Inject constructor(
         showAccountDetailsIfNeeded()
     }
 
-    fun onDeleteAccountClicked() {
+    fun onDeleteAccountClicked(requireAuth: Boolean) {
         viewModelScope.launch {
-            command.send(AskDeleteAccount)
+            if (requireAuth) {
+                requiresSetupAuthentication {
+                    command.send(AskDeleteAccount)
+                }
+            } else {
+                command.send(AskDeleteAccount)
+            }
         }
     }
 
