@@ -126,9 +126,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
-    private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
-    private val isProgressBarIndeterminateEnabled =
-        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
@@ -141,8 +138,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             showFireIcon = !isSplitOmnibarEnabled,
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
-            isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
-            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
         ),
     )
 
@@ -414,6 +409,21 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }.launchIn(viewModelScope)
+
+        combine(
+            progressBarUpgradeFeature.behaviourUpdate().enabled(),
+            progressBarUpgradeFeature.indeterminateFallback().enabled(),
+        ) { isProgressBarUpgradeEnabled, isIndeterminateFallbackEnabled ->
+            isProgressBarUpgradeEnabled to (isProgressBarUpgradeEnabled && isIndeterminateFallbackEnabled)
+        }.onEach { (isProgressBarUpgradeEnabled, isProgressBarIndeterminateEnabled) ->
+            _viewState.update {
+                it.copy(
+                    isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
+                    isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
+                )
+            }
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
 
         serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
             this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
