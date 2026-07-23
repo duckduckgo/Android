@@ -17,19 +17,32 @@
 package com.duckduckgo.modalcoordinator.impl
 
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class RealModalShownReporterTest {
 
     private val completionStore: ModalEvaluatorCompletionStore = mock()
-    private val testee = RealModalShownReporter(completionStore)
+    private val promptsCoordinator: PromptsCoordinator = mock()
+    private val testee = RealModalShownReporter(completionStore, promptsCoordinator)
 
     @Test
     fun whenNotifyExternalModalShownThenRecordCompletionSyncIsCalled() {
         testee.reportModalShown()
 
         verify(completionStore).recordCompletionSync()
+        verifyNoInteractions(promptsCoordinator)
+    }
+
+    @Test
+    fun whenModalDismissedThenModalClaimIsReportedDone() {
+        testee.reportModalDismissed()
+
+        verify(promptsCoordinator).onClaimDone(PromptType.MODAL)
+        verifyNoInteractions(completionStore)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,9 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace "com.duckduckgo.modalcoordinator.impl"
+    namespace "com.duckduckgo.promptscoordinator.impl"
     anvil {
         generateDaggerFactories = true
-    }
-    lint {
-        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {
@@ -42,10 +39,11 @@ android {
 }
 
 dependencies {
-    implementation project(':modal-coordinator-api')
     implementation project(':prompts-coordinator-api')
 
     implementation project(':common-utils')
+    implementation project(':feature-toggles-api')
+    implementation project(':remote-messaging-api')
 
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
@@ -54,9 +52,6 @@ dependencies {
 
     // Dagger
     implementation Google.dagger
-
-    implementation AndroidX.lifecycle.common
-    implementation AndroidX.lifecycle.process
 
     implementation Square.logcat
 
