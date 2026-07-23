@@ -124,6 +124,7 @@ import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
+import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -169,7 +170,6 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -191,6 +191,8 @@ import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
+import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
+import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecision
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -482,6 +484,9 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteScorer: AutoCompleteScorer = mock()
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
+
+    // Default (unstubbed) decide() returns null, i.e. no promo eligible.
+    private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
 
@@ -843,7 +848,7 @@ class BrowserTabViewModelTest {
                 CtaViewModel(
                     appInstallStore = mockAppInstallStore,
                     pixel = mockPixel,
-                    widgetCapabilities = mockWidgetCapabilities,
+                    subscriptionPromoModalDecider = mockSubscriptionPromoModalDecider,
                     dismissedCtaDao = mockDismissedCtaDao,
                     userAllowListRepository = mockUserAllowListRepository,
                     settingsDataStore = ctaViewModelMockSettingsStore,
@@ -1059,6 +1064,8 @@ class BrowserTabViewModelTest {
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
+                newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
+                newTabPageModalTrigger = mock(),
             )
 
         testee.loadData("abc", null, false, false)
@@ -3947,40 +3954,70 @@ class BrowserTabViewModelTest {
         }
     }
 
+    // The Privacy Pro promo is now decided by the modal coordinator; the view-model only renders it
+    // (via showSubscriptionPromo) subject to the surface guards below.
     @Test
-    fun whenOnViewVisibleAndOnDuckAiUrlThenSubscriptionPromoModalNotShown() =
+    fun whenShowSubscriptionPromoModalCtaAndOnDuckAiUrlThenNotShown() =
         runTest {
-            givenSubscriptionPromoModalCtaEligible()
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
             loadUrl("https://duck.ai/", isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
 
-            testee.onViewVisible()
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
 
+            assertFalse(shown)
             assertFalse(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
         }
 
     @Test
-    fun whenOnViewVisibleAndOnNonDuckAiUrlThenSubscriptionPromoModalShown() =
+    fun whenShowSubscriptionPromoModalCtaAndOnNonDuckAiUrlThenShown() =
         runTest {
-            givenSubscriptionPromoModalCtaEligible()
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
             loadUrl(exampleUrl, isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
 
-            testee.onViewVisible()
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
 
+            assertTrue(shown)
             assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
         }
 
-    private suspend fun givenSubscriptionPromoModalCtaEligible() {
-        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-        whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-        whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-    }
+    @Test
+    fun whenShowAddWidgetModalCtaWhileBrowsingThenNotShown() =
+        runTest {
+            loadUrl(exampleUrl, isBrowserShowing = true)
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertFalse(shown)
+            assertFalse(testee.ctaViewState.value?.cta is HomePanelCta.AddWidgetAutoOnboarding)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaOnNewTabPageThenAccepted() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertTrue(shown)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaOnNewTabPageButCtaSlotOccupiedThenDeclined() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+            // A higher-priority CTA already owns the NTP slot: Add Widget must not clobber it.
+            setCta(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertFalse(shown)
+            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
+        }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() =
@@ -9824,13 +9861,10 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
             flowSelectedTab.emit(initialTab)
 
-            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
-            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-            whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-            whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-            whenever(subscriptions.isEligible()).thenReturn(true)
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+            // isPromoOnboardingDialogShowing() now delegates to the decider, so stub it directly.
+            whenever(mockSubscriptionPromoModalDecider.decide()).thenReturn(
+                SubscriptionPromoModalDecision(flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING, isFreeTrialCopy = false),
+            )
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             testee.observeSelectedTab(isRestored = false)

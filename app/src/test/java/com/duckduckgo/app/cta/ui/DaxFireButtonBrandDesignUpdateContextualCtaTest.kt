@@ -141,7 +141,7 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            widgetCapabilities = mockWidgetCapabilities,
+            subscriptionPromoModalDecider = mock(),
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,

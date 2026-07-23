@@ -23,7 +23,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
+import com.duckduckgo.modalcoordinator.api.ModalTrigger
+import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +40,12 @@ import javax.inject.Inject
  * Coordinates evaluation of modal evaluators with priority ordering and 24-hour blocking.
  *
  * Key behaviors:
+ * - Each coordinated pass is started by a [ModalTrigger] and only considers evaluators declaring
+ *   that trigger (see [ModalEvaluator.trigger]); evaluators on different triggers never compete
+ * - [ModalTrigger.APP_RESUME] passes run on process foreground (onResume)
+ * - [ModalTrigger.NTP_RENDER] passes run when a host reports a New Tab Page render
  * - Evaluators are sorted by priority (lowest number = highest priority)
- * - Only one evaluator runs per lifecycle resume
+ * - Only one evaluator runs per coordinated pass
  * - Evaluators blocked by 24-hour window are skipped entirely (evaluate() not called)
  * - When evaluation completes (with or without action), timestamp is recorded
  */
@@ -46,25 +53,35 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = NewTabPageModalTrigger::class,
+)
 @SingleInstanceIn(AppScope::class)
 class ModalEvaluatorCoordinator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val modalEvaluatorPluginPoint: PluginPoint<ModalEvaluator>,
     private val completionStore: ModalEvaluatorCompletionStore,
     private val dispatchers: DispatcherProvider,
-) : MainProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch(dispatchers.io()) {
-            coordinateEvaluation()
+            coordinateEvaluation(ModalTrigger.APP_RESUME)
         }
     }
 
-    private suspend fun coordinateEvaluation() = evaluationMutex.withLock {
-        logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation" }
+    override fun onNewTabPageShown() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            coordinateEvaluation(ModalTrigger.NTP_RENDER)
+        }
+    }
+
+    private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
+        logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
 
         // Check 24-hour blocking first
         if (completionStore.isBlockedBy24HourWindow()) {
@@ -72,8 +89,10 @@ class ModalEvaluatorCoordinator @Inject constructor(
             return@withLock
         }
 
-        val evaluators = modalEvaluatorPluginPoint.getPlugins().sortedBy { it.priority }
-        logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators" }
+        val evaluators = modalEvaluatorPluginPoint.getPlugins()
+            .filter { it.trigger == trigger }
+            .sortedBy { it.priority }
+        logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators for trigger $trigger" }
 
         for (evaluator in evaluators) {
             logcat { "ModalEvaluatorCoordinator: Evaluating '${evaluator.evaluatorId}' (priority ${evaluator.priority})" }
@@ -91,6 +110,6 @@ class ModalEvaluatorCoordinator @Inject constructor(
             }
         }
 
-        logcat { "ModalEvaluatorCoordinator: Coordination complete, no action taken" }
+        logcat { "ModalEvaluatorCoordinator: Coordination complete for trigger $trigger, no action taken" }
     }
 }
