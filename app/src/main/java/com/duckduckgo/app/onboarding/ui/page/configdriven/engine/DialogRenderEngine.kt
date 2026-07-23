@@ -303,8 +303,19 @@ class DialogRenderEngine(
      * [generation] check alone is not enough (a superseding [render] settles this render's continuation
      * synchronously rather than merely discarding it, so [pendingMorphContinuation] must also be checked here to
      * avoid running it a second time when the real `onTransitionEnd` eventually fires).
+     *
+     * Known limitation: a same-frame double [render] can strand a continuation until the next skip/render
+     * (TransitionManager absorbs a second `beginDelayedTransition` for a root with a pending transition);
+     * recovered by the next [render]/[skipRunningAnimations] - acceptable POC limitation.
      */
     private fun morphCard(onEnd: () -> Unit) {
+        if (!binding.root.isLaidOut) {
+            // beginDelayedTransition no-ops on a not-yet-laid-out root and onTransitionEnd never fires;
+            // run the continuation directly — the first layout pass places everything, only the 400ms bounds
+            // tween is lost.
+            onEnd()
+            return
+        }
         val gen = generation
         val transition: Transition = ChangeBounds().setDuration(CARD_MORPH_DURATION_MS)
         transition.addListener(object : TransitionListenerAdapter() {
