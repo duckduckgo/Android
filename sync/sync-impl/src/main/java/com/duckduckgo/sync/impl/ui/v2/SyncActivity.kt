@@ -248,6 +248,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.notifyMeContainer.isVisible = viewState.showAccount
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
