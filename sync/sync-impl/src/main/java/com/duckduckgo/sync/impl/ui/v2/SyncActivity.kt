@@ -227,7 +227,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureSyncThisDeviceCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
-        configureMessageWarnings()
+        configureWarningMessages()
         configureRecoverySection()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
@@ -461,7 +461,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureMessageWarnings() {
+    private fun configureWarningMessages() {
         binding.includeEnabledView.apply {
             val hasPlugins = syncMessagesPlugin.isNotEmpty()
             warningsContainer.isVisible = hasPlugins
