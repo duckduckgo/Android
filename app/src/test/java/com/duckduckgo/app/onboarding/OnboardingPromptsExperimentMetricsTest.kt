@@ -53,4 +53,34 @@ class OnboardingPromptsExperimentMetricsTest {
             sent.toggle.featureName().name,
         )
     }
+
+    @Test
+    fun `when fireWidgetSearchMetric then sends widget_search day5-7 NORMAL metric bound to the experiment toggle`() = runTest {
+        metrics.fireWidgetSearchMetric()
+
+        val sent = fakeMetricsPixelExtension.sentMetrics.single()
+        assertEquals("widget_search", sent.metric)
+        assertEquals("1", sent.value)
+        assertEquals(MetricType.NORMAL, sent.type)
+        assertEquals(listOf(ConversionWindow(lowerWindow = 5, upperWindow = 7)), sent.conversionWindow)
+        assertEquals(
+            toggles.addToDockAndWidgetExperimentJul25().featureName().name,
+            sent.toggle.featureName().name,
+        )
+    }
+
+    @Test
+    fun `when fireOnboardingCompletedMetric then sends onboarding_completed day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+        metrics.fireOnboardingCompletedMetric()
+
+        val sent = fakeMetricsPixelExtension.sentMetrics.single()
+        assertEquals("onboarding_completed", sent.metric)
+        assertEquals("1", sent.value)
+        assertEquals(MetricType.NORMAL, sent.type)
+        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            toggles.addToDockAndWidgetExperimentJul25().featureName().name,
+            sent.toggle.featureName().name,
+        )
+    }
 }

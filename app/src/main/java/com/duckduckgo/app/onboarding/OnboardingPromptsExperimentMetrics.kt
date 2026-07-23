@@ -27,6 +27,10 @@ import javax.inject.Inject
 interface OnboardingPromptsExperimentMetrics {
 
     suspend fun fireWidgetAddedMetric()
+
+    suspend fun fireWidgetSearchMetric()
+
+    suspend fun fireOnboardingCompletedMetric()
 }
 
 @ContributesBinding(AppScope::class)
@@ -37,6 +41,26 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
     override suspend fun fireWidgetAddedMetric() {
         MetricsPixel(
             metric = "widget_added",
+            type = MetricType.NORMAL,
+            value = "1",
+            toggle = toggles.addToDockAndWidgetExperimentJul25(),
+            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+        ).send()
+    }
+
+    override suspend fun fireWidgetSearchMetric() {
+        MetricsPixel(
+            metric = "widget_search",
+            type = MetricType.NORMAL,
+            value = "1",
+            toggle = toggles.addToDockAndWidgetExperimentJul25(),
+            conversionWindow = listOf(ConversionWindow(lowerWindow = 5, upperWindow = 7)),
+        ).send()
+    }
+
+    override suspend fun fireOnboardingCompletedMetric() {
+        MetricsPixel(
+            metric = "onboarding_completed",
             type = MetricType.NORMAL,
             value = "1",
             toggle = toggles.addToDockAndWidgetExperimentJul25(),

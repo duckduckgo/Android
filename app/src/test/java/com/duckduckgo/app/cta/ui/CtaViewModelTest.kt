@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -165,6 +166,7 @@ class CtaViewModelTest {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
+    private val mockOnboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics = mock()
 
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
@@ -246,6 +248,7 @@ class CtaViewModelTest {
             },
             duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
+            onboardingPromptsExperimentMetrics = mockOnboardingPromptsExperimentMetrics,
         )
     }
 
@@ -277,6 +280,19 @@ class CtaViewModelTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
+    }
+
+    @Test
+    fun whenDaxEndCtaShownThenOnboardingCompletedMetricFired() = runTest {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockOnboardingPromptsExperimentMetrics).fireOnboardingCompletedMetric()
+    }
+
+    @Test
+    fun whenNonEndCtaShownThenOnboardingCompletedMetricNotFired() = runTest {
+        testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockOnboardingPromptsExperimentMetrics, never()).fireOnboardingCompletedMetric()
     }
 
     @Test
