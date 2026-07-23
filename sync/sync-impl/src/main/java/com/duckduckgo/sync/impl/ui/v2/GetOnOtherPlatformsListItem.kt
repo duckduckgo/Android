@@ -24,7 +24,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.duckduckgo.sync.impl.databinding.ViewSyncV2OtherPlatformsListItemBinding
 
-internal class SyncOnOtherPlatformsListItem @JvmOverloads constructor(
+internal class GetOnOtherPlatformsListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

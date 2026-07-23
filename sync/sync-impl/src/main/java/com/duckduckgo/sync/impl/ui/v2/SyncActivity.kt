@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncSettingsPlugin
@@ -56,6 +57,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2Binding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -121,6 +123,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var shareAction: ShareAction
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
@@ -217,6 +222,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureDevicesRecyclerView()
         configureBookmarksSection()
         configureRecoverySection()
+        configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
 
@@ -253,7 +259,7 @@ class SyncActivity : DuckDuckGoActivity() {
         syncedDeviceAdapter.submitList(viewState.syncedDevices)
         binding.includeEnabledView.apply {
             root.isVisible = viewState.showAccount
-            syncOnOtherPlatformsItem.setState(
+            getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
@@ -270,7 +276,7 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.includeDisabledView.apply {
             root.isGone = viewState.showAccount
             syncThisDeviceToggle.quietlySetIsChecked(viewState.isThisDeviceSyncing, syncThisDeviceListener)
-            syncOnOtherPlatformsItem.setState(
+            getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
             syncWithAnotherDeviceButton.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
@@ -362,7 +368,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchSyncGetOnOtherPlatforms -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(command.source))
             }
 
             is RecoveryCodePDFSuccess -> {
@@ -454,6 +460,31 @@ class SyncActivity : DuckDuckGoActivity() {
                 viewModel.onCopyRecoveryCodeClicked()
             }
         }
+    }
+
+    private fun configureGetOnOtherPlatformsItem() {
+        binding.includeEnabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+            },
+        )
+        binding.includeDisabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+            },
+        )
     }
 
     private fun configureDataExpirationNotice() {
