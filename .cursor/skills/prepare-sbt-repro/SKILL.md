@@ -1,13 +1,18 @@
 ---
-description: Android build, install, launch, screenshot, and cleanup guidance for SBT live-site reproduction on Cursor self-hosted agents.
-alwaysApply: false
+name: prepare-sbt-repro
+description: >
+  Build, install, launch, screenshot, and cleanup mechanics for SBT live-site
+  reproduction on Cursor self-hosted Android agents. Use when preparing SBT
+  repro runs or handling emulator and device setup issues.
+disable-model-invocation: true
 ---
 
-# SBT Live Reproduction: Android
+# Prepare SBT Repro
 
-Use this when running Android live-site breakage reproduction on `ddg-native-android`.
+Use this for build, emulator, launch, screenshot, and cleanup mechanics when
+preparing an SBT live-site reproduction on `ddg-native-android`.
 
-## Build And Install
+## Build and install
 
 - Use `npm run android:build` for build smoke.
 - Use `npm run android:install` when the target AVD does not already have DDG installed.
@@ -43,7 +48,7 @@ adb shell screencap -p /sdcard/before.png
 adb pull /sdcard/before.png /opt/cursor/artifacts/<dir>/before.png
 ```
 
-## System UI Cleanup
+## System UI cleanup
 
 If screenshots are blocked by `Application Not Responding: com.google.android.apps.nexuslauncher`, verify DDG is foreground/responsive first.
 
@@ -52,4 +57,4 @@ adb shell input keyevent BACK
 adb shell am force-stop com.google.android.apps.nexuslauncher
 ```
 
-Then relaunch the URL activity and report the cleanup in the steps_summary of your required output.
+Then relaunch the URL activity and report the cleanup in the required output.

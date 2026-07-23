@@ -1,1 +1,0 @@
-../../.cursor/rules/sbt-live-reproduction-android.mdc

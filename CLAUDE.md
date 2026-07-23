@@ -14,6 +14,5 @@ The following rule files contain detailed guidance for specific topics. Read the
 | `.cursor/rules/contributions.mdc` | Branch naming, commit messages, PR creation workflow |
 | `.cursor/rules/pixels.mdc` | What pixels are, when to use them, privacy requirements, telemetry best practices |
 | `.cursor/rules/pixel-definitions.mdc` | Creating and maintaining pixel definition JSON files for pixels and wide events |
-| `.cursor/rules/sbt-live-reproduction-android.mdc` | Android build, install, launch, screenshot, and cleanup guidance for SBT live-site reproduction |
 
 ---
