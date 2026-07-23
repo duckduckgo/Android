@@ -298,22 +298,12 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 
 - ~1.3k lines of duplicated per-dialog wiring become one diff plus per-screen data. Snap and
   animate cannot drift apart.
-- Re-ordering or permuting a flow = editing a list. Step indicator renumbers itself; any
-  ordering animates correctly with no new transition code.
-- New bubble screen = defining (reusing) a layout and providing variables. No need for ~200 lines duplicated across two when-blocks for plumbing.
+- Re-ordering or permuting a flow = editing a list. Any ordering animates correctly with no new transition code.
 - One owner for running animations: tap-to-skip and view teardown become one call instead of
   hand-enumerating ~25 animators. This pays off even before any re-ordering does.
-- Every dialog can enter from an empty stage. "No previous config" means clear the stage
-  and enter — not a special case. This covers the first dialog and returns from
-  `BrowserActivity` (today a hand-coded comparison-chart path).
-- `ViewState` collapses from 16 fields (one already write-only dead) to a config and two flags;
-  the VM's dialog switch reduces to five branches — the four command-only steps (intro
-  animation, notification permission, default browser, add widget) plus one for every
-  config-rendered dialog.
+- `ViewState` collapses from 16 fields to a config and couple of flags.
 - `DialogConfig` is the state model a future Compose port would consume unchanged — the
   declarative architecture without the rewrite risk.
-- One place to honor system animation settings: animations-off routes the whole pipeline
-  through its snapped path. Today nothing in this flow respects reduced motion.
 - The orchestrator already supports `GoBack` and a diff is direction-agnostic, so backward
   transitions come free if the parent project ever wants back navigation. Enabled, not scoped.
 
