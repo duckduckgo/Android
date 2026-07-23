@@ -134,6 +134,9 @@ class EmbellishmentController(
         drainInFlight()
 
         if (previous == next) {
+            // the drain may have superseded this decoration's own entrance mid-flight; snap() is
+            // idempotent and guarantees the settled end state.
+            decorations[next]?.let { it.snap() }
             onSettled(applyFit(next))
             return
         }
@@ -168,6 +171,7 @@ class EmbellishmentController(
     }
 
     fun skipRunning() {
+        if (skipping) return // reentrant call from a drain cascade; the outer invocation finishes the drain
         // While skipping, transition()'s enterNext takes the snap path instead of starting a new enter
         // animator, so nothing re-escapes the drain below.
         skipping = true
