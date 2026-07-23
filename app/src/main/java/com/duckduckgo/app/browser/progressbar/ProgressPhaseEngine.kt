@@ -42,9 +42,7 @@ class ProgressPhaseEngine(
 
     var stallDetectionEnabled: Boolean = false
 
-    var realProgress: Float = 0f
-        private set
-
+    private var realProgress: Float = 0f
     private var velocity: Float = 0f
     private var phaseStartTime: Long = 0L
     private var creepProgress: Float = 0f
