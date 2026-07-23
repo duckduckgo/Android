@@ -23,6 +23,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Base64
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -98,6 +99,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val testSyncWarningListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.enableTestSyncWarning(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
@@ -151,6 +156,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.testSyncWarningToggle.setOnCheckedChangeListener(testSyncWarningListener)
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
@@ -342,5 +348,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
                 }
             }
         }
+        binding.testSyncWarningToggle.quietlySetIsChecked(viewState.isTestSyncWarningEnabled, testSyncWarningListener)
     }
 }
