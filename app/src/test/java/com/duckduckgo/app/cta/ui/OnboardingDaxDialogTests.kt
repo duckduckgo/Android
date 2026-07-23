@@ -58,12 +58,10 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -131,7 +129,7 @@ class OnboardingDaxDialogTests {
         testee = CtaViewModel(
             appInstallStore,
             pixel,
-            widgetCapabilities,
+            mock<SubscriptionPromoModalDecider>(),
             dismissedCtaDao,
             userAllowListRepository,
             settingsDataStore,
@@ -294,24 +292,6 @@ class OnboardingDaxDialogTests {
 
         val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
         assertTrue(inContextDaxDialogsComplete)
-    }
-
-    @Test
-    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenGetPromoCtaOnForegroundReturnsSubscriptionCta() = runTest {
-        whenever(settingsDataStore.hideTips).thenReturn(true)
-        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
-        whenever(extendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
-
-        val result = testee.getPromoCtaOnForeground()
-
-        assertNotNull(result)
-        assertTrue(result is SubscriptionPromoModalCta)
     }
 
     @Test

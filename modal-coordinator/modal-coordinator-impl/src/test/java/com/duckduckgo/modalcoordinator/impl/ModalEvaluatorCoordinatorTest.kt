@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
+import com.duckduckgo.modalcoordinator.api.ModalTrigger
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -171,14 +172,57 @@ class ModalEvaluatorCoordinatorTest {
         verify(mockCompletionStore).recordCompletion()
     }
 
+    @Test
+    fun whenOnResumeThenOnlyAppResumeEvaluatorsAreCalled() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val appResumeEvaluator = createMockEvaluator("resume", 1, ModalEvaluator.EvaluationResult.Skipped, ModalTrigger.APP_RESUME)
+        val ntpEvaluator = createMockEvaluator("ntp", 2, ModalEvaluator.EvaluationResult.Skipped, ModalTrigger.NTP_RENDER)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(appResumeEvaluator, ntpEvaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(appResumeEvaluator).evaluate()
+        verify(ntpEvaluator, never()).evaluate()
+    }
+
+    @Test
+    fun whenNewTabPageShownThenOnlyNtpRenderEvaluatorsAreCalled() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val appResumeEvaluator = createMockEvaluator("resume", 1, ModalEvaluator.EvaluationResult.Skipped, ModalTrigger.APP_RESUME)
+        val ntpEvaluator = createMockEvaluator("ntp", 2, ModalEvaluator.EvaluationResult.Skipped, ModalTrigger.NTP_RENDER)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(appResumeEvaluator, ntpEvaluator))
+
+        testee.onNewTabPageShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpEvaluator).evaluate()
+        verify(appResumeEvaluator, never()).evaluate()
+    }
+
+    @Test
+    fun whenNewTabPageShownAndBlockedBy24HourWindowThenNoEvaluatorsAreCalled() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(true)
+        val ntpEvaluator = createMockEvaluator("ntp", 1, ModalEvaluator.EvaluationResult.ModalShown, ModalTrigger.NTP_RENDER)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(ntpEvaluator))
+
+        testee.onNewTabPageShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpEvaluator, never()).evaluate()
+        verify(mockCompletionStore, never()).recordCompletion()
+    }
+
     private suspend fun createMockEvaluator(
         id: String,
         priority: Int,
         result: ModalEvaluator.EvaluationResult = ModalEvaluator.EvaluationResult.Skipped,
+        trigger: ModalTrigger = ModalTrigger.APP_RESUME,
     ): ModalEvaluator {
         return mock<ModalEvaluator>().apply {
             whenever(this.evaluatorId).thenReturn(id)
             whenever(this.priority).thenReturn(priority)
+            whenever(this.trigger).thenReturn(trigger)
             whenever(this.evaluate()).thenReturn(result)
         }
     }
