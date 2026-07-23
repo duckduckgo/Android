@@ -518,8 +518,13 @@ class SyncActivity : DuckDuckGoActivity() {
                     override fun onNegativeButtonClicked() {
                         viewModel.onDeleteAccountCancelled()
                     }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteAccountCancelled()
+                    }
                 },
             )
+            .setCancellable(true)
             .show()
     }
 
