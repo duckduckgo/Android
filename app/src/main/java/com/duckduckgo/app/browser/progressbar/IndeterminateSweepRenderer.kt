@@ -20,11 +20,11 @@ import android.graphics.Canvas
 import android.graphics.Paint
 
 /**
- * Draws the indeterminate sweep: a single accent-coloured segment that grows from the left, travels,
- * and contracts off the right on a continuous [ProgressBarConfig.indeterminateCycleMs] cycle. The
- * first cycle is seeded from the current fill (see [start]) for a seamless hand-off. Call
- * [requestFinish] when leaving the indeterminate state to let the current cycle finish and empty the
- * bar before the determinate fill resumes; [hasFinished] reports when it has.
+ * Draws the indeterminate animation: a fast accent-colored sweep followed by a slow sweep on a
+ * continuous [ProgressBarConfig.indeterminateCycleMs] cycle. The first fast sweep is seeded from the
+ * current fill (see [start]) for a seamless hand-off. Call [requestFinish] when leaving the
+ * indeterminate state to let the active fast-slow sequence finish and empty the bar before the
+ * determinate fill resumes; [hasFinished] reports when it has.
  */
 class IndeterminateSweepRenderer(
     private val config: ProgressBarConfig,
@@ -38,6 +38,7 @@ class IndeterminateSweepRenderer(
     private var startTime = 0L
     private var seedLeading = 0f
     private var endTime = 0L
+    private var finalCycleIndex: Long? = null
 
     val isActive: Boolean get() = startTime > 0L
 
@@ -46,20 +47,23 @@ class IndeterminateSweepRenderer(
         startTime = now
         seedLeading = seedLeadingFraction.coerceIn(0f, 1f)
         endTime = 0L
+        finalCycleIndex = null
     }
 
     fun stop() {
         startTime = 0L
         endTime = 0L
+        finalCycleIndex = null
     }
 
     /**
-     * Stop looping: finish the current cycle, then report done via [hasFinished]. The segment
-     * contracts off the right at the cycle boundary, leaving the bar empty for the determinate hand-back.
+     * Stop looping: finish the current fast-slow sequence, then report done via [hasFinished].
+     * Sweeps from the next sequence are suppressed while the final slow sweep exits.
      */
     fun requestFinish(now: Long) {
         if (!isActive || endTime > 0L) return
-        endTime = IndeterminateSweepGeometry.cycleEnd(startTime, now, config.indeterminateCycleMs)
+        finalCycleIndex = IndeterminateSweepGeometry.getCycleIndex(startTime, now, config.indeterminateCycleMs)
+        endTime = IndeterminateSweepGeometry.calculateSequenceEnd(startTime, now, config.indeterminateCycleMs)
     }
 
     fun hasFinished(now: Long): Boolean = endTime in 1..now
@@ -67,13 +71,17 @@ class IndeterminateSweepRenderer(
     fun draw(canvas: Canvas, trackWidth: Float, top: Float, bottom: Float, now: Long) {
         if (!isActive || trackWidth <= 0f) return
         val elapsed = now - startTime
-        val s = (elapsed % config.indeterminateCycleMs).toFloat() / config.indeterminateCycleMs
-        val seed = IndeterminateSweepGeometry.seedForCycle(elapsed, config.indeterminateCycleMs, seedLeading)
-        val edges = IndeterminateSweepGeometry.calculateEdges(s, seed)
-        val left = edges.trailing * trackWidth
-        val right = edges.leading * trackWidth
-        if (right - left <= 0f) return
         val radius = (bottom - top) / 2f
-        canvas.drawRoundRect(left, top, right, bottom, radius, radius, paint)
+        val lastCycle = finalCycleIndex
+        IndeterminateSweepGeometry.calculateSegments(elapsed, config.indeterminateCycleMs, seedLeading)
+            .asSequence()
+            .filter { segment -> lastCycle == null || segment.cycleIndex <= lastCycle }
+            .forEach { segment ->
+                val left = segment.edges.trailing * trackWidth
+                val right = segment.edges.leading * trackWidth
+                if (right - left > 0f) {
+                    canvas.drawRoundRect(left, top, right, bottom, radius, radius, paint)
+                }
+            }
     }
 }

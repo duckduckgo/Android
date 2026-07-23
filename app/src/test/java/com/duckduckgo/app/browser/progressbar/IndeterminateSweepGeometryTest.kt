@@ -27,25 +27,30 @@ class IndeterminateSweepGeometryTest {
 
     @Test
     fun `seeded cycle starts exactly at the current fill`() {
-        val e = IndeterminateSweepGeometry.calculateEdges(cycleProgress = 0f, seedLeading = 0.5f)
+        val e = IndeterminateSweepGeometry.calculateEdges(sweepProgress = 0f, seedLeading = 0.5f, pass = SweepPass.FAST)
         assertEquals(0f, e.trailing, 0.0001f)
         assertEquals(0.5f, e.leading, 0.0001f)
     }
 
     @Test
     fun `unseeded cycle starts at zero width`() {
-        val e = IndeterminateSweepGeometry.calculateEdges(cycleProgress = 0f, seedLeading = 0f)
-        assertEquals(0f, e.trailing, 0.0001f)
-        assertEquals(0f, e.leading, 0.0001f)
+        for (pass in SweepPass.entries) {
+            val e = IndeterminateSweepGeometry.calculateEdges(sweepProgress = 0f, seedLeading = 0f, pass = pass)
+            assertEquals(0f, e.trailing, 0.0001f)
+            assertEquals(0f, e.leading, 0.0001f)
+        }
     }
 
     @Test
     fun `leading is always at least trailing`() {
         var s = 0f
         while (s < 1f) {
-            for (seed in seeds) {
-                val e = IndeterminateSweepGeometry.calculateEdges(s, seed)
-                assertTrue("s=$s seed=$seed", e.leading >= e.trailing - 0.0001f)
+            for (pass in SweepPass.entries) {
+                val passSeeds = if (pass == SweepPass.FAST) seeds else listOf(0f)
+                for (seed in passSeeds) {
+                    val e = IndeterminateSweepGeometry.calculateEdges(s, seed, pass)
+                    assertTrue("s=$s seed=$seed pass=$pass", e.leading >= e.trailing - 0.0001f)
+                }
             }
             s += 0.01f
         }
@@ -55,10 +60,10 @@ class IndeterminateSweepGeometryTest {
     fun `segment never spans the full track`() {
         var s = 0f
         while (s < 1f) {
-            for (seed in seeds) {
-                val e = IndeterminateSweepGeometry.calculateEdges(s, seed)
+            for (pass in SweepPass.entries) {
+                val e = IndeterminateSweepGeometry.calculateEdges(s, seedLeading = 0f, pass = pass)
                 val spansFull = e.trailing < 0.02f && e.leading > 0.98f
-                assertFalse("full bar at s=$s seed=$seed", spansFull)
+                assertFalse("full bar at s=$s pass=$pass", spansFull)
             }
             s += 0.005f
         }
@@ -66,42 +71,90 @@ class IndeterminateSweepGeometryTest {
 
     @Test
     fun `leading advances monotonically over a cycle`() {
-        var prev = -1f
-        var s = 0f
-        while (s <= 1f) {
-            val leading = IndeterminateSweepGeometry.calculateEdges(s, 0f).leading
-            assertTrue("regressed at s=$s", leading >= prev - 0.0001f)
-            prev = leading
-            s += 0.02f
+        for (pass in SweepPass.entries) {
+            var prev = -1f
+            var s = 0f
+            while (s <= 1f) {
+                val leading = IndeterminateSweepGeometry.calculateEdges(s, seedLeading = 0f, pass = pass).leading
+                assertTrue("regressed at s=$s pass=$pass", leading >= prev - 0.0001f)
+                prev = leading
+                s += 0.02f
+            }
         }
     }
 
     @Test
-    fun `seedForCycle applies the seed only on the first cycle`() {
-        assertEquals(0.5f, IndeterminateSweepGeometry.seedForCycle(0L, 2000L, 0.5f), 0.0001f)
-        assertEquals(0.5f, IndeterminateSweepGeometry.seedForCycle(1999L, 2000L, 0.5f), 0.0001f)
-        assertEquals(0f, IndeterminateSweepGeometry.seedForCycle(2000L, 2000L, 0.5f), 0.0001f)
-        assertEquals(0f, IndeterminateSweepGeometry.seedForCycle(5000L, 2000L, 0.5f), 0.0001f)
+    fun `system easing makes the segment visible early in the sweep`() {
+        val edges = IndeterminateSweepGeometry.calculateEdges(sweepProgress = 0.25f, seedLeading = 0f, pass = SweepPass.FAST)
+
+        assertTrue(edges.leading > 0.35f)
+        assertEquals(0f, edges.trailing, 0.0001f)
     }
 
     @Test
-    fun `cycleEnd returns the end of the first cycle when finishing within it`() {
-        assertEquals(3000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 1000L, cycleMs = 2000L))
-        assertEquals(3000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 2500L, cycleMs = 2000L))
+    fun `slow sweep is longer than fast sweep at midpoint`() {
+        val fast = IndeterminateSweepGeometry.calculateEdges(sweepProgress = 0.5f, seedLeading = 0f, pass = SweepPass.FAST)
+        val slow = IndeterminateSweepGeometry.calculateEdges(sweepProgress = 0.5f, seedLeading = 0f, pass = SweepPass.SLOW)
+
+        assertTrue(slow.leading - slow.trailing > fast.leading - fast.trailing)
     }
 
     @Test
-    fun `cycleEnd rolls to the next boundary exactly on a boundary`() {
-        assertEquals(5000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 3000L, cycleMs = 2000L))
+    fun `sequence starts with a seeded fast sweep`() {
+        val segments = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 0L, cycleMs = 2000L, seedLeading = 0.5f)
+
+        assertEquals(1, segments.size)
+        assertEquals(SweepPass.FAST, segments.single().pass)
+        assertEquals(0L, segments.single().cycleIndex)
+        assertEquals(0.5f, segments.single().edges.leading, 0.0001f)
     }
 
     @Test
-    fun `cycleEnd returns the end of the current cycle when finishing in a later cycle`() {
-        assertEquals(7000L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 5500L, cycleMs = 2000L))
+    fun `fast sweep is followed by a slow sweep`() {
+        val fast = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 350L, cycleMs = 2000L, seedLeading = 0f).single()
+        val gap = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 800L, cycleMs = 2000L, seedLeading = 0f)
+        val slow = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 1475L, cycleMs = 2000L, seedLeading = 0f).single()
+
+        assertEquals(SweepPass.FAST, fast.pass)
+        assertTrue(gap.isEmpty())
+        assertEquals(SweepPass.SLOW, slow.pass)
+        assertEquals(fast.edges.leading, slow.edges.leading, 0.0001f)
+        assertTrue(slow.edges.leading - slow.edges.trailing > fast.edges.leading - fast.edges.trailing)
     }
 
     @Test
-    fun `cycleEnd finishes immediately for a non-positive cycle`() {
-        assertEquals(5500L, IndeterminateSweepGeometry.cycleEnd(startTime = 1000L, now = 5500L, cycleMs = 0L))
+    fun `slow sweep briefly overlaps the next fast sweep`() {
+        val segments = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 2025L, cycleMs = 2000L, seedLeading = 0.5f)
+
+        assertEquals(2, segments.size)
+        assertEquals(SweepPass.SLOW, segments[0].pass)
+        assertEquals(0L, segments[0].cycleIndex)
+        assertEquals(SweepPass.FAST, segments[1].pass)
+        assertEquals(1L, segments[1].cycleIndex)
+    }
+
+    @Test
+    fun `only the first fast sweep is seeded`() {
+        val firstFast = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 0L, cycleMs = 2000L, seedLeading = 0.5f)
+            .single { it.pass == SweepPass.FAST }
+        val secondFast = IndeterminateSweepGeometry.calculateSegments(elapsedMs = 2000L, cycleMs = 2000L, seedLeading = 0.5f)
+            .single { it.pass == SweepPass.FAST }
+
+        assertEquals(0.5f, firstFast.edges.leading, 0.0001f)
+        assertEquals(0f, secondFast.edges.leading, 0.0001f)
+    }
+
+    @Test
+    fun `sequenceEnd returns the end of the active slow sweep`() {
+        assertEquals(3050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 1000L, cycleMs = 2000L))
+        assertEquals(3050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 2500L, cycleMs = 2000L))
+        assertEquals(5050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 3000L, cycleMs = 2000L))
+        assertEquals(7050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 5500L, cycleMs = 2000L))
+    }
+
+    @Test
+    fun `invalid cycle has no segments and finishes immediately`() {
+        assertTrue(IndeterminateSweepGeometry.calculateSegments(elapsedMs = 100L, cycleMs = 0L, seedLeading = 0.5f).isEmpty())
+        assertEquals(5500L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 5500L, cycleMs = 0L))
     }
 }
