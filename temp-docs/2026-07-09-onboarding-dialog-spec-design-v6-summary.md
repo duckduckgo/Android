@@ -1,4 +1,4 @@
-# Onboarding dialog spec (v6 — summary)
+# Onboarding dialog config (v6 — summary)
 
 ## Problem
 
@@ -9,7 +9,7 @@
    again for snapped renders (rotation, re-entry). Every change touches both, and they drift.
 2. **Every dialog is modeled three times**:
     ```
-    NewUserOnboardingActivityDialog   (step render intent, built in the plan provider)
+    NewUserOnboardingActivityDialog   (step definition, built in the plan provider)
       └─ applyDialog() maps it to →   PreOnboardingDialogType + ~11 scattered ViewState fields
             └─ two when-blocks map that to →   actual views
     ```
@@ -17,15 +17,15 @@
    behind (which embellishment to dismiss, which animation to exit). Re-ordering screens
    breaks these assumptions one by one.
 
-The Custom AI flow already re-orders screens, and the parent project will add more
+The Custom AI flow already re-orders screens, and https://app.asana.com/1/137249556945/project/1208671518894266/task/1215556935109578?focus=true will add more
 permutations. The current structure makes each one a hand-wired special case.
 
 ## Goals
 
 **Goals**
-- One `DialogSpec` per screen: pure data (background, embellishment, content, CTAs). The
+- One `DialogConfig` per screen: pure data (background, embellishment, content, CTAs). The
   step in the plan provider resolves it, the VM forwards it, the renderer draws it. Three representations become one.
-- One render engine that diffs previous spec against new spec. One code path for animated
+- One render engine that diffs previous config against new config. One code path for animated
   and snapped renders, so they cannot drift.
 - Any dialog can follow any dialog, or appear from nothing. Re-ordering a flow becomes a
   list edit in the plan provider.
@@ -38,10 +38,10 @@ permutations. The current structure makes each one a hand-wired special case.
 
 ## Strategy
 
-Each onboarding step describes its screen as a `DialogSpec`: plain data listing the
+Each onboarding step describes its screen as a `DialogConfig`: plain data listing the
 background, embellishment, content, and CTAs. The plan provider becomes the single authority
 for what each screen shows and in what order. The VM stops translating and just forwards the
-spec. A new render engine compares the previous spec with the new one and animates only what
+config. A new render engine compares the previous config with the new one and animates only what
 changed — the same code path snaps everything into place when there is nothing to animate
 (rotation, re-entry). All the per-dialog view wiring that exists today collapses into that
 one engine plus per-screen data. The engine itself is a set of independent axis controllers —
@@ -49,51 +49,51 @@ background, embellishment, card anchor, content — each seeing only its own pre
 value. Nothing branches on a (previous screen, next screen) pair; that single rule is what
 keeps N screens at N transition costs instead of resurrecting the N×N matrix.
 
-### `DialogSpec`
+### `DialogConfig`
 
 ```kotlin
-data class DialogSpec(
+data class DialogConfig(
     val background: OnboardingBackgroundStep,   // existing enum, reused as-is
     val embellishment: Embellishment,           // enum: WalkingDax, BobbingDax, BottomWing, LeftWing, None
-    val content: ContentSpec,                   // sealed data, below; carries the screen's title and variable elements
-    val primaryCta: CtaSpec,
-    val secondaryCta: CtaSpec? = null,
+    val content: ContentConfig,                   // sealed data, below; carries the screen's title and variable elements
+    val primaryCta: CtaConfig,
+    val secondaryCta: CtaConfig? = null,
     val stepIndicator: StepProgress? = null,    // existing type, filled in by the VM from plan position
 )
 ```
 
-**Spec is value-comparable data.** No lambdas, no views. Equality drives the diff, and
-  specs are unit-testable straight off the plan.
+**Config is value-comparable data.** No lambdas, no views. Equality drives the diff, and
+  configs are unit-testable straight off the plan.
 
-### `ContentSpec` and `ContentHandle`
+### `ContentConfig` and `ContentHandle`
 
-`ContentSpec` carries the screen's title plus whatever seed data varies:
+`ContentConfig` carries the screen's title plus whatever seed data varies:
 
 ```kotlin
-sealed interface ContentSpec {
-    val title: TextSpec   // every screen has one; rendered by its include's title view
+sealed interface ContentConfig {
+    val title: TextConfig   // every screen has one; rendered by its include's title view
 
     // stateless
-    data class Welcome(override val title: TextSpec, val body1: TextSpec, val body2: TextSpec?) : ContentSpec
-    data class ComparisonChart(override val title: TextSpec, val config: ComparisonChartConfig) : ContentSpec
-    data class AddToDock(override val title: TextSpec) : ContentSpec
-    data class WidgetPrompt(override val title: TextSpec) : ContentSpec
+    data class Welcome(override val title: TextConfig, val body1: TextConfig, val body2: TextConfig?) : ContentConfig
+    data class ComparisonChart(override val title: TextConfig, val config: ComparisonChartConfig) : ContentConfig
+    data class AddToDock(override val title: TextConfig) : ContentConfig
+    data class WidgetPrompt(override val title: TextConfig) : ContentConfig
 
     // stateful: seed in, live edits mirror into a plain VM field, submit event built from the current selection
-    data class AddressBar(override val title: TextSpec, val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentSpec
-    data class InputScreen(override val title: TextSpec, val initialWithAi: Boolean) : ContentSpec
-    data class InputScreenPreview(override val title: TextSpec, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentSpec
-    data class QuickSetup(override val title: TextSpec, val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentSpec
+    data class AddressBar(override val title: TextConfig, val initialPosition: OmnibarType, val showSplitOption: Boolean) : ContentConfig
+    data class InputScreen(override val title: TextConfig, val initialWithAi: Boolean) : ContentConfig
+    data class InputScreenPreview(override val title: TextConfig, val isSearchDefault: Boolean, val searchSuggestions: List<…>, val chatSuggestions: List<…>) : ContentConfig
+    data class QuickSetup(override val title: TextConfig, val hideSetDefaultBrowserRow: Boolean, val hideAddWidgetRow: Boolean, val hideAddressBarRow: Boolean, val isReinstallUser: Boolean) : ContentConfig
 }
 ```
 
 View elements, strings, etc. that never vary stay in the include's XML or in
-the binder, as today. Only the title and plan-dependent copy travel through the spec.
+the binder, as today. Only the title and plan-dependent copy travel through the config.
 `title` stays non-null while every screen has one; if a titleless screen ever appears,
 making it nullable (engine skips the typing stage) is a one-line change — deliberately
 not pre-built.
 
-The view layer binds a spec and hands the engine a small handle. The handle is how a screen
+The view layer binds a config and hands the engine a small handle. The handle is how a screen
 declares its views without re-describing the choreography:
 
 ```kotlin
@@ -121,13 +121,13 @@ it; the rendering engine tells it when to type or snap. No screen re-implements 
 
 **Stateful screens** (address bar, input screen, quick setup — with more planned as the next
 step of this initiative). User edits inside the screen
-never produce a new spec, so the engine only diffs on real step changes. No holder object is
+never produce a new config, so the engine only diffs on real step changes. No holder object is
 needed — two existing mechanisms cover it:
 
 - **Live value.** The view writes edits into a small typed key-value store owned by the VM
   (`viewModel.liveValues[AddressBarPosition] = it`). It is not render state, so nothing
   re-renders; it survives rotation because the VM does, and the binder seeds the picker from
-  it, falling back to the spec's initial value. The VM never reads the store — it just owns
+  it, falling back to the config's initial value. The VM never reads the store — it just owns
   it. Adding a stateful screen means a new key, not a new VM field, so the pattern stays
   constant-cost as screens are added.
 - **Submit.** The binder gives the handle a `result` closure that builds the orchestrator
@@ -137,34 +137,34 @@ needed — two existing mechanisms cover it:
 - **External changes.** Some content mirrors system state that changes mid-step: quick setup
   re-syncs its default-browser and widget switches on resume. That stays on the existing
   `Command` channel, which this design leaves untouched — the command handler pokes the
-  bound view (via an optional update hook on the handle). Not render state, no new spec.
+  bound view (via an optional update hook on the handle). Not render state, no new config.
 
 If a future screen's live state needs to influence *other* steps before submit, the store
 is not the tool: that value should travel through an orchestrator event into the plan's
 context (existing precedent: the pending Duck.ai prompt). Escape valve, not the default.
 
 **The binder** is the only place that knows which layout include belongs to which
-`ContentSpec`. It sets the spec's data on the views and returns the handle:
+`ContentConfig`. It sets the config's data on the views and returns the handle:
 
 ```kotlin
 // view layer
 class ContentBinder(private val binding: …) {
-    fun bind(content: ContentSpec): ContentHandle = when (content) {
-        is ContentSpec.Welcome -> with(binding.welcomeContent) {
+    fun bind(content: ContentConfig): ContentHandle = when (content) {
+        is ContentConfig.Welcome -> with(binding.welcomeContent) {
             body1.text = content.body1.resolve()
             content.body2?.let { body2.text = it.resolve() }
             ContentHandle(title = titleView, fadeTargets = listOfNotNull(body1, content.body2?.let { body2 }))
         }
-        is ContentSpec.ComparisonChart -> with(binding.comparisonChartContent) {
+        is ContentConfig.ComparisonChart -> with(binding.comparisonChartContent) {
             populate(content.config)
             ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), intro = checkIconStagger())
         }
-        is ContentSpec.AddressBar -> with(binding.addressBarContent) {
+        is ContentConfig.AddressBar -> with(binding.addressBarContent) {
             picker.selected = viewModel.liveValues[AddressBarPosition] ?: content.initialPosition
             picker.onOptionSelected = { viewModel.liveValues[AddressBarPosition] = it }  // survives rotation
             ContentHandle(title = titleView, fadeTargets = listOf(picker), result = { AddressBarConfirmed(picker.selected) })
         }
-        is ContentSpec.AddToDock -> with(binding.addToDockContent) {
+        is ContentConfig.AddToDock -> with(binding.addToDockContent) {
             ContentHandle(title = titleView, fadeTargets = listOf(body, video), unbind = { releaseVideo() })
         }
         // one branch per screen …
@@ -189,14 +189,14 @@ actor User
 == Step becomes current ==
 Orchestrator -> VM : state: InProgress(step)
 VM -> Step : resolveDialog()
-Step --> VM : Dialog(DialogSpec)
-VM -> VM : ViewState = stepId + spec\n(+ step indicator from plan position)
+Step --> VM : Dialog(DialogConfig)
+VM -> VM : ViewState = stepId + config\n(+ step indicator from plan position)
 VM -> Orchestrator : Presented
 note right : shown pixel fires\nvia the step wrapper
 
 == Render ==
-VM -> Engine : render(spec, animate = first show of this step)
-Engine -> Engine : diff previous vs new spec\n(no previous → clear stage, enter everything)
+VM -> Engine : render(config, animate = first show of this step)
+Engine -> Engine : diff previous vs new config\n(no previous → clear stage, enter everything)
 Engine -> Binder : unbind(previous content)
 Engine -> Binder : bind(new content)
 Binder --> Engine : ContentHandle
@@ -206,7 +206,7 @@ note right : animate = false runs the same\npipeline snapped to end states\n(rot
 == Interaction ==
 User -> Binder : live edits (picker, toggle)
 Binder -> VM : value into keyed live-value store\n(VM-owned, survives rotation)
-note right : no new spec, no re-render
+note right : no new config, no re-render
 User -> Engine : CTA click
 alt action is Emit(event)
   Engine -> VM : event as-is
@@ -222,7 +222,7 @@ note right : VM never sees the handle;\nit forwards events blindly
 Orchestrator -> Step : transition(event)
 Step --> Orchestrator : Advance (or Stay / SwitchTo / AbortPlan)
 Orchestrator -> VM : state: InProgress(next step)
-note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing spec against the new one
+note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing config against the new one
 @enduml
 ```
 
@@ -242,14 +242,14 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 - New bubble screen = defining (reusing) a layout and providing variables. No need for ~200 lines duplicated across two when-blocks for plumbing.
 - One owner for running animations: tap-to-skip and view teardown become one call instead of
   hand-enumerating ~25 animators. This pays off even before any re-ordering does.
-- Every dialog can enter from an empty stage. "No previous spec" means clear the stage
+- Every dialog can enter from an empty stage. "No previous config" means clear the stage
   and enter — not a special case. This covers the first dialog and returns from
   `BrowserActivity` (today a hand-coded comparison-chart path).
-- `ViewState` collapses from 16 fields (one already write-only dead) to a spec and two flags;
+- `ViewState` collapses from 16 fields (one already write-only dead) to a config and two flags;
   the VM's dialog switch reduces to five branches — the four command-only steps (intro
   animation, notification permission, default browser, add widget) plus one for every
-  spec-rendered dialog.
-- `DialogSpec` is the state model a future Compose port would consume unchanged — the
+  config-rendered dialog.
+- `DialogConfig` is the state model a future Compose port would consume unchanged — the
   declarative architecture without the rewrite risk.
 - One place to honor system animation settings: animations-off routes the whole pipeline
   through its snapped path. Today nothing in this flow respects reduced motion.
@@ -260,19 +260,19 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 
 | Risk | Mitigation |
 |---|---|
-| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared spec ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
+| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared config ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
 | Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
 | Regression in a release-critical flow | Whole parallel renderer behind a remote toggle (see Rollout): the flag-off arm stays byte-identical, mixed-renderer sessions never exist, and the kill switch needs no release. Maestro release-blocker flows run in both flag states, plus unit tests off the resolver |
-| Two consecutive steps resolve identical specs, `StateFlow` swallows the second | Emitted state is keyed by step id, not spec equality alone |
-| Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content spec or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
+| Two consecutive steps resolve identical configs, `StateFlow` swallows the second | Emitted state is keyed by step id, not config equality alone |
+| Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content config or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
 ## Rollout
 
 Behind a remote feature flag from day one: a new toggle on the existing
-`OnboardingBrandDesignUpdateToggles` (e.g. `specDrivenDialogs()`, default INTERNAL). The flag
+`OnboardingBrandDesignUpdateToggles` (e.g. `configDrivenDialogs()`, default INTERNAL). The flag
 selects a whole parallel renderer, not per-screen paths.
 `OnboardingPageManager`/`OnboardingPageBuilder` already choose between welcome-page fragments
-(legacy vs brand-design); the toggle adds one more branch at that seam — a new spec-driven
+(legacy vs brand-design); the toggle adds one more branch at that seam — a new config-driven
 fragment when on, the existing `BrandDesignUpdateWelcomePage` untouched when off. Mixed-renderer
 sessions never exist, so no legacy screen ever follows an engine-rendered one (which would trip
 exactly the neighbor assumptions this design deletes), and the flag-off arm stays byte-identical
@@ -281,14 +281,14 @@ throughout. The remote toggle doubles as a no-release kill switch.
 Shared vs duplicated while both arms exist:
 
 - **Orchestrator and plan provider: untouched.** Steps keep returning
-  `NewUserOnboardingActivityDialog`; the new path adds one pure `DialogSpecResolver` (a single
-  `when` mapping dialog → `DialogSpec`) — the unit-testable spec source immediately, inlined
+  `NewUserOnboardingActivityDialog`; the new path adds one pure `DialogConfigResolver` (a single
+  `when` mapping dialog → `DialogConfig`) — the unit-testable config source immediately, inlined
   into the steps at cleanup. That is when "plan provider is the single authority" lands; until
   then neither the plan nor the legacy VM sees the flag.
 - **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
   the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
   in place first, with legacy binding through it — the single legacy edit of the rollout.
-- **New slim VM.** Spec + two flags + live-value store. The shown-pixel map (~15 lines) is
+- **New slim VM.** Config + two flags + live-value store. The shown-pixel map (~15 lines) is
   duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
   are directly comparable. Command handling for the command-only steps and the quick-setup
   syncs ports as-is.
@@ -296,11 +296,11 @@ Shared vs duplicated while both arms exist:
 Sequence:
 
 1. `OnboardingDialogTitleView` include refactor in place (only legacy edit; ships alone).
-2. Dark scaffolding: `DialogSpec` types + resolver + engine + binder + new fragment/VM behind
+2. Dark scaffolding: `DialogConfig` types + resolver + engine + binder + new fragment/VM behind
    the flag at INTERNAL. The POC chain (welcome → comparison → address-bar) exercises every
    risky mechanism in one pass on internal builds before anything else is built.
 3. Remaining screens, one dark PR each — any order; no coexistence constraints.
-4. Gate: Maestro release-blocker flows run in both flag states; unit tests assert specs
+4. Gate: Maestro release-blocker flows run in both flag states; unit tests assert configs
    straight off the resolver.
 5. Ramp as an experiment with pixel parity between arms; kill switch armed.
 6. 100% plus one release of soak → delete the legacy fragment, VM, when-blocks, and
