@@ -145,16 +145,47 @@ class IndeterminateSweepGeometryTest {
     }
 
     @Test
-    fun `sequenceEnd returns the end of the active slow sweep`() {
-        assertEquals(3050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 1000L, cycleMs = 2000L))
-        assertEquals(3050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 2500L, cycleMs = 2000L))
-        assertEquals(5050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 3000L, cycleMs = 2000L))
-        assertEquals(7050L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 5500L, cycleMs = 2000L))
+    fun `finish target returns the end of the active slow sweep`() {
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 0L, endTime = 3050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 1000L, cycleMs = 2000L),
+        )
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 0L, endTime = 3050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 2500L, cycleMs = 2000L),
+        )
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 2L, endTime = 7050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 5500L, cycleMs = 2000L),
+        )
+    }
+
+    @Test
+    fun `finish target remains on previous sequence throughout overlap`() {
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 0L, endTime = 3050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 3000L, cycleMs = 2000L),
+        )
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 0L, endTime = 3050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 3049L, cycleMs = 2000L),
+        )
+    }
+
+    @Test
+    fun `finish target advances once previous slow sweep exits`() {
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 1L, endTime = 5050L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 3050L, cycleMs = 2000L),
+        )
     }
 
     @Test
     fun `invalid cycle has no segments and finishes immediately`() {
         assertTrue(IndeterminateSweepGeometry.calculateSegments(elapsedMs = 100L, cycleMs = 0L, seedLeading = 0.5f).isEmpty())
-        assertEquals(5500L, IndeterminateSweepGeometry.calculateSequenceEnd(startTime = 1000L, now = 5500L, cycleMs = 0L))
+        assertEquals(
+            SweepFinishTarget(cycleIndex = 0L, endTime = 5500L),
+            IndeterminateSweepGeometry.calculateFinishTarget(startTime = 1000L, now = 5500L, cycleMs = 0L),
+        )
     }
 }

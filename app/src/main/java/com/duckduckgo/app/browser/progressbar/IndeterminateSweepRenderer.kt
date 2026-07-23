@@ -62,8 +62,9 @@ class IndeterminateSweepRenderer(
      */
     fun requestFinish(now: Long) {
         if (!isActive || endTime > 0L) return
-        finalCycleIndex = IndeterminateSweepGeometry.getCycleIndex(startTime, now, config.indeterminateCycleMs)
-        endTime = IndeterminateSweepGeometry.calculateSequenceEnd(startTime, now, config.indeterminateCycleMs)
+        val finishTarget = IndeterminateSweepGeometry.calculateFinishTarget(startTime, now, config.indeterminateCycleMs)
+        finalCycleIndex = finishTarget.cycleIndex
+        endTime = finishTarget.endTime
     }
 
     fun hasFinished(now: Long): Boolean = endTime in 1..now

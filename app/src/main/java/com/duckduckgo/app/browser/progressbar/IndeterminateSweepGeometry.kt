@@ -32,6 +32,11 @@ data class SweepSegment(
     val edges: SweepEdges,
 )
 
+data class SweepFinishTarget(
+    val cycleIndex: Long,
+    val endTime: Long,
+)
+
 /**
  * Pure geometry for the indeterminate animation: a fast sweep followed by a slow sweep on each
  * repeating cycle. Each sweep grows from the left, travels, and contracts off the right. The first
@@ -124,17 +129,29 @@ object IndeterminateSweepGeometry {
     }
 
     /**
-     * The end of the fast-slow sequence active at [now]. This is where its slow sweep has fully
-     * exited. Used to finish the current sequence gracefully when leaving the indeterminate state.
+     * Selects the sequence to finish and the time when its slow sweep has fully exited. During the
+     * brief overlap at a nominal cycle boundary, the previous sequence remains the finish target
+     * and the newly-started fast sweep is suppressed.
      */
-    fun calculateSequenceEnd(startTime: Long, now: Long, cycleMs: Long): Long {
-        if (cycleMs <= 0L) return now
-        val cycleIndex = (now - startTime).coerceAtLeast(0L) / cycleMs
-        return startTime + cycleIndex * cycleMs + getSlowSweepStart(cycleMs) + getSlowSweepDuration(cycleMs)
-    }
+    fun calculateFinishTarget(startTime: Long, now: Long, cycleMs: Long): SweepFinishTarget {
+        if (cycleMs <= 0L) return SweepFinishTarget(cycleIndex = 0L, endTime = now)
 
-    fun getCycleIndex(startTime: Long, now: Long, cycleMs: Long): Long =
-        if (cycleMs <= 0L) 0L else (now - startTime).coerceAtLeast(0L) / cycleMs
+        val elapsed = (now - startTime).coerceAtLeast(0L)
+        val nominalCycleIndex = elapsed / cycleMs
+        val cycleElapsed = elapsed % cycleMs
+        val sequenceEndOffset = getSlowSweepStart(cycleMs) + getSlowSweepDuration(cycleMs)
+        val overlapDuration = (sequenceEndOffset - cycleMs).coerceAtLeast(0L)
+        val finishingCycleIndex = if (nominalCycleIndex > 0L && cycleElapsed < overlapDuration) {
+            nominalCycleIndex - 1L
+        } else {
+            nominalCycleIndex
+        }
+
+        return SweepFinishTarget(
+            cycleIndex = finishingCycleIndex,
+            endTime = startTime + finishingCycleIndex * cycleMs + sequenceEndOffset,
+        )
+    }
 
     private fun MutableList<SweepSegment>.addSlowSweepIfActive(
         cycleIndex: Long,
