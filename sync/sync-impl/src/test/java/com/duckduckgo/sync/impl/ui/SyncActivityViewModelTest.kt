@@ -605,14 +605,14 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveDeviceSucceedsThenFetchRemoteDevices() = runTest {
+    fun whenOnRemoveDeviceSucceedsThenDeviceIsRemovedWithoutRefetch() = runTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
         testee.onRemoveDeviceConfirmed(connectedDevice)
 
-        verify(syncAccountRepository).getConnectedDevices()
+        verify(syncAccountRepository, never()).getConnectedDevices()
     }
 
     @Test
@@ -624,16 +624,43 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             var awaitItem = expectMostRecentItem()
             assertEquals(1, awaitItem.syncedDevices.size)
-            whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(listOf()))
             testee.onRemoveDeviceConfirmed(connectedDevice)
-            awaitItem = awaitItem()
+            awaitItem = expectMostRecentItem()
             assertEquals(0, awaitItem.syncedDevices.size)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnRemoveDeviceFailsThenRestorePreviousList() = runTest {
+    fun whenStaleDeviceFetchCompletesAfterRemovalThenRemovedDeviceDoesNotReappear() = runTest {
+        givenAuthenticatedUser()
+
+        val otherDevice = connectedDevice.copy(thisDevice = false, deviceId = "otherDeviceId")
+        whenever(syncAccountRepository.logout(otherDevice.deviceId)).thenReturn(Result.Success(true))
+        var fetchCount = 0
+        whenever(syncAccountRepository.getConnectedDevices()).thenAnswer {
+            fetchCount++
+            if (fetchCount == 2) {
+                // this fetch read the server before the removal: the user confirms the removal
+                // while it is in flight, so its stale result lands afterwards
+                testee.onRemoveDeviceConfirmed(otherDevice)
+            }
+            Result.Success(listOf(connectedDevice, otherDevice))
+        }
+
+        testee.viewState().test {
+            assertEquals(2, expectMostRecentItem().syncedDevices.size)
+
+            testee.onDevicesUpdated()
+
+            val devices = expectMostRecentItem().syncedDevices.filterIsInstance<SyncedDevice>()
+            assertEquals(listOf(deviceId), devices.map { it.device.deviceId })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnRemoveDeviceFailsThenDeviceRemainsInList() = runTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
@@ -642,6 +669,7 @@ class SyncActivityViewModelTest {
             testee.onRemoveDeviceConfirmed(connectedDevice)
             val awaitItem = expectMostRecentItem()
             assertEquals(1, awaitItem.syncedDevices.size)
+            assertFalse((awaitItem.syncedDevices.first() as SyncedDevice).loading)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -657,8 +685,23 @@ class SyncActivityViewModelTest {
             val newDevice = connectedDevice.copy(deviceName = "newDevice")
             whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(newDevice)))
             testee.onDeviceEdited(newDevice)
-            awaitItem = awaitItem()
+            awaitItem = expectMostRecentItem()
             assertNotNull(awaitItem.syncedDevices.filterIsInstance<SyncedDevice>().first { it.device.deviceName == newDevice.deviceName })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDeviceEditedFailsThenDeviceRemainsInList() = runTest {
+        givenAuthenticatedUser()
+
+        whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Error(reason = "error"))
+
+        testee.viewState().test {
+            testee.onDeviceEdited(connectedDevice.copy(deviceName = "newDevice"))
+            val awaitItem = expectMostRecentItem()
+            assertEquals(1, awaitItem.syncedDevices.size)
+            assertFalse((awaitItem.syncedDevices.first() as SyncedDevice).loading)
             cancelAndIgnoreRemainingEvents()
         }
     }
