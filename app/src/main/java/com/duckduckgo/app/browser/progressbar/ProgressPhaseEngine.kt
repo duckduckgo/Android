@@ -131,7 +131,7 @@ class ProgressPhaseEngine(
             Phase.IDLE -> {} // no-op
             Phase.FAST_START -> tickFastStart()
             Phase.TRACKING -> tickTracking(dt)
-            Phase.INDETERMINATE -> {} // hold displayProgress frozen; the view renders the sweep
+            Phase.INDETERMINATE -> if (!stallDetectionEnabled) onSweepFinished() // otherwise hold frozen; the view renders the sweep
             Phase.RESUMING -> tickResuming()
             Phase.COMPLETING -> tickCompleting()
             Phase.DONE -> {} // no-op
