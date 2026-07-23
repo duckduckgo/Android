@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
@@ -48,18 +47,12 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REI
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboarding.ui.page.configdriven.OnboardingDialogShownPixels
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -97,6 +90,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val shownPixels: OnboardingDialogShownPixels,
 ) : ViewModel() {
 
     data class ViewState(
@@ -206,16 +200,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
-        when (dialogType) {
-            SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
-            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-            AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
-            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW, QUICK_SETUP, ADD_TO_DOCK, SKIP_ONBOARDING_OPTION, WIDGET_PROMPT -> Unit
-        }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
 
@@ -493,8 +477,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     // Maps the current step's dialog onto the same viewState/commands the fragment already renders.
-    // Reuses setCurrentDialog / setInputScreenPreviewDialog so each dialog's shown pixel fires once.
+    // shownPixels.fireFor(dialog) fires the dialog's once-ever "shown" pixel (a no-op for command-only
+    // dialogs, which never fired one); fireDialogShownPixel only emits Presented now.
     private suspend fun applyDialog(dialog: NewUserOnboardingActivityDialog, progress: StepProgress?) {
+        shownPixels.fireFor(dialog)
         when (dialog) {
             is NewUserOnboardingActivityDialog.IntroAnimation -> {
                 _commands.send(Command.PlayIntroAnimation(withDuckAi = dialog.withDuckAi))
