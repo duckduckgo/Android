@@ -296,16 +296,16 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 
 ## Benefits
 
-- ~1.3k lines of duplicated per-dialog wiring become one diff plus per-screen data. Snap and
+- ~1.3k lines of duplicated per-dialog wiring become unified. Snap and
   animate cannot drift apart.
-- Re-ordering or permuting a flow = editing a list. Any ordering animates correctly with no new transition code.
+- Re-ordering or permuting a flow means editing a list. Any ordering animates correctly with no new transition code.
 - One owner for running animations: tap-to-skip and view teardown become one call instead of
-  hand-enumerating ~25 animators. This pays off even before any re-ordering does.
-- `ViewState` collapses from 16 fields to a config and couple of flags.
+  hand-enumerating ~25 animators.
+- `ViewState` collapses from 16 fields to a `DialogConfig` and a couple of flags.
 - `DialogConfig` is the state model a future Compose port would consume unchanged — the
   declarative architecture without the rewrite risk.
 - The orchestrator already supports `GoBack` and a diff is direction-agnostic, so backward
-  transitions come free if the parent project ever wants back navigation. Enabled, not scoped.
+  transitions come free if ever need it. Enabled by structure, but not scoped.
 
 ## Risks and mitigations
 
@@ -314,7 +314,6 @@ in-memory, so step identity is the only durable signal; the POC validates it suf
 | Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes. The fit veto re-runs per frame, so declared config ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. A thin POC of the welcome → comparison → address-bar chain de-risks all of this first |
 | Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes |
 | Regression in a release-critical flow | Whole parallel renderer behind a remote toggle (see Rollout): the flag-off arm stays byte-identical, mixed-renderer sessions never exist, and the kill switch needs no release. Maestro release-blocker flows run in both flag states, plus unit tests off the resolver |
-| Two consecutive steps resolve identical configs, `StateFlow` swallows the second | Emitted state is keyed by step id, not config equality alone |
 | Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content config or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
 ## Rollout
@@ -324,18 +323,14 @@ Behind a remote feature flag from day one: a new toggle on the existing
 selects a whole parallel renderer, not per-screen paths.
 `OnboardingPageManager`/`OnboardingPageBuilder` already choose between welcome-page fragments
 (legacy vs brand-design); the toggle adds one more branch at that seam — a new config-driven
-fragment when on, the existing `BrandDesignUpdateWelcomePage` untouched when off. Mixed-renderer
-sessions never exist, so no legacy screen ever follows an engine-rendered one (which would trip
-exactly the neighbor assumptions this design deletes), and the flag-off arm stays byte-identical
-throughout. The remote toggle doubles as a no-release kill switch.
+fragment when on, the existing `BrandDesignUpdateWelcomePage` untouched when off.
 
 Shared vs duplicated while both arms exist:
 
 - **Orchestrator and plan provider: untouched.** Steps keep returning
   `NewUserOnboardingActivityDialog`; the new path adds one pure `DialogConfigResolver` (a single
   `when` mapping dialog → `DialogConfig`) — the unit-testable config source immediately, inlined
-  into the steps at cleanup. That is when "plan provider is the single authority" lands; until
-  then neither the plan nor the legacy VM sees the flag.
+  into the steps at cleanup.
 - **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
   the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
   in place first, with legacy binding through it — the single legacy edit of the rollout.
@@ -343,23 +338,3 @@ Shared vs duplicated while both arms exist:
   duplicated into it and dies with legacy — both arms emit identical pixel names, so ramp arms
   are directly comparable. Command handling for the command-only steps ports as-is; the
   quick-setup syncs become VM writes into the content-value store.
-
-Sequence:
-
-1. `OnboardingDialogTitleView` include refactor in place (only legacy edit; ships alone).
-2. Dark scaffolding: `DialogConfig` types + resolver + engine + binder + new fragment/VM behind
-   the flag at INTERNAL. The POC chain (welcome → comparison → address-bar) exercises every
-   risky mechanism in one pass on internal builds before anything else is built.
-3. Remaining screens, one dark PR each — any order; no coexistence constraints.
-4. Gate: Maestro release-blocker flows run in both flag states; unit tests assert configs
-   straight off the resolver.
-5. Ramp as an experiment with pixel parity between arms; kill switch armed.
-6. 100% plus one release of soak → delete the legacy fragment, VM, when-blocks, and
-   `PreOnboardingDialogType` (including the dead `SKIP_ONBOARDING_OPTION`, never produced by
-   this VM) and dead `ViewState` fields (`isReinstallUser` is write-only today — audit whether
-   `QuickSetup` needs the flag at all); inline the resolver into the steps; retire the flag.
-
-Trade-off, named: nothing user-visible ships until every screen renders in the new path.
-Bounded — 8 binder branches plus the engine; screens still land as small continuous dark PRs,
-not a long-lived branch. Incremental user-visible shipping was the in-place strangler's only
-advantage, and it bought mixed-renderer coexistence to get it.
