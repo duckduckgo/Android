@@ -268,4 +268,247 @@ class ProgressPhaseEngineTest {
         assertEquals(Phase.IDLE, engine.phase)
         assertEquals(0f, engine.displayProgress)
     }
+
+    // --- Indeterminate fallback ---
+
+    @Test
+    fun `does not enter INDETERMINATE when stall detection disabled`() {
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1000)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `enters INDETERMINATE after stall timeout with no forward progress`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs + 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `forward progress before timeout keeps TRACKING and resets the stall timer`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs - 500)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        engine.onProgressUpdate(60f) // forward → resets timer
+        time.advance(600)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `becoming visible resets the stall timer after time spent in the background`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+
+        time.advance(config.stallTimeoutMs + 1000)
+        engine.onBecameVisible()
+        engine.tick(0.016f)
+
+        assertEquals(Phase.TRACKING, engine.phase)
+        time.advance(config.stallTimeoutMs - 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        time.advance(1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `disabling stall detection mid-sweep exits the indeterminate phase`() {
+        enterIndeterminate(real = 50f)
+
+        engine.stallDetectionEnabled = false
+        engine.tick(0.016f)
+
+        assertEquals(Phase.RESUMING, engine.phase)
+    }
+
+    @Test
+    fun `equal progress does not reset the stall timer`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        time.advance(config.stallTimeoutMs - 100)
+        engine.tick(0.016f)
+        engine.onProgressUpdate(50f) // equal → ignored, timer NOT reset
+        time.advance(200)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `forward progress stays INDETERMINATE with the fill frozen`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        repeat(100) {
+            time.advance(16)
+            engine.tick(0.016f)
+        }
+        time.advance(config.stallTimeoutMs + 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        val frozen = engine.displayProgress
+        engine.onProgressUpdate(60f)
+        repeat(100) {
+            time.advance(16)
+            engine.tick(0.016f)
+        }
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        assertEquals(frozen, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `displayProgress is frozen during INDETERMINATE`() {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        repeat(100) {
+            time.advance(16)
+            engine.tick(0.016f)
+        }
+        time.advance(config.stallTimeoutMs + 1)
+        engine.tick(0.016f)
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+        val frozen = engine.displayProgress
+        repeat(100) {
+            time.advance(16)
+            engine.tick(0.016f)
+        }
+        assertEquals(frozen, engine.displayProgress, 0.001f)
+    }
+
+    // --- Indeterminate hand-back (onSweepFinished) ---
+
+    @Test
+    fun `onSweepFinished while not INDETERMINATE is a no-op`() {
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(50f)
+        engine.onSweepFinished()
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `onSweepFinished starts the catch-up fill from zero`() {
+        enterIndeterminate(real = 50f)
+        engine.onSweepFinished()
+        assertEquals(Phase.RESUMING, engine.phase)
+        assertEquals(0f, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `resume catch-up is animated, not an instant jump`() {
+        enterIndeterminate(real = 60f)
+        engine.onSweepFinished()
+        time.advance(config.resumeDurationMs / 2)
+        engine.tick(0.1f)
+        assertEquals(Phase.RESUMING, engine.phase)
+        assertTrue("mid catch-up should be partway, was ${engine.displayProgress}", engine.displayProgress > 0f)
+    }
+
+    @Test
+    fun `resume catch-up climbs to the displayed value, not the lower real progress`() {
+        enterIndeterminate(real = 10f)
+        val frozen = engine.displayProgress
+        assertTrue("displayed ($frozen) should exceed the real progress", frozen > 15f)
+        engine.onProgressUpdate(15f) // real resumes but stays below the displayed value
+        engine.onSweepFinished()
+        time.advance(config.resumeDurationMs + 1)
+        engine.tick(0.4f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        assertEquals(frozen, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `resume catch-up climbs to real progress when it overtook the displayed value`() {
+        enterIndeterminate(real = 10f)
+        val frozen = engine.displayProgress
+        engine.onProgressUpdate(frozen + 20f) // real jumped past the displayed value
+        engine.onSweepFinished()
+        time.advance(config.resumeDurationMs + 1)
+        engine.tick(0.4f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        assertEquals(frozen + 20f, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `resume catch-up completes within the constant resume duration regardless of distance`() {
+        enterIndeterminate(real = 10f)
+        engine.onProgressUpdate(80f) // far target
+        engine.onSweepFinished()
+        assertEquals(Phase.RESUMING, engine.phase)
+        time.advance(config.resumeDurationMs + 1)
+        engine.tick(0.4f)
+        assertEquals(Phase.TRACKING, engine.phase)
+        assertEquals(80f, engine.displayProgress, 0.001f)
+    }
+
+    @Test
+    fun `triggerCompletion during INDETERMINATE defers until the sweep finishes`() {
+        enterIndeterminate(real = 50f)
+        engine.triggerCompletion()
+        assertEquals(Phase.INDETERMINATE, engine.phase)
+    }
+
+    @Test
+    fun `onSweepFinished completes to 100 when completion was requested during the sweep`() {
+        enterIndeterminate(real = 50f)
+        engine.triggerCompletion()
+        engine.onSweepFinished()
+        assertEquals(Phase.COMPLETING, engine.phase)
+        time.advance(301)
+        engine.tick(0.301f)
+        assertEquals(100f, engine.displayProgress, 0.001f)
+        assertEquals(Phase.DONE, engine.phase)
+    }
+
+    @Test
+    fun `completion supersedes a resume requested during the sweep`() {
+        enterIndeterminate(real = 50f)
+        engine.onProgressUpdate(60f) // resume requested
+        engine.triggerCompletion() // then the page finishes — completion wins
+        engine.onSweepFinished()
+        assertEquals(Phase.COMPLETING, engine.phase)
+        time.advance(301)
+        engine.tick(0.301f)
+        assertEquals(100f, engine.displayProgress, 0.001f)
+    }
+
+    private fun enterIndeterminate(real: Float) {
+        engine.stallDetectionEnabled = true
+        engine.start()
+        time.advance(601)
+        engine.tick(0.601f)
+        engine.onProgressUpdate(real)
+        repeat(400) {
+            time.advance(16)
+            engine.tick(0.016f)
+        }
+    }
 }
