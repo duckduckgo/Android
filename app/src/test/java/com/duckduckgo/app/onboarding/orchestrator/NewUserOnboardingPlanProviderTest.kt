@@ -982,8 +982,6 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
 
-        // Persisting the dismissal here (rather than relying on a live cohort check) keeps the bottom-sheet
-        // widget CTA suppressed even if the experiment is later disabled.
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
         assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }

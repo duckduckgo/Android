@@ -24,7 +24,9 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -103,6 +105,50 @@ class OnboardingPromptsExperimentManagerTest {
         val second = testee.enroll()
 
         assertEquals(first, second)
+    }
+
+    @Test
+    fun whenEnrolledInTreatmentWidgetOnlyThenIsEnrolledInWidgetPromptCohortReturnsTrue() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertTrue(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInTreatmentDockAndWidgetThenIsEnrolledInWidgetPromptCohortReturnsTrue() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertTrue(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInTreatmentDockOnlyThenIsEnrolledInWidgetPromptCohortReturnsFalse() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInControlThenIsEnrolledInWidgetPromptCohortReturnsFalse() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.CONTROL)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenNeverEnrolledThenIsEnrolledInWidgetPromptCohortReturnsFalseWithoutEnrolling() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
+
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+        assertNull(toggles.addToDockAndWidgetExperimentJul25().getCohort())
     }
 
     private fun givenCohortEnabled(winner: OnboardingPromptsCohorts?) {
