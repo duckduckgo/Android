@@ -502,6 +502,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
+                    is NewUserOnboardingEvent.Presented -> {
+                        withContext(dispatchers.io()) {
+                            dismissedCtaDao.insert(DismissedCta(CtaId.ADD_WIDGET))
+                        }
+                        Stay
+                    }
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance

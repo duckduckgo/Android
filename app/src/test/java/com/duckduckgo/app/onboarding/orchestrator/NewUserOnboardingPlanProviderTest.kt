@@ -19,6 +19,8 @@ package com.duckduckgo.app.onboarding.orchestrator
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -964,6 +966,26 @@ class NewUserOnboardingPlanProviderTest {
             ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
             ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
         )
+    }
+
+    @Test
+    fun whenWidgetPromptStepPresentedThenAddWidgetCtaDismissed() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll())
+            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        // Persisting the dismissal here (rather than relying on a live cohort check) keeps the bottom-sheet
+        // widget CTA suppressed even if the experiment is later disabled.
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
+        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }
 
     @Test
