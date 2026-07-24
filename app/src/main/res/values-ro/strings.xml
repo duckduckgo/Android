@@ -124,7 +124,6 @@
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -227,7 +226,6 @@
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
     <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității tale online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -245,24 +243,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Șterge toate chaturile, inclusiv pe cele fixate</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Alege ce să ștergi</string>
     <string name="dataClearingOptionTabs">File</string>
     <string name="dataClearingOptionData">Date privind modulele cookie și site-ul</string>
     <string name="dataClearingDuckAiChats">Chaturi Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Șterge toate chaturile</string>
-    <string name="fireDialogDeleteButton">Ștergere</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Închide fila</item>
-        <item quantity="few">Închide toate cele %1$d file</item>
-        <item quantity="other">Închide toate cele %1$d de file</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">S-ar putea să fii deconectat de la conturi.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Niciuna</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Șterge de pe un site. S-ar putea să fii deconectat de la conturi.</item>
-        <item quantity="few">Șterge de pe %1$d site-uri. S-ar putea să fii deconectat de la conturi.</item>
-        <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Dorești să ștergi filele și datele site-ului?</string>
@@ -291,8 +274,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
-
-    <string name="settingsAutomaticallyClearData">Șterge automat datele…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
@@ -309,9 +290,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
     <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
-    <string name="settingsClearDataActionSecondaryText">Șterge toate filele și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Șterge toate filele, conversațiile Duck.ai și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Despre</string>

@@ -32,7 +32,6 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -78,17 +76,11 @@ class DuckChatContextualViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val contextualSheetImprovementsToggle: Toggle = mock()
-    private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val singleTabFireDialogToggle: Toggle = mock()
-    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
-        parentName = "androidBrowserConfig",
-        name = "singleTabFireDialog",
-    )
 
     @Before
     fun setup() {
@@ -96,9 +88,6 @@ class DuckChatContextualViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
@@ -445,7 +434,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -856,7 +844,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -898,7 +885,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -1984,9 +1970,8 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when both fire flags enabled then isFireButtonEnabled is true`() = runTest {
+    fun `when contextual fire button flag enabled then isFireButtonEnabled is true`() = runTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
 
         assertTrue(testee.viewState.value.isFireButtonEnabled)
@@ -1995,25 +1980,6 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when contextual fire button flag disabled then isFireButtonEnabled is false`() = runTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
-        val testee = buildViewModel()
-
-        assertFalse(testee.viewState.value.isFireButtonEnabled)
-    }
-
-    @Test
-    fun `when singleTabFireDialog flag disabled then isFireButtonEnabled is false`() = runTest {
-        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        val testee = buildViewModel()
-
-        assertFalse(testee.viewState.value.isFireButtonEnabled)
-    }
-
-    @Test
-    fun `when singleTabFireDialog toggle does not exist then isFireButtonEnabled is false`() = runTest {
-        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(emptyList())
         val testee = buildViewModel()
 
         assertFalse(testee.viewState.value.isFireButtonEnabled)
@@ -2789,7 +2755,6 @@ class DuckChatContextualViewModelTest {
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
         duckChatFeature = duckChatFeature,
-        featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
         contextualNativeInputManager = contextualNativeInputManager,
         chatHistoryRepository = chatHistoryRepository,

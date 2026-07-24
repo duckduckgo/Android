@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -37,20 +36,17 @@ class DuckAiOnboardingAvailabilityTest {
     val coroutineRule = CoroutineTestRule()
 
     private val toggles: ExtendedOnboardingFeatureToggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
-    private val browserConfig: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockDuckChat: DuckChat = mock()
 
     private val testee = RealDuckAiOnboardingAvailability(
         toggles = toggles,
         duckChat = mockDuckChat,
-        browserConfig = browserConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
     fun whenAllConditionsTrueThenEnabled() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        browserConfig.singleTabFireDialog().setRawStoredState(Toggle.State(remoteEnableState = true))
         toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = true))
 
         assertTrue(testee.isDuckAiOnboardingEnabled())
@@ -59,16 +55,6 @@ class DuckAiOnboardingAvailabilityTest {
     @Test
     fun whenDuckChatDisabledThenNotEnabled() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        browserConfig.singleTabFireDialog().setRawStoredState(Toggle.State(remoteEnableState = true))
-        toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = true))
-
-        assertFalse(testee.isDuckAiOnboardingEnabled())
-    }
-
-    @Test
-    fun whenSingleTabFireDialogDisabledThenNotEnabled() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        browserConfig.singleTabFireDialog().setRawStoredState(Toggle.State(remoteEnableState = false))
         toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = true))
 
         assertFalse(testee.isDuckAiOnboardingEnabled())
@@ -77,7 +63,6 @@ class DuckAiOnboardingAvailabilityTest {
     @Test
     fun whenDuckAiOnboardingToggleDisabledThenNotEnabled() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        browserConfig.singleTabFireDialog().setRawStoredState(Toggle.State(remoteEnableState = true))
         toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = false))
 
         assertFalse(testee.isDuckAiOnboardingEnabled())

@@ -93,7 +93,6 @@ class NewUserOnboardingPlanProviderTest {
     private val pixel: Pixel = mock()
     private val splitOmnibarToggle: Toggle = mock()
     private val splitOmnibarWelcomeToggle: Toggle = mock()
-    private val singleTabFireDialogToggle: Toggle = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
@@ -107,10 +106,8 @@ class NewUserOnboardingPlanProviderTest {
     fun setup() {
         whenever(androidBrowserConfigFeature.splitOmnibar()).thenReturn(splitOmnibarToggle)
         whenever(androidBrowserConfigFeature.splitOmnibarWelcomePage()).thenReturn(splitOmnibarWelcomeToggle)
-        whenever(androidBrowserConfigFeature.singleTabFireDialog()).thenReturn(singleTabFireDialogToggle)
         whenever(splitOmnibarToggle.isEnabled()).thenReturn(false)
         whenever(splitOmnibarWelcomeToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -510,21 +507,6 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
         verify(customAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
         verify(duckAiOnboardingDemo, never()).arm()
-    }
-
-    @Test
-    fun `when custom ai path and single tab fire dialog disabled then preview and demo steps skipped`() = runTest {
-        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
-        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
-
-        // Continue from the comparison chart skips both gated steps (precondition false) and lands on the next satisfied step.
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
     }
 
     @Test

@@ -18,10 +18,6 @@ package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,44 +31,24 @@ interface AppShortcutDataClearer {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAppShortcutDataClearer @Inject constructor(
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val fireDataStore: FireDataStore,
     private val dataClearingWideEvent: DataClearingWideEvent,
     private val dataClearing: ManualDataClearing,
-    private val clearDataAction: ClearDataAction,
-    private val settingsDataStore: SettingsDataStore,
 ) : AppShortcutDataClearer {
 
     override suspend fun clearFromAppShortcut(browserMode: BrowserMode) {
-        if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-            val clearOptions = fireDataStore.getManualClearOptions()
-            dataClearingWideEvent.start(
-                entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
-                clearOptions = clearOptions,
-                browserMode = browserMode,
-            )
-            try {
-                dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = browserMode)
-                dataClearingWideEvent.finishSuccess()
-            } catch (e: Exception) {
-                dataClearingWideEvent.finishFailure(e)
-                throw e
-            }
-        } else {
-            dataClearingWideEvent.startLegacy(
-                entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_APP_SHORTCUT,
-                clearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA,
-                clearDuckAiData = settingsDataStore.clearDuckAiData,
-            )
-            try {
-                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                clearDataAction.setAppUsedSinceLastClearFlag(false)
-                dataClearingWideEvent.finishSuccess()
-            } catch (e: Exception) {
-                dataClearingWideEvent.finishFailure(e)
-                throw e
-            }
-            clearDataAction.killAndRestartProcess(notifyDataCleared = false)
+        val clearOptions = fireDataStore.getManualClearOptions()
+        dataClearingWideEvent.start(
+            entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
+            clearOptions = clearOptions,
+            browserMode = browserMode,
+        )
+        try {
+            dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = browserMode)
+            dataClearingWideEvent.finishSuccess()
+        } catch (e: Exception) {
+            dataClearingWideEvent.finishFailure(e)
+            throw e
         }
     }
 }

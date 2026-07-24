@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
     <string name="fireClearAll">Usuń karty i dane</string>
-    <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
     <string name="dataClearingActivityTitle">Czyszczenie danych</string>
     <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie usunąć dane, lub skonfiguruj automatyczne usuwanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Usuń wszystkie czaty, w tym przypięte</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Wybierz, co chcesz usunąć</string>
     <string name="dataClearingOptionTabs">Karty</string>
     <string name="dataClearingOptionData">Pliki cookie i dane witryny</string>
     <string name="dataClearingDuckAiChats">Czaty Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Usuń wszystkie czaty</string>
-    <string name="fireDialogDeleteButton">Usuń</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zamknij kartę</item>
-        <item quantity="few">Zamknij wszystkie %1$d karty</item>
-        <item quantity="many">Zamknij wszystkie %1$d kart</item>
-        <item quantity="other">Zamknij wszystkie %1$d karty</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Może nastąpić wylogowanie z kont.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Brak</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Usuń z 1 witryny. Może spowodować wylogowanie z kont.</item>
-        <item quantity="few">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
-        <item quantity="many">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
-        <item quantity="other">Usuń z %1$d witryny. Może spowodować wylogowanie z kont.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Usunąć karty i dane witryny?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
-
-    <string name="settingsAutomaticallyClearData">Automatyczne czyszczenie danych…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Usuwaj automatycznie…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
     <string name="settingsClearAiDataTitle">Usuń czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
-    <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Informacje</string>

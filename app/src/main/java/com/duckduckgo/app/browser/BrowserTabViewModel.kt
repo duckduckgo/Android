@@ -1214,11 +1214,9 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
-            if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
-                val domain = uri.host?.toTldPlusOneOrSelf()
-                if (domain != null) {
-                    tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
-                }
+            val domain = uri.host?.toTldPlusOneOrSelf()
+            if (domain != null) {
+                tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
             }
         }
     }

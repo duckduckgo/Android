@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Lapok és adatok törlése</string>
-    <string name="fireClearAllPlusDuckChats">Lapok, adatok és Duck.ai-csevegések törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Tűz gomb</string>
     <string name="dataClearingActivityTitle">Adattörlés</string>
     <string name="dataClearingDescription">Az adatok törlése segíthet az online adatvédelemben. A Fire Button segítségével manuálisan törölhetők az adatok, illetve beállítható automatikus törlés is.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Az összes csevegés törlése, beleértve a kitűzött csevegéseket is</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Törlendő elemek kiválasztása</string>
     <string name="dataClearingOptionTabs">Lapok</string>
     <string name="dataClearingOptionData">Sütik és webhelyadatok</string>
     <string name="dataClearingDuckAiChats">Duck.ai-csevegések</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Minden csevegés törlése</string>
-    <string name="fireDialogDeleteButton">Törlés</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Lap bezárása</item>
-        <item quantity="other">Mind a(z) %1$d lap bezárása</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Fiókokból való kijelentkezést eredményezhet.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Nincs</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Törlés 1 webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
-        <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Törlöd a lapokat és a webhelyadatokat?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
-
-    <string name="settingsAutomaticallyClearData">Adatok automatikus törlése…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
     <string name="settingsClearAiDataTitle">Duck.ai csevegések törlése</string>
     <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
-    <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
     <string name="aboutActivityTitleNew">További információ</string>

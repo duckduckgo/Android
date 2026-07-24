@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
     <string name="fireClearAll">Izbriši kartice i podatke</string>
-    <string name="fireClearAllPlusDuckChats">Izbriši kartice, podatke i razgovore s Duck.ai-om</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Brisanje podataka</string>
     <string name="dataClearingDescription">Brisanje podataka može pomoći u zaštiti tvoje privatnosti na mreži. Pomoću Fire Buttona ručno izbriši podatke ili postavi automatsko brisanje.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Izbriši sve razgovore, uključujući prikvačene razgovore</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Odaberi što želiš izbrisati</string>
     <string name="dataClearingOptionTabs">Kartice</string>
     <string name="dataClearingOptionData">Kolačići i podaci mrežne lokacije</string>
     <string name="dataClearingDuckAiChats">Duck.ai čavrljanja</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši sve čavrljanja</string>
-    <string name="fireDialogDeleteButton">Izbriši</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zatvori karticu</item>
-        <item quantity="few">Zatvori sve %1$d kartice</item>
-        <item quantity="many">Zatvori svih %1$d kartica</item>
-        <item quantity="other">Zatvori svih %1$d kartica</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Možda će te odjaviti s računa.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Nijedno</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
-        <item quantity="few">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
-        <item quantity="many">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
-        <item quantity="other">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Izbrisati kartice i podatke mrežne lokacije?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
-
-    <string name="settingsAutomaticallyClearData">Automatsko brisanje podataka…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivna 1 sat</string>
     <string name="settingsClearAiDataTitle">Izbriši Duck.ai čavrljanja</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button će također izbrisati povijest Duck.ai, uključujući prikvačene razgovore.</string>
-    <string name="settingsClearDataActionSecondaryText">Briše sve kartice i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Briše sve kartice, razgovore na Duck.ai i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
     <string name="aboutActivityTitleNew">O</string>

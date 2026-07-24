@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
     <string name="fireClearAll">Slett faner og data</string>
-    <string name="fireClearAllPlusDuckChats">Slett faner, data og Duck.ai-chatter</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data slettet</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Sletting av data</string>
     <string name="dataClearingDescription">Sletting av nettleserdata kan gi sterkere personvern på nettet. Bruk Fire Button til å slette data manuelt, eller sett opp automatisk sletting.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Slett alle chatter, inkludert festede chatter</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Velg hva som skal slettes</string>
     <string name="dataClearingOptionTabs">Faner</string>
     <string name="dataClearingOptionData">Informasjonskapsler og nettstedsdata</string>
     <string name="dataClearingDuckAiChats">Duck.ai-chatter</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Slett alle chatter</string>
-    <string name="fireDialogDeleteButton">Slett</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Lukk fanen</item>
-        <item quantity="other">Lukk alle %1$d fanene</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Kan føre til at du blir logget ut av kontoer.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Ingen</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Slett fra 1 nettsted. Kan føre til at du blir logget ut av kontoer.</item>
-        <item quantity="other">Slett fra %1$d nettsteder. Kan føre til at du blir logget ut av kontoer.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Vil du slette faner og nettstedsdata?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
-
-    <string name="settingsAutomaticallyClearData">Slett data automatisk …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tøm automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">når appen lukkes eller har vært inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Slett Duck.ai-chatter</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historikken, inkludert festede chatter.</string>
-    <string name="settingsClearDataActionSecondaryText">Fjerner alle faner og data for nettsteder du ikke har brukt Fireproof på.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Fjerner alle faner, Duck.ai-chatter og data for nettsteder du ikke har brukt Fireproof på.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Om</string>
