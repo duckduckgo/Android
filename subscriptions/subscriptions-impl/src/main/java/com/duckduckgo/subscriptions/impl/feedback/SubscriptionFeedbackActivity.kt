@@ -205,8 +205,6 @@ class SubscriptionFeedbackActivity :
                     ),
                 )
             }
-
-            else -> {} // Do nothing
         }
     }
 
