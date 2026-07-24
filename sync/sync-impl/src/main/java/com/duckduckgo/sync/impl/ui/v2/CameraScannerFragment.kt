@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -62,6 +63,8 @@ class CameraScannerFragment : DuckDuckGoFragment() {
         animationViewModel.onCameraPermissionResult()
     }
 
+    private var resetAnimationListener: OneShotPreDrawListener? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,7 +97,9 @@ class CameraScannerFragment : DuckDuckGoFragment() {
         // onPause can fire while the view is still on screen so rewinding immediately
         // would show a visible jump. By the next pre-draw the view is guaranteed
         // to be off-screen, so the rewind is never seen.
-        binding.introAnimation.doOnPreDraw {
+        resetAnimationListener?.removeListener()
+        resetAnimationListener = binding.introAnimation.doOnPreDraw {
+            resetAnimationListener = null
             val binding = _binding ?: return@doOnPreDraw
             if (!animationViewModel.viewState.value.animationFinished) {
                 binding.introAnimation.progress = 0f
@@ -104,6 +109,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     }
 
     override fun onDestroyView() {
+        resetAnimationListener = null
         _binding = null
         super.onDestroyView()
     }
@@ -139,6 +145,8 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     private fun processIntroAnimationCommand(command: Command) {
         when (command) {
             PlayIntroAnimation -> {
+                resetAnimationListener?.removeListener()
+                resetAnimationListener = null
                 binding.introAnimation.playAnimation()
             }
 
