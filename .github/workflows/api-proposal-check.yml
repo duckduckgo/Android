@@ -1,0 +1,138 @@
+name: API Proposal check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  api_proposal_check:
+    name: API Proposal check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify API Proposal is linked for -api changes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // Any .kt/.java file under a `*-api` module's src/main is a public
+            // API surface change. Matches nested (tabs/tabs-api/...) and
+            // top-level (browser-api/...) modules; excludes :app, -impl, tests
+            // and build.gradle.
+            const API_RE = /(^|\/)[^/]+-api\/src\/main\/.+\.(kt|java)$/;
+            const MARKER = '<!-- api-proposal-check -->';
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            async function findSticky() {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number: prNumber, per_page: 100,
+              });
+              return comments.find(c => c.user?.type === 'Bot' && c.body?.includes(MARKER)) || null;
+            }
+            async function deleteSticky() {
+              try {
+                const existing = await findSticky();
+                if (existing) {
+                  await github.rest.issues.deleteComment({ owner, repo, comment_id: existing.id });
+                }
+              } catch (e) {
+                core.warning(`Could not remove previous check comment: ${e.message}`);
+              }
+            }
+            async function upsertSticky(body) {
+              try {
+                const existing = await findSticky();
+                if (existing) {
+                  await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+                } else {
+                  await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+                }
+              } catch (e) {
+                // Fork PRs run with a read-only token, so commenting may fail.
+                core.warning(`Could not post check comment: ${e.message}`);
+              }
+            }
+
+            const { execFileSync } = require('child_process');
+            const baseSha = context.payload.pull_request.base.sha;
+            const headSha = context.payload.pull_request.head.sha;
+            const diff = execFileSync(
+              'git',
+              ['diff', '--name-only', '--no-renames', `${baseSha}...${headSha}`],
+              { encoding: 'utf8' },
+            );
+            const apiFiles = diff
+              .split('\n')
+              .map(f => f.trim())
+              .filter(f => API_RE.test(f));
+
+            if (apiFiles.length === 0) {
+              core.info('No -api source changes detected — API Proposal not required.');
+              await deleteSticky();
+              return;
+            }
+            core.info(`Detected ${apiFiles.length} changed -api source file(s).`);
+
+            // Match the field label up to its colon so it tolerates the
+            // "URL(s) (if applicable)" suffix used in the PR template (and stays
+            // backward-compatible with a bare "API Proposals:").
+            const body = context.payload.pull_request.body || '';
+            const noComments = body.replace(/<!--[\s\S]*?-->/g, '');
+            const label = noComments.match(/API Proposals[^\n:]*:/i);
+            let section = '';
+            if (label) {
+              section = noComments.slice(label.index + label[0].length);
+              const heading = section.search(/\n\s*###/); // stop at the next PR-body heading
+              if (heading !== -1) section = section.slice(0, heading);
+            }
+            const hasLink = /https?:\/\/\S+/i.test(section);
+            const hasNone = /\b(none|n\/?a)\b/i.test(section);
+            const satisfied = hasLink || hasNone;
+
+            if (satisfied) {
+              core.info('API Proposals section is filled in — check passed.');
+              await deleteSticky();
+              return;
+            }
+
+            const shown = apiFiles.slice(0, 40);
+            const fileList = shown.map(f => '- `' + f + '`').join('\n')
+              + (apiFiles.length > shown.length ? `\n- …and ${apiFiles.length - shown.length} more` : '');
+
+            const comment = [
+              MARKER,
+              '### ⚠️ API Proposal reminder',
+              '',
+              'This PR changes the public surface of one or more `-api` modules, but the ' +
+                '**API Proposals** field of the PR description is empty. This is a ' +
+                'non-blocking reminder — please double-check whether a proposal is needed.',
+              '',
+              'Changed `-api` source files:',
+              fileList,
+              '',
+              'To clear this reminder, edit the PR description and either:',
+              '- add the approved API Proposal link(s) in the `API Proposals` field (one per line), or',
+              '- write `None` there if this PR does not change the public API (e.g. KDoc, comments, tests).',
+              '',
+              'See the *API Proposals* section in `.cursor/rules/contributions.mdc` for details.',
+            ].join('\n');
+
+            await upsertSticky(comment);
+            core.warning(
+              'This PR changes an -api module but the "API Proposals" field of the PR ' +
+              'description is empty. Add the proposal link(s), or "None" if no public API changed.'
+            );

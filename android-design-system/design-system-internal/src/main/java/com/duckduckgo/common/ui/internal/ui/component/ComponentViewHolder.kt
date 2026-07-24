@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,13 +52,13 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
-import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -65,6 +67,7 @@ import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
 import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
 import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
+import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.internal.R
@@ -626,8 +629,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     @SuppressLint("ShowToast")
-    class SnackbarComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
+    class SnackbarComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
 
         init {
             val container: FrameLayout = view.findViewById(R.id.snackbar_container)
@@ -638,6 +643,37 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             (snackbarView.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.CENTER
 
             container.addView(snackbarView)
+
+            view.setupThemedComposeView(R.id.composeDaxSnackbar, isDarkTheme) {
+                val context = LocalContext.current
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    DaxSnackbar(
+                        message = "This is a Snackbar message",
+                    )
+                    DaxSnackbar(
+                        message = "This is a Snackbar message",
+                        action = DaxAction(
+                            text = "Action",
+                            onClick = { Toast.makeText(context, "Action pressed", Toast.LENGTH_SHORT).show() },
+                        ),
+                    )
+                    DaxSnackbar(
+                        message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
+                            "truncated with an ellipsis rather than growing unbounded beside the action.",
+                    )
+                    DaxSnackbar(
+                        message = "This snackbar message is far too long to fit, so it is capped at two lines and " +
+                            "truncated with an ellipsis rather than growing unbounded beside the action.",
+                        action = DaxAction(
+                            text = "Action",
+                            onClick = { Toast.makeText(context, "Action pressed", Toast.LENGTH_SHORT).show() },
+                        ),
+                    )
+                }
+            }
         }
     }
 
@@ -775,7 +811,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
-                Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
+                Component.SNACKBAR -> SnackbarComponentViewHolder(parent, isDarkTheme)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent, isDarkTheme)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)

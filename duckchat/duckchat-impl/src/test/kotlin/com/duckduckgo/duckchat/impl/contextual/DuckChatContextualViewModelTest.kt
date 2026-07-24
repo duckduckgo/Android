@@ -211,7 +211,7 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when prompt sent without updated page context then without-context pixel fired`() = runTest {
-        testee.updatedPageContext = ""
+        testee.currentPageContext = ""
 
         testee.onPromptSent("Hello Duck.ai")
 
@@ -556,7 +556,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with missing content then context stays hidden`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -578,7 +578,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with empty context then invalid empty pixel fired`() =
         runTest {
-            testee.updatedPageContext = ""
+            testee.currentPageContext = ""
 
             testee.addPageContext()
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -589,7 +589,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with missing title then invalid no title pixel fired`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "url": "https://ctx.com",
@@ -606,7 +606,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with both title and content missing then both invalid pixels fired`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "url": "https://ctx.com"
@@ -623,7 +623,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when addPageContext with valid context then context shown`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -660,7 +660,7 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextTitle)
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -678,7 +678,7 @@ class DuckChatContextualViewModelTest {
 
             testee.onPageContextReceived("tab-1", serializedPageData)
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -688,7 +688,7 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.onPageContextReceived("tab-1", "")
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
             verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
         }
@@ -698,7 +698,7 @@ class DuckChatContextualViewModelTest {
         runTest {
             testee.onPageContextReceived("tab-1", "{not valid json")
 
-            assertEquals("", testee.updatedPageContext)
+            assertEquals("", testee.currentPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
             verify(duckChatPixels, never()).reportContextualPageContextInvalidNoTitle()
             verify(duckChatPixels, never()).reportContextualPageContextInvalidNoContent()
@@ -841,7 +841,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received without request and attachments disabled then context ignored`() =
+    fun `when page context received without request and attachments disabled then attached chip is not updated but latest is tracked`() =
         runTest {
             whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
             whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
@@ -875,9 +875,11 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived("tab-1", serializedPageData, isStorePageContextEnabled = true)
 
             val state = testee.viewState.value
+            // The attached chip is untouched by an unsolicited push while auto-attach is off...
             assertEquals("", state.contextTitle)
             assertEquals("", state.contextUrl)
-            assertEquals("", testee.updatedPageContext)
+            // ...but the latest page is tracked so a later manual attach can use the current page.
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -919,7 +921,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertEquals("Ctx Title", state.contextTitle)
             assertEquals("https://ctx.com", state.contextUrl)
-            assertEquals(serializedPageData, testee.updatedPageContext)
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -941,7 +943,7 @@ class DuckChatContextualViewModelTest {
             val state = testee.viewState.value
             assertEquals("Ctx Title", state.contextTitle)
             assertEquals("https://ctx.com", state.contextUrl)
-            assertEquals(serializedPageData, testee.updatedPageContext)
+            assertEquals(serializedPageData, testee.currentPageContext)
         }
 
     @Test
@@ -971,7 +973,7 @@ class DuckChatContextualViewModelTest {
                 // initial emission
                 awaitItem()
 
-                testee.updatedPageContext =
+                testee.currentPageContext =
                     """
                     {
                         "title": "Ctx Title",
@@ -1053,6 +1055,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when summarize quick action clicked in submit mode then summarize prompt selected pixel fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1067,6 +1070,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when ask about page quick action clicked then summarize prompt selected pixel not fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1080,6 +1084,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when ask about page quick action clicked then focus input command emitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -1173,7 +1178,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when prompt cleared then context state unchanged`() =
         runTest {
-            testee.updatedPageContext =
+            testee.currentPageContext =
                 """
                 {
                     "title": "Ctx Title",
@@ -1269,6 +1274,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("123", "Chat", 1L))
 
         testee.commands.test {
             testee.onSheetOpened(tabId)
@@ -1395,6 +1401,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
 
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -1407,6 +1414,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
@@ -1436,6 +1444,7 @@ class DuckChatContextualViewModelTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=abc-123"
         contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        recentChatsFlow.value = listOf(fakeChat("abc-123", "Chat", 1L))
         testee.onSheetOpened(tabId)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertEquals("abc-123", testee.chatId.value)
@@ -1642,13 +1651,16 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when main browser page finished in input mode with auto context disabled then no command emitted`() = runTest {
+    fun `when main browser page finished in input mode with auto context disabled then page context still requested to track latest`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
 
         testee.commands.test {
             testee.onMainBrowserPageFinished()
 
-            expectNoEvents()
+            // Even with auto-attach off we refresh the latest page context on navigation so a manual
+            // attach targets the current page; the attached chip is left untouched (see onPageContextReceived).
+            val command = awaitItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.RequestPageContext)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1694,6 +1706,200 @@ class DuckChatContextualViewModelTest {
         }
 
         assertFalse(testee.isPageContextRequested)
+    }
+
+    @Test
+    fun `when auto-attach enabled then a navigation page context push refreshes the attached context`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Context for the initial page is auto-attached.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // URL changes: the browser pushes the new page's context unsolicited.
+        testee.onMainBrowserPageFinished(isStorePageContextEnabled = true)
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach disabled then a navigation page context push does not refresh the attached context`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Context for the initial page is available and manually attached.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // URL changes: the unsolicited push must be ignored, leaving the attached context untouched.
+        testee.onMainBrowserPageFinished(isStorePageContextEnabled = true)
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when sheet opened then tabId is set synchronously before the async open completes`() = runTest {
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+
+        // No advanceUntilIdle: tabId must already be set so per-tab consumers never read an empty id.
+        assertEquals("tab-1", testee.viewState.value.tabId)
+    }
+
+    @Test
+    fun `when auto-attach off and sheet reopened on a different url then the stale attached context is dropped`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        // Manually attach context for page A.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Close, navigate to page B, and reopen: the page-A attachment is now stale.
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when auto-attach off and sheet reopened on the same url then the attached context is kept`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Reopen on the same page: the attachment still matches, so keep it.
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach on and sheet reopened on a different url then the attached context is refreshed not dropped`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""", isStorePageContextEnabled = true)
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        testee.onSheetClosed()
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""", isStorePageContextEnabled = true)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach on and removed context then navigating to a new url re-attaches`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        assertTrue(testee.viewState.value.showContext)
+        // User removes the auto-attached context for page A.
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(testee.viewState.value.showContext)
+        assertTrue(testee.viewState.value.userRemovedContext)
+
+        // Navigating to page B auto-attaches again.
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+        assertFalse(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when auto-attach on and removed context then re-receiving the same url stays removed`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(testee.viewState.value.showContext)
+
+        // The same page's context arriving again (e.g. a refresh) must respect the removal.
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+
+        assertFalse(testee.viewState.value.showContext)
+        assertTrue(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when auto-attach off and reattaching after navigating then the current page is attached`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
+
+        // Navigate to page B (a passive navigation push, not sheet-solicited), then remove and re-attach.
+        testee.onMainBrowserPageFinished()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://b.com", testee.viewState.value.contextUrl)
+    }
+
+    @Test
+    fun `when auto-attach off and attached then passive navigation leaves the attached chip unchanged`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"A","url":"https://a.com","content":"a"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        // Passive navigation to page B while the sheet stays open must not change the attached chip.
+        testee.onMainBrowserPageFinished()
+        testee.onPageContextReceived("tab-1", """{"title":"B","url":"https://b.com","content":"b"}""")
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("https://a.com", testee.viewState.value.contextUrl)
     }
 
     @Test
@@ -1814,6 +2020,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in ASK_ABOUT_PAGE with valid context then state transitions to SUBMIT_SUMMARIZE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1838,8 +2045,27 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when contextualSheetImprovements enabled and page context arrives then context is NOT auto-attached`() = runTest {
+    fun `when contextualSheetImprovements enabled and auto-attach enabled then context is auto-attached in SUBMIT_SUMMARIZE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+            testee.viewState.value.quickActionState,
+        )
+        verify(duckChatPixels).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled and auto-attach disabled then page context is NOT auto-attached`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1847,12 +2073,17 @@ class DuckChatContextualViewModelTest {
         testee.onPageContextReceived("tab-1", pageContext)
 
         assertFalse(testee.viewState.value.showContext)
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE,
+            testee.viewState.value.quickActionState,
+        )
         verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
     }
 
     @Test
     fun `when contextualSheetImprovements enabled then context only attaches after ASK_ABOUT_PAGE clicked`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1867,6 +2098,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in ASK_ABOUT_PAGE with valid page context then context is attached`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1880,6 +2112,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when quick action clicked in SUBMIT_SUMMARIZE then summarize prompt is auto-submitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1902,6 +2135,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked then context-attach pixel not re-fired`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1919,6 +2153,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked after user removed context then summarize is NOT submitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1940,6 +2175,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when new chat triggered with contextualSheetImprovements enabled then quickActionState resets to ASK_ABOUT_PAGE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1965,6 +2201,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked with typed input then web prefill event emitted after auto-submit`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -1996,6 +2233,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when SUBMIT_SUMMARIZE clicked with typed input then ChangeSheetState carries prefill`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -2045,6 +2283,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when removePageContext from SUBMIT_SUMMARIZE then quickActionState reverts to ASK_ABOUT_PAGE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -2109,6 +2348,7 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when removePageContext reverts to ASK_ABOUT_PAGE then placeholder shown pixel is not fired but removed pixel is`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
@@ -2291,77 +2531,13 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when loaded chat deleted elsewhere then sheet resets to input without forcing sheet open`() = runTest {
+    fun `when sheet opened and stored chat was deleted while away then sheet resets to input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L), fakeChat("a", "A", 5L))
+        recentChatsFlow.value = listOf(fakeChat("other", "Other", 5L))
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
         val testee = buildViewModel()
+
         testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals("current", testee.chatId.value)
-
-        testee.commands.test {
-            expectMostRecentItem() // drain setup commands
-            recentChatsFlow.value = listOf(fakeChat("a", "A", 5L)) // current chat deleted elsewhere
-            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-            expectNoEvents() // no ChangeSheetState command -> sheet position untouched
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
-        assertNull(testee.chatId.value)
-        assertNull(contextualDataStore.getTabChatUrl("tab-1"))
-        verify(duckChatJSHelper).onNativeAction(NativeAction.NEW_CHAT)
-    }
-
-    @Test
-    fun `when brand new chat not yet persisted then sheet is not reset`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = emptyList()
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=new")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        // List changes but never contained the new chat -> it was never seen, so do not treat as deletion.
-        recentChatsFlow.value = listOf(fakeChat("unrelated", "Unrelated", 1L))
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("new", testee.chatId.value)
-        verify(duckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
-    }
-
-    @Test
-    fun `when a different chat is deleted then loaded chat sheet is not reset`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L), fakeChat("other", "Other", 5L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L)) // a different chat deleted
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("current", testee.chatId.value)
-    }
-
-    @Test
-    fun `when all chats deleted while a chat is loaded then sheet resets to input`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        recentChatsFlow.value = emptyList() // e.g. clear-all / fire button
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
@@ -2370,41 +2546,32 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when chat history keeps updating after a deletion then sheet is reset only once`() = runTest {
+    fun `when sheet opened and stored chat still in history then session is restored to webview`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
         val testee = buildViewModel()
+
         testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        recentChatsFlow.value = emptyList() // loaded chat deleted -> reset
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-        // Further history emissions that still lack the (now cleared) chat must not retrigger the reset.
-        recentChatsFlow.value = listOf(fakeChat("unrelated", "Unrelated", 1L))
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
-        verify(duckChatJSHelper, times(1)).onNativeAction(NativeAction.NEW_CHAT)
+        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+        assertEquals("current", testee.chatId.value)
     }
 
     @Test
-    fun `when improvements disabled and loaded chat deleted then sheet is not reset`() = runTest {
+    fun `when improvements disabled and stored chat was deleted while away then sheet still resets to input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
-        recentChatsFlow.value = listOf(fakeChat("current", "Current", 10L))
-        val testee = buildViewModel()
-        testee.onSheetOpened("tab-1")
-        testee.onPromptSent("hi")
-        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
         recentChatsFlow.value = emptyList()
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?chatID=current")
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        // Deletion observation is gated behind contextualSheetImprovements, so nothing resets when it is off.
-        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
-        assertEquals("current", testee.chatId.value)
+        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
+        assertNull(testee.chatId.value)
+        assertNull(contextualDataStore.getTabChatUrl("tab-1"))
     }
 
     @Test
@@ -2436,7 +2603,7 @@ class DuckChatContextualViewModelTest {
     fun `when ask about tab clicked without valid context then showContext stays false`() =
         runTest {
             testee.onSheetOpened("tab-1")
-            testee.updatedPageContext = ""
+            testee.currentPageContext = ""
 
             testee.onAskAboutTabClicked()
 

@@ -25,8 +25,8 @@
     <string name="subscriptionOnboardingDuckAiNext">Next</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Ask about tab</string>
-    <string name="duckChatContextualAskAboutPage">Ask about page</string>
+    <string name="duckChatContextualAskAboutTab">Ask About Tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask About Page</string>
 
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>

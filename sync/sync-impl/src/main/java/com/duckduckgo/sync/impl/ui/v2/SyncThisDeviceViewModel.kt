@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -54,15 +55,29 @@ class SyncThisDeviceViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onSyncEnabled()
+
+            suspend fun getDeviceAndFinish() {
+                val device = syncAccountRepository.getThisConnectedDevice()
+                if (device != null) {
+                    _commands.send(Command.FinishSyncing(device))
+                } else {
+                    syncSetupWideEvent.onAccountCreationFailed()
+                    _commands.send(
+                        Command.ShowError(R.string.sync_create_account_generic_error),
+                    )
+                }
+            }
+
             if (syncAccountRepository.isSignedIn()) {
-                _commands.send(Command.FinishSyncing)
+                getDeviceAndFinish()
             } else {
                 when (val result = syncAccountRepository.createAccount()) {
                     is Result.Success<*> -> {
                         syncSetupWideEvent.onAccountCreated()
                         syncPixels.fireSignupDirectPixel(source)
-                        _commands.send(Command.FinishSyncing)
+                        getDeviceAndFinish()
                     }
+
                     is Result.Error -> {
                         syncSetupWideEvent.onAccountCreationFailed()
                         _commands.send(
@@ -108,7 +123,9 @@ class SyncThisDeviceViewModel @Inject constructor(
     )
 
     sealed interface Command {
-        data object FinishSyncing : Command
+        data class FinishSyncing(
+            val device: ConnectedDevice,
+        ) : Command
 
         data object SyncWithAnotherDevice : Command
 

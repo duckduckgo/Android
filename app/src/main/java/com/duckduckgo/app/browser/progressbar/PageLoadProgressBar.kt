@@ -53,6 +53,11 @@ class PageLoadProgressBar @JvmOverloads constructor(
         shimmerColor = lighten(barColor, shimmerLightenFraction(config)),
     )
 
+    private val indeterminateSweepRenderer = IndeterminateSweepRenderer(
+        config = config,
+        barColor = barColor,
+    )
+
     private val progressPaint = Paint().apply {
         color = barColor
         style = Paint.Style.FILL
@@ -76,6 +81,10 @@ class PageLoadProgressBar @JvmOverloads constructor(
      */
     val isStarted: Boolean get() = _isStarted
 
+    fun setStallDetectionEnabled(enabled: Boolean) {
+        engine.stallDetectionEnabled = enabled
+    }
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             val dtSeconds = if (lastFrameTimeNanos == 0L) {
@@ -85,13 +94,25 @@ class PageLoadProgressBar @JvmOverloads constructor(
             }
             lastFrameTimeNanos = frameTimeNanos
 
+            val now = SystemClock.elapsedRealtime()
             val state = engine.tick(dtSeconds)
+
+            if (state.phase == Phase.INDETERMINATE) {
+                if (!indeterminateSweepRenderer.isActive) {
+                    indeterminateSweepRenderer.start(now, state.displayProgress / 100f)
+                } else if (indeterminateSweepRenderer.hasFinished(now)) {
+                    indeterminateSweepRenderer.stop()
+                    engine.onSweepFinished()
+                }
+            } else if (indeterminateSweepRenderer.isActive) {
+                indeterminateSweepRenderer.stop()
+            }
 
             invalidate()
 
-            if (state.phase == Phase.DONE) {
+            if (engine.phase == Phase.DONE) {
                 onDone()
-            } else if (state.shouldInvalidate) {
+            } else if (state.shouldInvalidate && windowVisibility == VISIBLE) {
                 Choreographer.getInstance().postFrameCallback(this)
             }
         }
@@ -106,6 +127,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         engine.reset()
         engine.start()
         _isStarted = true
+        indeterminateSweepRenderer.stop()
 
         lastReportedProgress = 0f
         shimmerRenderer.start(SystemClock.elapsedRealtime())
@@ -114,13 +136,15 @@ class PageLoadProgressBar @JvmOverloads constructor(
             alpha = 1f
         } else {
             alpha = 0f
-            animate().alpha(1f).setDuration(config.fadeInDuration).start()
+            animate().alpha(1f).setDuration(config.fadeInDurationMs).start()
         }
         visibility = VISIBLE
         lastFrameTimeNanos = 0L
         // Ensure we don't have multiple frame callbacks queued if start() is called multiple times in quick succession
         Choreographer.getInstance().removeFrameCallback(frameCallback)
-        Choreographer.getInstance().postFrameCallback(frameCallback)
+        if (windowVisibility == VISIBLE) {
+            Choreographer.getInstance().postFrameCallback(frameCallback)
+        }
     }
 
     fun onProgressUpdate(progress: Float) {
@@ -128,12 +152,21 @@ class PageLoadProgressBar @JvmOverloads constructor(
             // Progress went backward — new navigation, restart fresh
             start()
         }
+        val resumedFromStall = engine.phase == Phase.INDETERMINATE && progress > lastReportedProgress
         lastReportedProgress = progress
         engine.onProgressUpdate(progress)
+        if (resumedFromStall) {
+            indeterminateSweepRenderer.requestFinish(SystemClock.elapsedRealtime())
+        }
     }
 
     fun triggerCompletion() {
+        val wasIndeterminate = engine.phase == Phase.INDETERMINATE
         engine.triggerCompletion()
+        if (wasIndeterminate) {
+            // Page finished while the sweep shows — let it finish the current cycle before completing.
+            indeterminateSweepRenderer.requestFinish(SystemClock.elapsedRealtime())
+        }
     }
 
     fun reset() {
@@ -143,6 +176,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         animate().cancel()
         engine.reset()
         shimmerRenderer.stop()
+        indeterminateSweepRenderer.stop()
         Choreographer.getInstance().removeFrameCallback(frameCallback)
         lastFrameTimeNanos = 0L
         visibility = INVISIBLE
@@ -154,13 +188,14 @@ class PageLoadProgressBar @JvmOverloads constructor(
         isDismissing = true
         animate()
             .alpha(0f)
-            .setDuration(config.fadeOutDuration)
+            .setDuration(config.fadeOutDurationMs)
             .withEndAction {
                 if (isDismissing) {
                     _isStarted = false
                     isDismissing = false
                     engine.reset()
                     shimmerRenderer.stop()
+                    indeterminateSweepRenderer.stop()
                     visibility = INVISIBLE
                     alpha = 1f
                     lastFrameTimeNanos = 0L
@@ -171,16 +206,30 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         val state = engine.frameState
-        if (state.displayProgress <= 0f) return
+        if (state.phase == Phase.INDETERMINATE) {
+            val top = height - barHeightPx
+            indeterminateSweepRenderer.draw(canvas, width.toFloat(), top, height.toFloat(), SystemClock.elapsedRealtime())
+            return
+        }
 
+        if (state.displayProgress <= 0f) return
         val progressWidth = (state.displayProgress / 100f) * width
         val cornerRadius = barHeightPx / 2f
         val top = height - barHeightPx
-        // Draw round rect starting off-screen left so left corners are clipped by the view bounds
         canvas.drawRoundRect(-cornerRadius, top, progressWidth, height.toFloat(), cornerRadius, cornerRadius, progressPaint)
 
         if (shimmerRenderer.isActive) {
             shimmerRenderer.draw(canvas, progressWidth, top, height.toFloat(), SystemClock.elapsedRealtime())
+        }
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        Choreographer.getInstance().removeFrameCallback(frameCallback)
+        lastFrameTimeNanos = 0L
+        if (visibility == VISIBLE && isStarted && engine.phase != Phase.DONE) {
+            engine.onBecameVisible()
+            Choreographer.getInstance().postFrameCallback(frameCallback)
         }
     }
 

@@ -1026,7 +1026,7 @@ class RealDuckChat @Inject constructor(
 
             areMultipleContentAttachmentsEnabled = isContextualModeEnabled && duckChatFeature.supportsMultipleContexts().isEnabled()
 
-            if (duckChatFeature.rememberTogglePosition().isEnabled() && duckChatFeatureRepository.getDefaultTogglePosition() == null) {
+            if (duckChatFeatureRepository.getDefaultTogglePosition() == null) {
                 val default = if (appBuildConfig.isNewInstall()) DefaultTogglePosition.LAST_USED else DefaultTogglePosition.SEARCH
                 duckChatFeatureRepository.setDefaultTogglePosition(default.name)
             }

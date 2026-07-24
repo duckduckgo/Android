@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -109,8 +110,22 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private var fullModeUrl: String = ""
-    var updatedPageContext: String = ""
-    var sheetTabId: String = ""
+
+    private data class PageContextState(
+        // The current page reported by the browser — what a manual attach grabs.
+        val currentPage: String = "",
+        // The frozen snapshot actually submitted for the current attachment, so passive navigation
+        // doesn't change what an existing attachment sends.
+        val attachedPage: String = "",
+    )
+
+    private var pageContextState = PageContextState()
+
+    var currentPageContext: String
+        get() = pageContextState.currentPage
+        set(value) {
+            pageContextState = pageContextState.copy(currentPage = value)
+        }
 
     // Chat id currently shown in the contextual webview, derived from the URL query param.
     // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
@@ -194,7 +209,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
             if (isContextualSheetImprovementsEnabled) {
                 observeRecentChats()
-                observeCurrentChatDeletion()
             }
         }
 
@@ -203,35 +217,10 @@ class DuckChatContextualViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
-    // URL) before it is persisted, so "absent from history" only means "deleted" once we've actually
-    // seen it present — this field is what distinguishes the two.
-    private var lastSeenChatId: String? = null
-
-    private fun observeCurrentChatDeletion() {
-        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
-            currentChatId to chats.any { it.chatId == currentChatId }
-        }
-            .flowOn(dispatchers.io())
-            .onEach { (currentChatId, isPresent) ->
-                if (isPresent) {
-                    lastSeenChatId = currentChatId
-                } else if (currentChatId != null && currentChatId == lastSeenChatId && _viewState.value.sheetMode == SheetMode.WEBVIEW) {
-                    // A chat we had seen in history is now gone -> deleted elsewhere. Clear
-                    // synchronously so repeat emissions for the same id don't retrigger before the
-                    // reset propagates to _chatId/sheetMode.
-                    lastSeenChatId = null
-                    handleLoadedChatDeleted()
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun handleLoadedChatDeleted() {
-        logcat { "Duck.ai Contextual: loaded chat deleted elsewhere, resetting sheet" }
-        // Reset session/state but leave the sheet position untouched (sheetState = null):
-        // if visible it swaps to INPUT in place; if hidden it stays hidden and opens fresh next time.
-        renderNewChatState(sheetState = null)
+    private suspend fun isStoredChatMissingFromHistory(url: String?): Boolean {
+        val chatId = extractChatId(url) ?: return false
+        val chats = chatHistoryRepository.observeChats().firstOrNull() ?: return false
+        return chats.none { it.chatId == chatId }
     }
 
     private fun observeRecentChats() {
@@ -271,7 +260,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
 
-        contextualNativeInputManager.onContextualReopened(sheetTabId)
+        contextualNativeInputManager.onContextualReopened(_viewState.value.tabId)
 
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
@@ -302,6 +291,10 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+        if (isStoredChatMissingFromHistory(existingChatUrl)) {
+            renderNewChatState()
+            return
+        }
         withContext(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
         }
@@ -337,13 +330,13 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onSheetOpened(tabId: String) {
+        _viewState.update { it.copy(tabId = tabId) }
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
             withContext(dispatchers.main()) {
                 isPageContextRequested = true
                 commandChannel.trySend(Command.RequestPageContext)
             }
-            sheetTabId = tabId
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {
@@ -367,7 +360,8 @@ class DuckChatContextualViewModel @Inject constructor(
                 return@launch
             }
 
-            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId)
+            val shouldReuseUrl = shouldReuseStoredChatUrl(tabId) &&
+                !isStoredChatMissingFromHistory(existingChatUrl)
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
                 val hasChatHistory = hasChatId(existingChatUrl)
@@ -497,7 +491,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val viewState = _viewState.value
         val pageContext =
             if (viewState.showContext) {
-                updatedPageContext
+                pageContextState.attachedPage
                     .takeIf { it.isNotBlank() }
                     ?.let { runCatching { JSONObject(it) }.getOrNull() }
                     ?: run {
@@ -556,8 +550,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generatePageContextEventData(): SubscriptionEventData {
-        val pageContext = if (isContextValid(updatedPageContext)) {
-            updatedPageContext
+        val pageContext = if (isContextValid(currentPageContext)) {
+            currentPageContext
                 .takeIf { it.isNotBlank() }
                 ?.let { runCatching { JSONObject(it) }.getOrNull() }
                 ?: run {
@@ -565,7 +559,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     null
                 }
 
-            val json = JSONObject(updatedPageContext)
+            val json = JSONObject(currentPageContext)
             val url = json.optString("url")
             logcat { "Duck.ai: generatePageContextEventData for url $url" }
             json
@@ -609,7 +603,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
-        contextualNativeInputManager.onContextualClosed(sheetTabId)
+        contextualNativeInputManager.onContextualClosed(_viewState.value.tabId)
     }
 
     private fun persistTabClosed() {
@@ -652,14 +646,18 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPlaceholderContextTapped()
         }
         viewModelScope.launch {
-            val isContextValid = isContextValid(updatedPageContext, reportInvalidPixels = true)
+            val isContextValid = isContextValid(currentPageContext, reportInvalidPixels = true)
             if (isContextValid) {
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+                val json = JSONObject(currentPageContext)
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
                 _viewState.update { current ->
-                    logcat { "Duck.ai Contextual: addPageContext $current context $updatedPageContext" }
+                    logcat { "Duck.ai Contextual: addPageContext $current context $currentPageContext" }
                     current.copy(
-                        showContext = isContextValid(updatedPageContext),
+                        showContext = true,
                         userRemovedContext = false,
+                        contextTitle = json.optString("title"),
+                        contextUrl = json.optString("url"),
                     )
                 }
             }
@@ -710,10 +708,14 @@ class DuckChatContextualViewModel @Inject constructor(
             } else {
                 input.plus(" ").plus(prompt)
             }
+            val hasValidContext = isContextValid(currentPageContext)
+            if (hasValidContext) {
+                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+            }
             _viewState.update { current ->
                 current.copy(
                     prompt = newPrompt,
-                    showContext = isContextValid(updatedPageContext),
+                    showContext = hasValidContext,
                 )
             }
         }
@@ -727,7 +729,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
 
             QuickActionState.ASK_ABOUT_PAGE -> {
-                if (!isContextValid(updatedPageContext)) {
+                if (!isContextValid(currentPageContext)) {
                     // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
                     return
                 }
@@ -754,7 +756,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onAskAboutTabClicked() {
-        if (!isContextValid(updatedPageContext)) {
+        if (!isContextValid(currentPageContext)) {
             // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
             return
         }
@@ -820,36 +822,56 @@ class DuckChatContextualViewModel @Inject constructor(
         pageContext: String,
         isStorePageContextEnabled: Boolean = false,
     ) {
-        if (isStorePageContextEnabled && !isPageContextRequested && !duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-            // Only applies when storePageContext is enabled.
-            // We don't process what we receive if the sheet did not specifically request it and automatic context attachment is disabled
+        if (isContextValid(pageContext)) {
+            currentPageContext = pageContext
+        }
+        val inputMode = _viewState.value
+        if (inputMode.sheetMode == SheetMode.INPUT &&
+            !isPageContextRequested &&
+            !duckChatInternal.isAutomaticContextAttachmentEnabled()
+        ) {
             return
         }
 
         if (isContextValid(pageContext, reportInvalidPixels = true)) {
-            updatedPageContext = pageContext
-            val json = JSONObject(updatedPageContext)
+            val json = JSONObject(pageContext)
             val title = json.optString("title")
             val url = json.optString("url")
 
             logcat { "Duck.ai: onPageContextReceived for url $url" }
-            val inputMode = _viewState.value
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+
+                val urlChanged = inputMode.contextUrl.isNotEmpty() && url != inputMode.contextUrl
+                val remainsUserRemoved = inputMode.userRemovedContext && !urlChanged
+                val dropStaleAttachment = !allowsAutomaticContextAttachment &&
+                    inputMode.showContext &&
+                    urlChanged
+
+                val showContext = when {
+                    allowsAutomaticContextAttachment -> !remainsUserRemoved
+                    dropStaleAttachment -> false
+                    else -> inputMode.showContext
+                }
+                val newlyAutoAttached = showContext && !inputMode.showContext
+                if (showContext) {
+                    pageContextState = pageContextState.copy(attachedPage = pageContext)
+                }
                 val updatedState =
                     inputMode.copy(
                         contextTitle = title,
                         contextUrl = url,
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
-                        showContext =
-                        if (allowsAutomaticContextAttachment && !isContextualSheetImprovementsEnabled) {
-                            !inputMode.userRemovedContext
-                        } else {
-                            inputMode.showContext
+                        showContext = showContext,
+                        userRemovedContext = remainsUserRemoved,
+                        quickActionState = when {
+                            isContextualSheetImprovementsEnabled && newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
+                            isContextualSheetImprovementsEnabled && dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
+                            else -> inputMode.quickActionState
                         },
                     )
-                if (updatedState.showContext && !inputMode.showContext) {
+                if (newlyAutoAttached) {
                     duckChatPixels.reportContextualPageContextAutoAttached()
                 }
                 _viewState.update { updatedState }
@@ -869,8 +891,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     }
                 }
             }
-        } else {
-            updatedPageContext = ""
         }
     }
 
@@ -958,6 +978,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
                 withContext(dispatchers.main()) {
                     clearSheetUrl()
+                    pageContextState = pageContextState.copy(attachedPage = "")
                     val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
                         QuickActionState.ASK_ABOUT_PAGE
                     } else {
@@ -1026,11 +1047,10 @@ class DuckChatContextualViewModel @Inject constructor(
         val currentState = _viewState.value
         if (currentState.sheetMode != SheetMode.INPUT) return
 
-        if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-            viewModelScope.launch(dispatchers.main()) {
-                logcat { "Duck.ai: requesting page context after main browser page change" }
-                commandChannel.trySend(Command.RequestPageContext)
-            }
+        isPageContextRequested = false
+        viewModelScope.launch(dispatchers.main()) {
+            logcat { "Duck.ai: requesting page context after main browser page change" }
+            commandChannel.trySend(Command.RequestPageContext)
         }
     }
 

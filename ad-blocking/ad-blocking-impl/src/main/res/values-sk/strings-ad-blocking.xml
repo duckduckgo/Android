@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Vypnúť do opätovného spustenia</string>
     <string name="ad_blocking_menu_always_off">Vždy vypnuté</string>
     <string name="ad_blocking_disabled_popup_title">Nefunguje blokovanie reklám na YouTube?</string>
-    <string name="ad_blocking_disabled_popup_description">Odošli anonymnú správu o poruche na DuckDuckGo. Pomôž zlepšiť blokovanie reklám pre všetkých!</string>
+    <string name="ad_blocking_disabled_popup_description">Odošli anonymné hlásenie na DuckDuckGo a pomôž zlepšiť blokovanie reklám pre všetkých!</string>
     <string name="ad_blocking_disabled_primary_action">Odoslať správu o poruche</string>
     <string name="ad_blocking_disabled_secondary_action">Zrušiť</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Zakázané až do opätovného spustenia</string>
-    <string name="ad_blocking_omnibar_badge_text">Blokovanie reklám na YouTube je zapnuté</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Blok. reklám zap.</string></resources>

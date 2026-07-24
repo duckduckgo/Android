@@ -182,6 +182,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
     private val nativeInputEventListener: NativeInputEventListener,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
@@ -283,9 +284,12 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isNativeInputActive(): Boolean {
         if (!isNativeInputFieldEnabled) return false
-        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
+        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only,
+        // unless the search-only feature flag is on.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
-        return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
+        return inDuckAi ||
+            inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY ||
+            nativeInputSearchOnlyFeature.self().isEnabled()
     }
 
     override fun isNativeInputShown(): Boolean {
@@ -350,6 +354,13 @@ class RealNativeInputManager @Inject constructor(
 
         // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
         // off (and after a paused animated hide left the widget attached).
+
+        // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds focus
+        // when the widget is dismissed, and a focused, attached EditText remains the IME target —
+        // the window re-requests the keyboard after the hide. Dropping focus first removes the
+        // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
+        // this is a no-op there.
+        widgetFrom(widgetView)?.clearInputFocus()
 
         if (isNavigation) {
             widgetFrom(widgetView)?.let { widget ->
@@ -707,12 +718,6 @@ class RealNativeInputManager @Inject constructor(
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
-            // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds
-            // focus when Back is pressed, and a focused, attached EditText remains the IME target —
-            // the window re-requests the keyboard after the hide. Dropping focus first removes the
-            // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
-            // this is a no-op there.
-            widget.clearInputFocus()
             hideNativeInput()
         }
         val previousOnChatSelected = widget.onChatSelected

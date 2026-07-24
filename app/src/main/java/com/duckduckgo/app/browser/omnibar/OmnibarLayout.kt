@@ -1020,6 +1020,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun updatePageLoadProgressBar(viewState: ViewState) {
+        pageLoadProgressBar.setStallDetectionEnabled(viewState.isProgressBarIndeterminateEnabled)
         if (viewState.isLoading) {
             if (!pageLoadProgressBar.isStarted) {
                 pageLoadProgressBar.start()

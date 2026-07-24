@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.compose.message
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 /**

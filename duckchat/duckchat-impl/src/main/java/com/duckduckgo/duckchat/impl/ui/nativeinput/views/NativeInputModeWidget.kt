@@ -61,7 +61,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
@@ -231,9 +230,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val viewModel: NativeInputModeWidgetViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NativeInputModeWidgetViewModel::class.java]
     }
-
-    @Inject
-    lateinit var duckChatFeature: DuckChatFeature
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -1097,7 +1093,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun applyDefaultTogglePosition() {
         doOnAttach {
-            if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
                 // Wait for the first state emission so we know whether the toggle row is even shown.
                 // For SEARCH_ONLY users (input-screen setting off) the toggle is hidden, and flipping
@@ -1119,7 +1114,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun saveLastUsedTogglePosition(isChat: Boolean) {
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
             viewModel.saveLastUsedTogglePosition(position.name)
