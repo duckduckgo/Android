@@ -59,8 +59,10 @@ class RealContextualNativeInputManagerTest {
     private val duckChatInternal: DuckChatInternal = mock()
     private val publisher: NativeInputStatePublisher = mock()
     private val showVoiceChatEntry = MutableStateFlow(false)
+    private val showVoiceSearchToggle = MutableStateFlow(true)
     private val duckAiFeatureState: DuckAiFeatureState = mock {
         whenever(it.showVoiceChatEntry).thenReturn(showVoiceChatEntry)
+        whenever(it.showVoiceSearchToggle).thenReturn(showVoiceSearchToggle)
     }
     private val voiceSearchAvailable = MutableStateFlow(false)
     private val voiceSearchAvailability: VoiceSearchAvailability = mock {
@@ -368,10 +370,11 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when voice search available then widget voice search is made available`() {
+    fun `when voice search device available and duck ai toggle on then widget voice search is made available`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = true
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
@@ -387,10 +390,11 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when voice search unavailable then widget voice search is not available`() {
+    fun `when voice search device unavailable then widget voice search is not available`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         voiceSearchAvailable.value = false
+        showVoiceSearchToggle.value = true
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
@@ -401,6 +405,50 @@ class RealContextualNativeInputManagerTest {
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
         )
+
+        verify(widget).setVoiceSearchAvailable(false)
+    }
+
+    @Test
+    fun `when voice search device available but duck ai toggle off then widget voice search is not available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = false
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceSearchAvailable(false)
+    }
+
+    @Test
+    fun `when duck ai voice search toggle turns off then widget voice search becomes unavailable`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = true
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+        verify(widget).setVoiceSearchAvailable(true)
+
+        // Toggling the Duck.ai voice-search entry point off must re-emit and hide the mic immediately.
+        showVoiceSearchToggle.value = false
 
         verify(widget).setVoiceSearchAvailable(false)
     }

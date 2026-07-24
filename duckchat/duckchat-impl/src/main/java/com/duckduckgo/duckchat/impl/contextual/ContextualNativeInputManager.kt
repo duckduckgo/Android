@@ -36,6 +36,7 @@ import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
@@ -290,7 +291,12 @@ class RealContextualNativeInputManager @Inject constructor(
         widget: NativeInputModeWidget,
         lifecycleOwner: LifecycleOwner,
     ) {
-        voiceSearchAvailability.observeVoiceSearchAvailability()
+        combine(
+            voiceSearchAvailability.observeVoiceSearchAvailability(),
+            duckAiFeatureState.showVoiceSearchToggle,
+        ) { deviceAvailable, duckAiEntryEnabled ->
+            deviceAvailable && duckAiEntryEnabled
+        }
             .onEach { widget.setVoiceSearchAvailable(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
