@@ -197,6 +197,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
+import com.duckduckgo.app.browser.modals.NewTabPageModalPresenter
+import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -264,6 +266,7 @@ import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
@@ -387,6 +390,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
+import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -588,12 +592,15 @@ class BrowserTabViewModel @Inject constructor(
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
     private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
+    private val newTabPageModalPresenterRegistry: NewTabPageModalPresenterRegistry,
+    private val newTabPageModalTrigger: NewTabPageModalTrigger,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
     UrlExtractionListener,
-    NavigationHistoryListener {
+    NavigationHistoryListener,
+    NewTabPageModalPresenter {
     private var buildingSiteFactoryJob: Job? = null
     private var pendingVoiceSessionEndJob: Job? = null
     private var lastAutoCompleteState: AutoCompleteViewState? = null
@@ -1305,6 +1312,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
+        newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
@@ -1337,20 +1345,27 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        // This tab is the visible one, so it owns the NTP modal presenter surface.
+        newTabPageModalPresenterRegistry.register(this)
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
+        // The Privacy Pro foreground promo is now coordinated by the modal coordinator
+        // (SubscriptionPromoModalEvaluator, APP_RESUME trigger), so it is no longer decided here.
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
-                if (checkSubscriptionPromoOnForeground()) return@launch
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
+                // Empty NTP, this tab registered as presenter (above), CTA slot settled: let the
+                // coordinator evaluate NTP-render modals (e.g. Add Widget). Firing here (after
+                // registration) fixes a first-render race where showNewTab's trigger could run
+                // before the tab registered, then never re-fire due to render de-duping.
+                if (cta == null) {
+                    newTabPageModalTrigger.onNewTabPageShown()
+                }
             }
         } else {
             command.value = HideKeyboard
-            if (currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
-                viewModelScope.launch { checkSubscriptionPromoOnForeground() }
-            }
         }
 
         browserViewState.value =
@@ -1376,6 +1391,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewHidden() {
+        newTabPageModalPresenterRegistry.unregister(this)
         ctaViewState.value?.cta.let {
             if (it is BrokenSitePromptDialogCta) {
                 command.value = HideBrokenSitePromptCta(it)
@@ -3789,21 +3805,49 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
-    private suspend fun checkSubscriptionPromoOnForeground(): Boolean {
+    /**
+     * [NewTabPageModalPresenter] entry point for the Privacy Pro promo, called by the modal
+     * coordinator. Mirrors the surface checks of the former onForeground path (browser layout,
+     * never over Duck.ai). Must be called on the main thread. Returns true if accepted for display.
+     */
+    override fun showSubscriptionPromo(
+        flow: SubscriptionPromoFlow,
+        isFreeTrialCopy: Boolean,
+    ): Boolean {
         if (currentGlobalLayoutState() !is Browser) return false
         val currentUrl = url
         if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) return false
-        val cta = withContext(dispatchers.io()) { ctaViewModel.getPromoCtaOnForeground() }
-        if (cta != null) {
-            ctaViewState.value = currentCtaViewState().copy(
-                cta = cta,
-                isBrowserShowing = currentBrowserViewState().browserShowing,
-                isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
-            )
-            ctaChangedTicker.emit(System.currentTimeMillis().toString())
-            return true
-        }
-        return false
+        ctaViewState.value = currentCtaViewState().copy(
+            cta = SubscriptionPromoModalCta(isFreeTrialCopy = isFreeTrialCopy, flow = flow),
+            isBrowserShowing = currentBrowserViewState().browserShowing,
+            isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+        )
+        viewModelScope.launch { ctaChangedTicker.emit(System.currentTimeMillis().toString()) }
+        return true
+    }
+
+    /**
+     * [NewTabPageModalPresenter] entry point for the Add Widget promo, called by the modal
+     * coordinator. Only shown on the New Tab Page. Must be called on the main thread. Returns true
+     * if accepted for display.
+     */
+    override fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean {
+        if (currentGlobalLayoutState() !is Browser) return false
+        if (currentBrowserViewState().browserShowing) return false
+        // Add Widget is the lowest-priority home CTA: it must never replace a CTA that already owns
+        // the NTP slot (RMF message, subscription promo, etc.). getHomeCta()'s priority ordering used
+        // to enforce this; now that Add Widget is coordinated separately, this is the authoritative,
+        // race-free checkpoint. A fire-time cta==null gate can't guarantee it (the trigger dispatch is
+        // async and the evaluator delays before rendering), so the slot must be re-checked here.
+        if (currentCtaViewState().cta != null) return false
+        val cta = if (supportsAutomaticAdd) HomePanelCta.AddWidgetAutoOnboarding else HomePanelCta.AddWidgetInstructions
+        ctaViewState.value = currentCtaViewState().copy(
+            cta = cta,
+            isBrowserShowing = false,
+            isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+        )
+        viewModelScope.launch { ctaChangedTicker.emit(System.currentTimeMillis().toString()) }
+        return true
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
@@ -5533,6 +5577,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onNewTabShown() {
         newTabPixels.get().fireNewTabDisplayed()
+        // Let the modal coordinator evaluate NTP-render promos (e.g. Add Widget) for this render.
+        newTabPageModalTrigger.onNewTabPageShown()
     }
 
     fun handleMenuRefreshAction() {
