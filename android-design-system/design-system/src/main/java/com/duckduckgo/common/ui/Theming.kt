@@ -54,6 +54,8 @@ object Theming {
             "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
             "com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity",
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
+            "com.duckduckgo.sync.impl.ui.v2.CodeExchangeActivity",
+            "com.duckduckgo.sync.impl.ui.v2.QrCodeActivity",
         )
     }
 }
