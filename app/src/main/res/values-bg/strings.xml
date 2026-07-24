@@ -965,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Искате ли да разговаряте поверително и безплатно с ChatGPT, Claude и други AI в браузър, който осигурява активна защита?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Не забравяйте: Можете да използвате Duck.ai от всяко място, където видите иконата за чат</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Започнете чат с AI</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI защити активирани!</string>
@@ -1009,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Нов раздел Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>НОВО!</b> Изпробвайте разделите Fire, в които сърфирате, без да запазвате локална история.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
 </resources>

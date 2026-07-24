@@ -16,12 +16,10 @@
 
 package com.duckduckgo.espresso
 
-import android.view.View
 import android.webkit.WebView
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.web.model.Atoms
 import androidx.test.espresso.web.sugar.Web
 import androidx.test.ext.junit.rules.activityScenarioRule
@@ -33,12 +31,13 @@ import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.hamcrest.Matcher
-import org.hamcrest.Matchers.instanceOf
+import logcat.logcat
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class RequestBlocklistTest {
 
@@ -51,11 +50,11 @@ class RequestBlocklistTest {
         ),
     )
 
-    private val registeredResources = mutableListOf<IdlingResource>()
-
     @After
     fun tearDown() {
-        registeredResources.forEach { IdlingRegistry.getInstance().unregister(it) }
+        IdlingRegistry.getInstance().resources.toList().forEach {
+            IdlingRegistry.getInstance().unregister(it)
+        }
     }
 
     @Test @InternalPrivacyTest
@@ -66,28 +65,76 @@ class RequestBlocklistTest {
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
+        val browserWebView = webView!!
 
-        WebViewIdlingResource(webView!!).track()
+        // The requestBlocklist rules are NOT bundled with the app: they arrive via an async remote
+        // privacy-config download and are then loaded into memory off the main thread, so on a
+        // fresh/slow boot the page can issue its requests before blocking is live. There is no
+        // observable signal for in-memory readiness, so we retry the real end condition: run the
+        // page, and if requests that should be blocked still load, wait for the download to land,
+        // reload, and try again — up to MAX_ATTEMPTS.
+        //
+        // This only compensates for config-download *timing*. A config that genuinely lacks rules
+        // for the test domain, or the test site being unreachable, will (correctly) still fail
+        // once the attempts are exhausted.
+        var attempts = 0
+        var overallStatus: String? = null
+        var checks: List<RequestBlocklistResult> = emptyList()
+        var failures: List<RequestBlocklistResult> = emptyList()
 
-        // window.results won't exist until the request-blocklist page's finished() fires
-        JsObjectIdlingResource(webView!!, "window.results").track()
+        while (true) {
+            attempts++
 
-        val results = Web.onWebView()
-            .perform(Atoms.script(SCRIPT))
-            .get()
+            // window.results is only set when the page's finished() fires, i.e. the suite is
+            // complete — the true completion signal. failOnTimeout = false so a slow run degrades
+            // into another attempt here rather than crashing the whole test from the idling
+            // resource's Handler.
+            val resultsIdling = JsObjectIdlingResource(browserWebView, "window.results", failOnTimeout = false)
+            IdlingRegistry.getInstance().register(resultsIdling)
 
-        val testJson: TestJson? = getTestJson(results.toJSONString())
-        assertEquals(
-            "Overall status should be success but was: ${testJson?.value?.status}",
-            SUCCESS,
-            testJson?.value?.status,
+            val results = Web.onWebView()
+                .perform(Atoms.script(SCRIPT))
+                .get()
+
+            IdlingRegistry.getInstance().unregister(resultsIdling)
+
+            val testJson: TestJson? = getTestJson(results.toJSONString())
+            overallStatus = testJson?.value?.status
+            checks = testJson?.value?.results.orEmpty()
+            failures = checks.filter { it.actual != it.expected }
+            logcat { "RequestBlocklistTest: attempt $attempts/$MAX_ATTEMPTS, status=$overallStatus, ${failures.size}/${checks.size} checks failing" }
+
+            if (checks.isNotEmpty() && failures.isEmpty()) break
+            if (attempts >= MAX_ATTEMPTS) break
+
+            // Rules likely weren't loaded yet: give the background config download time to land,
+            // then reload so the page re-issues its requests with blocking active.
+            onView(isRoot()).perform(waitFor(DOWNLOAD_WAIT_MILLIS))
+            reloadClearingResults(browserWebView)
+        }
+
+        assertTrue(
+            "No request-blocklist checks were returned after $attempts attempt(s). Overall status: $overallStatus",
+            checks.isNotEmpty(),
         )
-        testJson?.value?.results?.forEach { result ->
-            assertEquals(
-                "\"${result.description}\" expected ${result.expected} but was ${result.actual}",
-                result.expected,
-                result.actual,
-            )
+        assertTrue(
+            "Overall status was '$overallStatus' after $attempts attempt(s). ${failures.size} of ${checks.size} checks failed:\n" +
+                failures.joinToString("\n") {
+                    "  • \"${it.description}\": expected <${it.expected}> but was <${it.actual}>"
+                },
+            failures.isEmpty(),
+        )
+    }
+
+    private fun reloadClearingResults(webView: WebView) {
+        val cleared = CountDownLatch(1)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            webView.evaluateJavascript("window.results = undefined;") { cleared.countDown() }
+        }
+        cleared.await(CLEAR_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            webView.reload()
         }
     }
 
@@ -97,20 +144,16 @@ class RequestBlocklistTest {
         return jsonAdapter.fromJson(jsonString)
     }
 
-    private fun inputFieldId(): Int {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        return context.resources.getIdentifier("inputField", "id", context.packageName)
-            .also { require(it != 0) { "inputField id not found in ${context.packageName}" } }
-    }
-
-    private fun IdlingResource.track() = apply {
-        registeredResources += this
-        IdlingRegistry.getInstance().register(this)
-    }
-
     companion object {
         const val SCRIPT = "return window.results;"
-        const val SUCCESS = "success"
+
+        private const val MAX_ATTEMPTS = 3
+
+        // Time given to the background config download between attempts before reloading.
+        private const val DOWNLOAD_WAIT_MILLIS = 30_000L
+
+        // Best-effort bound for the synchronous window.results clear before a reload.
+        private const val CLEAR_TIMEOUT_MILLIS = 5_000L
     }
 
     data class TestJson(
@@ -129,13 +172,4 @@ class RequestBlocklistTest {
         val status: String,
         val actual: String,
     )
-
-    private class WebViewGrabber : ViewAction {
-        var webView: WebView? = null
-        override fun getConstraints(): Matcher<View> = instanceOf(WebView::class.java)
-        override fun getDescription(): String = "grab WebView reference"
-        override fun perform(uiController: UiController, view: View) {
-            webView = view as WebView
-        }
-    }
 }

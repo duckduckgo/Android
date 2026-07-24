@@ -1005,7 +1005,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Si pripravený/-á súkromne četovať s ChatGPT, Claudom a ďalšími umelými inteligenciami zadarmo v prehliadači, ktorý ťa aktívne chráni?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Pamätaj: Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu.</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Spustiť AI čet</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI ochrany boli aktivované!</string>
@@ -1049,5 +1048,6 @@
     <string name="fireTabsNewTabButton">Nová karta Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyskúšaj karty Fire na prehliadanie bez ukladania do lokálnej histórie.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Chceš vymazať karty Fire a ich údaje?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
 </resources>

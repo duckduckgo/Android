@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Zdieľať obľúbené položky</string>
-    <string name="sync_enable_option_favorites_subtitle">Používajte rovnaké obľúbené položky na všetkých zariadeniach. Toto vynechajte, ak chcete aby obľúbené položky z mobilných zariadení a počítačov zostali oddelené.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Zdieľať obľúbené položky medzi zariadeniami</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Používaj tie isté obľúbené záložky na mobile aj v počítači.</string>
     <string name="saved_site_limit_warning"><b>Synchronizácia bola pozastavená</b>\nDosiahli ste maximálny počet záložiek. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_bookmarks">Správa záložiek</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synchronizácia záložiek bola pozastavená</b>\nDosiahli ste maximálny počet záložiek. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.</string>
     <string name="saved_site_invalid_warning"><b></b>\nNiektoré záložky sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.\n\n<annotation type="manage_bookmarks">Správa záložiek</annotation></string>
@@ -107,8 +107,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Naozaj chcete odstrániť záložku používateľa &lt;b&gt;%1$s&lt;/b&gt;?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Prevzatie ikon záložiek</string>
-    <string name="sync_fetch_icons_subtitle">Automatické preberanie ikon pre synchronizované záložky.</string>
+    <string name="sync_simplified_fetch_icons_title">Načítať ikony záložiek</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Načíta ikony z webových stránok, ktoré máš uložené v záložkách. Sťahovanie ikon je vystavené tvojej sieti.</string>
     <string name="faviconsPromptTitle">Chcete si stiahnuť chýbajúce ikony?</string>
     <string name="faviconsPromptMessage">Chcete, aby toto zariadenie automaticky preberalo ikony synchronizovaných záložiek z webových stránok so záložkami?</string>
     <string name="faviconsPromptPrimaryCta">Udržujte ikony záložiek aktualizované</string>

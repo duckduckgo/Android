@@ -965,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Bereit, privat und kostenlos mit ChatGPT, Claude und anderen KIs zu chatten, in einem Browser, der dich aktiv schützt?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Zur Erinnerung: Du kannst Duck.ai überall dort nutzen, wo du das Chat-Symbol siehst</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">KI-Chat starten</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">KI-Schutz aktiviert!</string>
@@ -1009,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
 </resources>

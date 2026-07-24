@@ -965,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Oletko valmis keskustelemaan yksityisesti ChatGPT:n, Clauden ja muiden tekoälyjen kanssa ilmaiseksi selaimessa, joka suojaa sinua aktiivisesti?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Muista: voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Aloita tekoälykeskustelu</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Tekoälysuojaukset aktivoitu!</string>
@@ -1009,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Uusi Fire-välilehti</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUTTA!</b> Kokeile Fire-välilehtiä selataksesi ilman paikallisen historian tallentamista.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Poistetaanko Fire-välilehdet ja niiden tiedot?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Tiedoston avaaminen ei onnistu. Tarkista yhteensopiva sovellus.</string>
 </resources>

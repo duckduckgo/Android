@@ -985,7 +985,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Ești gata să discuți în privat cu ChatGPT, Claude și alte sisteme de IA, în mod gratuit, într-un browser care te protejează activ?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Nu uita: poți folosi Duck.ai oriunde vezi pictograma de chat</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Pornește chatul IA</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">Protecții IA activate!</string>
@@ -1029,5 +1028,6 @@
     <string name="fireTabsNewTabButton">Noua filă Fire</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOU!</b> Încearcă filele Fire pentru a naviga fără a salva istoricul local.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 </resources>

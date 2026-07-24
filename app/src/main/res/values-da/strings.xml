@@ -965,7 +965,6 @@
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Er du klar til at chatte privat med ChatGPT, Claude og andre AI\'er gratis i en browser, der aktivt beskytter dig?</string>
-    <string name="preOnboardingDaxDialog3TextCustomAi">Husk: Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI-chat</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI-beskyttelse aktiveret!</string>
@@ -1009,5 +1008,6 @@
     <string name="fireTabsNewTabButton">Ny Fire-fane</string>
     <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYT!</b> Prøv Fire-faner for at surfe uden at gemme lokal historik.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Slet Fire-faner og deres data?</string>
+
     <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
 </resources>

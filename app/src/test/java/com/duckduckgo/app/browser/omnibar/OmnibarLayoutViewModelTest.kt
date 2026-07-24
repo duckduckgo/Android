@@ -49,6 +49,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -3129,6 +3130,42 @@ class OmnibarLayoutViewModelTest {
                 ),
             )
             assertTrue(viewState.scrollingEnabled)
+        }
+    }
+
+    @Test
+    fun whenBothProgressBarUpgradeAndIndeterminateFallbackEnabledThenIndeterminateFlagIsTrue() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = true))
+        fakeProgressBarUpgradeFeature.indeterminateFallback().setRawStoredState(Toggle.State(enable = true))
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isProgressBarIndeterminateEnabled)
+        }
+    }
+
+    @Test
+    fun whenUpgradeEnabledButIndeterminateFallbackDisabledThenIndeterminateFlagIsFalse() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = true))
+        fakeProgressBarUpgradeFeature.indeterminateFallback().setRawStoredState(Toggle.State(enable = false))
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isProgressBarIndeterminateEnabled)
+        }
+    }
+
+    @Test
+    fun whenUpgradeDisabledButIndeterminateFallbackEnabledThenIndeterminateFlagIsFalse() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = false))
+        fakeProgressBarUpgradeFeature.indeterminateFallback().setRawStoredState(Toggle.State(enable = true))
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isProgressBarIndeterminateEnabled)
         }
     }
 }

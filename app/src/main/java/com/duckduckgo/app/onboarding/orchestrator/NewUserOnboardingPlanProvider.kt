@@ -27,16 +27,13 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
@@ -60,7 +57,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStep
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.ReturnAndAdvance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import com.duckduckgo.sync.api.SyncAutoRestore
@@ -88,7 +84,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckChat: DuckChat,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
-    private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val onboardingPixelSender: OnboardingPixelSender,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val defaultBrowserDetector: DefaultBrowserDetector,
@@ -99,6 +94,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
 ) {
 
     suspend fun buildRootPlan(
@@ -117,12 +113,19 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
-            buildDefaultPlan(onCompleted, onSkipped)
+            val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+            val variant = if (isReinstall) {
+                null
+            } else {
+                onboardingPromptsExperimentManager.enroll()
+            }
+            buildDefaultPlan(onCompleted, onSkipped, variant)
         }
 
-    private fun buildDefaultPlan(
+    private suspend fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant?,
     ): LinearOnboardingPlan {
         val ctx = NewUserOnboardingPlanContext()
 
@@ -130,25 +133,33 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
 
-        val skipPlan = skipPlan()
         val quickSetupPlan = quickSetupPlan(ctx)
+
+        val variantAllowsWidget = onboardingPromptExperimentVariant ==
+            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
+            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+        val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
 
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
             onSkipped = onSkipped,
-            steps = listOf(
-                introAnimationStep(),
-                notificationPermissionStep(),
-                syncRestoreStep(firstDialog, skipPlan, quickSetupPlan),
-                initialReinstallUserStep(firstDialog, skipPlan, quickSetupPlan),
-                initialStep(firstDialog),
-                comparisonChartStep(),
-                defaultBrowserPromptStep(),
-                addressBarPositionStep(),
-                inputScreenStep(ctx),
-                inputScreenPreviewStep(ctx, duckAiEnabled),
-            ),
+            steps = buildList {
+                add(introAnimationStep())
+                add(notificationPermissionStep())
+                add(syncRestoreStep(firstDialog, quickSetupPlan))
+                add(initialReinstallUserStep(firstDialog, quickSetupPlan))
+                add(initialStep(firstDialog))
+                add(comparisonChartStep())
+                add(defaultBrowserPromptStep())
+                if (showWidget) {
+                    add(widgetPromptStep(ctx))
+                    add(addWidgetStep(ctx))
+                }
+                add(addressBarPositionStep())
+                add(inputScreenStep(ctx))
+                add(inputScreenPreviewStep(ctx, duckAiEnabled))
+            },
         )
     }
 
@@ -159,7 +170,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val ctx = NewUserOnboardingPlanContext()
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
 
-        val skipPlan = skipPlan()
         val quickSetupPlan = quickSetupPlan(ctx, forceWithAiInput = true)
 
         val dismissDuckAiFireCta = suspend {
@@ -191,7 +201,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = listOf(
                 introAnimationStep(withDuckAi = true),
                 notificationPermissionStep(),
-                initialReinstallUserStep(firstDialog, skipPlan, quickSetupPlan, isCustomAiPlan = true),
+                initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true),
                 initialStep(firstDialog),
                 aiComparisonChartStep(),
                 customAiInputScreenPreviewStep(ctx),
@@ -216,9 +226,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             onSkipped = onSkipped,
             result = { ctx.completionResult },
         )
-
-    private fun skipPlan(): LinearOnboardingPlan =
-        LinearOnboardingPlan(id = SKIP_PLAN_ID, steps = listOf(skipOnboardingOptionStep()).firingShownPixels().abortingOnDevSkip())
 
     private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean = false): LinearOnboardingPlan =
         LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx, forceWithAiInput)).firingShownPixels().abortingOnDevSkip())
@@ -325,7 +332,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun syncRestoreStep(
         firstDialog: SuspendMemo<FirstDialog>,
-        skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
     ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_WELCOME
@@ -346,7 +352,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.SkipRequested -> {
                         pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
-                        skipFork(skipPlan, quickSetupPlan)
+                        SwitchTo(quickSetupPlan)
                     }
 
                     else -> Stay
@@ -357,7 +363,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun initialReinstallUserStep(
         firstDialog: SuspendMemo<FirstDialog>,
-        skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
         isCustomAiPlan: Boolean = false,
     ): NewUserOnboardingActivityStep {
@@ -389,7 +394,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.SkipRequested -> {
                         pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
-                        skipFork(skipPlan, quickSetupPlan)
+                        SwitchTo(quickSetupPlan)
                     }
 
                     else -> Stay
@@ -462,6 +467,55 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         },
     )
+
+    private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.WIDGET_PROMPT,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.AddWidgetRequested -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    is NewUserOnboardingEvent.WidgetPromptSkipped -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        ctx.skipAddWidget = true
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun addWidgetStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        // No shown pixel of its own; the confirmed result belongs to the widget-prompt pixel
+        // (shown on the widget_prompt page). Skipped when the user opted out or already has a widget.
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_WIDGET,
+            pixelName = null,
+            precondition = {
+                !ctx.skipAddWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddWidget },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.AddWidgetFinished -> {
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_WIDGET_PROMPT,
+                            OnboardingPixelAction.WidgetConfirmed(added = event.widgetAdded),
+                        )
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
@@ -620,33 +674,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun skipOnboardingOptionStep(): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
-        return NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION,
-            pixelName = pixelName,
-            resolveDialog = { NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption },
-            transition = { event ->
-                when (event) {
-                    is NewUserOnboardingEvent.SkipConfirmed -> {
-                        pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
-                        duckChat.setInputScreenUserSetting(true)
-                        AbortPlan
-                    }
-
-                    is NewUserOnboardingEvent.ResumeRequested -> {
-                        pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
-                        ReturnAndAdvance
-                    }
-
-                    else -> Stay
-                }
-            },
-        )
-    }
-
     private fun quickSetupStep(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_QUICK_SETUP
         return NewUserOnboardingActivityStep(
@@ -688,16 +715,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private suspend fun skipFork(
-        skipPlan: LinearOnboardingPlan,
-        quickSetupPlan: LinearOnboardingPlan,
-    ): LinearOnboardingTransition =
-        if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
-            SwitchTo(quickSetupPlan)
-        } else {
-            SwitchTo(skipPlan)
-        }
-
     private suspend fun applyInputModeSelection(
         ctx: NewUserOnboardingPlanContext,
         withAi: Boolean,
@@ -737,7 +754,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     companion object {
 
         const val ROOT_PLAN_ID = "new-user_onboarding"
-        const val SKIP_PLAN_ID = "new-user_skip"
         const val QUICK_SETUP_PLAN_ID = "new-user_quick-setup"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L

@@ -65,7 +65,23 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_2" />
 
-    <!-- TODO Options container -->
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/bookmarksSectionHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_settings_v2_bookmarks_section_header" />
+
+    <LinearLayout
+        android:id="@+id/bookmarksSectionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/bookmarksSectionDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/keyline_2" />
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"

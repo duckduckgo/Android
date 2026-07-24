@@ -32,7 +32,6 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_SET_DEFAULT.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_NOTIFICATIONS.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_AI_INTRO.pixelName to PixelParameter.removeAtb(),
@@ -43,6 +42,7 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_END.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SUBSCRIPTION_PROMO.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_WIDGET_PROMPT.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

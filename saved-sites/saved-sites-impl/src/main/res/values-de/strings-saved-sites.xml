@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Sync settings screen -->
-    <string name="sync_enable_option_favorites_title">Favoriten teilen</string>
-    <string name="sync_enable_option_favorites_subtitle">Verwende auf allen Geräten dieselben Favoriten. Lass diese Option deaktiviert, um deine Favoriten auf deinem Handy und deinem Desktop getrennt zu halten.</string>
+    <string name="sync_simplified_enable_option_favorites_title">Favoriten geräteübergreifend teilen</string>
+    <string name="sync_simplified_enable_option_favorites_subtitle">Verwende dieselben Lieblingslesezeichen auf dem Handy und auf dem Desktop.</string>
     <string name="saved_site_limit_warning"><b>Synchronisierung angehalten</b>\nDu hast die maximale Anzahl von Lesezeichen erreicht. Lösche einige, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Die Lesezeichen-Synchronisierung wurde angehalten</b>\nDu hast die maximale Anzahl von Lesezeichen erreicht. Bitte lösche einige Lesezeichen, um die Synchronisierung fortzusetzen.</string>
     <string name="saved_site_invalid_warning"><b>Synchronisierung angehalten</b>\nEinige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n<annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
@@ -99,8 +99,8 @@
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
 
     <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Lesezeichen-Symbole abrufen</string>
-    <string name="sync_fetch_icons_subtitle">Symbole für deine synchronisierten Lesezeichen automatisch herunterladen.</string>
+    <string name="sync_simplified_fetch_icons_title">Lesezeichen-Symbole laden</string>
+    <string name="sync_simplified_fetch_icons_subtitle">Lädt Symbole von Webseiten, die du als Lesezeichen gespeichert hast. Symbol-Downloads werden in deinem Netzwerk offengelegt.</string>
     <string name="faviconsPromptTitle">Fehlende Symbole herunterladen?</string>
     <string name="faviconsPromptMessage">Möchtest du, dass dieses Gerät automatisch Symbole für synchronisierte Lesezeichen von den mit Lesezeichen versehenen Websites herunterlädt?</string>
     <string name="faviconsPromptPrimaryCta">Halte die Lesezeichensymbole auf dem neuesten Stand</string>

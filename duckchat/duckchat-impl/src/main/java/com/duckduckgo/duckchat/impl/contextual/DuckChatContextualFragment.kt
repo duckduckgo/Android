@@ -393,8 +393,8 @@ class DuckChatContextualFragment :
                                             id,
                                             data,
                                             Mode.CONTEXTUAL,
-                                            viewModel.updatedPageContext,
-                                            viewModel.sheetTabId,
+                                            viewModel.currentPageContext,
+                                            viewModel.viewState.value.tabId,
                                             browserMode,
                                         )?.let { response ->
                                             logcat { "JS Helper: response $response" }
@@ -808,7 +808,6 @@ class DuckChatContextualFragment :
             binding.contextualNativeInputWidget.setPageContext(
                 title = viewState.contextTitle,
                 url = viewState.contextUrl,
-                faviconUrl = null,
             )
         } else {
             binding.contextualNativeInputWidget.clearPageContext()
@@ -1135,13 +1134,15 @@ class DuckChatContextualFragment :
         resultCode: Int,
         intent: Intent?,
     ) {
+        val uploadTask = pendingUploadTask
+        pendingUploadTask = null
         if (resultCode != Activity.RESULT_OK || intent == null) {
-            pendingUploadTask?.onReceiveValue(null)
+            uploadTask?.onReceiveValue(null)
             return
         }
 
         val uris = fileChooserIntentBuilder.extractSelectedFileUris(intent)
-        pendingUploadTask?.onReceiveValue(uris)
+        uploadTask?.onReceiveValue(uris)
     }
 
     override fun onResume() {
@@ -1151,7 +1152,6 @@ class DuckChatContextualFragment :
     }
 
     override fun onPause() {
-        viewModel.onSheetClosed()
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {

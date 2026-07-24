@@ -34,6 +34,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -67,6 +69,7 @@ class AttachmentView(
     var onPageContextRemoved: (() -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
+    private var faviconManager: FaviconManager? = null
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
@@ -82,10 +85,16 @@ class AttachmentView(
         setOnClickListener { showPopupMenu() }
     }
 
-    fun bind(scope: CoroutineScope, factory: ViewViewModelFactory, nativeInputStateProvider: NativeInputStateProvider) {
+    fun bind(
+        scope: CoroutineScope,
+        factory: ViewViewModelFactory,
+        nativeInputStateProvider: NativeInputStateProvider,
+        faviconManager: FaviconManager,
+    ) {
         val owner = findViewTreeViewModelStoreOwner() ?: return
         val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
         viewModel = vm
+        this.faviconManager = faviconManager
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
         scope.launch {
@@ -244,6 +253,11 @@ class AttachmentView(
             view.show(next) {
                 viewModel?.removePageContext()
                 onPageContextRemoved?.invoke()
+            }
+            view.faviconView()?.let { faviconView ->
+                viewModel?.viewModelScope?.launch {
+                    faviconManager?.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
+                }
             }
         }
     }

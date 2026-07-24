@@ -80,6 +80,34 @@
                 app:leadingIconBackground="circular"
                 app:primaryText="@string/sync_setup_v2_edit_device_name_item" />
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/editThisDeviceNameShimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/twoLineItemHeight"
+                    android:orientation="horizontal">
+
+                    <com.duckduckgo.common.ui.view.SkeletonView
+                        android:layout_width="@dimen/listItemImageContainerSize"
+                        android:layout_height="@dimen/listItemImageContainerSize"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/keyline_4" />
+
+                    <com.duckduckgo.common.ui.view.SkeletonView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/keyline_4"
+                        android:layout_marginEnd="64dp" />
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/editThisDeviceNameDivider"
                 android:layout_width="match_parent"

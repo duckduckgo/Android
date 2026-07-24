@@ -28,7 +28,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -147,19 +146,6 @@ class RealOnboardingPixelSenderTest {
                 "value" to "dismiss",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_dismiss"),
-        )
-    }
-
-    @Test
-    fun whenInstalledMoreThan28DaysAgoThenDaysParamOmitted() = runTest {
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(40))
-
-        testee.fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Shown)
-
-        verify(mockPixel).fire(
-            ONBOARDING_SKIP_ONBOARDING,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "e" to "shown"),
-            type = Unique(tag = "onboarding_skip-onboarding_shown"),
         )
     }
 

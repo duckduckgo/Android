@@ -68,8 +68,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
@@ -835,21 +837,6 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun `when skip confirmed then resume on skip option then emits skip confirmed then resume requested`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
-        advanceUntilIdle()
-
-        testee.onPrimaryCtaClicked()
-        testee.onSecondaryCtaClicked()
-        advanceUntilIdle()
-
-        assertEquals(
-            listOf(NewUserOnboardingEvent.SkipConfirmed, NewUserOnboardingEvent.ResumeRequested),
-            recordedEvents,
-        )
-    }
-
-    @Test
     fun `when demo query submitted then forwards event`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
         advanceUntilIdle()
@@ -908,12 +895,19 @@ class BrandDesignUpdatePageViewModelTest {
     @Test
     fun `when run aborted then sends onboarding skipped`() = runTest {
         val testee = startAt(
-            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption,
+            NewUserOnboardingActivityDialog.QuickSetup(
+                showSplitOption = false,
+                hideSetDefaultBrowserRow = false,
+                hideAddWidgetRow = false,
+                hideAddressBarRow = false,
+                isReinstallUser = false,
+            ),
             transition = { LinearOnboardingTransition.AbortPlan },
         )
         testee.commands.test {
             advanceUntilIdle()
-            realOrchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
+            // -> AbortPlan -> run skipped
+            realOrchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
             advanceUntilIdle()
             assertEquals(Command.OnboardingSkipped, awaitItem())
         }
@@ -939,6 +933,99 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verifyNoInteractions(newUserOnboardingPlanBootstrapper)
+    }
+
+    // endregion
+
+    // region Widget prompt (orchestrator-driven flow)
+
+    private fun widgetPromptStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.WIDGET_PROMPT,
+            pixelName = null,
+            showsStepIndicator = true,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
+        )
+
+    private fun addWidgetStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_WIDGET,
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddWidget },
+        )
+
+    private fun inProgressOn(step: NewUserOnboardingActivityStep) =
+        LinearOnboardingState.InProgress(
+            rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
+            currentStepIndex = 0,
+        )
+
+    @Test
+    fun whenWidgetPromptPrimaryThenAddWidgetRequestedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(widgetPromptStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.WIDGET_PROMPT, testee.viewState.value.currentDialog)
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.AddWidgetRequested)
+    }
+
+    @Test
+    fun whenWidgetPromptSecondaryThenWidgetPromptSkippedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(widgetPromptStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.WidgetPromptSkipped)
+    }
+
+    @Test
+    fun whenAddWidgetDialogAppliedThenLaunchAddWidgetPromptCommandAndNoAdvance() = runTest {
+        orchestratorState.value = inProgressOn(addWidgetStep())
+        val testee = createViewModel()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchAddWidgetPrompt)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        assertNull(testee.viewState.value.currentDialog)
+        verify(mockOrchestrator, never()).onEvent(any())
+    }
+
+    @Test
+    fun whenResumeAfterAddWidgetPromptWithWidgetInstalledThenAdvancesWithAdded() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        orchestratorState.value = inProgressOn(addWidgetStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        testee.checkAddWidgetPromptResult()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = true))
+    }
+
+    @Test
+    fun whenResumeWithoutAddWidgetPromptStartedThenNoWidgetEvent() = runTest {
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        testee.checkAddWidgetPromptResult()
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockWidgetCapabilities)
+        verify(mockOrchestrator, never()).onEvent(any())
     }
 
     // endregion

@@ -18,10 +18,11 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
 /**
  * Display-only token representing the current page attached to the unified input as a chip.
- * The page content itself is held by the contextual layer; this carries only what the chip needs.
+ * The page content itself is held by the contextual layer; this carries only what the chip needs,
+ * including the [tabId] and [url] used to resolve the page favicon from the local favicon store.
  */
 data class PageContextAttachment(
     val title: String,
     val url: String,
-    val faviconUrl: String?,
+    val tabId: String?,
 )

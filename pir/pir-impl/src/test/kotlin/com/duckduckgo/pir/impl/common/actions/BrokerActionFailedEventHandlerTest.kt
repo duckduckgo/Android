@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOut
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_OPTOUT
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_SCAN
@@ -49,6 +50,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class BrokerActionFailedEventHandlerTest {
@@ -105,7 +107,20 @@ class BrokerActionFailedEventHandlerTest {
         expectations = emptyList(),
     )
 
+    private val testConditionAction = BrokerAction.Condition(
+        id = "condition-action-1",
+        comment = "Optional prompt that only sometimes appears",
+        expectations = emptyList(),
+        actions = emptyList(),
+    )
+
     private val testError = PirError.JsError.ActionError("Test error")
+
+    // The real error a condition produces when its expectation is not met (also "Local timeout").
+    private val testConditionError = PirError.ActionError.JsActionFailed(
+        actionID = "condition-action-1",
+        message = "element with selector #spellcheck-original not found.",
+    )
 
     @Before
     fun setUp() {
@@ -423,6 +438,86 @@ class BrokerActionFailedEventHandlerTest {
                 runType = RunType.MANUAL,
             ),
         )
+    }
+
+    @Test
+    fun whenConditionActionFailedInScanThenSkipsToNextActionInsteadOfRetryingOrFailing() = runTest {
+        // A condition whose expectation is not met reports a JsActionFailed (or "Local timeout").
+        // For a condition this is not fatal: skip to the next action instead of retrying then failing
+        // the whole broker step. Uses allowRetry = true to prove the condition bypasses the retry path.
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testConditionAction, testClickAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            actionRetryCount = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = BrokerActionFailed(error = testConditionError, allowRetry = true)
+
+        val result = testee.invoke(state, event)
+
+        // Advances to the next action and resets the retry count.
+        assertEquals(1, result.nextState.currentActionIndex)
+        assertEquals(0, result.nextState.actionRetryCount)
+        val nextEvent = result.nextEvent as ExecuteBrokerStepAction
+        assertEquals(testProfileQuery, (nextEvent.actionRequestData as PirScriptRequestData.UserProfile).userProfile)
+        // Scan step: no opt-out condition pixel fired.
+        verifyNoInteractions(mockPirRunStateHandler)
+    }
+
+    @Test
+    fun whenConditionActionFailedInOptOutThenFiresConditionNotFoundAndSkipsToNextAction() = runTest {
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(testConditionAction, testClickAction),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            actionRetryCount = 0,
+            attemptId = "attempt-1",
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 1000L,
+            ),
+        )
+        val event = BrokerActionFailed(error = testConditionError, allowRetry = true)
+
+        val result = testee.invoke(state, event)
+
+        verify(mockPirRunStateHandler).handleState(
+            BrokerOptOutConditionNotFound(
+                broker = testBroker,
+                actionID = testConditionAction.id,
+                attemptId = "attempt-1",
+                durationMs = testCurrentTimeInMillis - 1000L,
+                currentActionAttemptCount = 1,
+            ),
+        )
+        assertEquals(1, result.nextState.currentActionIndex)
+        val nextEvent = result.nextEvent as ExecuteBrokerStepAction
+        assertEquals(testProfileQuery, (nextEvent.actionRequestData as PirScriptRequestData.UserProfile).userProfile)
     }
 
     @Test

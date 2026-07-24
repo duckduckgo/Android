@@ -28,6 +28,9 @@
     <string name="sync_settings_v2_download_recovery_code_item">Download Your Recovery Code</string>
     <string name="sync_settings_v2_copy_recovery_code_item">Copy Your Recovery Code</string>
     <string name="sync_settings_v2_delete_account_item">Turn Off and Delete Server Data</string>
+    <string name="sync_settings_v2_bookmarks_section_header">Bookmarks</string>
+    <string name="sync_settings_v2_delete_server_data_dialog_title">Turn Off Sync &amp; Backup and Delete Server Data?</string>
+    <string name="sync_settings_v2_delete_server_data_dialog_body">All devices using Sync &amp; Backup will be disconnected and your synced data will be deleted from the server.</string>
     <string name="sync_setup_v2_header_headline">Sync this device with a nearby computer.</string>
     <string name="sync_setup_v2_header_body">We’ll help you sync your devices.</string>
     <string name="sync_setup_v2_this_device_cta_title">Sync This Device Only</string>
@@ -36,4 +39,20 @@
     <string name="sync_setup_v2_edit_device_name_item">Edit Name</string>
     <string name="sync_setup_v2_remove_this_device_notice">This device will no longer be able to access your synced data if you remove it.</string>
     <string name="sync_setup_v2_remove_another_device_notice">This device will no longer be able to access your synced data if this is turned off.</string>
+    <string name="sync_device_v2_edit_device_dialog_title">Edit Name</string>
+    <string name="sync_device_v2_edit_device_dialog_primary_button">Done</string>
+    <string name="sync_device_v2_edit_device_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_remove_device_dialog_title">Remove Device?</string>
+    <string name="sync_device_v2_remove_device_dialog_body" instruction="Placeholder is a device name">\"%1$s\" will no longer be able to access your synced data.</string>
+    <string name="sync_device_v2_remove_device_dialog_primary_button">Remove</string>
+    <string name="sync_device_v2_remove_device_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_title">Turn Off Sync &amp; Backup?</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_body">This device will no longer be able to access your synced data on other devices.</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_primary_button">Turn Off</string>
+    <string name="sync_device_v2_turn_off_sync_dialog_secondary_button">Cancel</string>
+    <string name="sync_device_v2_recovery_code_headline" instruction="Placeholder is a device name">%1$s has been added to Sync &amp; Backup.</string>
+    <string name="sync_device_v2_recovery_code_body">Use this code to restore your data if you lose access to this device. Keep it safe.</string>
+    <string name="sync_device_v2_recovery_code_download_code_button">Download Your Recovery Code</string>
+    <string name="sync_device_v2_recovery_code_done_button">Done</string>
+    <string name="sync_device_v2_recovery_code_get_code_error">Unable to get recovery code.</string>
 </resources>

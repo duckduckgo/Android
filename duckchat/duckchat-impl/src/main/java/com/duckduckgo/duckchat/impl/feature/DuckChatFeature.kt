@@ -218,13 +218,6 @@ interface DuckChatFeature {
     fun duckAiVoiceEntryPoint(): Toggle
 
     /**
-     * @return `true` when the "Default Toggle Position" setting should be visible in AI Features Settings.
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun rememberTogglePosition(): Toggle
-
-    /**
      * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
      * allowing the user to clear their current chat.
      * If the remote feature is not present defaults to `internal`
@@ -327,6 +320,6 @@ interface DuckChatFeature {
      * the legacy input for INPUT mode while still using the native widget in WEBVIEW (in-chat) mode.
      * When native chat input is off, this has no effect (everything falls back to legacy/web input).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
 }

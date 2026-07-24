@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
@@ -181,13 +181,6 @@ sealed interface DaxMessageActions {
     /** A single small primary button. */
     data class SmallSingle(val primary: DaxAction) : DaxMessageActions
 }
-
-/** A single button entry used by [DaxMessageActions]. */
-@Immutable
-data class DaxAction(
-    val text: String,
-    val onClick: () -> Unit,
-)
 
 private object DaxMessageDefaults {
     val shape: Shape = RectangleShape

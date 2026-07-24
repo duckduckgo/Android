@@ -13,6 +13,12 @@ and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
 
 ---
 
+## Before you implement
+
+Before writing code, assess whether the change will touch a public `-api` surface or is cross-cutting (spans multiple modules / adds a new integration). If so, tell the user at planning time that it will need an approved **API Proposal** and/or **Tech Design** — start these before implementation, don't surface them for the first time at PR time. See the *API Proposals* and *Tech Design* sections of `.cursor/rules/contributions.mdc`.
+
+---
+
 ## Build System
 
 ### Module Discovery

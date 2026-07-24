@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.message.DaxAction
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.message.DaxMessageActions
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R

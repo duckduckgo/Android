@@ -36,12 +36,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.duckduckgo.common.ui.compose.DaxAction
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxCardElevation
-import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox

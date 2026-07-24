@@ -71,6 +71,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -1764,12 +1765,12 @@ class RealDuckChatTest {
         assertEquals("SEARCH", result)
     }
 
-    @Suppress("DenyListedApi")
     @Test
     fun `when new user then default toggle position is set to LAST_USED`() = runTest {
-        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        // Ignore the defaulting that runs during testee init, before these stubs were applied.
+        clearInvocations(mockDuckChatFeatureRepository)
 
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
@@ -1777,12 +1778,12 @@ class RealDuckChatTest {
         verify(mockDuckChatFeatureRepository).setDefaultTogglePosition(DefaultTogglePosition.LAST_USED.name)
     }
 
-    @Suppress("DenyListedApi")
     @Test
     fun `when existing user then default toggle position is set to SEARCH`() = runTest {
-        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+        // Ignore the defaulting that runs during testee init, before these stubs were applied.
+        clearInvocations(mockDuckChatFeatureRepository)
 
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
@@ -1790,23 +1791,11 @@ class RealDuckChatTest {
         verify(mockDuckChatFeatureRepository).setDefaultTogglePosition(DefaultTogglePosition.SEARCH.name)
     }
 
-    @Suppress("DenyListedApi")
     @Test
     fun `when default toggle position already set then do not overwrite`() = runTest {
-        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn("DUCK_AI")
-
-        testee.onPrivacyConfigDownloaded()
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
-    }
-
-    @Suppress("DenyListedApi")
-    @Test
-    fun `when feature flag off then default toggle position is not set`() = runTest {
-        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
-        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
+        // Ignore the defaulting that runs during testee init, before these stubs were applied.
+        clearInvocations(mockDuckChatFeatureRepository)
 
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()

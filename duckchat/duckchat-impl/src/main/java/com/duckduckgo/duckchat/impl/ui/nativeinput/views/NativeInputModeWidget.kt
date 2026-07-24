@@ -48,6 +48,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -60,7 +61,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
@@ -147,7 +147,7 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
-    fun setPageContext(title: String, url: String, faviconUrl: String?)
+    fun setPageContext(title: String, url: String)
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
@@ -232,9 +232,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     @Inject
-    lateinit var duckChatFeature: DuckChatFeature
-
-    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
@@ -245,6 +242,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var browserMode: BrowserMode
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
 
     private var activeTabId: String? = null
 
@@ -454,7 +454,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onAskAboutTab = pendingAskAboutTab
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
-            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
+            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
         }
         (pluginView as? ModelPicker)?.let { picker ->
@@ -1093,7 +1093,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun applyDefaultTogglePosition() {
         doOnAttach {
-            if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
                 // Wait for the first state emission so we know whether the toggle row is even shown.
                 // For SEARCH_ONLY users (input-screen setting off) the toggle is hidden, and flipping
@@ -1115,7 +1114,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun saveLastUsedTogglePosition(isChat: Boolean) {
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
             viewModel.saveLastUsedTogglePosition(position.name)
@@ -1227,8 +1225,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
 
-    override fun setPageContext(title: String, url: String, faviconUrl: String?) {
-        val attachment = PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl)
+    override fun setPageContext(title: String, url: String) {
+        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId)
         pendingPageContext = attachment
         attachmentView?.setPageContext(attachment)
     }

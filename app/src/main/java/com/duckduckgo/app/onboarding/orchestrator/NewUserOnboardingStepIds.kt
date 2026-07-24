@@ -31,9 +31,10 @@ internal object NewUserOnboardingStepIds {
     const val AI_COMPARISON_CHART: LinearOnboardingStepId = "ai_comparison_chart"
     const val DUCK_AI_DEMO: LinearOnboardingStepId = "duck_ai_demo"
     const val DEFAULT_BROWSER_PROMPT: LinearOnboardingStepId = "default_browser_prompt"
+    const val WIDGET_PROMPT: LinearOnboardingStepId = "widget_prompt"
+    const val ADD_WIDGET: LinearOnboardingStepId = "add_widget"
     const val ADDRESS_BAR_POSITION: LinearOnboardingStepId = "address_bar_position"
     const val INPUT_SCREEN: LinearOnboardingStepId = "input_screen"
     const val INPUT_SCREEN_PREVIEW: LinearOnboardingStepId = "input_screen_preview"
-    const val SKIP_ONBOARDING_OPTION: LinearOnboardingStepId = "skip_onboarding_option"
     const val QUICK_SETUP: LinearOnboardingStepId = "quick_setup"
 }
