@@ -18,6 +18,7 @@ package com.duckduckgo.history.impl
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
@@ -51,6 +52,7 @@ class HistoryModule {
     @Provides
     fun provideDatabase(context: Context): HistoryDatabase {
         return Room.databaseBuilder(context, HistoryDatabase::class.java, "history.db")
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
