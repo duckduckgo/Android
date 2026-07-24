@@ -265,4 +265,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">„Duck.ai“ nuostatos</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Klausti apie kortelę</string>
+    <string name="duckChatContextualAskAboutPage">Klausti apie puslapį</string>
 </resources>
