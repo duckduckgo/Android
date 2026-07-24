@@ -1,3 +1,5 @@
+# Config-driven onboarding dialogs (tech design)
+
 ## Problem
 
 `BrandDesignUpdateWelcomePage` is ~3.1k lines and growing. This becomes unmanageable. Three causes:
@@ -21,10 +23,10 @@ permutations. The current structure makes each one a hand-wired special case.
 ## Goals
 
 **Goals**
-- One `DialogConfig` per step, that describes all of its unique characteristics.
+- One `DialogConfig` per step, describing all of its unique characteristics.
 - One code path for animated and snapped renders, so they cannot drift.
 - Any dialog can follow any dialog, or appear from nothing. Re-ordering a flow becomes a
-  list edit in the plan provider, no transition logic changes or special cases need.
+  list edit in the plan provider, no transition logic changes or special cases needed.
 
 **Non-goals**
 - The legacy (non-brand-design) onboarding flow stays as-is, soon to be removed anyway.
@@ -52,12 +54,23 @@ data class DialogConfig(
     val background: OnboardingBackgroundStep,   // existing enum, reused as-is
     val embellishment: Embellishment,           // enum: WalkingDax, BobbingDax, BottomWing, LeftWing, None
     val content: ContentConfig,                 // sealed data, described below
-    val primaryCta: CtaConfig? = null,          // CTA buttons configs
+    val primaryCta: CtaConfig? = null,          // CTA button configs
     val secondaryCta: CtaConfig? = null,
     val stepIndicator: StepProgress? = null,    // existing type, filled in by the VM from plan position
-    val showCardArrow: Boolean = true,          // false on the input screen preview TODO: refactor into CardArrowConfig
-    val cardArrowAtEnd: Boolean = true,         // false only on welcome (arrow stays at its XML start offset) TODO: refactor into CardArrowConfig
+    val cardArrow: CardArrowConfig = Hidden,
 )
+
+enum class CardArrowConfig { Hidden, AtStart, AtEnd }
+
+data class CtaConfig(
+    val text: TextConfig,
+    val action: CtaAction,
+)
+
+sealed interface CtaAction {
+    data class Emit(val event: NewUserOnboardingEvent) : CtaAction  // click forwards this event to the orchestrator as-is
+    data object Submit : CtaAction  // click asks the bound screen to build the event from its live state (ContentHandle.result below)
+}
 ```
 
 **Config is value-comparable data.** No lambdas, no views. Equality drives the diff, and
@@ -135,28 +148,23 @@ The handle is how a screen declares its views without re-describing the choreogr
 class ContentHandle(
     val title: OnboardingDialogTitleView?,   // engine types content.title into it
     val fadeTargets: List<View>,             // bodies, media, pickers; engine fades them uniformly
-    val entrance: (EntranceScope.() -> Unit)? = null, // bespoke intro animations, declared via scope hooks TODO: drop EntranceScope since afterTitle is unused. Just expose 'val afterFade: (animator: () -> Animator)? = null'.
+    val afterFade: (() -> Animator)? = null, // bespoke intro animations, played by the engine once the standard fade lands (check-icon stagger, suggestion buttons)
     val result: (() -> NewUserOnboardingEvent)? = null, // stateful screens: builds the submit event from the current selection
     val unbind: () -> Unit = {},             // non-animation resource release; engine cancels scope animators itself
 )
-
-interface EntranceScope {
-    fun afterFade(animator: () -> Animator)   // runs once the standard fade lands (check-icon stagger, suggestion buttons)
-    fun afterTitle(animator: () -> Animator)  // runs once title typing finishes
-}
 ```
 
-The bind scope carries the coroutine scope for state observation and the two channels for content-initiated events, outside of primary/secondary CTA buttons clicks, which the engine automates:
+The bind scope carries the coroutine scope for state observation and one channel for content-initiated interactions — everything a screen triggers outside the primary/secondary CTA clicks, which the engine wires itself:
 
 ```kotlin
 class BindScope(
     val coroutineScope: CoroutineScope,          // engine cancels it at unbind (state observation lives here)
-    val emit: (NewUserOnboardingEvent) -> Unit,  // content-initiated orchestrator events (query submit) TODO: drop emit and just expose a ContentInteraction#SubmitInput event?
-    val execute: (ContentInteraction) -> Unit,   // content-initiated VM interactions (bottom sheets, toggles)
+    val execute: (ContentInteraction) -> Unit,   // content-initiated VM interactions
 )
 
 // the VM interactions a bound screen can trigger outside the shared CTA flow
 sealed interface ContentInteraction {
+    data class SubmitInput(val query: String, val isChat: Boolean, val fromSuggestion: Boolean) : ContentInteraction  // input preview: typed query or suggestion tap
     data object EditAddressBarPosition : ContentInteraction
     data object EditSearchOptions : ContentInteraction
     data class SetDefaultBrowserToggled(val checked: Boolean) : ContentInteraction
@@ -164,9 +172,8 @@ sealed interface ContentInteraction {
 }
 ```
 
-**Binders declare animations, never run them.** The engine owns
-every animator it gets: it plays them at the declared hook, ends them on the snap path and
-`cancel()`s them on unbind.
+**Binders declare animations, never run them.** The engine owns every animator it gets: it plays it at the declared hook,
+ends it on the snap path and `cancel()`s it on unbind.
 
 **Titles.** Every step layout today copy-pastes the same title machinery: a
 `TypeAnimationTextView` for the typing effect, an invisible sizing twin (`hiddenTitleText`)
@@ -202,31 +209,69 @@ never produce a new config, they stay local until submitted:
 
 ### Architecture
 
-TODO: refactor the text below to better fit this section ('Architecture')
-Shared vs duplicated while both arms exist:
+The new config driven stack lives behind a feature flag. The orchestrator, the plan provider, and
+the layouts serve both old and new implementations; the new arm replaces the fragment and the VM:
 
 - **Orchestrator and plan provider: untouched.** Steps keep returning
-  `NewUserOnboardingActivityDialog`; the new path adds one pure `DialogConfigResolver` (a single
+  `NewUserOnboardingActivityDialog`; the new arm adds one pure `DialogConfigResolver` (a single
   `when` mapping dialog → `DialogConfig`) — the unit-testable config source immediately, inlined
-  into the steps at cleanup.
+  into the steps once the legacy arm goes.
 - **Layouts: shared.** The new fragment inflates the same card and includes. One exception:
-  the `OnboardingDialogTitleView` widget changes include internals, so that refactor happens
-  in place, with legacy binding through it — one of two mechanical legacy edits of the
-  rollout (the other is the shown-pixel extraction below).
-- **New slim VM.** Config + two flags + `ContentValueStore`. Shown pixels come from one shared
-  mapping: an exhaustive `when (dialog)` → pixel, extracted from legacy (~15 lines) and called
-  by both VMs. Parity can't drift — a pixel added during ramp fires from both arms, and a new
-  dialog is a compile error until mapped. Both arms emit identical pixel names, so ramp arms are
-  directly comparable. Command handling for the command-only steps ports as-is; the quick-setup
-  syncs become VM writes into the content-value store.
+  the `OnboardingDialogTitleView` dropped in to each step's layout.
+- **New slim VM.** `ViewState` is a step id, a `DialogConfig`, plus the
+  `ContentValueStore` for stateful screens. Shown pixels come from one shared mapping: an
+  exhaustive `when (dialog)` → pixel, extracted from legacy (~15 lines) and called by both
+  VMs. Parity can't drift — a pixel added during ramp fires from both arms, and a new dialog
+  is a compile error until mapped.
+- **New fragment: thin.** It observes the `ViewState` and hands each config to the render
+  engine; the engine drives the axis controllers and the per-screen binders. No per-dialog
+  branches anywhere in the fragment.
 
-TODO: create a PLANTUML diagram of the new old pagea and vm and new page and vm, and how the new page uses the renderer, taht uses the binders etc (instead of being a monolith, and how the vm has little state and content now)
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
 
+package "Shared" {
+  [Orchestrator\n+ plan provider] as Orch
+  [Shown-pixel\nmapper] as Pixels
+  [Card + content\nlayouts (XML)] as Layouts
+}
+
+package "Legacy arm (flag off)" {
+  [BrandDesignUpdatePageViewModel\nViewState: ~16 per-dialog fields] as OldVM
+  [BrandDesignUpdateWelcomePage\n~3.1k lines: every dialog wired twice\n(animated + snapped)] as OldPage
+}
+
+package "Config-driven arm (flag on)" {
+  [ConfigDrivenOnboardingPageViewModel\nViewState: stepId + DialogConfig + ContentValueStore] as NewVM
+  [DialogConfigResolver\ndialog → DialogConfig] as Resolver
+  [ConfigDrivenWelcomePage\n(thin fragment)] as NewPage
+  [DialogRenderEngine\ndiff previous vs new config] as Engine
+  [Axis controllers\nbackground / embellishment /\ncard anchor / step indicator] as Axes
+  [ContentBinder\n+ one binder per screen] as Binders
+}
+
+Orch <--> OldVM
+Orch <--> NewVM
+OldVM ..> Pixels
+NewVM ..> Pixels
+NewVM --> Resolver
+OldVM --> OldPage : ViewState
+NewVM --> NewPage : ViewState
+NewPage --> Engine : render(config, animate)
+Engine --> Axes : one axis each,\nprevious → next
+Engine --> Binders : bind / unbind
+Binders --> Layouts
+OldPage --> Layouts
+@enduml
+```
 
 ### Flow
 
 One full step lifecycle, from the step becoming current to the next step taking over:
-// TODO: is the flow up-to-date?
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -240,14 +285,15 @@ actor User
 == Step becomes current ==
 Orchestrator -> VM : state: InProgress(step)
 VM -> Step : resolveDialog()
-Step --> VM : Dialog(DialogConfig)
+Step --> VM : dialog
+VM -> VM : DialogConfigResolver:\ndialog → DialogConfig
+VM -> VM : fire shown pixel\n(mapper shared with the legacy arm)
 VM -> VM : ViewState = stepId + config\n(+ step indicator from plan position)
 VM -> Orchestrator : Presented
-note right : shown pixel fires\nvia the step wrapper
 
 == Render ==
 VM -> Engine : render(config, animate)
-note right : animate is VM-owned,\nkeyed by step identity;\nengine obeys it verbatim
+note right : the flag whether animations should play or not is VM-owned,\nto handle orientation change
 Engine -> Engine : diff previous vs new config\n(no previous → reset stage, enter everything)
 Engine -> Binder : unbind(previous content)
 note right : cancels running animators\nand the BindScope (state observation)
@@ -268,8 +314,8 @@ opt external change (quick setup resume sync)
 end
 opt content-initiated interaction (query submit, bottom sheet, system toggle)
   User -> Binder : text submit / row tap / switch flip
-  Binder -> VM : scope.emit(event) or scope.execute(interaction)
-  note right : self-toggling views write the optimistic\nvalue into the content state first
+  Binder -> VM : scope.execute(interaction)
+  note right : VM interprets it: SubmitInput becomes an\norchestrator event, the rest run commands\nor side effects; self-toggling views write the\noptimistic value into the content state first
 end
 User -> Engine : CTA click
 alt action is Emit(event)
@@ -297,6 +343,7 @@ note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing config agai
 - Re-ordering or permuting a flow means editing a list. Any ordering animates correctly with no new transition code.
 - One owner for running animations: tap-to-skip and view teardown become one call instead of
   hand-enumerating ~25 animators.
+- Key render logic is split by concerns, improving readability and maintainability.
 - `ViewState` collapses from 16 fields to a `DialogConfig` and a couple of flags.
 - `DialogConfig` is the state model a future Compose port would consume unchanged — the
   declarative architecture without the rewrite risk.
@@ -305,27 +352,28 @@ note over VM, Engine : cycle repeats; the engine diffs\nthe outgoing config agai
 
 ## Risks and mitigations
 
-| Risk | Mitigation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|---|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring; one screen depends on anchor timing during the previous embellishment's exit | Owned by one `EmbellishmentController` (fit veto + anchoring) plus a general engine rule: hold the card anchor until the exiting embellishment finishes (the enter itself runs in parallel with the exit). The fit veto re-runs per frame, so declared config ≠ actual stage — the controller is sole owner of declared-vs-actual reconciliation; the engine diffs declared values only and delegates. The anchored card bias is per-decoration data (`anchoredCardBiasPhone/Tablet`), matching legacy exactly — the POC's attempt to normalize it inverted legacy's phone biases and sank the card to the screen bottom. De-risked: the POC implements the full flow and survived a device-debugging round TODO: this needs to be much more concise, just highlgihting that mitigation is that logic lives in a single controller (and some minor additioanl wins or expectations of this would be enough) |
-| Shown pixels silently stop firing | Shown pixels fire when the orchestrator receives a `Presented` event, and today that event is sent from code this design deletes; the VM fires it explicitly per step instead. While both arms exist the shown-pixel mapping is a single shared `when` both VMs call (see Rollout), so a pixel added to legacy fires from the new arm too. Legacy `PREONBOARDING_*_SHOWN_UNIQUE` pixels are moved onto steps or confirmed superseded before the old path goes                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Regression in a release-critical flow | Whole parallel renderer behind a remote toggle (see Rollout): the flag-off arm stays byte-identical, mixed-renderer sessions never exist. Maestro release-blocker flows run in both flag states, plus unit tests off the resolver                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Engine grows dialog-specific logic over time | Hard rules: bespoke behaviour goes into the screen's content config or its handle, never into the engine; and no code branches on (previous, next) screen pairs — each axis controller sees only its own axis. The whole-stage responsibilities above are the sanctioned exceptions: screen-agnostic by definition, never per-screen                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Risk | Mitigation                                                                                                                                                                                    |
+|---|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Choreography edge cases: embellishments can be vetoed by available space, and they decide the card's anchoring | All of it lives in one `EmbellishmentController` — fit veto, anchoring, and the declared-vs-actual reconciliation the per-frame veto implies.                                                 |
+| Shown pixels silently stop firing | Pixel mapping extracted into a shared utility called by both old and new VMs, ensuring parity.                                                                                                |
+| Regression in a release-critical flow | Whole parallel renderer is behind a remote toggle. With the flag-off, unchanged, byte-identical old arm is used. Maestro release-blocker flows run in both flag states.                       |
+| Engine grows dialog-specific logic over time | Bespoke behaviour goes into the screen's content config or its handle, never into the engine. No code branches on (previous, next) screen pairs — each axis controller sees only its own axis |
 
 ## Rollout
 
-Behind a remote feature flag from day one: a new toggle on the existing
+Behind a remote feature flag. A new toggle added on the existing
 `OnboardingBrandDesignUpdateToggles` (`configDrivenDialogs()`). The flag
-selects a whole parallel renderer, not per-screen paths.
+selects a whole parallel renderer, not per-screen paths, so mixed-renderer sessions never
+exist.
 
 ## Appendix: Examples
-[1] Binder examples: // TODO: are these examples up-to-date?
+[1] Binder examples:
 ```kotlin
 // stateless dialog example
 class ComparisonChartBinder(private val binding: ViewComparisonChartContentBinding) : DialogBinder<ContentConfig.ComparisonChart> {
     override fun bind(content: ContentConfig.ComparisonChart, scope: BindScope): ContentHandle = with(binding) {
         populate(content.config)
-        ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), entrance = { afterFade { checkIconStagger() } })
+        ContentHandle(title = titleView, fadeTargets = listOf(comparisonTable), afterFade = { checkIconStaggerAnimator() })
     }
 }
 
