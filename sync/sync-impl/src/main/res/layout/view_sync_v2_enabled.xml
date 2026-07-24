@@ -55,8 +55,8 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/sync_settings_v2_download_section_header" />
 
-    <com.duckduckgo.sync.impl.ui.v2.SyncOnOtherPlatformsListItem
-        android:id="@+id/sync_on_other_platforms_item"
+    <com.duckduckgo.sync.impl.ui.v2.GetOnOtherPlatformsListItem
+        android:id="@+id/get_on_other_platforms_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

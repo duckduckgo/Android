@@ -24,7 +24,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.duckduckgo.sync.impl.databinding.ViewSyncV2OtherPlatformsListItemBinding
 
-internal class SyncOnOtherPlatformsListItem @JvmOverloads constructor(
+internal class GetOnOtherPlatformsListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -36,5 +36,21 @@ internal class SyncOnOtherPlatformsListItem @JvmOverloads constructor(
     ) {
         binding.getDesktopBrowserItem.isVisible = isNewDesktopBrowserAvailable
         binding.getOnOtherPlatformsItem.isGone = isNewDesktopBrowserAvailable
+    }
+
+    fun setListener(listener: Listener?) {
+        if (listener == null) {
+            binding.getDesktopBrowserItem.setOnClickListener(null)
+            binding.getOnOtherPlatformsItem.setOnClickListener(null)
+        } else {
+            binding.getDesktopBrowserItem.setOnClickListener { listener.onClickGetDesktopBrowser() }
+            binding.getOnOtherPlatformsItem.setOnClickListener { listener.onClickGetOnOtherPlatforms() }
+        }
+    }
+
+    interface Listener {
+        fun onClickGetDesktopBrowser()
+
+        fun onClickGetOnOtherPlatforms()
     }
 }
