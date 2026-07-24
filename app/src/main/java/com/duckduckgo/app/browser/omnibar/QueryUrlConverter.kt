@@ -18,13 +18,13 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.net.Uri
 import android.webkit.URLUtil
+import com.duckduckgo.app.browser.DuckDuckGoSerpHostProvider
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.UriString.Companion.extractUrl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
@@ -48,6 +48,7 @@ class QueryUrlConverter @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val queryUrlPredictor: QueryUrlPredictor,
+    private val serpHostProvider: DuckDuckGoSerpHostProvider,
 ) : OmnibarEntryConverter, PrivacyConfigCallbackPlugin {
 
     @Volatile
@@ -109,7 +110,7 @@ class QueryUrlConverter @Inject constructor(
         val uriBuilder = Uri.Builder()
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
-            .authority(Url.HOST)
+            .authority(serpHostProvider.searchHost())
 
         if (vertical != null && majorVerticals.contains(vertical)) {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)
