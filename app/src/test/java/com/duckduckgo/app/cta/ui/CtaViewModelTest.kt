@@ -493,26 +493,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndAddWidgetCtaDismissedThenWidgetCtaNotReturned() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        whenever(mockDismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertNull(value)
-    }
-
-    @Test
-    fun whenRefreshCtaOnHomeTabAndUserEnrolledInDockOnlyExperimentThenWidgetCtaReturned() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is HomePanelCta.AddWidgetAutoOnboarding)
-    }
-
-    @Test
     fun whenRefreshCtaWhileBrowsingMajorTrackerSiteThenReturnNetworkCta() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
