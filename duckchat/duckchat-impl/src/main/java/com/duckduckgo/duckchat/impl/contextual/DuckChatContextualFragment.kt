@@ -278,17 +278,11 @@ class DuckChatContextualFragment :
         super.onCreate(savedInstanceState)
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) { event ->
             if (event is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
-                when (val result = event.result) {
-                    is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
-                        viewModel.onContextualClose()
-                        startActivity(browserNav.openInNewTab(requireContext(), result.query))
-                    }
-
-                    is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onContextualClose()
-                        duckChat.openDuckChatWithAutoPrompt(result.query)
-                    }
-                }
+                val result = event.result
+                viewModel.onVoiceRecognitionSuccess(
+                    query = result.query,
+                    isDuckAiResult = result is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult,
+                )
             }
         }
     }
@@ -707,6 +701,16 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
                         globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                    }
+
+                    is DuckChatContextualViewModel.Command.OpenSearchInNewTab -> {
+                        viewModel.onContextualClose()
+                        startActivity(browserNav.openInNewTab(requireContext(), command.query))
+                    }
+
+                    is DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt -> {
+                        viewModel.onContextualClose()
+                        duckChat.openDuckChatWithAutoPrompt(command.query)
                     }
 
                     is DuckChatContextualViewModel.Command.FocusInput -> {

@@ -159,6 +159,8 @@ class DuckChatContextualViewModel @Inject constructor(
         ) : Command()
         data object LaunchChatHistory : Command()
         data object FocusInput : Command()
+        data class OpenSearchInNewTab(val query: String) : Command()
+        data class OpenDuckAiWithPrompt(val query: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -430,6 +432,24 @@ class DuckChatContextualViewModel @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    fun onVoiceRecognitionSuccess(
+        query: String,
+        isDuckAiResult: Boolean,
+    ) {
+        if (query.isBlank()) return
+        when {
+            !isDuckAiResult -> emitCommand(Command.OpenSearchInNewTab(query))
+            _viewState.value.sheetMode == SheetMode.WEBVIEW -> onPromptSent(query)
+            else -> emitCommand(Command.OpenDuckAiWithPrompt(query))
+        }
+    }
+
+    private fun emitCommand(command: Command) {
+        viewModelScope.launch(dispatchers.main()) {
+            commandChannel.trySend(command)
         }
     }
 
