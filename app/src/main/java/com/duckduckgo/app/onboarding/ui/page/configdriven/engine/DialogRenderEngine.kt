@@ -158,26 +158,32 @@ class DialogRenderEngine(
         if (animateNow) {
             handle.fadeTargets.forEach { it.alpha = 0f }
             ctaViews(config).forEach { it.alpha = 0f }
-            // Captured so the fade's onEnd below (fired async, possibly well after this render() call returns)
-            // can tell whether it's still describing the *current* render before arming CTA listeners for it -
-            // see [attachCtaListeners] call site and [generation]'s own doc.
+            // Captured so the reveal/fade onEnd continuations below (fired async, possibly well after this
+            // render() call returns) can tell whether they're still describing the *current* render before
+            // continuing its chain / arming CTA listeners for it - see [attachCtaListeners] call site and
+            // [generation]'s own doc.
             val gen = generation
-            morphCard {
-                handle.title?.type {
-                    runAndTrack(entrance.afterTitleAnimators)
-                    fadeIn(handle.fadeTargets + ctaViews(config)) {
-                        runAndTrack(entrance.afterFadeAnimators)
-                        // Finding 2: CTAs are armed only once their fade-in has actually completed (real time,
-                        // or settled early by skipRunningAnimations()/settlePendingMorph()) - never at bind time -
-                        // so a CTA sitting at alpha 0 during the entrance can't be clicked before it's visible.
-                        // The generation check guards against a superseded render's fade being end()ed by a
-                        // newer render's own skipRunningAnimations() call: that must not arm listeners for a
-                        // config/handle this engine has already unbound.
-                        if (gen == generation) attachCtaListeners(config, handle)
+            revealCard {
+                if (gen != generation) return@revealCard // superseded (new render or release()) while the card was still fading in.
+                morphCard {
+                    handle.title?.type {
+                        runAndTrack(entrance.afterTitleAnimators)
+                        fadeIn(handle.fadeTargets + ctaViews(config)) {
+                            runAndTrack(entrance.afterFadeAnimators)
+                            // Finding 2: CTAs are armed only once their fade-in has actually completed (real time,
+                            // or settled early by skipRunningAnimations()/settlePendingMorph()) - never at bind time -
+                            // so a CTA sitting at alpha 0 during the entrance can't be clicked before it's visible.
+                            // The generation check guards against a superseded render's fade being end()ed by a
+                            // newer render's own skipRunningAnimations() call: that must not arm listeners for a
+                            // config/handle this engine has already unbound.
+                            if (gen == generation) attachCtaListeners(config, handle)
+                        }
                     }
                 }
             }
         } else {
+            binding.daxDialogCta.root.isVisible = true
+            binding.daxDialogCta.root.alpha = 1f
             handle.title?.snap()
             handle.fadeTargets.forEach { it.alpha = 1f }
             ctaViews(config).forEach { it.alpha = 1f }
@@ -220,6 +226,13 @@ class DialogRenderEngine(
         skipping = true
         try {
             bound?.handle?.title?.finishTyping()
+            settlePendingMorph()
+            drainRunningAnimators { it.end() }
+            // A [revealCard] fade end()ed by the drain above schedules this render's morph from its own
+            // onAnimationEnd - mid-drain, after the first settlePendingMorph() already ran. Settle that morph
+            // too (it finishes the typing its continuation starts), then drain the afterTitle/afterFade
+            // animators that chain just created, so one tap still settles everything. Both calls are no-ops
+            // when no reveal was in flight.
             settlePendingMorph()
             drainRunningAnimators { it.end() }
             embellishments.skipRunning()
@@ -333,6 +346,41 @@ class DialogRenderEngine(
     )
 
     /**
+     * Reveals the card root itself, which starts `alpha="0"` + `visibility="invisible"` in XML
+     * (pre_onboarding_dax_dialog_cta_brand_design_update.xml) and is revealed by nothing else in this arm -
+     * every other step of the pipeline (title typing, content/CTA fades) plays inside it. Port of legacy's
+     * `fadeInDialog` (BrandDesignUpdateWelcomePage.kt:2679-2689): visible immediately, alpha fades in after
+     * [CARD_FADE_IN_START_DELAY_MS]; the snap branch of [render] sets both directly, mirroring legacy's
+     * `showDialogWithoutAnimation` counterpart (:1732-1733).
+     *
+     * Alpha already 1 means the card is already on stage (every animated render after the first), so [onEnd]
+     * runs synchronously and this is a no-op - only an empty stage actually fades. Under [skipping] this snaps
+     * to the end state like [fadeIn], for the same reason.
+     */
+    private fun revealCard(onEnd: () -> Unit) {
+        val card = binding.daxDialogCta.root
+        card.isVisible = true
+        if (card.alpha == 1f) {
+            onEnd()
+            return
+        }
+        if (skipping) {
+            card.alpha = 1f
+            onEnd()
+            return
+        }
+        val reveal = ObjectAnimator.ofFloat(card, View.ALPHA, 1f).apply {
+            startDelay = CARD_FADE_IN_START_DELAY_MS
+            duration = CARD_FADE_IN_DURATION_MS
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) = onEnd()
+            })
+        }
+        runningAnimators += reveal
+        reveal.start()
+    }
+
+    /**
      * ChangeBounds card morph, mirroring legacy's quick-setup expansion (BrandDesignUpdateWelcomePage.kt:998-1040).
      *
      * [onEnd] is deferred until the transition's own `onTransitionEnd` fires (naturally, ~[CARD_MORPH_DURATION_MS]
@@ -429,8 +477,11 @@ class DialogRenderEngine(
     }
 
     private companion object {
-        // Ported from BrandDesignUpdateWelcomePage.kt: DIALOG_TRANSITION_DURATION (:3078) / DIALOG_CONTENT_FADE_IN_DURATION (:3070).
+        // Ported from BrandDesignUpdateWelcomePage.kt: DIALOG_TRANSITION_DURATION (:3078) / DIALOG_CONTENT_FADE_IN_DURATION (:3070) /
+        // DIALOG_FADE_IN_DURATION (:3069) + fadeInDialog's 200ms start delay (:2684).
         const val CARD_MORPH_DURATION_MS = 400L
         const val DIALOG_CONTENT_FADE_DURATION_MS = 200L
+        const val CARD_FADE_IN_DURATION_MS = 400L
+        const val CARD_FADE_IN_START_DELAY_MS = 200L
     }
 }
