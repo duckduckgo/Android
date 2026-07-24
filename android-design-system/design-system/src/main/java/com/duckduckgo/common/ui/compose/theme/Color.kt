@@ -109,6 +109,8 @@ data class DuckDuckGoSystemColors(
     val sliderTrackInactive: Color,
     val textInputEnabledOutline: Color,
     val touchFeedback: Color,
+    val progressSpinnerTrack: Color,
+    val progressSpinnerIndicator: Color,
 )
 
 @Immutable
@@ -124,6 +126,7 @@ val LocalDuckDuckGoColors = staticCompositionLocalOf<DuckDuckGoColors> {
 //region Black color variants
 val Black84 = Color(0xD6000000)
 val Black60 = Color(0x99000000)
+val Black54 = Color(0x8A000000)
 val Black50 = Color(0x80000000)
 val Black48 = Color(0x7A000000)
 val Black40 = Color(0x66000000)
@@ -142,6 +145,7 @@ val Black = Color(0xFF000000)
 val White84 = Color(0xD6FFFFFF)
 val White78 = Color(0xC7FFFFFF)
 val White60 = Color(0x99FFFFFF)
+val White54 = Color(0x8AFFFFFF)
 val White48 = Color(0x7AFFFFFF)
 val White40 = Color(0x66FFFFFF)
 val White36 = Color(0x5CFFFFFF)
