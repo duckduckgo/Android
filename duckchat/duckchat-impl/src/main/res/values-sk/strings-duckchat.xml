@@ -265,4 +265,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Nastavenia Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Opýtaj sa na kartu</string>
+    <string name="duckChatContextualAskAboutPage">Opýtaj sa na stránku</string>
 </resources>
