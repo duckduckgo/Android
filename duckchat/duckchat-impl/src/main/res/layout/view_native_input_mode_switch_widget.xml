@@ -108,9 +108,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingStart="@dimen/keyline_0"
+                    android:paddingStart="@dimen/nativeInputDuckAiCardContentPaddingHorizontal"
                     android:paddingTop="@dimen/keyline_empty"
-                    android:paddingEnd="@dimen/keyline_empty"
+                    android:paddingEnd="@dimen/nativeInputDuckAiCardContentPaddingHorizontal"
                     android:paddingBottom="@dimen/keyline_empty">
 
                     <EditText
@@ -189,6 +189,8 @@
                     android:layout_marginTop="8dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
+                    android:paddingStart="@dimen/nativeInputDuckAiBottomRowPaddingHorizontal"
+                    android:paddingEnd="@dimen/nativeInputDuckAiBottomRowPaddingHorizontal"
                     android:visibility="gone"
                     tools:visibility="visible">
 
@@ -210,6 +212,7 @@
                             android:id="@id/optionsButtonContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/nativeInputDuckAiControlSpacing"
                             android:visibility="gone"
                             tools:visibility="visible" />
 
@@ -235,7 +238,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="@dimen/keyline_1"
+                            android:layout_marginStart="@dimen/nativeInputDuckAiModelPickerSpacing"
                             android:visibility="gone"
                             tools:visibility="visible" />
 
