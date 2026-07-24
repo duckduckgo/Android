@@ -235,13 +235,21 @@ class DialogRenderEngine(
             handle.title?.snap()
             handle.fadeTargets.forEach { it.alpha = 1f }
             ctaViews(config).forEach { it.alpha = 1f }
-            // Snap path: apply (not suppress) every entrance animator's final state. end() on a never-started
-            // ValueAnimator fires onAnimationStart synchronously before jumping to end values; for the
-            // engine-owned trigger animators binders declare (AVD/check-icon finals, the input-screen Lottie
-            // loop trigger) that IS the desired settled state - legacy's own snap path also leaves the
-            // input-screen Lottie loop playing (BrandDesignUpdateWelcomePage.kt:2130-2131). cancel() would
-            // SUPPRESS the trigger instead (that's what release() wants) which would be wrong here.
-            (entrance.afterTitleAnimators + entrance.afterFadeAnimators).forEach { it().end() }
+            // Snap path: apply (not suppress) every entrance animator's final state. start() fires the
+            // onAnimationStart triggers binders rely on (AVD/check-icon finals, the input-screen Lottie loop
+            // trigger) - the desired settled state; legacy's own snap path also leaves the input-screen Lottie
+            // loop playing (BrandDesignUpdateWelcomePage.kt:2130-2131) - and end() then jumps straight to the
+            // end values. start() must come first: unlike ValueAnimator (whose end() self-starts), an
+            // AnimatorSet's end() is a NO-OP while the set is unstarted, so a bare end() would leave any
+            // set-based entrance (the preview suggestions stagger, check-icon stagger) stuck at its factory's
+            // alpha-0 initial state. cancel() would SUPPRESS the triggers instead (that's what release()
+            // wants), which would be wrong here.
+            (entrance.afterTitleAnimators + entrance.afterFadeAnimators).forEach { factory ->
+                factory().apply {
+                    start()
+                    end()
+                }
+            }
             // Nothing async between here and bind time on this branch, so no generation race to guard against -
             // arm directly, matching the animate path's end state.
             attachCtaListeners(config, handle)
