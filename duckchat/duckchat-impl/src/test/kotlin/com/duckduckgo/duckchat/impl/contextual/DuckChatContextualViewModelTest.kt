@@ -1144,6 +1144,76 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when voice search result received in input state then search opens in a new tab`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "cats", isDuckAiResult = false)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenSearchInNewTab)
+            assertEquals("cats", (command as DuckChatContextualViewModel.Command.OpenSearchInNewTab).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice search result received while chat is running then search still opens in a new tab`() = runTest {
+        val testee = buildViewModel()
+        testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "cats", isDuckAiResult = false)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenSearchInNewTab)
+            assertEquals("cats", (command as DuckChatContextualViewModel.Command.OpenSearchInNewTab).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice duck ai result received in input state then duck ai opens with prompt`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "why is the sky blue", isDuckAiResult = true)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt)
+            assertEquals("why is the sky blue", (command as DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice duck ai result received while chat is running then it is submitted to the current chat`() = runTest {
+        val testee = buildViewModel()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+            awaitItem() // consume the initial prompt event
+
+            testee.onVoiceRecognitionSuccess(query = "follow up question", isDuckAiResult = true)
+
+            val event = awaitItem()
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertEquals("follow up question", event.params.getJSONObject("query").getString("prompt"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice result is blank then no action is taken`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "   ", isDuckAiResult = true)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when replace prompt with previous input then prompt is appended`() =
         runTest {
             testee.viewState.test {
