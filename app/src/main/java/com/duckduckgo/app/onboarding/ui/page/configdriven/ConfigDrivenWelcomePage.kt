@@ -274,10 +274,11 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
      * the deferred outro one — never merely scheduled, so the one-shot `animateEntry` flip can't outrun the render
      * it's meant to describe.
      *
-     * Note: since a config change always creates a fresh engine (`previous == null`), [DialogRenderEngine.render]'s
-     * own "empty stage always animates" policy means a rotation's first render animates its entrance regardless of
-     * `animateEntry` — a known, spec-documented tension the engine itself flags, not something resolved here (see
-     * `task-9-report.md`).
+     * Note: [DialogRenderEngine.render] obeys `animateEntry` verbatim (no empty-stage animate policy of its
+     * own), so a rotation snaps: the VM survives it with `animateEntry` already false for the showing step,
+     * while every activity entry builds a fresh VM whose first publish of a step carries `animateEntry = true`
+     * — which is exactly the spec's "an empty stage always animates its entrance", expressed as the VM's
+     * decision (POC results gap 4, resolved).
      */
     private fun renderConfig(state: ConfigDrivenOnboardingPageViewModel.ViewState) {
         if (outroInFlight) return // the in-flight outro's own continuation (below) will render the freshest config when it completes.

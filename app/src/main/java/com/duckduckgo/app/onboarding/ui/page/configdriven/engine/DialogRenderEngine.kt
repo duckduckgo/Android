@@ -115,13 +115,13 @@ class DialogRenderEngine(
     private var skipping = false
 
     /**
-     * Renders [config], animated if [animate] is true. Empty stage (no [previous] config — first bind, e.g.
-     * after returning from a full-screen detour) always animates its entrance regardless of [animate]: that
-     * is this engine's policy exactly as specified, not something this task invents. In particular, on
-     * configuration change a *new* fragment/engine instance is created (so `previous == null` here) even
-     * though the VM may report `animate = false` for a rotation snap — reconciling that (e.g. having the
-     * fragment/VM layer restore [previous] before the first [render] call after rotation) is a later task's
-     * responsibility, not this engine's.
+     * Renders [config], animated if [animate] is true — the engine obeys [animate] verbatim and has no
+     * animate policy of its own. The spec's "an empty stage always animates its entrance" rule is the VM's to
+     * express through [animate]: a fresh VM (every activity entry — first show, return from a full-screen
+     * detour) publishes each step's first render with `animateEntry = true`, while a rotation keeps the VM
+     * whose `animateEntry` already flipped false for the showing step, so the recreated fragment/engine snaps.
+     * (An earlier revision forced `previous == null` to animate here, which made rotation replay the whole
+     * entrance — POC results gap 4, resolved as proposed there by making it the VM's decision.)
      *
      * Re-emission of the same [config] while already bound is a no-op — the orchestrator can re-emit its
      * current state (e.g. on a VM restart) without this engine replaying an entrance every time.
@@ -132,7 +132,6 @@ class DialogRenderEngine(
         generation++ // supersedes any prior render's still in-flight morph continuation - see [generation].
 
         val emptyStage = previous == null
-        val animateNow = animate || emptyStage
 
         skipRunningAnimations() // never let a new render race a still-settling previous one
         unbindCurrent()
@@ -142,8 +141,8 @@ class DialogRenderEngine(
         if (emptyStage) contentBinder.hideAll()
 
         // Per-axis diffs only: each controller sees just its own previous -> next value, never the screens.
-        background.apply(previous?.background, config.background, animateNow)
-        stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animateNow)
+        background.apply(previous?.background, config.background, animate)
+        stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animate)
 
         val scope = createBindScope()
         bindScope = scope
@@ -155,11 +154,11 @@ class DialogRenderEngine(
 
         val entrance = EntranceCollector().also { collector -> handle.entrance?.invoke(collector) }
 
-        embellishments.transition(previous?.embellishment, config.embellishment, animateNow) { settled ->
+        embellishments.transition(previous?.embellishment, config.embellishment, animate) { settled ->
             cardAnchor.apply(settled, isTablet, showArrow = showArrowFor(config.content))
         }
 
-        if (animateNow) {
+        if (animate) {
             handle.fadeTargets.forEach { it.alpha = 0f }
             ctaViews(config).forEach { it.alpha = 0f }
             // Captured so the reveal/fade onEnd continuations below (fired async, possibly well after this
