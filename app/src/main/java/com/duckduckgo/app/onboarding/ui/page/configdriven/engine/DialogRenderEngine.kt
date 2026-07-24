@@ -20,10 +20,12 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionListenerAdapter
@@ -41,6 +43,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DialogConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.EntranceScope
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.toPx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -154,8 +157,14 @@ class DialogRenderEngine(
 
         val entrance = EntranceCollector().also { collector -> handle.entrance?.invoke(collector) }
 
+        // Screen data, applied synchronously: legacy swaps the arrow at the same moment it begins the card's
+        // bounds transition (:1535-1537). Riding the embellishment settle below instead would delay it behind
+        // a previous decoration's whole exit animation (input -> input-preview hides the arrow seconds late).
+        binding.daxDialogCta.cardView.setShowArrow(showArrowFor(config.content))
+        applyArrowPosition(config, animate)
+
         embellishments.transition(previous?.embellishment, config.embellishment, animate) { settled ->
-            cardAnchor.apply(settled, isTablet, showArrow = showArrowFor(config.content))
+            cardAnchor.apply(settled, isTablet)
         }
 
         if (animate) {
@@ -297,6 +306,36 @@ class DialogRenderEngine(
     // Only screen-specific branch in this engine: legacy hides the card's bubble arrow for input-screen-preview
     // alone (BrandDesignUpdateWelcomePage.kt:1537/:2230). Documented POC gap carried over from Task 6.
     private fun showArrowFor(content: ContentConfig): Boolean = content !is ContentConfig.InputScreenPreview
+
+    // Same documented-exception status as [showArrowFor]: legacy leaves the arrow at its XML start offset only
+    // on the welcome dialog and parks it ARROW_TARGET_OFFSET_END_DP from the card's end edge on every later
+    // screen (:1128/:1781 et al., snap and animated branches alike).
+    private fun arrowAtEndFor(content: ContentConfig): Boolean = content !is ContentConfig.Welcome
+
+    /**
+     * Horizontal arrow position, diff-driven like every other axis: legacy slides the arrow start -> end
+     * across the one transition where it actually moves (welcome -> next: :1043-1051 quick setup,
+     * :1668-1675 comparison chart; 400ms FastOutSlowIn, parallel with the card morph) and snaps the fraction
+     * everywhere else, including all showDialogWithoutAnimation branches. The slide animator is tracked in
+     * [runningAnimators], so tap-to-skip end()s it to its final fraction like any engine-owned animator.
+     */
+    private fun applyArrowPosition(config: DialogConfig, animate: Boolean) {
+        val cardView = binding.daxDialogCta.cardView
+        cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+        val atEnd = arrowAtEndFor(config.content)
+        val slideAcross = animate && !skipping && atEnd && previous?.let { arrowAtEndFor(it.content) } == false
+        if (slideAcross) {
+            val slide = ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = CARD_MORPH_DURATION_MS
+                interpolator = FastOutSlowInInterpolator()
+                addUpdateListener { cardView.setArrowAnimationFraction(it.animatedValue as Float) }
+            }
+            runningAnimators += slide
+            slide.start()
+        } else {
+            cardView.setArrowAnimationFraction(if (atEnd) 1f else 0f)
+        }
+    }
 
     /**
      * Finding 2 fix, step 1 of 2: text/visibility only, at bind time. Deliberately leaves both CTA views
@@ -481,10 +520,11 @@ class DialogRenderEngine(
 
     private companion object {
         // Ported from BrandDesignUpdateWelcomePage.kt: DIALOG_TRANSITION_DURATION (:3078) / DIALOG_CONTENT_FADE_IN_DURATION (:3070) /
-        // DIALOG_FADE_IN_DURATION (:3069) + fadeInDialog's 200ms start delay (:2684).
+        // DIALOG_FADE_IN_DURATION (:3069) + fadeInDialog's 200ms start delay (:2684) / ARROW_TARGET_OFFSET_END_DP (:3084).
         const val CARD_MORPH_DURATION_MS = 400L
         const val DIALOG_CONTENT_FADE_DURATION_MS = 200L
         const val CARD_FADE_IN_DURATION_MS = 400L
         const val CARD_FADE_IN_START_DELAY_MS = 200L
+        const val ARROW_TARGET_OFFSET_END_DP = 80
     }
 }

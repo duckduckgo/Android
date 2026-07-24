@@ -42,10 +42,13 @@ class CardAnchorController(private val binding: ContentOnboardingWelcomePageUpda
      * @param settled The decoration the embellishment axis settled on, or null (no decoration /
      *   vetoed by fit). Card anchors above [SettledDecoration.view] when non-null and either
      *   [isTablet] or [SettledDecoration.anchorsCardOnPhone] is true; otherwise pins to parent bottom.
-     * @param showArrow Whether the card shows its bubble tail at all (legacy hides it only for the
-     *   input-screen-preview dialog via `cardView.setShowArrow(false)`, :1537/:2230).
+     *
+     * Arrow *visibility* (`setShowArrow`) is deliberately not handled here: it is screen data the
+     * engine applies synchronously at render time — this method fires from the embellishment axis's
+     * settle, which waits out a previous decoration's exit, far too late for the arrow swap legacy
+     * performs at the same moment it begins the card's bounds transition (:1535-1537).
      */
-    fun apply(settled: SettledDecoration?, isTablet: Boolean, showArrow: Boolean) {
+    fun apply(settled: SettledDecoration?, isTablet: Boolean) {
         val card = binding.daxDialogCta.root
 
         card.updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -61,6 +64,5 @@ class CardAnchorController(private val binding: ContentOnboardingWelcomePageUpda
         }
 
         binding.daxDialogCta.cardView.setArrowDepthFraction(if (settled != null) 1f else 0f)
-        binding.daxDialogCta.cardView.setShowArrow(showArrow)
     }
 }
