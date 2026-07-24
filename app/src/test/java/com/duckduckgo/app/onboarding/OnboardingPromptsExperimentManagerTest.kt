@@ -108,33 +108,47 @@ class OnboardingPromptsExperimentManagerTest {
     }
 
     @Test
-    fun whenEnrolledInTreatmentWidgetOnlyThenIsEnrolledInWidgetOnlyReturnsTrue() = runTest {
+    fun whenEnrolledInTreatmentWidgetOnlyThenIsEnrolledInWidgetPromptCohortReturnsTrue() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertTrue(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInTreatmentDockAndWidgetThenIsEnrolledInWidgetPromptCohortReturnsTrue() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertTrue(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInTreatmentDockOnlyThenIsEnrolledInWidgetPromptCohortReturnsFalse() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenEnrolledInControlThenIsEnrolledInWidgetPromptCohortReturnsFalse() = runTest {
+        givenCohortEnabled(OnboardingPromptsCohorts.CONTROL)
+        testee.onPrivacyConfigPersisted()
+        testee.enroll()
+
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+    }
+
+    @Test
+    fun whenNeverEnrolledThenIsEnrolledInWidgetPromptCohortReturnsFalseWithoutEnrolling() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
 
-        testee.onPrivacyConfigPersisted()
-
-        assertTrue(testee.isEnrolledInWidgetOnly())
-        assertFalse(testee.isEnrolledInDockAndWidget())
-    }
-
-    @Test
-    fun whenEnrolledInTreatmentDockAndWidgetThenIsEnrolledInDockAndWidgetReturnsTrue() = runTest {
-        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
-
-        testee.onPrivacyConfigPersisted()
-
-        assertTrue(testee.isEnrolledInDockAndWidget())
-        assertFalse(testee.isEnrolledInWidgetOnly())
-    }
-
-    @Test
-    fun whenEnrolledInTreatmentDockOnlyThenIsEnrolledInWidgetOnlyAndDockAndWidgetReturnFalse() = runTest {
-        givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY)
-
-        testee.onPrivacyConfigPersisted()
-
-        assertFalse(testee.isEnrolledInWidgetOnly())
-        assertFalse(testee.isEnrolledInDockAndWidget())
+        assertFalse(testee.isEnrolledInWidgetPromptCohort())
+        assertNull(toggles.addToDockAndWidgetExperimentJul25().getCohort())
     }
 
     private fun givenCohortEnabled(winner: OnboardingPromptsCohorts?) {
