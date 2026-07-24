@@ -166,7 +166,6 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
             },
             duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
             onboardingPixelSender = mock(),
-            onboardingPromptsExperimentManager = mock(),
             contextualCtaSuppressorPlugins = mock(),
         )
     }

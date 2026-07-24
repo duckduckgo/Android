@@ -1125,9 +1125,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     titleView.text = ""
                     titleView.alpha = 1f
 
-                    binding.daxDialogCta.cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
-                    binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
-                    binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
 
                     backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddToDock)
 
@@ -1866,9 +1864,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.addToDockContent.addToDockBody.alpha = 1f
                 binding.daxDialogCta.addToDockContent.addToDockMedia.alpha = 1f
 
-                binding.daxDialogCta.cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
-                binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
-                binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
+                binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
 
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddToDockPrimaryCta)
                 binding.daxDialogCta.primaryCta.alpha = 1f
