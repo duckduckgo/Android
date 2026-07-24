@@ -1,6 +1,6 @@
 ---
-name: prepare-sbt-repro
-description: Build, install, launch, screenshot, and cleanup mechanics for SBT live-site reproduction on Cursor self-hosted Android agents in `ddg-native-android`. Use when setting up a device for SBT repro runs.
+name: prepare-site-breakage-triage-repro-build
+description: Build, install, launch, screenshot, and cleanup mechanics for automated reproduction of site breakage on Cursor self-hosted Android agents in `ddg-native-android`. Use when setting up a device for automated site breakage triage repro runs.
 disable-model-invocation: true
 ---
 
