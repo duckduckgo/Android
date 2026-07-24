@@ -43,8 +43,9 @@ internal fun mintDdgWrappedProtectedKey(
     syncJweCrypto: SyncJweCrypto,
     nativeLib: SyncLib,
     errorPrefix: String,
+    keySizeBits: Int,
 ): Result<MintedProtectedKey> {
-    val rsa = runCatching { syncJweCrypto.generateRsaKeyPair() }
+    val rsa = runCatching { syncJweCrypto.generateRsaKeyPair(keySizeBits) }
         .getOrElse { return it.asLoggedError("$errorPrefix: failed to generate RSA keypair") }
     val (n, e) = runCatching { syncJweCrypto.extractJwkComponents(rsa.publicKeyBase64) }
         .getOrElse { return it.asLoggedError("$errorPrefix: failed to extract JWK components") }
