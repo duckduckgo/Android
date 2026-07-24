@@ -24,12 +24,16 @@ import android.os.Build
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.widget.AppWidgetManagerAddWidgetLauncher.Companion.ACTION_ADD_WIDGET
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -39,6 +43,8 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class WidgetAddedReceiver @Inject constructor(
     private val context: Context,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     companion object {
@@ -61,6 +67,11 @@ class WidgetAddedReceiver @Inject constructor(
         context: Context?,
         intent: Intent?,
     ) {
+        val source = AddWidgetSource.fromName(intent?.getStringExtra(AppWidgetManagerAddWidgetLauncher.EXTRA_WIDGET_ADD_SOURCE))
+        if (source == AddWidgetSource.ONBOARDING || source == AddWidgetSource.HOME_SCREEN_PROMPT) {
+            appCoroutineScope.launch { onboardingPromptsExperimentMetrics.fireWidgetAddedMetric() }
+        }
+
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {
                 val title = intent?.getStringExtra(AppWidgetManagerAddWidgetLauncher.EXTRA_WIDGET_ADDED_LABEL) ?: ""
