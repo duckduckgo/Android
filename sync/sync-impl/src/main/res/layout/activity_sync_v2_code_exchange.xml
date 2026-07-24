@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:orientation="horizontal">
+
+        <com.duckduckgo.common.ui.view.button.IconButton
+            android:id="@+id/closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:contentDescription="@string/closeButtonContentDescription"
+            android:padding="@dimen/keyline_4"
+            app:srcCompat="@drawable/ic_close_24" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.duckduckgo.common.ui.view.button.IconButton
+            android:id="@+id/showQrCodeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:contentDescription="@string/sync_scanner_v2_show_qr_code_content_description"
+            android:padding="@dimen/keyline_4"
+            app:srcCompat="@drawable/ic_qr_24" />
+
+    </LinearLayout>
+
+    <com.duckduckgo.sync.impl.ui.v2.HeightWrappingTabLayout
+        android:id="@+id/tabContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/background_code_exchange_tab_layout"
+        app:tabGravity="center"
+        app:tabIndicator="@drawable/background_code_exchange_tab_indicator"
+        app:tabIndicatorAnimationMode="linear"
+        app:tabIndicatorColor="?attr/daxColorControlRaisedFillPrimary"
+        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorGravity="stretch"
+        app:tabMode="fixed"
+        app:tabPaddingBottom="10dp"
+        app:tabPaddingEnd="@dimen/keyline_4"
+        app:tabPaddingStart="@dimen/keyline_4"
+        app:tabPaddingTop="10dp"
+        app:tabRippleColor="@null"
+        app:tabSelectedTextColor="?attr/daxColorPrimaryText"
+        app:tabTextAppearance="@style/Typography.DuckDuckGo.Body1"
+        app:tabTextColor="?attr/daxColorPrimaryText" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/contentPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_weight="1" />
+
+</LinearLayout>

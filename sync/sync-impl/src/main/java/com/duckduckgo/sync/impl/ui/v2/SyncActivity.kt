@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui.v2
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -225,6 +226,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
         configureToolbar()
         configureSyncThisDeviceCta()
+        configureSyncWithAnotherDeviceCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
         configureWarningMessages()
@@ -418,7 +420,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is SyncWithAnotherDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    startActivity(Intent(this, CodeExchangeActivity::class.java))
+                }
             }
         }
     }
@@ -437,6 +441,15 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureSyncThisDeviceCta() {
         binding.includeDisabledView.syncThisDeviceToggle.setOnCheckedChangeListener(syncThisDeviceListener)
+    }
+
+    private fun configureSyncWithAnotherDeviceCta() {
+        binding.includeDisabledView.syncWithAnotherDeviceButton.setOnClickListener {
+            viewModel.onSyncWithAnotherDevice()
+        }
+        binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
+            viewModel.onSyncWithAnotherDevice()
+        }
     }
 
     private fun configureDevicesRecyclerView() {
