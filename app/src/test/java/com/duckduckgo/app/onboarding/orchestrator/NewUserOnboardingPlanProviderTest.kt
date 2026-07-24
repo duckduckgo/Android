@@ -933,13 +933,27 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun whenControlThenNoNewPagesInPlan() = runTest {
         val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     @Test
+    fun whenDockOnlyThenOnlyAddToDockInsertedAfterDefaultBrowser() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY)
+        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK),
+        )
+    }
+
+    @Test
     fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
         val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
         assertEquals(
@@ -961,9 +975,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenBothThenDockThenWidgetPromptThenAddWidget() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET)
+        val dock = ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK)
+        val prompt = ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT)
+        val add = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET)
+        assertTrue(dock < prompt && prompt < add)
+        assertEquals(ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1, dock)
+    }
+
+    @Test
     fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
     }
 
@@ -993,7 +1018,9 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun stepIndicatorTotalsMatchCohort() = runTest {
         val control = indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY))
         assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY))
+        assertEquals(control + 2, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET))
     }
 
     // endregion
