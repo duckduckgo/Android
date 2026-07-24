@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Izbriši zavihke in podatke</string>
-    <string name="fireClearAllPlusDuckChats">Počisti zavihke, podatke in klepete Duck.ai</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Gumb Fire Button</string>
     <string name="dataClearingActivityTitle">Počiščenje podatkov</string>
     <string name="dataClearingDescription">Brisanje podatkov lahko pomaga zaščititi vašo zasebnost na spletu. Uporabite gumb Fire Button za ročno brisanje podatkov ali nastavite samodejno brisanje.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Izbrišite vse klepete, vključno s pripetimi klepeti</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Izberite, kaj želite izbrisati</string>
     <string name="dataClearingOptionTabs">Zavihki</string>
     <string name="dataClearingOptionData">Piškotki in podatki spletnega mesta</string>
     <string name="dataClearingDuckAiChats">Klepeti Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši vse klepete</string>
-    <string name="fireDialogDeleteButton">Izbriši</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zapri zavihek</item>
-        <item quantity="two">Zapri %1$d zavihka</item>
-        <item quantity="few">Zapri vse %1$d zavihke</item>
-        <item quantity="other">Zapri vseh %1$d zavihkov</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Morda boste odjavljeni iz računov.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Brez</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Izbriši iz 1 strani. Morda boste odjavljeni iz računov.</item>
-        <item quantity="two">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
-        <item quantity="few">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
-        <item quantity="other">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Želiš izbrisati zavihke in podatke spletnega mesta?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
-
-    <string name="settingsAutomaticallyClearData">Samodejno počisti podatke…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
     <string name="settingsClearAiDataTitle">Izbriši klepete Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Duck.ai, vključno s pripetimi klepeti.</string>
-    <string name="settingsClearDataActionSecondaryText">Počisti vse zavihke in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Počisti vse zavihke, klepete Duck.ai in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">O nas</string>

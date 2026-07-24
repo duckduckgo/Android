@@ -40,7 +40,6 @@ import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
-import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
@@ -62,7 +61,6 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScree
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
@@ -544,7 +542,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
-            is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchDataClearingSettingsScreen -> launchScreen(DataClearingSettingsScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)

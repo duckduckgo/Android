@@ -124,7 +124,6 @@
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
     <string name="fireClearAll">Dzēst cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Dzēst cilnes, datus un Duck.ai tērzēšanas sarunas</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -227,7 +226,6 @@
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datu notīrīšana</string>
     <string name="dataClearingDescription">Tavu datu dzēšana var palīdzēt aizsargāt tavu privātumu tiešsaistē. Izmanto Fire Button, lai manuāli dzēstu datus vai iestatītu automātisku dzēšanu.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -245,24 +243,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Dzēs visas tērzēšanas sarunas, ieskaitot piespraustās tērzēšanas</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Izvēlies, ko dzēst</string>
     <string name="dataClearingOptionTabs">Cilnes</string>
     <string name="dataClearingOptionData">Sīkfaili un vietnes dati</string>
     <string name="dataClearingDuckAiChats">Duck.ai tērzēšanas</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Dzēst visas tērzēšanas sarunas</string>
-    <string name="fireDialogDeleteButton">Dzēst</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="zero">Aizvērt visas %1$d cilnes</item>
-        <item quantity="one">Aizvērt cilni</item>
-        <item quantity="other">Aizvērt visas %1$d cilnes</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Var izrakstīt tevi no kontiem.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Nav</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="zero">Dzēst no %1$d vietnēm. Var izrakstīt tevi no kontiem.</item>
-        <item quantity="one">Dzēst no 1 vietnes. Var izrakstīt tevi no kontiem.</item>
-        <item quantity="other">Dzēst no %1$d vietnēm. Var izrakstīt tevi no kontiem.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Vai dzēst cilnes un vietņu datus?</string>
@@ -291,8 +274,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
-
-    <string name="settingsAutomaticallyClearData">Automātiski notīrīt datus…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
@@ -309,9 +290,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
     <string name="settingsClearAiDataTitle">Dzēst Duck.ai tērzēšanas sarunas</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
-    <string name="settingsClearDataActionSecondaryText">Notīra visas cilnes un datus par visām vietnēm, kuras neesi iestatījis Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Notīra visas cilnes, Duck.ai tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Par</string>

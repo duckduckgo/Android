@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
     <string name="fireClearAll">Supprimer les onglets et les données</string>
-    <string name="fireClearAllPlusDuckChats">Supprimer les onglets, les données et les chats Duck.ai</string>
     <string name="fireCancel">Annuler</string>
     <string name="fireDataCleared">Données effacées</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Effacement des données</string>
     <string name="dataClearingDescription">Supprimer vos données peut contribuer à protéger la confidentialité en ligne. Utilisez le Fire Button pour supprimer manuellement les données, ou configurez une suppression automatique.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Supprimer toutes les discussions, y compris les discussions épinglées</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Choisir le contenu à supprimer</string>
     <string name="dataClearingOptionTabs">Onglets</string>
     <string name="dataClearingOptionData">Cookies et données du site</string>
     <string name="dataClearingDuckAiChats">Chats Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Supprimer toutes les discussions</string>
-    <string name="fireDialogDeleteButton">Supprimer</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Fermer l\'onglet</item>
-        <item quantity="other">Fermer les %1$d onglets</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Peut vous déconnecter des comptes.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Aucune</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Supprimer d\'un site. Peut vous déconnecter des comptes.</item>
-        <item quantity="other">Supprimer de %1$d sites. Peut vous déconnecter des comptes.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Supprimer les onglets et les données du site ?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
-
-    <string name="settingsAutomaticallyClearData">Effacer automatiquement les données…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Effacer automatiquement…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Aucune</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Onglets</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Quitter l\'application, inactivité pendant 1 heure</string>
     <string name="settingsClearAiDataTitle">Supprimer les chats Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Le Fire Button supprimera également l\'historique de Duck.ai, y compris les discussions épinglées.</string>
-    <string name="settingsClearDataActionSecondaryText">Efface tous les onglets et toutes les données des sites que vous n\'avez pas protégés par Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Efface tous les onglets, les chats Duck.ai et les données des sites que vous n\'avez pas protégés par Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de DuckDuckGo</string>
     <string name="aboutActivityTitleNew">À propos</string>

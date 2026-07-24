@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
     <string name="fireClearAll">Tabbladen en gegevens verwijderen</string>
-    <string name="fireClearAllPlusDuckChats">Tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Gegevens wissen</string>
     <string name="dataClearingDescription">Het verwijderen van je gegevens kan helpen om je privacy online te beschermen. Gebruik de Fire Button om gegevens handmatig te verwijderen of stel in dat gegevens automatisch worden verwijderd.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Alle chats verwijderen, inclusief vastgezette chats</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Kies wat je wilt verwijderen</string>
     <string name="dataClearingOptionTabs">Tabbladen</string>
     <string name="dataClearingOptionData">Cookies en sitegegevens</string>
     <string name="dataClearingDuckAiChats">Duck.ai chats</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Alle chats verwijderen</string>
-    <string name="fireDialogDeleteButton">Verwijderen</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">%1$d tabblad sluiten</item>
-        <item quantity="other">Alle %1$d tabbladen sluiten</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Mogelijk word je uitgelegd bij accounts.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Geen</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Verwijder van 1 website. Je kan worden uitgelogd bij accounts.</item>
-        <item quantity="other">Verwijder van %1$d websites. Je kan worden uitgelogd bij accounts.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Tabbladen en sitegegevens verwijderen?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
-
-    <string name="settingsAutomaticallyClearData">Gegevens automatisch wissen...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
     <string name="settingsClearAiDataTitle">Duck.ai-chats verwijderen</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
-    <string name="settingsClearDataActionSecondaryText">Wist alle tabbladen en gegevens van sites die je niet Fireproof hebt gemaakt.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Sluit alle tabbladen, Duck.ai-chats en wist gegevens van sites die je niet Fireproof hebt gemaakt.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Over</string>

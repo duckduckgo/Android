@@ -627,11 +627,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
-            precondition = {
-                withContext(dispatchers.io()) {
-                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-                }
-            },
             showsStepIndicator = true,
             resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
             transition = { event ->
@@ -656,11 +651,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserBrowserActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
             pixelName = pixelName,
-            precondition = {
-                withContext(dispatchers.io()) {
-                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-                }
-            },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
             transition = { event ->
                 when {

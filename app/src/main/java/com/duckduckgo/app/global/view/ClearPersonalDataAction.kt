@@ -58,22 +58,6 @@ sealed class ClearDataResult {
 
 interface ClearDataAction {
     /**
-     * Clears tabs and all browser data (legacy full clear).
-     * @param appInForeground whether the app is in foreground
-     * @param shouldFireDataClearPixel whether to fire the data clear pixel
-     */
-    suspend fun clearTabsAndAllDataAsync(
-        appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean,
-    ): Unit?
-
-    /**
-     * Clears tabs and associated data.
-     * @param appInForeground whether the app is in foreground
-     */
-    suspend fun clearTabsAsync(appInForeground: Boolean)
-
-    /**
      * Clears tabs and associated data.
      */
     suspend fun clearTabsOnly()
@@ -149,39 +133,6 @@ class ClearPersonalDataAction(
     override fun killProcess() {
         logcat(INFO) { "Killing process" }
         System.exit(0)
-    }
-
-    override suspend fun clearTabsAndAllDataAsync(
-        appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean,
-    ) {
-        withContext(dispatchers.io()) {
-            clearFireproofExemptData()
-
-            // https://app.asana.com/0/69071770703008/1204375817149200/f
-            if (!deviceSyncState.isUserSignedInOnDevice()) {
-                savedSitesRepository.pruneDeleted()
-            }
-
-            clearTabsAsync(appInForeground)
-
-            webTrackersBlockedRepository.deleteAll()
-
-            navigationHistory.clearHistory()
-            tabVisitedSitesRepository.clearAll()
-        }
-
-        clearDataAsync(shouldFireDataClearPixel)
-
-        logcat(INFO) { "Finished clearing everything" }
-    }
-
-    override suspend fun clearTabsAsync(appInForeground: Boolean) {
-        withContext(dispatchers.io()) {
-            tabRepository.deleteAll()
-            setAppUsedSinceLastClearFlag(appInForeground)
-            logcat { "Finished clearing tabs" }
-        }
     }
 
     override suspend fun clearTabsOnly() {
@@ -274,20 +225,6 @@ class ClearPersonalDataAction(
         sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
         sitePreferencesDataClearer.clearAllButFireproofed(fireproofEntities.map { it.domain }.toSet())
         thirdPartyCookieManager.clearAllData()
-    }
-
-    private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
-        withContext(dispatchers.main()) {
-            if (shouldFireDataClearPixel) {
-                // this is only called in Regular mode
-                clearingStore.incrementCount(BrowserMode.REGULAR)
-            }
-
-            dataManager.clearData(createWebView(), createWebStorage())
-            appCacheClearer.clearCache()
-
-            logcat(INFO) { "Finished clearing data" }
-        }
     }
 
     private suspend fun clearDataGranularlyAsync(shouldFireDataClearPixel: Boolean) {

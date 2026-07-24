@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
     <string name="fireClearAll">Ištrinti korteles ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Trinti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
     <string name="dataClearingActivityTitle">Duomenų valymas</string>
     <string name="dataClearingDescription">Jei ištrinsi duomenis gali apsaugoti savo privatumą internete. Naudok „Fire“ mygtuką, jei nori ištrinti duomenis rankiniu būdu, arba nustatyk, kad jie būtų trinami automatiškai.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Ištrinti visus pokalbius, įskaitant prisegtus</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Pasirinkite, ką ištrinti</string>
     <string name="dataClearingOptionTabs">Kortelės</string>
     <string name="dataClearingOptionData">Slapukai ir svetainės duomenys</string>
     <string name="dataClearingDuckAiChats">„Duck.ai“ pokalbiai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Ištrinti visus pokalbius</string>
-    <string name="fireDialogDeleteButton">Trinti</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Uždaryti skirtuką</item>
-        <item quantity="few">Uždaryti visus %1$d skirtukus</item>
-        <item quantity="many">Uždaryti visus %1$d skirtukus</item>
-        <item quantity="other">Uždaryti visus %1$d skirtukų</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Gali jus atjungti nuo paskyrų.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Jokie</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Ištrinti iš 1 svetainės. Gali jus atjungti nuo paskyrų.</item>
-        <item quantity="few">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
-        <item quantity="many">Ištrinti iš %1$d svetainės. Gali jus atjungti nuo paskyrų.</item>
-        <item quantity="other">Ištrinti iš %1$d svetainių. Gali jus atjungti nuo paskyrų.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Ištrinti skirtukus ir svetainės duomenis?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
-
-    <string name="settingsAutomaticallyClearData">Automatiškai išvalyti duomenis…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
     <string name="settingsClearAiDataTitle">Ištrinti „Duck.ai“ pokalbius</string>
     <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
-    <string name="settingsClearDataActionSecondaryText">Išvalo visus skirtukus ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Išvalo visus skirtukus, „Duck.ai“ pokalbius ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
     <string name="aboutActivityTitleNew">Apie</string>

@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
     <string name="fireClearAll">Sekmeleri ve Verileri Sil</string>
-    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Sil</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Veri Temizleme</string>
     <string name="dataClearingDescription">Kişisel verilerinizi silmek, çevrimiçi gizliliğinizi korumanıza yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullanın veya otomatik silmeyi ayarlayın.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Sabitlenmiş sohbetler dahil tüm sohbetleri siler</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Nelerin Silineceğini Seçin</string>
     <string name="dataClearingOptionTabs">Sekmeler</string>
     <string name="dataClearingOptionData">Çerezler ve Site Verileri</string>
     <string name="dataClearingDuckAiChats">Duck.ai Sohbetleri</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Tüm sohbetleri sil</string>
-    <string name="fireDialogDeleteButton">Sil</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sekmeyi Kapat</item>
-        <item quantity="other">%1$d Sekmenin Tümünü Kapat</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Hesaplarınızdan çıkış yapılabilir.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Yok</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">1 siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
-        <item quantity="other">%1$d siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Sekmeleri ve site verilerini silmek mi istiyorsunuz?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
-
-    <string name="settingsAutomaticallyClearData">Verileri Otomatik Olarak Temizle…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
     <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Sil</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
-    <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
     <string name="aboutActivityTitleNew">Hakkında</string>

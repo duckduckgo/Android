@@ -39,7 +39,6 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -73,7 +72,6 @@ class DuckChatContextualViewModel @Inject constructor(
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
-    private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
     private val chatHistoryRepository: ChatHistoryRepository,
@@ -184,10 +182,6 @@ class DuckChatContextualViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            val isSingleTabFireEnabled = featureTogglesInventory
-                .getAllTogglesForParent("androidBrowserConfig")
-                .find { it.featureName().name == "singleTabFireDialog" }
-                ?.isEnabled() == true
             isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
             val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
                 QuickActionState.ASK_ABOUT_PAGE
@@ -201,7 +195,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
             _viewState.update {
                 it.copy(
-                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
+                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled(),
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
                     showChatsIcon = isContextualSheetImprovementsEnabled,

@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta vahekaardid ja andmed</string>
-    <string name="fireClearAllPlusDuckChats">Kustuta vahekaardid, andmed ja Duck.ai vestlused</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Andmete kustutamine</string>
     <string name="dataClearingDescription">Andmete kustutamine aitab kaitsta sinu privaatsust veebis. Andmete käsitsi kustutamiseks kasuta nuppu Fire Button või seadista automaatne kustutamine.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Kustuta kõik vestlused, sh kinnitatud vestlused</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Vali, mida kustutada</string>
     <string name="dataClearingOptionTabs">Vahelehed</string>
     <string name="dataClearingOptionData">Küpsised ja saidi andmed</string>
     <string name="dataClearingDuckAiChats">Duck.ai vestlused</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Kustuta kõik vestlused</string>
-    <string name="fireDialogDeleteButton">Kustuta</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sule vahekaart</item>
-        <item quantity="other">Sule kõik %1$d vahekaarti</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Võib sind kontodelt välja logida.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Puudub</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
-        <item quantity="other">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Kas kustutada vahekaardid ja saidi andmed?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
-
-    <string name="settingsAutomaticallyClearData">Kustuta andmed automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
     <string name="settingsClearAiDataTitle">Kustuta Duck.ai vestlused</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Duck.ai ajaloo, sealhulgas kinnitatud vestlused.</string>
-    <string name="settingsClearDataActionSecondaryText">Kustutab kõik vahekaardid ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Kustutab kõik vahekaardid, Duck.ai vestlused ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
     <string name="aboutActivityTitleNew">Teave</string>

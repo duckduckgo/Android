@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изтриване на раздели и данни</string>
-    <string name="fireClearAllPlusDuckChats">Изтриване на раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Изчистване на данни</string>
     <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността Ви онлайн. Използвайте Fire Button, за да изтриете данните ръчно или задайте автоматично изтриване.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Изтриване на всички чатове, включително закачените чатове</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Избери какво да изтриеш</string>
     <string name="dataClearingOptionTabs">Раздели</string>
     <string name="dataClearingOptionData">Бисквитки и данни за сайта</string>
     <string name="dataClearingDuckAiChats">Чатове с Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Изтриване на всички чатове</string>
-    <string name="fireDialogDeleteButton">Изтрий</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Затваряне на раздела</item>
-        <item quantity="other">Затваряне на всички %1$d раздела</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Може да Ви отпише от акаунтите.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Няма</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Изтрий от 1 сайт. Може да те отпише от акаунтите.</item>
-        <item quantity="other">Изтрий от %1$d сайта. Може да те отпише от акаунтите.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Да изтрием ли разделите и данните от сайта?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
-
-    <string name="settingsAutomaticallyClearData">Автоматично изчистване на данните…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматично изчистване…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
     <string name="settingsClearAiDataTitle">Изтриване на чатове с Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button ще изтрие също и историята на Duck.ai, включително закачените чатове.</string>
-    <string name="settingsClearDataActionSecondaryText">Изчиства всички раздели и данни за всички сайтове, които не защитиш с Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Изчиства всички раздели, Duck.ai чатове и данни за всички сайтове, които не защитиш с Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
     <string name="aboutActivityTitleNew">За нас</string>

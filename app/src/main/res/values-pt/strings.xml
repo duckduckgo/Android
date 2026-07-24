@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
     <string name="fireClearAll">Eliminar separadores e dados</string>
-    <string name="fireClearAllPlusDuckChats">Eliminar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Botão de proteção</string>
     <string name="dataClearingActivityTitle">Limpeza de Dados</string>
     <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para eliminar dados manualmente ou configura a eliminação automática.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Eliminar todos os chats, incluindo os fixados</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Escolhe o que apagar</string>
     <string name="dataClearingOptionTabs">Separadores</string>
     <string name="dataClearingOptionData">Cookies e dados de sites</string>
     <string name="dataClearingDuckAiChats">Chats Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todas as conversas</string>
-    <string name="fireDialogDeleteButton">Eliminar</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Fechar separador</item>
-        <item quantity="other">Fechar os %1$d separadores</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Pode terminar a tua sessão nas contas.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Nenhum</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Eliminar de 1 site. Podes terminar a tua sessão nas contas.</item>
-        <item quantity="other">Eliminar de %1$d sites. Podes terminar a tua sessão nas contas.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Eliminar separadores e dados do site?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
-
-    <string name="settingsAutomaticallyClearData">Limpar os dados automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Limpar automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nenhum</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Separadores</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Saída da aplicação, inativa por 1 hora</string>
     <string name="settingsClearAiDataTitle">Eliminar as conversas do Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">O Fire Button também elimina o histórico do Duck.ai, incluindo os chats fixados.</string>
-    <string name="settingsClearDataActionSecondaryText">Fecha todas as abas e limpa os dados de quaisquer sites que não tenha protegido com o Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Limpa todos os separadores, chats do Duck.ai e dados de quaisquer sites que não tenhas protegido com o Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Acerca de</string>
