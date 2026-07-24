@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai-asetukset</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Kysy välilehdestä</string>
+    <string name="duckChatContextualAskAboutPage">Kysy sivusta</string>
 </resources>
