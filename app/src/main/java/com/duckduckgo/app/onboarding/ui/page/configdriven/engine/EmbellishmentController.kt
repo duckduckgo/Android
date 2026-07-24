@@ -42,7 +42,13 @@ import com.duckduckgo.common.ui.view.toPx
  * decoration anchors the card. `null` means no decoration is showing (either [Embellishment.None]
  * or the declared decoration lost the fit veto), so the card anchors to the parent bottom.
  */
-data class SettledDecoration(val view: View, val anchorsCardOnPhone: Boolean)
+data class SettledDecoration(
+    val view: View,
+    val anchorsCardOnPhone: Boolean,
+    /** Card vertical bias while anchored above this decoration — legacy sets these per dialog branch, see each build site. */
+    val anchoredCardBiasPhone: Float,
+    val anchoredCardBiasTablet: Float,
+)
 
 /**
  * Owns the embellishment axis: which Lottie stage decoration (walking dax, bobbing dax, either
@@ -230,7 +236,12 @@ class EmbellishmentController(
                 maxHeightPx = decoration.maxHeightDp.toPx(),
                 bottomOverlapPx = decoration.bottomOverlapPx(),
             )
-            SettledDecoration(decoration.view, decoration.anchorsCardOnPhone)
+            SettledDecoration(
+                view = decoration.view,
+                anchorsCardOnPhone = decoration.anchorsCardOnPhone,
+                anchoredCardBiasPhone = decoration.anchoredCardBiasPhone,
+                anchoredCardBiasTablet = decoration.anchoredCardBiasTablet,
+            )
         } else {
             fitCorrector.clear()
             null
@@ -265,6 +276,10 @@ class EmbellishmentController(
         return Decoration(
             view = view,
             anchorsCardOnPhone = true,
+            // Welcome keeps the card XML's bias 1 (pressed down against the dax) on both device classes:
+            // legacy's welcome branch never rewrites the anchor when the dax fits (applyWalkingDaxLayout :2465-2476).
+            anchoredCardBiasPhone = 1f,
+            anchoredCardBiasTablet = 1f,
             maxHeightDp = WALKING_DAX_MAX_HEIGHT_DP,
             minHeightDp = WALKING_DAX_MIN_HEIGHT_DP,
             // Ported from `playWalkingDaxAnimation` (:2562-2586).
@@ -312,6 +327,9 @@ class EmbellishmentController(
         return Decoration(
             view = view,
             anchorsCardOnPhone = true,
+            // Legacy quick-setup/comparison anchor blocks (:1057-1067, :1681-1691): top-biased on phone, centered on tablet.
+            anchoredCardBiasPhone = 0f,
+            anchoredCardBiasTablet = 0.5f,
             maxHeightDp = BOTTOM_WING_MAX_HEIGHT_DP,
             minHeightDp = BOTTOM_WING_MIN_HEIGHT_DP,
             // Ported from `playBottomWingAnimation` (:2791-2804).
@@ -354,6 +372,9 @@ class EmbellishmentController(
         return Decoration(
             view = view,
             anchorsCardOnPhone = false,
+            // Anchors on tablet only, centered (:1257-1267, :1430-1440); the phone value is never read.
+            anchoredCardBiasPhone = 0f,
+            anchoredCardBiasTablet = 0.5f,
             maxHeightDp = LEFT_WING_MAX_HEIGHT_DP,
             minHeightDp = LEFT_WING_MIN_HEIGHT_DP,
             bottomOverlapPx = { leftWingBottomOverlapPx() },
@@ -398,6 +419,9 @@ class EmbellishmentController(
         return Decoration(
             view = view,
             anchorsCardOnPhone = false,
+            // Anchors on tablet only, centered (:1288-1298); the phone value is never read.
+            anchoredCardBiasPhone = 0f,
+            anchoredCardBiasTablet = 0.5f,
             maxHeightDp = BOBBING_DAX_MAX_HEIGHT_DP,
             minHeightDp = BOBBING_DAX_MIN_HEIGHT_DP,
             // Ported from `animateBobbingDaxIn` (:2588-2619).
@@ -491,6 +515,8 @@ class EmbellishmentController(
     private class Decoration(
         val view: LottieAnimationView,
         val anchorsCardOnPhone: Boolean,
+        val anchoredCardBiasPhone: Float,
+        val anchoredCardBiasTablet: Float,
         val maxHeightDp: Int,
         val minHeightDp: Int,
         val bottomOverlapPx: () -> Int = { 0 },

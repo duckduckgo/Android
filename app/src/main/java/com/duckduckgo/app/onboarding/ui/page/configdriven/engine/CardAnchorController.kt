@@ -28,11 +28,13 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdate
  * :1681-1691 comparison chart).
  *
  * Those blocks disagree dialog-by-dialog on which decorations anchor the card on phones (walking
- * dax and the bottom wing do; bobbing dax and the left wing only anchor on tablet) — encoded here
- * as [SettledDecoration.anchorsCardOnPhone] so this controller never branches on dialog/decoration
- * identity, only on the flag. They also disagree in the fine details of the *unanchored* vertical
- * bias per call site (some tablet-aware, some not); this controller normalizes that to a single
- * policy (see below) rather than reproducing every inconsistency — a deliberate POC simplification.
+ * dax and the bottom wing do; bobbing dax and the left wing only anchor on tablet) and on the card's
+ * bias while anchored (welcome presses the card down onto the walking dax with the XML's bias 1; the
+ * bottom wing keeps it top-biased on phones) — both encoded as [SettledDecoration] data
+ * ([SettledDecoration.anchorsCardOnPhone] / the anchored-bias pair) so this controller never branches
+ * on dialog/decoration identity. Unanchored, legacy uses bias 0 on phones everywhere and is
+ * inconsistent on tablets (0.5 in quick-setup/add-to-dock, 0 elsewhere); normalized here to
+ * tablet 0.5 / phone 0 — the one deliberate POC simplification left on this axis.
  */
 class CardAnchorController(private val binding: ContentOnboardingWelcomePageUpdateBinding) {
 
@@ -50,11 +52,11 @@ class CardAnchorController(private val binding: ContentOnboardingWelcomePageUpda
             if (settled != null && (isTablet || settled.anchorsCardOnPhone)) {
                 bottomToTop = settled.view.id
                 bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-                verticalBias = if (isTablet) 0.5f else 1f
+                verticalBias = if (isTablet) settled.anchoredCardBiasTablet else settled.anchoredCardBiasPhone
             } else {
                 bottomToTop = ConstraintLayout.LayoutParams.UNSET
                 bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                verticalBias = if (settled != null) 1f else 0f
+                verticalBias = if (isTablet) 0.5f else 0f
             }
         }
 
