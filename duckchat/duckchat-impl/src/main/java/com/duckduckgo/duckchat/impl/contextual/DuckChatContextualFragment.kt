@@ -492,6 +492,10 @@ class DuckChatContextualFragment :
             onAskAboutTab = { viewModel.onAskAboutTabClicked() },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },
             onPageContextRemoved = { viewModel.removePageContext() },
+            onVoiceChatRequested = {
+                viewModel.onContextualClose()
+                duckChat.openVoiceDuckChat()
+            },
         )
         observeViewModel()
 
