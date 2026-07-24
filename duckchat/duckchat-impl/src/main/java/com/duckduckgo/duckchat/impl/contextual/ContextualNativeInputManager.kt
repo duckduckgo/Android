@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
@@ -73,6 +74,7 @@ interface ContextualNativeInputManager {
         onAskAboutPage: () -> Unit = {},
         onPageContextRemoved: () -> Unit = {},
         onVoiceChatRequested: () -> Unit = {},
+        onVoiceSearchRequested: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -100,6 +102,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
@@ -127,6 +130,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
+        onVoiceSearchRequested: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
@@ -137,10 +141,11 @@ class RealContextualNativeInputManager @Inject constructor(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
             onPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
-            onVoiceChatRequested,
+            onVoiceChatRequested, onVoiceSearchRequested,
         )
         observeNativeInputSetting(lifecycleOwner)
         observeVoiceChatEntry(widget, lifecycleOwner)
+        observeVoiceSearchEntry(widget, lifecycleOwner)
     }
 
     override fun onContextualClosed(tabId: String) {
@@ -213,6 +218,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
+        onVoiceSearchRequested: () -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
@@ -220,6 +226,7 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onVoiceChatClick = onVoiceChatRequested
+        widget.onVoiceSearchClick = onVoiceSearchRequested
         widget.bindAttachmentCallbacks(
             onCameraCaptureRequested = onCameraCaptureRequested,
             onFilePickerRequested = onFilePickerRequested,
@@ -276,6 +283,15 @@ class RealContextualNativeInputManager @Inject constructor(
     ) {
         duckAiFeatureState.showVoiceChatEntry
             .onEach { widget.setVoiceChatAvailable(it) }
+            .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVoiceSearchEntry(
+        widget: NativeInputModeWidget,
+        lifecycleOwner: LifecycleOwner,
+    ) {
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach { widget.setVoiceSearchAvailable(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 

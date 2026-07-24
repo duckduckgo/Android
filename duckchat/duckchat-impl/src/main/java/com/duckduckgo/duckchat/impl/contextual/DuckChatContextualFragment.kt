@@ -104,6 +104,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -198,6 +201,9 @@ class DuckChatContextualFragment :
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
 
     @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
     lateinit var webViewModeInitializer: WebViewModeInitializer
 
     @Inject
@@ -267,6 +273,25 @@ class DuckChatContextualFragment :
 
     private var lastWebViewX = 0f
     private var lastWebViewY = 0f
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) { event ->
+            if (event is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
+                when (val result = event.result) {
+                    is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                        viewModel.onContextualClose()
+                        startActivity(browserNav.openInNewTab(requireContext(), result.query))
+                    }
+
+                    is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                        viewModel.onContextualClose()
+                        duckChat.openDuckChatWithAutoPrompt(result.query)
+                    }
+                }
+            }
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -495,6 +520,10 @@ class DuckChatContextualFragment :
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
                 duckChat.openVoiceDuckChat()
+            },
+            onVoiceSearchRequested = {
+                activity?.hideKeyboard()
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
             },
         )
         observeViewModel()
