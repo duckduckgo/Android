@@ -32,9 +32,7 @@ interface OnboardingPromptsExperimentManager {
 
     suspend fun enroll(): OnboardingPromptExperimentVariant?
 
-    suspend fun isEnrolledInWidgetOnly(): Boolean
-
-    suspend fun isEnrolledInDockAndWidget(): Boolean
+    suspend fun isEnrolledInWidgetPromptCohort(): Boolean
 
     enum class OnboardingPromptExperimentVariant {
         CONTROL,
@@ -82,11 +80,11 @@ class OnboardingPromptsExperimentManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun isEnrolledInWidgetOnly(): Boolean =
-        enroll() == OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY
-
-    override suspend fun isEnrolledInDockAndWidget(): Boolean =
-        enroll() == OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+    override suspend fun isEnrolledInWidgetPromptCohort(): Boolean = withContext(dispatcherProvider.io()) {
+        val toggle = toggles.addToDockAndWidgetExperimentJul25()
+        toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY) ||
+            toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
+    }
 
     private suspend fun waitForPrivacyConfig(): Boolean =
         withTimeoutOrNull(PRIVACY_CONFIG_WAIT_TIMEOUT_MS) {

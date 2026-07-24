@@ -32,7 +32,6 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -106,7 +105,6 @@ class OnboardingDaxDialogTests {
     private val mockDuckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
-    private val mockOnboardingPromptsExperimentManager: OnboardingPromptsExperimentManager = mock()
     private val mockAppTheme: AppTheme = org.mockito.kotlin.mock { on { isLightModeEnabled() } doReturn true }
     private val mockDeviceInfo: DeviceInfo = mock()
 
@@ -129,8 +127,6 @@ class OnboardingDaxDialogTests {
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetOnly()).thenReturn(false)
-        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInDockAndWidget()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -163,7 +159,6 @@ class OnboardingDaxDialogTests {
             },
             mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
             mock(),
-            mockOnboardingPromptsExperimentManager,
         )
     }
 
