@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -1894,10 +1893,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    binding.topMockupToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
-                }
-
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBinding = binding.topMockupToolbar
 
@@ -1905,9 +1900,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     omnibarToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
 
-                if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
-                }
+                omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
 
                 if (settingsDataStore.omnibarType == OmnibarType.SPLIT) {
                     binding.topMockupToolbar.tabsMenu.gone()
@@ -1918,10 +1911,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
 
             OmnibarType.SINGLE_BOTTOM -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    binding.bottomMockupToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
-                }
-
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBottomBinding = binding.bottomMockupToolbar
 
@@ -1929,9 +1918,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     omnibarToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
 
-                if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
-                }
+                omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
             }
         }
     }

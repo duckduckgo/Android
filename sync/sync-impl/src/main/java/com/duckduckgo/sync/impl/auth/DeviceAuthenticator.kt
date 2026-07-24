@@ -128,12 +128,8 @@ class RealDeviceAuthenticator @Inject constructor(
                 Settings.ACTION_BIOMETRIC_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
             }
 
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {
-                Settings.ACTION_FINGERPRINT_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
-            }
-
             else -> {
-                Settings.ACTION_SECURITY_SETTINGS.safeLaunchSettingsActivity(context, tryFallback = true)
+                Settings.ACTION_FINGERPRINT_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
             }
         }
     }

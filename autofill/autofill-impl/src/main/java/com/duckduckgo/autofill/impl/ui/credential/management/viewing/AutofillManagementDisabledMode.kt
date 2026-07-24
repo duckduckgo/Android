@@ -23,7 +23,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_BIOMETRIC_ENROLL
 import android.provider.Settings.ACTION_FINGERPRINT_ENROLL
-import android.provider.Settings.ACTION_SECURITY_SETTINGS
 import android.provider.Settings.ACTION_SETTINGS
 import android.provider.Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED
 import android.view.LayoutInflater
@@ -98,12 +97,8 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
                 intent.safeLaunchSettingsActivity(tryFallback = true)
             }
 
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {
-                Intent(ACTION_FINGERPRINT_ENROLL).safeLaunchSettingsActivity(tryFallback = true)
-            }
-
             else -> {
-                Intent(ACTION_SECURITY_SETTINGS).safeLaunchSettingsActivity(tryFallback = true)
+                Intent(ACTION_FINGERPRINT_ENROLL).safeLaunchSettingsActivity(tryFallback = true)
             }
         }
 
