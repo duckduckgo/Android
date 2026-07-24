@@ -55,4 +55,8 @@
     <string name="sync_device_v2_recovery_code_download_code_button">Download Your Recovery Code</string>
     <string name="sync_device_v2_recovery_code_done_button">Done</string>
     <string name="sync_device_v2_recovery_code_get_code_error">Unable to get recovery code.</string>
+    <string name="sync_scanner_v2_show_qr_code_content_description">Show QR Code</string>
+    <string name="sync_scanner_v2_scan_qr_code_tab_item_label">Scan QR</string>
+    <string name="sync_scanner_v2_enter_code_manually_tab_item_label">Enter Code</string>
+    <string name="sync_scanner_v2_qr_code_screen_title">QR Code</string>
 </resources>
