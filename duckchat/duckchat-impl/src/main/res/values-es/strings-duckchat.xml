@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Configuración de Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Preguntar sobre la pestaña</string>
+    <string name="duckChatContextualAskAboutPage">Preguntar sobre la página</string>
 </resources>
