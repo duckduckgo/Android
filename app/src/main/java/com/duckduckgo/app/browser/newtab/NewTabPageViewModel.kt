@@ -27,6 +27,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -81,6 +82,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -201,9 +203,11 @@ class NewTabPageViewModel @AssistedInject constructor(
         } else {
             dismissedCtaDao.exists(CtaId.DAX_END)
         }
+        val widgetCtaCompletesOnboarding = dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
+            !onboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()
         return lastDialogShown ||
             settingsDataStore.hideTips ||
-            dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+            widgetCtaCompletesOnboarding
     }
 
     fun onMessageShown() {
