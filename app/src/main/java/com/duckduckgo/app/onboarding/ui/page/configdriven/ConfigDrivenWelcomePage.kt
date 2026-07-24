@@ -232,6 +232,10 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             isTablet = deviceInfo.isTablet(),
             emit = viewModel::onEvent,
             execute = viewModel::onContentInteraction,
+            // Legacy's isAnimating setter (:181-187): while an entrance runs, the card container swallows its
+            // children's touches so a tap anywhere on the card lands on the tap-to-skip listener below instead
+            // of a picker/switch consuming it.
+            onAnimatingChanged = { animating -> binding.daxDialogCta.cardContainer.interceptChildTouches = animating },
         )
 
         binding.root.setOnClickListener { engine?.skipRunningAnimations() }

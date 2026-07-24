@@ -68,8 +68,25 @@ class EmbellishmentController(
     private val cardBottomInsetPx: () -> Int = { 0 },
 ) {
 
-    /** Every animator this controller starts, so [skipRunning] can end() and [release] can cancel() them all. */
+    /**
+     * Every still-live animator this controller started, so a superseding [transition]'s drain can end() and
+     * [release] can cancel() them all. Entries remove themselves on natural completion (see [track]): end()ing
+     * an already-finished animator RESTARTS it (its onAnimationStart listeners fire again — for the enter
+     * animators that means `view.playAnimation()`, visibly replaying the decoration's Lottie from frame 0).
+     */
     private val trackedAnimators = mutableListOf<Animator>()
+
+    /** Tracks [animators] and removes each again the moment it ends on its own. */
+    private fun track(animators: List<Animator>) {
+        trackedAnimators += animators
+        animators.forEach { animator ->
+            animator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    trackedAnimators.remove(animation)
+                }
+            })
+        }
+    }
 
     /**
      * The wing dismiss animations are driven by Lottie's own animator (its real duration isn't
@@ -88,14 +105,6 @@ class EmbellishmentController(
      * fires its [onSettled] a second (stale) time.
      */
     private var generation = 0
-
-    /**
-     * True for the duration of [skipRunning]. While set, [transition]'s enter step must take the
-     * same snap path used for `animate == false` instead of starting a new enter animator/Lottie
-     * playback — otherwise an enter kicked off by a chained exit-onEnd during the skip's drain
-     * would escape the snapshot loop and keep animating after [skipRunning] returns.
-     */
-    private var skipping = false
 
     private val fitCorrector = OnboardingDecorationFitCorrector(
         root = binding.root,
@@ -155,8 +164,8 @@ class EmbellishmentController(
             val settled = applyFit(next)
             if (settled != null) {
                 val entering = decorations.getValue(next)
-                if (animate && !skipping) {
-                    trackedAnimators += entering.enter()
+                if (animate) {
+                    track(entering.enter())
                 } else {
                     entering.snap()
                 }
@@ -177,9 +186,11 @@ class EmbellishmentController(
                 // card anchor waits for the exit to finish (the engine rule): onSettled below fires from the
                 // exit's own completion, gen-guarded against a newer transition superseding it meanwhile.
                 val settled = applyNext()
-                trackedAnimators += exiting.exit {
-                    if (gen == generation) onSettled(settled)
-                }
+                track(
+                    exiting.exit {
+                        if (gen == generation) onSettled(settled)
+                    },
+                )
             }
             else -> {
                 instantHide(exiting.view)
@@ -188,27 +199,10 @@ class EmbellishmentController(
         }
     }
 
-    fun skipRunning() {
-        if (skipping) return // reentrant call from a drain cascade; the outer invocation finishes the drain
-        // While skipping, transition()'s enterNext takes the snap path instead of starting a new enter
-        // animator, so nothing re-escapes the drain below.
-        skipping = true
-        try {
-            // Loop until settled: draining can chain exit -> onEnd -> enterNext, and — belt-and-braces —
-            // keep draining rather than assume a single pass always empties both slots.
-            while (trackedAnimators.isNotEmpty() || pendingDismiss != null) {
-                drainInFlight()
-            }
-        } finally {
-            skipping = false
-        }
-    }
-
-    // Ends every tracked animator and finishes any pending Lottie dismiss in one pass. Snapshot-and-remove
-    // before ending: an end() listener/finish callback can synchronously chain into the next decoration's
-    // enter() (exit -> onEnd -> enterNext()), adding fresh animators mid-loop — clearing the list afterwards
-    // would wipe those out from under the animation that just started. Shared by [transition] (settle-then-
-    // supersede) and [skipRunning] (full drain).
+    // Ends every tracked animator and finishes any pending Lottie dismiss in one pass, so a new [transition]
+    // never runs while a previous one's work is still in flight (settle-then-supersede). Snapshot-and-remove
+    // before ending: end() listeners mutate [trackedAnimators] (self-removal via [track]), so iterating the
+    // live list would skip entries.
     private fun drainInFlight() {
         val animators = trackedAnimators.toList()
         trackedAnimators.removeAll(animators)
@@ -228,9 +222,29 @@ class EmbellishmentController(
         fitCorrector.detach()
     }
 
+    /**
+     * The decoration currently on stage (fit-approved), or null when the current screen shows none (declared
+     * [Embellishment.None] or vetoed). What [skipRunning] snaps to its settled end state.
+     */
+    private var currentDecoration: Decoration? = null
+
+    /**
+     * Tap-to-skip: settles this whole axis in one call. [drainInFlight] end()s the in-flight animators (an
+     * exit's completion still runs, so the deferred card re-anchor happens now) and then the current
+     * decoration is snap()ed on top: end() on a not-yet-started enter fires its onAnimationStart listener —
+     * `view.playAnimation()`, which alone would visibly replay the Lottie from frame 0 — and the snap
+     * immediately cancels that playback and freezes the decoration at its real end state instead.
+     */
+    fun skipRunning() {
+        drainInFlight()
+        currentDecoration?.let { it.snap() }
+    }
+
     /** Runs the fit veto for [embellishment], sizing and tracking the winning view. Ported from `applyDecorationLayout`/`applyWalkingDaxLayout`. */
     private fun applyFit(embellishment: Embellishment): SettledDecoration? {
-        val decoration = decorations[embellishment] ?: return null
+        val decoration = decorations[embellishment]
+        currentDecoration = decoration // null for Embellishment.None; reset below if the fit vetoes it.
+        if (decoration == null) return null
         releaseCardBottomInset()
         val fitHeightPx = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
@@ -256,6 +270,7 @@ class EmbellishmentController(
             )
         } else {
             fitCorrector.clear()
+            currentDecoration = null
             null
         }
     }

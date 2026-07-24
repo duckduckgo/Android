@@ -73,7 +73,22 @@ class DialogRenderEngine(
     private val isTablet: Boolean,
     private val emit: (NewUserOnboardingEvent) -> Unit,
     private val execute: (ContentInteraction) -> Unit,
+    private val onAnimatingChanged: (Boolean) -> Unit = {},
 ) {
+
+    /**
+     * True from an animated [render] until its entrance chain has fully settled (CTAs armed) — the fragment
+     * mirrors it into `cardContainer.interceptChildTouches`, exactly like legacy's `isAnimating` setter
+     * (BrandDesignUpdateWelcomePage.kt:181-187): while the entrance runs, taps anywhere on the card reach the
+     * container's click listener (tap-to-skip) instead of being consumed by interactive children (pickers,
+     * switches). Cleared on the snap path, at skip completion, and at [release].
+     */
+    private var isAnimating = false
+        set(value) {
+            if (field == value) return
+            field = value
+            onAnimatingChanged(value)
+        }
 
     private var previous: DialogConfig? = null
     private var bound: BoundContent? = null
@@ -81,8 +96,23 @@ class DialogRenderEngine(
     /** The current bind's coroutine scope, cancelled at [unbindCurrent]. See [createBindScope]. */
     private var bindScope: CoroutineScope? = null
 
-    /** Every animator this engine itself created (entrance + uniform fade), so a skip/release can settle them. */
+    /**
+     * Every animator this engine itself created (entrance + uniform fade) that is still live, so a
+     * skip/release can settle them. Entries remove themselves on natural completion (see [track]): end()ing
+     * an already-finished animator RESTARTS it (Android fires its onAnimationStart listeners again), so a
+     * stale entry would make a later skip re-trigger whatever that listener does.
+     */
     private val runningAnimators = mutableListOf<Animator>()
+
+    /** Adds [animator] to [runningAnimators] and removes it again the moment it ends on its own. */
+    private fun track(animator: Animator) {
+        runningAnimators += animator
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                runningAnimators.remove(animation)
+            }
+        })
+    }
 
     /**
      * The [morphCard] `onEnd` continuation for whichever render is currently mid-morph, if any — set when
@@ -168,6 +198,7 @@ class DialogRenderEngine(
         }
 
         if (animate) {
+            isAnimating = true
             handle.fadeTargets.forEach { it.alpha = 0f }
             ctaViews(config).forEach { it.alpha = 0f }
             // Captured so the reveal/fade onEnd continuations below (fired async, possibly well after this
@@ -187,13 +218,18 @@ class DialogRenderEngine(
                             // so a CTA sitting at alpha 0 during the entrance can't be clicked before it's visible.
                             // The generation check guards against a superseded render's fade being end()ed by a
                             // newer render's own skipRunningAnimations() call: that must not arm listeners for a
-                            // config/handle this engine has already unbound.
-                            if (gen == generation) attachCtaListeners(config, handle)
+                            // config/handle this engine has already unbound (nor clear the newer render's own
+                            // isAnimating).
+                            if (gen == generation) {
+                                attachCtaListeners(config, handle)
+                                isAnimating = false
+                            }
                         }
                     }
                 }
             }
         } else {
+            isAnimating = false
             binding.daxDialogCta.root.isVisible = true
             binding.daxDialogCta.root.alpha = 1f
             handle.title?.snap()
@@ -247,8 +283,14 @@ class DialogRenderEngine(
             // when no reveal was in flight.
             settlePendingMorph()
             drainRunningAnimators { it.end() }
+            // Unlike legacy's skip (card content only, :2700-2735), one tap settles the whole stage: the
+            // embellishment and background axes snap to their end states too. Each controller owns making
+            // that restart-safe (see EmbellishmentController.skipRunning for the end()-refires-playAnimation
+            // hazard its snap neutralizes).
             embellishments.skipRunning()
+            background.skipRunning()
             stepIndicator.skipRunning()
+            isAnimating = false
         } finally {
             skipping = false
         }
@@ -275,6 +317,7 @@ class DialogRenderEngine(
     /** Fragment onDestroyView: suppress (never apply) anything still pending, then tear down. */
     fun release() {
         generation++ // supersede any in-flight morph's onTransitionEnd - release suppresses it, it never settles it.
+        isAnimating = false
         pendingMorphContinuation = null
         bound?.handle?.title?.cancel()
         drainRunningAnimators { it.cancel() }
@@ -330,7 +373,7 @@ class DialogRenderEngine(
                 interpolator = FastOutSlowInInterpolator()
                 addUpdateListener { cardView.setArrowAnimationFraction(it.animatedValue as Float) }
             }
-            runningAnimators += slide
+            track(slide)
             slide.start()
         } else {
             cardView.setArrowAnimationFraction(if (atEnd) 1f else 0f)
@@ -418,7 +461,7 @@ class DialogRenderEngine(
                 override fun onAnimationEnd(animation: Animator) = onEnd()
             })
         }
-        runningAnimators += reveal
+        track(reveal)
         reveal.start()
     }
 
@@ -478,7 +521,7 @@ class DialogRenderEngine(
                 override fun onAnimationEnd(animation: Animator) = onEnd()
             })
         }
-        runningAnimators += fade
+        track(fade)
         fade.start()
     }
 
@@ -486,7 +529,7 @@ class DialogRenderEngine(
     private fun runAndTrack(factories: List<() -> Animator>) {
         factories.forEach { factory ->
             val animator = factory()
-            runningAnimators += animator
+            track(animator)
             animator.start()
         }
     }

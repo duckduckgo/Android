@@ -26,8 +26,23 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
  */
 class BackgroundController(private val animator: OnboardingBackgroundAnimator) {
 
+    /** Set while a transitionTo may still be animating, so [skipRunning] knows there is something to settle. */
+    private var transitioningTo: OnboardingBackgroundStep? = null
+
     fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean) {
         if (previous == next) return
-        if (animate) animator.transitionTo(next) else animator.snapTo(next)
+        if (animate) {
+            transitioningTo = next
+            animator.transitionTo(next)
+        } else {
+            transitioningTo = null
+            animator.snapTo(next)
+        }
+    }
+
+    /** Tap-to-skip: settles a possibly in-flight background transition straight at its target step. */
+    fun skipRunning() {
+        transitioningTo?.let { animator.snapTo(it) }
+        transitioningTo = null
     }
 }
