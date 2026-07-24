@@ -172,6 +172,29 @@
             }
         ]
     },
+    "onboarding_add-to-dock": {
+        "description": "Add-to-Dock onboarding page. shown when the page is displayed; clicked when the user taps Continue. Unique once per user per event.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
+        ]
+    },
     "onboarding_widget-prompt": {
         "description": "Widget-prompt onboarding page. shown when the page is displayed; clicked engage/dismiss on the Add widget / Skip CTAs; confirmed added/not_added after the system add-widget prompt returns. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],

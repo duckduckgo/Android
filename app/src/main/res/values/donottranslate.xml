@@ -98,4 +98,9 @@
     <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
+
+    <!-- Add to Dock (onboarding) -->
+    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
+    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 </resources>
