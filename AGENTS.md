@@ -156,16 +156,26 @@ These rules are enforced in the root `build.gradle`. Violations fail the build.
 
 ## Code Comments
 
-Comments explain the **why** — intent, assumptions, non-obvious decisions — not the **what** the code already shows.
+Comments explain the **why** (intent, assumptions, non-obvious decisions), not the **what** the code already shows.
 Default to no comment: prefer self-documenting code (clear names, small functions), and add one only where code alone can't carry the reasoning, and only if it still answers *"why was this done this way?"* for someone reading it two years from now.
-`-api` modules declarations may carry KDoc describing the contract, that's documentation for consumers, not narration.
+`-api` module declarations may carry KDoc describing the contract, that's documentation for consumers, not narration.
 
 Never add:
-- **narration** of trivial code — `count++ // increment the counter`
-- **conversational / temporal residue** — `// fixes the bug from the previous task`, `// changed from LiveData`
-- **process / plan references** — `// step 3 of the plan`, `// per the Asana task`
+- **narration** of trivial code
+- **conversational / temporal residue**
+- **process / plan references**
 
-When reviewing a diff, flag any added comment that has been added and doesn't follow the above rules.
+Examples of comments to avoid:
+
+```kotlin
+count++ // increment the counter -> narration of trivial code
+val user = repo.load() // fixes the bug from the previous task -> temporal residue
+val state = flow // changed from LiveData -> temporal residue
+cache.clear() // step 3 of the plan -> process / plan reference
+retryCount = 3 // per the Asana task -> process / plan reference
+```
+
+When reviewing a diff, flag any added comment that doesn't follow these rules.
 
 ---
 
