@@ -78,14 +78,16 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
+    private lateinit var brandDesignSwitch: OneLineListItem
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
 
     @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        val selectedTheme = runBlocking {
+        val (selectedTheme, brandDesignUpdateEnabled) = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
-            applyTheme(selectedTheme)
-            selectedTheme
+            val brandDesignUpdateEnabled = appComponentsViewModel.brandDesignUpdateFlow.first()
+            applyTheme(selectedTheme, applyBrandDesignUpdate = brandDesignUpdateEnabled)
+            selectedTheme to brandDesignUpdateEnabled
         }
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge(isDarkTheme = isDarkThemeEnabled(selectedTheme))
@@ -93,6 +95,7 @@ class AppComponentsActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
         darkThemeSwitch = findViewById(R.id.dark_theme_switch)
+        brandDesignSwitch = findViewById(R.id.brand_design_switch)
 
         configureEdgeToEdgeInsets()
 
@@ -109,6 +112,14 @@ class AppComponentsActivity : AppCompatActivity() {
             }
             lifecycleScope.launch {
                 appComponentsViewModel.setTheme(newTheme)
+                startActivity(intent(this@AppComponentsActivity))
+                finish()
+            }
+        }
+
+        brandDesignSwitch.quietlySetIsChecked(brandDesignUpdateEnabled) { _, enabled ->
+            lifecycleScope.launch {
+                appComponentsViewModel.setBrandDesignUpdate(enabled)
                 startActivity(intent(this@AppComponentsActivity))
                 finish()
             }

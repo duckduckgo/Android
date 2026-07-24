@@ -17,6 +17,7 @@
 package com.duckduckgo.lint.ui
 
 import com.android.SdkConstants.ANDROID_URI
+import com.android.SdkConstants.ATTR_FONT_FAMILY
 import com.android.SdkConstants.ATTR_LAYOUT_HEIGHT
 import com.android.SdkConstants.ATTR_LAYOUT_WIDTH
 import com.android.SdkConstants.ATTR_STYLE
@@ -56,6 +57,8 @@ class DaxButtonStylingDetector : LayoutDetector() {
         }
 
         checkInvalidAttributes(context, element)
+
+        checkDuckSansFontFamily(context, element)
     }
 
     private fun checkInvalidAttributes(context: XmlContext, element: Element){
@@ -63,6 +66,18 @@ class DaxButtonStylingDetector : LayoutDetector() {
             if (checkAttribute(element, it)){
                 reportIssue(context, element, it)
             }
+        }
+    }
+
+    private fun checkDuckSansFontFamily(context: XmlContext, element: Element){
+        if (!element.hasAttributeNS(ANDROID_URI, ATTR_FONT_FAMILY)) return
+        val fontFamily = element.getAttributeNS(ANDROID_URI, ATTR_FONT_FAMILY)
+        if (fontFamily.contains(DUCK_SANS, ignoreCase = true)){
+            context.report(
+                issue = INVALID_DAX_BUTTON_PROPERTY,
+                location = context.getNameLocation(element),
+                message = DUCK_SANS_FONT_FAMILY_MESSAGE,
+            )
         }
     }
 
@@ -86,10 +101,16 @@ class DaxButtonStylingDetector : LayoutDetector() {
         private const val DAX_BUTTON_DESTRUCTIVE = "com.duckduckgo.common.ui.view.button.DaxButtonDestructive"
         private const val DAX_BUTTON_GHOST_DESTRUCTIVE = "com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive"
         private const val DAX_BUTTON_DESTRUCTIVE_SECONDARY = "com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary"
+        private const val DAX_BUTTON_BRAND = "com.duckduckgo.common.ui.view.button.DaxButtonBrand"
 
-        val DAX_BUTTONS = listOf(DAX_BUTTON_PRIMARY, DAX_BUTTON_DESTRUCTIVE, DAX_BUTTON_SECONDARY, DAX_BUTTON_GHOST, DAX_BUTTON_GHOST_DESTRUCTIVE, DAX_BUTTON_DESTRUCTIVE_SECONDARY)
+        val DAX_BUTTONS = listOf(DAX_BUTTON_PRIMARY, DAX_BUTTON_DESTRUCTIVE, DAX_BUTTON_SECONDARY, DAX_BUTTON_GHOST, DAX_BUTTON_GHOST_DESTRUCTIVE, DAX_BUTTON_DESTRUCTIVE_SECONDARY, DAX_BUTTON_BRAND)
 
         val INVALID_ATTRIBUTES = listOf(ATTR_TEXT_STYLE, ATTR_TEXT_COLOR, ATTR_TEXT_APPEARANCE, ATTR_TEXT_ALL_CAPS, ATTR_TINT)
+
+        private const val DUCK_SANS = "ducksans"
+
+        private const val DUCK_SANS_FONT_FAMILY_MESSAGE =
+            "DuckSans fonts can only be applied to DaxButtonBrand via app:daxButtonBrandTypography=\"duckSans\", not android:fontFamily"
 
         val INVALID_DAX_BUTTON_PROPERTY = Issue
             .create(

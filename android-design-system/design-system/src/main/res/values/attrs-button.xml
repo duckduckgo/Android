@@ -23,6 +23,13 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="DaxButtonBrand">
+        <attr name="daxButtonBrandTypography" format="enum">
+            <enum name="standard" value="0"/>
+            <enum name="duckSans" value="1"/>
+        </attr>
+    </declare-styleable>
+
     <attr name="daxButtonPrimary" format="reference"/>
     <attr name="daxButtonSecondary" format="reference"/>
     <attr name="daxButtonGhost" format="reference"/>
@@ -30,6 +37,7 @@
     <attr name="daxButtonGhostDestructive" format="reference"/>
     <attr name="daxButtonDestructiveSecondary" format="reference"/>
     <attr name="daxButtonGhostAlt" format="reference"/>
+    <attr name="daxButtonBrand" format="reference"/>
 
     <attr name="radioButtonStyle" format="reference"/>
 

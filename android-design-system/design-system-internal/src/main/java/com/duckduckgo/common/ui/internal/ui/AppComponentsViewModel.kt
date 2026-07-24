@@ -30,4 +30,10 @@ class AppComponentsViewModel(
     suspend fun setTheme(theme: DuckDuckGoTheme) {
         appComponentsPrefsDataStore.setTheme(theme)
     }
+
+    val brandDesignUpdateFlow: Flow<Boolean> = appComponentsPrefsDataStore.brandDesignUpdateFlow
+
+    suspend fun setBrandDesignUpdate(enabled: Boolean) {
+        appComponentsPrefsDataStore.setBrandDesignUpdate(enabled)
+    }
 }

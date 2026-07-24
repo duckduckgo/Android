@@ -38,6 +38,57 @@
             android:layout_height="wrap_content"
             app:primaryText="Dax Buttons" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:platformType="view" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brand Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brand Small"
+            app:icon="@drawable/ic_add_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brand Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brand Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_device_desktop_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Brand Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_duck_sans"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brand DuckSans"
+            app:daxButtonBrandTypography="duckSans" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
+
         <!-- PRIMARY -->
         <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
             android:layout_width="match_parent"

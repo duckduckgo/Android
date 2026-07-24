@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.view.button
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import com.duckduckgo.common.ui.view.button.Size.Small
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
@@ -49,20 +50,66 @@ open class DaxButton @JvmOverloads constructor(
 
         typedArray.recycle()
 
-        val sidePadding = if (buttonSize == Small) {
-            resources.getDimensionPixelSize(R.dimen.buttonSmallSidePadding)
+        val sidePadding = resolveThemeDimensionPx(
+            if (buttonSize == Small) R.attr.daxButtonSmallSidePadding else R.attr.daxButtonLargeSidePadding,
+            if (buttonSize == Small) R.dimen.buttonSmallSidePadding else R.dimen.buttonLargeSidePadding,
+        )
+
+        val topPadding = resolveThemeDimensionPx(
+            if (buttonSize == Small) R.attr.daxButtonSmallTopPadding else R.attr.daxButtonLargeTopPadding,
+            if (buttonSize == Small) R.dimen.buttonSmallTopPadding else R.dimen.buttonLargeTopPadding,
+        )
+
+        val insetValue = TypedValue()
+        val insetAttr = if (buttonSize == Small) R.attr.daxButtonSmallVerticalInset else R.attr.daxButtonLargeVerticalInset
+        val verticalInset = if (context.theme.resolveAttribute(insetAttr, insetValue, true)) {
+            TypedValue.complexToDimensionPixelSize(insetValue.data, resources.displayMetrics)
         } else {
-            resources.getDimensionPixelSize(R.dimen.buttonLargeSidePadding)
+            null
+        }
+        if (verticalInset != null) {
+            insetTop = verticalInset
+            insetBottom = verticalInset
         }
 
-        val topPadding = if (buttonSize == Small) {
-            resources.getDimensionPixelSize(R.dimen.buttonSmallTopPadding)
+        val resolvedHeight = resolveThemeDimensionPx(
+            if (buttonSize == Small) R.attr.daxButtonSmallHeight else R.attr.daxButtonLargeHeight,
+            Size.dimension(buttonSize),
+        )
+        minHeight = if (buttonSize == Size.Large && verticalInset != null) {
+            resolvedHeight + verticalInset * 2
         } else {
-            resources.getDimensionPixelSize(R.dimen.buttonLargeTopPadding)
+            resolvedHeight
         }
 
-        minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
         setPadding(sidePadding, topPadding, sidePadding, topPadding)
+
+        if (buttonSize == Size.Large && !hasLayoutTextAppearance(attrs)) {
+            val largeAppearance = TypedValue()
+            if (context.theme.resolveAttribute(R.attr.textAppearanceButtonLarge, largeAppearance, true)) {
+                setTextAppearance(largeAppearance.resourceId)
+            }
+        }
+    }
+
+    private fun resolveThemeDimensionPx(
+        attr: Int,
+        fallbackDimen: Int,
+    ): Int {
+        val value = TypedValue()
+        return if (context.theme.resolveAttribute(attr, value, true) && value.type == TypedValue.TYPE_DIMENSION) {
+            TypedValue.complexToDimensionPixelSize(value.data, resources.displayMetrics)
+        } else {
+            resources.getDimensionPixelSize(fallbackDimen)
+        }
+    }
+
+    private fun hasLayoutTextAppearance(attrs: AttributeSet?): Boolean {
+        if (attrs == null) return false
+        for (i in 0 until attrs.attributeCount) {
+            if (attrs.getAttributeName(i) == "textAppearance") return true
+        }
+        return false
     }
 }
 
@@ -99,6 +146,7 @@ enum class ButtonType {
     DESTRUCTIVE_SECONDARY,
     GHOST_DESTRUCTIVE,
     GHOST_ALT,
+    BRAND,
     ;
 
     fun getView(context: Context): DaxButton {
@@ -110,6 +158,7 @@ enum class ButtonType {
             DESTRUCTIVE_SECONDARY -> DaxButtonDestructiveSecondary(context, null)
             GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
             GHOST_ALT -> DaxButtonGhostAlt(context, null)
+            BRAND -> DaxButtonBrand(context, null)
         }
     }
 }
