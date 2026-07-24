@@ -37,6 +37,7 @@ class QrCodeActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         setSupportActionBar(binding.includeToolbar.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.includeToolbar.toolbar.setNavigationIcon(CommonR.drawable.ic_close_24)
     }
 }
