@@ -149,8 +149,9 @@ class EmbellishmentController(
 
         val exiting = previous?.let { decorations[it] }
 
-        fun enterNext() {
-            if (gen != generation) return // superseded by a newer transition before we got here.
+        // Fit veto + enter/snap for [next], returning what settled. Runs synchronously in every branch below
+        // (no generation check needed — nothing can supersede between the bump above and here).
+        fun applyNext(): SettledDecoration? {
             val settled = applyFit(next)
             if (settled != null) {
                 val entering = decorations.getValue(next)
@@ -163,15 +164,26 @@ class EmbellishmentController(
                 // Declared but vetoed (or Embellishment.None, which has no map entry at all).
                 decorations[next]?.let { instantHide(it.view) }
             }
-            onSettled(settled)
+            return settled
         }
 
         when {
-            exiting == null -> enterNext()
-            animate && exiting.view.isVisible -> trackedAnimators += exiting.exit { enterNext() }
+            exiting == null -> onSettled(applyNext())
+            animate && exiting.view.isVisible -> {
+                // Legacy starts the next decoration's entrance in the same frame as the previous one's
+                // dismiss (dismissBottomWingAnimation() :1274 + animateBobbingDaxIn() :1304 run in one
+                // synchronous block) — serializing the enter behind a multi-second Lottie dismiss made the
+                // next embellishment visibly late and out of sync with the background transition. Only the
+                // card anchor waits for the exit to finish (the engine rule): onSettled below fires from the
+                // exit's own completion, gen-guarded against a newer transition superseding it meanwhile.
+                val settled = applyNext()
+                trackedAnimators += exiting.exit {
+                    if (gen == generation) onSettled(settled)
+                }
+            }
             else -> {
                 instantHide(exiting.view)
-                enterNext()
+                onSettled(applyNext())
             }
         }
     }
