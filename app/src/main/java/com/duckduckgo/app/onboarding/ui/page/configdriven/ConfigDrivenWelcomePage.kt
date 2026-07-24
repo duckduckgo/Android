@@ -309,8 +309,20 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
                 // before the first real dialog renders, since this fresh instance's views start at their
                 // pre-intro XML defaults and no outro will run to fade them.
                 intro?.snapToOutroEndState()
-                engine.render(config, state.animateEntry)
-                state.stepId?.let { viewModel.onDialogRendered(it) }
+                // Mirrors legacy's doOnLayout around both of its no-predecessor renders (:576/:608): after a
+                // rotation the retained VM emits before the recreated view's first layout pass, and rendering
+                // then makes the embellishment fit veto measure a 0-height root — the decoration would vanish
+                // and never re-appear. Runs synchronously when the view is already laid out (fresh-VM entries,
+                // whose first emission arrives after layout). Re-reads the live state like the outro path
+                // above: a newer emission may have rendered directly while this waited for layout — the engine
+                // then dedups the (already-current) config instead of re-rendering a stale one.
+                binding.root.doOnLayout {
+                    val liveState = viewModel.viewState.value
+                    val renderState = if (liveState.config != null) liveState else state
+                    val liveConfig = renderState.config ?: return@doOnLayout
+                    engine.render(liveConfig, renderState.animateEntry)
+                    renderState.stepId?.let { viewModel.onDialogRendered(it) }
+                }
             }
         } else {
             engine.render(config, state.animateEntry)
