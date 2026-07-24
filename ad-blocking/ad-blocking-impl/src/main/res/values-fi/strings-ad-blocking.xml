@@ -24,7 +24,7 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Avaa videot häiriöttömässä teatteritilassa, jolloin katsomasi sisältö ei vaikuta YouTube-syötteeseesi.</string>
     <string name="ad_blocking_settings_title_v2">Mainosten esto</string>
-    <string name="ad_blocking_settings_header_description">Estää tunkeilevat seurantaohjelmat ennen niiden latautumista, mikä eliminoi tehokkaasti seurantaa käyttävät mainokset</string>
+    <string name="ad_blocking_settings_header_description">Estää tunkeilevat seurantatoiminnot ennen niiden latautumista, mikä eliminoi tehokkaasti seurantaa käyttävät mainokset.</string>
     <string name="contingencyMessageTitle">YouTube-mainosten esto ei ole käytettävissä</string>
     <string name="contingencyMessageContent">YouTuben viimeaikaiset muutokset ovat vaikuttaneet mainosten estämiseen. Pyrimme korjaamaan nämä ongelmat. Kiitos ymmärryksestä.</string>
     <string name="contingencyMessagePrimaryButton">Selvä</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Poissa käytöstä uudelleenkäynnistykseen asti</string>
     <string name="ad_blocking_menu_always_off">Aina pois käytöstä</string>
     <string name="ad_blocking_disabled_popup_title">Eikö YouTube-mainosten esto toimi?</string>
-    <string name="ad_blocking_disabled_popup_description">Lähetä anonyymi rikkoutumisraportti DuckDuckGolle. Auta meitä parantamaan mainosten estoa kaikille!</string>
+    <string name="ad_blocking_disabled_popup_description">Lähetä anonyymi raportti DuckDuckGolle ja auta meitä parantamaan mainosten estoa!</string>
     <string name="ad_blocking_disabled_primary_action">Lähetä rikkoutumisraportti</string>
     <string name="ad_blocking_disabled_secondary_action">Peruuta</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Poissa käytöstä uudelleenkäynnistykseen asti</string>
-    <string name="ad_blocking_omnibar_badge_text">YouTube-mainosten esto käytössä</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Mainosesto käytössä</string></resources>
