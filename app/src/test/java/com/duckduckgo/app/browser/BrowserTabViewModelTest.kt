@@ -324,6 +324,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -487,6 +488,8 @@ class BrowserTabViewModelTest {
 
     // Default (unstubbed) decide() returns null, i.e. no promo eligible.
     private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
+
+    private val mockModalShownReporter: ModalShownReporter = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
 
@@ -1066,6 +1069,7 @@ class BrowserTabViewModelTest {
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
                 newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
                 newTabPageModalTrigger = mock(),
+                modalShownReporter = mockModalShownReporter,
             )
 
         testee.loadData("abc", null, false, false)
@@ -4003,6 +4007,29 @@ class BrowserTabViewModelTest {
             val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
 
             assertTrue(shown)
+        }
+
+    @Test
+    fun whenUserDismissesCoordinatedPromoCtaThenModalClaimIsReportedDone() =
+        runTest {
+            val promoCta = SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE)
+            testee.onUserClickCtaDismissButton(promoCta)
+            verify(mockModalShownReporter).reportModalDismissed()
+
+            val widgetCta = HomePanelCta.AddWidgetAutoOnboarding
+            testee.onUserClickCtaOkButton(widgetCta)
+            verify(mockModalShownReporter, times(2)).reportModalDismissed()
+        }
+
+    @Test
+    fun whenUserDismissesNonCoordinatedCtaThenNoModalClaimIsReported() =
+        runTest {
+            testee.onUserDismissedCta(HomePanelCta.AddWidgetInstructions)
+            verify(mockModalShownReporter).reportModalDismissed()
+
+            reset(mockModalShownReporter)
+            testee.onUserDismissedCta(DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+            verify(mockModalShownReporter, never()).reportModalDismissed()
         }
 
     @Test

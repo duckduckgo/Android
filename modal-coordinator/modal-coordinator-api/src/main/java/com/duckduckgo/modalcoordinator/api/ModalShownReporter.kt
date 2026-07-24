@@ -27,4 +27,12 @@ interface ModalShownReporter {
      * Records that a modal-equivalent UI has just been shown by an external source.
      */
     fun reportModalShown()
+
+    /**
+     * Records that a coordinator-scheduled modal has left the screen (dismissed, actioned, or
+     * otherwise closed). Frees the shared prompt surface and starts the quiet gap before the next
+     * prompt. Safe to call for modals that were not coordinator-scheduled: it is a no-op when no
+     * claim is held.
+     */
+    fun reportModalDismissed()
 }

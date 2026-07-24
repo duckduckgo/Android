@@ -34,6 +34,8 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
@@ -81,6 +83,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
+    private val promptsCoordinator: PromptsCoordinator,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -163,16 +166,26 @@ class NewTabPageViewModel @AssistedInject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
-                    val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
+                    // The RMF card shares the NTP prompt surface with coordinator modals: it only
+                    // renders while holding the prompts-coordinator claim (re-claims by the showing
+                    // card are granted; when refused we suppress and re-check on the next render).
+                    val message = snapshot.remoteMessage?.takeIf { promptsCoordinator.tryClaim(PromptType.RMF) }
+                    if (message == null && lastRemoteMessageSeen != null) {
+                        // The card we were showing left the screen (user dismissal, action click or
+                        // remote expiry all funnel through this transition): free the surface and
+                        // start the quiet gap. No-op if RMF no longer holds the claim.
+                        promptsCoordinator.onClaimDone(PromptType.RMF)
+                    }
+                    val newMessage = message?.id != lastRemoteMessageSeen?.id
                     if (newMessage) {
-                        lastRemoteMessageSeen = snapshot.remoteMessage
+                        lastRemoteMessageSeen = message
                     }
 
                     withContext(dispatchers.io()) {
                         val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
                         _viewState.emit(
                             viewState.value.copy(
-                                message = snapshot.remoteMessage,
+                                message = message,
                                 messageImageFilePath = messageImageFilePath,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,

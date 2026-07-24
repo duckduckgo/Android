@@ -26,6 +26,8 @@ import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.modalcoordinator.api.ModalTrigger
 import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -62,6 +64,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val modalEvaluatorPluginPoint: PluginPoint<ModalEvaluator>,
     private val completionStore: ModalEvaluatorCompletionStore,
+    private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
@@ -83,8 +86,15 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
 
-        // Check 24-hour blocking first
-        if (completionStore.isBlockedBy24HourWindow()) {
+        val promptsCoordinatorEnabled = promptsCoordinator.isEnabled()
+        if (promptsCoordinatorEnabled) {
+            // The prompts-coordinator owns all prompt gaps (its 24h-since-any-prompt gate subsumes
+            // the internal modal↔modal window, which is kept below only as the kill-switch fallback).
+            if (!promptsCoordinator.tryClaim(PromptType.MODAL)) {
+                logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by the prompts coordinator" }
+                return@withLock
+            }
+        } else if (completionStore.isBlockedBy24HourWindow()) {
             logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by 24-hour window" }
             return@withLock
         }
@@ -101,6 +111,9 @@ class ModalEvaluatorCoordinator @Inject constructor(
             when (evaluator.evaluate()) {
                 is ModalEvaluator.EvaluationResult.ModalShown -> {
                     logcat { "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' completed and modal shown, record timestamp and stop" }
+                    // Always recorded (even when the prompts-coordinator owns gating) so flipping
+                    // the kill-switch either way stays seamless. The claim stays held: the modal's
+                    // dismissal call-site reports onClaimDone(MODAL) when the prompt leaves the screen.
                     completionStore.recordCompletion()
                     return@withLock
                 }
@@ -110,6 +123,9 @@ class ModalEvaluatorCoordinator @Inject constructor(
             }
         }
 
+        // Nothing was shown: free the surface without stamping the gap timestamp (no-op when the
+        // prompts-coordinator is disabled or holds no claim).
+        promptsCoordinator.onClaimCancelled(PromptType.MODAL)
         logcat { "ModalEvaluatorCoordinator: Coordination complete for trigger $trigger, no action taken" }
     }
 }

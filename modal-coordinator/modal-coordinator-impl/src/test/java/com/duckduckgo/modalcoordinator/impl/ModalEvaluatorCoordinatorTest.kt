@@ -22,6 +22,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.modalcoordinator.api.ModalTrigger
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -39,15 +41,19 @@ class ModalEvaluatorCoordinatorTest {
     private val mockCompletionStore: ModalEvaluatorCompletionStore = mock()
     private val mockPluginPoint: PluginPoint<ModalEvaluator> = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
+    private val mockPromptsCoordinator: PromptsCoordinator = mock()
 
     private lateinit var testee: ModalEvaluatorCoordinator
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        // Default: prompts-coordinator kill-switch disabled → legacy 24h window behaviour.
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(false)
         testee = ModalEvaluatorCoordinator(
             appCoroutineScope = coroutinesTestRule.testScope,
             modalEvaluatorPluginPoint = mockPluginPoint,
             completionStore = mockCompletionStore,
+            promptsCoordinator = mockPromptsCoordinator,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
         )
     }
@@ -211,6 +217,70 @@ class ModalEvaluatorCoordinatorTest {
 
         verify(ntpEvaluator, never()).evaluate()
         verify(mockCompletionStore, never()).recordCompletion()
+    }
+
+    @Test
+    fun whenPromptsCoordinatorEnabledAndClaimRefusedThenNoEvaluatorsAreCalled() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(false)
+        val mockEvaluator = createMockEvaluator("test", 1)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockEvaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockEvaluator, never()).evaluate()
+        verify(mockCompletionStore, never()).recordCompletion()
+        // The internal 24h window must not be consulted while the prompts-coordinator owns gating.
+        verify(mockCompletionStore, never()).isBlockedBy24HourWindow()
+    }
+
+    @Test
+    fun whenPromptsCoordinatorEnabledAndClaimGrantedThenInternal24HourWindowIsSkipped() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
+        val mockEvaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockEvaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockCompletionStore, never()).isBlockedBy24HourWindow()
+        verify(mockEvaluator).evaluate()
+        // Timestamps keep recording regardless of the flag so kill-switch flips stay seamless.
+        verify(mockCompletionStore).recordCompletion()
+        // Claim stays held until the modal's dismissal call-site reports done.
+        verify(mockPromptsCoordinator, never()).onClaimCancelled(PromptType.MODAL)
+    }
+
+    @Test
+    fun whenPromptsCoordinatorEnabledAndAllEvaluatorsSkipThenClaimIsCancelled() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
+        val evaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.Skipped)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(evaluator).evaluate()
+        verify(mockPromptsCoordinator).onClaimCancelled(PromptType.MODAL)
+        verify(mockCompletionStore, never()).recordCompletion()
+    }
+
+    @Test
+    fun whenPromptsCoordinatorDisabledThenClaimIsNeverAttempted() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(false)
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val evaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPromptsCoordinator, never()).tryClaim(PromptType.MODAL)
+        verify(mockCompletionStore).isBlockedBy24HourWindow()
+        verify(mockCompletionStore).recordCompletion()
     }
 
     private suspend fun createMockEvaluator(

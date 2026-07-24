@@ -19,6 +19,8 @@ package com.duckduckgo.modalcoordinator.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -27,9 +29,16 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealModalShownReporter @Inject constructor(
     private val completionStore: ModalEvaluatorCompletionStore,
+    private val promptsCoordinator: PromptsCoordinator,
 ) : ModalShownReporter {
 
     override fun reportModalShown() {
         completionStore.recordCompletionSync()
+    }
+
+    override fun reportModalDismissed() {
+        // The claim was taken by the coordinated evaluation pass that scheduled the modal; the
+        // modal-coordinator owns releasing it so call-sites never touch the prompts-coordinator.
+        promptsCoordinator.onClaimDone(PromptType.MODAL)
     }
 }

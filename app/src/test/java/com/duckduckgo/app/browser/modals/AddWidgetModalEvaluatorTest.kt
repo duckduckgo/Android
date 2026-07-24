@@ -30,9 +30,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.onBlocking
 import org.mockito.kotlin.whenever
 
 class AddWidgetModalEvaluatorTest {
@@ -43,15 +41,14 @@ class AddWidgetModalEvaluatorTest {
     private val widgetCapabilities: WidgetCapabilities = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val registry = NewTabPageModalPresenterRegistry()
-    private val onboardingFlowChecker: OnboardingFlowChecker = mock {
-        onBlocking { isOnboardingComplete() } doReturn true
-    }
+    private val onboardingFlowChecker: OnboardingFlowChecker = mock()
 
     private lateinit var testee: AddWidgetModalEvaluator
 
     @Before
-    fun before() {
+    fun before() = runTest {
         // Default: eligible (onboarding complete, no widgets installed, not dismissed).
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)

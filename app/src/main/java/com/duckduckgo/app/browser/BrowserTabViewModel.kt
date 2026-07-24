@@ -389,6 +389,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
+import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -592,6 +593,7 @@ class BrowserTabViewModel @Inject constructor(
     private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
     private val newTabPageModalPresenterRegistry: NewTabPageModalPresenterRegistry,
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
+    private val modalShownReporter: ModalShownReporter,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3835,7 +3837,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The NTP promo bottom sheets (Privacy Pro, Add Widget) are scheduled by the Modal Coordinator.
+     * Every user interaction below closes the sheet, so each handler reports the dismissal back to
+     * the modal-coordinator (which owns the shared prompt surface bookkeeping). No-op for CTAs that
+     * are not coordinator-driven modals.
+     */
+    private fun reportNtpModalClaimDone(cta: Cta?) {
+        val isCoordinatedModal = cta is SubscriptionPromoModalCta ||
+            cta is HomePanelCta.AddWidgetInstructions ||
+            cta is HomePanelCta.AddWidgetAutoOnboarding
+        if (isCoordinatedModal) {
+            modalShownReporter.reportModalDismissed()
+        }
+    }
+
     fun onUserClickCtaOkButton(cta: Cta) {
+        reportNtpModalClaimDone(cta)
         viewModelScope.launch {
             ctaViewModel.onUserClickCtaOkButton(cta)
         }
@@ -3862,6 +3880,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaSecondaryButton(cta: Cta) {
+        reportNtpModalClaimDone(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
@@ -3883,6 +3902,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaDismissButton(cta: Cta) {
+        reportNtpModalClaimDone(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
@@ -3901,6 +3921,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserDismissedCta(cta: Cta?) {
+        reportNtpModalClaimDone(cta)
         cta?.let {
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)

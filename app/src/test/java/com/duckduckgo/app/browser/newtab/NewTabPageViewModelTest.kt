@@ -34,6 +34,8 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MessageTrigger
@@ -80,6 +82,7 @@ class NewTabPageViewModelTest {
     private val pixel: Pixel = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockCtaViewModel: CtaViewModel = mock()
+    private val mockPromptsCoordinator: PromptsCoordinator = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -91,6 +94,8 @@ class NewTabPageViewModelTest {
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
+        // Default: the prompt surface is free, so RMF claims are granted.
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.RMF)).thenReturn(true)
 
         testee = createTestee()
     }
@@ -115,6 +120,7 @@ class NewTabPageViewModelTest {
             pixel = pixel,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
+            promptsCoordinator = mockPromptsCoordinator,
             browserMode = browserMode,
         )
     }
@@ -132,6 +138,54 @@ class NewTabPageViewModelTest {
         testee.viewState.test {
             assertEquals(remoteMessage, expectMostRecentItem().message)
         }
+    }
+
+    @Test
+    fun whenPromptSurfaceClaimRefusedThenActiveMessageIsSuppressed() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.RMF)).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+    }
+
+    @Test
+    fun whenPromptSurfaceClaimGrantedThenActiveMessageIsShownAndClaimNotReleased() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.RMF)
+        verify(mockPromptsCoordinator, never()).onClaimCancelled(PromptType.RMF)
+    }
+
+    @Test
+    fun whenShownMessageLeavesTheScreenThenClaimIsDone() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(remoteMessage)
+        testee.viewState.test {
+            assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
+
+        // The card is dismissed (user action or remote expiry): the active-message flow emits null.
+        messages.emit(null)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator).onClaimDone(PromptType.RMF)
     }
 
     @Test
