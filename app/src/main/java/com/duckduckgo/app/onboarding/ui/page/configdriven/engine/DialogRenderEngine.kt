@@ -136,6 +136,10 @@ class DialogRenderEngine(
 
         skipRunningAnimations() // never let a new render race a still-settling previous one
         unbindCurrent()
+        // Fresh stage: content includes sit at their XML defaults (welcome defaults *visible*), and unbind only
+        // ever hides the include this engine itself bound — reset them all before the first bind. See
+        // [ContentBinder.hideAll].
+        if (emptyStage) contentBinder.hideAll()
 
         // Per-axis diffs only: each controller sees just its own previous -> next value, never the screens.
         background.apply(previous?.background, config.background, animateNow)

@@ -328,6 +328,20 @@ class OnboardingIntroChoreographer(
     }
 
     /**
+     * Post-outro settle for mid-flow re-entry: everything [snapToIntroEndState] settles (background at its
+     * post-intro state), but with the intro-only views (title/logo/duck.ai) hidden the way [playOutro] leaves
+     * them. Mirrors legacy's `showDialogWithoutAnimation`, which follows its own `snapToIntroEndState()` call
+     * (:1706) by zeroing exactly these three alphas in every branch (:1713-1715 et al.) — a fragment recreated
+     * mid-flow must never show the intro logo/title behind the card.
+     */
+    fun snapToOutroEndState() {
+        snapToIntroEndState()
+        binding.welcomeTitle.alpha = 0f
+        binding.logoAnimation.alpha = 0f
+        binding.duckAiIntroAnimation.alpha = 0f
+    }
+
+    /**
      * Fades the intro-only views out (title/logo/duck.ai) and reports completion via [onEnd]. Unlike legacy's
      * `playOutroAnimation`, this does not also drive the background step transition — see class doc.
      */

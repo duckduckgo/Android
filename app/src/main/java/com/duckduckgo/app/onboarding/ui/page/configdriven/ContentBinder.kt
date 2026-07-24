@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.view.View
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.databinding.PreOnboardingDaxDialogCtaBrandDesignUpdateBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddToDockBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBinder
@@ -54,6 +55,28 @@ class ContentBinder(
     private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
     private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent)
     private val quickSetup = QuickSetupBinder(binding.reinstallerQuickSetupContent)
+
+    private val allContentViews = listOf(
+        welcome.view,
+        comparisonChart.view,
+        addToDock.view,
+        widgetPrompt.view,
+        addressBar.view,
+        inputScreen.view,
+        inputScreenPreview.view,
+        quickSetup.view,
+    )
+
+    /**
+     * Fresh-stage reset: the welcome include defaults *visible* in the shared card XML (legacy's welcome
+     * branches rely on that default, so it can't be flipped to gone), while the engine only ever hides the
+     * include it previously bound. A fresh engine rendering any non-welcome screen first (mid-flow re-entry)
+     * would otherwise keep the welcome include stacked above it in the card — its alpha-0 children reserving
+     * blank height. Legacy's equivalent is each branch explicitly hiding every other include.
+     */
+    fun hideAll() {
+        allContentViews.forEach { it.isVisible = false }
+    }
 
     fun bind(content: ContentConfig, scope: BindScope): BoundContent = when (content) {
         is ContentConfig.Welcome -> BoundContent(welcome.view, welcome.bind(content, scope))

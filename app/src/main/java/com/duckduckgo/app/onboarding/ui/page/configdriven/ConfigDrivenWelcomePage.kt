@@ -302,10 +302,12 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
                     renderState.stepId?.let { viewModel.onDialogRendered(it) }
                 }
             } else {
-                // Mirrors legacy's snapToIntroEndState() call at the top of showDialogWithoutAnimation
-                // (BrandDesignUpdateWelcomePage.kt:1706): settle the intro-only views once before the first
-                // real dialog renders, since this fresh instance's views start at their pre-intro XML defaults.
-                intro?.snapToIntroEndState()
+                // Mirrors legacy's snapToIntroEndState() + intro-view alpha zeroing at the top of every
+                // showDialogWithoutAnimation branch (BrandDesignUpdateWelcomePage.kt:1706 + :1713-1715): settle
+                // the background at its post-intro state and hide the intro-only views (logo/title/duck.ai)
+                // before the first real dialog renders, since this fresh instance's views start at their
+                // pre-intro XML defaults and no outro will run to fade them.
+                intro?.snapToOutroEndState()
                 engine.render(config, state.animateEntry)
                 state.stepId?.let { viewModel.onDialogRendered(it) }
             }
