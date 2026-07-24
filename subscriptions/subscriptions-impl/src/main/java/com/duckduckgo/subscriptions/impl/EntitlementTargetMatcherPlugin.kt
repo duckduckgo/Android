@@ -20,18 +20,19 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class EntitlementTargetMatcherPlugin @Inject constructor(
-    private val subscriptions: Subscriptions,
+    private val subscriptions: Lazy<Subscriptions>,
 ) : Toggle.TargetMatcherPlugin {
     override fun matchesTargetProperty(target: Toggle.State.Target): Boolean {
         return target.entitlement?.let { entitlement ->
             runBlocking {
-                subscriptions.getEntitlementStatus().firstOrNull()?.any { it.value.lowercase() == entitlement.lowercase() } ?: false
+                subscriptions.get().getEntitlementStatus().firstOrNull()?.any { it.value.lowercase() == entitlement.lowercase() } ?: false
             }
         } ?: true
     }
