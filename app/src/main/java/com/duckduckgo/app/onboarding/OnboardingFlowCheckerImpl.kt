@@ -35,14 +35,17 @@ class OnboardingFlowCheckerImpl @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val userStageStore: UserStageStore,
     private val dispatcher: DispatcherProvider,
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
 ) : OnboardingFlowChecker {
 
     override suspend fun isOnboardingComplete(): Boolean {
         // TODO Consider adding allOnboardingCtasShown() in the future.
         //  See https://app.asana.com/1/137249556945/project/414730916066338/task/1212406513605392
         return withContext(dispatcher.io()) {
+            val widgetCtaCompletesOnboarding = dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
+                !onboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()
             settingsDataStore.hideTips ||
-                dismissedCtaDao.exists(CtaId.ADD_WIDGET) ||
+                widgetCtaCompletesOnboarding ||
                 userStageStore.getUserAppStage() == AppStage.ESTABLISHED
         }
     }

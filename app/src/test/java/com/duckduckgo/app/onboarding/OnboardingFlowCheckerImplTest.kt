@@ -39,18 +39,21 @@ class OnboardingFlowCheckerImplTest {
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val userStageStore: UserStageStore = mock()
+    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager = mock()
 
     private lateinit var testee: OnboardingFlowCheckerImpl
 
     @Before
     fun setup() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        whenever(onboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()).thenReturn(false)
 
         testee = OnboardingFlowCheckerImpl(
             dismissedCtaDao = dismissedCtaDao,
             settingsDataStore = settingsDataStore,
             userStageStore = userStageStore,
             dispatcher = coroutineTestRule.testDispatcherProvider,
+            onboardingPromptsExperimentManager = onboardingPromptsExperimentManager,
         )
     }
 
@@ -72,6 +75,18 @@ class OnboardingFlowCheckerImplTest {
         val result = testee.isOnboardingComplete()
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenAddWidgetCtaIsDismissedButEnrolledInWidgetPromptCohortThenOnboardingIsNotComplete() = runTest {
+        // The widget CTA was dismissed early by linear onboarding, so it must not signal onboarding as done.
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(true)
+        whenever(onboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()).thenReturn(true)
+
+        val result = testee.isOnboardingComplete()
+
+        assertFalse(result)
     }
 
     @Test
