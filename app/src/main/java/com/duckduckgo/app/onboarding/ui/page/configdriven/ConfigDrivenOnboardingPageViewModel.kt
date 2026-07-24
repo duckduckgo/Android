@@ -162,10 +162,23 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                     _commands.send(Command.ShowQuickSetupSearchOptionsBottomSheet(initialWithAi = currentWithAi))
                 }
             }
-            is ContentInteraction.SetDefaultBrowserToggled ->
+            // Both switch interactions mirror the view's (optimistic) toggle into the content state before any
+            // side effect: the switch view has already flipped itself on click, and the store must reflect what
+            // the view shows or a later corrective write of the *old* value (system dialog declined, onResume
+            // re-sync) is deduped by the MutableStateFlow as a no-change and never reaches the binder — legacy's
+            // equivalent was resetting the switch view directly via setCheckedSilently(false).
+            is ContentInteraction.SetDefaultBrowserToggled -> {
+                currentQuickSetup()?.let { quickSetup ->
+                    contentValues.contentState(quickSetup).update { it.copy(defaultBrowserChecked = interaction.checked) }
+                }
                 if (interaction.checked) onQuickSetupSetAsDefaultClicked() else onQuickSetupSetAsDefaultUnchecked()
-            is ContentInteraction.AddWidgetToggled ->
+            }
+            is ContentInteraction.AddWidgetToggled -> {
+                currentQuickSetup()?.let { quickSetup ->
+                    contentValues.contentState(quickSetup).update { it.copy(widgetChecked = interaction.checked) }
+                }
                 if (interaction.checked) onQuickSetupAddHomescreenWidgetClicked() else onQuickSetupRemoveHomescreenWidgetClicked()
+            }
         }
     }
 
