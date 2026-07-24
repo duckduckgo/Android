@@ -25,7 +25,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/keyline_2" />
 
-    <!-- TODO Warnings container -->
+    <LinearLayout
+        android:id="@+id/warningsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
