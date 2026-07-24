@@ -24,7 +24,7 @@ runs:
   steps:
     - name: Find Asana User ID
       id: find-asana-user-id
-      uses: duckduckgo/native-github-asana-sync@v2.3
+      uses: duckduckgo/native-github-asana-sync@v2.6.0
       with:
         action: 'get-asana-user-id'
         github-username: ${{ github.actor }}
