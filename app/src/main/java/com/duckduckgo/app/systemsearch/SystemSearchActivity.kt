@@ -175,6 +175,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
                     result.data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                        viewModel.onInputScreenQuerySubmitted(query)
                         launchBrowser(query)
                     } ?: finish()
                 }
@@ -258,6 +259,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             intent?.let {
+                viewModel.setLaunchedFromWidget(launchedFromAnyWidget(it))
                 sendLaunchPixels(it)
                 if (launchedFromAssist(it)) {
                     handleDigitalAssistIntent(it)
@@ -297,6 +299,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
+        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         sendLaunchPixels(intent)
         if (launchedFromAssist(intent)) {
             handleDigitalAssistIntent(intent)
@@ -755,6 +758,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun launchedFromSystemSearchBox(intent: Intent): Boolean = intent.action == NEW_SEARCH_ACTION
 
     private fun launchedFromAssist(intent: Intent): Boolean = intent.action == Intent.ACTION_ASSIST
+
+    private fun launchedFromAnyWidget(intent: Intent): Boolean =
+        launchedFromWidget(intent) || launchedFromSearchOnlyWidget(intent) || launchedFromSearchWithFavsWidget(intent)
 
     private fun launchedFromWidget(intent: Intent): Boolean = intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
 

@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -95,6 +96,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
+    private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
 ) {
 
     suspend fun buildRootPlan(
@@ -509,6 +511,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelName.ONBOARDING_WIDGET_PROMPT,
                             OnboardingPixelAction.WidgetConfirmed(added = event.widgetAdded),
                         )
+                        if (event.widgetAdded) {
+                            onboardingPromptsExperimentMetrics.fireWidgetAddedMetric()
+                        }
                         Advance
                     }
                     else -> Stay

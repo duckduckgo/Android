@@ -181,6 +181,7 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
             },
             duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
             onboardingPixelSender = mock(),
+            onboardingPromptsExperimentMetrics = mock(),
             contextualCtaSuppressorPlugins = mock(),
         )
     }

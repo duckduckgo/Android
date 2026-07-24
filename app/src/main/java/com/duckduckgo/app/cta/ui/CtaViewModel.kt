@@ -36,6 +36,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -116,6 +117,7 @@ class CtaViewModel @Inject constructor(
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val onboardingPixelSender: OnboardingPixelSender,
+    private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -250,6 +252,9 @@ class CtaViewModel @Inject constructor(
             if (cta is SubscriptionPromoModalCta) {
                 pixel.fire(cta.flow.shownPixel, cta.pixelShownParameters())
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
+            if (cta.ctaId == CtaId.DAX_END) {
+                onboardingPromptsExperimentMetrics.fireOnboardingCompletedMetric()
             }
         }
     }

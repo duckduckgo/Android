@@ -159,6 +159,7 @@ class OnboardingDaxDialogTests {
             },
             mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
             mock(),
+            mock(),
         )
     }
 
