@@ -188,7 +188,8 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
             duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
-            onboardingPixelSender = mock(), contextualCtaSuppressorPlugins = mock(),
+            onboardingPixelSender = mock(),
+            contextualCtaSuppressorPlugins = mock(),
         )
     }
 
