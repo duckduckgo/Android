@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Instellingen Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Stel een vraag over het tabblad</string>
+    <string name="duckChatContextualAskAboutPage">Stel een vraag over de pagina</string>
 </resources>
