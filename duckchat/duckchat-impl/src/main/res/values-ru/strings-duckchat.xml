@@ -265,4 +265,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Настройки Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Задайте вопрос о вкладке</string>
+    <string name="duckChatContextualAskAboutPage">Задайте вопрос о странице</string>
 </resources>
