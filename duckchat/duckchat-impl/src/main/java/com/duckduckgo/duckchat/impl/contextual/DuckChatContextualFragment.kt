@@ -48,6 +48,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -231,6 +232,7 @@ class DuckChatContextualFragment :
     private val keyboardVisibilityListener =
         ViewTreeObserver.OnGlobalLayoutListener {
             runCatching {
+                updateContentAreaHeight()
                 val rootView = binding.root
                 val rect = Rect()
                 rootView.getWindowVisibleDisplayFrame(rect)
@@ -262,12 +264,14 @@ class DuckChatContextualFragment :
                     viewModel.onSheetClosed()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+                updateContentAreaHeight()
             }
 
             override fun onSlide(
                 bottomSheet: View,
                 slideOffset: Float,
             ) {
+                updateContentAreaHeight()
             }
         }
 
@@ -539,8 +543,44 @@ class DuckChatContextualFragment :
         bottomSheetBehavior.skipCollapsed = true
         bottomSheetBehavior.isDraggable = true
         bottomSheetBehavior.isHideable = true
-        bottomSheetBehavior.isFitToContents = true
+        bottomSheetBehavior.isFitToContents = false
         bottomSheetBehavior.expandedOffset = 0
+        bottomSheetBehavior.halfExpandedRatio = HALF_EXPANDED_RATIO
+    }
+
+    private fun updateContentAreaHeight() {
+        // contextualContentArea holds either the contextual prompts or the chat webview.
+        val contentArea = binding.contextualContentArea
+        // Let the content area flex (weight 1) to fill the remaining height, input kept as wrap_content
+        // below it, when:
+        //  - WEBVIEW mode: the webview should always take the rest; never resize it per-frame (glitches).
+        //  - Expanded: the sheet fills the coordinator, so BrowserActivity's adjustResize can lift the
+        //    input above the keyboard natively instead of the per-frame resize below fighting the IME.
+        val isWebViewMode = viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.WEBVIEW
+        if (isWebViewMode || bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            val params = contentArea.layoutParams as LinearLayout.LayoutParams
+            if (params.height != 0 || params.weight != 1f) {
+                contentArea.updateLayoutParams<LinearLayout.LayoutParams> {
+                    weight = 1f
+                    height = 0
+                }
+            }
+            return
+        }
+
+        val sheet = binding.contextualModeRoot.parent as? View ?: return
+        val coordinatorHeight = (sheet.parent as? View)?.height ?: return
+        if (coordinatorHeight <= 0) return
+        val visibleSheetHeight = (coordinatorHeight - sheet.top).coerceAtLeast(0)
+        val chromeHeight = binding.contextualModeButtons.height + binding.contextualInputContainer.height
+        val contentHeight = (visibleSheetHeight - chromeHeight).coerceAtLeast(0)
+        // Size the middle to the visible sheet minus header + input, so the input sits on the visible edge.
+        if (contentArea.layoutParams.height != contentHeight) {
+            contentArea.updateLayoutParams<LinearLayout.LayoutParams> {
+                weight = 0f
+                height = contentHeight
+            }
+        }
     }
 
     private fun setupBackPressHandling() {
@@ -1212,6 +1252,7 @@ class DuckChatContextualFragment :
     }
 
     companion object {
+        private const val HALF_EXPANDED_RATIO = 0.5f
         private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
