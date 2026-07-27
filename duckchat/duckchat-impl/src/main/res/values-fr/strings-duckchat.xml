@@ -265,6 +265,6 @@
     <string name="duckAiSettingsTitle">Paramètres Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Poser des questions sur l\'onglet</string>
-    <string name="duckChatContextualAskAboutPage">Poser des questions sur la page</string>
+    <string name="duckChatContextualAskAboutTab">Posez des questions sur l\'onglet</string>
+    <string name="duckChatContextualAskAboutPage">Posez des questions sur la page</string>
 </resources>
