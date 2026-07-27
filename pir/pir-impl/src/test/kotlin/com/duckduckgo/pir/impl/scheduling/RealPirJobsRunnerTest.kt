@@ -25,6 +25,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -86,6 +87,7 @@ class RealPirJobsRunnerTest {
     private val mockPirScanWideEvent: PirScanWideEvent = mock()
     private val mockPirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
+    private val mockPirWebViewCountProvider: PirWebViewCountProvider = mock()
 
     @Before
     fun setUp() = kotlinx.coroutines.runBlocking {
@@ -98,6 +100,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRemoteFeatures.trackerBlocking()).thenReturn(mockTrackerBlockingToggle)
         whenever(mockTrackerBlockingToggle.isEnabled()).thenReturn(false)
         whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+        whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20)
 
         testee = RealPirJobsRunner(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -114,6 +117,7 @@ class RealPirJobsRunnerTest {
             pirScanWideEvent = mockPirScanWideEvent,
             pirInitialScanCompletionWideEvent = mockPirInitialScanCompletionWideEvent,
             networkProtectionState = mockNetworkProtectionState,
+            pirWebViewCountProvider = mockPirWebViewCountProvider,
         )
     }
 

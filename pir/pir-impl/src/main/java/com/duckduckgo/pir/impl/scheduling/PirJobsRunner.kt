@@ -27,7 +27,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
-import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -82,6 +82,7 @@ class RealPirJobsRunner @Inject constructor(
     private val pirScanWideEvent: PirScanWideEvent,
     private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
     private val networkProtectionState: NetworkProtectionState,
+    private val pirWebViewCountProvider: PirWebViewCountProvider,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -156,7 +157,7 @@ class RealPirJobsRunner @Inject constructor(
         val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
         val notificationsPermissionGranted = context.areNotificationsPermissionGranted()
         val isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled()
-        val webViewCount = minOf(eligibleJobs.size, MAX_DETACHED_WEBVIEW_COUNT)
+        val webViewCount = minOf(eligibleJobs.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         pirScanWideEvent.onRunStarted(
             executionType = executionType,
