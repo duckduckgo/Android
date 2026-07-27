@@ -239,7 +239,7 @@ class RealExchangeV2Runner @Inject constructor(
      * (in which case an error event was already emitted).
      */
     private suspend fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
-        val keyPair = jweCrypto.generateRsaKeyPair()
+        val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
         ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
             val candidate = UUID.randomUUID().toString()
@@ -870,6 +870,9 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     companion object {
+        // RSA modulus size (bits) for the v2 exchange pairing keypair.
+        private const val EXCHANGE_RSA_KEY_SIZE = 2048
+
         private const val REPLAY = 100
 
         // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.

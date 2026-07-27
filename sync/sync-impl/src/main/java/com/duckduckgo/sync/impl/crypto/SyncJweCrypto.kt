@@ -43,7 +43,10 @@ import javax.inject.Inject
 private const val JWE_CONTENT_TYPE_OCTET_STREAM = "application/octet-stream"
 
 interface SyncJweCrypto {
-    fun generateRsaKeyPair(): RsaKeyPair
+    /**
+     * Generate an RSA keypair of [keySizeBits] bits.
+     */
+    fun generateRsaKeyPair(keySizeBits: Int): RsaKeyPair
 
     /**
      * JWE-encrypt content with a symmetric AES-256 key using direct encryption (alg=dir, enc=A256GCM).
@@ -94,10 +97,10 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
 
     private val secureRandom = SecureRandom()
 
-    override fun generateRsaKeyPair(): RsaKeyPair {
-        logcat { "Sync-ScopedToken: generating RSA-$RSA_KEY_SIZE keypair" }
+    override fun generateRsaKeyPair(keySizeBits: Int): RsaKeyPair {
+        logcat { "Sync-ScopedToken: generating RSA-$keySizeBits keypair" }
         val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-        keyPairGenerator.initialize(RSA_KEY_SIZE)
+        keyPairGenerator.initialize(keySizeBits)
         val keyPair: KeyPair = keyPairGenerator.generateKeyPair()
 
         return RsaKeyPair(
@@ -242,7 +245,6 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
     }
 
     companion object {
-        private const val RSA_KEY_SIZE = 2048
         private const val AES_KEY_BYTES = 32 // 256-bit AES
         private const val GCM_IV_BYTES = 12
         private const val GCM_TAG_BYTES = 16
