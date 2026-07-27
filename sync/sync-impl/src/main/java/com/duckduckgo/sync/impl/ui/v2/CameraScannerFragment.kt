@@ -19,7 +19,10 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -82,6 +85,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
 
         configureIntroAnimation()
         configureReadyToScanButtons()
+        configureGoToSettingsButton()
 
         observeUiEvents()
     }
@@ -187,5 +191,15 @@ class CameraScannerFragment : DuckDuckGoFragment() {
         }
         binding.includeIntro.readyToScanSecondaryButton.setOnClickListener(listener)
         binding.includeIntro.readyToScanPrimaryButton.setOnClickListener(listener)
+    }
+
+    private fun configureGoToSettingsButton() {
+        binding.includeNoPermission.goToPermissionsSettingsButton.setOnClickListener {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.fromParts("package", requireContext().packageName, null),
+            )
+            startActivity(intent)
+        }
     }
 }
