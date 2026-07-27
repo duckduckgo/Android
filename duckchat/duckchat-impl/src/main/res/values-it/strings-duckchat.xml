@@ -266,5 +266,5 @@
 
     <!-- File/image attachment menu options -->
     <string name="duckChatContextualAskAboutTab">Chiedi informazioni sulla scheda</string>
-    <string name="duckChatContextualAskAboutPage">Chiedi informazioni sulla pagina</string>
+    <string name="duckChatContextualAskAboutPage">Richiedi informazioni sulla pagina</string>
 </resources>
