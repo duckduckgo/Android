@@ -14,13 +14,6 @@
   ~ limitations under the License.
   -->
 
-<!--
-  ~ Showcase of the circular loading spinners currently used across the app's real screens.
-  ~ There is no shared ADS/Dax spinner yet; each of these is reproduced faithfully from its
-  ~ source screen so we can compare them before designing the Compose DaxProgressSpinner.
-  ~ Spinners that use a white tint in-app (Fire dialog, User survey) sit on an inverted-background
-  ~ chip here purely so they remain visible in light theme.
-  -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -30,7 +23,6 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_5">
 
-    <!-- Material CircularProgressIndicator: Privacy Dashboard (default size, accent) -->
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,7 +36,6 @@
         android:indeterminate="true"
         app:indicatorColor="?attr/daxColorAccentBlue" />
 
-    <!-- Material CircularProgressIndicator: Sync (16dp, 1dp track, accent) -->
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +52,6 @@
         app:indicatorSize="16dp"
         app:trackThickness="1dp" />
 
-    <!-- Material CircularProgressIndicator: Fire dialog (default size, white) -->
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,7 +75,6 @@
             app:indicatorColor="?attr/daxColorWhite" />
     </LinearLayout>
 
-    <!-- Raw Android ProgressBar: User survey (stock circular, white) -->
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -110,7 +99,6 @@
             android:indeterminateTintMode="src_in" />
     </LinearLayout>
 
-    <!-- Compose DaxProgressSpinner (ADS) -->
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

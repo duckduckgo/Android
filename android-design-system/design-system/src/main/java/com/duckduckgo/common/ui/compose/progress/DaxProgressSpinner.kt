@@ -45,26 +45,27 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 @Composable
 fun DaxProgressSpinner(
     modifier: Modifier = Modifier,
-    strokeWidth: Dp = DaxProgressSpinnerDefaults.strokeWidth,
+    strokeWidth: Dp = DaxProgressSpinnerDefaults.StrokeWidth,
 ) {
     CircularProgressIndicator(
         modifier = modifier,
-        color = DaxProgressSpinnerDefaults.headColor,
-        trackColor = DaxProgressSpinnerDefaults.trackColor,
+        color = DaxProgressSpinnerDefaults.HeadColor,
+        trackColor = DaxProgressSpinnerDefaults.TrackColor,
         strokeWidth = strokeWidth,
-        gapSize = 0.dp,
+        gapSize = DaxProgressSpinnerDefaults.TrackGapSize,
     )
 }
 
 private object DaxProgressSpinnerDefaults {
-    val strokeWidth: Dp = 4.dp
+    val StrokeWidth: Dp = 4.dp
+    val TrackGapSize: Dp = 0.dp
 
-    val trackColor: Color
+    val TrackColor: Color
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.system.progressSpinnerTrack
 
-    val headColor: Color
+    val HeadColor: Color
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.system.progressSpinnerIndicator
