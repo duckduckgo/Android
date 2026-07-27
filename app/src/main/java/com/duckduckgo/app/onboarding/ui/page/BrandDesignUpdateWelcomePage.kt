@@ -1176,7 +1176,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
                     binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
-                        getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+                        getString(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle).preventWidows()
 
                     val showLeftWingAnimation = applyDecorationLayout(
                         binding.leftWingAnimation,
@@ -1198,7 +1198,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingWidgetPromptPrimaryCta)
                     binding.daxDialogCta.primaryCta.alpha = 0f
-                    binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
+                    binding.daxDialogCta.secondaryCta.text = getString(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton)
                     binding.daxDialogCta.secondaryCta.alpha = 0f
 
                     titleView.cancelAnimation()
@@ -1220,7 +1220,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
                             if (view == null) return
-                            titleView.startOnboardingTypingAnimation(getString(R.string.preOnboardingWidgetPromptTitle).preventWidows()) {
+                            titleView.startOnboardingTypingAnimation(
+                                getString(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle).preventWidows(),
+                            ) {
                                 binding.daxDialogCta.secondaryCta.isVisible = true
                                 homeScreenPromptFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -1901,11 +1903,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
                 binding.daxDialogCta.secondaryCta.visibility = View.VISIBLE
-                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingWidgetPromptSecondaryCta)
+                binding.daxDialogCta.secondaryCta.text = getString(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton)
                 binding.daxDialogCta.secondaryCta.alpha = 1f
                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                 binding.daxDialogCta.widgetPromptContent.widgetPromptBody.text =
-                    getString(R.string.preOnboardingWidgetPromptBody).preventWidows()
+                    getString(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle).preventWidows()
 
                 val showLeftWing = applyDecorationLayout(
                     binding.leftWingAnimation,
@@ -1938,7 +1940,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 val titleView = binding.daxDialogCta.widgetPromptContent.widgetPromptTitle
                 titleView.cancelAnimation()
-                titleView.text = getString(R.string.preOnboardingWidgetPromptTitle).preventWidows()
+                titleView.text = getString(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle).preventWidows()
                 titleView.alpha = 1f
                 binding.daxDialogCta.widgetPromptContent.widgetPromptBody.alpha = 1f
                 binding.daxDialogCta.widgetPromptContent.widgetPromptMedia.alpha = 1f
