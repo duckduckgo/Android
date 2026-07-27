@@ -12424,6 +12424,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBrandDesignDuckAiFireButtonCtaOkClickedThenFireDialogLaunchedAndCtaNotDismissed() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.onUserClickCtaOkButton(brandDesignDuckAiFireButtonCta())
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.LaunchDuckAiOnboardingFireDialog>()
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+    }
+
+    @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDuckAiFireCtaThenCtaDismissed() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
