@@ -18,8 +18,10 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ExpandScannerCutout
 import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.PlayIntroAnimation
 import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.RequestCameraPermission
+import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ResumeCamera
 import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.ViewMode
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -230,6 +232,123 @@ class IntroAnimationViewModelTest {
 
         assertEquals(ViewMode.NoCameraAvailable, testee.viewState.value.viewMode)
         assertFalse(testee.viewState.value.animationFinished)
+    }
+
+    @Test
+    fun `when the scan button is clicked with camera permission granted then the camera resume and cutout expand commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onScanButtonClicked()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the scan button is clicked without camera permission then only the permission request command is sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(false)
+
+        testee.commands.test {
+            testee.onScanButtonClicked()
+            assertIs<RequestCameraPermission>(awaitItem())
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the permission request is granted then the camera resume and cutout expand commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onCameraPermissionResult()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the permission request is denied then no camera commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(false)
+
+        testee.commands.test {
+            testee.onCameraPermissionResult()
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the animation finishes with camera permission granted then the camera resume and cutout expand commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onAnimationFinished()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when refreshing shows the camera then the camera resume and cutout expand commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(false)
+        testee.onCameraPermissionResult()
+
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.refreshCameraPermissionState()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when refreshing while the camera is already shown then the camera resume and cutout expand commands are sent again`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onScanButtonClicked()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            testee.refreshCameraPermissionState()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when refreshing while the intro is still running then no camera commands are sent`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+
+        testee.commands.test {
+            testee.refreshCameraPermissionState()
+            expectNoEvents()
+
+            cancel()
+        }
     }
 }
 

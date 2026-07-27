@@ -17,11 +17,15 @@
 package com.duckduckgo.sync.impl.ui.v2
 
 import android.content.Intent
+import android.graphics.Outline
 import android.os.Bundle
+import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -56,6 +60,7 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
 
         configureToolbar()
         configureContentAdapter()
+        configureContentCorners()
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -94,6 +99,20 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
             }
         }
         mediator.attach()
+    }
+
+    private fun configureContentCorners() {
+        val radius = 28f.toPx()
+        binding.contentPager.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(
+                view: View,
+                outline: Outline,
+            ) {
+                // Extend the rect past the bottom so only the top corners are rounded
+                outline.setRoundRect(0, 0, view.width, view.height + radius.toInt(), radius)
+            }
+        }
+        binding.contentPager.clipToOutline = true
     }
 
     companion object {
