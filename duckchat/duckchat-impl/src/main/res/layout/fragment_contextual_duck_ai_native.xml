@@ -117,43 +117,48 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:id="@+id/contextualModePrompts"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:paddingHorizontal="@dimen/keyline_4"
-        android:gravity="bottom"
-        android:paddingTop="@dimen/keyline_4"
-        android:paddingBottom="@dimen/keyline_1"
-        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetCard"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contextualModeInputSpacer">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/contextualPromptQuickAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/duck_ai_prompt_background"
-            android:drawableStart="@drawable/ic_arrow_down_right_16"
-            android:drawablePadding="@dimen/keyline_2"
-            android:padding="@dimen/keyline_2"
-            tools:text="@string/duckAIContextualPromptSummarize"
-            app:typography="body2_bold" />
-
-    </LinearLayout>
-
     <FrameLayout
-        android:id="@+id/contextualWebviewContainer"
+        android:id="@+id/contextualContentArea"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <WebView
-            android:id="@+id/simpleWebview"
+        <LinearLayout
+            android:id="@+id/contextualModePrompts"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:gravity="bottom"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_1">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/contextualPromptQuickAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/duck_ai_prompt_background"
+                android:drawableStart="@drawable/ic_arrow_down_right_16"
+                android:drawablePadding="@dimen/keyline_2"
+                android:padding="@dimen/keyline_2"
+                tools:text="@string/duckAIContextualPromptSummarize"
+                app:typography="body2_bold" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/contextualWebviewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <WebView
+                android:id="@+id/simpleWebview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
 
     </FrameLayout>
 
