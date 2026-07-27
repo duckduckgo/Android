@@ -93,16 +93,16 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     }
 
     override fun onPause() {
-        binding.introAnimation.pauseAnimation()
+        binding.includeIntro.introAnimation.pauseAnimation()
         // onPause can fire while the view is still on screen so rewinding immediately
         // would show a visible jump. By the next pre-draw the view is guaranteed
         // to be off-screen, so the rewind is never seen.
         resetAnimationListener?.removeListener()
-        resetAnimationListener = binding.introAnimation.doOnPreDraw {
+        resetAnimationListener = binding.includeIntro.introAnimation.doOnPreDraw {
             resetAnimationListener = null
             val binding = _binding ?: return@doOnPreDraw
             if (!animationViewModel.viewState.value.animationFinished) {
-                binding.introAnimation.progress = 0f
+                binding.includeIntro.introAnimation.progress = 0f
             }
         }
         super.onPause()
@@ -129,17 +129,17 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     }
 
     private fun renderIntroAnimationViewState(viewState: ViewState) {
-        binding.introAnimationContainer.isVisible = viewState.viewMode == ViewMode.Intro
+        binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro
         binding.noCameraPermissionContainer.isVisible = viewState.viewMode == ViewMode.NoCameraPermission
         binding.cameraContainer.isVisible = viewState.viewMode == ViewMode.Camera
         binding.noCameraAvailableContainer.isVisible = viewState.viewMode == ViewMode.NoCameraAvailable
 
         val isAnimationFinished = viewState.animationFinished
         if (isAnimationFinished) {
-            binding.introAnimation.progress = 1f
+            binding.includeIntro.introAnimation.progress = 1f
         }
-        binding.readyToScanSecondaryButton.isGone = isAnimationFinished
-        binding.readyToScanPrimaryButton.isVisible = isAnimationFinished
+        binding.includeIntro.readyToScanSecondaryButton.isGone = isAnimationFinished
+        binding.includeIntro.readyToScanPrimaryButton.isVisible = isAnimationFinished
     }
 
     private fun processIntroAnimationCommand(command: Command) {
@@ -147,7 +147,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
             PlayIntroAnimation -> {
                 resetAnimationListener?.removeListener()
                 resetAnimationListener = null
-                binding.introAnimation.playAnimation()
+                binding.includeIntro.introAnimation.playAnimation()
             }
 
             RequestCameraPermission -> {
@@ -157,7 +157,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     }
 
     private fun configureIntroAnimation() {
-        binding.introAnimation.addAnimatorListener(
+        binding.includeIntro.introAnimation.addAnimatorListener(
             object : AnimatorListenerAdapter() {
                 private var cancelled = false
 
@@ -180,12 +180,12 @@ class CameraScannerFragment : DuckDuckGoFragment() {
 
     private fun configureReadyToScanButtons() {
         val listener = View.OnClickListener {
-            if (binding.introAnimation.isAnimating) {
-                binding.introAnimation.cancelAnimation()
+            if (binding.includeIntro.introAnimation.isAnimating) {
+                binding.includeIntro.introAnimation.cancelAnimation()
             }
             animationViewModel.onScanButtonClicked()
         }
-        binding.readyToScanSecondaryButton.setOnClickListener(listener)
-        binding.readyToScanPrimaryButton.setOnClickListener(listener)
+        binding.includeIntro.readyToScanSecondaryButton.setOnClickListener(listener)
+        binding.includeIntro.readyToScanPrimaryButton.setOnClickListener(listener)
     }
 }
