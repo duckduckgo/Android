@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -28,32 +29,42 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface EdgeToEdgeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun browser(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun settings(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun autofill(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun sync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun vpn(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun webview(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun onboarding(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun misc(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
     fun bottomSheets(): Toggle
 }

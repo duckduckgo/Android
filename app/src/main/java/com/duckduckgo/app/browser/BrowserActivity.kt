@@ -919,7 +919,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            // Scrim needed: SystemBarStyle colours are no-ops on Android 15+, and views that disable
+            // ancestor clipping (pulse animation, card shadows) can otherwise draw over the status bar.
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)

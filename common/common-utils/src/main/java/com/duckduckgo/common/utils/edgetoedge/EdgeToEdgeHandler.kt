@@ -326,27 +326,30 @@ class EdgeToEdgeHandler @Inject constructor() {
      * screen; a no-op when the colour can't be resolved.
      */
     private fun installStatusBarScrim(anchor: View) {
-        val contentRoot = anchor.rootView?.findViewById<ViewGroup>(android.R.id.content) ?: return
-        if (contentRoot.findViewWithTag<View>(STATUS_BAR_SCRIM_TAG) != null) return
-        val scrimColor = anchor.context.resolveStatusBarScrimColor() ?: return
+        // Deferred until attach: before setContentView there is no window content frame to add the scrim to.
+        anchor.doOnAttach {
+            val contentRoot = anchor.rootView?.findViewById<ViewGroup>(android.R.id.content) ?: return@doOnAttach
+            if (contentRoot.findViewWithTag<View>(STATUS_BAR_SCRIM_TAG) != null) return@doOnAttach
+            val scrimColor = anchor.context.resolveStatusBarScrimColor() ?: return@doOnAttach
 
-        val scrim = View(anchor.context).apply {
-            tag = STATUS_BAR_SCRIM_TAG
-            setBackgroundColor(scrimColor)
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.TOP)
-        }
-        contentRoot.addView(scrim)
-
-        ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
-            val top = insets.getInsets(
-                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
-            ).top
-            if (v.layoutParams.height != top) {
-                v.updateLayoutParams { height = top }
+            val scrim = View(anchor.context).apply {
+                tag = STATUS_BAR_SCRIM_TAG
+                setBackgroundColor(scrimColor)
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.TOP)
             }
-            insets
+            contentRoot.addView(scrim)
+
+            ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
+                val top = insets.getInsets(
+                    WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+                ).top
+                if (v.layoutParams.height != top) {
+                    v.updateLayoutParams { height = top }
+                }
+                insets
+            }
+            ViewCompat.requestApplyInsets(scrim)
         }
-        ViewCompat.requestApplyInsets(scrim)
     }
 
     /**
