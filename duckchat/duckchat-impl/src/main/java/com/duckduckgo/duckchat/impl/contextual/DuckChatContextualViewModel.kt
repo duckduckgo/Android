@@ -272,6 +272,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 withContext(dispatchers.main()) {
                     logcat { "Duck.ai: reopenSheet in Input mode" }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    if (_viewState.value.showsAskAboutPageQuickAction()) {
+                        duckChatPixels.reportContextualAskAboutPageShown()
+                    }
                 }
             }
         }
@@ -352,6 +355,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 if (_viewState.value.showsAttachContextPlaceholder()) {
                     duckChatPixels.reportContextualPlaceholderContextShown()
+                }
+                if (_viewState.value.showsAskAboutPageQuickAction()) {
+                    duckChatPixels.reportContextualAskAboutPageShown()
                 }
                 return@launch
             }
@@ -648,6 +654,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (_viewState.value.showsAttachContextPlaceholder()) {
             duckChatPixels.reportContextualPlaceholderContextShown()
         }
+        if (_viewState.value.showsAskAboutPageQuickAction()) {
+            duckChatPixels.reportContextualAskAboutPageShown()
+        }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
@@ -710,6 +719,10 @@ class DuckChatContextualViewModel @Inject constructor(
         sheetMode == SheetMode.INPUT &&
             quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
             !showContext
+
+    private fun ViewState.showsAskAboutPageQuickAction(): Boolean =
+        sheetMode == SheetMode.INPUT &&
+            quickActionState == QuickActionState.ASK_ABOUT_PAGE
 
     fun replacePrompt(
         input: String,
@@ -1016,6 +1029,9 @@ class DuckChatContextualViewModel @Inject constructor(
 
                     if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
                         duckChatPixels.reportContextualPlaceholderContextShown()
+                    }
+                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAskAboutPageQuickAction()) {
+                        duckChatPixels.reportContextualAskAboutPageShown()
                     }
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
