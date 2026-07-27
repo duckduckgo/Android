@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2023 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,26 +18,20 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?daxColorSurface">
+    android:visibility="gone"
+    tools:showIn="@layout/fragment_sync_v2_camera_scanner">
 
-    <include
-        android:id="@+id/includeNoHardware"
-        layout="@layout/fragment_sync_v2_camera_scanner_no_hardware"
-        android:visibility="gone" />
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No camera available UI"
+        app:typography="h2"
+        tools:ignore="HardcodedText" />
 
-    <include
-        android:id="@+id/includeNoPermission"
-        layout="@layout/fragment_sync_v2_camera_scanner_no_permission"
-        android:visibility="gone" />
-
-    <include
-        android:id="@+id/includeIntro"
-        layout="@layout/fragment_sync_v2_camera_scanner_intro" />
-
-    <include
-        android:id="@+id/includeCamera"
-        layout="@layout/fragment_sync_v2_camera_scanner_camera"
-        android:visibility="gone" />
 </FrameLayout>
+
