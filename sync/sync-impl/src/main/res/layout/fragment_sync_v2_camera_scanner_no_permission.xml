@@ -23,10 +23,9 @@
     tools:showIn="@layout/fragment_sync_v2_camera_scanner">
 
     <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
-        android:id="@+id/codeExchangeHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_5"
         app:bodyText="@string/sync_scanner_v2_scan_qr_code_body"
         app:headlineText="@string/sync_scanner_v2_scan_qr_code_headline" />

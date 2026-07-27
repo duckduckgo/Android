@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,20 +14,47 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:showIn="@layout/fragment_sync_v2_camera_scanner">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="wrap_content"
+    <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="No camera available UI"
-        app:typography="h2"
-        tools:ignore="HardcodedText" />
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_5"
+        app:bodyText="@string/sync_scanner_v2_scan_qr_code_body"
+        app:headlineText="@string/sync_scanner_v2_scan_qr_code_headline" />
 
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:layout_weight="1"
+        android:background="@drawable/background_code_exchange_panel"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/keyline_4">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            app:srcCompat="@drawable/ic_no_camera_hardware_128" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="@string/sync_camera_unavailable"
+            app:typography="h3" />
+
+    </LinearLayout>
+
+</LinearLayout>
