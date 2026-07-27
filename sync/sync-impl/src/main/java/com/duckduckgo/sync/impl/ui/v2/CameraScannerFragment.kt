@@ -130,7 +130,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
 
     private fun renderIntroAnimationViewState(viewState: ViewState) {
         binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro
-        binding.noCameraPermissionContainer.isVisible = viewState.viewMode == ViewMode.NoCameraPermission
+        binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission
         binding.cameraContainer.isVisible = viewState.viewMode == ViewMode.Camera
         binding.noCameraAvailableContainer.isVisible = viewState.viewMode == ViewMode.NoCameraAvailable
 
