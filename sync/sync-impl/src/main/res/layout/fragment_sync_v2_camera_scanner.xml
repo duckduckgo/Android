@@ -29,21 +29,9 @@
         android:id="@+id/includeNoPermission"
         layout="@layout/fragment_sync_v2_camera_scanner_no_permission" />
 
-    <FrameLayout
-        android:id="@+id/cameraContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Camera UI"
-            app:typography="h2"
-            tools:ignore="HardcodedText" />
-
-    </FrameLayout>
+    <include
+        android:id="@+id/includeCamera"
+        layout="@layout/fragment_sync_v2_camera_scanner_camera" />
 
     <FrameLayout
         android:id="@+id/noCameraAvailableContainer"
