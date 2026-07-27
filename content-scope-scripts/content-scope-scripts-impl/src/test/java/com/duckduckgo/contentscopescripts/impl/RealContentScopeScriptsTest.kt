@@ -58,15 +58,7 @@ class RealContentScopeScriptsTest {
 
     @Before
     fun setup() {
-        testee = RealContentScopeScripts(
-            mockPluginPoint,
-            mockUserAllowListRepository,
-            mockContentScopeJsReader,
-            mockAppBuildConfig,
-            mockUnprotectedTemporary,
-            mockFingerprintProtectionManager,
-            contentScopeScriptsFeature,
-        )
+        testee = createTestee()
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2))
@@ -344,26 +336,105 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenOptimizeInjectionEnabledThenOutputIsByteIdenticalToFallbackPath() {
+        // getScript memoizes cachedContentScopeJS, so each path uses its own fresh instance to force a real build.
         // Fallback path (chained String.replace).
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
-        val fallbackJs = testee.getScript(null, listOf())
+        val fallbackTestee = createTestee()
+        val fallbackJs = fallbackTestee.getScript(null, listOf())
 
-        // Optimized path (single-pass StringBuilder). Fresh instance so its caches build under the flag.
-        val optimizedTestee = RealContentScopeScripts(
-            mockPluginPoint,
-            mockUserAllowListRepository,
-            mockContentScopeJsReader,
-            mockAppBuildConfig,
-            mockUnprotectedTemporary,
-            mockFingerprintProtectionManager,
-            contentScopeScriptsFeature,
-        )
+        // Optimized path (single-pass StringBuilder).
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val optimizedTestee = createTestee()
         val optimizedJs = optimizedTestee.getScript(null, listOf())
 
         // The three messaging secrets are random per instance; normalise them before the byte comparison.
         val secret = Regex("[\\da-f]{32}")
         assertEquals(secret.replace(fallbackJs, "SECRET"), secret.replace(optimizedJs, "SECRET"))
+    }
+
+    @Test
+    fun whenOptimizeInjectionEnabledAndUnprotectedTemporaryChangesThenReusedAdapterSerializesNewValue() {
+        // Build the testee with the flag on so the list adapters are created once, up front, and then reused.
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val optimizedTestee = createTestee()
+
+        // First call serialises both exceptions through the cached adapter.
+        verifyJsScript(optimizedTestee.getScript(null, listOf()))
+
+        // Change the exceptions: the reused adapter must serialise the new list, not a stale cached result.
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false," +
+                "\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
+        verifyJsScript(optimizedTestee.getScript(null, listOf()), newRegEx)
+    }
+
+    @Test
+    fun whenOptimizeInjectionEnabledAndCohortsChangeThenReusedExperimentsAdapterSerializesNewValue() = runTest {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val optimizedTestee = createTestee()
+
+        // First call with no experiments builds and caches the experiments adapter (empty currentCohorts).
+        verifyJsScript(optimizedTestee.getScript(false, listOf()))
+
+        // A later call with cohorts must serialise them through the same reused adapter.
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(Cohort("control", weight = 1))
+        whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        verifyJsScript(optimizedTestee.getScript(false, listOf(mockToggle)), newRegEx)
+    }
+
+    @Test
+    fun whenOptimizeInjectionEnabledAndAllowListChangesThenReusedAdapterSerializesNewValue() {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val optimizedTestee = createTestee()
+
+        // First call serialises the initial allow-list through the cached domains adapter.
+        verifyJsScript(optimizedTestee.getScript(null, listOf()))
+
+        // Change the allow-list: the reused adapter must serialise the new domain.
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"foo\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\},\"locale\":\"en\"," +
+                "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
+                "\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
+        verifyJsScript(optimizedTestee.getScript(null, listOf()), newRegEx)
     }
 
     @Test
@@ -456,6 +527,16 @@ class RealContentScopeScriptsTest {
         assertFalse("preferences must not contain a double comma", js.contains(",,"))
         assertTrue(js.contains("\"globalPrivacyControlValue\":true"))
     }
+
+    private fun createTestee(): CoreContentScopeScripts = RealContentScopeScripts(
+        mockPluginPoint,
+        mockUserAllowListRepository,
+        mockContentScopeJsReader,
+        mockAppBuildConfig,
+        mockUnprotectedTemporary,
+        mockFingerprintProtectionManager,
+        contentScopeScriptsFeature,
+    )
 
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {
         val matchResult = regex.find(js)

@@ -28,6 +28,7 @@ import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
@@ -61,6 +62,15 @@ class RealContentScopeScripts @Inject constructor(
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
 ) : CoreContentScopeScripts {
+    // These adapters must be declared before cachedContentScopeJson.
+    private val reusableMoshi: Moshi = Builder().build()
+    private val userUnprotectedDomainsAdapter: JsonAdapter<List<String>> =
+        reusableMoshi.adapter(Types.newParameterizedType(MutableList::class.java, String::class.java))
+    private val unprotectedTemporaryAdapter: JsonAdapter<List<FeatureException>> =
+        reusableMoshi.adapter(Types.newParameterizedType(MutableList::class.java, FeatureException::class.java))
+    private val experimentsAdapter: JsonAdapter<List<Experiment>> =
+        reusableMoshi.adapter(Types.newParameterizedType(List::class.java, Experiment::class.java))
+
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
@@ -116,6 +126,8 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     override fun isEnabled(): Boolean = contentScopeScriptsFeature.self().isEnabled()
+
+    private fun optimizeInjectionEnabled(): Boolean = contentScopeScriptsFeature.optimizeContentScopeInjection().isEnabled()
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
 
@@ -173,7 +185,7 @@ class RealContentScopeScripts @Inject constructor(
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
         val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
 
-        cachedContentScopeJS = if (contentScopeScriptsFeature.optimizeContentScopeInjection().isEnabled()) {
+        cachedContentScopeJS = if (optimizeInjectionEnabled()) {
             assembleContentScopeJS(contentScopeJS, messagingParameters)
         } else {
             contentScopeJS
@@ -242,17 +254,25 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
-        val type = Types.newParameterizedType(MutableList::class.java, String::class.java)
-        val moshi = Builder().build()
-        val jsonAdapter: JsonAdapter<List<String>> = moshi.adapter(type)
-        return jsonAdapter.toJson(userUnprotectedDomains)
+        if (optimizeInjectionEnabled()) {
+            return userUnprotectedDomainsAdapter.toJson(userUnprotectedDomains)
+        } else {
+            val type = Types.newParameterizedType(MutableList::class.java, String::class.java)
+            val moshi = Builder().build()
+            val jsonAdapter: JsonAdapter<List<String>> = moshi.adapter(type)
+            return jsonAdapter.toJson(userUnprotectedDomains)
+        }
     }
 
     private fun getUnprotectedTemporaryJson(unprotectedTemporaryExceptions: List<FeatureException>): String {
-        val type = Types.newParameterizedType(MutableList::class.java, FeatureException::class.java)
-        val moshi = Builder().build()
-        val jsonAdapter: JsonAdapter<List<FeatureException>> = moshi.adapter(type)
-        return jsonAdapter.toJson(unprotectedTemporaryExceptions)
+        if (optimizeInjectionEnabled()) {
+            return unprotectedTemporaryAdapter.toJson(unprotectedTemporaryExceptions)
+        } else {
+            val type = Types.newParameterizedType(MutableList::class.java, FeatureException::class.java)
+            val moshi = Builder().build()
+            val jsonAdapter: JsonAdapter<List<FeatureException>> = moshi.adapter(type)
+            return jsonAdapter.toJson(unprotectedTemporaryExceptions)
+        }
     }
 
     private fun getUserPreferencesJson(
@@ -282,9 +302,13 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getExperimentsKeyValuePair(activeExperiments: List<Toggle>): String {
         return runBlocking {
-            val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
-            val moshi = Builder().build()
-            val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
+            val jsonAdapter: JsonAdapter<List<Experiment>> = if (optimizeInjectionEnabled()) {
+                experimentsAdapter
+            } else {
+                val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
+                val moshi = Builder().build()
+                moshi.adapter(type)
+            }
             activeExperiments
                 .filter { it.getCohort() != null && it.featureName().parentName != null }
                 .map {
