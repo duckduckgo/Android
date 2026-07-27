@@ -1,7 +1,7 @@
 {
   "name": "NeighborWho",
   "url": "neighborwho.com",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "parent": "beenverified.com",
   "optOutUrl": "https://www.neighborwho.com/svc/optout/search/optouts",
   "mirrorSites": [
@@ -9,7 +9,7 @@
       "name": "Background Checks.me",
       "url": "backgroundchecks.me",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357592,
       "optOutUrl": "https://www.neighborwho.com/svc/optout/search/optouts"
     }
   ],
@@ -226,5 +226,5 @@
     "maxAttempts": -1
   },
   "addedDatetime": 1745320348502,
-  "removedAt": null
+  "removedAt": 1784914357592
 }

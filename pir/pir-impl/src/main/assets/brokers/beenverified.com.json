@@ -1,70 +1,70 @@
 {
   "name": "BeenVerified",
   "url": "beenverified.com",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts",
   "mirrorSites": [
     {
       "name": "Background Checks.org",
       "url": "backgroundchecks.org",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "DOBSearch",
       "url": "DOBsearch.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "EmailTracer",
       "url": "emailtracer.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "Government Registry",
       "url": "governmentregistry.org",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "Open Public Records",
       "url": "open-public-records.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "Phone Lookup California",
       "url": "californiaphonelookup.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "Phone Lookup Florida",
       "url": "floridaphonelookup.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "SearchSystems",
       "url": "publicrecords.searchsystems.net",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     },
     {
       "name": "yellowbook",
       "url": "yellowbook.com",
       "addedAt": 1745317273356,
-      "removedAt": null,
+      "removedAt": 1784914357590,
       "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts"
     }
   ],
@@ -539,5 +539,5 @@
     "maxAttempts": -1
   },
   "addedDatetime": 1744978506975,
-  "removedAt": null
+  "removedAt": 1784914357590
 }

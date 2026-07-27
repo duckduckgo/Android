@@ -1,7 +1,7 @@
 {
   "name": "PeopleLooker",
   "url": "peoplelooker.com",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "parent": "beenverified.com",
   "optOutUrl": "https://www.peoplelooker.com/svc/optout/search/optouts",
   "steps": [
@@ -217,5 +217,5 @@
     "maxAttempts": -1
   },
   "addedDatetime": 1745320373493,
-  "removedAt": null
+  "removedAt": 1784914357593
 }
