@@ -47,6 +47,8 @@
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical"
                 android:paddingTop="28dp"
                 android:paddingBottom="20dp">
@@ -58,6 +60,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp" />
+
+                <include
+                    android:id="@+id/downloadReasonContent"
+                    layout="@layout/include_brand_design_dialog_download_reason"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
 
                 <include
                     android:id="@+id/comparisonChartContent"

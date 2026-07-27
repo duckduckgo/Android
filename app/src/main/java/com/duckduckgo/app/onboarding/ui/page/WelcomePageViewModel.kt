@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADD_TO_DOCK
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.DOWNLOAD_REASON
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
@@ -193,6 +194,10 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
+            DOWNLOAD_REASON -> {
+                // only rendered by the brand-design onboarding page
+            }
+
             COMPARISON_CHART -> {
                 viewModelScope.launch {
                     val isDDGDefaultBrowser =
@@ -312,6 +317,10 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
+            DOWNLOAD_REASON -> {
+                // only rendered by the brand-design onboarding page
+            }
+
             COMPARISON_CHART, AI_COMPARISON_CHART -> {
                 // no-op
             }
@@ -385,6 +394,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             INITIAL -> {
                 pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            }
+            DOWNLOAD_REASON -> {
+                // only rendered by the brand-design onboarding page
             }
             COMPARISON_CHART -> {
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())

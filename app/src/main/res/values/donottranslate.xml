@@ -53,6 +53,15 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <!-- Segmented onboarding -->
+    <string name="downloadReasonTitle">Set things up your way</string>
+    <string name="downloadReasonBody">Choose one option that interests you most, and we’ll set you up quickly.</string>
+    <string name="downloadReasonOptionSearch">Search and browse privately</string>
+    <string name="downloadReasonOptionAiChat">Chat with AI privately</string>
+    <string name="downloadReasonOptionNoAi">Remove AI from search results</string>
+    <string name="downloadReasonOptionBlockAds">Block ads and pop-ups</string>
+    <string name="downloadReasonPrimaryCta">Next</string>
+
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 

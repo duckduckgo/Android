@@ -82,6 +82,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
+enum class DownloadReasonOption {
+    SEARCH,
+    AI_CHAT,
+    NO_AI,
+    BLOCK_ADS,
+}
+
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
 class BrandDesignUpdatePageViewModel @Inject constructor(
@@ -116,6 +123,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val isCustomAiOnboardingFlow: Boolean = false,
         val stepIndicator: StepProgress? = null,
         val onboardingImprovementsV2Enabled: Boolean = true,
+        val selectedDownloadReason: DownloadReasonOption? = null,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -210,6 +218,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
             INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            DOWNLOAD_REASON -> {}
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
@@ -227,11 +236,19 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun notificationPermissionFlowFinished() = emit(NewUserOnboardingEvent.NotificationPermissionFinished(granted = notificationPermissionGranted))
 
+    fun onDownloadReasonOptionClicked(option: DownloadReasonOption) {
+        _viewState.update {
+            // Single-select toggle: tapping the selected option again clears the selection.
+            val next = if (it.selectedDownloadReason == option) null else option
+            it.copy(selectedDownloadReason = next)
+        }
+    }
+
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
-            INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, ADD_TO_DOCK ->
+            INITIAL, INITIAL_REINSTALL_USER, DOWNLOAD_REASON, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, ADD_TO_DOCK ->
                 emit(NewUserOnboardingEvent.ContinueClicked)
             ADDRESS_BAR_POSITION ->
                 emit(NewUserOnboardingEvent.AddressBarConfirmed(_viewState.value.selectedAddressBarPosition))
@@ -252,6 +269,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INITIAL_REINSTALL_USER, SYNC_RESTORE -> emit(NewUserOnboardingEvent.SkipRequested)
             WIDGET_PROMPT -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
             INITIAL,
+            DOWNLOAD_REASON,
             COMPARISON_CHART,
             AI_COMPARISON_CHART,
             ADDRESS_BAR_POSITION,
@@ -514,6 +532,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INITIAL_REINSTALL_USER)
             }
             NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
+            NewUserOnboardingActivityDialog.DownloadReason ->
+                setCurrentDialog(DOWNLOAD_REASON)
             NewUserOnboardingActivityDialog.ComparisonChart ->
                 setCurrentDialog(COMPARISON_CHART, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AiComparisonChart ->

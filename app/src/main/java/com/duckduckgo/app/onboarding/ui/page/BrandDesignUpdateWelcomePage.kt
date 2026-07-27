@@ -84,6 +84,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADD_TO_DOCK
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.DOWNLOAD_REASON
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
@@ -166,7 +167,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
     private var quickSetupFadeInAnimatorSet: AnimatorSet? = null
+    private var downloadReasonFadeInAnimatorSet: AnimatorSet? = null
     private var quickSetupSelectionJob: Job? = null
+    private var downloadReasonSelectionJob: Job? = null
     private var stepIndicatorFadeOutAnimator: ObjectAnimator? = null
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
@@ -793,8 +796,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         quickSetupFadeInAnimatorSet?.removeAllListeners()
         quickSetupFadeInAnimatorSet?.cancel()
         quickSetupFadeInAnimatorSet = null
+        downloadReasonFadeInAnimatorSet?.removeAllListeners()
+        downloadReasonFadeInAnimatorSet?.cancel()
+        downloadReasonFadeInAnimatorSet = null
+        binding.daxDialogCta.downloadReasonContent.downloadReasonTitle.cancelAnimation()
         quickSetupSelectionJob?.cancel()
         quickSetupSelectionJob = null
+        downloadReasonSelectionJob?.cancel()
+        downloadReasonSelectionJob = null
         stepIndicatorFadeOutAnimator?.removeAllListeners()
         stepIndicatorFadeOutAnimator?.cancel()
         stepIndicatorFadeOutAnimator = null
@@ -884,6 +893,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             // entrance (no predecessor on screen) over a cross-dialog morph.
             val freshEntry = isFreshDialogEntry()
             hasRenderedDialog = true
+            // Only DOWNLOAD_REASON gates the shared primary CTA on a selection; every other step re-enables it.
+            binding.daxDialogCta.primaryCta.isEnabled = true
             when (onboardingDialogType) {
                 INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
                     val isSyncRestore = onboardingDialogType == SYNC_RESTORE
@@ -1072,6 +1083,83 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         getString(R.string.preOnboardingReinstallStartBrowsing)
                     }
                     binding.daxDialogCta.primaryCta.alpha = 0f
+                }
+
+                DOWNLOAD_REASON -> {
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.DownloadReason)
+
+                    // Swap content before measuring so the next layout pass reflects the download-reason size,
+                    // and ChangeBounds animates the card into it. The include root stays fully opaque so the
+                    // title is visible while it types; body, options grid and primary CTA are alpha-hidden
+                    // until typing completes.
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+
+                    binding.daxDialogCta.downloadReasonContent.root.isVisible = true
+                    binding.daxDialogCta.downloadReasonContent.downloadReasonTitleHidden.text =
+                        getString(R.string.downloadReasonTitle).preventWidows()
+                    binding.daxDialogCta.downloadReasonContent.downloadReasonBody.text =
+                        getString(R.string.downloadReasonBody).preventWidows()
+
+                    val showBottomWingAnimation = applyDecorationLayout(
+                        binding.bottomWingAnimation,
+                        BOTTOM_WING_MAX_HEIGHT_DP,
+                        BOTTOM_WING_MIN_HEIGHT_DP,
+                    )
+                    if (!showBottomWingAnimation) {
+                        binding.bottomWingAnimation.isVisible = false
+                    }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBottomWingAnimation) 1f else 0f)
+
+                    val transition = ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            // Transition callbacks can still arrive after removeListener() if the
+                            // end event was already in flight; unlike Animator.cancel(), this is
+                            // not a synchronous stop.
+                            if (view == null) return
+                            playDownloadReasonContentIntro()
+                        }
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    val cardView = binding.daxDialogCta.cardView
+                    cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                    arrowSlideAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                        interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator()
+                        addUpdateListener {
+                            cardView.setArrowAnimationFraction(it.animatedValue as Float)
+                        }
+                        start()
+                    }
+
+                    if (showBottomWingAnimation) {
+                        playBottomWingAnimation()
+                    }
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        if (showBottomWingAnimation) {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = binding.bottomWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.downloadReasonPrimaryCta)
+                    binding.daxDialogCta.primaryCta.alpha = 0f
+                    // Gated until a tile is selected; the intro fade lands it at its disabled alpha.
+                    binding.daxDialogCta.primaryCta.isEnabled = false
                 }
 
                 COMPARISON_CHART, AI_COMPARISON_CHART -> {
@@ -1616,6 +1704,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         // Swap content before measuring so the dialog height reflects the comparison chart
         binding.daxDialogCta.welcomeContent.root.isVisible = false
+        binding.daxDialogCta.downloadReasonContent.root.isVisible = false
         binding.daxDialogCta.secondaryCta.isVisible = false
         binding.daxDialogCta.comparisonChartContent.root.isVisible = true
 
@@ -1705,6 +1794,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         snapToIntroEndState()
 
+        // Only DOWNLOAD_REASON gates the shared primary CTA on a selection; every other step re-enables it.
+        binding.daxDialogCta.primaryCta.isEnabled = true
         when (onboardingDialogType) {
             INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
                 val isSyncRestore = onboardingDialogType == SYNC_RESTORE
@@ -1766,6 +1857,70 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.secondaryCta.alpha = 1f
                     binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                 }
+            }
+
+            DOWNLOAD_REASON -> {
+                if (binding.daxDialogCta.downloadReasonContent.root.isVisible) {
+                    return
+                }
+
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.DownloadReason)
+
+                // Apply the final visibility of every include + cta BEFORE measuring, so the dialog's
+                // measured height reflects what will actually be on screen.
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+
+                val downloadReasonTitleText = getString(R.string.downloadReasonTitle).preventWidows()
+                binding.daxDialogCta.downloadReasonContent.root.isVisible = true
+                binding.daxDialogCta.downloadReasonContent.downloadReasonTitleHidden.text = downloadReasonTitleText
+                binding.daxDialogCta.downloadReasonContent.downloadReasonTitle.cancelAnimation()
+                binding.daxDialogCta.downloadReasonContent.downloadReasonTitle.text = downloadReasonTitleText
+                binding.daxDialogCta.downloadReasonContent.downloadReasonBody.text =
+                    getString(R.string.downloadReasonBody).preventWidows()
+                binding.daxDialogCta.downloadReasonContent.downloadReasonBody.alpha = 1f
+                binding.daxDialogCta.downloadReasonContent.downloadReasonOptions.alpha = 1f
+
+                binding.daxDialogCta.primaryCta.text = getString(R.string.downloadReasonPrimaryCta)
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                // Restore tile selection + CTA enabled/alpha from view state (survives config changes).
+                setDownloadReasonListeners()
+
+                val showWing = applyDecorationLayout(
+                    binding.bottomWingAnimation,
+                    BOTTOM_WING_MAX_HEIGHT_DP,
+                    BOTTOM_WING_MIN_HEIGHT_DP,
+                )
+                binding.bottomWingAnimation.apply {
+                    cancelAnimation()
+                    isVisible = showWing
+                    alpha = 1f
+                    progress = WING_STOP_PROGRESS
+                }
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    if (showWing) {
+                        verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                        bottomToTop = binding.bottomWingAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
+
+                val cardView = binding.daxDialogCta.cardView
+                cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                cardView.setArrowAnimationFraction(1f)
+                cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
 
             COMPARISON_CHART, AI_COMPARISON_CHART -> {
@@ -2373,6 +2528,38 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun setDownloadReasonListeners() {
+        with(binding.daxDialogCta.downloadReasonContent) {
+            downloadReasonOptionSearch.setOnClickListener { viewModel.onDownloadReasonOptionClicked(DownloadReasonOption.SEARCH) }
+            downloadReasonOptionAiChat.setOnClickListener { viewModel.onDownloadReasonOptionClicked(DownloadReasonOption.AI_CHAT) }
+            downloadReasonOptionNoAi.setOnClickListener { viewModel.onDownloadReasonOptionClicked(DownloadReasonOption.NO_AI) }
+            downloadReasonOptionBlockAds.setOnClickListener { viewModel.onDownloadReasonOptionClicked(DownloadReasonOption.BLOCK_ADS) }
+        }
+        observeDownloadReasonSelection()
+    }
+
+    private fun observeDownloadReasonSelection() {
+        downloadReasonSelectionJob?.cancel()
+        downloadReasonSelectionJob = viewModel.viewState
+            .map { it.selectedDownloadReason }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { bindDownloadReasonSelection(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun bindDownloadReasonSelection(selected: DownloadReasonOption?) {
+        with(binding.daxDialogCta.downloadReasonContent) {
+            downloadReasonOptionSearch.isSelected = selected == DownloadReasonOption.SEARCH
+            downloadReasonOptionAiChat.isSelected = selected == DownloadReasonOption.AI_CHAT
+            downloadReasonOptionNoAi.isSelected = selected == DownloadReasonOption.NO_AI
+            downloadReasonOptionBlockAds.isSelected = selected == DownloadReasonOption.BLOCK_ADS
+        }
+        val enabled = selected != null
+        binding.daxDialogCta.primaryCta.isEnabled = enabled
+        binding.daxDialogCta.primaryCta.alpha = if (enabled) 1f else DOWNLOAD_REASON_CTA_DISABLED_ALPHA
+    }
+
     private fun addressBarPositionIconRes(type: OmnibarType): Int = when (type) {
         OmnibarType.SINGLE_TOP -> R.drawable.ic_address_bar_top_24
         OmnibarType.SINGLE_BOTTOM -> R.drawable.ic_address_bar_bottom_24
@@ -2676,6 +2863,32 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun playDownloadReasonContentIntro() {
+        binding.daxDialogCta.downloadReasonContent.downloadReasonTitle.startOnboardingTypingAnimation(
+            getString(R.string.downloadReasonTitle).preventWidows(),
+        ) {
+            downloadReasonFadeInAnimatorSet = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(binding.daxDialogCta.downloadReasonContent.downloadReasonBody, View.ALPHA, 1f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                    ObjectAnimator.ofFloat(binding.daxDialogCta.downloadReasonContent.downloadReasonOptions, View.ALPHA, 1f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                    // No tile is selected on fresh entry, so the CTA lands at its disabled alpha.
+                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, DOWNLOAD_REASON_CTA_DISABLED_ALPHA)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                )
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        isAnimating = false
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                        setDownloadReasonListeners()
+                    }
+                })
+                start()
+            }
+        }
+    }
+
     private fun fadeInDialog(onAnimationEnd: () -> Unit) {
         binding.daxDialogCta.root.isVisible = true
         binding.daxDialogCta.daxCtaContainer.animate()
@@ -2704,6 +2917,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         with(binding.daxDialogCta) {
             listOf(
                 welcomeContent.titleText,
+                downloadReasonContent.downloadReasonTitle,
                 comparisonChartContent.comparisonChartTitle,
                 addressBarContent.addressBarTitle,
                 inputScreenContent.inputScreenTitle,
@@ -2716,6 +2930,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         // End any running content fade-in animations (end() snaps to final values and triggers end listeners)
         welcomeFadeInAnimatorSet?.end()
+        downloadReasonFadeInAnimatorSet?.end()
         comparisonChartFadeInAnimatorSet?.end()
         comparisonChartDetailAnimatorSet?.end()
         addressBarFadeInAnimatorSet?.end()
@@ -3068,6 +3283,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         private const val DIALOG_FADE_IN_DURATION = 400L
         private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+        private const val DOWNLOAD_REASON_CTA_DISABLED_ALPHA = 0.4f
 
         private const val CHECK_ICON_ANIMATION_DURATION = 400L
         private const val CHECK_ICON_FADE_DURATION = 130L

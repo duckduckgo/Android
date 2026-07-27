@@ -1051,4 +1051,44 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     // endregion
+
+    // region Download reason selection
+
+    @Test
+    fun whenDownloadReasonOptionClickedThenSelectionSet() = runTest {
+        val testee = createViewModel()
+
+        testee.onDownloadReasonOptionClicked(DownloadReasonOption.SEARCH)
+
+        assertEquals(DownloadReasonOption.SEARCH, testee.viewState.value.selectedDownloadReason)
+    }
+
+    @Test
+    fun whenSameDownloadReasonOptionClickedTwiceThenSelectionCleared() = runTest {
+        val testee = createViewModel()
+
+        testee.onDownloadReasonOptionClicked(DownloadReasonOption.SEARCH)
+        testee.onDownloadReasonOptionClicked(DownloadReasonOption.SEARCH)
+
+        assertNull(testee.viewState.value.selectedDownloadReason)
+    }
+
+    @Test
+    fun whenDifferentDownloadReasonOptionClickedThenSelectionReplaced() = runTest {
+        val testee = createViewModel()
+
+        testee.onDownloadReasonOptionClicked(DownloadReasonOption.SEARCH)
+        testee.onDownloadReasonOptionClicked(DownloadReasonOption.AI_CHAT)
+
+        assertEquals(DownloadReasonOption.AI_CHAT, testee.viewState.value.selectedDownloadReason)
+    }
+
+    @Test
+    fun whenNoDownloadReasonOptionClickedThenSelectionIsNull() = runTest {
+        val testee = createViewModel()
+
+        assertNull(testee.viewState.value.selectedDownloadReason)
+    }
+
+    // endregion
 }

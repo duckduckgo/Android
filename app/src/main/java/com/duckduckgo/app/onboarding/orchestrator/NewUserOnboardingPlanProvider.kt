@@ -153,6 +153,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(syncRestoreStep(firstDialog, quickSetupPlan))
                 add(initialReinstallUserStep(firstDialog, quickSetupPlan))
                 add(initialStep(firstDialog))
+                add(downloadReasonStep())
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
                 if (showDock) {
@@ -422,6 +423,22 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when {
                     event is NewUserOnboardingEvent.ContinueClicked -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun downloadReasonStep(): NewUserOnboardingActivityStep {
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
+            pixelName = null,
+            resolveDialog = { NewUserOnboardingActivityDialog.DownloadReason },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.ContinueClicked -> {
                         Advance
                     }
                     else -> Stay
