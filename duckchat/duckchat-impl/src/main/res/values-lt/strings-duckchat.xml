@@ -268,5 +268,5 @@
 
     <!-- File/image attachment menu options -->
     <string name="duckChatContextualAskAboutTab">Klausti apie kortelę</string>
-    <string name="duckChatContextualAskAboutPage">Klausti apie puslapį</string>
+    <string name="duckChatContextualAskAboutPage">Klausk apie puslapį</string>
 </resources>
