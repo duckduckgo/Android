@@ -19,7 +19,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone"
     tools:showIn="@layout/fragment_sync_v2_camera_scanner">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
