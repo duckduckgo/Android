@@ -27,8 +27,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
  * Gate rebrand changes on [feature] via `feature().isEnabled()`, never on [self]:
  * self() cannot use the incremental rollout mechanism.
  *
- * Interim scaffolding for the brand design update. The follow-up theme project promotes
- * the new styles into the base themes and deletes this flag and its supporting code.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
