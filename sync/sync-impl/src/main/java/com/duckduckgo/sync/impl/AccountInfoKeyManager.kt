@@ -22,6 +22,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -46,7 +47,7 @@ interface AccountInfoKeyManager {
      * (ddg always, 3party if a scoped password exists), and registers it with the server via set-if-absent.
      *
      * If another device already registered a key for this purpose first, the local mint is discarded and the server's key is adopted instead.
-     * The winning public key is returned in [AccountInfoKeyResult].
+     * The winning public key is returned in [AccountInfoKeyResult] and cached in [SyncStore.accountInfoPublicKey].
      */
     suspend fun ensureKeyRegistered(): Result<AccountInfoKeyResult>
 }
@@ -86,13 +87,18 @@ class RealAccountInfoKeyManager @Inject constructor(
         }
 
         logcat { "Sync-UnifiedDevices: registering $SYNC_PURPOSE_ACCOUNT_INFO key (kid=${minted.entry.kid}, wraps=${entries.size})" }
-        when (val result = syncApi.setKeysIfAbsent(token, SYNC_PURPOSE_ACCOUNT_INFO, entries)) {
+        val registration = when (val result = syncApi.setKeysIfAbsent(token, SYNC_PURPOSE_ACCOUNT_INFO, entries)) {
             is Success -> onSetIfAbsentSuccess(token, minted, entries.size, result.data)
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: setKeysIfAbsent failed: ${result.reason}" }
                 result
             }
         }
+        // Cache the winning public key once, covering all adopt paths (ours won, adopted from the response, or fetched after a conflict).
+        if (registration is Success) {
+            registration.data.publicKey?.let { syncStore.accountInfoPublicKey = it.toStoredKey(registration.data.kid) }
+        }
+        registration
     }
 
     private fun mintKeypair(accountSecretKey: String): Result<MintedProtectedKey> =
@@ -159,4 +165,6 @@ class RealAccountInfoKeyManager @Inject constructor(
             }
         }
     }
+
+    private fun RsaJwk.toStoredKey(kid: String) = AccountInfoPublicKey(keyId = kid, modulus = n, exponent = e)
 }
