@@ -20,6 +20,10 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Outline
 import android.net.Uri
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -203,6 +207,9 @@ class RealNativeInputManager @Inject constructor(
     // The nav bar is shown once when the browser input opens empty, then latched off the first time the
     // user types. Latched stays off for the session — clearing text or toggling the keyboard won't bring it back.
     private var navBarInteractionLatched: Boolean = false
+
+    // True when this input session opened with the inline buttons shown (search-only, empty).
+    private var inlineNavButtonsShown: Boolean = false
     private var navBarHeightPx: Int = 0
     private var navBarIsBottom: Boolean = false
     private var navBarTabCountLiveData: LiveData<Int>? = null
@@ -392,7 +399,8 @@ class RealNativeInputManager @Inject constructor(
             slideNavBarOutWithClose(animate = animate)
         }
 
-        if (!animate) {
+        // When the inline buttons are showing, closing should not "slide".
+        if (!animate || inlineNavButtonsCurrentlyShown()) {
             animator.cancelAnimation()
             isExiting = false
             // Match animated exit: suspend LayoutTransition before resetting offsets so CHANGING
@@ -592,7 +600,16 @@ class RealNativeInputManager @Inject constructor(
         val createNavBar = shouldCreateNavBar(isNavBarFeatureEnabled, omnibarController.isDuckAiMode(), inputModeCapability) &&
             prefillText.isEmpty()
         val navBarView = if (createNavBar) createNavBarView(layoutInflater) else null
-        bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
+        // Inline Fire/Tabs/Menu buttons are the search-only counterpart to the nav-bar strip: shown when
+        // the browser input opens empty in search-only mode.
+        val showInlineNavButtons = shouldShowInlineNavButtons(
+            isDuckAiMode = omnibarController.isDuckAiMode(),
+            inputMode = inputModeCapability,
+            openedEmpty = prefillText.isEmpty(),
+            interactionLatched = false,
+        )
+        inlineNavButtonsShown = showInlineNavButtons
+        bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom, showInlineNavButtons)
         if (navBarView != null) bindNavBar(navBarView, widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             // Restore the cache before setting text — triggerAutocomplete preserves the
@@ -660,7 +677,7 @@ class RealNativeInputManager @Inject constructor(
             // Fires on every keystroke regardless of the selected tab (search text routes to
             // onSearchTextChanged, chat text to onChatTextChanged), so this is the tab-agnostic signal
             // that latches the nav bar off on the user's first input.
-            onInputTextEmptyChanged = { isEmpty -> if (!isEmpty) onNavBarInputInteraction() },
+            onInputTextEmptyChanged = ::onInputTextEmptyChanged,
             onSearchSubmitted = { query ->
                 nativeInputEventListener.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
@@ -810,20 +827,22 @@ class RealNativeInputManager @Inject constructor(
             onTabs = callbacks.onTabSwitcherPressed,
             onBrowserMenu = callbacks.onBrowserMenuPressed,
         )
-        bindNavBarTabCount(navBarView, lifecycleOwner, tabs)
+        navBarView.findViewById<TabSwitcherButton?>(R.id.inputModeWidgetNavTabs)?.let { tabsButton ->
+            bindNavBarTabCount(tabsButton, lifecycleOwner, tabs)
+        }
     }
 
     /**
      * Mirrors [NativeInputWidget.bindTabCount]: the fragment's viewLifecycleOwner is reused across
      * show/hide cycles, so the previous observer is removed before re-observing — otherwise each cycle
-     * stacks an observer that keeps updating a detached nav bar button.
+     * stacks an observer that keeps updating a detached button. Shared by the nav-bar strip and the
+     * search-only inline buttons.
      */
     private fun bindNavBarTabCount(
-        navBarView: View,
+        tabsButton: TabSwitcherButton,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
     ) {
-        val tabsButton = navBarView.findViewById<TabSwitcherButton?>(R.id.inputModeWidgetNavTabs) ?: return
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         val tabCount = tabs.map { it.size }
         val observer = Observer<Int> { count -> tabsButton.count = count }
@@ -840,6 +859,7 @@ class RealNativeInputManager @Inject constructor(
         currentTabUrl: Flow<String?>,
         callbacks: NativeInputCallbacks,
         isBottom: Boolean,
+        showInlineNavButtons: Boolean,
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
@@ -880,6 +900,7 @@ class RealNativeInputManager @Inject constructor(
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
+        bindInlineNavButtons(widgetView, lifecycleOwner, tabs, callbacks, showInlineNavButtons)
     }
 
     private fun bindVoiceButtons(
@@ -982,12 +1003,58 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
     }
 
-    /** The user typed: latch the nav bar off for the rest of this input session and slide it out. */
-    private fun onNavBarInputInteraction() {
-        if (navBarInteractionLatched || navBarRoot == null) return
+    /** On the user's first keystroke (empty to non-empty), latches the nav bar off for the rest of this input session and slide it out. */
+    private fun onInputTextEmptyChanged(isEmpty: Boolean) {
+        if (isEmpty || navBarInteractionLatched) return
         navBarInteractionLatched = true
-        refreshNavBarVisibility()
+        if (navBarRoot != null) {
+            refreshNavBarVisibility()
+        } else if (inlineNavButtonsShown) {
+            retractInlineButtons()
+        }
     }
+
+    /** Slides the search-only inline Fire/Tabs/Menu buttons out, widening the field into the freed space. */
+    private fun retractInlineButtons() {
+        val container = rootView.findViewById<View?>(R.id.inlineNavButtonsContainer) ?: return
+        // Matches the open/close morph duration so it feels consistent with the field closing.
+        (container.parent as? ViewGroup)?.let { parent ->
+            TransitionManager.beginDelayedTransition(
+                parent,
+                TransitionSet().apply {
+                    ordering = TransitionSet.ORDERING_TOGETHER
+                    addTransition(ChangeBounds())
+                    addTransition(Fade())
+                    duration = RealNativeInputAnimator.ANIMATION_DURATION_MS
+                },
+            )
+        }
+        container.gone()
+    }
+
+    /**
+     * Wires the inline Fire/Tabs/Menu buttons that live OUTSIDE the input card (search-only only).
+     * The buttons sit on the plain background beside the card like the legacy omnibar rather than on the card.
+     */
+    private fun bindInlineNavButtons(
+        widgetView: View,
+        lifecycleOwner: LifecycleOwner,
+        tabs: LiveData<List<TabEntity>>,
+        callbacks: NativeInputCallbacks,
+        show: Boolean,
+    ) {
+        val container = widgetView.findViewById<View?>(R.id.inlineNavButtonsContainer) ?: return
+        container.visibility = if (show) View.VISIBLE else View.GONE
+        widgetView.findViewById<View?>(R.id.inputModeWidgetNavFire)?.setOnClickListener { callbacks.onFireButtonPressed() }
+        widgetView.findViewById<View?>(R.id.inputModeWidgetNavMenu)?.setOnClickListener { callbacks.onBrowserMenuPressed() }
+        widgetView.findViewById<TabSwitcherButton?>(R.id.inputModeWidgetNavTabs)?.let { tabsButton ->
+            tabsButton.setOnClickListener { callbacks.onTabSwitcherPressed() }
+            bindNavBarTabCount(tabsButton, lifecycleOwner, tabs)
+        }
+    }
+
+    /** True when the inline search-only buttons are currently on screen (opened with them, not yet latched off). */
+    private fun inlineNavButtonsCurrentlyShown(): Boolean = inlineNavButtonsShown && !navBarInteractionLatched
 
     /**
      * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
@@ -1176,6 +1243,7 @@ class RealNativeInputManager @Inject constructor(
 
     private fun startEnterAnimation(widgetView: View, isBottom: Boolean): Boolean {
         if (omnibarController.isDuckAiMode()) return false
+        if (inlineNavButtonsShown) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
         // Apply focused-state layout so the widget is measured at its final size; otherwise
@@ -1426,6 +1494,19 @@ internal fun computeVoiceButtonAvailability(
  */
 internal fun shouldCreateNavBar(featureEnabled: Boolean, isDuckAiMode: Boolean, inputMode: NativeInputState.InputMode): Boolean =
     featureEnabled && !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+
+/**
+ * Whether the inline Fire/Tabs/Menu buttons should show for the current search-only browser input
+ * session. Only search-only browser input shows them: Duck.ai keeps its own controls and Search &
+ * Duck.ai uses the nav-bar strip. The widget is only shown in search-only when the feature flag is on
+ */
+internal fun shouldShowInlineNavButtons(
+    isDuckAiMode: Boolean,
+    inputMode: NativeInputState.InputMode,
+    openedEmpty: Boolean,
+    interactionLatched: Boolean,
+): Boolean =
+    !isDuckAiMode && inputMode == NativeInputState.InputMode.SEARCH_ONLY && openedEmpty && !interactionLatched
 
 /**
  * Whether the input-mode nav bar should currently be on screen. It's shown for a browser-input session that
