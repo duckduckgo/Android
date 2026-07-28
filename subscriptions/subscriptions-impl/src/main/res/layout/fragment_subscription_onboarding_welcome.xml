@@ -101,13 +101,15 @@
         </LinearLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/subscriptionOnboardingWelcomeBannerDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/subscriptionOnboardingWelcomeBannerDescription"
-            app:typography="body2" />
+            app:typography="body2"
+            tools:text="Billing starts on May 7, 2026" />
 
         <LinearLayout
+            android:id="@+id/freeTrialDaysLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -117,57 +119,64 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="31" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="1" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="2" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay4"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="3" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay5"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="4" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay6"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="5" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/freeTrialBannerDay7"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 app:typography="body2_bold"
                 tools:text="6" />
 
