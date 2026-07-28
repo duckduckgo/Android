@@ -105,7 +105,7 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
             com.duckduckgo.mobile.android.R.drawable.ic_close_24
         }
         binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
-        supportActionBar?.setTitle(command.stepPlugin.titleResId)
+        supportActionBar?.title = command.stepPlugin.titleResId?.let { getString(it) } ?: ""
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
         }

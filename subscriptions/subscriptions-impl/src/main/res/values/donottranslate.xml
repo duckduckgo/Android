@@ -45,7 +45,7 @@
     <string name="subscriptionOnboardingWelcomeBannerTitle1">Day</string>
     <string name="subscriptionOnboardingWelcomeBannerTitle2">1</string>
     <string name="subscriptionOnboardingWelcomeBannerTitle3">of your free trial</string>
-    <string name="subscriptionOnboardingWelcomeBannerDescription">Billing starts on May 7, 2026</string>
+    <string name="subscriptionOnboardingWelcomeBannerDescription">Billing starts on %1$s</string>
     <string name="subscriptionOnboardingWelcomePrimaryButton">Let\'s go!</string>
     <string name="subscriptionOnboardingFeaturesTitle">Ready to activate your new protections?</string>
     <string name="subscriptionOnboardingFeaturesDescription">Next, we\'ll get your VPN online and help you activate all your premium protections.</string>
