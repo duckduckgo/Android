@@ -25,7 +25,6 @@ import com.duckduckgo.app.cta.model.CtaId.ADD_WIDGET
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -82,7 +81,6 @@ class NewTabPageViewModelTest {
     private val pixel: Pixel = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockCtaViewModel: CtaViewModel = mock()
-    private val mockOnboardingPromptsExperimentManager: OnboardingPromptsExperimentManager = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -94,7 +92,6 @@ class NewTabPageViewModelTest {
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
-        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()).thenReturn(false)
 
         testee = createTestee()
     }
@@ -119,7 +116,6 @@ class NewTabPageViewModelTest {
             pixel = pixel,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
-            onboardingPromptsExperimentManager = mockOnboardingPromptsExperimentManager,
             browserMode = browserMode,
         )
     }
@@ -257,10 +253,9 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun whenAddWidgetCtaDismissedAndNotInWidgetPromptCohortThenOnboardingComplete() = runTest {
+    fun whenAddWidgetCtaDismissedThenOnboardingComplete() = runTest {
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(true)
-        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()).thenReturn(false)
 
         testee = createTestee()
         testee.onStart(mockLifecycleOwner)
@@ -268,23 +263,6 @@ class NewTabPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.onboardingComplete)
-            }
-        }
-    }
-
-    @Test
-    fun whenAddWidgetCtaDismissedButInWidgetPromptCohortThenOnboardingNotComplete() = runTest {
-        // The widget CTA was dismissed early by linear onboarding, so it must not signal home onboarding as done.
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
-        whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(true)
-        whenever(mockOnboardingPromptsExperimentManager.isEnrolledInWidgetPromptCohort()).thenReturn(true)
-
-        testee = createTestee()
-        testee.onStart(mockLifecycleOwner)
-
-        testee.viewState.test {
-            expectMostRecentItem().also {
-                assertFalse(it.onboardingComplete)
             }
         }
     }

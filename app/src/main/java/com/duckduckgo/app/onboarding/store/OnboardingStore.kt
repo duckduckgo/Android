@@ -20,6 +20,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
+    var linearPlanWidgetPromptShown: Boolean
 
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getChatSuggestions(): List<DaxDialogIntroOption>

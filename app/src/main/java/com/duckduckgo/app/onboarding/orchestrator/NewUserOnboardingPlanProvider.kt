@@ -503,9 +503,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.Presented -> {
-                        withContext(dispatchers.io()) {
-                            dismissedCtaDao.insert(DismissedCta(CtaId.ADD_WIDGET))
-                        }
+                        onboardingStore.linearPlanWidgetPromptShown = true
                         Stay
                     }
                     is NewUserOnboardingEvent.AddWidgetRequested -> {

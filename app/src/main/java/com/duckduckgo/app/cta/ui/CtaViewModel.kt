@@ -569,7 +569,9 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
-        return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+        return !widgetCapabilities.hasInstalledWidgets &&
+            !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
+            !onboardingStore.linearPlanWidgetPromptShown
     }
 
     private suspend fun freeTrialCopyAvailable(): Boolean =

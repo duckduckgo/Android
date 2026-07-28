@@ -951,7 +951,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenWidgetPromptStepPresentedThenAddWidgetCtaDismissed() = runTest {
+    fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
         whenever(homeScreenPromptsExperiment.enroll())
             .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
         start()
@@ -964,7 +964,8 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
 
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
+        verify(onboardingStore).linearPlanWidgetPromptShown = true
+        verify(dismissedCtaDao, never()).insert(DismissedCta(CtaId.ADD_WIDGET))
         assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }
 
