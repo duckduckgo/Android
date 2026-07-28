@@ -1017,7 +1017,23 @@ class RealNativeInputManager @Inject constructor(
     /** Slides the search-only inline Fire/Tabs/Menu buttons out, widening the field into the freed space. */
     private fun retractInlineButtons() {
         val container = rootView.findViewById<View?>(R.id.inlineNavButtonsContainer) ?: return
-        // Matches the open/close morph duration so it feels consistent with the field closing.
+        beginInlineButtonsMorph(container)
+        container.gone()
+    }
+
+    /**
+     * Split-mode first focus: the reverse of [retractInlineButtons]. The card opens at the omnibar's
+     * full width (buttons GONE) and then contracts as the buttons fade in, so the native input looks
+     * like it took over the omnibar before retracting to reveal them.
+     */
+    private fun revealInlineButtons(container: View) {
+        beginInlineButtonsMorph(container)
+        container.show()
+    }
+
+    /** ChangeBounds + Fade on the card/buttons row. Matches the open/close morph duration so the
+     *  reveal/retract feels consistent with the field opening and closing. */
+    private fun beginInlineButtonsMorph(container: View) {
         (container.parent as? ViewGroup)?.let { parent ->
             TransitionManager.beginDelayedTransition(
                 parent,
@@ -1029,7 +1045,6 @@ class RealNativeInputManager @Inject constructor(
                 },
             )
         }
-        container.gone()
     }
 
     /**
@@ -1044,7 +1059,14 @@ class RealNativeInputManager @Inject constructor(
         show: Boolean,
     ) {
         val container = widgetView.findViewById<View?>(R.id.inlineNavButtonsContainer) ?: return
-        container.visibility = if (show) View.VISIBLE else View.GONE
+        if (show && omnibarController.isSplitMode()) {
+            // Split mode: the omnibar was full-width, so start hidden (the card fills the row) and reveal
+            // the buttons with a contraction once the widget is laid out.
+            container.gone()
+            widgetView.post { revealInlineButtons(container) }
+        } else {
+            container.visibility = if (show) View.VISIBLE else View.GONE
+        }
         widgetView.findViewById<View?>(R.id.inputModeWidgetNavFire)?.setOnClickListener { callbacks.onFireButtonPressed() }
         widgetView.findViewById<View?>(R.id.inputModeWidgetNavMenu)?.setOnClickListener { callbacks.onBrowserMenuPressed() }
         widgetView.findViewById<TabSwitcherButton?>(R.id.inputModeWidgetNavTabs)?.let { tabsButton ->
