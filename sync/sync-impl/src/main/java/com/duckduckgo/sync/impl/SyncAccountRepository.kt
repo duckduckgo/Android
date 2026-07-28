@@ -1391,6 +1391,9 @@ internal const val CREDENTIAL_ID_3PARTY = "3party"
 // when authenticating against a 3party-restricted credential.
 internal const val SYNC_SCOPE_AI_CHATS = "ai_chats"
 
+// Purpose for the account-wide `device_info` protected key (unified cross-credential device list)
+internal const val SYNC_PURPOSE_ACCOUNT_INFO = "account_info"
+
 // Recovery code version emitted in v2 recovery codes per the Recovery Payload Shape RFC
 // (Asana 1214804486778180). Format is "major.minor" — clients in major version 2 accept 2.x
 // codes (ignoring unknown fields) and must reject codes with major version >2.
