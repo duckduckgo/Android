@@ -1657,6 +1657,49 @@
             }
         ]
     },
+    "m_dbp_scan_renderer-gone": {
+        "description": "Fired when the shared WebView renderer process is terminated (crash or system memory reclaim) during a PIR scan.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
+            },
+            {
+                "key": "did_crash",
+                "description": "True if the renderer actually crashed (RenderProcessGoneDetail.didCrash()); false if the system reclaimed it (e.g. low memory)",
+                "type": "boolean"
+            },
+            {
+                "key": "scan_trigger",
+                "description": "What triggered the scan run",
+                "type": "string",
+                "enum": ["onboarding", "onboarding_resume", "profile_edit", "scheduled"]
+            }
+        ]
+    },
     "m_dbp_scheduled-run_scheduled": {
         "description": "Fired when the pir scheduled runs are scheduled",
         "owners": ["karlenDimla", "landomen"],
@@ -2327,8 +2370,14 @@
                     "io_exception",
                     "sqlite_exception",
                     "timeout_cancellation_exception",
+                    "renderer_gone",
                     "unknown_error"
                 ]
+            },
+            {
+                "key": "feature.data.ext.did_crash",
+                "description": "Only present on renderer_gone failures. true = the WebView renderer actually crashed; false = the system reclaimed it (e.g. low memory).",
+                "type": "boolean"
             },
             "pirCancellationReason",
             {
@@ -2643,8 +2692,14 @@
                     "io_exception",
                     "sqlite_exception",
                     "timeout_cancellation_exception",
+                    "renderer_gone",
                     "unknown_error"
                 ]
+            },
+            {
+                "key": "feature.data.ext.did_crash",
+                "description": "Only present on renderer_gone failures. true = the WebView renderer actually crashed; false = the system reclaimed it (e.g. low memory).",
+                "type": "boolean"
             },
             "pirCancellationReason",
             {

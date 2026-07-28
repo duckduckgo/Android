@@ -25,6 +25,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -1387,7 +1388,7 @@ class RealPirJobsRunnerTest {
         verify(mockPirScanWideEvent).onOptOutStarted(any())
         verify(mockPirScanWideEvent).onOptOutCompleted(any(), any())
         verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
-        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any(), anyOrNull())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 
@@ -1501,7 +1502,7 @@ class RealPirJobsRunnerTest {
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
         verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
         verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
@@ -1552,7 +1553,7 @@ class RealPirJobsRunnerTest {
         )
         verify(mockPirScanWideEvent).onRunCancelled(any(), any())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
-        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any(), anyOrNull())
     }
 
     @Test
@@ -1598,9 +1599,42 @@ class RealPirJobsRunnerTest {
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
+    }
+
+    @Test
+    fun whenScanThrowsRendererGoneThenFiresPixelAndReturnsFailureWithoutRethrowing() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id),
+        ).thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            listOf(testScanJobRecord),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(any(), eq(mockContext), eq(RunType.MANUAL), anyOrNull(), anyOrNull()),
+        ).thenAnswer { throw PirRendererGoneException(didCrash = true) }
+
+        // When - runEligibleJobs must NOT rethrow; it must convert renderer-gone into a failure Result
+        // so the foreground service's launch{} coroutine does not crash the :pir process.
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+
+        // Then
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is PirRendererGoneException)
+        verify(mockPixelSender).reportRendererGone(executionType = MANUAL_INITIAL, didCrash = true)
+        verify(mockPirScanWideEvent).onRunFailed(
+            executionType = MANUAL_INITIAL,
+            reason = PirScanWideEvent.FailureReason.RENDERER_GONE,
+            didCrash = true,
+        )
     }
 
     @Test
@@ -1643,7 +1677,7 @@ class RealPirJobsRunnerTest {
         }
 
         // Then
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.TIMEOUT_CANCELLATION_EXCEPTION))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.TIMEOUT_CANCELLATION_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 
@@ -1680,7 +1714,7 @@ class RealPirJobsRunnerTest {
         // Then
         verify(mockPirScanWideEvent).onScanCompleted(any())
         verify(mockPirScanWideEvent).onOptOutStarted(any())
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }

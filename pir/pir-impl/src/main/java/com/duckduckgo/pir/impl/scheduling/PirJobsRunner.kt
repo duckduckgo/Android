@@ -27,6 +27,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -275,6 +276,14 @@ class RealPirJobsRunner @Inject constructor(
         } catch (e: CancellationException) {
             pirScanWideEvent.onRunCancelled(executionType, PirScanWideEvent.CancellationReason.WORK_STOPPED)
             throw e
+        } catch (e: PirRendererGoneException) {
+            pixelSender.reportRendererGone(executionType = executionType, didCrash = e.didCrash)
+            pirScanWideEvent.onRunFailed(
+                executionType = executionType,
+                reason = FailureReason.RENDERER_GONE,
+                didCrash = e.didCrash,
+            )
+            return@withContext Result.failure(e)
         } catch (e: Exception) {
             pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.fromException(e))
             throw e
