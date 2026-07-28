@@ -265,4 +265,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Nastavitve Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Vprašajte o zavihku</string>
+    <string name="duckChatContextualAskAboutPage">Vprašajte o strani</string>
 </resources>

@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Ρυθμίσεις Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Ρώτα για την καρτέλα</string>
+    <string name="duckChatContextualAskAboutPage">Ρώτα για τη σελίδα</string>
 </resources>

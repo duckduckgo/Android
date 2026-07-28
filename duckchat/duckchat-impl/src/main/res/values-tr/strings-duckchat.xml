@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai Ayarları</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Sekme Hakkında Soru Sor</string>
+    <string name="duckChatContextualAskAboutPage">Sayfa Hakkında Soru Sor</string>
 </resources>

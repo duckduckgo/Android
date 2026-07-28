@@ -265,4 +265,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Ustawienia Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Zapytaj o kartę</string>
+    <string name="duckChatContextualAskAboutPage">Zapytaj o stronę</string>
 </resources>
