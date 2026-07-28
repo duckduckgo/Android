@@ -317,6 +317,17 @@ Wrap `SkeletonView` elements in `ShimmerFrameLayout`:
 
 Never set `android:background="@drawable/background_skeleton"` on SkeletonView — lint prevents it.
 
+### Progress spinner (Compose)
+
+For an indeterminate spinner in Compose, use `DaxProgressSpinner` from `com.duckduckgo.common.ui.compose.progress`. Material3's `CircularProgressIndicator` is build-breaking outside the design-system modules.
+
+```kotlin
+DaxProgressSpinner()                                                     // Material3 default size (40dp)
+DaxProgressSpinner(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)  // reduce the stroke when smaller
+```
+
+`strokeWidth` defaults to `4.dp`. Colours come from the theme (`DuckDuckGoTheme.colors.system.progressSpinner*`) — there is no colour parameter.
+
 ---
 
 ## NotifyMeView
@@ -408,6 +419,7 @@ These are enforced at compile time:
 | `DaxButtonStylingDetector` | Forbidden attributes on `DaxButton*` |
 | `DaxTextViewStylingDetector` | Forbidden attributes on `DaxTextView` |
 | `MissingDividerDetector` | Plain `View` used as divider |
+| `NoMaterial3CircularProgressIndicatorUsageDetector` | Compose: Material3 `CircularProgressIndicator` (use `DaxProgressSpinner`) |
 | `NoAlertDialogDetector` | `AlertDialog` / `MaterialAlertDialog` |
 | `NoBottomSheetDialogDetector` | Raw `BottomSheetDialog` without ADS style |
 | `SkeletonViewBackgroundDetector` | `background_skeleton` drawable on `SkeletonView` |
