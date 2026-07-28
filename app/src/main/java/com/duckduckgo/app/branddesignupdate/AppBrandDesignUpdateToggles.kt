@@ -22,7 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide brand design update (rebrand) feature flag.
+ * App-wide brand design update (rebrand) feature flag, excluding onboarding which is gated via [OnboardingBrandDesignUpdateToggles].
  *
  * Gate rebrand changes on [feature] via `feature().isEnabled()`, never on [self]:
  * self() cannot use the incremental rollout mechanism.
