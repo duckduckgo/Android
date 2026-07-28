@@ -20,8 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ExpandScannerCutout
 import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.PlayIntroAnimation
 import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.RequestCameraPermission
+import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ResumeCamera
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,6 +67,7 @@ class IntroAnimationViewModel @Inject constructor(
                     state
                 }
             }
+            requestCameraActivation()
         }
     }
 
@@ -75,11 +78,13 @@ class IntroAnimationViewModel @Inject constructor(
                 viewMode = if (cameraAccess.isPermissionGranted()) ViewMode.Camera else it.viewMode,
             )
         }
+        requestCameraActivation()
     }
 
     fun onScanButtonClicked() = withCameraHardware {
         if (cameraAccess.isPermissionGranted()) {
             _viewState.update { it.copy(animationFinished = true, viewMode = ViewMode.Camera) }
+            requestCameraActivation()
         } else {
             _viewState.update { it.copy(animationFinished = true) }
             viewModelScope.launch {
@@ -92,6 +97,18 @@ class IntroAnimationViewModel @Inject constructor(
         val isGranted = cameraAccess.isPermissionGranted()
         _viewState.update {
             it.copy(viewMode = if (isGranted) ViewMode.Camera else ViewMode.NoCameraPermission)
+        }
+        if (isGranted) {
+            requestCameraActivation()
+        }
+    }
+
+    private fun requestCameraActivation() {
+        if (viewState.value.viewMode == ViewMode.Camera) {
+            viewModelScope.launch {
+                _command.send(ResumeCamera)
+                _command.send(ExpandScannerCutout)
+            }
         }
     }
 
@@ -116,5 +133,7 @@ class IntroAnimationViewModel @Inject constructor(
     sealed class Command {
         data object PlayIntroAnimation : Command()
         data object RequestCameraPermission : Command()
+        data object ResumeCamera : Command()
+        data object ExpandScannerCutout : Command()
     }
 }

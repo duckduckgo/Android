@@ -21,12 +21,24 @@
     android:layout_height="match_parent"
     tools:showIn="@layout/fragment_sync_v2_camera_scanner">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="wrap_content"
+    <com.journeyapps.barcodescanner.BarcodeView
+        android:id="@+id/barcodeView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.duckduckgo.sync.impl.ui.v2.CameraScannerOverlayView
+        android:id="@+id/scannerOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
+    <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
+        android:id="@+id/scannerHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Camera UI"
-        app:typography="h2"
-        tools:ignore="HardcodedText" />
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_5"
+        app:bodyText="@string/sync_scanner_v2_scan_qr_code_body"
+        app:headlineText="@string/sync_scanner_v2_scan_qr_code_headline" />
 
 </FrameLayout>
