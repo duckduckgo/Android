@@ -1732,6 +1732,10 @@ class BrowserTabFragment :
                 customTabToolbarColor,
             )
 
+            if (!edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+                requireActivity().window.navigationBarColor = customTabToolbarColor
+                requireActivity().window.statusBarColor = customTabToolbarColor
+            }
             // Update status bar icon colors based on toolbar color luminance
             updateStatusBarIconColors(customTabToolbarColor)
 
