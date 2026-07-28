@@ -782,7 +782,7 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onAskAboutTabClicked() {
+    fun onAskAboutPageClicked() {
         if (!isContextValid(currentPageContext)) {
             // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
             return
@@ -790,15 +790,6 @@ class DuckChatContextualViewModel @Inject constructor(
         addPageContext()
         commandChannel.trySend(Command.FocusInput)
         _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
-    }
-
-    fun onAskAboutPageClicked() {
-        if (!_viewState.value.showContext) {
-            // Context not attached; nothing to ask about.
-            return
-        }
-        commandChannel.trySend(Command.FocusInput)
-        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
     }
 
     fun onPromptCleared() {
