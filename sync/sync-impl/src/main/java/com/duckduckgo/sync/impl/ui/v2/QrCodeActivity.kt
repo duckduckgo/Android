@@ -89,13 +89,13 @@ class QrCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        val hasQrCode = viewState.bitmap != null
-        if (hasQrCode) {
-            binding.qrCodeImage.setImageBitmap(viewState.bitmap.bitmap)
-            binding.qrCodeText.text = viewState.bitmap.displayCode
+        val bitmapWrapper = viewState.bitmap
+        if (bitmapWrapper != null) {
+            binding.qrCodeImage.setImageBitmap(bitmapWrapper.bitmap)
+            binding.qrCodeText.text = bitmapWrapper.displayCode
         }
-        binding.loadingIndicator.isGone = hasQrCode
-        binding.qrCodeContent.isVisible = hasQrCode
+        binding.loadingIndicator.isGone = bitmapWrapper != null
+        binding.qrCodeContent.isVisible = bitmapWrapper != null
     }
 
     private fun processCommand(command: Command) {
