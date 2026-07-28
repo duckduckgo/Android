@@ -1304,11 +1304,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         (card.layoutParams as? MarginLayoutParams)?.let { lp ->
             lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetHorizontalMargin - card.paddingLeft
-            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+            lp.marginStart = targetStartMargin - card.paddingLeft
+            lp.marginEnd = targetEndMargin - card.paddingRight
             card.layoutParams = lp
         }
     }

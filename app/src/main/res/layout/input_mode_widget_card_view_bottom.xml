@@ -57,9 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_1"
             android:layout_weight="1"
             app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardCornerRadius="26dp"
+            app:cardCornerRadius="@dimen/largeShapeCornerRadius"
             app:cardElevation="3dp"
             app:cardUseCompatPadding="false">
 

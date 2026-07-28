@@ -268,11 +268,13 @@ class RealNativeInputManager @Inject constructor(
         duckChatInputModeState.inputModeCapability
             .onEach {
                 inputModeCapability = it
-                // A live switch to Search-only means the browser no longer uses native input. Tear down an
-                // open widget so the legacy omnibar returns instead of lingering as a toggle-less widget
-                // until the user closes and refocuses (hideNativeInput no-ops when nothing is shown).
-                // Otherwise re-evaluate the nav bar for the new mode.
-                if (!isNativeInputActive()) {
+                // Rebuild on the next focus (rather than half-update in place) when the new search mode no
+                // longer fits the open widget: native input is now inactive, or,with search-only on, it's
+                // the browser omnibar, whose two search layouts differ. An active Duck.ai input is unaffected,
+                // so just refresh its nav bar.
+                val rebuildOnRefocus = !isNativeInputActive() ||
+                    (nativeInputSearchOnlyFeature.self().isEnabled() && !omnibarController.isDuckAiMode())
+                if (rebuildOnRefocus) {
                     hideNativeInput(animate = false)
                 } else {
                     refreshNavBarVisibility()
@@ -291,12 +293,12 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isNativeInputActive(): Boolean {
         if (!isNativeInputFieldEnabled) return false
-        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only,
-        // unless the search-only feature flag is on.
+        // Native input is used in Duck.ai mode, in Search & Duck.ai mode, and in search-only mode
+        // only when the search-only feature flag is on.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
         return inDuckAi ||
-            inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY ||
-            nativeInputSearchOnlyFeature.self().isEnabled()
+            inputModeCapability == NativeInputState.InputMode.SEARCH_AND_DUCK_AI ||
+            (nativeInputSearchOnlyFeature.self().isEnabled() && inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY)
     }
 
     override fun isNativeInputShown(): Boolean {
@@ -400,7 +402,8 @@ class RealNativeInputManager @Inject constructor(
         }
 
         // When the inline buttons are showing, closing should not "slide".
-        if (!animate || inlineNavButtonsCurrentlyShown()) {
+        // If the card is full-width, it morphs back to the omnibar.
+        if (!animate || (inlineNavButtonsShown && !navBarInteractionLatched)) {
             animator.cancelAnimation()
             isExiting = false
             // Match animated exit: suspend LayoutTransition before resetting offsets so CHANGING
@@ -1074,9 +1077,6 @@ class RealNativeInputManager @Inject constructor(
             bindNavBarTabCount(tabsButton, lifecycleOwner, tabs)
         }
     }
-
-    /** True when the inline search-only buttons are currently on screen (opened with them, not yet latched off). */
-    private fun inlineNavButtonsCurrentlyShown(): Boolean = inlineNavButtonsShown && !navBarInteractionLatched
 
     /**
      * Shows/hides the persistent nav bar. No-op when there is no bar (non-browser context) or the bar
