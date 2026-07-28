@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -109,6 +110,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * The Unified Input surface a pixel is fired from, sent as the `surface` param. Distinguishes the
+ * contextual chat sheet from the Duck.ai tab and the address bar.
+ */
+enum class DuckChatPixelSurface(val value: String) {
+    /** The address bar / omnibar (any omnibar surface that isn't the Duck.ai tab). */
+    ADDRESS_BAR("address_bar"),
+
+    /** The dedicated Duck.ai tab. */
+    DUCK_AI("duck_ai"),
+
+    /** The contextual chat sheet presented over a web page. */
+    CONTEXTUAL_CHAT("contextual_chat"),
+    ;
+
+    companion object {
+        fun from(inputContext: NativeInputState.InputContext): DuckChatPixelSurface = when (inputContext) {
+            NativeInputState.InputContext.BROWSER -> ADDRESS_BAR
+            NativeInputState.InputContext.DUCK_AI -> DUCK_AI
+            NativeInputState.InputContext.DUCK_AI_CONTEXTUAL -> CONTEXTUAL_CHAT
+        }
+    }
+}
+
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
     fun reportOpen()
@@ -152,12 +177,12 @@ interface DuckChatPixels {
     fun reportVoiceServiceStarted()
     fun reportVoiceServiceKilled()
 
-    fun fireImageGenerationSelected()
-    fun fireImageGenerationDeselected()
-    fun fireImageGenerationSubmitted()
-    fun fireWebSearchSelected()
-    fun fireWebSearchDeselected()
-    fun fireWebSearchSubmitted()
+    fun fireImageGenerationSelected(surface: DuckChatPixelSurface)
+    fun fireImageGenerationDeselected(surface: DuckChatPixelSurface)
+    fun fireImageGenerationSubmitted(surface: DuckChatPixelSurface)
+    fun fireWebSearchSelected(surface: DuckChatPixelSurface)
+    fun fireWebSearchDeselected(surface: DuckChatPixelSurface)
+    fun fireWebSearchSubmitted(surface: DuckChatPixelSurface)
     fun firePromptSubmitted(
         selectedTool: String,
         modelId: String?,
@@ -165,37 +190,38 @@ interface DuckChatPixels {
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         hasText: Boolean,
+        surface: DuckChatPixelSurface,
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
     fun fireSentPromptInChat()
-    fun fireModelSelected(modelId: String)
-    fun fireReasoningEffortSelected(effortLevel: String)
+    fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface)
+    fun fireReasoningEffortSelected(effortLevel: String, surface: DuckChatPixelSurface)
 
     /** FE recovery flow: native model picker opened in response to a `showModelPicker` message. */
-    fun fireShowModelPicker()
+    fun fireShowModelPicker(surface: DuckChatPixelSurface)
 
     /** FE recovery flow: the chosen model reported back to the FE via `submitChangeModelAction`. */
-    fun fireSubmitChangeModel(modelId: String)
+    fun fireSubmitChangeModel(modelId: String, surface: DuckChatPixelSurface)
 
     /** FE recovery flow: a prompt submitted after recovering the chat's model. */
-    fun fireSubmitChangeModelPromptSent()
+    fun fireSubmitChangeModelPromptSent(surface: DuckChatPixelSurface)
 
     fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
-    fun fireImageAttached(source: String)
-    fun fireImageValidationFailed(reason: String)
-    fun fireImageRemoved()
-    fun fireFileAttached()
-    fun fireFileRemoved()
-    fun fireFileValidationFailed(reason: String)
+    fun fireImageAttached(source: String, surface: DuckChatPixelSurface)
+    fun fireImageValidationFailed(reason: String, surface: DuckChatPixelSurface)
+    fun fireImageRemoved(surface: DuckChatPixelSurface)
+    fun fireFileAttached(surface: DuckChatPixelSurface)
+    fun fireFileRemoved(surface: DuckChatPixelSurface)
+    fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface)
     fun fireVoiceTapped()
-    fun fireStopGenerationTapped()
+    fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
     fun fireDuckAiChatHistorySuggestionClicked()
     fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
     fun fireRecentChatDeleteButtonTapped()
     fun fireRecentChatDeleteConfirmed()
     fun fireRecentChatDeleteCancelled()
-    fun fireCustomizeResponsesSelected()
+    fun fireCustomizeResponsesSelected(surface: DuckChatPixelSurface)
     fun fireOmnibarShown()
     fun fireOmnibarTextAreaFocused(landscape: Boolean)
     fun fireOmnibarQuerySubmitted(query: String)
@@ -229,6 +255,9 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(daily, parameters = parameters, type = Pixel.PixelType.Daily())
         }
     }
+
+    private fun surfaceParams(surface: DuckChatPixelSurface): Map<String, String> =
+        mapOf(DuckChatPixelParameters.SURFACE to surface.value)
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -532,34 +561,40 @@ class RealDuckChatPixels @Inject constructor(
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED)
     }
 
-    override fun fireImageGenerationSelected() = fireCountAndDaily(
+    override fun fireImageGenerationSelected(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireImageGenerationDeselected() = fireCountAndDaily(
+    override fun fireImageGenerationDeselected(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireImageGenerationSubmitted() = fireCountAndDaily(
+    override fun fireImageGenerationSubmitted(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireWebSearchSelected() = fireCountAndDaily(
+    override fun fireWebSearchSelected(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireWebSearchDeselected() = fireCountAndDaily(
+    override fun fireWebSearchDeselected(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireWebSearchSubmitted() = fireCountAndDaily(
+    override fun fireWebSearchSubmitted(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY,
+        surfaceParams(surface),
     )
 
     override fun firePromptSubmitted(
@@ -569,6 +604,7 @@ class RealDuckChatPixels @Inject constructor(
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         hasText: Boolean,
+        surface: DuckChatPixelSurface,
     ) {
         val params = buildMap {
             put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
@@ -577,6 +613,7 @@ class RealDuckChatPixels @Inject constructor(
             put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
             put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
             put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
+            put(DuckChatPixelParameters.SURFACE, surface.value)
         }
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
@@ -590,47 +627,62 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY,
     )
 
-    override fun fireModelSelected(modelId: String) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED, parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId))
-        }
-    }
-
-    override fun fireReasoningEffortSelected(effortLevel: String) {
+    override fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(
-                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED,
-                parameters = mapOf(DuckChatPixelParameters.EFFORT_LEVEL to effortLevel),
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED,
+                parameters = mapOf(
+                    DuckChatPixelParameters.MODEL_ID to modelId,
+                    DuckChatPixelParameters.SURFACE to surface.value,
+                ),
             )
         }
     }
 
-    override fun fireShowModelPicker() {
+    override fun fireReasoningEffortSelected(effortLevel: String, surface: DuckChatPixelSurface) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED,
+                parameters = mapOf(
+                    DuckChatPixelParameters.EFFORT_LEVEL to effortLevel,
+                    DuckChatPixelParameters.SURFACE to surface.value,
+                ),
+            )
+        }
+    }
+
+    override fun fireShowModelPicker(surface: DuckChatPixelSurface) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT,
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY,
+            surfaceParams(surface),
         )
     }
 
-    override fun fireCustomizeResponsesSelected() {
+    override fun fireCustomizeResponsesSelected(surface: DuckChatPixelSurface) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_COUNT,
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_DAILY,
+            surfaceParams(surface),
         )
     }
 
-    override fun fireSubmitChangeModel(modelId: String) {
+    override fun fireSubmitChangeModel(modelId: String, surface: DuckChatPixelSurface) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT,
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY,
-            parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId),
+            parameters = mapOf(
+                DuckChatPixelParameters.MODEL_ID to modelId,
+                DuckChatPixelParameters.SURFACE to surface.value,
+            ),
         )
     }
 
-    override fun fireSubmitChangeModelPromptSent() {
+    override fun fireSubmitChangeModelPromptSent(surface: DuckChatPixelSurface) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT,
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
+            surfaceParams(surface),
         )
     }
 
@@ -648,37 +700,49 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
-    override fun fireImageAttached(source: String) = fireCountAndDaily(
+    override fun fireImageAttached(source: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY,
-        mapOf(DuckChatPixelParameters.ATTACHMENT_SOURCE to source),
+        mapOf(
+            DuckChatPixelParameters.ATTACHMENT_SOURCE to source,
+            DuckChatPixelParameters.SURFACE to surface.value,
+        ),
     )
 
-    override fun fireImageRemoved() = fireCountAndDaily(
+    override fun fireImageRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireImageValidationFailed(reason: String) = fireCountAndDaily(
+    override fun fireImageValidationFailed(reason: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY,
-        mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to reason),
+        mapOf(
+            DuckChatPixelParameters.FILE_VALIDATION_REASON to reason,
+            DuckChatPixelParameters.SURFACE to surface.value,
+        ),
     )
 
-    override fun fireFileAttached() = fireCountAndDaily(
+    override fun fireFileAttached(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireFileRemoved() = fireCountAndDaily(
+    override fun fireFileRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireFileValidationFailed(reason: String) = fireCountAndDaily(
+    override fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
-        mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to reason),
+        mapOf(
+            DuckChatPixelParameters.FILE_VALIDATION_REASON to reason,
+            DuckChatPixelParameters.SURFACE to surface.value,
+        ),
     )
 
     override fun fireVoiceTapped() = fireCountAndDaily(
@@ -686,9 +750,12 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
     )
 
-    override fun fireStopGenerationTapped() {
+    override fun fireStopGenerationTapped(surface: DuckChatPixelSurface) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED)
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED,
+                parameters = surfaceParams(surface),
+            )
         }
     }
 
@@ -1074,6 +1141,7 @@ object DuckChatPixelParameters {
     const val HAS_TEXT = "has_text"
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
+    const val SURFACE = "surface"
     const val UPSELL_SOURCE = "source"
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"

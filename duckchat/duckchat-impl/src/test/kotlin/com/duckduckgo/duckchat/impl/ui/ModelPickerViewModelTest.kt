@@ -47,6 +47,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -243,7 +244,7 @@ class ModelPickerViewModelTest {
         testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
         runCurrent()
 
-        verify(duckChatPixels).fireModelSelected("new")
+        verify(duckChatPixels).fireModelSelected(eq("new"), any())
     }
 
     @Test
@@ -254,7 +255,7 @@ class ModelPickerViewModelTest {
         testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
         runCurrent()
 
-        verify(duckChatPixels, never()).fireModelSelected(any())
+        verify(duckChatPixels, never()).fireModelSelected(any(), any())
     }
 
     @Test
@@ -271,7 +272,7 @@ class ModelPickerViewModelTest {
             requiredTier = "plus",
             flowType = "purchase",
         )
-        verify(duckChatPixels, never()).fireModelSelected(any())
+        verify(duckChatPixels, never()).fireModelSelected(any(), any())
     }
 
     @Test
@@ -296,7 +297,7 @@ class ModelPickerViewModelTest {
 
         testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
-        verify(duckChatPixels).fireModelSelected("new-model")
+        verify(duckChatPixels).fireModelSelected(eq("new-model"), any())
     }
 
     @Test
@@ -307,7 +308,7 @@ class ModelPickerViewModelTest {
 
         testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
-        verify(duckChatPixels).fireSubmitChangeModel("new-model")
+        verify(duckChatPixels).fireSubmitChangeModel(eq("new-model"), any())
     }
 
     @Test

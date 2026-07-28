@@ -24,6 +24,7 @@ import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -45,6 +46,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -87,6 +89,9 @@ class RealDuckChatJSHelperTest {
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val mockLimitsHandler: LimitsHandler = mock()
     private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
+    private val mockNativeInputStateProvider: NativeInputStateProvider = mock {
+        on { stateForTab(any()) } doReturn MutableStateFlow(NativeInputState.zero())
+    }
     private val mockAppInstall: AppInstall = mock {
         onBlocking { getInstallAge() } doReturn Duration.ZERO
     }
@@ -109,6 +114,7 @@ class RealDuckChatJSHelperTest {
         voiceSessionStateManager = mockVoiceSessionStateManager,
         limitsHandler = mockLimitsHandler,
         nativeInputStatePublisher = mockNativeInputStatePublisher,
+        nativeInputStateProvider = mockNativeInputStateProvider,
         appInstall = mockAppInstall,
         appBuildConfig = mockAppBuildConfig,
         subscriptions = mockSubscriptions,
@@ -1309,14 +1315,14 @@ class RealDuckChatJSHelperTest {
     fun whenShowModelPickerThenShowModelPickerPixelFired() = runTest {
         testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "tab-1")
 
-        verify(mockDuckChatPixels).fireShowModelPicker()
+        verify(mockDuckChatPixels).fireShowModelPicker(any())
     }
 
     @Test
     fun whenShowModelPickerWithEmptyTabIdThenShowModelPickerPixelNotFired() = runTest {
         testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "")
 
-        verify(mockDuckChatPixels, never()).fireShowModelPicker()
+        verify(mockDuckChatPixels, never()).fireShowModelPicker(any())
     }
 
     @Test
