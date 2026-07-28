@@ -50,12 +50,23 @@ class RealSetKeysIfAbsentCall @Inject constructor(
 
             if (response.isSuccessful) {
                 if (response.code() == 201) {
+                    logcat { "Sync-UnifiedDevices: set-if-absent 201 — our keypair won" }
                     Result.Success(SetKeysIfAbsentResult.Created)
                 } else {
-                    val existing = response.body()?.keys?.firstOrNull() ?: return Result.Error(reason = "SetKeysIfAbsent: 200 response missing keys")
-
-                    Result.Success(SetKeysIfAbsentResult.Existing(existing.kid, existing.publicKey))
+                    // 200 is a backwards-compat shim for "a key already exists"; adopt it if the body carries it,
+                    // otherwise fall back to fetching (same path as a 409).
+                    val existing = response.body()?.keys?.firstOrNull()
+                    if (existing != null) {
+                        logcat { "Sync-UnifiedDevices: set-if-absent 200 — adopting key from response (kid=${existing.kid})" }
+                        Result.Success(SetKeysIfAbsentResult.Existing(existing.kid, existing.publicKey))
+                    } else {
+                        logcat { "Sync-UnifiedDevices: set-if-absent 200 — key exists but not returned; will fetch" }
+                        Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired)
+                    }
                 }
+            } else if (response.code() == HTTP_CONFLICT) {
+                logcat { "Sync-UnifiedDevices: set-if-absent 409 — a different key already exists; will fetch" }
+                Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired)
             } else {
                 mapError(response)
             }
@@ -79,5 +90,9 @@ class RealSetKeysIfAbsentCall @Inject constructor(
         } else {
             Result.Error(code = response.code(), reason = "empty response")
         }
+    }
+
+    companion object {
+        private const val HTTP_CONFLICT = 409
     }
 }

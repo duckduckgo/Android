@@ -87,7 +87,7 @@ class RealAccountInfoKeyManager @Inject constructor(
 
         logcat { "Sync-UnifiedDevices: registering $SYNC_PURPOSE_ACCOUNT_INFO key (kid=${minted.entry.kid}, wraps=${entries.size})" }
         when (val result = syncApi.setKeysIfAbsent(token, SYNC_PURPOSE_ACCOUNT_INFO, entries)) {
-            is Success -> onSetIfAbsentSuccess(minted, entries.size, result.data)
+            is Success -> onSetIfAbsentSuccess(token, minted, entries.size, result.data)
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: setKeysIfAbsent failed: ${result.reason}" }
                 result
@@ -119,6 +119,7 @@ class RealAccountInfoKeyManager @Inject constructor(
     }
 
     private fun onSetIfAbsentSuccess(
+        token: String,
         minted: MintedProtectedKey,
         wrapsSent: Int,
         outcome: SetKeysIfAbsentResult,
@@ -131,10 +132,30 @@ class RealAccountInfoKeyManager @Inject constructor(
                 )
             }
             is SetKeysIfAbsentResult.Existing -> {
-                logcat { "Sync-UnifiedDevices: another device's key won (kid=${outcome.kid}); discarding local mint" }
+                logcat { "Sync-UnifiedDevices: another device's key won (kid=${outcome.kid}); adopting from response" }
                 Success(
                     AccountInfoKeyResult(kid = outcome.kid, publicKey = outcome.publicKey, created = false, wrapsSent = wrapsSent),
                 )
+            }
+            SetKeysIfAbsentResult.ExistsFetchRequired -> adoptExistingFromServer(token, wrapsSent)
+        }
+    }
+
+    /** The server has a key for this purpose but didn't return it (409, or a 200 shim); fetch and adopt it. */
+    private fun adoptExistingFromServer(token: String, wrapsSent: Int): Result<AccountInfoKeyResult> {
+        logcat { "Sync-UnifiedDevices: key already exists on server; fetching to adopt" }
+        return when (val result = syncApi.getProtectedKeys(token)) {
+            is Success -> {
+                val existing = result.data.firstOrNull { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO }
+                    ?: return Error(reason = "CreateAccountInfoKey: server reported an existing key but none was found on fetch")
+                logcat { "Sync-UnifiedDevices: adopted existing key (kid=${existing.kid})" }
+                Success(
+                    AccountInfoKeyResult(kid = existing.kid, publicKey = existing.publicKey, created = false, wrapsSent = wrapsSent),
+                )
+            }
+            is Error -> {
+                logcat(ERROR) { "Sync-UnifiedDevices: failed to fetch keys to adopt existing: ${result.reason}" }
+                result
             }
         }
     }

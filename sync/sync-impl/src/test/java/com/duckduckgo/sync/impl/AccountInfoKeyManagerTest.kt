@@ -186,6 +186,43 @@ class AccountInfoKeyManagerTest {
     }
 
     @Test
+    fun whenSetIfAbsentRequiresFetchThenFetchesKeysAndAdopts() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.ExistsFetchRequired))
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(
+            Success(
+                listOf(
+                    ProtectedKeyEntry(
+                        kid = "server-kid",
+                        purpose = "account_info",
+                        encryptedWith = "ddg",
+                        encryptedPrivateKey = "AAAA",
+                        publicKey = RsaJwk(n = "server-mod", e = "AQAB"),
+                    ),
+                ),
+            ),
+        )
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals("server-kid", result.data.kid)
+        assertEquals(RsaJwk(n = "server-mod", e = "AQAB"), result.data.publicKey)
+        assertTrue(!result.data.created)
+    }
+
+    @Test
+    fun whenSetIfAbsentRequiresFetchButNoAccountInfoKeyFoundThenReturnsError() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any()))
+            .thenReturn(Success(SetKeysIfAbsentResult.ExistsFetchRequired))
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(emptyList()))
+
+        val result = manager.ensureKeyRegistered()
+
+        assertTrue(result is Error)
+    }
+
+    @Test
     fun whenSetIfAbsentFailsThenReturnsError() = runTest {
         configureForSetIfAbsentFailure()
 
