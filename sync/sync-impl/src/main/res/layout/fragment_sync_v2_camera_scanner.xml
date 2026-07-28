@@ -16,6 +16,7 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?daxColorSurface">
@@ -37,6 +38,92 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/introAnimation"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:saveEnabled="false"
+            app:layout_constraintBottom_toTopOf="@+id/buttonsContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/codeExchangeHeader"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/sync_camera_intro_animation" />
+
+        <FrameLayout
+            android:id="@+id/buttonsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/keyline_5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/readyToScanSecondaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sync_scanner_v2_scan_button_cta"
+                app:daxButtonSize="small" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/readyToScanPrimaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sync_scanner_v2_scan_button_cta"
+                android:visibility="gone"
+                app:daxButtonSize="small" />
+
+        </FrameLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/noCameraPermissionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Missing permission UI"
+            app:typography="h2"
+            tools:ignore="HardcodedText" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/cameraContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Camera UI"
+            app:typography="h2"
+            tools:ignore="HardcodedText" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/noCameraAvailableContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No camera available UI"
+            app:typography="h2"
+            tools:ignore="HardcodedText" />
+
+    </FrameLayout>
 
 </FrameLayout>
