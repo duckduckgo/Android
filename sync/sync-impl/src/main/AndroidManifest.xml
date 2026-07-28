@@ -109,5 +109,21 @@
             android:label="@string/sync_screen_title"
             android:parentActivityName=".ui.v2.SyncActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.CodeExchangeActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
+
+        <activity
+            android:name=".ui.v2.QrCodeActivity"
+            android:exported="false"
+            android:label="@string/sync_scanner_v2_qr_code_screen_title"
+            android:parentActivityName=".ui.v2.CodeExchangeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.DuckDuckGo.Dark" />
     </application>
 </manifest>
