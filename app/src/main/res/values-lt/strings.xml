@@ -1003,7 +1003,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Praleisti</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Pridėti mane ekrano apačioje.</string>
     <string name="preOnboardingAddToDockBody">Pagrindiniame ekrane raskite „DuckDuckGo“ piktogramą. Tada paspauskite ir vilkite į vietą. Štai ir viskas!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Supratau!</string>
 

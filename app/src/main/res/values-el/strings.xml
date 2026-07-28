@@ -967,7 +967,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Παράλειψη</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Προσθέστε με στο κάτω μέρος της οθόνης σας.</string>
     <string name="preOnboardingAddToDockBody">Βρείτε το εικονίδιο DuckDuckGo στην Αρχική οθόνη σας. Στη συνέχεια, πατήστε και μεταφέρετέ το στη θέση του. Αυτό ήταν!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Το κατάλαβα!</string>
 

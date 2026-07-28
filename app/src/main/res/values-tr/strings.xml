@@ -967,7 +967,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Beni ekranınızın en altına ekleyin.</string>
     <string name="preOnboardingAddToDockBody">Ana Ekranınızda DuckDuckGo simgesini bulun. Daha sonra simgeye basıp sürükleyerek yerine sabitleyin. Hepsi bu kadar!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Anladım!</string>
 

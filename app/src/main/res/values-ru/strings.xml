@@ -1003,7 +1003,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропустить</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Добавьте меня в нижнюю часть экрана.</string>
     <string name="preOnboardingAddToDockBody">Найдите значок DuckDuckGo на главном экране. Затем нажмите и перетащите виджет на нужное место. Готово!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Понятно</string>
 
