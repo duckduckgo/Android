@@ -25,8 +25,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
@@ -52,7 +54,8 @@ interface CoreContentScopeScripts {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = CoreContentScopeScripts::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val userAllowListRepository: UserAllowListRepository,
@@ -61,7 +64,7 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
-) : CoreContentScopeScripts {
+) : CoreContentScopeScripts, PrivacyConfigCallbackPlugin {
     // These adapters must be declared before cachedContentScopeJson.
     private val reusableMoshi: Moshi = Builder().build()
     private val userUnprotectedDomainsAdapter: JsonAdapter<List<String>> =
@@ -71,7 +74,21 @@ class RealContentScopeScripts @Inject constructor(
     private val experimentsAdapter: JsonAdapter<List<Experiment>> =
         reusableMoshi.adapter(Types.newParameterizedType(List::class.java, Experiment::class.java))
 
-    private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
+    // Plugin config() is driven only by privacy-config persistence, so we cache the assembled
+    // config string and refresh it only when a new config is persisted/downloaded, rather than
+    // iterating every plugin on every navigation. Set from onPrivacyConfigPersisted() (worker
+    // thread) and read in getScript() (main), hence @Volatile.
+    @Volatile private var pluginConfigNeedsRebuild: Boolean = true
+
+    // Startup latch: feature repos load their persisted config into memory asynchronously and
+    // expose no completion signal, so we keep refreshing the plugin config on every call until it
+    // stops changing (repos settled), then trust pluginConfigNeedsRebuild. Only touched from getScript().
+    // On a config download the repos reload synchronously inside PrivacyFeaturePlugin.store(), before
+    // onPrivacyConfigPersisted() is dispatched, so the latch only has to cover process startup.
+    private var pluginConfigSettled: Boolean = false
+    private var cachedPluginConfig: String = ""
+
+    private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimizeInjectionEnabled())
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
     private var cachedUserUnprotectedDomainsJson: String = EMPTY_JSON_LIST
@@ -93,34 +110,98 @@ class RealContentScopeScripts @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String {
+        return if (optimizeInjectionEnabled()) {
+            getOptimizedScript(isDesktopMode, activeExperiments)
+        } else {
+            getLegacyScript(isDesktopMode, activeExperiments)
+        }
+    }
+
+    // Original implementation, left intact. Used when optimizeContentScopeInjection is disabled, and
+    // deleted together with that flag once the optimized path is fully rolled out.
+    private fun getLegacyScript(
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ): String {
         var updateJS = false
 
         val pluginParameters = getPluginParameters()
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions, optimized = false)
             updateJS = true
         }
 
-        val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions)
+        val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions, optimized = false)
         if (cachedContentScopeJson != contentScopeJson) {
             cachedContentScopeJson = contentScopeJson
             updateJS = true
         }
 
         if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
-            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
+            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList(), optimized = false)
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments, optimized = false)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
         }
 
         if (!this::cachedContentScopeJS.isInitialized || updateJS) {
-            cacheContentScopeJS()
+            cacheContentScopeJS(optimized = false)
+        }
+        return cachedContentScopeJS
+    }
+
+    // Optimized path: the expensive plugin config() assembly is cached and refreshed only when the
+    // privacy config is persisted (plus a startup stabilisation latch, see field docs), and the
+    // content scope JSON is re-serialized only when one of its two inputs actually changed. The
+    // cheaper per-call inputs (allow list, preferences, cohorts) are unchanged.
+    private fun getOptimizedScript(
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ): String {
+        var updateJS = false
+        var contentScopeChanged = false
+
+        if (pluginConfigNeedsRebuild || !pluginConfigSettled) {
+            pluginConfigNeedsRebuild = false
+            val pluginConfig = getPluginConfig()
+            // An empty config means the repos have not finished loading yet, so never latch on it.
+            pluginConfigSettled = pluginConfig.isNotEmpty() && pluginConfig == cachedPluginConfig
+            if (pluginConfig != cachedPluginConfig) {
+                cachedPluginConfig = pluginConfig
+                contentScopeChanged = true
+            }
+        }
+
+        val unprotectedTemporaryExceptions = unprotectedTemporary.unprotectedTemporaryExceptions
+        if (cachedUnprotectTemporaryExceptions != unprotectedTemporaryExceptions) {
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions, optimized = true)
+            contentScopeChanged = true
+        }
+
+        if (contentScopeChanged) {
+            cachedContentScopeJson = buildContentScopeJson(cachedPluginConfig, cachedUnprotectTemporaryExceptionsJson)
+            updateJS = true
+        }
+
+        val userUnprotectedDomains = userAllowListRepository.domainsInUserAllowList()
+        if (cachedUserUnprotectedDomains != userUnprotectedDomains) {
+            cacheUserUnprotectedDomains(userUnprotectedDomains, optimized = true)
+            updateJS = true
+        }
+
+        val userPreferencesJson = getUserPreferencesJson(getPluginPreferences(), isDesktopMode, activeExperiments, optimized = true)
+        if (cachedUserPreferencesJson != userPreferencesJson) {
+            cachedUserPreferencesJson = userPreferencesJson
+            updateJS = true
+        }
+
+        if (!this::cachedContentScopeJS.isInitialized || updateJS) {
+            cacheContentScopeJS(optimized = true)
         }
         return cachedContentScopeJS
     }
@@ -134,6 +215,18 @@ class RealContentScopeScripts @Inject constructor(
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
 
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
+
+    override fun onPrivacyConfigDownloaded() {
+        // No-op: invalidation is handled in onPrivacyConfigPersisted(), which fires on every persist
+        // (both the startup local-config load and each remote download), whereas this fires on
+        // downloads only.
+    }
+
+    override fun onPrivacyConfigPersisted() {
+        // Invalidate the cached plugin config so the next getScript() rebuilds it. Fires on every
+        // config persist (startup local load and each remote download).
+        pluginConfigNeedsRebuild = true
+    }
 
     private fun getPluginParameters(): PluginParameters {
         var config = ""
@@ -161,31 +254,47 @@ class RealContentScopeScripts @Inject constructor(
         return PluginParameters(config, preferences)
     }
 
-    private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
+    private fun getPluginConfig(): String = joinNonEmpty { it.config() }
+
+    private fun getPluginPreferences(): String = joinNonEmpty { it.preferences() }
+
+    private inline fun joinNonEmpty(value: (ContentScopeConfigPlugin) -> String?): String =
+        pluginPoint.getPlugins()
+            .mapNotNull(value)
+            .filter { it.isNotEmpty() }
+            .joinToString(",")
+
+    private fun cacheUserUnprotectedDomains(
+        userUnprotectedDomains: List<String>,
+        optimized: Boolean,
+    ) {
         cachedUserUnprotectedDomains.clear()
         if (userUnprotectedDomains.isEmpty()) {
             cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
         } else {
-            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains)
+            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized)
             cachedUserUnprotectedDomains.addAll(userUnprotectedDomains)
         }
     }
 
-    private fun cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
+    private fun cacheUserUnprotectedTemporaryExceptions(
+        unprotectedTemporaryExceptions: List<FeatureException>,
+        optimized: Boolean,
+    ) {
         cachedUnprotectTemporaryExceptions.clear()
         if (unprotectedTemporaryExceptions.isEmpty()) {
             cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
         } else {
-            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)
+            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized)
             cachedUnprotectTemporaryExceptions.addAll(unprotectedTemporaryExceptions)
         }
     }
 
-    private fun cacheContentScopeJS() {
+    private fun cacheContentScopeJS(optimized: Boolean) {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
         val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
 
-        cachedContentScopeJS = if (optimizeInjectionEnabled()) {
+        cachedContentScopeJS = if (optimized) {
             assembleContentScopeJS(contentScopeJS, messagingParameters)
         } else {
             contentScopeJS
@@ -253,8 +362,11 @@ class RealContentScopeScripts @Inject constructor(
         return segments
     }
 
-    private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
-        if (optimizeInjectionEnabled()) {
+    private fun getUserUnprotectedDomainsJson(
+        userUnprotectedDomains: List<String>,
+        optimized: Boolean,
+    ): String {
+        if (optimized) {
             return userUnprotectedDomainsAdapter.toJson(userUnprotectedDomains)
         } else {
             val type = Types.newParameterizedType(MutableList::class.java, String::class.java)
@@ -264,8 +376,11 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
-    private fun getUnprotectedTemporaryJson(unprotectedTemporaryExceptions: List<FeatureException>): String {
-        if (optimizeInjectionEnabled()) {
+    private fun getUnprotectedTemporaryJson(
+        unprotectedTemporaryExceptions: List<FeatureException>,
+        optimized: Boolean,
+    ): String {
+        if (optimized) {
             return unprotectedTemporaryAdapter.toJson(unprotectedTemporaryExceptions)
         } else {
             val type = Types.newParameterizedType(MutableList::class.java, FeatureException::class.java)
@@ -279,8 +394,9 @@ class RealContentScopeScripts @Inject constructor(
         userPreferences: String,
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
+        optimized: Boolean,
     ): String {
-        val experiments = getExperimentsKeyValuePair(activeExperiments)
+        val experiments = getExperimentsKeyValuePair(activeExperiments, optimized)
         val defaultParameters =
             "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
                 "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$MESSAGING_PARAMETERS"
@@ -300,9 +416,14 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 
-    private fun getExperimentsKeyValuePair(activeExperiments: List<Toggle>): String {
+    // Toggle.getCohort() is suspend but has no suspension points today, so runBlocking runs inline and
+    // never parks the caller. If it ever gains real IO this becomes a main-thread stall.
+    private fun getExperimentsKeyValuePair(
+        activeExperiments: List<Toggle>,
+        optimized: Boolean,
+    ): String {
         return runBlocking {
-            val jsonAdapter: JsonAdapter<List<Experiment>> = if (optimizeInjectionEnabled()) {
+            val jsonAdapter: JsonAdapter<List<Experiment>> = if (optimized) {
                 experimentsAdapter
             } else {
                 val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
@@ -326,10 +447,13 @@ class RealContentScopeScripts @Inject constructor(
     private fun getContentScopeJson(
         config: String,
         unprotectedTemporaryExceptions: List<FeatureException>,
-    ): String =
-        (
-            "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
-            )
+        optimized: Boolean,
+    ): String = buildContentScopeJson(config, getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized))
+
+    private fun buildContentScopeJson(
+        config: String,
+        unprotectedTemporaryJson: String,
+    ): String = "{\"features\":{$config},\"unprotectedTemporary\":$unprotectedTemporaryJson}"
 
     companion object {
         const val EMPTY_JSON_LIST = "[]"
