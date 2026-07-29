@@ -34,7 +34,7 @@ class ReadSyncCodeViewModel @Inject constructor(
     private val clipboard: Clipboard,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
-    internal val commands = _commands.receiveAsFlow()
+    val commands = _commands.receiveAsFlow()
 
     fun pasteSyncCode() {
         val url = clipboard.pasteFromClipboard()
@@ -49,7 +49,7 @@ class ReadSyncCodeViewModel @Inject constructor(
         }
     }
 
-    internal sealed interface Command {
+    sealed interface Command {
         data class ShowMessage(
             @StringRes val message: Int,
         ) : Command
