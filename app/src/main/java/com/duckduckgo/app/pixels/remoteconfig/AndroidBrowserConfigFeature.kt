@@ -283,15 +283,6 @@ interface AndroidBrowserConfigFeature {
     fun onboardingDuckAiCopyUpdatesFeb26(): Toggle
 
     /**
-     * Controls the fire dialog and data clearing options.
-     * @return `true` when the remote config has the global "granularFireDialog" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun granularFireDialog(): Toggle
-
-    /**
      * Controls whether verified install/update pixels are sent.
      * @return `true` when the remote config has the global "sendVerifiedInstallPixels" androidBrowserConfig
      * sub-feature flag enabled
@@ -320,16 +311,6 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendDataClearingWideEvent(): Toggle
-
-    /**
-     * Controls the single tab fire dialog that allows deleting a single tab's data.
-     * @return `true` when the remote config has the global "singleTabFireDialog" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun singleTabFireDialog(): Toggle
 
     /**
      * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not

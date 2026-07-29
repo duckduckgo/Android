@@ -49,86 +49,88 @@ class RealDuckChatPixelsToolsTest {
         termsOfServiceHandler = termsOfServiceHandler,
     )
 
+    private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
+
     @Test
     fun whenImageGenerationSelectedThenFiresCountAndDaily() = runTest {
-        testee.fireImageGenerationSelected()
+        testee.fireImageGenerationSelected(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenImageGenerationDeselectedThenFiresCountAndDaily() = runTest {
-        testee.fireImageGenerationDeselected()
+        testee.fireImageGenerationDeselected(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenImageGenerationSubmittedThenFiresCountAndDaily() = runTest {
-        testee.fireImageGenerationSubmitted()
+        testee.fireImageGenerationSubmitted(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenWebSearchSelectedThenFiresCountAndDaily() = runTest {
-        testee.fireWebSearchSelected()
+        testee.fireWebSearchSelected(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenWebSearchDeselectedThenFiresCountAndDaily() = runTest {
-        testee.fireWebSearchDeselected()
+        testee.fireWebSearchDeselected(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenWebSearchSubmittedThenFiresCountAndDaily() = runTest {
-        testee.fireWebSearchSubmitted()
+        testee.fireWebSearchSubmitted(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenCustomizeResponsesSelectedThenFiresCountAndDaily() = runTest {
-        testee.fireCustomizeResponsesSelected()
+        testee.fireCustomizeResponsesSelected(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -142,6 +144,7 @@ class RealDuckChatPixelsToolsTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
         )
 
         val params = mapOf(
@@ -151,6 +154,7 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "true",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "contextual_chat",
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
         verify(pixel).fire(
@@ -169,6 +173,7 @@ class RealDuckChatPixelsToolsTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
         )
 
         val params = mapOf(
@@ -176,6 +181,7 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "address_bar",
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
         verify(pixel).fire(

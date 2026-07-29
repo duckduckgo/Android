@@ -18,11 +18,9 @@ package com.duckduckgo.dataclearing.api.fire
 
 /**
  * Provider for creating Fire dialog instances.
- * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
  *
  * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
- * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
- * from GranularFireDialog or NonGranularFireDialog.
+ * use FragmentManager.setFragmentResultListener with [FireDialog.REQUEST_KEY].
  */
 interface FireDialogProvider {
     /**
@@ -30,7 +28,7 @@ interface FireDialogProvider {
      *
      * @param origin Where the dialog is being launched from. Determines which buttons
      *  are shown and which tab(s) the dialog operates on.
-     * @return A FireDialog (Granular or NonGranular variant, selected by remote feature flag).
+     * @return A Fire dialog configured for [origin].
      */
     suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
 

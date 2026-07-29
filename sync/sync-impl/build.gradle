@@ -94,6 +94,9 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
 
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

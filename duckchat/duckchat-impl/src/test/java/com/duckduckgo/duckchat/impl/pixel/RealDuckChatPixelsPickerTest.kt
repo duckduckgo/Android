@@ -51,19 +51,25 @@ class RealDuckChatPixelsPickerTest {
 
     @Test
     fun whenModelSelectedThenSingleCountWithModelId() = runTest {
-        testee.fireModelSelected(modelId = "gpt-5")
+        testee.fireModelSelected(modelId = "gpt-5", surface = DuckChatPixelSurface.DUCK_AI)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED,
-            parameters = mapOf(DuckChatPixelParameters.MODEL_ID to "gpt-5"),
+            parameters = mapOf(
+                DuckChatPixelParameters.MODEL_ID to "gpt-5",
+                DuckChatPixelParameters.SURFACE to "duck_ai",
+            ),
         )
     }
 
     @Test
     fun whenReasoningSelectedThenSingleCountWithEffort() = runTest {
-        testee.fireReasoningEffortSelected(effortLevel = "extended_reasoning")
+        testee.fireReasoningEffortSelected(effortLevel = "extended_reasoning", surface = DuckChatPixelSurface.DUCK_AI)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED,
-            parameters = mapOf(DuckChatPixelParameters.EFFORT_LEVEL to "extended_reasoning"),
+            parameters = mapOf(
+                DuckChatPixelParameters.EFFORT_LEVEL to "extended_reasoning",
+                DuckChatPixelParameters.SURFACE to "duck_ai",
+            ),
         )
     }
 
@@ -83,21 +89,25 @@ class RealDuckChatPixelsPickerTest {
 
     @Test
     fun whenShowModelPickerThenFiresCountAndDaily() = runTest {
-        testee.fireShowModelPicker()
+        testee.fireShowModelPicker(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT, parameters = emptyMap())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY,
-            parameters = emptyMap(),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenSubmitChangeModelThenFiresCountAndDailyWithModelId() = runTest {
-        testee.fireSubmitChangeModel(modelId = "gpt-5")
+        testee.fireSubmitChangeModel(modelId = "gpt-5", surface = DuckChatPixelSurface.DUCK_AI)
 
-        val params = mapOf(DuckChatPixelParameters.MODEL_ID to "gpt-5")
+        val params = mapOf(
+            DuckChatPixelParameters.MODEL_ID to "gpt-5",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+        )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY,
@@ -108,12 +118,13 @@ class RealDuckChatPixelsPickerTest {
 
     @Test
     fun whenSubmitChangeModelPromptSentThenFiresCountAndDaily() = runTest {
-        testee.fireSubmitChangeModelPromptSent()
+        testee.fireSubmitChangeModelPromptSent(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT, parameters = emptyMap())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
-            parameters = emptyMap(),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }

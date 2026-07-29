@@ -493,6 +493,17 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaOnHomeTabAndLinearPlanWidgetPromptShownThenReturnNull() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockOnboardingStore.linearPlanWidgetPromptShown).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertNull(value)
+    }
+
+    @Test
     fun whenRefreshCtaWhileBrowsingMajorTrackerSiteThenReturnNetworkCta() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))

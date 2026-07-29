@@ -34,4 +34,14 @@ interface ContentScopeScriptsFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useWebMessageListener(): Toggle
+
+    /**
+     * Kill-switch for the ContentScopeScripts injection performance work.
+     * When enabled, the optimized injection path is used.
+     * @return `true` when the remote config has the global "optimizeContentScopeInjection" clientContentFeatures
+     * sub-feature flag enabled.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun optimizeContentScopeInjection(): Toggle
 }

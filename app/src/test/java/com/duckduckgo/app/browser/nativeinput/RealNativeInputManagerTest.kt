@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -77,6 +78,7 @@ class RealNativeInputManagerTest {
     private val pixel: Pixel = mock()
     private val nativeInputEventListener: NativeInputEventListener = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
+    private val nativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val rootView: ViewGroup = FrameLayout(context)
@@ -91,6 +93,7 @@ class RealNativeInputManagerTest {
     fun setUp() {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
+        nativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -101,6 +104,7 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
+            nativeInputSearchOnlyFeature,
             nativeInputEventListener,
         )
     }

@@ -46,6 +46,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.B
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.internal.TestSyncWarningPlugin
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
@@ -79,6 +80,7 @@ constructor(
     private val syncFeature: SyncFeature,
     private val appBuildConfig: AppBuildConfig,
     private val syncApi: SyncApi,
+    private val testSyncWarningState: TestSyncWarningPlugin.StateHolder,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -120,6 +122,7 @@ constructor(
         val v2StoreFieldsText: String = "",
         val createThirdPartyResult: String = "",
         val keysText: String = "",
+        val isTestSyncWarningEnabled: Boolean = false,
     )
 
     sealed class BlockStoreValue {
@@ -145,6 +148,7 @@ constructor(
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
+        observeTestSyncWarningState()
     }
 
     fun onResume() {
@@ -784,5 +788,17 @@ constructor(
     private fun isDeviceSecureLockEnabled(): Boolean {
         val keyguardManager = context.getSystemService(KeyguardManager::class.java)
         return keyguardManager?.isDeviceSecure == true
+    }
+
+    fun enableTestSyncWarning(enable: Boolean) {
+        testSyncWarningState.isEnabled.value = enable
+    }
+
+    private fun observeTestSyncWarningState() {
+        viewModelScope.launch {
+            testSyncWarningState.isEnabled.collect { isEnabled ->
+                viewState.update { it.copy(isTestSyncWarningEnabled = isEnabled) }
+            }
+        }
     }
 }

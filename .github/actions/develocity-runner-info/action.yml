@@ -1,0 +1,81 @@
+name: 'Develocity Runner Info'
+description: 'Capture GitHub Actions runner hardware and region as Develocity build scan custom values'
+
+inputs:
+  runner-type:
+    description: >-
+      Optional human-readable label for the runner (e.g. "ubuntu-latest-4-core").
+      Only needed if you want a friendly name alongside the auto-detected VM size,
+      CPU count and region below. Leave unset to rely purely on runtime detection,
+      which needs no maintenance as runner sizes change.
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Capture runner info
+      shell: bash
+      # Context values are passed through env vars and referenced as $VARS below, rather
+      # than interpolated as ${{ }} directly into the script. ${{ }} is expanded before the
+      # shell runs, so a value containing a newline or shell metacharacter could otherwise
+      # inject entries into $GITHUB_ENV or arbitrary commands (GitHub's script-injection
+      # hardening guidance). These particular contexts are trusted, but the pattern is cheap.
+      env:
+        RUNNER_TYPE: ${{ inputs.runner-type }}
+        RUNNER_NAME: ${{ runner.name }}
+        RUNNER_ENVIRONMENT: ${{ runner.environment }}
+      run: |
+        # Every value below is exposed to the Gradle build as an env var; settings.gradle
+        # reads them and publishes them as build scan custom values.
+        #
+        # DuckDuckGo's build scans are PUBLIC. On GitHub-hosted runners every value below
+        # describes GitHub's shared Azure fleet (already public knowledge), so it is safe
+        # to publish. On self-hosted runners the same values would describe OUR OWN
+        # machines — hostname, hardware, location — so host-identifying details are guarded
+        # behind a github-hosted check and omitted otherwise.
+
+        # Optional human label — only emitted if the caller passed one.
+        if [ -n "$RUNNER_TYPE" ]; then
+          echo "DDG_RUNNER_TYPE=$RUNNER_TYPE" >> "$GITHUB_ENV"
+        fi
+
+        # Environment (github-hosted vs self-hosted) is not host-identifying and drives the
+        # guard below. os/arch are omitted on purpose — the build scan records them natively.
+        echo "DDG_RUNNER_ENVIRONMENT=$RUNNER_ENVIRONMENT" >> "$GITHUB_ENV"
+
+        # CPU count is a non-identifying aggregate and is available on every runner.
+        CPU_COUNT="$(nproc 2>/dev/null || echo '')"
+        if [ -n "$CPU_COUNT" ]; then
+          echo "DDG_RUNNER_CPU_COUNT=$CPU_COUNT" >> "$GITHUB_ENV"
+        fi
+
+        # Everything below identifies the specific machine/location. On self-hosted runners
+        # that is our infrastructure, and our build scans are public — so capture it only on
+        # GitHub-hosted runners, where it describes GitHub's shared fleet. Gating the IMDS
+        # calls here also avoids probing the Azure link-local address on non-Azure hardware.
+        if [ "$RUNNER_ENVIRONMENT" = "github-hosted" ]; then
+          # Runner name from the runner context (generic on hosted; a hostname on self-hosted).
+          echo "DDG_RUNNER_NAME=$RUNNER_NAME" >> "$GITHUB_ENV"
+
+          # GitHub-hosted runners are Azure VMs. Query the Azure Instance Metadata Service
+          # (IMDS) for the authoritative VM size and region — no hardcoding, self-updating
+          # as GitHub changes runner SKUs. Best-effort: this must never fail the build.
+          IMDS='http://169.254.169.254/metadata/instance/compute'
+          VM_SIZE="$(curl --silent --fail --max-time 5 -H 'Metadata: true' "$IMDS/vmSize?api-version=2021-02-01&format=text" || true)"
+          REGION="$(curl --silent --fail --max-time 5 -H 'Metadata: true' "$IMDS/location?api-version=2021-02-01&format=text" || true)"
+          if [ -n "$VM_SIZE" ]; then
+            echo "DDG_RUNNER_VM_SIZE=$VM_SIZE" >> "$GITHUB_ENV"
+          fi
+          if [ -n "$REGION" ]; then
+            echo "DDG_RUNNER_REGION=$REGION" >> "$GITHUB_ENV"
+          fi
+        fi
+
+        # Diagnostic log. Note CI logs on this public repo are also public, so the runner
+        # name (a hostname on self-hosted) is only logged on github-hosted runners.
+        if [ "$RUNNER_ENVIRONMENT" = "github-hosted" ]; then
+          echo "Runner: name='$RUNNER_NAME' env='$RUNNER_ENVIRONMENT' type='$RUNNER_TYPE' vmSize='${VM_SIZE:-?}' cpus='${CPU_COUNT:-?}' region='${REGION:-?}'"
+        else
+          echo "Runner: env='$RUNNER_ENVIRONMENT' type='$RUNNER_TYPE' cpus='${CPU_COUNT:-?}' (host-identifying details omitted from public build scan/logs)"
+        fi

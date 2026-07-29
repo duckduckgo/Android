@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
     <string name="fireClearAll">Eliminar pestañas y datos</string>
-    <string name="fireClearAllPlusDuckChats">Borrar pestañas, datos y chats de Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Protección contra ventanas emergentes de cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Eliminación de datos</string>
     <string name="dataClearingDescription">Eliminar tus datos puede ayudar a proteger tu privacidad en línea. Usa el Fire Button para eliminar los datos manualmente o configura la eliminación automática.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Elimina todos los chats, incluidos los chats fijados</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Elige qué eliminar</string>
     <string name="dataClearingOptionTabs">Pestañas</string>
     <string name="dataClearingOptionData">Cookies y datos del sitio</string>
     <string name="dataClearingDuckAiChats">Chats de Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todos los chats</string>
-    <string name="fireDialogDeleteButton">Eliminar</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Cerrar pestaña</item>
-        <item quantity="other">Cerrar todas las %1$d pestañas</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Puede que cierre sesión en tus cuentas.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Ninguna</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Eliminar de 1 sitio. Puede que cierre sesión en tus cuentas.</item>
-        <item quantity="other">Eliminar de %1$d sitios. Puede que cierre sesión en tus cuentas.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">¿Eliminar pestañas y datos del sitio?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
-
-    <string name="settingsAutomaticallyClearData">Borrar datos automáticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Borrar automáticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ninguno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Pestañas</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salir de la aplicación (1 hora de inactividad)</string>
     <string name="settingsClearAiDataTitle">Elimina los chats de Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button también eliminará el historial de Duck.ai, incluidos los chats anclados.</string>
-    <string name="settingsClearDataActionSecondaryText">Borrar todas las pestañas y los datos de los sitios no protegidos con Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Borra todas las pestañas, los chats de Duck.ai y los datos de los sitios que no hayas protegido con Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Sobre</string>
@@ -943,6 +923,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hola.</string>
     <string name="preOnboardingWelcomeDialogBody1">¿Todo listo para un navegador más rápido que\nte da el control?</string>
     <string name="preOnboardingWelcomeDialogBody2">La IA es siempre opcional y la protección de privacidad está siempre activada.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d de %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cómo se dice «duck» en inglés</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cómo se dice «duck» en español</string>
@@ -978,6 +959,17 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">¡Prueba un chat privado de IA ahora!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">¿Quieres que DuckDuckGo sea tu navegador predeterminado?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Prueba nuestro widget de pantalla de inicio.</string>
+    <string name="preOnboardingWidgetPromptBody">Añade nuestro widget de búsqueda a tu pantalla de inicio para facilitar y agilizar el acceso.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Añadir widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Omitir</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockBody">Busca el icono de DuckDuckGo en tu pantalla de inicio. A continuación, selecciónalo y arrástralo a su ubicación. ¡Eso es todo!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Entendido</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Inicia un chat privado de IA con Duck.ai o cambia a Búsqueda para navegación protegida.<br/><br/>Puedes usar Duck.ai desde cualquier lugar donde veas el icono de chat]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">También ofrecemos una suscripción de pago con modelos de IA avanzados con límites de chat más altos de GPT y Claude, una VPN segura y mucho más.</string>

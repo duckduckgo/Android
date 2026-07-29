@@ -25,6 +25,7 @@ import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFi
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.SUBSCRIPTION_ELIGIBLE
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import javax.inject.Inject
@@ -40,7 +41,7 @@ interface ExperimentFiltersManager {
 @ContributesBinding(AppScope::class)
 class ExperimentFiltersManagerImpl @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    private val subscriptions: Subscriptions,
+    private val subscriptions: Lazy<Subscriptions>,
     private val dispatcherProvider: DispatcherProvider,
 ) : ExperimentFiltersManager {
     override fun computeFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean {
@@ -63,7 +64,7 @@ class ExperimentFiltersManagerImpl @Inject constructor(
             filters[ANDROID_VERSION] = entity.filters!!.androidVersion.contains(userAndroidVersion)
         }
         if (entity.filters?.privacyProEligible != null) {
-            val isEligible = runBlocking(dispatcherProvider.io()) { subscriptions.isEligible() }
+            val isEligible = runBlocking(dispatcherProvider.io()) { subscriptions.get().isEligible() }
             filters[SUBSCRIPTION_ELIGIBLE] = entity.filters?.privacyProEligible == isEligible
         }
 

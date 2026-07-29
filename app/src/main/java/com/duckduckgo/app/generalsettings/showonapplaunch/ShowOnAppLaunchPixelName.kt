@@ -25,4 +25,12 @@ enum class ShowOnAppLaunchPixelName(override val pixelName: String) : Pixel.Pixe
     LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY("m_ntp_after_idle_last_tab_shortcut_setting_enabled_daily"),
     LAST_TAB_SHORTCUT_SETTING_DISABLED("m_ntp_after_idle_last_tab_shortcut_setting_disabled_count"),
     LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY("m_ntp_after_idle_last_tab_shortcut_setting_disabled_daily"),
+
+    // After-inactivity launch option selected pixels (New Tab Page / Last Opened Tab / Specific Page)
+    LAUNCH_OPTION_NEW_TAB_PAGE("m_ntp_after_idle_launch_option_new_tab_page_count"),
+    LAUNCH_OPTION_NEW_TAB_PAGE_DAILY("m_ntp_after_idle_launch_option_new_tab_page_daily"),
+    LAUNCH_OPTION_LAST_OPENED_TAB("m_ntp_after_idle_launch_option_last_opened_tab_count"),
+    LAUNCH_OPTION_LAST_OPENED_TAB_DAILY("m_ntp_after_idle_launch_option_last_opened_tab_daily"),
+    LAUNCH_OPTION_SPECIFIC_PAGE("m_ntp_after_idle_launch_option_specific_page_count"),
+    LAUNCH_OPTION_SPECIFIC_PAGE_DAILY("m_ntp_after_idle_launch_option_specific_page_daily"),
 }

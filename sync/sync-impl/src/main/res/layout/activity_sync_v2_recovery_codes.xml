@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_device_synced" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/headlineText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                app:textType="primary"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/sync_device_v2_recovery_code_body"
+                app:textType="secondary"
+                app:typography="body1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5">
+
+                <LinearLayout
+                    android:id="@+id/recoveryCodeContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_card_container"
+                    android:orientation="vertical"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.duckduckgo.sync.impl.ui.v2.RecoveryCodeView
+                        android:id="@+id/recoveryCodeView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_4"
+                        android:layout_marginTop="@dimen/keyline_4" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:id="@+id/downloadCodeButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_3"
+                        android:layout_marginVertical="@dimen/keyline_4"
+                        android:text="@string/sync_device_v2_recovery_code_download_code_button"
+                        app:daxButtonSize="small" />
+
+                </LinearLayout>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/loadingShimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintEnd_toEndOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintStart_toStartOf="@+id/recoveryCodeContainer"
+                    app:layout_constraintTop_toTopOf="@+id/recoveryCodeContainer">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card_container" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/restoreOnReinstallToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/background_card_container"
+                app:primaryText="@string/sync_restore_on_reinstall_title"
+                app:secondaryText="@string/sync_restore_on_reinstall_description"
+                app:showSwitch="true" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/doneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:text="@string/sync_device_v2_recovery_code_done_button"
+        app:daxButtonSize="large" />
+
+</LinearLayout>
+
+

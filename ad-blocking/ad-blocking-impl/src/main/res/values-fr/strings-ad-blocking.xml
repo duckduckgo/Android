@@ -24,7 +24,7 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Ouvre les vidéos en mode « Salle de projection sans distractions », ce qui empêche ce que vous regardez d\'influencer votre fil d\'actualité YouTube.</string>
     <string name="ad_blocking_settings_title_v2">Blocage des publicités</string>
-    <string name="ad_blocking_settings_header_description">Bloque les traqueurs invasifs avant leur chargement, ce qui permet d\'éliminer efficacement les publicités reposant sur le pistage</string>
+    <string name="ad_blocking_settings_header_description">Bloque les traqueurs invasifs avant leur chargement, ce qui permet d\'éliminer efficacement les publicités reposant sur le pistage.</string>
     <string name="contingencyMessageTitle">Blocage des publicités sur YouTube indisponible</string>
     <string name="contingencyMessageContent">Les récents changements apportés à YouTube ont affecté le blocage des publicités. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension.</string>
     <string name="contingencyMessagePrimaryButton">J\'ai compris</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Désactiver jusqu\'au redémarrage</string>
     <string name="ad_blocking_menu_always_off">Toujours désactivé</string>
     <string name="ad_blocking_disabled_popup_title">Le blocage des publicités sur YouTube ne fonctionne pas ?</string>
-    <string name="ad_blocking_disabled_popup_description">Envoyez un rapport anonyme de dysfonctionnement à DuckDuckGo. Contribuez à améliorer le blocage des publicités pour tous !</string>
+    <string name="ad_blocking_disabled_popup_description">Envoyez un rapport anonyme à DuckDuckGo et contribuez à améliorer le blocage des publicités pour tous !</string>
     <string name="ad_blocking_disabled_primary_action">Envoyer un rapport de défaillance</string>
     <string name="ad_blocking_disabled_secondary_action">Annuler</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Désactivé jusqu\'au redémarrage</string>
-    <string name="ad_blocking_omnibar_badge_text">Blocage des publicités sur YouTube activé</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Blocage pubs activé</string></resources>

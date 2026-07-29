@@ -135,6 +135,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         val quickSetupPlan = quickSetupPlan(ctx)
 
+        val showDock = onboardingPromptExperimentVariant ==
+            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY ||
+            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
         val variantAllowsWidget = onboardingPromptExperimentVariant ==
             OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
             onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
@@ -152,6 +155,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(initialStep(firstDialog))
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
+                if (showDock) {
+                    add(addToDockStep())
+                }
                 if (showWidget) {
                     add(widgetPromptStep(ctx))
                     add(addWidgetStep(ctx))
@@ -468,6 +474,25 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
+    private fun addToDockStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_ADD_TO_DOCK
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.ContinueClicked -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
+
     private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
         return NewUserOnboardingActivityStep(
@@ -477,6 +502,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
+                    is NewUserOnboardingEvent.Presented -> {
+                        onboardingStore.linearPlanWidgetPromptShown = true
+                        Stay
+                    }
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -627,11 +656,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
-            precondition = {
-                withContext(dispatchers.io()) {
-                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-                }
-            },
             showsStepIndicator = true,
             resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
             transition = { event ->
@@ -656,11 +680,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserBrowserActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
             pixelName = pixelName,
-            precondition = {
-                withContext(dispatchers.io()) {
-                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-                }
-            },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
             transition = { event ->
                 when {

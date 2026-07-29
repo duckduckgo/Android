@@ -126,6 +126,8 @@ fun DuckDuckGoTheme(
             sliderTrackInactive = Gray60_50,
             textInputEnabledOutline = Black30,
             touchFeedback = colorResource(R.color.controls_fill_primary_light),
+            progressSpinnerTrack = Black18,
+            progressSpinnerIndicator = Black54,
         ),
         infoPanel = DuckDuckGoInfoPanelColors(
             backgroundBlue = Blue0_50,
@@ -186,6 +188,8 @@ fun DuckDuckGoTheme(
             sliderTrackInactive = Gray40_50,
             textInputEnabledOutline = White30,
             touchFeedback = colorResource(R.color.controls_fill_primary_dark),
+            progressSpinnerTrack = White18,
+            progressSpinnerIndicator = White54,
         ),
         infoPanel = DuckDuckGoInfoPanelColors(
             backgroundBlue = Blue50_12,

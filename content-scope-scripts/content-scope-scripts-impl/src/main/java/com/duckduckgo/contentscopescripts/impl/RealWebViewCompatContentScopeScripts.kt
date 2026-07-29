@@ -65,6 +65,12 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : WebViewCompatContentScopeScripts {
 
+    // NOTE: this class is intentionally NOT in sync with RealContentScopeScripts anymore.
+    // RealContentScopeScripts now builds a single Moshi and reuses its list adapters across getScript() calls
+    // (gated behind the optimizeContentScopeInjection flag), whereas this class still builds a fresh
+    // Moshi.Builder().build() per JSON serialization. This was deliberately left out of that change.
+    // TODO: port the shared-adapter optimization here as part of the effort to re-enable these flags,
+    // in a separate project. Keep the two implementations aligned once that happens.
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()

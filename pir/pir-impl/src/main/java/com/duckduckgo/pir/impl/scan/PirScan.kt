@@ -29,7 +29,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
-import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
@@ -120,6 +120,7 @@ class RealPirScan @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewDataCleaner: PirWebViewDataCleaner,
+    private val pirWebViewCountProvider: PirWebViewCountProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -167,7 +168,7 @@ class RealPirScan @Inject constructor(
         }
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(processedJobRecords.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
         // Initiate runners
@@ -332,7 +333,7 @@ class RealPirScan @Inject constructor(
         logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(brokers.size * profileQueries.size, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(brokers.size * profileQueries.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 

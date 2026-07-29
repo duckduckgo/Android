@@ -93,9 +93,6 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
-    <!-- Widget prompt (onboarding) -->
-    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
-    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
-    <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
-    <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
+    <!-- Add to Dock (onboarding) -->
+    <string name="preOnboardingDockStepTitle">Add me to your favorites row.</string>
 </resources>

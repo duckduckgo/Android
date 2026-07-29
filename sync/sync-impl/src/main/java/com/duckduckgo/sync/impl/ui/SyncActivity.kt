@@ -36,12 +36,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
-import com.duckduckgo.di.*
-import com.duckduckgo.di.scopes.*
+import com.duckduckgo.di.DaggerMap
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
-import com.duckduckgo.sync.api.*
+import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncMessagePlugin
+import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
@@ -60,6 +64,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
@@ -73,9 +78,9 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncThisDeviceCanceled
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
@@ -331,7 +336,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncEnabled.deleteAccountButton.setOnClickListener {
-            viewModel.onDeleteAccountClicked()
+            viewModel.onDeleteAccountClicked(requireAuth = false)
         }
 
         binding.viewSyncEnabled.syncAnotherDeviceItem.setOnClickListener {
@@ -424,12 +429,20 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskRemoveDevice -> askRemoveDevice(command.device)
             is AskEditDevice -> askEditDevice(command.device)
+            is AskToCopyRecoveryCode -> {
+                authenticate {
+                    viewModel.onCopyRecoveryCodeAuthenticated()
+                }
+            }
             is AddAnotherDevice -> {
                 authenticate {
                     syncWithAnotherDeviceFlow.launch(null)
                 }
             }
             is ShowError -> showError(command)
+            is ShowMessage -> {
+                binding.root.makeSnackbarWithNoBottomInset(command.message, Snackbar.LENGTH_LONG).show()
+            }
             is ShowDeviceUnsupported -> {
                 startActivity(DeviceUnsupportedActivity.intent(this))
                 finish()
@@ -457,8 +470,6 @@ class SyncActivity : DuckDuckGoActivity() {
                     deepLinkIntoSetup(command.barcodeSyncUrl.asUrl())
                 }
             }
-            // This is a no-op in this flow. Simplified sync flow uses a toggle that needs to be checked off.
-            is SyncThisDeviceCanceled -> Unit
         }
     }
 

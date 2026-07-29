@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai-indstillinger</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Spørg om fanen</string>
+    <string name="duckChatContextualAskAboutPage">Spørg om siden</string>
 </resources>

@@ -1270,8 +1270,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            @Suppress("DenyListedApi")
-            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -1295,8 +1293,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            @Suppress("DenyListedApi")
-            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -1320,33 +1316,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            @Suppress("DenyListedApi")
-            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-                serpSettingsDataProvider = serpSettingsDataProvider,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isDefaultTogglePositionVisible)
-            }
-        }
-
-    @Test
-    fun `default toggle position - hidden when feature flag disabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            @Suppress("DenyListedApi")
-            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -1370,8 +1339,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
-            @Suppress("DenyListedApi")
-            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,

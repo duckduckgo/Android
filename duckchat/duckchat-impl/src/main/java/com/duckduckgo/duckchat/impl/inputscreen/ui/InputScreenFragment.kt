@@ -330,7 +330,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val launchOnChat = when (params?.initialInputMode) {
             InputMode.SEARCH -> false
             InputMode.DUCK_AI -> true
-            null -> if (duckChatFeature.rememberTogglePosition().isEnabled() && params?.isNewTab == true) {
+            null -> if (params?.isNewTab == true) {
                 viewModel.getNewTabTogglePosition() == DefaultTogglePosition.DUCK_AI
             } else {
                 false

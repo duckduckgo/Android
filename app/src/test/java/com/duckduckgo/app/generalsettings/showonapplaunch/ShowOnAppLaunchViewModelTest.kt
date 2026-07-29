@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -243,6 +244,33 @@ class ShowOnAppLaunchViewModelTest {
         verify(ntpAfterIdleManager).setReturnToLastTabEnabled(true)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToNewTabPageThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToLastOpenedTabThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToSpecificPageThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(SpecificPage("example.com"))
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
     }
 
     @Test

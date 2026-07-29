@@ -38,7 +38,6 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenFragment
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
@@ -64,9 +63,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     @Inject
     lateinit var inputScreenConfigResolver: InputScreenConfigResolver
 
-    @Inject
-    lateinit var duckChatFeature: DuckChatFeature
-
     private val viewModel: InputScreenViewModel by lazy {
         ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
     }
@@ -88,9 +84,7 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configureChatSuggestions()
-        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
-            configureChatUrlSuggestions()
-        }
+        configureChatUrlSuggestions()
         configureObservers()
         configureBottomBlur()
     }
@@ -131,11 +125,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private fun configureObservers() {
         val parentFragment = requireParentFragment() as InputScreenFragment
 
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) {
-            configureLegacyObservers(parentFragment)
-            return
-        }
-
         combine(
             viewModel.chatSuggestions,
             viewModel.chatUrlSuggestions,
@@ -171,17 +160,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
 
                 val hasAnySuggestions = hasChatSuggestions || isTyping
                 parentFragment.updateChatSuggestionsVisibility(hasAnySuggestions)
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun configureLegacyObservers(parentFragment: InputScreenFragment) {
-        viewModel.chatSuggestions
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { suggestions ->
-                chatSuggestionsAdapter.submitList(suggestions)
-                if (!viewModel.visibilityState.value.searchMode) {
-                    parentFragment.updateChatSuggestionsVisibility(suggestions.isNotEmpty())
-                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

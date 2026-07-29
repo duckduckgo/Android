@@ -310,6 +310,27 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_ntp_after_idle_launch_option_new_tab_page": {
+        "description": "User selected 'New Tab Page' as the after-inactivity launch option.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_launch_option_last_opened_tab": {
+        "description": "User selected 'Last Opened Tab' as the after-inactivity launch option.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_launch_option_specific_page": {
+        "description": "User selected 'Specific Page' (custom URL) as the after-inactivity launch option.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
 
     // Daily state-snapshot pixels: one per active user per day reflecting the current setting
     "m_ntp_after_idle_return_to_last_tab_enabled_daily": {

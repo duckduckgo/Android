@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -70,6 +71,10 @@ class ModelPickerViewModel @Inject constructor(
 
     private var modelChangeMode: Boolean = false
 
+    // The pixel surface for the active tab, tracked from the published input context.
+    // Named distinctly from the [PickerSurface] param on [onModelTapped] to avoid shadowing.
+    private var pixelSurface: DuckChatPixelSurface = DuckChatPixelSurface.ADDRESS_BAR
+
     // The model picked during the current recovery flow. Display-only: it drives the chip and the
     // picker's selected tick immediately, without waiting for the FE to sync the chat's model back
     // to native storage. Cleared when the recovery window ends.
@@ -88,6 +93,7 @@ class ModelPickerViewModel @Inject constructor(
         viewModelScope.launch {
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
+                pixelSurface = DuckChatPixelSurface.from(state.inputContext)
                 if (!state.modelChangeMode) recoverySelectedModelId.value = null
             }
         }
@@ -172,14 +178,14 @@ class ModelPickerViewModel @Inject constructor(
                 // pick immediately on the chip + tick rather than waiting for that sync.
                 // Fire the same selection pixel as the normal flow (skip a re-tap of the same pick).
                 if (model.id != recoverySelectedModelId.value) {
-                    duckChatPixels.fireModelSelected(model.id)
+                    duckChatPixels.fireModelSelected(model.id, pixelSurface)
                 }
-                duckChatPixels.fireSubmitChangeModel(model.id)
+                duckChatPixels.fireSubmitChangeModel(model.id, pixelSurface)
                 recoverySelectedModelId.value = model.id
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {
-                    duckChatPixels.fireModelSelected(model.id)
+                    duckChatPixels.fireModelSelected(model.id, pixelSurface)
                 }
                 viewModelScope.launch { modelManager.selectModel(model) }
             }

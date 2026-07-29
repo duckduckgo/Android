@@ -48,6 +48,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -186,7 +187,7 @@ class ReasoningModePickerViewModelTest {
         testee.onModeTapped(ReasoningMode.REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
         runCurrent()
 
-        verify(duckChatPixels).fireReasoningEffortSelected("reasoning")
+        verify(duckChatPixels).fireReasoningEffortSelected(eq("reasoning"), any())
     }
 
     @Test
@@ -204,7 +205,7 @@ class ReasoningModePickerViewModelTest {
         testee.onModeTapped(ReasoningMode.FAST, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
         runCurrent()
 
-        verify(duckChatPixels, never()).fireReasoningEffortSelected(any())
+        verify(duckChatPixels, never()).fireReasoningEffortSelected(any(), any())
     }
 
     @Test
@@ -228,7 +229,7 @@ class ReasoningModePickerViewModelTest {
             requiredTier = "pro",
             flowType = "upgrade",
         )
-        verify(duckChatPixels, never()).fireReasoningEffortSelected(any())
+        verify(duckChatPixels, never()).fireReasoningEffortSelected(any(), any())
     }
 
     @Test

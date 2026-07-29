@@ -36,7 +36,7 @@ class EntitlementTargetMatcherPluginTest {
 
     @Before
     fun setup() {
-        matcher = EntitlementTargetMatcherPlugin(subscriptions)
+        matcher = EntitlementTargetMatcherPlugin { subscriptions }
     }
 
     @Test

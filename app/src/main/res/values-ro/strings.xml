@@ -124,7 +124,6 @@
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -227,7 +226,6 @@
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
     <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității tale online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -245,24 +243,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Șterge toate chaturile, inclusiv pe cele fixate</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Alege ce să ștergi</string>
     <string name="dataClearingOptionTabs">File</string>
     <string name="dataClearingOptionData">Date privind modulele cookie și site-ul</string>
     <string name="dataClearingDuckAiChats">Chaturi Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Șterge toate chaturile</string>
-    <string name="fireDialogDeleteButton">Ștergere</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Închide fila</item>
-        <item quantity="few">Închide toate cele %1$d file</item>
-        <item quantity="other">Închide toate cele %1$d de file</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">S-ar putea să fii deconectat de la conturi.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Niciuna</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Șterge de pe un site. S-ar putea să fii deconectat de la conturi.</item>
-        <item quantity="few">Șterge de pe %1$d site-uri. S-ar putea să fii deconectat de la conturi.</item>
-        <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Dorești să ștergi filele și datele site-ului?</string>
@@ -291,8 +274,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
-
-    <string name="settingsAutomaticallyClearData">Șterge automat datele…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
@@ -309,9 +290,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
     <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
-    <string name="settingsClearDataActionSecondaryText">Șterge toate filele și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Șterge toate filele, conversațiile Duck.ai și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Despre</string>
@@ -963,6 +941,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
     <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
     <string name="preOnboardingWelcomeDialogBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d din %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
@@ -998,6 +977,17 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Acum, încearcă un chat privat cu IA!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vrei să setezi DuckDuckGo ca browser implicit?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Încearcă widgetul nostru pentru ecranul de întâmpinare.</string>
+    <string name="preOnboardingWidgetPromptBody">Adăugă widgetul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Adaugă widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Omite</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockBody">Găsește pictograma DuckDuckGo pe ecranul de pornire. Apoi apasă și trage în poziție. Gata!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Am înțeles!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">De asemenea, oferim un abonament plătit care include modele avansate de IA, cu limite de chat mai mari de la GPT și Claude, un VPN securizat și multe altele.</string>

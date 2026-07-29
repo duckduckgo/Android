@@ -83,7 +83,7 @@ class RealExchangeV2RunnerTest {
             ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = "2"),
         )
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
-        whenever(jweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
+        whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
         whenever(channel.createChannel(any())).thenReturn(Result.Success(Unit))
         whenever(channel.poll(any(), any())).thenReturn(emptyFlow())
         whenever(channel.sendMessage(any(), any(), any(), any())).thenReturn(Result.Success(Unit))
@@ -96,6 +96,13 @@ class RealExchangeV2RunnerTest {
         runner.startScan(pastedUrl = "ignored")
 
         assertSame(ExchangeV2State.Negotiating, runner.currentState)
+    }
+
+    @Test fun `bootstrap generates a 2048-bit RSA keypair`() = runTest {
+        val runner = newRunner()
+        runner.startScan(pastedUrl = "ignored")
+
+        verify(jweCrypto).generateRsaKeyPair(2048)
     }
 
     @Test fun `cancel abandons the session`() = runTest {

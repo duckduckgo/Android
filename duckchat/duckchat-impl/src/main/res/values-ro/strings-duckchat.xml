@@ -264,4 +264,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Setări Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Întreabă despre filă</string>
+    <string name="duckChatContextualAskAboutPage">Întreabă despre pagină</string>
 </resources>

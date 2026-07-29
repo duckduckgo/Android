@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.progressbar
 
 enum class Phase {
-    IDLE, FAST_START, TRACKING, COMPLETING, DONE
+    IDLE, FAST_START, TRACKING, INDETERMINATE, RESUMING, COMPLETING, DONE
 }
 
 data class FrameState(
@@ -40,12 +40,17 @@ class ProgressPhaseEngine(
     var displayProgress: Float = 0f
         private set
 
+    var stallDetectionEnabled: Boolean = false
+
     private var realProgress: Float = 0f
     private var velocity: Float = 0f
     private var phaseStartTime: Long = 0L
     private var creepProgress: Float = 0f
+    private var lastForwardProgressTime: Long = 0L
 
     private var completionFrom: Float = 0f
+    private var pendingCompletion: Boolean = false
+    private var resumeTarget: Float = 0f
 
     val frameState: FrameState
         get() = FrameState(
@@ -60,22 +65,56 @@ class ProgressPhaseEngine(
         realProgress = 0f
         velocity = 0f
         creepProgress = 0f
+        pendingCompletion = false
 
         phaseStartTime = timeProvider.elapsedRealtime()
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
     }
 
     fun onProgressUpdate(progress: Float) {
         if (phase == Phase.IDLE || phase == Phase.DONE) return
         if (progress <= 0f) return
-        if (progress <= realProgress) return // ignore backward progress
+        if (progress <= realProgress) return // ignore backward/equal progress
         realProgress = progress
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
+    }
+
+    fun onBecameVisible() {
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
     }
 
     fun triggerCompletion() {
         if (phase == Phase.COMPLETING || phase == Phase.DONE || phase == Phase.IDLE) return
+        if (phase == Phase.INDETERMINATE) {
+            // Defer until the sweep finishes its cycle; onSweepFinished() then completes from empty.
+            pendingCompletion = true
+            return
+        }
         phase = Phase.COMPLETING
         completionFrom = displayProgress
         phaseStartTime = timeProvider.elapsedRealtime()
+    }
+
+    /**
+     * Hands back from the finished indeterminate sweep. Completes if the page finished during the
+     * sweep; otherwise runs a constant-time catch-up fill from 0 up to the progress shown before the
+     * stall (never the lower raw value), and only then resumes determinate tracking.
+     */
+    fun onSweepFinished() {
+        if (phase != Phase.INDETERMINATE) return
+        if (pendingCompletion) {
+            pendingCompletion = false
+            displayProgress = 0f
+            completionFrom = 0f
+            phase = Phase.COMPLETING
+        } else {
+            resumeTarget = maxOf(displayProgress, realProgress).coerceAtMost(95f)
+            displayProgress = 0f
+            velocity = 0f
+            phase = Phase.RESUMING
+        }
+        phaseStartTime = timeProvider.elapsedRealtime()
+        lastForwardProgressTime = timeProvider.elapsedRealtime()
     }
 
     fun reset() {
@@ -84,6 +123,7 @@ class ProgressPhaseEngine(
         realProgress = 0f
         velocity = 0f
         creepProgress = 0f
+        pendingCompletion = false
     }
 
     fun tick(dtSeconds: Float): FrameState {
@@ -93,6 +133,8 @@ class ProgressPhaseEngine(
             Phase.IDLE -> {} // no-op
             Phase.FAST_START -> tickFastStart()
             Phase.TRACKING -> tickTracking(dt)
+            Phase.INDETERMINATE -> if (!stallDetectionEnabled) onSweepFinished() // otherwise hold frozen; the view renders the sweep
+            Phase.RESUMING -> tickResuming()
             Phase.COMPLETING -> tickCompleting()
             Phase.DONE -> {} // no-op
         }
@@ -101,7 +143,7 @@ class ProgressPhaseEngine(
 
     private fun tickFastStart() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.fastStartDuration).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / config.fastStartDurationMs).coerceIn(0f, 1f)
         // cubic ease-in
         val eased = t * t * t
         displayProgress = eased * config.fastStartTarget
@@ -115,6 +157,14 @@ class ProgressPhaseEngine(
     }
 
     private fun tickTracking(dt: Float) {
+        if (stallDetectionEnabled &&
+            timeProvider.elapsedRealtime() - lastForwardProgressTime >= config.stallTimeoutMs
+        ) {
+            phase = Phase.INDETERMINATE
+            velocity = 0f
+            return
+        }
+
         val floor = config.fastStartTarget
 
         // Perpetual creep accumulates independently
@@ -140,9 +190,25 @@ class ProgressPhaseEngine(
         displayProgress = displayProgress.coerceIn(floor, 95f)
     }
 
+    private fun tickResuming() {
+        val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
+        val t = (elapsed.toFloat() / config.resumeDurationMs).coerceIn(0f, 1f)
+        // Constant-time cosmetic catch-up (ease-out), independent of the spring.
+        val inv = 1f - t
+        val eased = 1f - inv * inv * inv
+        displayProgress = resumeTarget * eased
+
+        if (t >= 1f) {
+            displayProgress = resumeTarget
+            creepProgress = resumeTarget
+            velocity = 0f
+            phase = Phase.TRACKING
+        }
+    }
+
     private fun tickCompleting() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.endDuration).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / config.endDurationMs).coerceIn(0f, 1f)
         val eased = t * t * t // cubic ease-in
         displayProgress = completionFrom + (100f - completionFrom) * eased
 

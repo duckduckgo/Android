@@ -42,6 +42,10 @@ class OnboardingStoreImpl @Inject constructor(
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
+    override var linearPlanWidgetPromptShown: Boolean
+        get() = preferences.getBoolean(KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN, false)
+        set(shown) = preferences.edit { putBoolean(KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN, shown) }
+
     override fun getSearchOptions(): List<DaxDialogIntroOption> {
         val country = Locale.getDefault().country
         val language = Locale.getDefault().language
@@ -232,5 +236,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
+        private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
     }
 }

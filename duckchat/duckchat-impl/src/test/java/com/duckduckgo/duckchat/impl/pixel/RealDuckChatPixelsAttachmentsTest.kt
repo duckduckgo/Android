@@ -51,81 +51,96 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenImageAttachedFromCameraThenSourceParam() = runTest {
-        testee.fireImageAttached(source = "camera")
+        testee.fireImageAttached(source = "camera", surface = DuckChatPixelSurface.DUCK_AI)
 
+        val params = mapOf(
+            DuckChatPixelParameters.ATTACHMENT_SOURCE to "camera",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+        )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT,
-            parameters = mapOf(DuckChatPixelParameters.ATTACHMENT_SOURCE to "camera"),
+            parameters = params,
         )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY,
-            parameters = mapOf(DuckChatPixelParameters.ATTACHMENT_SOURCE to "camera"),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenImageRemovedThenCountAndDaily() = runTest {
-        testee.fireImageRemoved()
+        testee.fireImageRemoved(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT, parameters = emptyMap())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY,
-            parameters = emptyMap(),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenImageValidationFailedThenReasonParam() = runTest {
-        testee.fireImageValidationFailed(reason = "count_exceeded")
+        testee.fireImageValidationFailed(reason = "count_exceeded", surface = DuckChatPixelSurface.DUCK_AI)
 
+        val params = mapOf(
+            DuckChatPixelParameters.FILE_VALIDATION_REASON to "count_exceeded",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+        )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT,
-            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "count_exceeded"),
+            parameters = params,
         )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY,
-            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "count_exceeded"),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenFileAttachedThenCountAndDaily() = runTest {
-        testee.fireFileAttached()
+        testee.fireFileAttached(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT, parameters = emptyMap())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
-            parameters = emptyMap(),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenFileRemovedThenCountAndDaily() = runTest {
-        testee.fireFileRemoved()
+        testee.fireFileRemoved(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT, parameters = emptyMap())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_DAILY,
-            parameters = emptyMap(),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenFileValidationFailedThenReasonParam() = runTest {
-        testee.fireFileValidationFailed(reason = "size_exceeded")
+        testee.fireFileValidationFailed(reason = "size_exceeded", surface = DuckChatPixelSurface.DUCK_AI)
 
+        val params = mapOf(
+            DuckChatPixelParameters.FILE_VALIDATION_REASON to "size_exceeded",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+        )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
-            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "size_exceeded"),
+            parameters = params,
         )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
-            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "size_exceeded"),
+            parameters = params,
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -144,8 +159,11 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenStopTappedThenSingleCount() = runTest {
-        testee.fireStopGenerationTapped()
+        testee.fireStopGenerationTapped(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED,
+            parameters = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai"),
+        )
     }
 }
