@@ -43,6 +43,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_BUFFERING_HOLD_REMOVED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
@@ -253,6 +254,7 @@ class RealDuckPlayer @Inject constructor(
             "overlay" -> DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
             "play.use" -> DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
             "play.do_not_use" -> DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
+            "buffering.hold_removed" -> DUCK_PLAYER_BUFFERING_HOLD_REMOVED
             else -> { null }
         }
 

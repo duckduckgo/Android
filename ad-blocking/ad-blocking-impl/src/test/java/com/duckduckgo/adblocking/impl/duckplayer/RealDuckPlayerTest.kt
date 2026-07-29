@@ -34,6 +34,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_BUFFERING_HOLD_REMOVED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
@@ -455,6 +456,23 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
+    }
+
+    @Test
+    fun sendDuckPlayerPixelWithBufferingHoldRemoved_firesPixelWithReasonAndDuration() = runTest {
+        val pixelName = "buffering.hold_removed"
+        val pixelData = mapOf("reason" to "frame", "duration" to "3-10")
+
+        testee.sendDuckPlayerPixel(pixelName, pixelData)
+
+        verify(mockPixel).fire(DUCK_PLAYER_BUFFERING_HOLD_REMOVED, pixelData, emptyMap(), Count)
+    }
+
+    @Test
+    fun sendDuckPlayerPixelWithUnknownName_firesNoPixel() = runTest {
+        testee.sendDuckPlayerPixel("not.a.known.pixel", mapOf("reason" to "frame"))
+
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
     }
 
     // endregion
