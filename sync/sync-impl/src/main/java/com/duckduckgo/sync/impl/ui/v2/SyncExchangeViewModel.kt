@@ -134,6 +134,7 @@ class SyncExchangeViewModel @AssistedInject constructor(
 
         var isPolling = qrCodeResult is Result.Success
         while (isPolling) {
+            delay(POLLING_INTERVAL_CONNECT_FLOW)
             accountRepository.pollConnectionKeys()
                 .onSuccess { isSynced ->
                     if (isSynced) {
@@ -152,7 +153,6 @@ class SyncExchangeViewModel @AssistedInject constructor(
                         }
                     }
                 }
-            delay(POLLING_INTERVAL_CONNECT_FLOW)
         }
     }
 
