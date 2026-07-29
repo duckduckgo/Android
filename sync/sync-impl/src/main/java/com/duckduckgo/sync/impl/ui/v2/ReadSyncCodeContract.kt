@@ -19,14 +19,14 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.v2.CodeExchangeContract.Input
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeContract.Input
 
-class CodeExchangeContract : ActivityResultContract<Input, Unit>() {
+class ReadSyncCodeContract : ActivityResultContract<Input, Unit>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return CodeExchangeActivity.intent(context, input.source)
+        return ReadSyncCodeActivity.intent(context, input.source)
     }
 
     override fun parseResult(

@@ -38,22 +38,22 @@ import androidx.core.graphics.withTranslation
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ViewSyncV2CodeExchangeHeaderBinding
+import com.duckduckgo.sync.impl.databinding.ViewSyncV2PairingHeaderBinding
 import logcat.logcat
 import com.duckduckgo.mobile.android.R as CommonR
 
-internal class CodeExchangeHeaderView @JvmOverloads constructor(
+internal class SyncPairingHeaderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
-    private val binding = ViewSyncV2CodeExchangeHeaderBinding.inflate(LayoutInflater.from(context), this)
+    private val binding = ViewSyncV2PairingHeaderBinding.inflate(LayoutInflater.from(context), this)
 
     init {
         orientation = VERTICAL
-        context.withStyledAttributes(attrs, R.styleable.CodeExchangeHeaderView) {
-            getResourceId(R.styleable.CodeExchangeHeaderView_headlineText, 0).takeIf { it != 0 }?.let(::setHeadline)
-            getResourceId(R.styleable.CodeExchangeHeaderView_bodyText, 0).takeIf { it != 0 }?.let(::setBody)
+        context.withStyledAttributes(attrs, R.styleable.SyncPairingHeaderView) {
+            getResourceId(R.styleable.SyncPairingHeaderView_headlineText, 0).takeIf { it != 0 }?.let(::setHeadline)
+            getResourceId(R.styleable.SyncPairingHeaderView_bodyText, 0).takeIf { it != 0 }?.let(::setBody)
         }
     }
 

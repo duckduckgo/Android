@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
+            <com.duckduckgo.sync.impl.ui.v2.SyncPairingHeaderView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"

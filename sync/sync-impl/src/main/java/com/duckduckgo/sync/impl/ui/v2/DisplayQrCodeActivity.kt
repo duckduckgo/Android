@@ -36,23 +36,23 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
-import com.duckduckgo.sync.impl.databinding.ActivitySyncV2QrCodeBinding
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2DisplayQrCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetSuccessResult
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowError
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Factory
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Factory.Provider
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory.Provider
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -60,8 +60,8 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-class QrCodeActivity : DuckDuckGoActivity() {
-    private val binding by viewBinding<ActivitySyncV2QrCodeBinding>()
+class DisplayQrCodeActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncV2DisplayQrCodeBinding>()
 
     @Inject
     lateinit var vmFactory: Factory
@@ -77,7 +77,7 @@ class QrCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val viewModel by viewModels<SyncExchangeViewModel> {
+    private val viewModel by viewModels<DisplayQrCodeViewModel> {
         Provider(vmFactory, launchSource)
     }
 
@@ -134,8 +134,8 @@ class QrCodeActivity : DuckDuckGoActivity() {
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
-            is SetSuccessResult -> setResult(QrCodeContract.RESULT_SYNC_SUCCESS)
-            is SetFailureResult -> setResult(QrCodeContract.RESULT_SYNC_FAILURE)
+            is SetSuccessResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_SUCCESS)
+            is SetFailureResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_FAILURE)
             is ShowError -> showError(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
@@ -230,7 +230,7 @@ class QrCodeActivity : DuckDuckGoActivity() {
             context: Context,
             source: String?,
         ): Intent {
-            return Intent(context, QrCodeActivity::class.java).apply {
+            return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
             }
         }

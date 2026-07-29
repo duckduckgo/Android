@@ -19,18 +19,18 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.v2.QrCodeContract.Input
-import com.duckduckgo.sync.impl.ui.v2.QrCodeContract.Output
-import com.duckduckgo.sync.impl.ui.v2.QrCodeContract.Output.Failure
-import com.duckduckgo.sync.impl.ui.v2.QrCodeContract.Output.NoOp
-import com.duckduckgo.sync.impl.ui.v2.QrCodeContract.Output.Success
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Input
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.Failure
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.NoOp
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.Success
 
-class QrCodeContract : ActivityResultContract<Input, Output>() {
+class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return QrCodeActivity.intent(context, input.source)
+        return DisplayQrCodeActivity.intent(context, input.source)
     }
 
     override fun parseResult(

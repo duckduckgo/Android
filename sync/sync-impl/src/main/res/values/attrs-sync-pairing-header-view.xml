@@ -16,8 +16,7 @@
 
 <resources>
 
-    <!--CodeExchangeHeaderView-->
-    <declare-styleable name="CodeExchangeHeaderView">
+    <declare-styleable name="SyncPairingHeaderView">
         <attr name="headlineText" format="reference" />
         <attr name="bodyText" format="reference" />
     </declare-styleable>

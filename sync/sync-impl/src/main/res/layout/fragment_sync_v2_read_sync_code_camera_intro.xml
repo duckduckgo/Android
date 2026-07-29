@@ -22,10 +22,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:showIn="@layout/fragment_sync_v2_camera_scanner">
+    tools:showIn="@layout/fragment_sync_v2_read_sync_code_camera">
 
-    <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
-        android:id="@+id/codeExchangeHeader"
+    <com.duckduckgo.sync.impl.ui.v2.SyncPairingHeaderView
+        android:id="@+id/pairingHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
@@ -44,7 +44,7 @@
         app:layout_constraintBottom_toTopOf="@+id/buttonsContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/codeExchangeHeader"
+        app:layout_constraintTop_toBottomOf="@+id/pairingHeader"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/sync_camera_intro_animation" />
 

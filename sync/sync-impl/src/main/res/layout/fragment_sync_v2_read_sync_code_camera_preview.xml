@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:showIn="@layout/fragment_sync_v2_camera_scanner">
+    tools:showIn="@layout/fragment_sync_v2_read_sync_code_camera">
 
     <com.journeyapps.barcodescanner.BarcodeView
         android:id="@+id/barcodeView"
@@ -32,7 +32,7 @@
         android:layout_height="match_parent"
         android:importantForAccessibility="no" />
 
-    <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
+    <com.duckduckgo.sync.impl.ui.v2.SyncPairingHeaderView
         android:id="@+id/scannerHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

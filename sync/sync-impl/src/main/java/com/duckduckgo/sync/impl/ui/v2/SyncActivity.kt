@@ -187,8 +187,8 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val codeExchangeLauncher = registerForActivityResult(
-        CodeExchangeContract(),
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
     ) { /* No-op, auto-refresh will update the device list */ }
 
     private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
@@ -424,7 +424,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    codeExchangeLauncher.launch(CodeExchangeContract.Input(launchSource))
+                    readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
                 }
             }
         }
