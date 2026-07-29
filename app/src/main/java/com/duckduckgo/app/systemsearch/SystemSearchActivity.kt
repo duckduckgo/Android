@@ -259,7 +259,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             intent?.let {
-                viewModel.setLaunchedFromWidget(launchedFromAnyWidget(it))
                 sendLaunchPixels(it)
                 if (launchedFromAssist(it)) {
                     handleDigitalAssistIntent(it)
@@ -281,6 +280,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             )
         }
 
+        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
 
         showKeyboard(omnibarTextInput)
