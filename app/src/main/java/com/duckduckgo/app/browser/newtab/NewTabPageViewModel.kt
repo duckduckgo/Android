@@ -201,10 +201,9 @@ class NewTabPageViewModel @AssistedInject constructor(
         } else {
             dismissedCtaDao.exists(CtaId.DAX_END)
         }
-        val widgetCtaCompletesOnboarding = dismissedCtaDao.exists(CtaId.ADD_WIDGET)
         return lastDialogShown ||
             settingsDataStore.hideTips ||
-            widgetCtaCompletesOnboarding
+            dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     fun onMessageShown() {

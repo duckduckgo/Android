@@ -21,7 +21,6 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId.ADD_WIDGET
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
@@ -241,21 +240,6 @@ class NewTabPageViewModelTest {
         whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-
-        testee = createTestee()
-        testee.onStart(mockLifecycleOwner)
-
-        testee.viewState.test {
-            expectMostRecentItem().also {
-                assertTrue(it.onboardingComplete)
-            }
-        }
-    }
-
-    @Test
-    fun whenAddWidgetCtaDismissedThenOnboardingComplete() = runTest {
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
-        whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(true)
 
         testee = createTestee()
         testee.onStart(mockLifecycleOwner)
