@@ -126,6 +126,7 @@ constructor(
         val keysText: String = "",
         val isTestSyncWarningEnabled: Boolean = false,
         val accountInfoKeyResult: String = "",
+        val cachedAccountInfoKeyResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -312,6 +313,7 @@ constructor(
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
                 accountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.accountInfoKeyResult else "",
+                cachedAccountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.cachedAccountInfoKeyResult else "",
             ),
         )
     }
@@ -640,6 +642,28 @@ constructor(
                     command.send(ShowMessage(text))
                 }
             }
+        }
+    }
+
+    fun onShowCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val cached = syncStore.accountInfoPublicKey
+            val text = if (cached == null) {
+                "No cached account_info key"
+            } else {
+                "keyId=${cached.keyId}, modulus=${cached.modulus.take(24)}…, exponent=${cached.exponent}"
+            }
+            logcat { "Sync-UnifiedDevices: cached account_info key: $text" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = text) }
+        }
+    }
+
+    fun onDeleteCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncStore.accountInfoPublicKey = null
+            logcat { "Sync-UnifiedDevices: cleared cached account_info key" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = "Cached account_info key cleared") }
+            command.send(ShowMessage("Cached account_info key cleared"))
         }
     }
 

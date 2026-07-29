@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
@@ -170,6 +171,7 @@ class AccountInfoKeyManagerTest {
         assertTrue(result.data.created)
         assertEquals(1, result.data.wrapsSent)
         assertEquals(RsaJwk(n = "modulus", e = "AQAB"), result.data.publicKey)
+        verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = result.data.kid, modulus = "modulus", exponent = "AQAB")
     }
 
     @Test
@@ -183,6 +185,7 @@ class AccountInfoKeyManagerTest {
         assertEquals("other-kid", result.data.kid)
         assertEquals(RsaJwk(n = "other-mod", e = "AQAB"), result.data.publicKey)
         assertTrue(!result.data.created)
+        verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = "other-kid", modulus = "other-mod", exponent = "AQAB")
     }
 
     @Test
@@ -208,6 +211,7 @@ class AccountInfoKeyManagerTest {
         assertEquals("server-kid", result.data.kid)
         assertEquals(RsaJwk(n = "server-mod", e = "AQAB"), result.data.publicKey)
         assertTrue(!result.data.created)
+        verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = "server-kid", modulus = "server-mod", exponent = "AQAB")
     }
 
     @Test
@@ -229,6 +233,7 @@ class AccountInfoKeyManagerTest {
         val result = manager.ensureKeyRegistered()
 
         assertTrue(result is Error)
+        verify(syncStore, org.mockito.kotlin.times(0)).accountInfoPublicKey = anyOrNull()
     }
 
     @Test
