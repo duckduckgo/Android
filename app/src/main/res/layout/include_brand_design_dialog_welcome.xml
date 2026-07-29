@@ -20,32 +20,12 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <FrameLayout
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/hiddenTitleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:text="@string/preOnboardingWelcomeDialogTitle"
-            android:visibility="invisible"
-            app:typography="onboarding_title" />
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/titleText"
-            style="@style/Typography.DuckDuckGo.Onboarding.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:textColor="?attr/daxColorPrimaryText" />
-
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:text="@string/preOnboardingWelcomeDialogTitle" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/bodyText1"

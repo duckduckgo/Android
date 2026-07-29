@@ -13,27 +13,28 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    tools:parentTag="android.widget.FrameLayout">
 
-    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
-        android:id="@+id/addressBarTitle"
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/onboardingDialogTitleSizingText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:paddingHorizontal="12dp"
-        android:text="@string/preOnboardingAddressBarTitle" />
+        android:gravity="center"
+        android:visibility="invisible"
+        app:typography="onboarding_title" />
 
-    <com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignAddressBarPositionPicker
-        android:id="@+id/addressBarPicker"
+    <com.duckduckgo.common.ui.view.TypeAnimationTextView
+        android:id="@+id/onboardingDialogTitleAnimatedText"
+        style="@style/Typography.DuckDuckGo.Onboarding.Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_2"
-        android:alpha="0"
-        tools:alpha="1" />
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:textColor="?attr/daxColorPrimaryText"
+        tools:text="Onboarding dialog title" />
 
-</LinearLayout>
+</merge>
