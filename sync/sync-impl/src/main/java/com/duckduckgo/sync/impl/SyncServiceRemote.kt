@@ -119,6 +119,14 @@ interface SyncApi {
     /** List this account's protected keys across all purposes. */
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
+    /** First-writer-wins registration of a purpose-scoped protected key. On [SetKeysIfAbsentResult.Existing]
+     *  the caller must discard its own minted keypair and adopt the returned one instead. */
+    fun setKeysIfAbsent(
+        token: String,
+        purpose: String,
+        keys: List<ProtectedKeyEntry>,
+    ): Result<SetKeysIfAbsentResult>
+
     fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
 
     fun createAccessCredential(
@@ -140,10 +148,19 @@ interface SyncApi {
     fun deleteExchangeChannel(channelId: String): Result<Unit>
 }
 
+sealed class SetKeysIfAbsentResult {
+    /** Our posted keys won (server returned 201). */
+    data object Created : SetKeysIfAbsentResult()
+
+    /** Another device's key already existed (server returned 200); this is the one that won. */
+    data class Existing(val kid: String, val publicKey: RsaJwk?) : SetKeysIfAbsentResult()
+}
+
 @ContributesBinding(AppScope::class)
 class SyncServiceRemote @Inject constructor(
     private val syncService: SyncService,
     private val syncStore: SyncStore,
+    private val setKeysIfAbsentCall: SetKeysIfAbsentCall,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -548,6 +565,16 @@ class SyncServiceRemote @Inject constructor(
             val keys = response.body()?.keys ?: emptyList()
             Result.Success(keys)
         }
+    }
+
+    override fun setKeysIfAbsent(
+        token: String,
+        purpose: String,
+        keys: List<ProtectedKeyEntry>,
+    ): Result<SetKeysIfAbsentResult> {
+        val result = setKeysIfAbsentCall.execute(token, purpose, keys)
+        if (result is Result.Error) result.removeKeysIfInvalid()
+        return result
     }
 
     override fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>> {
