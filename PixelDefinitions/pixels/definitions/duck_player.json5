@@ -5,6 +5,7 @@
         "description": "Fires when the Duck Player buffering hold (poster + spinner shown while the YouTube player buffers) is removed, reporting why it ended and how long it lasted. Used to tune the give-up timeout and to spot holds that never resolve on their own.",
         "owners": ["CrisBarreiro"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
