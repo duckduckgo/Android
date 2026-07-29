@@ -34,6 +34,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -68,6 +69,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
+    private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> { viewModelFactory }
+
     private val cameraPermissionLauncher = registerForActivityResult(RequestPermission()) {
         animationViewModel.onCameraPermissionResult()
     }
@@ -93,6 +96,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         configureIntroAnimation()
         configureReadyToScanButtons()
         configureGoToSettingsButton()
+        configureScanner()
         configureCutout()
 
         observeUiEvents()
@@ -230,6 +234,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
                 Uri.fromParts("package", requireContext().packageName, null),
             )
             startActivity(intent)
+        }
+    }
+
+    private fun configureScanner() {
+        binding.includeCamera.barcodeView.decodeContinuous { barcode ->
+            syncCodeViewModel.processScannedCode(barcode.text)
         }
     }
 
