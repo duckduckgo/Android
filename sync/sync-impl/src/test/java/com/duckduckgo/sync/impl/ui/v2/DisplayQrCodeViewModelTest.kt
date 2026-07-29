@@ -47,8 +47,8 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
@@ -134,9 +134,9 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertIs<ShowError>(command)
-            assertEquals(R.string.sync_connect_generic_error, command.message)
-            assertEquals("boom", command.reason)
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_generic_error, command.content.message)
+            assertEquals("boom", command.content.reason)
 
             cancel()
         }
@@ -171,9 +171,9 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertIs<ShowError>(command)
-            assertEquals(R.string.sync_connect_login_error, command.message)
-            assertEquals("boom", command.reason)
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_login_error, command.content.message)
+            assertEquals("boom", command.content.reason)
 
             cancel()
         }
