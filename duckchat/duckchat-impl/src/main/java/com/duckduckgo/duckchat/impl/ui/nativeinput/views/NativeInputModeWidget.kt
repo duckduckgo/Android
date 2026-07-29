@@ -771,6 +771,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateNewLineButtonVisibility()
         updateSendButtonIcon()
         applyOmnibarShape()
+        if (!isChatTabSelected()) {
+            val searchOnly = state.inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
+                state.inputContext == NativeInputState.InputContext.BROWSER
+            // Search-only browser input uses the shorter "Search" placeholder.
+            val searchHint = if (searchOnly) R.string.input_screen_search_only_hint else R.string.input_screen_search_hint
+            inputField.hint = context.getString(searchHint)
+        }
         // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position,
         // chatId) change, or on the first emission. This corrects stale IME setup from a tab listener
         // that fired before the state-flow caught up.
