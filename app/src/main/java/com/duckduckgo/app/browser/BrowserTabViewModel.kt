@@ -113,6 +113,7 @@ import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboarding
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
+import com.duckduckgo.app.browser.commands.Command.LaunchDuckAiOnboardingFireDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
@@ -5318,7 +5319,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
-        onUserDismissedCta(onboardingCta)
+        val shouldDismiss = when (onboardingCta) {
+            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> false
+            else -> true
+        }
+        if (shouldDismiss) {
+            onUserDismissedCta(onboardingCta)
+        }
+
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta,
             is DaxSerpBrandDesignUpdateContextualCta,
@@ -5363,6 +5371,8 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxFireButtonCta,
             is DaxFireButtonBrandDesignUpdateContextualCta,
             -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
+            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta,
+            -> LaunchDuckAiOnboardingFireDialog
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
