@@ -28,32 +28,42 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface EdgeToEdgeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun browser(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun settings(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun autofill(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun sync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun vpn(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun webview(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun onboarding(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun misc(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
     fun bottomSheets(): Toggle
 }
