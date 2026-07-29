@@ -119,8 +119,10 @@ interface SyncApi {
     /** List this account's protected keys across all purposes. */
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
-    /** First-writer-wins registration of a purpose-scoped protected key. On [SetKeysIfAbsentResult.Existing]
-     *  the caller must discard its own minted keypair and adopt the returned one instead. */
+    /** First-writer-wins registration of a purpose-scoped protected key.
+     * If a key already exists the caller must discard its own mint and adopt the server's. If coming from the server, it could be either:
+     *   - the one in [SetKeysIfAbsentResult.Existing],
+     *   - or, for [SetKeysIfAbsentResult.ExistsFetchRequired], fetched via [getProtectedKeys]. */
     fun setKeysIfAbsent(
         token: String,
         purpose: String,
@@ -152,8 +154,11 @@ sealed class SetKeysIfAbsentResult {
     /** Our posted keys won (server returned 201). */
     data object Created : SetKeysIfAbsentResult()
 
-    /** Another device's key already existed (server returned 200); this is the one that won. */
+    /** A key already existed and the server returned it */
     data class Existing(val kid: String, val publicKey: RsaJwk?) : SetKeysIfAbsentResult()
+
+    /** A key already existed but wasn't returned (409, or a 200 with no body); the caller must fetch and adopt it. */
+    data object ExistsFetchRequired : SetKeysIfAbsentResult()
 }
 
 @ContributesBinding(AppScope::class)

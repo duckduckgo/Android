@@ -66,12 +66,21 @@ class SetKeysIfAbsentCallTest {
     }
 
     @Test
-    fun whenResponseIs200WithNoKeyThenReturnError() {
+    fun whenResponseIs200WithNoKeyThenReturnExistsFetchRequired() {
         stubResponse(Response.success(200, SetKeyIfAbsentResponse(keys = emptyList())))
 
         val result = call.execute(token, "account_info", listOf(accountInfoKey))
 
-        assertEquals(Result.Error(reason = "SetKeysIfAbsent: 200 response missing keys"), result)
+        assertEquals(Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired), result)
+    }
+
+    @Test
+    fun whenResponseIs409ThenReturnExistsFetchRequired() {
+        stubResponse(Response.error(409, """{"error":"conflict"}""".toResponseBody("application/json".toMediaTypeOrNull())))
+
+        val result = call.execute(token, "account_info", listOf(accountInfoKey))
+
+        assertEquals(Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired), result)
     }
 
     @Test

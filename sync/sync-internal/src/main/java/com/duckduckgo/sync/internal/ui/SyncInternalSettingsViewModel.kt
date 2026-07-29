@@ -627,7 +627,7 @@ constructor(
             logcat { "Sync-UnifiedDevices: creating & registering account_info key from dev screen" }
             when (val result = accountInfoKeyManager.ensureKeyRegistered()) {
                 is Success -> {
-                    val outcome = if (result.data.created) "201 created (ours won)" else "200 existing (adopted)"
+                    val outcome = if (result.data.created) "created (ours won)" else "adopted existing"
                     val text = "kid=${result.data.kid}, wraps_sent=${result.data.wrapsSent}, outcome=$outcome"
                     logcat { "Sync-UnifiedDevices: $text" }
                     viewState.update { it.copy(accountInfoKeyResult = text) }
