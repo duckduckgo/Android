@@ -40,28 +40,28 @@ class OnboardingDialogTitleControllerTest {
     private fun letTypingRun() = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(5))
 
     @Test
-    fun whenTitleSetThenSizingTextReservesSpaceForTheDecodedTitle() {
+    fun `when title set then sizing text reserves space for the decoded title`() {
         controller.setTitle("Ready to get started?<br/>Try a search or AI chat!")
 
         assertEquals("Ready to get started?\nTry a search or AI${NBSP}chat!", sizingText.text.toString())
     }
 
     @Test
-    fun whenTitleSetThenTheLastSpaceBecomesNonBreaking() {
+    fun `when title set then the last space becomes non-breaking`() {
         controller.setTitle("Where should I put your address bar?")
 
         assertEquals("Where should I put your address${NBSP}bar?", sizingText.text.toString())
     }
 
     @Test
-    fun whenTitleHasASingleSpaceThenItIsLeftAlone() {
+    fun `when title has a single space then it is left alone`() {
         controller.setTitle("Hi there.")
 
         assertEquals("Hi there.", sizingText.text.toString())
     }
 
     @Test
-    fun whenTitleSetThenAnimatedTextIsCleared() {
+    fun `when title set then animated text is cleared`() {
         controller.setTitle("Protections activated!")
         controller.snapTitle()
 
@@ -71,7 +71,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTitleSnappedThenAnimatedTextShowsTheWholeDecodedTitle() {
+    fun `when title snapped then animated text shows the whole decoded title`() {
         controller.setTitle("Welcome back!<br/>Want to customize anything?")
 
         controller.snapTitle()
@@ -80,7 +80,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTypingFinishedEarlyThenAnimatedTextShowsTheWholeDecodedTitle() {
+    fun `when typing finished early then animated text shows the whole decoded title`() {
         controller.setTitle("Welcome back!<br/>Want to customize anything?")
 
         controller.typeTitle()
@@ -90,7 +90,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTypingFinishedEarlyThenOnFinishedIsInvoked() {
+    fun `when typing finished early then onFinished is invoked`() {
         controller.setTitle("Protections activated!")
         var finished = false
 
@@ -101,7 +101,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTypingNeverStartedThenFinishTypingLeavesTheTitleAlone() {
+    fun `when typing never started then finishTyping leaves the title alone`() {
         controller.setTitle("Protections activated!")
 
         controller.finishTyping()
@@ -110,7 +110,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTitleSetWhileTypingThenTheSupersededAnimationPaintsNothing() {
+    fun `when title set while typing then the superseded animation paints nothing`() {
         controller.setTitle("Protections activated!")
         controller.typeTitle()
 
@@ -121,7 +121,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenAnimationCancelledThenTypingPaintsNothingFurther() {
+    fun `when animation cancelled then typing paints nothing further`() {
         controller.setTitle("Protections activated!")
         controller.typeTitle()
 
@@ -132,7 +132,7 @@ class OnboardingDialogTitleControllerTest {
     }
 
     @Test
-    fun whenTypingRunsToCompletionThenAnimatedTextShowsTheWholeDecodedTitle() {
+    fun `when typing runs to completion then animated text shows the whole decoded title`() {
         controller.setTitle("Welcome back!<br/>Want to customize anything?")
 
         controller.typeTitle()
