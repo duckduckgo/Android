@@ -38,10 +38,6 @@ interface CardStage {
 
     fun morph(animate: Boolean, onEnd: () -> Unit)
 
-    /**
-     * CTA text, visibility and click handling. A CTA fading in from alpha 0 cannot be clicked early even though
-     * it is bound here: the card container swallows its children's touches for as long as an entrance runs.
-     */
     fun showCtas(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
 
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
