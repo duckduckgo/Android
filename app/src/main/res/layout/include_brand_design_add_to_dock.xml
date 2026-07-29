@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:includeFontPadding="false"
-            android:text="@string/preOnboardingAddToDockTitle"
+            android:text="@string/preOnboardingDockStepTitle"
             android:visibility="invisible"
             app:typography="onboarding_title" />
 

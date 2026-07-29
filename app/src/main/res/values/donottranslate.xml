@@ -94,5 +94,5 @@
     </plurals>
 
     <!-- Add to Dock (onboarding) -->
-    <string name="preOnboardingAddToDockTitle">Add me to your favorites row.</string>
+    <string name="preOnboardingDockStepTitle">Add me to your favorites row.</string>
 </resources>

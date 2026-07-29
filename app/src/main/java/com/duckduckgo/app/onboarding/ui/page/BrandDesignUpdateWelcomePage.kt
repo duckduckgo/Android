@@ -1138,7 +1138,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
                             if (view == null) return
-                            titleView.startOnboardingTypingAnimation(getString(R.string.preOnboardingAddToDockTitle).preventWidows()) {
+                            titleView.startOnboardingTypingAnimation(getString(R.string.preOnboardingDockStepTitle).preventWidows()) {
                                 homeScreenPromptFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
                                         ObjectAnimator.ofFloat(bodyView, View.ALPHA, 1f)
@@ -1859,7 +1859,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 val titleView = binding.daxDialogCta.addToDockContent.addToDockTitle
                 titleView.cancelAnimation()
-                titleView.text = getString(R.string.preOnboardingAddToDockTitle).preventWidows()
+                titleView.text = getString(R.string.preOnboardingDockStepTitle).preventWidows()
                 titleView.alpha = 1f
                 binding.daxDialogCta.addToDockContent.addToDockBody.text =
                     getString(R.string.preOnboardingAddToDockBody).preventWidows()
