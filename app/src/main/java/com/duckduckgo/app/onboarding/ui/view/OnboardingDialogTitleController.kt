@@ -22,9 +22,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 
 /**
- * The title machinery behind [OnboardingDialogTitleView], kept apart from the view so it can be exercised
- * without inflating anything: [animatedText] types the title in, while [sizingText] already holds the whole
- * title so the card reserves its final height instead of growing as the text types.
+ * The title machinery behind [OnboardingDialogTitleView].
  */
 internal class OnboardingDialogTitleController(
     private val animatedText: TypeAnimationTextView,
@@ -38,8 +36,6 @@ internal class OnboardingDialogTitleController(
      * height, while [animatedText] stays empty until [typeTitle] or [snapTitle].
      */
     fun setTitle(text: String) {
-        // Without this, a title set while a previous typing animation is still running would keep being
-        // overpainted by that animation's remaining frames.
         animatedText.cancelAnimation()
         title = text.preventWidows()
         sizingText.text = decodedTitle()
@@ -57,13 +53,9 @@ internal class OnboardingDialogTitleController(
         animatedText.text = decodedTitle()
     }
 
-    /**
-     * Tap-to-skip: completes a running typing animation, [typeTitle]'s `onFinished` included.
-     *
-     * [TypeAnimationTextView.finishAnimation] snaps the text but doesn't invoke that callback, so go through
-     * the click listener [TypeAnimationTextView.startTypingAnimation] installs, which does both in order.
-     */
     fun finishTyping() {
+        // TypeAnimationTextView.finishAnimation snaps the text but doesn't invoke that callback.
+        // Workaround by using the click listener, which does both in order.
         if (animatedText.hasAnimationStarted()) {
             animatedText.performClick()
         }
@@ -73,11 +65,6 @@ internal class OnboardingDialogTitleController(
         animatedText.cancelAnimation()
     }
 
-    /**
-     * [title] is kept as authored because [typeTitle] hands it to [TypeAnimationTextView.startTypingAnimation],
-     * which decodes it itself. The paths that assign text directly have to decode here instead, or a title
-     * carrying markup (`<br/>`) would render its tags literally and mis-measure [sizingText].
-     */
     private fun decodedTitle(): CharSequence = title.html(animatedText.context)
 
     private companion object {
