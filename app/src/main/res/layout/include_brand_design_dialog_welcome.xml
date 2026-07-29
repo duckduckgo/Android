@@ -24,7 +24,6 @@
         android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
         android:text="@string/preOnboardingWelcomeDialogTitle" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView

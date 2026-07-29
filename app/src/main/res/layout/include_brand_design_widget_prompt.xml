@@ -24,7 +24,6 @@
         android:id="@+id/widgetPromptTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
         android:paddingHorizontal="@dimen/keyline_3"
         android:text="@string/experimentHomeScreenWidgetBottomSheetDialogTitle" />
 

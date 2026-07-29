@@ -25,8 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_6"
-        android:layout_marginEnd="@dimen/keyline_6"
-        android:includeFontPadding="false" />
+        android:layout_marginEnd="@dimen/keyline_6" />
 
     <LinearLayout
         android:id="@+id/quickSetupOptionsContainer"

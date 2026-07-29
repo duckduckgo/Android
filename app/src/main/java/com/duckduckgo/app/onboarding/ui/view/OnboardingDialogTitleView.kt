@@ -28,8 +28,7 @@ import com.duckduckgo.app.browser.databinding.ViewOnboardingDialogTitleBinding
  * The title of an onboarding dialog card: it types the title in, and reserves the space the finished title
  * will take so the card doesn't resize while it types. See [OnboardingDialogTitleController].
  *
- * Accepts `android:text` for the initial title, and `android:includeFontPadding`, which it forwards to both
- * of its texts so they keep measuring identically.
+ * Accepts `android:text` for the initial title.
  */
 class OnboardingDialogTitleView @JvmOverloads constructor(
     context: Context,
@@ -47,9 +46,6 @@ class OnboardingDialogTitleView @JvmOverloads constructor(
 
     init {
         context.theme.obtainStyledAttributes(attrs, R.styleable.OnboardingDialogTitleView, 0, 0).use { attributes ->
-            val includeFontPadding = attributes.getBoolean(R.styleable.OnboardingDialogTitleView_android_includeFontPadding, true)
-            binding.onboardingDialogTitleSizingText.includeFontPadding = includeFontPadding
-            binding.onboardingDialogTitleAnimatedText.includeFontPadding = includeFontPadding
             attributes.getString(R.styleable.OnboardingDialogTitleView_android_text)?.let(::setTitle)
         }
     }

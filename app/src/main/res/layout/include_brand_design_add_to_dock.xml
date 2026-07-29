@@ -26,7 +26,6 @@
         android:id="@+id/addToDockTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
         android:paddingHorizontal="12dp"
         android:text="@string/preOnboardingDockStepTitle" />
 

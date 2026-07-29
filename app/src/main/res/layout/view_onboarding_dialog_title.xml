@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:visibility="invisible"
         app:typography="onboarding_title" />
 
@@ -34,6 +35,7 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:textColor="?attr/daxColorPrimaryText"
         tools:text="Onboarding dialog title" />
 

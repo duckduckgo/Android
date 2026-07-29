@@ -17,7 +17,6 @@
 
     <declare-styleable name="OnboardingDialogTitleView">
         <attr name="android:text" />
-        <attr name="android:includeFontPadding" />
     </declare-styleable>
 
 </resources>
