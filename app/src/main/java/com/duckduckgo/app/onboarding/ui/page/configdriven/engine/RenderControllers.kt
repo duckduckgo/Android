@@ -17,10 +17,6 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import android.view.View
-import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
-import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 
 /**
  * The decoration the embellishment controller settled on, after its fit check.
@@ -31,12 +27,3 @@ data class SettledDecoration(
     val anchoredCardBiasPhone: Float,
     val anchoredCardBiasTablet: Float,
 )
-
-interface ContentController {
-    /** Hides every content include. Used before the first bind, when includes still sit at their XML defaults. */
-    fun resetStage()
-
-    fun bind(stepId: LinearOnboardingStepId, content: ContentConfig, scope: BindScope): ContentHandle
-
-    fun hideBound()
-}
