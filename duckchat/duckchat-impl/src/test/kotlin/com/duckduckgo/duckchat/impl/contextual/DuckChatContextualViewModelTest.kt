@@ -2667,7 +2667,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when ask about tab clicked with valid context then showContext true and no prompt sent`() =
+    fun `when ask about page clicked with valid context then showContext true and no prompt sent`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2684,7 +2684,7 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived(tabId, serializedPageData)
 
             testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutTabClicked()
+                testee.onAskAboutPageClicked()
                 expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -2692,18 +2692,18 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when ask about tab clicked without valid context then showContext stays false`() =
+    fun `when ask about page clicked without valid context then showContext stays false`() =
         runTest {
             testee.onSheetOpened("tab-1")
             testee.currentPageContext = ""
 
-            testee.onAskAboutTabClicked()
+            testee.onAskAboutPageClicked()
 
             assertFalse(testee.viewState.value.showContext)
         }
 
     @Test
-    fun `when ask about tab clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
+    fun `when ask about page clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2717,7 +2717,7 @@ class DuckChatContextualViewModelTest {
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
 
-            testee.onAskAboutTabClicked()
+            testee.onAskAboutPageClicked()
 
             assertEquals(
                 DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
@@ -2726,7 +2726,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when ask about tab clicked with valid context then focus input command emitted`() =
+    fun `when ask about page clicked with valid context then focus input command emitted`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2741,52 +2741,8 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived(tabId, serializedPageData)
 
             testee.commands.test {
-                testee.onAskAboutTabClicked()
+                testee.onAskAboutPageClicked()
                 assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when ask about page clicked with context then submits ask about page prompt with pageContext`() =
-        runTest {
-            val tabId = "tab-1"
-            val serializedPageData =
-                """
-                {
-                    "title": "Page Title",
-                    "url": "https://example.com",
-                    "content": "Extracted DOM text...",
-                    "truncated": false,
-                    "fullContentLength": 1234
-                }
-                """.trimIndent()
-            testee.onSheetOpened(tabId)
-            testee.onPageContextReceived(tabId, serializedPageData)
-            testee.addPageContext()
-
-            testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutPageClicked()
-
-                val event = awaitItem()
-                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
-                val params = event.params
-                val query = params.getJSONObject("query")
-                assertEquals(context.getString(R.string.duckChatContextualAskAboutPage), query.getString("prompt"))
-                val pageContext = params.getJSONObject("pageContext")
-                assertEquals("https://example.com", pageContext.getString("url"))
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when ask about page clicked without context then no prompt sent`() =
-        runTest {
-            testee.onSheetOpened("tab-1")
-
-            testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutPageClicked()
-                expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }
         }

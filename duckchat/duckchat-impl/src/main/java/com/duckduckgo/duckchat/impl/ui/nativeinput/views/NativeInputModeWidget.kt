@@ -151,7 +151,6 @@ interface NativeInputWidget {
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     )
@@ -340,7 +339,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     private var pendingIsContextual: Boolean = false
-    private var pendingAskAboutTab: (() -> Unit)? = null
     private var pendingAskAboutPage: (() -> Unit)? = null
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
@@ -451,7 +449,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.isContextual = pendingIsContextual
-            pluginView.onAskAboutTab = pendingAskAboutTab
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
@@ -1239,17 +1236,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
 
     override fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     ) {
         pendingIsContextual = true
-        pendingAskAboutTab = onAskAboutTab
         pendingAskAboutPage = onAskAboutPage
         pendingOnPageContextRemoved = onPageContextRemoved
         attachmentView?.let { view ->
             view.isContextual = true
-            view.onAskAboutTab = onAskAboutTab
             view.onAskAboutPage = onAskAboutPage
             view.onPageContextRemoved = onPageContextRemoved
         }
