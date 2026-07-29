@@ -106,6 +106,13 @@ class RealContentScopeScripts @Inject constructor(
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
 
+    private val cachedMessagingParameters: String =
+        "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
+
+    private val cachedVersionAndPlatformParameters: String by lazy {
+        "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
+    }
+
     override fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
@@ -124,6 +131,11 @@ class RealContentScopeScripts @Inject constructor(
         activeExperiments: List<Toggle>,
     ): String {
         var updateJS = false
+
+        // This path maintains cachedContentScopeJson but not cachedPluginConfig, so the optimized path
+        // must re-derive it if the flag is ever flipped back mid-session. Write-only here: nothing below
+        // reads it, so legacy behaviour is unaffected.
+        pluginConfigNeedsRebuild = true
 
         val pluginParameters = getPluginParameters()
 
@@ -292,11 +304,11 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun cacheContentScopeJS(optimized: Boolean) {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
-        val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
 
         cachedContentScopeJS = if (optimized) {
-            assembleContentScopeJS(contentScopeJS, messagingParameters)
+            assembleContentScopeJS(contentScopeJS)
         } else {
+            val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
             contentScopeJS
                 .replace(CONTENT_SCOPE, cachedContentScopeJson)
                 .replace(USER_UNPROTECTED_DOMAINS, cachedUserUnprotectedDomainsJson)
@@ -305,26 +317,22 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
-    private fun assembleContentScopeJS(
-        template: String,
-        messagingParameters: String,
-    ): String {
+    private fun assembleContentScopeJS(template: String): String {
         val segments = cachedTemplateSegments ?: splitTemplate(template).also { cachedTemplateSegments = it }
         val builder = StringBuilder(
             template.length +
                 cachedContentScopeJson.length +
                 cachedUserUnprotectedDomainsJson.length +
                 cachedUserPreferencesJson.length +
-                messagingParameters.length,
+                cachedMessagingParameters.length,
         )
         segments.forEach { segment ->
             when (segment) {
                 is TemplateSegment.Literal -> builder.append(segment.text)
                 TemplateSegment.ContentScope -> builder.append(cachedContentScopeJson)
                 TemplateSegment.UserUnprotectedDomains -> builder.append(cachedUserUnprotectedDomainsJson)
-                TemplateSegment.UserPreferences ->
-                    builder.append(cachedUserPreferencesJson.replace(MESSAGING_PARAMETERS, messagingParameters))
-                TemplateSegment.MessagingParameters -> builder.append(messagingParameters)
+                TemplateSegment.UserPreferences -> builder.append(cachedUserPreferencesJson)
+                TemplateSegment.MessagingParameters -> builder.append(cachedMessagingParameters)
             }
         }
         return builder.toString()
@@ -397,9 +405,15 @@ class RealContentScopeScripts @Inject constructor(
         optimized: Boolean,
     ): String {
         val experiments = getExperimentsKeyValuePair(activeExperiments, optimized)
+        val messaging = if (optimized) cachedMessagingParameters else MESSAGING_PARAMETERS
+        val versionAndPlatform = if (optimized) {
+            cachedVersionAndPlatformParameters
+        } else {
+            "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
+        }
         val defaultParameters =
-            "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
-                "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$MESSAGING_PARAMETERS"
+            "$versionAndPlatform,${getLanguageKeyValuePair()}," +
+                "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$messaging"
         if (userPreferences.isEmpty()) {
             return "{$experiments,$defaultParameters}"
         }
@@ -430,17 +444,29 @@ class RealContentScopeScripts @Inject constructor(
                 val moshi = Builder().build()
                 moshi.adapter(type)
             }
-            activeExperiments
-                .filter { it.getCohort() != null && it.featureName().parentName != null }
-                .map {
+            val experiments = if (optimized) {
+                activeExperiments.mapNotNull { toggle ->
+                    val cohort = toggle.getCohort() ?: return@mapNotNull null
+                    val featureName = toggle.featureName()
+                    val parentName = featureName.parentName ?: return@mapNotNull null
                     Experiment(
-                        cohort = it.getCohort()!!.name,
-                        feature = it.featureName().parentName!!,
-                        subfeature = it.featureName().name,
+                        cohort = cohort.name,
+                        feature = parentName,
+                        subfeature = featureName.name,
                     )
-                }.let {
-                    return@runBlocking "\"currentCohorts\":${jsonAdapter.toJson(it)}"
                 }
+            } else {
+                activeExperiments
+                    .filter { it.getCohort() != null && it.featureName().parentName != null }
+                    .map {
+                        Experiment(
+                            cohort = it.getCohort()!!.name,
+                            feature = it.featureName().parentName!!,
+                            subfeature = it.featureName().name,
+                        )
+                    }
+            }
+            return@runBlocking "\"currentCohorts\":${jsonAdapter.toJson(experiments)}"
         }
     }
 

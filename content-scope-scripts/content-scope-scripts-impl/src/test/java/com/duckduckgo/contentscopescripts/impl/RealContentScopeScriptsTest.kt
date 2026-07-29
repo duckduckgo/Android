@@ -279,6 +279,77 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
+    fun whenFlagFlipsBackToOptimizedThenPluginConfigDroppedOnTheLegacyPathIsNotResurrected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        // Settle the cached plugin config on the full plugin set.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        testee.getScript(null, listOf())
+        testee.getScript(null, listOf())
+
+        // The legacy path takes over and the plugin config shrinks. Legacy recomputes it per call, so it
+        // serves the new config, but it does not maintain the optimized path's cache of it.
+        optimizeFlag.setRawStoredState(State(enable = false))
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
+        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{$config1}"))
+
+        // Back to the optimized path with no persist signal, and something else forces a rebuild of the
+        // content scope JSON. It must not be rebuilt from the plugin config captured before the flip.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
+        val js = testee.getScript(null, listOf())
+
+        assertFalse("config dropped while on the legacy path must not be resurrected", js.contains(config2))
+        assertTrue(js.contains("\"features\":{$config1}"))
+    }
+
+    @Test
+    fun whenOptimizeEnabledThenEachToggleCohortIsReadOnce() = runTest {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(Cohort("control", weight = 1))
+        whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        testee.getScript(null, listOf(mockToggle))
+
+        // getCohort() can enrol to self-heal a stale cohort, so the optimized path must not call it twice.
+        verify(mockToggle).getCohort()
+    }
+
+    @Test
+    fun whenOptimizeDisabledThenEachToggleCohortIsReadTwice() = runTest {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(Cohort("control", weight = 1))
+        whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        testee.getScript(null, listOf(mockToggle))
+
+        // The legacy path filters then maps, so it reads each toggle twice. Frozen deliberately.
+        verify(mockToggle, times(2)).getCohort()
+    }
+
+    @Test
+    fun whenOptimizeEnabledThenBuildConstantsAreReadOnce() {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+
+        repeat(3) { testee.getScript(null, listOf()) }
+
+        // The version and platform parameters cannot change while the process is alive.
+        verify(mockAppBuildConfig).versionCode
+    }
+
+    @Test
+    fun whenOptimizeDisabledThenBuildConstantsAreReadOnEveryCall() {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
+
+        repeat(3) { testee.getScript(null, listOf()) }
+
+        // The legacy path rebuilds them per call. Frozen deliberately.
+        verify(mockAppBuildConfig, times(3)).versionCode
+    }
+
+    @Test
     fun whenOptimizeDisabledThenPluginConfigChangesAreReflectedImmediately() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
         testee.getScript(null, listOf())
