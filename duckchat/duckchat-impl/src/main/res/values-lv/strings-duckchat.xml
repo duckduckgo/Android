@@ -264,4 +264,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai iestatījumi</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Jautā par cilni</string>
+    <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
 </resources>

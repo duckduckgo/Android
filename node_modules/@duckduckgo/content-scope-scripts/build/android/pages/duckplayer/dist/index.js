@@ -1513,39 +1513,39 @@
     };
   }
   function q(n2, u3, t3, i3, r3, o3, e3, f3, c3, a3) {
-    var s3, h3, p3, v3, y3, d3, _3, k3, x3, M, $2, I2, P2, A3, H2, T3 = u3.type;
+    var s3, h3, p3, v3, y3, d3, _3, k3, x3, M, $2, I2, P2, A3, H2, T3, j3 = u3.type;
     if (void 0 !== u3.constructor) return null;
     128 & t3.__u && (c3 = !!(32 & t3.__u), o3 = [f3 = u3.__e = t3.__e]), (s3 = l.__b) && s3(u3);
-    n: if ("function" == typeof T3) try {
-      if (k3 = u3.props, x3 = T3.prototype && T3.prototype.render, M = (s3 = T3.contextType) && i3[s3.__c], $2 = s3 ? M ? M.props.value : s3.__ : i3, t3.__c ? _3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (x3 ? u3.__c = h3 = new T3(k3, $2) : (u3.__c = h3 = new C(k3, $2), h3.constructor = T3, h3.render = Q), M && M.sub(h3), h3.state || (h3.state = {}), h3.__n = i3, p3 = h3.__d = true, h3.__h = [], h3._sb = []), x3 && null == h3.__s && (h3.__s = h3.state), x3 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = m({}, h3.__s)), m(h3.__s, T3.getDerivedStateFromProps(k3, h3.__s))), v3 = h3.props, y3 = h3.state, h3.__v = u3, p3) x3 && null == T3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), x3 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
-      else {
-        if (x3 && null == T3.getDerivedStateFromProps && k3 !== v3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(k3, $2), u3.__v == t3.__v || !h3.__e && null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(k3, h3.__s, $2)) {
-          u3.__v != t3.__v && (h3.props = k3, h3.state = h3.__s, h3.__d = false), u3.__e = t3.__e, u3.__k = t3.__k, u3.__k.some(function(n3) {
-            n3 && (n3.__ = u3);
-          }), w.push.apply(h3.__h, h3._sb), h3._sb = [], h3.__h.length && e3.push(h3);
-          break n;
+    n: if ("function" == typeof j3) {
+      h3 = e3.length;
+      try {
+        if (x3 = u3.props, M = j3.prototype && j3.prototype.render, $2 = (s3 = j3.contextType) && i3[s3.__c], I2 = s3 ? $2 ? $2.props.value : s3.__ : i3, t3.__c ? k3 = (p3 = u3.__c = t3.__c).__ = p3.__E : (M ? u3.__c = p3 = new j3(x3, I2) : (u3.__c = p3 = new C(x3, I2), p3.constructor = j3, p3.render = Q), $2 && $2.sub(p3), p3.state || (p3.state = {}), p3.__n = i3, v3 = p3.__d = true, p3.__h = [], p3._sb = []), M && null == p3.__s && (p3.__s = p3.state), M && null != j3.getDerivedStateFromProps && (p3.__s == p3.state && (p3.__s = m({}, p3.__s)), m(p3.__s, j3.getDerivedStateFromProps(x3, p3.__s))), y3 = p3.props, d3 = p3.state, p3.__v = u3, v3) M && null == j3.getDerivedStateFromProps && null != p3.componentWillMount && p3.componentWillMount(), M && null != p3.componentDidMount && p3.__h.push(p3.componentDidMount);
+        else {
+          if (M && null == j3.getDerivedStateFromProps && x3 !== y3 && null != p3.componentWillReceiveProps && p3.componentWillReceiveProps(x3, I2), u3.__v == t3.__v || !p3.__e && null != p3.shouldComponentUpdate && false === p3.shouldComponentUpdate(x3, p3.__s, I2)) {
+            u3.__v != t3.__v && (p3.props = x3, p3.state = p3.__s, p3.__d = false), u3.__e = t3.__e, u3.__k = t3.__k, u3.__k.some(function(n3) {
+              n3 && (n3.__ = u3);
+            }), w.push.apply(p3.__h, p3._sb), p3._sb = [], p3.__h.length && e3.push(p3);
+            break n;
+          }
+          null != p3.componentWillUpdate && p3.componentWillUpdate(x3, p3.__s, I2), M && null != p3.componentDidUpdate && p3.__h.push(function() {
+            p3.componentDidUpdate(y3, d3, _3);
+          });
         }
-        null != h3.componentWillUpdate && h3.componentWillUpdate(k3, h3.__s, $2), x3 && null != h3.componentDidUpdate && h3.__h.push(function() {
-          h3.componentDidUpdate(v3, y3, d3);
-        });
+        if (p3.context = I2, p3.props = x3, p3.__P = n2, p3.__e = false, P2 = l.__r, A3 = 0, M) p3.state = p3.__s, p3.__d = false, P2 && P2(u3), s3 = p3.render(p3.props, p3.state, p3.context), w.push.apply(p3.__h, p3._sb), p3._sb = [];
+        else do {
+          p3.__d = false, P2 && P2(u3), s3 = p3.render(p3.props, p3.state, p3.context), p3.state = p3.__s;
+        } while (p3.__d && ++A3 < 25);
+        p3.state = p3.__s, null != p3.getChildContext && (i3 = m(m({}, i3), p3.getChildContext())), M && !v3 && null != p3.getSnapshotBeforeUpdate && (_3 = p3.getSnapshotBeforeUpdate(y3, d3)), H2 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3, f3 = L(n2, g(H2) ? H2 : [H2], u3, t3, i3, r3, o3, e3, f3, c3, a3), p3.base = u3.__e, u3.__u &= -161, p3.__h.length && e3.push(p3), k3 && (p3.__E = p3.__ = null);
+      } catch (n3) {
+        if (e3.length = h3, u3.__v = null, c3 || null != o3) {
+          if (n3.then) {
+            for (u3.__u |= c3 ? 160 : 128; f3 && 8 == f3.nodeType && f3.nextSibling; ) f3 = f3.nextSibling;
+            null != o3 && (o3[o3.indexOf(f3)] = null), u3.__e = f3;
+          } else if (null != o3) for (T3 = o3.length; T3--; ) b(o3[T3]);
+        } else u3.__e = t3.__e;
+        null == u3.__k && (u3.__k = t3.__k || []), n3.then || B(u3), l.__e(n3, u3, t3);
       }
-      if (h3.context = $2, h3.props = k3, h3.__P = n2, h3.__e = false, I2 = l.__r, P2 = 0, x3) h3.state = h3.__s, h3.__d = false, I2 && I2(u3), s3 = h3.render(h3.props, h3.state, h3.context), w.push.apply(h3.__h, h3._sb), h3._sb = [];
-      else do {
-        h3.__d = false, I2 && I2(u3), s3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
-      } while (h3.__d && ++P2 < 25);
-      h3.state = h3.__s, null != h3.getChildContext && (i3 = m(m({}, i3), h3.getChildContext())), x3 && !p3 && null != h3.getSnapshotBeforeUpdate && (d3 = h3.getSnapshotBeforeUpdate(v3, y3)), A3 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3, f3 = L(n2, g(A3) ? A3 : [A3], u3, t3, i3, r3, o3, e3, f3, c3, a3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && e3.push(h3), _3 && (h3.__E = h3.__ = null);
-    } catch (n3) {
-      if (u3.__v = null, c3 || null != o3) if (n3.then) {
-        for (u3.__u |= c3 ? 160 : 128; f3 && 8 == f3.nodeType && f3.nextSibling; ) f3 = f3.nextSibling;
-        o3[o3.indexOf(f3)] = null, u3.__e = f3;
-      } else {
-        for (H2 = o3.length; H2--; ) b(o3[H2]);
-        B(u3);
-      }
-      else u3.__e = t3.__e, u3.__k = t3.__k, n3.then || B(u3);
-      l.__e(n3, u3, t3);
-    }
-    else null == o3 && u3.__v == t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : f3 = u3.__e = G(t3.__e, u3, t3, i3, r3, o3, e3, c3, a3);
+    } else null == o3 && u3.__v == t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : f3 = u3.__e = G(t3.__e, u3, t3, i3, r3, o3, e3, c3, a3);
     return (s3 = l.diffed) && s3(u3), 128 & u3.__u ? void 0 : f3;
   }
   function B(n2) {
@@ -1607,7 +1607,7 @@
       } catch (n3) {
         l.__e(n3, u3);
       }
-      i3.base = i3.__P = null;
+      i3.base = i3.__P = i3.__n = null;
     }
     if (i3 = n2.__k) for (r3 = 0; r3 < i3.length; r3++) i3[r3] && K(i3[r3], u3, t3 || "function" != typeof n2.type);
     t3 || b(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
@@ -1617,7 +1617,7 @@
   }
   function R(u3, t3, i3) {
     var r3, o3, e3, f3;
-    t3 == document && (t3 = document.documentElement), l.__ && l.__(u3, t3), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t3.__k, e3 = [], f3 = [], q(t3, u3 = (!r3 && i3 || t3).__k = k(S, null, [u3]), o3 || d, d, t3.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t3.firstChild ? n.call(t3.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t3.firstChild, r3, f3), D(e3, u3, f3);
+    t3 == document && (t3 = document.documentElement), l.__ && l.__(u3, t3), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t3.__k, e3 = [], f3 = [], q(t3, u3 = (!r3 && i3 || t3).__k = k(S, null, [u3]), o3 || d, d, t3.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t3.firstChild ? n.call(t3.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t3.firstChild, r3, f3), D(e3, u3, f3), u3.props.children = null;
   }
   function X(n2) {
     function l3(n3) {
@@ -1673,36 +1673,35 @@
   var v2 = c2.diffed;
   var l2 = c2.__c;
   var m2 = c2.unmount;
-  var s2 = c2.__;
-  function p2(n2, t3) {
+  var p2 = c2.__;
+  function s2(n2, t3) {
     c2.__h && c2.__h(r2, n2, o2 || t3), o2 = 0;
     var u3 = r2.__H || (r2.__H = { __: [], __h: [] });
     return n2 >= u3.__.length && u3.__.push({}), u3.__[n2];
   }
   function d2(n2) {
-    return o2 = 1, h2(D2, n2);
+    return o2 = 1, y2(D2, n2);
   }
-  function h2(n2, u3, i3) {
-    var o3 = p2(t2++, 2);
+  function y2(n2, u3, i3) {
+    var o3 = s2(t2++, 2);
     if (o3.t = n2, !o3.__c && (o3.__ = [i3 ? i3(u3) : D2(void 0, u3), function(n3) {
       var t3 = o3.__N ? o3.__N[0] : o3.__[0], r3 = o3.t(t3, n3);
       t3 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
     }], o3.__c = r2, !r2.__f)) {
       var f3 = function(n3, t3, r3) {
         if (!o3.__c.__H) return true;
-        var u4 = o3.__c.__H.__.filter(function(n4) {
-          return n4.__c;
-        });
-        if (u4.every(function(n4) {
-          return !n4.__N;
-        })) return !c3 || c3.call(this, n3, t3, r3);
-        var i4 = o3.__c.props !== n3;
-        return u4.some(function(n4) {
+        var u4 = false, i4 = o3.__c.props !== n3;
+        if (o3.__c.__H.__.some(function(n4) {
           if (n4.__N) {
+            u4 = true;
             var t4 = n4.__[0];
             n4.__ = n4.__N, n4.__N = void 0, t4 !== n4.__[0] && (i4 = true);
           }
-        }), c3 && c3.call(this, n3, t3, r3) || i4;
+        }), c3) {
+          var f4 = c3.call(this, n3, t3, r3);
+          return u4 ? f4 || i4 : f4;
+        }
+        return !u4 || i4;
       };
       r2.__f = true;
       var c3 = r2.shouldComponentUpdate, e3 = r2.componentWillUpdate;
@@ -1716,12 +1715,12 @@
     }
     return o3.__N || o3.__;
   }
-  function y2(n2, u3) {
-    var i3 = p2(t2++, 3);
+  function h2(n2, u3) {
+    var i3 = s2(t2++, 3);
     !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.u = u3, r2.__H.__h.push(i3));
   }
   function _2(n2, u3) {
-    var i3 = p2(t2++, 4);
+    var i3 = s2(t2++, 4);
     !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.u = u3, r2.__h.push(i3));
   }
   function A2(n2) {
@@ -1730,7 +1729,7 @@
     }, []);
   }
   function T2(n2, r3) {
-    var u3 = p2(t2++, 7);
+    var u3 = s2(t2++, 7);
     return C2(u3.__H, r3) && (u3.__ = n2(), u3.__H = r3, u3.__h = n2), u3.__;
   }
   function q2(n2, t3) {
@@ -1739,11 +1738,11 @@
     }, t3);
   }
   function x2(n2) {
-    var u3 = r2.context[n2.__c], i3 = p2(t2++, 9);
+    var u3 = r2.context[n2.__c], i3 = s2(t2++, 9);
     return i3.c = n2, u3 ? (null == i3.__ && (i3.__ = true, u3.sub(r2)), u3.props.value) : n2.__;
   }
   function g2() {
-    var n2 = p2(t2++, 11);
+    var n2 = s2(t2++, 11);
     if (!n2.__) {
       for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; ) u3 = u3.__;
       var i3 = u3.__m || (u3.__m = [0, 0]);
@@ -1764,7 +1763,7 @@
   c2.__b = function(n2) {
     r2 = null, e2 && e2(n2);
   }, c2.__ = function(n2, t3) {
-    n2 && t3.__k && t3.__k.__m && (n2.__m = t3.__k.__m), s2 && s2(n2, t3);
+    n2 && t3.__k && t3.__k.__m && (n2.__m = t3.__k.__m), p2 && p2(n2, t3);
   }, c2.__r = function(n2) {
     a2 && a2(n2), t2 = 0;
     var i3 = (r2 = n2.__c).__H;
@@ -1775,7 +1774,7 @@
     v2 && v2(n2);
     var t3 = n2.__c;
     t3 && t3.__H && (t3.__H.__h.length && (1 !== f2.push(t3) && i2 === c2.requestAnimationFrame || ((i2 = c2.requestAnimationFrame) || w2)(j2)), t3.__H.__.some(function(n3) {
-      n3.u && (n3.__H = n3.u), n3.u = void 0;
+      n3.u && (n3.__H = n3.u, n3.u = void 0);
     })), u2 = r2 = null;
   }, c2.__c = function(n2, t3) {
     t3.some(function(n3) {
@@ -1827,7 +1826,7 @@
   // shared/hooks/useMediaQuery.js
   function useMediaQuery(query) {
     const [matches, setMatches] = d2(() => window.matchMedia(query).matches);
-    y2(() => {
+    h2(() => {
       const mql = window.matchMedia(query);
       setMatches(mql.matches);
       const handler = () => setMatches(mql.matches);
@@ -1864,7 +1863,7 @@
   }) {
     const isDarkMode = useMediaQuery(THEME_QUERY);
     const [isReducedMotion, setReducedMotion] = d2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
-    y2(() => {
+    h2(() => {
       const mediaQueryList = window.matchMedia(REDUCED_MOTION_QUERY);
       const listener = (e3) => setter(e3.matches);
       mediaQueryList.addEventListener("change", listener);
@@ -1895,7 +1894,7 @@
     );
   }
   function UpdateEnvironment({ search }) {
-    y2(() => {
+    h2(() => {
       const params = new URLSearchParams(search);
       if (params.has("reduced-motion")) {
         setTimeout(() => {
@@ -2533,7 +2532,7 @@
   function UserValuesProvider({ initial, children }) {
     const [value, setValue] = d2(initial);
     const messaging2 = useMessaging();
-    y2(() => {
+    h2(() => {
       window.addEventListener("toggle-user-values-enabled", () => {
         setValue({ privatePlayerMode: { enabled: {} }, overlayInteracted: false });
       });
@@ -2727,7 +2726,7 @@
     const userValues = useUserValues();
     const setEnabled = useSetEnabled();
     const initialState = "enabled" in userValues.privatePlayerMode ? "completed" : "showing";
-    const [state, dispatch] = h2((state2, event) => {
+    const [state, dispatch] = y2((state2, event) => {
       console.log("\u{1F4E9}", { state: state2, event });
       switch (state2) {
         case "showing": {
@@ -2760,7 +2759,7 @@
       dispatch("change");
       setEnabled();
     }
-    y2(() => {
+    h2(() => {
       const evt = "enabled" in userValues.privatePlayerMode ? "enabled" : "ask";
       dispatch(evt);
     }, [initialState]);
@@ -2909,7 +2908,7 @@
   var EVENT_ON = "ddg-duckplayer-focusmode-on";
   var EVENT_OFF = "ddg-duckplayer-focusmode-off";
   function FocusMode() {
-    y2(() => {
+    h2(() => {
       let enabled = true;
       let timerId;
       const on = () => {
@@ -3054,7 +3053,7 @@
     const [error, setError] = d2(initialError);
     const messaging2 = useMessaging();
     const setFocusMode = useSetFocusMode();
-    y2(() => {
+    h2(() => {
       const errorEventHandler = (event) => {
         const eventError = event.detail?.error;
         if (YOUTUBE_ERROR_IDS.includes(eventError) || eventError === null) {
@@ -3704,7 +3703,7 @@
     );
     const settings = useSettings();
     const openOnYoutube = useOpenOnYoutubeHandler();
-    y2(() => {
+    h2(() => {
       if (!ref.current) return;
       const iframe = ref.current;
       const features = createIframeFeatures(settings, embed);
@@ -3921,7 +3920,7 @@
 
   // pages/duckplayer/app/providers/OrientationProvider.jsx
   function OrientationProvider({ onChange }) {
-    y2(() => {
+    h2(() => {
       if (!screen.orientation?.type) {
         onChange(getOrientationFromWidth());
         return;
@@ -3933,7 +3932,7 @@
       screen.orientation.addEventListener("change", handleOrientationChange);
       return () => screen.orientation.removeEventListener("change", handleOrientationChange);
     }, []);
-    y2(() => {
+    h2(() => {
       let timer;
       const listener = () => {
         clearTimeout(timer);

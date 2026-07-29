@@ -55,4 +55,11 @@
     <string name="sync_device_v2_recovery_code_download_code_button">Download Your Recovery Code</string>
     <string name="sync_device_v2_recovery_code_done_button">Done</string>
     <string name="sync_device_v2_recovery_code_get_code_error">Unable to get recovery code.</string>
+    <string name="sync_scanner_v2_show_qr_code_content_description">Show QR Code</string>
+    <string name="sync_scanner_v2_scan_qr_code_tab_item_label">Scan QR</string>
+    <string name="sync_scanner_v2_scan_qr_code_headline">Scan QR Code</string>
+    <string name="sync_scanner_v2_scan_qr_code_body">Open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation></string>
+    <string name="sync_scanner_v2_scan_button_cta">I’m Ready to Scan</string>
+    <string name="sync_scanner_v2_enter_code_manually_tab_item_label">Enter Code</string>
+    <string name="sync_scanner_v2_qr_code_screen_title">QR Code</string>
 </resources>

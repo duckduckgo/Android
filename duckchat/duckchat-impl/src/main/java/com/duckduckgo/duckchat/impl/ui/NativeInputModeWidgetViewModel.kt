@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -217,6 +218,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
+    /** The pixel surface for the active tab, derived from its published input context. */
+    private fun currentSurface(): DuckChatPixelSurface {
+        val inputContext = activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value.inputContext }
+            ?: NativeInputState.InputContext.BROWSER
+        return DuckChatPixelSurface.from(inputContext)
+    }
+
     /**
      * Fires the unified prompt-submitted pixel plus, when a tool is selected, the matching per-tool
      * submitted pixel. Called exactly once per Duck.ai (AI-chat) submission by the widget. Attachment
@@ -233,6 +241,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> "web_search"
             null -> "none"
         }
+        val surface = currentSurface()
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
@@ -240,10 +249,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
+            surface = surface,
         )
         when (tool) {
-            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted()
-            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted()
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted(surface)
             null -> {}
         }
     }
@@ -252,7 +262,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
 
-    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped()
+    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
@@ -438,7 +448,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         // recovering the chat's model — report it before the window is cleared below.
         val tabId = activeTabId.value
         if (tabId != null && nativeInputStateProvider.stateForTab(tabId).value.modelChangeMode) {
-            duckChatPixels.fireSubmitChangeModelPromptSent()
+            duckChatPixels.fireSubmitChangeModelPromptSent(currentSurface())
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()

@@ -214,7 +214,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW, QUICK_SETUP, SKIP_ONBOARDING_OPTION, WIDGET_PROMPT -> Unit
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP, ADD_TO_DOCK, SKIP_ONBOARDING_OPTION, WIDGET_PROMPT -> Unit
         }
         viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
@@ -231,7 +231,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
-            INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW ->
+            INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, ADD_TO_DOCK ->
                 emit(NewUserOnboardingEvent.ContinueClicked)
             ADDRESS_BAR_POSITION ->
                 emit(NewUserOnboardingEvent.AddressBarConfirmed(_viewState.value.selectedAddressBarPosition))
@@ -258,6 +258,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INPUT_SCREEN,
             INPUT_SCREEN_PREVIEW,
             QUICK_SETUP,
+            ADD_TO_DOCK,
             SKIP_ONBOARDING_OPTION,
             -> Unit
         }
@@ -534,6 +535,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INPUT_SCREEN, stepIndicator = progress)
             is NewUserOnboardingActivityDialog.InputScreenPreview ->
                 setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, stepIndicator = progress)
+            NewUserOnboardingActivityDialog.AddToDock ->
+                setCurrentDialog(ADD_TO_DOCK, stepIndicator = progress)
             NewUserOnboardingActivityDialog.WidgetPrompt ->
                 setCurrentDialog(WIDGET_PROMPT, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AddWidget -> {

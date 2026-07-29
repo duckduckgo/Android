@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
     <string name="fireClearAll">Slet faner og data</string>
-    <string name="fireClearAllPlusDuckChats">Slet faner, data og Duck.ai-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
     <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at slette data manuelt, eller opsæt automatisk sletning.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Slet alle chats, inklusive fastgjorte chats</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Vælg, hvad du vil slette</string>
     <string name="dataClearingOptionTabs">Faner</string>
     <string name="dataClearingOptionData">Cookies og webstedsdata</string>
     <string name="dataClearingDuckAiChats">Duck.ai-chats</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Slet alle chats</string>
-    <string name="fireDialogDeleteButton">Slet</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Luk fane</item>
-        <item quantity="other">Luk alle %1$d faner</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Du kan blive logget ud af konti.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Ingen</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Slet fra 1 websted. Du kan blive logget ud af konti.</item>
-        <item quantity="other">Slet fra %1$d websteder. Du kan blive logget ud af konti.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Slet faner og webstedsdata?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
-
-    <string name="settingsAutomaticallyClearData">Ryd data automatisk…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Slet Duck.ai-chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
-    <string name="settingsClearDataActionSecondaryText">Rydder alle faner og data for websteder, du ikke har sikret med Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rydder alle faner, Duck.ai-chats og data for websteder, du ikke har sikret med Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Omkring</string>
@@ -943,6 +923,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hej</string>
     <string name="preOnboardingWelcomeDialogBody1">Er du klar til en hurtigere browser, der sætter dig i førersædet?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er altid valgfrit, og beskyttelse af privatlivet er altid aktiveret.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d af %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">sådan siger man \"and\" på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">sådan siger man \"and\" på spansk</string>
@@ -978,6 +959,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Prøv nu en privat AI-chat!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vil du gøre DuckDuckGo til din standardbrowser?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Prøv vores widget til startskærmen.</string>
+    <string name="preOnboardingWidgetPromptBody">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Tilføj widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Spring over</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Føj mig til bunden af din skærm.</string>
+    <string name="preOnboardingAddToDockBody">Find DuckDuckGo-ikonet på din startskærm. Tryk og træk den derefter på plads. Det er det!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Forstået</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai, eller vælg Søg efter beskyttet browsing.<br/><br/>Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi tilbyder også et betalt abonnement med avancerede AI-modeller med højere chatgrænser fra GPT og Claude, en sikker VPN og meget mere.</string>

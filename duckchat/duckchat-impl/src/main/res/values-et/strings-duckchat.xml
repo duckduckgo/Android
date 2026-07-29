@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai seaded</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Küsi vahekaardi kohta</string>
+    <string name="duckChatContextualAskAboutPage">Küsi lehe kohta</string>
 </resources>

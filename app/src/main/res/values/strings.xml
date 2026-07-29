@@ -122,7 +122,6 @@
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Delete Tabs and Data</string>
-    <string name="fireClearAllPlusDuckChats">Delete Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -225,7 +224,6 @@
     <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Data Clearing</string>
     <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to delete data manually, or set up automatic deletion.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -242,22 +240,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Delete all chats, including pinned chats</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Choose What To Delete</string>
     <string name="dataClearingOptionTabs">Tabs</string>
     <string name="dataClearingOptionData">Cookies and Site Data</string>
     <string name="dataClearingDuckAiChats">Duck.ai Chats</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Delete all chats</string>
-    <string name="fireDialogDeleteButton">Delete</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Close 1 tab</item>
-        <item quantity="other" instruction="Placeholder is the number of tabs">Close all %1$d tabs</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">May sign you out of accounts.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">None</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Delete from 1 site. May sign you out of accounts.</item>
-        <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %1$d sites. May sign you out of accounts.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Delete tabs and site data?</string>
@@ -285,8 +270,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
-
-    <string name="settingsAutomaticallyClearData">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
@@ -303,9 +286,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Delete Duck.ai Chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
-    <string name="settingsClearDataActionSecondaryText">Clears all tabs and data for any sites you haven\'t fireproofed.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Clears all tabs, Duck.ai chats, and data for any sites you haven\'t fireproofed.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
     <string name="aboutActivityTitleNew">About</string>
@@ -978,6 +958,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
+    <string name="preOnboardingWidgetPromptBody">Add our search widget to your Home Screen for quick and easy access.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Add Widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Add me to the bottom of your screen.</string>
+    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT and Claude, a secure VPN, and more.</string>

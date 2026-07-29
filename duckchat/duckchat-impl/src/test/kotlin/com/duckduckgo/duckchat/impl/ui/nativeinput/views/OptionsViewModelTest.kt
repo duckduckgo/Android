@@ -37,6 +37,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -116,31 +117,31 @@ class OptionsViewModelTest {
     @Test
     fun whenImageGenSelectedByUserThenSelectedPixel() {
         testee.onToolSelectedByUser(Tool.IMAGE_GENERATION)
-        verify(duckChatPixels).fireImageGenerationSelected()
+        verify(duckChatPixels).fireImageGenerationSelected(any())
     }
 
     @Test
     fun whenWebSearchDeselectedByUserThenDeselectedPixel() {
         testee.onToolDeselectedByUser(Tool.WEB_SEARCH)
-        verify(duckChatPixels).fireWebSearchDeselected()
+        verify(duckChatPixels).fireWebSearchDeselected(any())
     }
 
     @Test
     fun whenWebSearchSelectedByUserThenSelectedPixel() {
         testee.onToolSelectedByUser(Tool.WEB_SEARCH)
-        verify(duckChatPixels).fireWebSearchSelected()
+        verify(duckChatPixels).fireWebSearchSelected(any())
     }
 
     @Test
     fun whenImageGenDeselectedByUserThenDeselectedPixel() {
         testee.onToolDeselectedByUser(Tool.IMAGE_GENERATION)
-        verify(duckChatPixels).fireImageGenerationDeselected()
+        verify(duckChatPixels).fireImageGenerationDeselected(any())
     }
 
     @Test
     fun whenCustomizeResponsesClickedThenFireCustomizeResponsesPixel() {
         testee.onCustomizeResponsesClicked()
-        verify(duckChatPixels).fireCustomizeResponsesSelected()
+        verify(duckChatPixels).fireCustomizeResponsesSelected(any())
     }
 
     @Test

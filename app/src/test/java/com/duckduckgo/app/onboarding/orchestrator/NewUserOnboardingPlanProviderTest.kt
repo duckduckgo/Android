@@ -93,7 +93,6 @@ class NewUserOnboardingPlanProviderTest {
     private val pixel: Pixel = mock()
     private val splitOmnibarToggle: Toggle = mock()
     private val splitOmnibarWelcomeToggle: Toggle = mock()
-    private val singleTabFireDialogToggle: Toggle = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
@@ -107,10 +106,8 @@ class NewUserOnboardingPlanProviderTest {
     fun setup() {
         whenever(androidBrowserConfigFeature.splitOmnibar()).thenReturn(splitOmnibarToggle)
         whenever(androidBrowserConfigFeature.splitOmnibarWelcomePage()).thenReturn(splitOmnibarWelcomeToggle)
-        whenever(androidBrowserConfigFeature.singleTabFireDialog()).thenReturn(singleTabFireDialogToggle)
         whenever(splitOmnibarToggle.isEnabled()).thenReturn(false)
         whenever(splitOmnibarWelcomeToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -510,21 +507,6 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
         verify(customAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
         verify(duckAiOnboardingDemo, never()).arm()
-    }
-
-    @Test
-    fun `when custom ai path and single tab fire dialog disabled then preview and demo steps skipped`() = runTest {
-        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
-        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
-
-        // Continue from the comparison chart skips both gated steps (precondition false) and lands on the next satisfied step.
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
     }
 
     @Test
@@ -933,13 +915,27 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun whenControlThenNoNewPagesInPlan() = runTest {
         val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     @Test
+    fun whenDockOnlyThenOnlyAddToDockInsertedAfterDefaultBrowser() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY)
+        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK),
+        )
+    }
+
+    @Test
     fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
         val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
         assertEquals(
@@ -961,9 +957,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenBothThenDockThenWidgetPromptThenAddWidget() = runTest {
+        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET)
+        val dock = ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK)
+        val prompt = ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT)
+        val add = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET)
+        assertTrue(dock < prompt && prompt < add)
+        assertEquals(ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1, dock)
+    }
+
+    @Test
     fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
     }
 
@@ -993,7 +1000,9 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun stepIndicatorTotalsMatchCohort() = runTest {
         val control = indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY))
         assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY))
+        assertEquals(control + 2, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET))
     }
 
     // endregion

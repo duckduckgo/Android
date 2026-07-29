@@ -19,7 +19,6 @@ package com.duckduckgo.app.fire
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
 import androidx.lifecycle.LiveData
@@ -32,8 +31,6 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
 import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
@@ -47,7 +44,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.LogPriority.WARN
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -72,8 +68,6 @@ class AutomaticDataClearer @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val dataClearing: AutomaticDataClearing,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     private val dispatchers: DispatcherProvider,
     private val fireDataStore: FireDataStore,
@@ -113,11 +107,7 @@ class AutomaticDataClearer @Inject constructor(
             val appIconChanged = settingsDataStore.appIconChanged
             settingsDataStore.appIconChanged = false
 
-            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
-            } else {
-                clearDataIfNeededLegacy(appUsedSinceLastClear, appIconChanged)
-            }
+            clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
 
             isFreshAppLaunch = false
             settingsDataStore.clearAppBackgroundTimestamp()
@@ -137,28 +127,6 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    private suspend fun clearDataIfNeededLegacy(
-        appUsedSinceLastClear: Boolean,
-        appIconChanged: Boolean,
-    ) {
-        val clearWhat = settingsDataStore.automaticallyClearWhatOption
-        val clearWhen = settingsDataStore.automaticallyClearWhenOption
-        logcat { "Currently configured to automatically clear $clearWhat / $clearWhen" }
-
-        if (clearWhat == ClearWhatOption.CLEAR_NONE) {
-            logcat { "No data will be cleared as it's configured to clear nothing automatically" }
-            postDataClearerState(FINISHED)
-        } else {
-            if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
-                logcat { "Decided data should be cleared" }
-                clearDataWhenAppInForegroundLegacy(clearWhat)
-            } else {
-                logcat { "Decided not to clear data at this time" }
-                postDataClearerState(FINISHED)
-            }
-        }
-    }
-
     private suspend fun postDataClearerState(state: ApplicationClearDataState) {
         withContext(dispatchers.main()) {
             dataClearerState.value = state
@@ -175,24 +143,13 @@ class AutomaticDataClearer @Inject constructor(
             withContext(dispatchers.io()) {
                 settingsDataStore.appBackgroundedTimestamp = timeNow
 
-                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                    val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
-                    val clearOptions = fireDataStore.getAutomaticClearOptions()
+                val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
+                val clearOptions = fireDataStore.getAutomaticClearOptions()
 
-                    if (clearOptions.isEmpty() || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-                        logcat { "No background timer required for current configuration: $clearOptions / $clearWhenOption" }
-                    } else {
-                        scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
-                    }
+                if (clearOptions.isEmpty() || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+                    logcat { "No background timer required for current configuration: $clearOptions / $clearWhenOption" }
                 } else {
-                    val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
-                    val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
-
-                    if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-                        logcat { "No background timer required for current configuration: $clearWhatOption / $clearWhenOption" }
-                    } else {
-                        scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
-                    }
+                    scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
                 }
             }
         }
@@ -201,11 +158,7 @@ class AutomaticDataClearer @Inject constructor(
     override fun onExit() {
         launch(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
-            val shouldKillProcess = if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                dataClearing.isAutomaticDataClearingOptionSelected()
-            } else {
-                settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE
-            }
+            val shouldKillProcess = dataClearing.isAutomaticDataClearingOptionSelected()
 
             if (shouldKillProcess) {
                 clearDataAction.killProcess()
@@ -260,109 +213,5 @@ class AutomaticDataClearer @Inject constructor(
                 postDataClearerState(FINISHED)
             }
         }
-    }
-
-    @UiThread
-    @Suppress("NON_EXHAUSTIVE_WHEN")
-    private suspend fun clearDataWhenAppInForegroundLegacy(clearWhat: ClearWhatOption) {
-        withContext(dispatchers.main()) {
-            logcat { "Clearing data when app is in the foreground: $clearWhat" }
-
-            dataClearingWideEvent.startLegacy(
-                entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_AUTO_FOREGROUND,
-                clearWhatOption = clearWhat,
-                clearDuckAiData = settingsDataStore.clearDuckAiData,
-            )
-            // Use legacy clearing
-            val processNeedsRestarted = !isFreshAppLaunch && clearWhat == ClearWhatOption.CLEAR_TABS_AND_DATA
-            logcat { "App is in foreground; restart needed? $processNeedsRestarted" }
-
-            when (clearWhat) {
-                ClearWhatOption.CLEAR_TABS_ONLY -> {
-                    try {
-                        clearDataAction.clearTabsAsync(true)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-
-                    logcat { "Notifying listener that clearing has finished" }
-                    postDataClearerState(FINISHED)
-                }
-
-                ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                    try {
-                        clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-
-                    logcat { "All data now cleared, will restart process? $processNeedsRestarted" }
-                    if (processNeedsRestarted) {
-                        withContext(dispatchers.io()) {
-                            clearDataAction.setAppUsedSinceLastClearFlag(false)
-                            dataClearerForegroundAppRestartPixel.incrementCount()
-                        }
-
-                        // need a moment to draw background color (reduces flickering UX)
-                        Handler(Looper.getMainLooper()).postDelayed(100) {
-                            logcat { "Will now restart process" }
-                            clearDataAction.killAndRestartProcess(notifyDataCleared = true)
-                        }
-                    } else {
-                        logcat { "Will not restart process" }
-                        postDataClearerState(FINISHED)
-                    }
-                }
-
-                else -> {}
-            }
-        }
-    }
-
-    private fun shouldClearData(
-        cleanWhenOption: ClearWhenOption,
-        appUsedSinceLastClear: Boolean,
-        appIconChanged: Boolean,
-    ): Boolean {
-        logcat { "Determining if data should be cleared for option $cleanWhenOption" }
-
-        if (!appUsedSinceLastClear) {
-            logcat { "App hasn't been used since last clear; no need to clear again" }
-            return false
-        }
-
-        logcat { "App has been used since last clear" }
-
-        if (isFreshAppLaunch) {
-            logcat { "This is a fresh app launch, so will clear the data" }
-            return true
-        }
-
-        if (appIconChanged) {
-            logcat { "No data will be cleared as the app icon was just changed" }
-            return false
-        }
-
-        if (cleanWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-            logcat { "This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data" }
-            return false
-        }
-        if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
-            logcat { "No background timestamp recorded; will not clear the data" }
-            logcat(WARN) { "No background timestamp recorded; will not clear the data" }
-            return false
-        }
-
-        val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed(
-            backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
-            clearWhenOption = cleanWhenOption,
-        )
-        logcat { "Has enough time passed to trigger the data clear? $enoughTimePassed" }
-
-        return enoughTimePassed
     }
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui.v2
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -43,9 +44,13 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.DaggerMap
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
@@ -56,6 +61,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2Binding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -102,6 +108,12 @@ class SyncActivity : DuckDuckGoActivity() {
     private val viewModel by bindViewModel<SyncActivityViewModel>()
 
     @Inject
+    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+
+    @Inject
+    lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
+
+    @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
@@ -114,13 +126,13 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var syncSetupWideEvent: SyncSetupWideEvent
 
     @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
-
-    @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
     lateinit var shareAction: ShareAction
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
@@ -214,9 +226,12 @@ class SyncActivity : DuckDuckGoActivity() {
 
         configureToolbar()
         configureSyncThisDeviceCta()
+        configureSyncWithAnotherDeviceCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
+        configureWarningMessages()
         configureRecoverySection()
+        configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
 
@@ -241,6 +256,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.notifyMeContainer.isVisible = viewState.showAccount
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
@@ -253,7 +269,7 @@ class SyncActivity : DuckDuckGoActivity() {
         syncedDeviceAdapter.submitList(viewState.syncedDevices)
         binding.includeEnabledView.apply {
             root.isVisible = viewState.showAccount
-            syncOnOtherPlatformsItem.setState(
+            getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
@@ -270,7 +286,7 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.includeDisabledView.apply {
             root.isGone = viewState.showAccount
             syncThisDeviceToggle.quietlySetIsChecked(viewState.isThisDeviceSyncing, syncThisDeviceListener)
-            syncOnOtherPlatformsItem.setState(
+            getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
             syncWithAnotherDeviceButton.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
@@ -354,7 +370,10 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchLearnMore -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                globalActivityStarter.start(
+                    this,
+                    SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
+                )
             }
 
             is LaunchOriginalFlow -> {
@@ -362,7 +381,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchSyncGetOnOtherPlatforms -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(command.source))
             }
 
             is RecoveryCodePDFSuccess -> {
@@ -401,7 +420,9 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is SyncWithAnotherDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    startActivity(Intent(this, CodeExchangeActivity::class.java))
+                }
             }
         }
     }
@@ -420,6 +441,15 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureSyncThisDeviceCta() {
         binding.includeDisabledView.syncThisDeviceToggle.setOnCheckedChangeListener(syncThisDeviceListener)
+    }
+
+    private fun configureSyncWithAnotherDeviceCta() {
+        binding.includeDisabledView.syncWithAnotherDeviceButton.setOnClickListener {
+            viewModel.onSyncWithAnotherDevice()
+        }
+        binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
+            viewModel.onSyncWithAnotherDevice()
+        }
     }
 
     private fun configureDevicesRecyclerView() {
@@ -444,6 +474,19 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureWarningMessages() {
+        binding.includeEnabledView.apply {
+            val hasPlugins = syncMessagesPlugin.isNotEmpty()
+            warningsContainer.isVisible = hasPlugins
+
+            if (hasPlugins) {
+                syncMessagesPlugin.forEach { plugin ->
+                    warningsContainer += plugin.getView(this@SyncActivity)
+                }
+            }
+        }
+    }
+
     private fun configureRecoverySection() {
         binding.includeEnabledView.apply {
             restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
@@ -456,13 +499,38 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureGetOnOtherPlatformsItem() {
+        binding.includeEnabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+            },
+        )
+        binding.includeDisabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+            },
+        )
+    }
+
     private fun configureDataExpirationNotice() {
         binding.includeEnabledView.expirationNoticeLabel.addClickableSpan(
             textSequence = getText(R.string.sync_settings_data_expiration),
             spans = listOf(
                 "learn_more_link" to object : DuckDuckGoClickableSpan() {
                     override fun onClick(widget: View) {
-                        logcat { "Learn more clicked" }
+                        viewModel.onLearnMoreClicked()
                     }
                 },
             ),

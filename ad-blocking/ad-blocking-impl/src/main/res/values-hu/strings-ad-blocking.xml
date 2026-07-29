@@ -24,7 +24,7 @@
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Zavaró elemektől mentes, mozis nézetben nyitja meg a videókat, így a nézett tartalom nem befolyásolja a YouTube-hírfolyamodat.</string>
     <string name="ad_blocking_settings_title_v2">Hirdetésblokkolás</string>
-    <string name="ad_blocking_settings_header_description">Még betöltés előtt blokkolja az invazív nyomkövetőket, így hatékonyan kiküszöböljük a nyomkövetésre épülő hirdetéseket</string>
+    <string name="ad_blocking_settings_header_description">Még betöltés előtt blokkolja az invazív nyomkövetőket, így hatékonyan kiküszöböljük a nyomkövetésre épülő hirdetéseket.</string>
     <string name="contingencyMessageTitle">YouTube-hirdetésblokkolás nem érhető el</string>
     <string name="contingencyMessageContent">A hirdetésblokkolást érintették a YouTube legutóbbi módosításai. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
     <string name="contingencyMessagePrimaryButton">Értem</string>
@@ -37,9 +37,9 @@
     <string name="ad_blocking_menu_disable_until_relaunch">Letiltás újraindításig</string>
     <string name="ad_blocking_menu_always_off">Mindig ki van kapcsolva</string>
     <string name="ad_blocking_disabled_popup_title">Nem működik a YouTube-hirdetésblokkolás?</string>
-    <string name="ad_blocking_disabled_popup_description">Küldj névtelen hibajelentést a DuckDuckGónak. Segíts, hogy mindenkinek jobb legyen a hirdetésblokkolás.</string>
+    <string name="ad_blocking_disabled_popup_description">Küldj névtelen jelentést a DuckDuckGónak, és segíts, hogy mindenkinek jobb legyen a hirdetésblokkolás.</string>
     <string name="ad_blocking_disabled_primary_action">Hibás működésre vonatkozó jelentés küldése</string>
     <string name="ad_blocking_disabled_secondary_action">Mégsem</string>
     <string name="ad_blocking_settings_disabled_until_relaunch">Letiltva az újraindításig</string>
-    <string name="ad_blocking_omnibar_badge_text">A YouTube-hirdetésblokkolás be van kapcsolva</string>
-</resources>
+    <!-- smartling.character_limit = 19 -->
+    <string name="ad_blocking_omnibar_badge_text" instruction="Short status pill shown in the address bar while ad blocking is active on a page. The status word (&quot;On&quot;) can be dropped if needed, since the pill only appears when blocking is active. Translation should refer to the feature, not imply ads blocked">Hirdetésblokkolás</string></resources>

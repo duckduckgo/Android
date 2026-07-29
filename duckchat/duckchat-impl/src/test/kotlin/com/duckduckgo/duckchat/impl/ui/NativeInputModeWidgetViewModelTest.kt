@@ -59,6 +59,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -882,7 +883,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.onPromptSubmitted()
 
-        verify(duckChatPixels).fireSubmitChangeModelPromptSent()
+        verify(duckChatPixels).fireSubmitChangeModelPromptSent(any())
     }
 
     @Test
@@ -893,7 +894,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.onPromptSubmitted()
 
-        verify(duckChatPixels, never()).fireSubmitChangeModelPromptSent()
+        verify(duckChatPixels, never()).fireSubmitChangeModelPromptSent(any())
     }
 
     @Test
@@ -1572,9 +1573,10 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
         )
-        verify(duckChatPixels).fireImageGenerationSubmitted()
-        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+        verify(duckChatPixels).fireImageGenerationSubmitted(any())
+        verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
     }
 
     @Test
@@ -1595,9 +1597,10 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
         )
-        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
-        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
+        verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
     }
 
     @Test
@@ -1619,9 +1622,10 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
         )
-        verify(duckChatPixels).fireWebSearchSubmitted()
-        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
+        verify(duckChatPixels).fireWebSearchSubmitted(any())
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
     }
 
     // endregion
@@ -1637,7 +1641,7 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenStopGenerationTappedThenStopPixel() {
         testee.fireStopGenerationTapped()
-        verify(duckChatPixels).fireStopGenerationTapped()
+        verify(duckChatPixels).fireStopGenerationTapped(any())
     }
 
     // endregion

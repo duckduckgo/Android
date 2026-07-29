@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Удалить вкладки и данные</string>
-    <string name="fireClearAllPlusDuckChats">Очистить вкладки, данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
     <string name="dataClearingActivityTitle">Очистка данных</string>
     <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно стирать автоматически или вручную с помощью кнопки Fire Button.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Удалить все чаты, включая закрепленные.</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Выбрать, что удалить</string>
     <string name="dataClearingOptionTabs">Вкладки</string>
     <string name="dataClearingOptionData">Куки-файлы и данные сайтов</string>
     <string name="dataClearingDuckAiChats">Чаты Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Удалить все чаты</string>
-    <string name="fireDialogDeleteButton">Удалить</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Закрыть вкладку</item>
-        <item quantity="few">Закрыть все %1$d вкладки</item>
-        <item quantity="many">Закрыть все %1$d вкладок</item>
-        <item quantity="other">Закрыть все вкладки (%1$d)</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Операция может сопровождаться выходом из учетных записей.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Ничего</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Данные будут удалены с 1 сайта. Операция может сопровождаться выходом из учетных записей.</item>
-        <item quantity="few">Данные будут удалены с %1$d сайтов. Операция может сопровождаться выходом из учетных записей.</item>
-        <item quantity="many">Данные будут удалены с %1$d сайтов. Операция может сопровождаться выходом из учетных записей.</item>
-        <item quantity="other">Данные будут удалены с сайтов (%1$d). Операция может сопровождаться выходом из учетных записей.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Удалить вкладки и данные сайтов?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
-
-    <string name="settingsAutomaticallyClearData">Автоудаление данных...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
     <string name="settingsClearAiDataTitle">Удалить чаты Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Нажатие кнопки Fire Button также сотрет историю Duck.ai, включая закрепленные чаты.</string>
-    <string name="settingsClearDataActionSecondaryText">Стереть все вкладки и данные всех сайтов (кроме огнеупорных)</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Стереть все вкладки, чаты Duck.ai и данные всех сайтов (кроме огнеупорных)</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
     <string name="aboutActivityTitleNew">О нас</string>
@@ -983,6 +959,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Привет!</string>
     <string name="preOnboardingWelcomeDialogBody1">Готовы перейти на быстрый браузер, где все под вашим контролем?</string>
     <string name="preOnboardingWelcomeDialogBody2">Здесь ИИ — всегда лишь дополнительная опция, а защита конфиденциальности всегда включена.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d из %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как сказать «утка» по-английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как сказать «утка» по-испански</string>
@@ -1018,6 +995,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Попробуйте создать приватный чат с ИИ!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Хотите сделать DuckDuckGo браузером по умолчанию?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Попробуйте наш виджет для главного экрана.</string>
+    <string name="preOnboardingWidgetPromptBody">Добавьте наш поисковый виджет на домашний экран для быстрого и удобного доступа.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Добавить виджет</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Пропустить</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Добавьте меня в нижнюю часть экрана.</string>
+    <string name="preOnboardingAddToDockBody">Найдите значок DuckDuckGo на главном экране. Затем нажмите и перетащите виджет на нужное место. Готово!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Понятно</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Мы также предлагаем платную подписку, включающую расширенные ИИ-модели с более высокими лимитами чатов с GPT и Claude, безопасный VPN и многое другое.</string>

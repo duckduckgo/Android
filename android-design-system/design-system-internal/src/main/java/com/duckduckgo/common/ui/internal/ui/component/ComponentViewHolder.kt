@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +67,7 @@ import com.duckduckgo.common.ui.compose.message.remote.DaxPromoSingleActionMessa
 import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
 import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
 import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
+import com.duckduckgo.common.ui.compose.progress.DaxProgressSpinner
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
@@ -789,6 +791,26 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class ProgressSpinnerComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_progress_spinner)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_progress_spinner, isDarkTheme = isDarkTheme) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    DaxProgressSpinner()
+                    DaxProgressSpinner(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                    )
+                }
+            }
+        }
+    }
+
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
         override fun bind(component: Component) {
@@ -821,6 +843,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
+                Component.PROGRESS_SPINNER -> ProgressSpinnerComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {

@@ -1,7 +1,7 @@
 {
   "name": "mylife",
   "url": "mylife.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "addedDatetime": 1715797497496,
   "optOutUrl": "https://mylife.jotform.com/260284407610047",
   "steps": [
@@ -179,5 +179,5 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": null
+  "removedAt": 1784914357595
 }

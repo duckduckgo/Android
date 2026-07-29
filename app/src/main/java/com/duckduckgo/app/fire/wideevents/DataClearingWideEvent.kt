@@ -17,7 +17,6 @@
 package com.duckduckgo.app.fire.wideevents
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
@@ -48,8 +47,6 @@ interface DataClearingWideEvent {
         tabCount: Int? = null,
     )
 
-    suspend fun startLegacy(entryPoint: EntryPoint, clearWhatOption: ClearWhatOption, clearDuckAiData: Boolean)
-
     suspend fun stepSuccess(step: DataClearingFlowStep)
 
     suspend fun stepFailure(step: DataClearingFlowStep, error: Throwable)
@@ -59,17 +56,11 @@ interface DataClearingWideEvent {
     suspend fun finishFailure(error: Throwable)
 
     enum class EntryPoint(val value: String) {
-        GRANULAR_FIRE_DIALOG("granular_fire_dialog"),
-        NONGRANULAR_FIRE_DIALOG("nongranular_fire_dialog"),
         SINGLE_TAB_FIRE_DIALOG("single_tab_fire_dialog"),
         APP_SHORTCUT("app_shortcut"),
         FIRE_TABS_EMPTIED("fire_tabs_emptied"),
         AUTO_FOREGROUND("auto_foreground"),
         AUTO_BACKGROUND("auto_background"),
-        LEGACY_FIRE_DIALOG("legacy_fire_dialog"),
-        LEGACY_APP_SHORTCUT("legacy_app_shortcut"),
-        LEGACY_AUTO_FOREGROUND("legacy_auto_foreground"),
-        LEGACY_AUTO_BACKGROUND("legacy_auto_background"),
     }
 
     enum class TabType(val value: String) {
@@ -127,16 +118,6 @@ class DataClearingWideEventImpl @Inject constructor(
                 key = KEY_TOTAL_DURATION_MS_BUCKETED,
             )
         }
-    }
-
-    override suspend fun startLegacy(
-        entryPoint: DataClearingWideEvent.EntryPoint,
-        clearWhatOption: ClearWhatOption,
-        clearDuckAiData: Boolean,
-    ) {
-        // The legacy clearing path (ClearDataAction/ClearPersonalDataAction) is wired exclusively to
-        // @RegularMode, so every "Legacy" entry point is always a Regular-mode clear.
-        start(entryPoint, legacyOptionsToClearOptions(clearWhatOption, clearDuckAiData), BrowserMode.REGULAR)
     }
 
     override suspend fun stepSuccess(step: DataClearingFlowStep) {
@@ -218,25 +199,6 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
         androidBrowserConfigFeature.sendDataClearingWideEvent().isEnabled()
-    }
-
-    private fun legacyOptionsToClearOptions(
-        clearWhatOption: ClearWhatOption,
-        clearDuckAiData: Boolean,
-    ): Set<FireClearOption> {
-        return buildSet {
-            when (clearWhatOption) {
-                ClearWhatOption.CLEAR_NONE -> Unit
-                ClearWhatOption.CLEAR_TABS_ONLY -> add(FireClearOption.TABS)
-                ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                    add(FireClearOption.TABS)
-                    add(FireClearOption.DATA)
-                }
-            }
-            if (clearDuckAiData) {
-                add(FireClearOption.DUCKAI_CHATS)
-            }
-        }
     }
 
     private fun Set<FireClearOption>.asMetadataValue(): String {

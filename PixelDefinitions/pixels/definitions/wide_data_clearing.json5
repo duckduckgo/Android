@@ -22,19 +22,7 @@
             {
                 "key": "context.name",
                 "description": "Describes the entry point to the data clearing flow.",
-                "enum": [
-                    "granular_fire_dialog",
-                    "nongranular_fire_dialog",
-                    "single_tab_fire_dialog",
-                    "app_shortcut",
-                    "fire_tabs_emptied",
-                    "auto_foreground",
-                    "auto_background",
-                    "legacy_fire_dialog",
-                    "legacy_app_shortcut",
-                    "legacy_auto_foreground",
-                    "legacy_auto_background"
-                ]
+                "enum": ["single_tab_fire_dialog", "app_shortcut", "fire_tabs_emptied", "auto_foreground", "auto_background"]
             },
             {
                 "key": "feature.data.ext.clear_options",
@@ -48,7 +36,7 @@
             },
             {
                 "key": "feature.data.ext.tab_type",
-                "description": "Type of the active tab when the burn was confirmed. Only present for dialog-driven flows (granular/nongranular/single-tab fire dialogs).",
+                "description": "Type of the active tab when the burn was confirmed. Only present for dialog-driven flows.",
                 "enum": ["web", "ai"]
             },
             {

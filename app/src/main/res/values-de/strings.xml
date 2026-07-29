@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
     <string name="fireClearAll">Tabs und Daten löschen</string>
-    <string name="fireClearAllPlusDuckChats">Tabs, Daten und Duck.ai-Chats löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Cookie-Pop-up-Schutz</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datenlöschung</string>
     <string name="dataClearingDescription">Das Löschen deiner Daten kann dazu beitragen, deinen Online-Datenschutz zu verbessern. Verwende den Fire Button, um Daten manuell zu löschen, oder richte die automatische Löschung ein.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Löschen aller Chats, einschließlich angehefteter Chats</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Wähle, was du löschen möchtest</string>
     <string name="dataClearingOptionTabs">Tabs</string>
     <string name="dataClearingOptionData">Cookies und Website-Daten</string>
     <string name="dataClearingDuckAiChats">Duck.ai-Chats</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Alle Chats löschen</string>
-    <string name="fireDialogDeleteButton">Löschen</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tab schließen</item>
-        <item quantity="other">Alle %1$d Tabs schließen</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">du wirst möglicherweise von Konten abgemeldet.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Gar nichts</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Von 1 Website löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
-        <item quantity="other">Von %1$d Websites löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Tabs und Seitendaten löschen?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
-
-    <string name="settingsAutomaticallyClearData">Daten automatisch löschen …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisches Löschen von …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Beim Verlassen der App, 1 Stunde lang inaktiv</string>
     <string name="settingsClearAiDataTitle">Duck.ai-Chats löschen</string>
     <string name="settingsClearAiDataDeleteMessage">Der Fire Button löscht auch den Verlauf von Duck.ai, einschließlich angehefteter Chats.</string>
-    <string name="settingsClearDataActionSecondaryText">Löscht alle Tabs und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Löscht alle Tabs, Duck.ai-Chats und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Über</string>
@@ -943,6 +923,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hallo.</string>
     <string name="preOnboardingWelcomeDialogBody1">Bereit für einen schnelleren Browser, \nder dir die Kontrolle gibt?</string>
     <string name="preOnboardingWelcomeDialogBody2">KI ist immer optional, und der Datenschutz ist immer aktiviert.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d von %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Wie sagt man „Ente“ auf Englisch?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Wie sagt man „Ente“ auf Spanisch?</string>
@@ -978,6 +959,18 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Probiere jetzt einen privaten KI-Chat aus!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Möchtest du DuckDuckGo zu deinem Standardbrowser machen?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Probiere unser Startbildschirm-Widget aus.</string>
+    <string name="preOnboardingWidgetPromptBody">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Widget hinzufügen</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Überspringen</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockTitle">Füge mich unten zu deinem Bildschirm hinzu.</string>
+    <string name="preOnboardingAddToDockBody">Suche auf deinem Startbildschirm das DuckDuckGo-Symbol. Ziehe es an die richtige Stelle. Das war es schon!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Verstanden.</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Wir bieten auch ein kostenpflichtiges Abonnement für fortschrittliche KI-Modelle mit höheren Chat-Limits von GPT und Claude, einem sicheren VPN und mehr.</string>

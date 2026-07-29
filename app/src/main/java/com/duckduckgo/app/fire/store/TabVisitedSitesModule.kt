@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire.store
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -32,6 +33,7 @@ class TabVisitedSitesModule {
     @Provides
     fun provideDatabase(context: Context): TabVisitedSitesDatabase {
         return Room.databaseBuilder(context, TabVisitedSitesDatabase::class.java, "tab_visited_sites.db")
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .fallbackToDestructiveMigration()
             .build()
     }

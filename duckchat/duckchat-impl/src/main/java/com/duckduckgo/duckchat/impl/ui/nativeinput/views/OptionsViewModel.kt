@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +42,10 @@ class OptionsViewModel @Inject constructor(
         .map { state -> state.selectedTool?.let { Tool.from(it) } }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    private val surface: StateFlow<DuckChatPixelSurface> = nativeInputStateProvider.state
+        .map { DuckChatPixelSurface.from(it.inputContext) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
+
     private val _visibleTools = MutableStateFlow(Tool.entries.toSet())
     val visibleTools: StateFlow<Set<Tool>> = _visibleTools.asStateFlow()
 
@@ -59,19 +64,19 @@ class OptionsViewModel @Inject constructor(
 
     fun onToolSelectedByUser(tool: Tool) {
         when (tool) {
-            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSelected()
-            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSelected()
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSelected(surface.value)
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSelected(surface.value)
         }
     }
 
     fun onToolDeselectedByUser(tool: Tool) {
         when (tool) {
-            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationDeselected()
-            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchDeselected()
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationDeselected(surface.value)
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchDeselected(surface.value)
         }
     }
 
     fun onCustomizeResponsesClicked() {
-        duckChatPixels.fireCustomizeResponsesSelected()
+        duckChatPixels.fireCustomizeResponsesSelected(surface.value)
     }
 }

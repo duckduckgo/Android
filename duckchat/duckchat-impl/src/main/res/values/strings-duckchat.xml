@@ -262,4 +262,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai Settings</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Ask About Tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask About Page</string>
 </resources>
