@@ -75,6 +75,7 @@ class OnboardingViewModelTest {
     // Brand design update off by default -> legacy WelcomePage path (orchestrator does not drive the run).
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock {
         on { brandDesignUpdate() } doReturn disabledToggle
+        on { configDrivenDialogs() } doReturn disabledToggle
     }
 
     private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock()
@@ -211,6 +212,28 @@ class OnboardingViewModelTest {
         testee.initializePages()
 
         verify(pageLayout).buildBrandDesignUpdatePageBlueprints()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndConfigDrivenDialogsEnabledThenBuildConfigDrivenPageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+        whenever(onboardingBrandDesignUpdateToggles.configDrivenDialogs()).thenReturn(enabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildConfigDrivenPageBlueprints()
+        verify(pageLayout, never()).buildBrandDesignUpdatePageBlueprints()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndConfigDrivenDialogsEnabledButBrandDesignUpdateDisabledThenBuildPageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+        whenever(onboardingBrandDesignUpdateToggles.configDrivenDialogs()).thenReturn(enabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildPageBlueprints()
+        verify(pageLayout, never()).buildConfigDrivenPageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

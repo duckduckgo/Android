@@ -60,10 +60,12 @@ class OnboardingViewModel @Inject constructor(
         val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
             onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
         }
-        if (isBrandDesignUpdateEnabled) {
-            pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
-        } else {
-            pageLayoutManager.buildPageBlueprints()
+        val isConfigDrivenDialogsEnabled = isBrandDesignUpdateEnabled &&
+            withContext(dispatchers.io()) { onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() }
+        when {
+            isConfigDrivenDialogsEnabled -> pageLayoutManager.buildConfigDrivenPageBlueprints()
+            isBrandDesignUpdateEnabled -> pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
+            else -> pageLayoutManager.buildPageBlueprints()
         }
     }
 
