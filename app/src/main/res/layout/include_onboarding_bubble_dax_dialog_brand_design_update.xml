@@ -93,16 +93,14 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                 android:id="@+id/primaryCta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
                 android:visibility="gone"
-                tools:ignore="InvalidDaxButtonProperty"
+                app:daxButtonBrandTypography="duckSans"
                 tools:text="High Five!"
                 tools:visibility="gone" />
 
