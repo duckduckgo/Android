@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
@@ -69,7 +68,6 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private val mockContext: Context = mock()
     private val pixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
-    private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
@@ -107,7 +105,6 @@ class ConfigDrivenOnboardingPageViewModelTest {
         newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         dialogConfigResolver = DialogConfigResolver(),
         dispatchers = coroutineRule.testDispatcherProvider,
-        defaultBrowserDetector = mockDefaultBrowserDetector,
         widgetCapabilities = mockWidgetCapabilities,
         defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
         context = mockContext,

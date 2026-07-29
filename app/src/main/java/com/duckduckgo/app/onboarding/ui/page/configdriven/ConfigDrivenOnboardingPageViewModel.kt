@@ -22,7 +22,6 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -72,7 +71,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
     private val dialogConfigResolver: DialogConfigResolver,
     private val dispatchers: DispatcherProvider,
-    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val context: Context,
