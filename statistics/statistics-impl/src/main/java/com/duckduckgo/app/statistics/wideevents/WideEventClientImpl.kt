@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import com.duckduckgo.app.statistics.wideevents.WideEventClient.Companion.SAMPLED_OUT_FLOW_ID
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -23,6 +24,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlin.runCatching
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
@@ -33,14 +35,21 @@ class WideEventClientImpl @Inject constructor(
     private val wideEventRepository: WideEventRepository,
     private val wideEventFeature: Lazy<WideEventFeature>,
     private val dispatcherProvider: DispatcherProvider,
+    private val random: Random,
 ) : WideEventClient {
     override suspend fun flowStart(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String>,
         cleanupPolicy: CleanupPolicy,
+        samplingProbability: Float,
     ): Result<Long> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (samplingProbability !in 0.0f..1.0f) {
+            return Result.failure(IllegalArgumentException("samplingProbability must be between 0.0 and 1.0, was $samplingProbability"))
+        }
+
+        if (random.nextFloat() >= samplingProbability) return Result.success(SAMPLED_OUT_FLOW_ID)
 
         return runCatching {
             wideEventRepository.insertWideEvent(
@@ -48,6 +57,7 @@ class WideEventClientImpl @Inject constructor(
                 flowEntryPoint = flowEntryPoint,
                 metadata = metadata,
                 cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
+                samplingProbability = samplingProbability,
             )
         }
     }
@@ -59,6 +69,7 @@ class WideEventClientImpl @Inject constructor(
         metadata: Map<String, String>,
     ): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
             wideEventRepository.addWideEventStep(
@@ -75,6 +86,7 @@ class WideEventClientImpl @Inject constructor(
         metadata: Map<String, String>,
     ): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
             val (wideEventStatus, statusMetadata) = status.mapToWideEventStatus()
@@ -89,6 +101,7 @@ class WideEventClientImpl @Inject constructor(
 
     override suspend fun flowAbort(wideEventId: Long): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
             val deleted = wideEventRepository.deleteWideEvent(wideEventId)
@@ -111,6 +124,7 @@ class WideEventClientImpl @Inject constructor(
         buckets: Set<Duration>?,
     ): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
             wideEventRepository.startInterval(
@@ -127,6 +141,7 @@ class WideEventClientImpl @Inject constructor(
         key: String,
     ): Result<Duration> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Duration.ZERO)
 
         return runCatching {
             wideEventRepository.endInterval(

@@ -88,7 +88,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -128,7 +128,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -163,7 +163,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -198,7 +198,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -233,7 +233,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -266,7 +266,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -304,7 +304,7 @@ class ApiWideEventSenderTest {
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
-                sampleRate = 1,
+                sampleRate = 1.0f,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -356,6 +356,40 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
     }
 
+    @Test
+    fun `when sendWideEvent called with custom sampleRate then sampleRate is included in request`() = runTest {
+        val event = createWideEvent(
+            id = 550L,
+            name = "sampled-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            samplingProbability = 0.1f,
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val expectedRequest = WideEventRequest(
+            global = GlobalSection(
+                platform = "Android",
+                type = "app",
+                sampleRate = 0.1f,
+            ),
+            app = AppSection(
+                name = "DuckDuckGo Android",
+                version = "5.123.0",
+                formFactor = "phone",
+                devMode = false,
+            ),
+            feature = FeatureSection(
+                name = "sampled-event",
+                status = "SUCCESS",
+                data = null,
+            ),
+            context = null,
+        )
+
+        verify(wideEventService).sendWideEvent(eq(expectedRequest))
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `when sendWideEvent called with null status then throws exception`() = runTest {
         val event = createWideEvent(
@@ -379,6 +413,7 @@ class ApiWideEventSenderTest {
         steps: List<WideEventRepository.WideEventStep> = emptyList(),
         metadata: Map<String, String?> = emptyMap(),
         flowEntryPoint: String? = null,
+        samplingProbability: Float = 1.0f,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -393,5 +428,6 @@ class ApiWideEventSenderTest {
             metadata = emptyMap(),
         ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
+        samplingProbability = samplingProbability,
     )
 }

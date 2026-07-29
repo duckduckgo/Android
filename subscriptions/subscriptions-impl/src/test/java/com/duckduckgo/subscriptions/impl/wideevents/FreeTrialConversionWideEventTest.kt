@@ -78,7 +78,7 @@ class FreeTrialConversionWideEventTest {
 
     @Test
     fun `onFreeTrialStarted starts flow with correct metadata and fires pixel`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
 
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.yearly.renews.us")
@@ -102,7 +102,7 @@ class FreeTrialConversionWideEventTest {
         freeTrialConversionWideEvent.onFreeTrialStarted("ddg.privacy.pro.yearly.renews.us")
 
         verify(pixelSender).reportFreeTrialStart()
-        verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).flowStart(any(), any(), any(), any(), any())
     }
 
     @Test
@@ -367,14 +367,14 @@ class FreeTrialConversionWideEventTest {
         verify(pixelSender).reportFreeTrialVpnActivation("vpn_activated_d1", "google")
 
         // Wide events do not fire when feature is disabled
-        verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).flowStart(any(), any(), any(), any(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
     @Test
     fun `flow resets after conversion and pixel fires for new trial`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(456L))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any())).thenReturn(Result.success(456L))
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(123L)))
             .thenReturn(Result.success(emptyList()))
@@ -401,6 +401,7 @@ class FreeTrialConversionWideEventTest {
             flowEntryPoint = anyOrNull(),
             metadata = eq(mapOf("free_trial_plan" to "ddg.privacy.pro.monthly.renews.us")),
             cleanupPolicy = any(),
+            samplingProbability = any(),
         )
     }
 
