@@ -21,7 +21,6 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
-import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 
 /**
@@ -33,22 +32,6 @@ data class SettledDecoration(
     val anchoredCardBiasPhone: Float,
     val anchoredCardBiasTablet: Float,
 )
-
-interface EmbellishmentController {
-    /**
-     * [onSettled] reports what the fit check settled on. When a decoration is leaving, it fires only once that
-     * exit has finished: the card must keep its anchor until the outgoing decoration is gone.
-     */
-    fun transition(
-        previous: Embellishment?,
-        next: Embellishment,
-        animate: Boolean,
-        onSettled: (SettledDecoration?) -> Unit,
-    )
-
-    fun skipRunning()
-    fun release()
-}
 
 interface ContentController {
     /** Hides every content include. Used before the first bind, when includes still sit at their XML defaults. */
