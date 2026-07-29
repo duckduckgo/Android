@@ -17,10 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import android.view.View
-import com.duckduckgo.app.onboarding.orchestrator.StepProgress
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
-import com.duckduckgo.app.onboarding.ui.page.configdriven.CardArrowConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
@@ -36,26 +33,6 @@ data class SettledDecoration(
     val anchoredCardBiasPhone: Float,
     val anchoredCardBiasTablet: Float,
 )
-
-interface BackgroundController {
-    fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean)
-    fun skipRunning()
-}
-
-interface StepIndicatorController {
-    fun apply(previous: StepProgress?, next: StepProgress?, animate: Boolean)
-    fun skipRunning()
-    fun release()
-}
-
-interface CardArrowController {
-    fun apply(previous: CardArrowConfig?, next: CardArrowConfig, animate: Boolean)
-    fun skipRunning()
-}
-
-interface CardAnchorController {
-    fun apply(settled: SettledDecoration?)
-}
 
 interface EmbellishmentController {
     /**
