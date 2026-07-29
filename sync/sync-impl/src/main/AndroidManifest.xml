@@ -125,5 +125,12 @@
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.DuckDuckGo.Dark" />
+
+        <activity
+            android:name=".ui.v2.SyncAnotherDeviceActivity"
+            android:exported="false"
+            android:label="@string/sync_scanner_v2_qr_code_screen_title"
+            android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

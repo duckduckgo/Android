@@ -45,7 +45,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -68,6 +67,10 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
             is DisplayQrCodeContract.Output.Failure -> finish()
             is DisplayQrCodeContract.Output.NoOp -> Unit
         }
+    }
+
+    private val syncAnotherDeviceLauncher = registerForActivityResult(SyncAnotherDeviceContract()) {
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,8 +102,17 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is ShowMessage -> showMessage(command.message)
-            is StartSyncProcess -> logcat { "TODO" }
+            is ShowMessage -> {
+                showMessage(command.message)
+            }
+
+            is StartSyncProcess -> {
+                val input = SyncAnotherDeviceContract.Input(
+                    syncUrl = command.syncUrl,
+                    launchSource = launchSource,
+                )
+                syncAnotherDeviceLauncher.launch(input)
+            }
         }
     }
 
