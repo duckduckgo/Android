@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:includeFontPadding="false"
-            android:text="@string/preOnboardingWidgetPromptTitle"
+            android:text="@string/experimentHomeScreenWidgetBottomSheetDialogTitle"
             android:visibility="invisible"
             app:typography="onboarding_title" />
 
@@ -57,7 +57,7 @@
         android:gravity="center"
         android:includeFontPadding="false"
         android:paddingHorizontal="@dimen/keyline_3"
-        android:text="@string/preOnboardingWidgetPromptBody"
+        android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSubTitle"
         app:typography="onboarding_body"
         tools:alpha="1" />
 
