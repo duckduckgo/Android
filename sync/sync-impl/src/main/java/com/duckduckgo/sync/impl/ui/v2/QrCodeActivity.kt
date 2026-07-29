@@ -16,6 +16,8 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -54,7 +56,6 @@ import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -74,8 +75,10 @@ class QrCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
+    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
     private val viewModel by viewModels<SyncExchangeViewModel> {
-        Provider(vmFactory, null)
+        Provider(vmFactory, launchSource)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,8 +134,8 @@ class QrCodeActivity : DuckDuckGoActivity() {
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
-            is SetSuccessResult -> logcat { "TODO" }
-            is SetFailureResult -> logcat { "TODO" }
+            is SetSuccessResult -> setResult(QrCodeContract.RESULT_SYNC_SUCCESS)
+            is SetFailureResult -> setResult(QrCodeContract.RESULT_SYNC_FAILURE)
             is ShowError -> showError(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
@@ -218,5 +221,18 @@ class QrCodeActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
+
+    companion object {
+        private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+
+        fun intent(
+            context: Context,
+            source: String?,
+        ): Intent {
+            return Intent(context, QrCodeActivity::class.java).apply {
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+            }
+        }
     }
 }
