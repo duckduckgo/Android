@@ -20,10 +20,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeManualBinding
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
@@ -33,6 +36,11 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
         }
 
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by activityViewModels<ReadSyncCodeViewModel> { viewModelFactory }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,6 +48,19 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
     ): View {
         _binding = FragmentSyncV2ReadSyncCodeManualBinding.inflate(inflater)
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        configurePasteButton()
+    }
+
+    private fun configurePasteButton() {
+        binding.pasteCodeButton.setOnClickListener { viewModel.pasteSyncCode() }
     }
 
     override fun onDestroyView() {

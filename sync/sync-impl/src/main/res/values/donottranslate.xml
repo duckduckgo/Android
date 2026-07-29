@@ -71,4 +71,5 @@
     <string name="sync_scanner_v2_manual_entry_example_code_label">Example Code:</string>
     <string name="sync_scanner_v2_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyeV9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
     <string name="sync_scanner_v2_manual_entry_paste_button">Paste Sync Code</string>
+    <string name="sync_scanner_v2_manual_entry_invalid_code_paster">Sorry, the pasted code is invalid.</string>
 </resources>

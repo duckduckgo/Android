@@ -22,7 +22,11 @@ import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -34,12 +38,21 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncV2ReadSyncCodeBinding>()
+
+    private val viewModel by bindViewModel<ReadSyncCodeViewModel>()
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
@@ -72,6 +85,27 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureContentAdapter()
         configureContentCorners()
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is ShowMessage -> showMessage(command.message)
+            is StartSyncProcess -> logcat { "TODO" }
+        }
+    }
+
+    private fun showMessage(@StringRes message: Int) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     private fun configureEdgeToEdgeInsets() {
