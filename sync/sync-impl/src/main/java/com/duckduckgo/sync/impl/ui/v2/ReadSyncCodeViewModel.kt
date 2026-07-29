@@ -41,7 +41,7 @@ class ReadSyncCodeViewModel @Inject constructor(
         val code = SyncBarcodeUrl.parseUrl(url)
         viewModelScope.launch {
             val command = if (code == null) {
-                Command.ShowMessage(R.string.sync_scanner_v2_manual_entry_invalid_code_paster)
+                Command.ShowMessage(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted)
             } else {
                 Command.StartSyncProcess(url)
             }
