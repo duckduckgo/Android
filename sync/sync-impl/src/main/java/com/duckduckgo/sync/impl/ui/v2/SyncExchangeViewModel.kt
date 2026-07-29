@@ -85,7 +85,6 @@ class SyncExchangeViewModel @AssistedInject constructor(
     }
 
     fun onHostConfirmed() {
-        _viewState.update { it.copy(isConnecting = true) }
         codeDispatcher.confirmHost()
     }
 
@@ -94,7 +93,6 @@ class SyncExchangeViewModel @AssistedInject constructor(
     }
 
     fun onJoinerConfirmed() {
-        _viewState.update { it.copy(isConnecting = true) }
         codeDispatcher.confirmJoiner()
     }
 
@@ -177,23 +175,19 @@ class SyncExchangeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
-                    _viewState.update { it.copy(isConnecting = false) }
                     _commands.send(Command.SetSuccessResult)
                     _commands.send(Command.Close)
                 }
 
                 is DispatchOutcome.AlreadyConnected -> {
-                    _viewState.update { it.copy(isConnecting = false) }
                     _commands.send(Command.ShowV2Error(v2AlreadyPairedError))
                 }
 
                 is DispatchOutcome.UpgradeRequired -> {
-                    _viewState.update { it.copy(isConnecting = false) }
                     _commands.send(Command.ShowV2Error(v2UpgradeRequiredError))
                 }
 
                 is DispatchOutcome.Failed -> {
-                    _viewState.update { it.copy(isConnecting = false) }
                     _commands.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
                 }
             }
@@ -219,7 +213,6 @@ class SyncExchangeViewModel @AssistedInject constructor(
 
     data class ViewState(
         val bitmap: BitmapWithCode? = null,
-        val isConnecting: Boolean = false,
     )
 
     data class BitmapWithCode(

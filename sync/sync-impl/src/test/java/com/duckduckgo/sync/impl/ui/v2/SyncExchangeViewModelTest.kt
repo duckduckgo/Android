@@ -236,14 +236,13 @@ class SyncExchangeViewModelTest {
     }
 
     @Test
-    fun `when the host is confirmed then the dispatcher is notified and the connection is in progress`() = runTest {
+    fun `when the host is confirmed then the dispatcher is notified`() = runTest {
         givenV2Enabled()
 
         val testee = createTestee()
         testee.onHostConfirmed()
 
         verify(codeDispatcher).confirmHost()
-        assertTrue(testee.viewState.value.isConnecting)
     }
 
     @Test
@@ -257,14 +256,13 @@ class SyncExchangeViewModelTest {
     }
 
     @Test
-    fun `when the joiner is confirmed then the dispatcher is notified and the connection is in progress`() = runTest {
+    fun `when the joiner is confirmed then the dispatcher is notified`() = runTest {
         givenV2Enabled()
 
         val testee = createTestee()
         testee.onJoinerConfirmed()
 
         verify(codeDispatcher).confirmJoiner()
-        assertTrue(testee.viewState.value.isConnecting)
     }
 
     @Test
