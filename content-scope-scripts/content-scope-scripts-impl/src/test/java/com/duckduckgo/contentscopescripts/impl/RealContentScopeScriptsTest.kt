@@ -489,6 +489,11 @@ class RealContentScopeScriptsTest {
     @Test
     fun whenOptimizeInjectionEnabledThenOutputIsByteIdenticalToFallbackPath() {
         // getScript memoizes cachedContentScopeJS, so each path uses its own fresh instance to force a real build.
+        // Two preferences contributors as well as two config ones, so the comparison covers both accumulators
+        // in getLegacyPluginParameters and its hand-maintained twin getOptimizedPluginParameters.
+        whenever(mockPlugin1.preferences()).thenReturn("\"pref1\":true")
+        whenever(mockPlugin2.preferences()).thenReturn("\"pref2\":false")
+
         // Fallback path (chained String.replace).
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = false))
         val fallbackTestee = createTestee()

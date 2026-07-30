@@ -71,10 +71,6 @@ class RealContentScopeScripts @Inject constructor(
     private val experimentsAdapter: JsonAdapter<List<Experiment>> =
         reusableMoshi.adapter(Types.newParameterizedType(List::class.java, Experiment::class.java))
 
-    // Compared against a freshly assembled config on every call, not used to skip assembling it: the
-    // feature repos load their persisted config into memory asynchronously and expose no completion
-    // signal, so any attempt to decide up front that the config cannot have changed risks serving
-    // default protections for the rest of the process.
     private var cachedPluginConfig: String = ""
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimized = true)
@@ -121,7 +117,7 @@ class RealContentScopeScripts @Inject constructor(
     ): String {
         var updateJS = false
 
-        val pluginParameters = getPluginParameters()
+        val pluginParameters = getLegacyPluginParameters()
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
             cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions, optimized = false)
@@ -161,7 +157,7 @@ class RealContentScopeScripts @Inject constructor(
         var updateJS = false
         var contentScopeChanged = false
 
-        val pluginParameters = getPluginParameters()
+        val pluginParameters = getOptimizedPluginParameters()
 
         if (cachedPluginConfig != pluginParameters.config) {
             cachedPluginConfig = pluginParameters.config
@@ -207,7 +203,7 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
 
-    private fun getPluginParameters(): PluginParameters {
+    private fun getLegacyPluginParameters(): PluginParameters {
         var config = ""
         var preferences = ""
         val plugins = pluginPoint.getPlugins()
@@ -231,6 +227,25 @@ class RealContentScopeScripts @Inject constructor(
             }
         }
         return PluginParameters(config, preferences)
+    }
+
+    private fun getOptimizedPluginParameters(): PluginParameters {
+        val config = StringBuilder()
+        val preferences = StringBuilder()
+        pluginPoint.getPlugins().forEach { plugin ->
+            plugin.config().let { pluginConfig ->
+                if (pluginConfig.isNotEmpty()) config.appendCommaSeparated(pluginConfig)
+            }
+            plugin.preferences()?.let { pluginPreferences ->
+                if (pluginPreferences.isNotEmpty()) preferences.appendCommaSeparated(pluginPreferences)
+            }
+        }
+        return PluginParameters(config.toString(), preferences.toString())
+    }
+
+    private fun StringBuilder.appendCommaSeparated(value: String) {
+        if (isNotEmpty()) append(',')
+        append(value)
     }
 
     private fun cacheUserUnprotectedDomains(
@@ -387,12 +402,12 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 
-    // Toggle.getCohort() is suspend but has no suspension points today, so runBlocking runs inline and
-    // never parks the caller. If it ever gains real IO this becomes a main-thread stall.
     private fun getExperimentsKeyValuePair(
         activeExperiments: List<Toggle>,
         optimized: Boolean,
     ): String {
+        if (optimized && activeExperiments.isEmpty()) return EMPTY_COHORTS
+
         return runBlocking {
             val jsonAdapter: JsonAdapter<List<Experiment>> = if (optimized) {
                 experimentsAdapter
@@ -441,6 +456,7 @@ class RealContentScopeScripts @Inject constructor(
     companion object {
         const val EMPTY_JSON_LIST = "[]"
         const val EMPTY_JSON = "{}"
+        const val EMPTY_COHORTS = "\"currentCohorts\":$EMPTY_JSON_LIST"
         const val CONTENT_SCOPE = "\$CONTENT_SCOPE$"
         const val USER_UNPROTECTED_DOMAINS = "\$USER_UNPROTECTED_DOMAINS$"
         const val USER_PREFERENCES = "\$USER_PREFERENCES$"
