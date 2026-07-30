@@ -28,7 +28,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.databinding.ActivitySyncV2AnotherDeviceBinding
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ExchangeSyncCodeBinding
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
-    private val binding by viewBinding<ActivitySyncV2AnotherDeviceBinding>()
+    private val binding by viewBinding<ActivitySyncV2ExchangeSyncCodeBinding>()
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider

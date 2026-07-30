@@ -38,7 +38,7 @@
             android:importantForAccessibility="no"
             app:lottie_autoPlay="true"
             app:lottie_loop="false"
-            app:lottie_rawRes="@raw/sync_another_device_animation" />
+            app:lottie_rawRes="@raw/sync_exchange_sync_code_animation" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="wrap_content"
