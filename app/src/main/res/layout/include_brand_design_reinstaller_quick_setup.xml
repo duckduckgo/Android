@@ -15,42 +15,17 @@
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/keyline_4"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/quickSetupTitleContainer"
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+        android:id="@+id/quickSetupTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_6"
-        android:layout_marginEnd="@dimen/keyline_6">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/quickSetupTitleHidden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:visibility="invisible"
-            app:typography="onboarding_title"
-            tools:text="@string/preOnboardingReinstallQuickSetupTitle" />
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/quickSetupTitle"
-            style="@style/Typography.DuckDuckGo.Onboarding.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:textColor="?attr/daxColorPrimaryText"
-            tools:text="@string/preOnboardingReinstallQuickSetupTitle" />
-
-    </FrameLayout>
+        android:layout_marginEnd="@dimen/keyline_6" />
 
     <LinearLayout
         android:id="@+id/quickSetupOptionsContainer"
