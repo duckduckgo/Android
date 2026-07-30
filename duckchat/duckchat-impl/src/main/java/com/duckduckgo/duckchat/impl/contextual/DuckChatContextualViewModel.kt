@@ -1011,6 +1011,12 @@ class DuckChatContextualViewModel @Inject constructor(
     // loaded chat is deleted elsewhere, so we don't pop a dismissed sheet back open).
     private fun renderNewChatState(sheetState: Int? = BottomSheetBehavior.STATE_HALF_EXPANDED) {
         viewModelScope.launch(dispatchers.io()) {
+            if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                withContext(dispatchers.main()) {
+                    isPageContextRequested = true
+                    commandChannel.trySend(Command.RequestPageContext)
+                }
+            }
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
                 contextualDataStore.clearTabChatUrl(currentTabId)

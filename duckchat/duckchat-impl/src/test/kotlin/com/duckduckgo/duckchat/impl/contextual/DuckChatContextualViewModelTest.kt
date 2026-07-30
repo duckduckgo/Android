@@ -2826,6 +2826,24 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `when new chat requested then page context is re-requested before the sheet state change`() = runTest {
+        testee = buildViewModel()
+        testee.onSheetOpened("tab")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            awaitItem()
+
+            testee.onNewChatRequested()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(awaitItem() is DuckChatContextualViewModel.Command.RequestPageContext)
+            assertTrue(testee.isPageContextRequested)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun buildViewModel() = DuckChatContextualViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
