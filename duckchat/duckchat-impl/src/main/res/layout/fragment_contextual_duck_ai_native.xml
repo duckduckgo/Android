@@ -133,6 +133,22 @@
             android:paddingTop="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_1">
 
+            <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsLoadingView
+                android:id="@+id/contextualSuggestionsLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/contextualSuggestionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/contextualPromptQuickAction"
                 android:layout_width="wrap_content"
