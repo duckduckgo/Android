@@ -104,13 +104,6 @@ class ComparisonChartBinder(
             .map { it.findViewById<ImageView>(R.id.rowCheck) }
             .toList()
 
-    /**
-     * One AnimatorSet the engine owns end to end: per row, fades and scales the check icon in with an overshoot
-     * interpolator, plus a zero-duration trigger animator starting the icon's AnimatedVectorDrawable at its own
-     * relative delay. Each row's listener forces the final state in `onAnimationEnd`, which Android invokes on
-     * natural completion and on cancel alike, so the engine's `end()`/`cancel()` both land the views visible even
-     * when a row was still pending on its start delay.
-     */
     private fun checkIconStaggerAnimator(): Animator {
         val overshoot = OvershootInterpolator(CHECK_ICON_OVERSHOOT_TENSION)
         val checkViews = comparisonCheckViews()
@@ -155,10 +148,13 @@ class ComparisonChartBinder(
     }
 
     /**
-     * Zero-duration animator used purely as a delayed trigger for `AnimatedVectorDrawable.start()`.
+     * Starts the check icon's [AnimatedVectorDrawable], which is not a property animation and so cannot sit on the
+     * row's timeline directly. A zero-duration animator carries it rather than a delayed post, keeping it under the
+     * engine's hold on the returned animator: a posted callback would outlive a skip or a teardown and draw the tick
+     * onto a card that has already snapped or been unbound.
      *
-     * `ValueAnimator.end()` on a never-started animator fires `onAnimationStart` synchronously first, so only
-     * `cancel()` suppresses this trigger.
+     * `ValueAnimator.end()` on a never-started animator fires `onAnimationStart` synchronously first, so a snapped
+     * render lands the tick drawn while only `cancel()` suppresses it.
      */
     private fun avdStartTrigger(checkView: ImageView): Animator =
         ValueAnimator.ofInt(0, 1).apply {

@@ -23,6 +23,8 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 interface BackgroundController {
     fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean)
     fun skipRunning()
+
+    fun release()
 }
 
 class BackgroundControllerImpl(private val animator: OnboardingBackgroundAnimator) : BackgroundController {
@@ -48,5 +50,9 @@ class BackgroundControllerImpl(private val animator: OnboardingBackgroundAnimato
     override fun skipRunning() {
         transitioningTo?.let { animator.snapTo(it) }
         transitioningTo = null
+    }
+
+    override fun release() {
+        animator.cancel()
     }
 }

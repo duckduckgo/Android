@@ -298,7 +298,7 @@ private class FakeCardStage : CardStage {
         stage(animate, onEnd)
     }
 
-    override fun showCtas(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit) {
+    override fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit) {
         this.primary = primary
         onCtaClick = onClick
     }

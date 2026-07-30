@@ -27,7 +27,7 @@ class BindScope(
     val execute: (ContentInteraction) -> Unit,
 )
 
-/** Interactions a bound screen raises outside the shared CTA flow. */
+/** Interactions a bound screen raises outside the shared CTA buttons interactions. */
 sealed interface ContentInteraction
 
 /** Binds a stateless [ContentConfig] to its include layout. */

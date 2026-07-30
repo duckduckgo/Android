@@ -59,11 +59,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Resolves the orchestrator's current step into one [DialogConfig] and publishes it, so the fragment's render
- * engine has a single value-comparable description of the screen to diff against. Live working state for
- * stateful screens lives in the [ContentValueStore] this view model owns, not in [ViewState].
- */
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
 class ConfigDrivenOnboardingPageViewModel @Inject constructor(
@@ -116,19 +111,16 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         start()
     }
 
-    /** Blind forward: the engine, through a CTA click or the bound screen's own result, already resolved the event. */
     fun onEvent(event: NewUserOnboardingEvent) = emit(event)
 
-    /** No [ContentInteraction] variants exist yet, so a bound screen has nothing to raise outside the CTA flow. */
-    fun onContentInteraction(interaction: ContentInteraction) = Unit
+    fun onContentInteraction(interaction: ContentInteraction) = Unit // No-op until dialogs with local state are implemented in follow-ups.
 
-    /**
-     * Flips the one-shot entry animation flag once the fragment has rendered [stepId], so a later rotation
-     * re-collection of [viewState], which replays its last value rather than recomputing it, snaps instead of
-     * replaying the entrance. No-op if the current step has since moved on.
-     */
     fun onDialogRendered(stepId: LinearOnboardingStepId) {
-        _viewState.update { if (it.stepId == stepId) it.copy(animateEntry = false) else it }
+        _viewState.update {
+            // The dialog for this step has been rendered.
+            // Disable entry animation for potential re-draws (like config change/rotation).
+            if (it.stepId == stepId) it.copy(animateEntry = false) else it
+        }
     }
 
     fun onResume() {
@@ -251,6 +243,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     /**
      * Handle commands and dialogs the renderer doesn't support yet by advancing past them, without reporting
      * them as presented.
+     *
+     * Temporary until all dialogs are implemented in the renderer.
      */
     private suspend fun advancePastUnrenderedDialog(dialog: NewUserOnboardingActivityDialog) {
         when (dialog) {

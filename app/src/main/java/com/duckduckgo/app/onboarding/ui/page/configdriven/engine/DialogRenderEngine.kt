@@ -88,16 +88,14 @@ class DialogRenderEngine(
         val handle = content.bind(stepId, config.content, BindScope(coroutineScope = scope, execute = execute))
         bound = handle
 
-        cardStage.showCtas(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
+        cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
         if (animate) cardStage.prepareEntrance(handle.fadeTargets)
 
         embellishments.transition(previous?.embellishment, config.embellishment, animate) { settled ->
             cardAnchor.apply(settled)
         }
 
-        // Every deferred stage below bails unless this render's binding is still the current one. Settling the
-        // card stage runs pending continuations rather than dropping them, so a render that has been superseded
-        // would otherwise drive the views its successor has already rebound.
+        // Every deferred stage below bails if the bound view has changed since dispatch
         cardStage.reveal(animate) {
             if (bound !== handle) return@reveal
             cardStage.morph(animating(animate)) {

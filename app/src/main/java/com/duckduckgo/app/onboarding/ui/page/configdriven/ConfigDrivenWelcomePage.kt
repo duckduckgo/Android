@@ -64,10 +64,6 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * Wires [ConfigDrivenOnboardingPageViewModel] to [DialogRenderEngine]: it owns the views, builds the engine's
- * collaborators from the inflated binding, and routes commands. Every rendering decision belongs to the engine.
- */
 @InjectWith(FragmentScope::class)
 class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_update) {
 
@@ -92,7 +88,6 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
     }
 
     private var engine: DialogRenderEngine? = null
-    private var backgroundAnimator: OnboardingBackgroundAnimator? = null
 
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
@@ -147,12 +142,6 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             windowInsets
         }
 
-        val newBackgroundAnimator = OnboardingBackgroundAnimator(
-            backgroundPrimary = binding.backgroundPrimary,
-            backgroundSecondary = binding.backgroundSecondary,
-        )
-        backgroundAnimator = newBackgroundAnimator
-
         engine = DialogRenderEngine(
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
@@ -160,7 +149,12 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
                 isLightMode = { appTheme.isLightModeEnabled() },
             ),
             cardStage = CardStageImpl(binding),
-            background = BackgroundControllerImpl(newBackgroundAnimator),
+            background = BackgroundControllerImpl(
+                OnboardingBackgroundAnimator(
+                    backgroundPrimary = binding.backgroundPrimary,
+                    backgroundSecondary = binding.backgroundSecondary,
+                ),
+            ),
             embellishments = EmbellishmentControllerImpl(
                 binding = binding,
                 onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
@@ -191,8 +185,7 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
     }
 
     /**
-     * The intro is not part of this renderer, and the views it animates do not all default to hidden, so they are
-     * settled once before the first dialog reaches the stage.
+     * Temporary until the intro animators are implemented in the follow-up.
      */
     private fun settleIntroViews() {
         binding.logoAnimation.isVisible = false
@@ -260,8 +253,6 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
         super.onDestroyView()
         engine?.release()
         engine = null
-        backgroundAnimator?.cancel()
-        backgroundAnimator = null
     }
 
     private companion object {

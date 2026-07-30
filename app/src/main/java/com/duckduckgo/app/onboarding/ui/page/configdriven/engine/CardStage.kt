@@ -32,13 +32,14 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdate
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
 
-/** The card choreography shared by every screen. Each call runs synchronously to its end state when not animating. */
 interface CardStage {
+    /** Fades the card root in. Nothing to do once the card is on stage, so only the first render of a run fades. */
     fun reveal(animate: Boolean, onEnd: () -> Unit)
 
+    /** Tweens the card's bounds from the outgoing screen's size to the newly bound one's. */
     fun morph(animate: Boolean, onEnd: () -> Unit)
 
-    fun showCtas(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
+    fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
 
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
     fun prepareEntrance(contentTargets: List<View>)
@@ -114,7 +115,7 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
         binding.root.requestLayout()
     }
 
-    override fun showCtas(
+    override fun showCtaButtons(
         primary: CtaConfig?,
         secondary: CtaConfig?,
         onClick: (CtaConfig) -> Unit,
