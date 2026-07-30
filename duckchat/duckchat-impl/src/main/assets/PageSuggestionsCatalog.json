@@ -1,0 +1,117 @@
+{
+  "maxSuggestedPrompts": 4,
+  "defaults": ["summarize-page", "translate-page"],
+
+  "catalog": {
+    "summarize-page":      { "label": "Summarize this page", "icon": "summary", "prompt": "Summarize this page." },
+    "translate-page":      { "label": "Translate this page", "icon": "translate", "prompt": "Translate this page into {language}.", "condition": "differentLanguage" },
+
+    "key-takeaways":       { "label": "What are the key takeaways?", "icon": "summary", "prompt": "What are the key takeaways from this article?" },
+    "explain-simply":      { "label": "Explain this simply", "prompt": "Explain this in simple, plain language." },
+    "counterarguments":    { "label": "What are the counterarguments?", "prompt": "What are the main counterarguments or criticisms of this?" },
+    "related-articles":    { "label": "Suggest related articles to explore", "prompt": "Suggest related articles or topics worth exploring next." },
+
+    "shopping-list":       { "label": "Generate a shopping list", "prompt": "Create a shopping list with quantities from this recipe." },
+    "recipe-nutrition":    { "label": "Estimate the nutrition", "prompt": "Estimate the nutritional information for this recipe." },
+    "scale-recipe":        { "label": "Adjust the servings", "prompt": "Rewrite this recipe scaled for a different number of servings." },
+
+    "product-pros-cons":   { "label": "What are the pros and cons?", "prompt": "What are the pros and cons of this product?" },
+    "find-alternatives":   { "label": "Find me alternatives", "prompt": "Suggest some alternatives to this product." },
+
+    "summarize-video":     { "label": "Summarize this video", "icon": "summary", "prompt": "Summarize this video." },
+    "video-key-points":    { "label": "What are the key points?", "prompt": "What are the key points covered in this video?" },
+
+    "tailor-resume":       { "label": "Tailor my resume", "prompt": "Help me tailor my resume for this job." },
+    "interview-prep":      { "label": "Help me prep for the interview", "prompt": "What interview questions might come up for this role?" },
+    "cover-letter":        { "label": "Draft a cover letter", "prompt": "Draft a cover letter for this job." },
+
+    "event-details":       { "label": "What are the key details?", "icon": "summary", "prompt": "Summarize the key details of this event." },
+
+    "worth-watching":      { "label": "Is this worth watching?", "prompt": "Is this worth watching? Give me a spoiler-free take." },
+    "similar-titles":      { "label": "Recommend similar titles", "prompt": "Recommend similar movies or shows." },
+    "cast-crew":           { "label": "Cast & Crew", "prompt": "Who are the main cast and crew, and what else are they known for?" },
+
+    "summarize-book":      { "label": "Summarize this book", "icon": "summary", "prompt": "Summarize this book." },
+    "similar-books":       { "label": "Recommend similar books", "prompt": "Recommend similar books." },
+
+    "explain-paper":       { "label": "Explain this paper", "prompt": "Explain this research paper in plain language." },
+    "paper-contributions": { "label": "What are the key contributions?", "prompt": "What are the key contributions of this paper?" },
+
+    "menu-highlights":     { "label": "What should I order?", "prompt": "What are the must-try dishes here?" },
+    "place-hours":         { "label": "What are the hours & location?", "prompt": "What are the opening hours, location, and contact details for this place?" },
+    "place-reviews":       { "label": "Is this place any good?", "prompt": "Is this place any good? Summarize its reputation based on reviews and ratings." },
+
+    "summarize-thread":    { "label": "Summarize this discussion", "icon": "summary", "prompt": "Summarize this discussion thread." },
+
+    "explain-repo":        { "label": "Explain this repo", "prompt": "Explain what this repository does and how to use it." },
+
+    "explain-answer":      { "label": "Explain the top answer", "prompt": "Explain the accepted answer in simple terms." },
+
+    "howto-steps":         { "label": "Walk me through the steps", "prompt": "Break this down into clear, numbered steps." },
+    "howto-materials":     { "label": "What will I need?", "prompt": "List the tools, materials, or prerequisites I need for this." },
+
+    "course-learn":        { "label": "What will I learn?", "prompt": "What are the key things I will learn from this course?" },
+    "course-worth":        { "label": "Is it worth taking?", "prompt": "Based on this page, is this course worth taking?" },
+
+    "faq-answer":          { "label": "What does this answer?", "prompt": "What are the main questions this page answers?" },
+    "faq-summary":         { "label": "Summarize the Q&As", "icon": "summary", "prompt": "Summarize the questions and answers on this page." },
+
+    "review-verdict":      { "label": "What's the verdict?", "prompt": "What is the overall verdict and rating for this?" },
+    "review-summary":      { "label": "Sum up the reviews", "icon": "summary", "prompt": "Summarize what the reviews say." },
+
+    "who-is-this":         { "label": "Who is this person?", "prompt": "Give me a quick background on this person." },
+    "person-background":   { "label": "Summarize their background", "icon": "summary", "prompt": "Summarize the background and notable work of this person." }
+  },
+
+  "byJsonLdType": [
+    { "type": "Recipe",                 "ids": ["shopping-list", "recipe-nutrition", "scale-recipe"] },
+    { "type": "HowTo",                  "ids": ["howto-steps", "howto-materials"] },
+    { "type": "JobPosting",             "ids": ["tailor-resume", "interview-prep", "cover-letter"] },
+    { "type": "Product",                "ids": ["product-pros-cons", "find-alternatives"] },
+    { "type": "Movie",                  "ids": ["worth-watching", "similar-titles", "cast-crew"] },
+    { "type": "TVSeries",               "ids": ["worth-watching", "similar-titles", "cast-crew"] },
+    { "type": "Book",                   "ids": ["summarize-book", "similar-books"] },
+    { "type": "Course",                 "ids": ["course-learn", "course-worth"] },
+    { "type": "Event",                  "ids": ["event-details"] },
+    { "type": "ScholarlyArticle",       "ids": ["explain-paper", "paper-contributions"] },
+    { "type": "Restaurant",             "ids": ["menu-highlights"] },
+    { "type": "FoodEstablishment",      "ids": ["menu-highlights"] },
+    { "type": "LocalBusiness",          "ids": ["place-hours", "place-reviews"] },
+    { "type": "Article",                "ids": ["key-takeaways", "explain-simply", "counterarguments", "related-articles"] },
+    { "type": "NewsArticle",            "ids": ["key-takeaways", "explain-simply", "counterarguments", "related-articles"] },
+    { "type": "ReportageNewsArticle",   "ids": ["key-takeaways", "explain-simply", "counterarguments", "related-articles"] },
+    { "type": "LiveBlogPosting",        "ids": ["key-takeaways", "explain-simply", "counterarguments", "related-articles"] },
+    { "type": "BlogPosting",            "ids": ["key-takeaways", "explain-simply", "counterarguments", "related-articles"] },
+    { "type": "FAQPage",                "ids": ["faq-answer", "faq-summary"] },
+    { "type": "DiscussionForumPosting", "ids": ["summarize-thread"] },
+    { "type": "QAPage",                 "ids": ["summarize-thread"] },
+    { "type": "SoftwareSourceCode",     "ids": ["explain-repo"] },
+    { "type": "Review",                 "ids": ["review-verdict", "review-summary"] },
+    { "type": "AggregateRating",        "ids": ["review-verdict", "review-summary"] },
+    { "type": "Person",                 "ids": ["who-is-this", "person-background"] },
+    { "type": "VideoObject",            "ids": ["summarize-video", "video-key-points"] }
+  ],
+
+  "byOgType": {
+    "article":      ["key-takeaways", "explain-simply", "counterarguments", "related-articles"],
+    "product":      ["product-pros-cons", "find-alternatives"],
+    "product.item": ["product-pros-cons", "find-alternatives"],
+    "video":        ["summarize-video", "video-key-points"],
+    "video.other":  ["summarize-video", "video-key-points"],
+    "video.movie":  ["worth-watching", "similar-titles", "cast-crew"],
+    "video.episode":["worth-watching", "similar-titles", "cast-crew"],
+    "video.tv_show":["worth-watching", "similar-titles", "cast-crew"],
+    "book":         ["summarize-book", "similar-books"],
+    "profile":      ["who-is-this", "person-background"]
+  },
+
+  "byDomain": {
+    "youtube.com":       ["summarize-video", "video-key-points"],
+    "imdb.com":          ["worth-watching", "similar-titles", "cast-crew"],
+    "github.com":        ["explain-repo"],
+    "arxiv.org":         ["explain-paper", "paper-contributions"],
+    "reddit.com":        ["summarize-thread"],
+    "stackoverflow.com": ["explain-answer"],
+    "amazon.com":        ["product-pros-cons", "find-alternatives"]
+  }
+}
