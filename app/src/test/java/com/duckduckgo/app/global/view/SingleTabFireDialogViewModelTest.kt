@@ -47,7 +47,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.downloads.api.DownloadsRepository
@@ -90,7 +89,6 @@ class SingleTabFireDialogViewModelTest {
     private val mockUserEventsStore: UserEventsStore = mock()
     private val mockFireButtonStore: FireButtonStore = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
-    private val mockDateProvider: DateProvider = mock()
     private val mockTabRepository: TabRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
@@ -107,7 +105,6 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDispatcherProvider.io()).thenReturn(coroutineTestRule.testDispatcherProvider.io())
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
-        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn("2025-12-15")
 
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
 
@@ -132,7 +129,6 @@ class SingleTabFireDialogViewModelTest {
         userEventsStore = mockUserEventsStore,
         fireButtonStore = mockFireButtonStore,
         dispatcherProvider = mockDispatcherProvider,
-        dateProvider = mockDateProvider,
         tabRepository = mockTabRepository,
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         downloadsRepository = mockDownloadsRepository,
@@ -966,50 +962,15 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when delete all clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
-        val today = "2025-12-15"
-        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)
-        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
+    fun `when delete all clicked then data clearing surface pixels are fired`() = runTest {
         testee = createViewModel()
 
         testee.onDeleteAllClicked()
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockFireButtonStore).storeLastFireButtonClearEventTime(any())
-        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
-    }
-
-    @Test
-    fun `when delete all clicked on same day then daily pixel is not fired again`() = runTest {
-        val today = "2025-12-15"
-        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(today)
-        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
-        testee = createViewModel()
-
-        testee.onDeleteAllClicked()
-
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
-        verify(mockPixel, never()).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
-    }
-
-    @Test
-    fun `when delete all clicked on different day then daily pixel is fired and timestamp is updated`() = runTest {
-        val yesterday = "2025-12-14"
-        val today = "2025-12-15"
-        whenever(mockFireButtonStore.lastEventSendTime).thenReturn(yesterday)
-        whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn(today)
-        testee = createViewModel()
-
-        testee.onDeleteAllClicked()
-
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(mockFireButtonStore).storeLastFireButtonClearEventTime(any())
-        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
     }
 
     @Test
@@ -1221,6 +1182,18 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when in fire mode delete all clicked then data clearing surface pixels are fired`() = runTest {
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
+    }
+
+    @Test
     fun `when in fire mode delete all clicked with animation enabled then dialog still completes`() = runTest {
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
         testee = createViewModel(browserMode = BrowserMode.FIRE)
@@ -1278,8 +1251,20 @@ class SingleTabFireDialogViewModelTest {
 
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED), any(), any(), any())
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED_DAILY), any(), any(), any())
-        verify(mockPixel, never()).enqueueFire(eq(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING), any(), any(), any())
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_ANIMATION), any(), any(), any())
+    }
+
+    @Test
+    fun `when delete selected chats clicked then data clearing surface pixels are fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
     }
 
     @Test
@@ -1397,8 +1382,20 @@ class SingleTabFireDialogViewModelTest {
 
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED), any(), any(), any())
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED_DAILY), any(), any(), any())
-        verify(mockPixel, never()).enqueueFire(eq(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING), any(), any(), any())
         verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_ANIMATION), any(), any(), any())
+    }
+
+    @Test
+    fun `when delete single chat clicked then data clearing surface pixels are fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete("https://duck.ai?chatID=a"))
+
+        testee.onDeleteSingleChatClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
     }
 
     @Test
@@ -1485,6 +1482,21 @@ class SingleTabFireDialogViewModelTest {
         val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, params)
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, params, type = Daily())
+    }
+
+    @Test
+    fun `when delete this tab clicked then data clearing surface pixels are fired`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
     }
 
     @Test

@@ -43,7 +43,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Browser
@@ -83,7 +82,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val userEventsStore: UserEventsStore,
     private val fireButtonStore: FireButtonStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val dateProvider: DateProvider,
     private val tabRepository: TabRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val downloadsRepository: DownloadsRepository,
@@ -138,14 +136,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private fun onDeleteAllClickedInRegularMode() {
         viewModelScope.launch {
             command.send(Command.OnClearStarted)
-            trySendDailyDeleteClicked()
+            fireDataClearingSurfacePixels()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
             pixel.enqueueFire(
                 AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY,
                 mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase()),
                 type = Daily(),
             )
-            pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
@@ -191,6 +188,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             // empty tab switcher in Fire mode (see EVENT_ON_FIRE_TABS_CLEARED)
             shouldRestartAfterClearing = false
             command.send(Command.OnClearStarted)
+            fireDataClearingSurfacePixels()
 
             val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
                 settingsDataStore.fireAnimationEnabled
@@ -221,6 +219,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         viewModelScope.launch {
             shouldRestartAfterClearing = false
             command.send(Command.OnClearStarted)
+            fireDataClearingSurfacePixels()
 
             val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
                 settingsDataStore.fireAnimationEnabled
@@ -247,6 +246,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, browserModeParams)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, browserModeParams, type = Daily())
+            fireDataClearingSurfacePixels()
 
             command.send(Command.OnClearStarted)
 
@@ -380,16 +380,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         delay(500)
     }
 
-    private suspend fun trySendDailyDeleteClicked() {
-        withContext(dispatcherProvider.io()) {
-            val now = dateProvider.getUtcIsoLocalDate()
-            val timestamp = fireButtonStore.lastEventSendTime
-
-            if (timestamp == null || now > timestamp) {
-                fireButtonStore.storeLastFireButtonClearEventTime(now)
-                pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY)
-            }
-        }
+    private fun fireDataClearingSurfacePixels() {
+        pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+        pixel.enqueueFire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY, type = Daily())
     }
 
     sealed class ViewState {
