@@ -50,6 +50,7 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
     ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
         val catalog = bundledCatalog ?: return@withContext DECODE_FAILURE_FALLBACK
         ContextualSuggestionsMatcher.resolve(input, catalog)
+            .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
     }
 
     private fun loadBundledCatalog(): SuggestionCatalog? {
@@ -63,9 +64,10 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
 
     companion object {
         private const val CATALOG_ASSET_PATH = "PageSuggestionsCatalog.json"
+        private const val SUGGESTION_ID_SUMMARIZE_PAGE = "summarize-page"
         private val DECODE_FAILURE_FALLBACK = listOf(
             ContextualSuggestedPrompt(
-                id = "summarize-page",
+                id = SUGGESTION_ID_SUMMARIZE_PAGE,
                 label = "Summarize this page",
                 prompt = "Summarize this page.",
                 icon = "summary",

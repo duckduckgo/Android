@@ -64,7 +64,7 @@ class RealContextualSuggestedPromptsProviderTest {
     }
 
     @Test
-    fun whenRealCatalogAndNothingMatchesThenReturnsNonEmptyFloor() = runTest {
+    fun whenRealCatalogResolvesThenSummarizePageIsExcluded() = runTest {
         val result = provider.resolveSuggestions(
             ResolvePageSuggestionsInput(
                 pageTypeSignals = null,
@@ -73,8 +73,7 @@ class RealContextualSuggestedPromptsProviderTest {
             ),
         )
 
-        assertTrue(result.isNotEmpty())
-        assertTrue(result.any { it.id == "summarize-page" })
+        assertTrue(result.none { it.id == "summarize-page" })
         assertTrue(result.size <= 4)
     }
 
