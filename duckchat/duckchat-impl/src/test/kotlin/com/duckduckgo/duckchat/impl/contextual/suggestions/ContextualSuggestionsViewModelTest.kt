@@ -172,6 +172,32 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
+    fun `when feature disabled after suggestions rendered then next load clears them`() = runTest {
+        stubProvider(listOf(ContextualSuggestedPrompt("id", "Label", "Prompt.", null)))
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        assertTrue(viewModel.viewState.value.suggestions.isNotEmpty())
+
+        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+        assertFalse(viewModel.viewState.value.loading)
+    }
+
+    @Test
+    fun `when feature disabled after suggestions rendered then next page context clears them`() = runTest {
+        stubProvider(listOf(ContextualSuggestedPrompt("id", "Label", "Prompt.", null)))
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        assertTrue(viewModel.viewState.value.suggestions.isNotEmpty())
+
+        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com/next","content":"c"}""")
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
     fun `when cleared then suggestions and loading reset`() = runTest {
         val tailored = ContextualSuggestedPrompt("id", "Label", "Prompt.", null)
         stubProvider(listOf(tailored))
