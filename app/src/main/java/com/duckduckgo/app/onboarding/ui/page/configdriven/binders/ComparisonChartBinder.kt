@@ -149,9 +149,7 @@ class ComparisonChartBinder(
 
     /**
      * Starts the check icon's [AnimatedVectorDrawable], which is not a property animation and so cannot sit on the
-     * row's timeline directly. A zero-duration animator carries it rather than a delayed post, keeping it under the
-     * engine's hold on the returned animator: a posted callback would outlive a skip or a teardown and draw the tick
-     * onto a card that has already snapped or been unbound.
+     * row's timeline directly.
      *
      * `ValueAnimator.end()` on a never-started animator fires `onAnimationStart` synchronously first, so a snapped
      * render lands the tick drawn while only `cancel()` suppresses it.

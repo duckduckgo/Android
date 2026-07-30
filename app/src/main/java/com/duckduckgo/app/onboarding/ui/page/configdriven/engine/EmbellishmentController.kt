@@ -53,13 +53,7 @@ interface EmbellishmentController {
 }
 
 /**
- * Owns the embellishment axis: which Lottie decoration (walking dax, bobbing dax, either wing) accompanies the
- * current dialog, its enter and exit choreography, and the fit check that hides a declared decoration when the
- * dialog content leaves it no room.
- *
- * [onDecorationHidden] fires asynchronously, from the fit corrector's pre-draw pass rather than from
- * [transition], when a decoration that used to fit stops fitting — the keyboard opening, say. No [transition] is
- * in flight at that point, so the card has to be re-anchored straight from that callback.
+ * @param onDecorationHidden callback to the host that a decoration that used to fit no longer does
  */
 class EmbellishmentControllerImpl(
     private val binding: ContentOnboardingWelcomePageUpdateBinding,
@@ -69,8 +63,7 @@ class EmbellishmentControllerImpl(
 
     /**
      * Every animator started here that has not finished on its own, so a superseding [transition] can end() them
-     * and [release] can cancel() them. Ending an animator that already completed restarts it, re-firing the start
-     * listeners that call [LottieAnimationView.playAnimation], so entries drop themselves as they complete.
+     * and [release] can cancel() them.
      */
     private val trackedAnimators = mutableListOf<Animator>()
 
@@ -153,10 +146,7 @@ class EmbellishmentControllerImpl(
         when {
             exiting == null -> onSettled(applyNext())
             animate && exiting.view.isVisible -> {
-                // The incoming decoration enters in the same frame the outgoing one starts leaving. A wing's exit
-                // plays its Lottie out over several seconds, and serializing the entrance behind that leaves the
-                // new decoration visibly late and out of step with the background transition. Only the card anchor
-                // waits, and it settles from the exit's own completion.
+                // The incoming decoration needs to enter in the same frame the outgoing one starts leaving to keep in sync with background.
                 val settled = applyNext()
                 track(
                     exiting.exit {
@@ -171,11 +161,6 @@ class EmbellishmentControllerImpl(
         }
     }
 
-    /**
-     * [drainInFlight] ends whatever is running, so an exit's completion happens now rather than at its natural
-     * end. Snapping on top of that matters for an entrance that had not started yet: ending it fires its start
-     * listener, which plays the decoration's Lottie from frame 0, and the snap freezes it at its end state.
-     */
     override fun skipRunning() {
         drainInFlight()
         currentDecoration?.snap()
@@ -193,10 +178,6 @@ class EmbellishmentControllerImpl(
         fitCorrector.detach()
     }
 
-    /**
-     * Ends every tracked animator and finishes any pending Lottie exit. The snapshot comes first because ending an
-     * animator removes it from [trackedAnimators] from inside the iteration.
-     */
     private fun drainInFlight() {
         val animators = trackedAnimators.toList()
         trackedAnimators.removeAll(animators)
@@ -204,7 +185,6 @@ class EmbellishmentControllerImpl(
         pendingExit?.finish?.invoke()
     }
 
-    /** Tracks [animators] and removes each again the moment it ends on its own. */
     private fun track(animators: List<Animator>) {
         trackedAnimators += animators
         animators.forEach { animator ->
@@ -520,7 +500,6 @@ class EmbellishmentControllerImpl(
         view.playAnimation()
     }
 
-    /** One decoration: its view, its anchoring and fit policy, and its choreography. */
     private class Decoration(
         val view: LottieAnimationView,
         val anchorsCardOnPhone: Boolean,

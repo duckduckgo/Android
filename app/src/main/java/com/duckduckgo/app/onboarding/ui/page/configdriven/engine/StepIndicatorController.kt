@@ -24,7 +24,6 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 
-/** Owns the step-indicator axis: the "X of Y" pill's visibility and its snap-vs-advance-one-step choreography. */
 interface StepIndicatorController {
     fun apply(previous: StepProgress?, next: StepProgress?, animate: Boolean)
     fun skipRunning()
@@ -35,12 +34,6 @@ class StepIndicatorControllerImpl(private val indicator: OnboardingStepIndicator
 
     private var fadeOut: ObjectAnimator? = null
 
-    /**
-     * @param previous The step shown before this call, or null if none was showing.
-     * @param next The step to show now, or null to hide the indicator entirely.
-     * @param animate Whether to animate the transition (fade-out when hiding; advance-one-step when [previous]
-     *   was already showing) or snap directly to the end state.
-     */
     override fun apply(
         previous: StepProgress?,
         next: StepProgress?,
