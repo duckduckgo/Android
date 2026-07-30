@@ -20,6 +20,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -50,6 +52,22 @@ interface ExtractedProfileDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertNewExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
+
+    /**
+     * Matches on the [StoredExtractedProfile.id] primary key, so the row - and every job record keyed on
+     * it - survives. A REPLACE-based insert would instead delete and re-insert, orphaning those records.
+     */
+    @Update
+    fun updateExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
+
+    @Transaction
+    fun insertAndRefreshExtractedProfiles(
+        toInsert: List<StoredExtractedProfile>,
+        toRefresh: List<StoredExtractedProfile>,
+    ) {
+        insertNewExtractedProfiles(toInsert)
+        updateExtractedProfiles(toRefresh)
+    }
 
     @Query("DELETE from pir_extracted_profiles")
     fun deleteAllExtractedProfiles()

@@ -38,6 +38,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -46,6 +47,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.pixels.PirStage
+import com.duckduckgo.pir.impl.scripts.models.AddressCityStateParams
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.DataSource
 import com.duckduckgo.pir.impl.scripts.models.ElementSelector
@@ -109,6 +111,10 @@ class ExecuteBrokerStepActionEventHandlerTest {
             brokerName = testBrokerName,
             name = "John Doe",
             email = "john@example.com",
+            addresses = listOf(
+                AddressCityState(city = "New York", state = "NY", extras = mapOf("county" to "Kings")),
+            ),
+            extras = mapOf("middleInitial" to "M"),
         )
 
     private val testEmailConfirmationJob =
@@ -689,6 +695,11 @@ class ExecuteBrokerStepActionEventHandlerTest {
         assertEquals(testProfileQuery, userData.userProfile)
         assertEquals("John Doe", userData.extractedProfile?.name)
         assertEquals("john@example.com", userData.extractedProfile?.email)
+        assertEquals(mapOf("middleInitial" to "M"), userData.extractedProfile?.extras)
+        assertEquals(
+            listOf(AddressCityStateParams(city = "New York", state = "NY", extras = mapOf("county" to "Kings"))),
+            userData.extractedProfile?.addresses,
+        )
     }
 
     @Test

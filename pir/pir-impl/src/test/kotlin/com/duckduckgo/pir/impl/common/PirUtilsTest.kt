@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.scripts.models.AddressCityStateParams
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -129,6 +130,71 @@ class PirUtilsTest {
         assertNull(result.profileUrl)
         assertNull(result.fullName)
         assertNull(result.email)
+        assertNull(result.age)
+        assertNull(result.addresses)
+        assertNull(result.phoneNumbers)
+        assertNull(result.relatives)
+        assertNull(result.alternativeNames)
+        assertNull(result.identifier)
+        assertNull(result.extras)
+    }
+
+    @Test
+    fun whenToParamsWithFullRecordThenPassesEveryFieldThrough() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            alternativeNames = listOf("Johnny"),
+            age = "35",
+            addresses = listOf(
+                AddressCityState(
+                    city = "City",
+                    state = "State",
+                    fullAddress = "123 Main St",
+                    extras = mapOf("county" to "Cook"),
+                ),
+            ),
+            phoneNumbers = listOf("555-1234"),
+            relatives = listOf("Jane Doe"),
+            identifier = "id-123",
+            extras = mapOf("middleInitial" to "M"),
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertEquals("35", result.age)
+        assertEquals(listOf("555-1234"), result.phoneNumbers)
+        assertEquals(listOf("Jane Doe"), result.relatives)
+        assertEquals(listOf("Johnny"), result.alternativeNames)
+        assertEquals("id-123", result.identifier)
+        assertEquals(mapOf("middleInitial" to "M"), result.extras)
+        assertEquals(
+            listOf(
+                AddressCityStateParams(
+                    city = "City",
+                    state = "State",
+                    fullAddress = "123 Main St",
+                    extras = mapOf("county" to "Cook"),
+                ),
+            ),
+            result.addresses,
+        )
+    }
+
+    @Test
+    fun whenToParamsWithEmptyExtrasThenExtrasAreNullAtBothLevels() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "City", state = "State")),
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertNull(result.extras)
+        assertNull(result.addresses!!.single().extras)
     }
 
     @Test
@@ -471,6 +537,57 @@ class PirUtilsTest {
         val result = profile1.matches(profile2)
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenMatchesWithAddressesDifferingOnlyByExtrasThenReturnsTrue() {
+        val profile1 = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(AddressCityState(city = "City", state = "State", fullAddress = "123 Main St")),
+        )
+
+        val profile2 = ExtractedProfile(
+            profileQueryId = 456L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(
+                AddressCityState(
+                    city = "City",
+                    state = "State",
+                    fullAddress = "123 Main St",
+                    extras = mapOf("county" to "Cook"),
+                ),
+            ),
+        )
+
+        assertTrue(profile1.matches(profile2))
+    }
+
+    @Test
+    fun whenMatchesWithDifferentAddressesThenReturnsFalseEvenWithMatchingExtras() {
+        val extras = mapOf("county" to "Cook")
+
+        val profile1 = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(AddressCityState(city = "City", state = "State", fullAddress = "123 Main St", extras = extras)),
+        )
+
+        val profile2 = ExtractedProfile(
+            profileQueryId = 456L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(AddressCityState(city = "Other City", state = "State", fullAddress = "456 Oak Ave", extras = extras)),
+        )
+
+        assertFalse(profile1.matches(profile2))
     }
 
     @Test

@@ -19,7 +19,6 @@ package com.duckduckgo.pir.impl.scheduling
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
@@ -592,18 +591,15 @@ class RealJobRecordUpdater @Inject constructor(
         }
     }
 
+    /**
+     * Mirrors the unique index of `pir_extracted_profiles`, so two profiles compare equal exactly when
+     * the DB considers them the same row. Scraped fields are deliberately excluded: they get refreshed
+     * on re-scan, so a changed relative or address must not read as a removal.
+     */
     private data class ExtractedProfileComparisonKey(
         val profileQueryId: Long,
         val brokerName: String,
         val name: String,
-        val alternativeNames: List<String>,
-        val age: String,
-        val addresses: List<AddressCityState>,
-        val phoneNumbers: List<String>,
-        val relatives: List<String>,
-        val reportId: String,
-        val email: String,
-        val fullName: String,
         val profileUrl: String,
         val identifier: String,
     )
@@ -613,14 +609,6 @@ class RealJobRecordUpdater @Inject constructor(
             profileQueryId = profileQueryId,
             brokerName = brokerName,
             name = name,
-            alternativeNames = alternativeNames,
-            age = age,
-            addresses = addresses,
-            phoneNumbers = phoneNumbers,
-            relatives = relatives,
-            reportId = reportId,
-            email = email,
-            fullName = fullName,
             profileUrl = profileUrl,
             identifier = identifier,
         )

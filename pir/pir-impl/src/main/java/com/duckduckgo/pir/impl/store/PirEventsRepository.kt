@@ -50,6 +50,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
+import javax.inject.Named
 
 interface PirEventsRepository {
     fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
@@ -121,7 +122,8 @@ interface PirEventsRepository {
 )
 @SingleInstanceIn(AppScope::class)
 class RealPirEventsRepository @Inject constructor(
-    val moshi: Moshi,
+    // Kotlin-aware, so reading a log back respects the non-null defaults on ExtractedProfile
+    @Named("pir") val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val databaseFactory: PirSecureStorageDatabaseFactory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

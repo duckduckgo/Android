@@ -74,6 +74,7 @@ dependencies {
     testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.room.testing
     testImplementation Testing.robolectric
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation AndroidX.work.testing
@@ -98,6 +99,9 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.pir.impl"
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }

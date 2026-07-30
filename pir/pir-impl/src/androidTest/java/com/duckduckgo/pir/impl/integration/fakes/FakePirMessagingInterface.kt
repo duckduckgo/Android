@@ -49,12 +49,27 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
     // Configurable extract response for confirmation scan testing
     private var nextExtractResponseEmpty: Boolean = false
 
+    private var profileExtras: Map<String, String> = mapOf("middleInitial" to "M")
+    private var addressExtras: Map<String, String> = mapOf("county" to "Kings")
+
     /**
      * Configures the next Extract action to return an empty list of profiles.
      * Used to simulate confirmation scan where the profile has been removed.
      */
     fun setNextExtractResponseEmpty(empty: Boolean) {
         nextExtractResponseEmpty = empty
+    }
+
+    /**
+     * Configures the extras returned by subsequent Extract actions, simulating a broker config that
+     * started extracting new fields.
+     */
+    fun setExtractExtras(
+        profileExtras: Map<String, String>,
+        addressExtras: Map<String, String>,
+    ) {
+        this.profileExtras = profileExtras
+        this.addressExtras = addressExtras
     }
 
     fun clearPushedActions() {
@@ -138,9 +153,11 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
                                 {
                                     "city": "New York",
                                     "state": "NY",
-                                    "fullAddress": "123 Main St, New York, NY 10001"
+                                    "fullAddress": "123 Main St, New York, NY 10001",
+                                    "extras": ${JSONObject(addressExtras)}
                                 }
-                            ]
+                            ],
+                            "extras": ${JSONObject(profileExtras)}
                         }
                     ]
                 """

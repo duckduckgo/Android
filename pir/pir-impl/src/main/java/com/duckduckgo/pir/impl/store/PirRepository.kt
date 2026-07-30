@@ -48,6 +48,7 @@ import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -138,7 +139,10 @@ interface PirRepository {
 
     /**
      * This method saves the new extracted profiles to the database.
-     * Any existing profiles (see indices of the table), we ignore them
+     *
+     * Profiles whose identity (see indices of the table) is already stored are refreshed in place: the
+     * scraped fields are overwritten with the newly extracted values while the row id, the date it was
+     * first found and the deprecated flag are preserved. Nothing is stored for a deprecated profile query.
      */
     suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>)
 
@@ -318,7 +322,10 @@ class RealPirRepository(
         prepareDatabase()
     }
 
-    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
+    // Kotlin-aware so legacy stored JSON without the extras key falls back to the declared default instead of null
+    private val addressCityStateAdapter by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(AddressCityState::class.java)
+    }
 
     override suspend fun isRepositoryAvailable(): Boolean = database.await() != null
 
@@ -556,12 +563,30 @@ class RealPirRepository(
                 return@withContext
             }
 
-            extractedProfiles
-                .map {
-                    it.toStoredExtractedProfile()
-                }.also {
-                    extractedProfileDao()?.insertNewExtractedProfiles(it)
+            val dao = extractedProfileDao() ?: return@withContext
+
+            val storedByIdentity =
+                extractedProfiles
+                    .map { it.brokerName to it.profileQueryId }
+                    .distinct()
+                    .flatMap { (brokerName, queryId) ->
+                        dao.getExtractedProfilesForBrokerAndProfile(brokerName, queryId)
+                    }.associateBy { it.identity() }
+
+            val toInsert = mutableListOf<StoredExtractedProfile>()
+            val toRefresh = mutableListOf<StoredExtractedProfile>()
+
+            extractedProfiles.forEach { extractedProfile ->
+                val incoming = extractedProfile.toStoredExtractedProfile()
+                val stored = storedByIdentity[incoming.identity()]
+                if (stored == null) {
+                    toInsert.add(incoming)
+                } else {
+                    toRefresh.add(stored.withScrapedFieldsFrom(incoming))
                 }
+            }
+
+            dao.insertAndRefreshExtractedProfiles(toInsert = toInsert, toRefresh = toRefresh)
         }
     }
 
@@ -869,6 +894,40 @@ class RealPirRepository(
             },
         )
 
+    /**
+     * The tuple covered by the unique index of `pir_extracted_profiles`: a change to any of these fields
+     * describes a different profile, so it is stored as a new row rather than refreshing an existing one.
+     */
+    private data class ExtractedProfileIdentity(
+        val profileQueryId: Long,
+        val brokerName: String,
+        val name: String,
+        val profileUrl: String,
+        val identifier: String,
+    )
+
+    private fun StoredExtractedProfile.identity(): ExtractedProfileIdentity =
+        ExtractedProfileIdentity(
+            profileQueryId = profileQueryId,
+            brokerName = brokerName,
+            name = name,
+            profileUrl = profileUrl,
+            identifier = identifier,
+        )
+
+    private fun StoredExtractedProfile.withScrapedFieldsFrom(incoming: StoredExtractedProfile): StoredExtractedProfile =
+        copy(
+            alternativeNames = incoming.alternativeNames,
+            age = incoming.age,
+            addresses = incoming.addresses,
+            phoneNumbers = incoming.phoneNumbers,
+            relatives = incoming.relatives,
+            reportId = incoming.reportId,
+            email = incoming.email,
+            fullName = incoming.fullName,
+            extras = incoming.extras,
+        )
+
     private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile =
         ExtractedProfile(
             dbId = this.id,
@@ -890,6 +949,7 @@ class RealPirRepository(
             fullName = this.fullName,
             dateAddedInMillis = this.dateAddedInMillis,
             deprecated = this.deprecated,
+            extras = this.extras,
         )
 
     private fun ExtractedProfile.toStoredExtractedProfile(): StoredExtractedProfile =
@@ -918,6 +978,7 @@ class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+            extras = this.extras,
         )
 
     private fun ProfileQuery.toUserProfile(): UserProfile =

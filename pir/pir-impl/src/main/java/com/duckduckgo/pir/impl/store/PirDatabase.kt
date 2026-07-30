@@ -54,7 +54,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 16,
+    version = 17,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
@@ -77,6 +77,8 @@ import com.squareup.moshi.Types
     autoMigrations = [
         // v16: adds nullable optOutFormSubmittedDate column to OptOutJobRecordEntity
         AutoMigration(from = 15, to = 16),
+        // v17: adds extras column (defaulting to "{}") to StoredExtractedProfile
+        AutoMigration(from = 16, to = 17),
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -108,6 +110,9 @@ object PirDatabaseConverters {
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
+    private val stringMapType = Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+    private val stringMapAdapter: JsonAdapter<Map<String, String>> = Moshi.Builder().build().adapter(stringMapType)
+
     @TypeConverter
     @JvmStatic
     fun toStringList(value: String): List<String> = stringListAdapter.fromJson(value)!!
@@ -115,4 +120,12 @@ object PirDatabaseConverters {
     @TypeConverter
     @JvmStatic
     fun fromStringList(value: List<String>): String = stringListAdapter.toJson(value)
+
+    @TypeConverter
+    @JvmStatic
+    fun toStringMap(value: String): Map<String, String> = stringMapAdapter.fromJson(value) ?: emptyMap()
+
+    @TypeConverter
+    @JvmStatic
+    fun fromStringMap(value: Map<String, String>): String = stringMapAdapter.toJson(value)
 }

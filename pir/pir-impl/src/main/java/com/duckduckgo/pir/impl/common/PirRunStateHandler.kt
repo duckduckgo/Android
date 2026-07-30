@@ -668,6 +668,7 @@ class RealPirRunStateHandler @Inject constructor(
                                     city = item.city,
                                     state = item.state,
                                     fullAddress = item.fullAddress,
+                                    extras = item.extras.toStringExtras(),
                                 )
                             },
                             phoneNumbers = it.phoneNumbers,
@@ -676,6 +677,7 @@ class RealPirRunStateHandler @Inject constructor(
                             reportId = it.reportId.orEmpty(),
                             email = it.email.orEmpty(),
                             fullName = it.fullName.orEmpty(),
+                            extras = it.extras.toStringExtras(),
                         )
                     }.also {
                         /**
@@ -829,3 +831,10 @@ class RealPirRunStateHandler @Inject constructor(
         private const val KEY_STEPTYPE_OPTOUT = "optOut"
     }
 }
+
+/**
+ * The contract for extras is string values only; anything else is undefined behaviour, so entries we
+ * can't read as a string are dropped rather than coerced or allowed to fail the whole response.
+ */
+private fun Map<String, Any?>?.toStringExtras(): Map<String, String> =
+    this?.mapNotNull { (key, value) -> (value as? String)?.let { key to it } }?.toMap().orEmpty()

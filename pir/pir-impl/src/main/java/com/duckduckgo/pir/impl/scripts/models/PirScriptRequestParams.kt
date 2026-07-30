@@ -46,6 +46,21 @@ data class ExtractedProfileParams(
     val profileUrl: String? = null,
     val email: String? = null,
     val fullName: String? = null,
+    val age: String? = null,
+    val addresses: List<AddressCityStateParams>? = null,
+    val phoneNumbers: List<String>? = null,
+    val relatives: List<String>? = null,
+    val alternativeNames: List<String>? = null,
+    val identifier: String? = null,
+    val extras: Map<String, String>? = null,
+)
+
+// Nullable extras (unlike the domain model's non-null map) so Moshi omits the key instead of emitting an empty object
+data class AddressCityStateParams(
+    val city: String,
+    val state: String,
+    val fullAddress: String? = null,
+    val extras: Map<String, String>? = null,
 )
 
 // Wraps the generated email as { "email": "..." } so C-S-S can resolve it via data[dataSource].email.

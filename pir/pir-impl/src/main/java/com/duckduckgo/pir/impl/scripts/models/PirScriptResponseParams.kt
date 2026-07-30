@@ -69,12 +69,16 @@ sealed class PirSuccessResponse(
             val email: String? = null,
             val removedDate: String? = null,
             val fullName: String? = null,
+            // Open bag; typed as Any? because a stricter value type would make one unexpected value
+            // from a broker config abort the whole extract response. Narrowed to strings on the way in.
+            val extras: Map<String, Any?>? = null,
         )
 
         data class ScriptAddressCityState(
             val city: String,
             val state: String,
             val fullAddress: String? = null,
+            val extras: Map<String, Any?>? = null,
         )
     }
 

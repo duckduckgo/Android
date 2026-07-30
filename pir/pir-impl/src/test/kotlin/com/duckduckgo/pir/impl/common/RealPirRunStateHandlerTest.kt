@@ -59,10 +59,12 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRM
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -145,6 +147,7 @@ class RealPirRunStateHandlerTest {
                     city = "New York",
                     state = "NY",
                     fullAddress = "123 Main St",
+                    extras = mapOf("county" to "Kings"),
                 ),
             ),
             phoneNumbers = listOf("555-1234"),
@@ -154,6 +157,7 @@ class RealPirRunStateHandlerTest {
             reportId = "report123",
             email = "john@example.com",
             fullName = "John Michael Doe",
+            extras = mapOf("middleInitial" to "M"),
         )
 
     private val testEmailConfirmationJob =
@@ -371,6 +375,7 @@ class RealPirRunStateHandlerTest {
                             city = "New York",
                             state = "NY",
                             fullAddress = "123 Main St",
+                            extras = mapOf("county" to "Kings"),
                         ),
                     ),
                     phoneNumbers = listOf("555-1234"),
@@ -379,6 +384,7 @@ class RealPirRunStateHandlerTest {
                     reportId = "report123",
                     email = "john@example.com",
                     fullName = "John Michael Doe",
+                    extras = mapOf("middleInitial" to "M"),
                 )
             whenever(mockJobRecordUpdater.markReappearedOptOutJobRecords(any(), any(), any()))
                 .thenReturn(emptyList())
@@ -433,6 +439,7 @@ class RealPirRunStateHandlerTest {
                             city = "New York",
                             state = "NY",
                             fullAddress = "123 Main St",
+                            extras = mapOf("county" to "Kings"),
                         ),
                     ),
                     phoneNumbers = listOf("555-1234"),
@@ -441,6 +448,7 @@ class RealPirRunStateHandlerTest {
                     reportId = "report123",
                     email = "john@example.com",
                     fullName = "John Michael Doe",
+                    extras = mapOf("middleInitial" to "M"),
                 )
             val revertedRecord =
                 OptOutJobRecord(
@@ -465,6 +473,54 @@ class RealPirRunStateHandlerTest {
                 profileQueryId = testProfileQueryId,
             )
             verify(mockPixelSender).reportBrokerOptOutProfileReappeared(testBroker.url)
+        }
+
+    @Test
+    fun whenHandleBrokerScanActionSucceededWithUnexpectedlyShapedExtrasThenKeepsOnlyStringValues() =
+        runTest {
+            // extras is string values only by contract; anything else is dropped rather than coerced,
+            // so a broker config emitting an unexpected value can never poison the stored record.
+            val extractedResponse =
+                ExtractedResponse(
+                    actionID = "extract123",
+                    actionType = "extract",
+                    response = listOf(
+                        testScriptExtractedProfile.copy(
+                            extras = mapOf(
+                                "county" to "Cook",
+                                "verified" to true,
+                                "count" to 3,
+                                "missing" to null,
+                                "nested" to mapOf("a" to "b"),
+                                "list" to listOf("a"),
+                            ),
+                            addresses = listOf(
+                                ScriptAddressCityState(
+                                    city = "New York",
+                                    state = "NY",
+                                    fullAddress = "123 Main St",
+                                    extras = null,
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            val state =
+                BrokerScanActionSucceeded(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    pirSuccessResponse = extractedResponse,
+                )
+            whenever(mockJobRecordUpdater.markReappearedOptOutJobRecords(any(), any(), any()))
+                .thenReturn(emptyList())
+
+            testee.handleState(state)
+
+            val captor = argumentCaptor<List<ExtractedProfile>>()
+            verify(mockRepository).saveNewExtractedProfiles(captor.capture())
+            val saved = captor.firstValue.single()
+            assertEquals(mapOf("county" to "Cook"), saved.extras)
+            assertEquals(emptyMap<String, String>(), saved.addresses.single().extras)
         }
 
     @Test

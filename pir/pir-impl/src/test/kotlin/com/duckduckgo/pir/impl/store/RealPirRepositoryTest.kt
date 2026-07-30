@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchSta
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
+import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
@@ -42,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -673,7 +675,7 @@ class RealPirRepositoryTest {
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
-        verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(any(), any())
     }
 
     @Test
@@ -702,7 +704,7 @@ class RealPirRepositoryTest {
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
-        verify(mockExtractedProfileDao, never()).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao, never()).insertAndRefreshExtractedProfiles(any(), any())
     }
 
     @Test
@@ -740,7 +742,7 @@ class RealPirRepositoryTest {
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
-        verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(any(), any())
     }
 
     @Test
@@ -772,7 +774,7 @@ class RealPirRepositoryTest {
 
         // Then
         verify(mockCurrentTimeProvider).currentTimeMillis()
-        verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(any(), any())
     }
 
     @Test
@@ -804,7 +806,7 @@ class RealPirRepositoryTest {
         testee.saveNewExtractedProfiles(extractedProfiles)
 
         // Then
-        verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(any(), any())
     }
 
     @Test
@@ -850,7 +852,216 @@ class RealPirRepositoryTest {
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
-        verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(any(), any())
+    }
+
+    @Test
+    fun whenSaveNewExtractedProfilesWithExtrasThenExtrasArePersistedAtBothLevels() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val extractedProfiles = listOf(
+            newExtractedProfile(profileQueryId).copy(
+                addresses = listOf(
+                    AddressCityState(city = "New York", state = "NY", extras = mapOf("county" to "Kings")),
+                ),
+                extras = mapOf("middleInitial" to "M"),
+            ),
+        )
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(nonDeprecatedUserProfile(profileQueryId))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(1000000L)
+
+        // When
+        testee.saveNewExtractedProfiles(extractedProfiles)
+
+        // Then
+        val inserted = captureInserted().single()
+        assertEquals(mapOf("middleInitial" to "M"), inserted.extras)
+        assertTrue(inserted.addresses.single().contains("\"county\":\"Kings\""))
+    }
+
+    @Test
+    fun whenReadingExtractedProfileThenExtrasAreMappedBackAtBothLevels() = runTest {
+        // Given
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", 1L))
+            .thenReturn(
+                listOf(
+                    storedExtractedProfile(
+                        addresses = listOf("""{"city":"New York","state":"NY","extras":{"county":"Kings"}}"""),
+                        extras = mapOf("middleInitial" to "M"),
+                    ),
+                ),
+            )
+
+        // When
+        val result = testee.getExtractedProfiles("TestBroker", 1L).single()
+
+        // Then
+        assertEquals(mapOf("middleInitial" to "M"), result.extras)
+        assertEquals(mapOf("county" to "Kings"), result.addresses.single().extras)
+    }
+
+    @Test
+    fun whenReadingLegacyAddressJsonWithoutExtrasThenExtrasIsEmpty() = runTest {
+        // Given - address JSON written before extras existed
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", 1L))
+            .thenReturn(
+                listOf(storedExtractedProfile(addresses = listOf("""{"city":"New York","state":"NY"}"""))),
+            )
+
+        // When
+        val result = testee.getExtractedProfiles("TestBroker", 1L).single()
+
+        // Then
+        assertEquals(emptyMap<String, String>(), result.addresses.single().extras)
+    }
+
+    @Test
+    fun whenSaveNewExtractedProfilesWithAlreadyStoredIdentityThenRefreshesRowInPlace() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val stored = storedExtractedProfile(
+            id = 42L,
+            addresses = listOf("""{"city":"New York","state":"NY"}"""),
+            dateAddedInMillis = 111L,
+        )
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", profileQueryId))
+            .thenReturn(listOf(stored))
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(nonDeprecatedUserProfile(profileQueryId))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(999L)
+
+        val rescanned = newExtractedProfile(profileQueryId).copy(
+            alternativeNames = listOf("Johnny"),
+            age = "36",
+            addresses = listOf(AddressCityState(city = "Boston", state = "MA")),
+            phoneNumbers = listOf("555-1234"),
+            relatives = listOf("Jane Doe"),
+            reportId = "report-999",
+            email = "new@example.com",
+            fullName = "John Michael Doe",
+            extras = mapOf("county" to "Cook"),
+        )
+
+        // When
+        testee.saveNewExtractedProfiles(listOf(rescanned))
+
+        // Then
+        assertTrue(captureInserted().isEmpty())
+        val refreshed = captureRefreshed().single()
+        // identity and native-owned values are untouched
+        assertEquals(42L, refreshed.id)
+        assertEquals(111L, refreshed.dateAddedInMillis)
+        assertEquals(false, refreshed.deprecated)
+        // scraped fields are replaced
+        assertEquals(listOf("Johnny"), refreshed.alternativeNames)
+        assertEquals("36", refreshed.age)
+        assertEquals(listOf("555-1234"), refreshed.phoneNumbers)
+        assertEquals(listOf("Jane Doe"), refreshed.relatives)
+        assertEquals("report-999", refreshed.reportId)
+        assertEquals("new@example.com", refreshed.email)
+        assertEquals("John Michael Doe", refreshed.fullName)
+        assertEquals(mapOf("county" to "Cook"), refreshed.extras)
+        assertTrue(refreshed.addresses.single().contains("\"city\":\"Boston\""))
+    }
+
+    @Test
+    fun whenSaveNewExtractedProfilesWithNewIdentityThenInsertsInsteadOfRefreshing() = runTest {
+        // Given
+        val profileQueryId = 1L
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", profileQueryId))
+            .thenReturn(listOf(storedExtractedProfile(id = 42L)))
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(nonDeprecatedUserProfile(profileQueryId))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(999L)
+
+        // When
+        testee.saveNewExtractedProfiles(listOf(newExtractedProfile(profileQueryId).copy(identifier = "identifier-999")))
+
+        // Then
+        assertTrue(captureRefreshed().isEmpty())
+        val inserted = captureInserted().single()
+        assertEquals("identifier-999", inserted.identifier)
+        assertEquals(999L, inserted.dateAddedInMillis)
+    }
+
+    @Test
+    fun whenSaveNewExtractedProfilesWithStoredDeprecatedRowThenRefreshesButKeepsDeprecated() = runTest {
+        // Given
+        val profileQueryId = 1L
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", profileQueryId))
+            .thenReturn(listOf(storedExtractedProfile(id = 42L, deprecated = true)))
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(nonDeprecatedUserProfile(profileQueryId))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(999L)
+
+        // When
+        testee.saveNewExtractedProfiles(
+            listOf(newExtractedProfile(profileQueryId).copy(extras = mapOf("county" to "Cook"))),
+        )
+
+        // Then
+        val refreshed = captureRefreshed().single()
+        assertEquals(true, refreshed.deprecated)
+        assertEquals(mapOf("county" to "Cook"), refreshed.extras)
+    }
+
+    @Test
+    fun whenSaveNewExtractedProfilesWithDeprecatedProfileQueryThenNeitherInsertsNorRefreshes() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val deprecatedUserProfile = nonDeprecatedUserProfile(profileQueryId).copy(deprecated = true)
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(deprecatedUserProfile)
+
+        // When
+        testee.saveNewExtractedProfiles(listOf(newExtractedProfile(profileQueryId)))
+
+        // Then
+        verify(mockExtractedProfileDao, never()).insertAndRefreshExtractedProfiles(any(), any())
+        verify(mockExtractedProfileDao, never()).getExtractedProfilesForBrokerAndProfile(any(), any())
+    }
+
+    private fun newExtractedProfile(profileQueryId: Long) = ExtractedProfile(
+        dbId = 0L,
+        profileQueryId = profileQueryId,
+        brokerName = "TestBroker",
+        name = "John Michael Doe",
+        profileUrl = "https://example.com/profile",
+        identifier = "identifier-123",
+    )
+
+    private fun storedExtractedProfile(
+        id: Long = 1L,
+        addresses: List<String> = emptyList(),
+        extras: Map<String, String> = emptyMap(),
+        dateAddedInMillis: Long = 111L,
+        deprecated: Boolean = false,
+    ) = StoredExtractedProfile(
+        id = id,
+        profileQueryId = 1L,
+        brokerName = "TestBroker",
+        name = "John Michael Doe",
+        profileUrl = "https://example.com/profile",
+        identifier = "identifier-123",
+        addresses = addresses,
+        extras = extras,
+        dateAddedInMillis = dateAddedInMillis,
+        deprecated = deprecated,
+    )
+
+    private fun nonDeprecatedUserProfile(profileQueryId: Long) = UserProfile(
+        id = profileQueryId,
+        userName = UserName(firstName = "John", lastName = "Doe"),
+        addresses = com.duckduckgo.pir.impl.store.db.Address(city = "NYC", state = "NY"),
+        birthYear = 1990,
+        deprecated = false,
+    )
+
+    private fun captureInserted(): List<StoredExtractedProfile> = saveArgumentCaptors().first
+
+    private fun captureRefreshed(): List<StoredExtractedProfile> = saveArgumentCaptors().second
+
+    private fun saveArgumentCaptors(): Pair<List<StoredExtractedProfile>, List<StoredExtractedProfile>> {
+        val insertCaptor = argumentCaptor<List<StoredExtractedProfile>>()
+        val refreshCaptor = argumentCaptor<List<StoredExtractedProfile>>()
+        verify(mockExtractedProfileDao).insertAndRefreshExtractedProfiles(insertCaptor.capture(), refreshCaptor.capture())
+        return insertCaptor.firstValue to refreshCaptor.firstValue
     }
 
     @Test

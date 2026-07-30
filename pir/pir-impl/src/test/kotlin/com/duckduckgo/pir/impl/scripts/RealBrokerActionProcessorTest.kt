@@ -21,7 +21,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.scripts.models.AddressCityStateParams
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
+import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
@@ -42,7 +44,9 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -174,6 +178,189 @@ class RealBrokerActionProcessorTest {
         verify(mockActionResultListener).onSuccess(successCaptor.capture())
         assertEquals("action-1", successCaptor.firstValue.actionID)
         assertEquals("navigate", successCaptor.firstValue.actionType)
+    }
+
+    @Test
+    fun whenProcessExtractResponseWithExtrasThenParsesThemAtBothLevels() = runTest {
+        val callback = registerAndGetCallback()
+
+        val successJson = """
+            {
+                "result": {
+                    "success": {
+                        "actionID": "action-1",
+                        "actionType": "extract",
+                        "response": [
+                            {
+                                "name": "John Doe",
+                                "profileUrl": "https://example.com/profile",
+                                "identifier": "id-123",
+                                "addresses": [
+                                    {
+                                        "city": "New York",
+                                        "state": "NY",
+                                        "extras": { "county": "Kings" }
+                                    }
+                                ],
+                                "extras": { "middleInitial": "M" }
+                            }
+                        ]
+                    }
+                }
+            }
+        """.trimIndent()
+
+        callback.process(
+            featureName = PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            method = PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            id = null,
+            data = JSONObject(successJson),
+        )
+
+        val successCaptor = argumentCaptor<PirSuccessResponse>()
+        verify(mockActionResultListener).onSuccess(successCaptor.capture())
+        val profile = (successCaptor.firstValue as ExtractedResponse).response.single()
+        assertEquals(mapOf("middleInitial" to "M"), profile.extras)
+        assertEquals(mapOf("county" to "Kings"), profile.addresses.single().extras)
+    }
+
+    @Test
+    fun whenProcessExtractResponseWithoutExtrasKeysThenExtrasAreEmpty() = runTest {
+        val callback = registerAndGetCallback()
+
+        // Payload from a C-S-S version that predates extras - must parse, not fail
+        val successJson = """
+            {
+                "result": {
+                    "success": {
+                        "actionID": "action-1",
+                        "actionType": "extract",
+                        "response": [
+                            {
+                                "name": "John Doe",
+                                "profileUrl": "https://example.com/profile",
+                                "identifier": "id-123",
+                                "addresses": [
+                                    { "city": "New York", "state": "NY" }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        """.trimIndent()
+
+        callback.process(
+            featureName = PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            method = PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            id = null,
+            data = JSONObject(successJson),
+        )
+
+        val successCaptor = argumentCaptor<PirSuccessResponse>()
+        verify(mockActionResultListener).onSuccess(successCaptor.capture())
+        val profile = (successCaptor.firstValue as ExtractedResponse).response.single()
+        assertNull(profile.extras)
+        assertNull(profile.addresses.single().extras)
+    }
+
+    @Test
+    fun whenProcessExtractResponseWithUnexpectedlyShapedExtrasThenResponseStillParses() = runTest {
+        val callback = registerAndGetCallback()
+
+        // extras is documented as string values only. A broker config emitting anything else is
+        // undefined behaviour, but it must not cost us the whole response.
+        val successJson = """
+            {
+                "result": {
+                    "success": {
+                        "actionID": "action-1",
+                        "actionType": "extract",
+                        "response": [
+                            {
+                                "name": "John Doe",
+                                "profileUrl": "https://example.com/profile",
+                                "identifier": "id-123",
+                                "addresses": [
+                                    { "city": "New York", "state": "NY", "extras": null }
+                                ],
+                                "extras": {
+                                    "county": "Cook",
+                                    "verified": true,
+                                    "count": 3,
+                                    "missing": null,
+                                    "nested": { "a": "b" },
+                                    "list": ["a"]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        """.trimIndent()
+
+        callback.process(
+            featureName = PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            method = PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            id = null,
+            data = JSONObject(successJson),
+        )
+
+        val successCaptor = argumentCaptor<PirSuccessResponse>()
+        verify(mockActionResultListener).onSuccess(successCaptor.capture())
+        val profile = (successCaptor.firstValue as ExtractedResponse).response.single()
+        assertEquals("John Doe", profile.name)
+        assertEquals("Cook", profile.extras?.get("county"))
+        assertNull(profile.addresses.single().extras)
+    }
+
+    @Test
+    fun whenPushActionWithExtrasThenExtrasAreSerializedAtBothLevels() = runTest {
+        testee.pushAction(
+            BrokerAction.FillForm(id = "action-fill", elements = emptyList(), selector = "form"),
+            UserProfile(
+                extractedProfile = ExtractedProfileParams(
+                    name = "John Doe",
+                    addresses = listOf(
+                        AddressCityStateParams(city = "New York", state = "NY", extras = mapOf("county" to "Kings")),
+                    ),
+                    extras = mapOf("middleInitial" to "M"),
+                ),
+            ),
+        )
+
+        val extractedProfileJson = capturedExtractedProfileJson()
+        assertEquals("M", extractedProfileJson.getJSONObject("extras").getString("middleInitial"))
+        assertEquals(
+            "Kings",
+            extractedProfileJson.getJSONArray("addresses").getJSONObject(0).getJSONObject("extras").getString("county"),
+        )
+    }
+
+    @Test
+    fun whenPushActionWithEmptyExtrasThenNoExtrasKeyIsSerialized() = runTest {
+        testee.pushAction(
+            BrokerAction.FillForm(id = "action-fill", elements = emptyList(), selector = "form"),
+            UserProfile(
+                extractedProfile = ExtractedProfileParams(
+                    name = "John Doe",
+                    addresses = listOf(AddressCityStateParams(city = "New York", state = "NY")),
+                ),
+            ),
+        )
+
+        val extractedProfileJson = capturedExtractedProfileJson()
+        assertFalse(extractedProfileJson.has("extras"))
+        assertFalse(extractedProfileJson.getJSONArray("addresses").getJSONObject(0).has("extras"))
+    }
+
+    private fun capturedExtractedProfileJson(): JSONObject {
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+        return eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("data")
+            .getJSONObject("extractedProfile")
     }
 
     @Test

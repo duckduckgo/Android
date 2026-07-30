@@ -42,10 +42,12 @@ data class ExtractedProfile(
     val identifier: String = "",
     val dateAddedInMillis: Long = 0L,
     val deprecated: Boolean = false,
+    val extras: Map<String, String> = emptyMap(),
 )
 
 data class AddressCityState(
     val city: String,
     val state: String,
     val fullAddress: String? = null,
+    val extras: Map<String, String> = emptyMap(),
 )

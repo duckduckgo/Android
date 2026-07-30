@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.scheduling
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
@@ -514,6 +515,115 @@ class RealJobRecordUpdaterTest {
             verify(mockSchedulingRepository).getValidOptOutJobRecord(100L)
             // Should not call saveOptOutJobRecord since no job record exists
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithChangedScrapedFieldsButSameIdentityThenDoesNotMarkAsRemoved() =
+        runTest {
+            // A re-scan of a still-listed profile that picked up a new relative, address and extras.
+            // Identity is unchanged, so this is a refresh, not a removal.
+            val storedProfiles = listOf(testExtractedProfile1)
+            val newProfiles = listOf(
+                testExtractedProfile1.copy(
+                    dbId = 0L,
+                    relatives = listOf("Jane Doe"),
+                    addresses = listOf(AddressCityState(city = "City", state = "State")),
+                    alternativeNames = listOf("Johnny"),
+                    age = "36",
+                    extras = mapOf("county" to "Cook"),
+                ),
+            )
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any(), any())
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkReappearedProfilesWithChangedScrapedFieldsButSameIdentityThenStillRevertsToRequested() =
+        runTest {
+            val storedProfiles = listOf(testExtractedProfile1)
+            val newProfiles = listOf(
+                testExtractedProfile1.copy(
+                    dbId = 0L,
+                    relatives = listOf("Jane Doe"),
+                    extras = mapOf("county" to "Cook"),
+                ),
+            )
+
+            val removedOptOutJobRecord = testOptOutJobRecord.copy(
+                extractedProfileId = 100L,
+                status = OptOutJobStatus.REMOVED,
+                optOutRemovedDateInMillis = 3000L,
+            )
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
+                .thenReturn(removedOptOutJobRecord)
+
+            val result = toTest.markReappearedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            val expectedRecord = removedOptOutJobRecord.copy(
+                status = OptOutJobStatus.REQUESTED,
+                optOutRemovedDateInMillis = 0L,
+            )
+            verify(mockSchedulingRepository).saveOptOutJobRecord(expectedRecord)
+            assertEquals(listOf(expectedRecord), result)
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithChangedIdentifierThenMarksAsRemoved() =
+        runTest {
+            val storedProfiles = listOf(testExtractedProfile1)
+            val newProfiles = listOf(testExtractedProfile1.copy(dbId = 0L, identifier = "id999"))
+            val optOutJobRecord1 = testOptOutJobRecord.copy(extractedProfileId = 100L)
+
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(mock())
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
+                .thenReturn(optOutJobRecord1)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                optOutJobRecord1.copy(
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                    deprecated = false,
+                ),
+            )
+        }
+
+    @Test
+    fun whenUpdateScanMatchesFoundWithDeprecatedProfileAndChangedScrapedFieldsThenDoesNotMarkAsDeprecated() =
+        runTest {
+            val deprecatedProfile = mock<com.duckduckgo.pir.impl.models.ProfileQuery>()
+            whenever(deprecatedProfile.deprecated).thenReturn(true)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(deprecatedProfile)
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(listOf(testExtractedProfile1))
+
+            // Same profile still listed, only its scraped fields changed - not a confirmed removal
+            val newProfiles = listOf(
+                testExtractedProfile1.copy(dbId = 0L, extras = mapOf("county" to "Cook")),
+            )
+
+            toTest.updateScanMatchesFound(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.MATCHES_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+                deprecated = false,
+            )
         }
 
     @Test

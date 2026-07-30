@@ -16,7 +16,9 @@
 
 package com.duckduckgo.pir.impl.common
 
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.scripts.models.AddressCityStateParams
 import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
 
 internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
@@ -47,6 +49,22 @@ internal fun ExtractedProfile.toParams(fullName: String): ExtractedProfileParams
         profileUrl = this.profileUrl.ifEmpty { null },
         fullName = fullName.ifEmpty { null },
         email = this.email.ifEmpty { null },
+        age = this.age.ifEmpty { null },
+        addresses =
+        this.addresses
+            .map {
+                AddressCityStateParams(
+                    city = it.city,
+                    state = it.state,
+                    fullAddress = it.fullAddress,
+                    extras = it.extras.ifEmpty { null },
+                )
+            }.ifEmpty { null },
+        phoneNumbers = this.phoneNumbers.ifEmpty { null },
+        relatives = this.relatives.ifEmpty { null },
+        alternativeNames = this.alternativeNames.ifEmpty { null },
+        identifier = this.identifier.ifEmpty { null },
+        extras = this.extras.ifEmpty { null },
     )
 }
 
@@ -60,8 +78,11 @@ internal fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boole
     return this.name == extractedProfile.name && this.age == extractedProfile.age &&
         this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
         this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
-        this.addresses.isASubSetOrSuperSetOf(extractedProfile.addresses)
+        // extras are an open bag driven by broker config; including them would break mirror-site dedup whenever a new field ships
+        this.addresses.withoutExtras().isASubSetOrSuperSetOf(extractedProfile.addresses.withoutExtras())
 }
+
+private fun List<AddressCityState>.withoutExtras(): List<AddressCityState> = map { it.copy(extras = emptyMap()) }
 
 private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
     return this.containsAll(other) || other.containsAll(this)
