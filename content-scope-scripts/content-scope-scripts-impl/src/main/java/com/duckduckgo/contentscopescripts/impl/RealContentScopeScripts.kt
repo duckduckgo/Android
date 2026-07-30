@@ -75,13 +75,19 @@ class RealContentScopeScripts @Inject constructor(
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimized = true)
 
+    // Legacy-path baselines. Defensive copies, because the flag-off path is frozen as it shipped.
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
+    private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
+
+    // Optimized-path baselines. Both repositories publish their list as an immutable snapshot in a single
+    // assignment, so holding the reference is enough and no copy is needed.
+    private var lastUserUnprotectedDomains: List<String> = emptyList()
+    private var lastUnprotectedTemporaryExceptions: List<FeatureException> = emptyList()
+
     private var cachedUserUnprotectedDomainsJson: String = EMPTY_JSON_LIST
+    private var cachedUnprotectTemporaryExceptionsJson: String = EMPTY_JSON_LIST
 
     private var cachedUserPreferencesJson: String = EMPTY_JSON
-
-    private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
-    private var cachedUnprotectTemporaryExceptionsJson: String = EMPTY_JSON_LIST
 
     private lateinit var cachedContentScopeJS: String
 
@@ -117,10 +123,18 @@ class RealContentScopeScripts @Inject constructor(
     ): String {
         var updateJS = false
 
+        // This path rewrites the shared JSON fields but keeps its own baselines, so the optimized baselines are
+        // dropped here. Without this, a mid-session flag flip followed by an input returning to its pre-flip
+        // value would leave the optimized path seeing no change while the shared JSON still holds what this
+        // path last wrote. Writes only: nothing below reads them, so legacy behaviour is unaffected.
+        cachedPluginConfig = ""
+        lastUserUnprotectedDomains = emptyList()
+        lastUnprotectedTemporaryExceptions = emptyList()
+
         val pluginParameters = getLegacyPluginParameters()
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions, optimized = false)
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
             updateJS = true
         }
 
@@ -131,7 +145,7 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
-            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList(), optimized = false)
+            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
             updateJS = true
         }
 
@@ -165,8 +179,8 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         val unprotectedTemporaryExceptions = unprotectedTemporary.unprotectedTemporaryExceptions
-        if (cachedUnprotectTemporaryExceptions != unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions, optimized = true)
+        if (lastUnprotectedTemporaryExceptions.differsFrom(unprotectedTemporaryExceptions)) {
+            cacheOptimizedUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions)
             contentScopeChanged = true
         }
 
@@ -176,8 +190,8 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         val userUnprotectedDomains = userAllowListRepository.domainsInUserAllowList()
-        if (cachedUserUnprotectedDomains != userUnprotectedDomains) {
-            cacheUserUnprotectedDomains(userUnprotectedDomains, optimized = true)
+        if (lastUserUnprotectedDomains.differsFrom(userUnprotectedDomains)) {
+            cacheOptimizedUserUnprotectedDomains(userUnprotectedDomains)
             updateJS = true
         }
 
@@ -248,28 +262,44 @@ class RealContentScopeScripts @Inject constructor(
         append(value)
     }
 
-    private fun cacheUserUnprotectedDomains(
-        userUnprotectedDomains: List<String>,
-        optimized: Boolean,
-    ) {
+    private fun <T> List<T>.differsFrom(other: List<T>): Boolean = this !== other && this != other
+
+    private fun cacheOptimizedUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
+        lastUserUnprotectedDomains = userUnprotectedDomains
+        cachedUserUnprotectedDomainsJson = if (userUnprotectedDomains.isEmpty()) {
+            EMPTY_JSON_LIST
+        } else {
+            getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized = true)
+        }
+    }
+
+    private fun cacheOptimizedUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
+        lastUnprotectedTemporaryExceptions = unprotectedTemporaryExceptions
+        cachedUnprotectTemporaryExceptionsJson = if (unprotectedTemporaryExceptions.isEmpty()) {
+            EMPTY_JSON_LIST
+        } else {
+            getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized = true)
+        }
+    }
+
+    // Frozen twins of the cacheOptimized* pair above: they copy the incoming list into a
+    // CopyOnWriteArrayList, which is what the flag-off path shipped with. Deleted with the flag.
+    private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
         cachedUserUnprotectedDomains.clear()
         if (userUnprotectedDomains.isEmpty()) {
             cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
         } else {
-            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized)
+            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized = false)
             cachedUserUnprotectedDomains.addAll(userUnprotectedDomains)
         }
     }
 
-    private fun cacheUserUnprotectedTemporaryExceptions(
-        unprotectedTemporaryExceptions: List<FeatureException>,
-        optimized: Boolean,
-    ) {
+    private fun cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
         cachedUnprotectTemporaryExceptions.clear()
         if (unprotectedTemporaryExceptions.isEmpty()) {
             cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
         } else {
-            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized)
+            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized = false)
             cachedUnprotectTemporaryExceptions.addAll(unprotectedTemporaryExceptions)
         }
     }

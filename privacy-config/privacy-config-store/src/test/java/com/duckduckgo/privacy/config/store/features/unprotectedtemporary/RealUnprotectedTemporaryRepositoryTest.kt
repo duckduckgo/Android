@@ -103,6 +103,68 @@ class RealUnprotectedTemporaryRepositoryTest {
             assertEquals(0, testee.exceptions.size)
         }
 
+    @Test
+    fun whenReloadingThenAReaderNeverObservesAPartialList() {
+        whenever(mockUnprotectedTemporaryDao.getAll())
+            .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
+        testee = createTestee()
+        assertEquals(2, testee.exceptions.size)
+
+        // Read `exceptions` from inside the reload, at the point where a refill-in-place implementation has
+        // already dropped the previous entries and not yet added the new ones.
+        val sizesObservedMidReload = mutableListOf<Int>()
+        whenever(mockUnprotectedTemporaryDao.getAll()).thenAnswer {
+            sizesObservedMidReload.add(testee.exceptions.size)
+            listOf(unprotectedTemporaryException)
+        }
+
+        testee.updateAll(listOf())
+
+        assertEquals(listOf(2), sizesObservedMidReload)
+        assertEquals(1, testee.exceptions.size)
+    }
+
+    @Test
+    fun whenReloadingThenAPreviouslyReturnedListIsUnaffected() {
+        whenever(mockUnprotectedTemporaryDao.getAll()).thenReturn(listOf(unprotectedTemporaryException))
+        testee = createTestee()
+        val held = testee.exceptions
+
+        whenever(mockUnprotectedTemporaryDao.getAll())
+            .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
+        testee.updateAll(listOf())
+
+        // Callers may cache the reference and detect a change by comparing it, so a published list must never
+        // be mutated afterwards.
+        assertEquals(1, held.size)
+        assertEquals(2, testee.exceptions.size)
+        assertNotSame(held, testee.exceptions)
+    }
+
+    @Test
+    fun whenReloadFailsThenThePreviouslyLoadedExceptionsAreRetained() {
+        whenever(mockUnprotectedTemporaryDao.getAll()).thenReturn(listOf(unprotectedTemporaryException))
+        testee = createTestee()
+        assertEquals(1, testee.exceptions.size)
+
+        whenever(mockUnprotectedTemporaryDao.getAll()).thenThrow(RuntimeException("database unavailable"))
+
+        // The new list is only published once the read succeeds, so a failed reload keeps serving the previous
+        // exceptions rather than dropping every exemption until the next successful one.
+        assertThrows(RuntimeException::class.java) { testee.updateAll(listOf()) }
+
+        assertEquals(1, testee.exceptions.size)
+        assertEquals(unprotectedTemporaryException.toFeatureException(), testee.exceptions.first())
+    }
+
+    private fun createTestee() =
+        RealUnprotectedTemporaryRepository(
+            mockDatabase,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
     private fun givenUnprotectedTemporaryDaoContainsExceptions() {
         whenever(mockUnprotectedTemporaryDao.getAll())
             .thenReturn(listOf(unprotectedTemporaryException))
@@ -110,5 +172,6 @@ class RealUnprotectedTemporaryRepositoryTest {
 
     companion object {
         val unprotectedTemporaryException = UnprotectedTemporaryEntity("example.com", "reason")
+        val unprotectedTemporaryException2 = UnprotectedTemporaryEntity("foo.com", "reason2")
     }
 }
