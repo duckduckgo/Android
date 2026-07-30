@@ -97,8 +97,8 @@
         android:layout_marginTop="@dimen/keyline_5"
         app:layout_constraintTop_toBottomOf="@id/onboardingSubscriptionFeaturesDivider2"
         app:leadingIcon="@drawable/ai_general_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature1Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature2Description" />
+        app:primaryText="@string/subscriptionOnboardingFeature3Title"
+        app:secondaryText="@string/subscriptionOnboardingFeature3Description" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/onboardingSubscriptionFeaturesDivider3"
@@ -116,8 +116,8 @@
         android:layout_marginTop="@dimen/keyline_5"
         app:layout_constraintTop_toBottomOf="@id/onboardingSubscriptionFeaturesDivider3"
         app:leadingIcon="@drawable/identity_blocked_pir_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature1Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature2Description" />
+        app:primaryText="@string/subscriptionOnboardingFeature4Title"
+        app:secondaryText="@string/subscriptionOnboardingFeature4Description" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingFeaturesPrimaryButton"

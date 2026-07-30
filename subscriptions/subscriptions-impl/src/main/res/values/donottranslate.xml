@@ -58,5 +58,9 @@
     <string name="subscriptionOnboardingFeature4Title">Personal Information Removal</string>
     <string name="subscriptionOnboardingFeature4Description">Find and remove your personal info from sites that store and sell it, reducing spam. </string>
     <string name="subscriptionOnboardingFeaturesPrimaryButton">Next</string>
+    <!-- Feature detail screen (WIP placeholder copy) -->
+    <string name="subscriptionOnboardingFeatureInfoTitle">Feature details</string>
+    <string name="subscriptionOnboardingFeatureInfoDescription">More information coming soon.</string>
+    <string name="subscriptionOnboardingFeatureInfoItemPlaceholder">Feature highlight</string>
 
 </resources>
