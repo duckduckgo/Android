@@ -22,7 +22,6 @@ import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesBinding
-import logcat.logcat
 import javax.inject.Inject
 
 interface OnboardingPromptsExperimentMetrics {
@@ -44,7 +43,6 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
 ) : OnboardingPromptsExperimentMetrics {
 
     override suspend fun fireWidgetAddedMetric() {
-        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire widget added metric" }
         MetricsPixel(
             metric = "widget_added",
             type = MetricType.NORMAL,
@@ -75,7 +73,6 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
     }
 
     override suspend fun fireWidgetSearchMetric() {
-        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire widget search metric" }
         MetricsPixel(
             metric = "widget_search",
             type = MetricType.NORMAL,
@@ -86,7 +83,6 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
     }
 
     override suspend fun fireOnboardingCompletedMetric() {
-        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire onboarding completed metric" }
         MetricsPixel(
             metric = "onboarding_completed",
             type = MetricType.NORMAL,
