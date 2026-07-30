@@ -22,7 +22,6 @@ import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -39,9 +38,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -102,22 +99,14 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is ShowMessage -> {
-                showMessage(command.message)
-            }
-
             is StartSyncProcess -> {
                 val input = SyncAnotherDeviceContract.Input(
-                    syncUrl = command.syncUrl,
+                    syncUrl = command.syncCode,
                     launchSource = launchSource,
                 )
                 syncAnotherDeviceLauncher.launch(input)
             }
         }
-    }
-
-    private fun showMessage(@StringRes message: Int) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     private fun configureEdgeToEdgeInsets() {
