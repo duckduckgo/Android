@@ -248,7 +248,6 @@ class SyncActivityViewModel @Inject constructor(
         data object IntroCreateAccount : Command()
         data object IntroRecoverSyncData : Command()
         data object ShowRecoveryCode : Command()
-        data object ShowDeviceConnected : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         data object AskDeleteAccount : Command()
         data object CheckIfUserHasStoragePermission : Command()
