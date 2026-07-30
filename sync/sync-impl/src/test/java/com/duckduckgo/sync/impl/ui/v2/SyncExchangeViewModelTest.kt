@@ -18,10 +18,12 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
@@ -39,9 +41,14 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
 import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.BitmapWithCode
+import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetFailureResult
+import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
@@ -82,19 +89,23 @@ class SyncExchangeViewModelTest {
     private val pixels = mock<SyncPixels>()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val qrEncoder = mock<QREncoder>()
+    private val clipboard = mock<ClipboardInteractor>()
 
     @Before
     fun setup() {
         whenever(codeDispatcher.presentV2()).thenReturn(emptyFlow())
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
+        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
     }
 
-    private fun createTestee() = SyncExchangeViewModel(
+    private fun createTestee(source: String? = null) = SyncExchangeViewModel(
+        source = source,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         pixels = pixels,
         syncFeature = syncFeature,
         qrEncoder = qrEncoder,
+        clipboard = clipboard,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -129,6 +140,43 @@ class SyncExchangeViewModelTest {
 
             cancel()
         }
+        verify(accountRepository, never()).pollConnectionKeys()
+    }
+
+    @Test
+    fun `when v2 is disabled and the connection keys are synced then the success result is set and the screen closes`() = runTest {
+        givenV2Disabled()
+        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+
+        val testee = createTestee(source = "foo")
+
+        testee.commands.test {
+            assertIs<SetSuccessResult>(awaitItem())
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+        verify(pixels).fireSignupConnectPixel("foo")
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, null, null, null)
+    }
+
+    @Test
+    fun `when v2 is disabled and polling fails with a login error then an error is shown`() = runTest {
+        givenV2Disabled()
+        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<ShowError>(command)
+            assertEquals(R.string.sync_connect_login_error, command.message)
+            assertEquals("boom", command.reason)
+
+            cancel()
+        }
     }
 
     @Test
@@ -157,6 +205,91 @@ class SyncExchangeViewModelTest {
 
             cancel()
         }
+    }
+
+    @Test
+    fun `when the host confirmation is requested then the user is asked to confirm the host`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device")))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertEquals(AskHostConfirmation(peerName = "Other Device"), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the joiner confirmation is requested then the user is asked to confirm the joiner`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device")))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertEquals(AskJoinerConfirmation(peerName = "Other Device"), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the host is confirmed then the dispatcher is notified`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onHostConfirmed()
+
+        verify(codeDispatcher).confirmHost()
+    }
+
+    @Test
+    fun `when the host is denied then the dispatcher is notified`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onHostDenied()
+
+        verify(codeDispatcher).denyHost()
+    }
+
+    @Test
+    fun `when the joiner is confirmed then the dispatcher is notified`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onJoinerConfirmed()
+
+        verify(codeDispatcher).confirmJoiner()
+    }
+
+    @Test
+    fun `when the joiner is denied then the dispatcher is notified`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onJoinerDenied()
+
+        verify(codeDispatcher).denyJoiner()
+    }
+
+    @Test
+    fun `when the login completes then the success result is set and the screen closes`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<SetSuccessResult>(awaitItem())
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+        verify(pixels).fireLoginPixel()
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -246,6 +379,90 @@ class SyncExchangeViewModelTest {
         createTestee()
 
         verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `when the copy button is clicked then the linking code is copied to the clipboard`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
+
+        val testee = createTestee()
+        testee.onCopyCodeClicked()
+
+        verify(clipboard).copyToClipboard(linkingUrl, isSensitive = true)
+        verify(pixels).fireSyncSetupCodeCopiedToClipboard(SYNC_CONNECT)
+    }
+
+    @Test
+    fun `when the copied code notification is not shown by the system then a message is shown`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
+        whenever(clipboard.copyToClipboard(any(), any())).thenReturn(false)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onCopyCodeClicked()
+            assertEquals(ShowMessage(R.string.sync_code_copied_message), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the copied code notification is shown by the system then no message is shown`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
+        whenever(clipboard.copyToClipboard(any(), any())).thenReturn(true)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onCopyCodeClicked()
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the copy button is clicked before the code is ready then nothing is copied`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onCopyCodeClicked()
+
+        verifyNoInteractions(clipboard)
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `when the share button is clicked then the share code command is sent`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onShareCodeClicked()
+            assertEquals(ShareCode(linkingUrl), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the share button is clicked before the code is ready then no command is sent`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onShareCodeClicked()
+            expectNoEvents()
+
+            cancel()
+        }
     }
 
     @Test

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Outline
 import android.os.Bundle
@@ -46,6 +47,16 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val qrCodeLauncher = registerForActivityResult(QrCodeContract()) { result ->
+        when (result) {
+            is QrCodeContract.Output.Success -> finish()
+            is QrCodeContract.Output.Failure -> finish()
+            is QrCodeContract.Output.NoOp -> Unit
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -74,7 +85,7 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
             finish()
         }
         binding.showQrCodeButton.setOnClickListener {
-            startActivity(Intent(this, QrCodeActivity::class.java))
+            qrCodeLauncher.launch(QrCodeContract.Input(launchSource))
         }
     }
 
@@ -118,5 +129,15 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
     companion object {
         private const val SCANNER_POSITION = 0
         private const val MANUAL_CODE_ENTRY_POSITION = 1
+        private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+
+        fun intent(
+            context: Context,
+            source: String?,
+        ): Intent {
+            return Intent(context, CodeExchangeActivity::class.java).apply {
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+            }
+        }
     }
 }

@@ -19,19 +19,23 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.graphics.Bitmap
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
@@ -41,23 +45,28 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV2PairingError
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
-import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
-@ContributesViewModel(ActivityScope::class)
-class SyncExchangeViewModel @Inject constructor(
+class SyncExchangeViewModel @AssistedInject constructor(
+    @Assisted private val source: String?,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
     private val syncFeature: SyncFeature,
     private val qrEncoder: QREncoder,
+    private val clipboard: ClipboardInteractor,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
@@ -75,6 +84,22 @@ class SyncExchangeViewModel @Inject constructor(
         }
     }
 
+    fun onHostConfirmed() {
+        codeDispatcher.confirmHost()
+    }
+
+    fun onHostDenied() {
+        codeDispatcher.denyHost()
+    }
+
+    fun onJoinerConfirmed() {
+        codeDispatcher.confirmJoiner()
+    }
+
+    fun onJoinerDenied() {
+        codeDispatcher.denyJoiner()
+    }
+
     fun onErrorDialogDismissed() {
         viewModelScope.launch {
             _commands.send(Command.SetFailureResult)
@@ -82,10 +107,51 @@ class SyncExchangeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun startV1Presentation() {
-        accountRepository.getConnectQR()
+    fun onCopyCodeClicked() {
+        viewModelScope.launch {
+            val code = viewState.value.bitmap?.url ?: return@launch
+            val isNotificationShown = clipboard.copyToClipboard(code, isSensitive = true)
+            if (!isNotificationShown) {
+                _commands.send(Command.ShowMessage(R.string.sync_code_copied_message))
+            }
+            pixels.fireSyncSetupCodeCopiedToClipboard(SYNC_CONNECT)
+        }
+    }
+
+    fun onShareCodeClicked() {
+        viewModelScope.launch {
+            val code = viewState.value.bitmap?.url ?: return@launch
+            _commands.send(Command.ShareCode(code))
+        }
+    }
+
+    private suspend fun startV1Presentation() = coroutineScope {
+        val qrCodeResult = accountRepository.getConnectQR()
             .onSuccess { showQrCode(it.qrCode) }
             .onFailure { _commands.send(Command.ShowError(R.string.sync_connect_generic_error, it.reason)) }
+
+        var isPolling = qrCodeResult is Result.Success
+        while (isPolling) {
+            delay(POLLING_INTERVAL_CONNECT_FLOW)
+            accountRepository.pollConnectionKeys()
+                .onSuccess { isSynced ->
+                    if (isSynced) {
+                        pixels.fireSignupConnectPixel(source)
+                        pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
+                        _commands.send(Command.SetSuccessResult)
+                        _commands.send(Command.Close)
+                        isPolling = false
+                    }
+                }
+                .onFailure { failure ->
+                    when (failure.code) {
+                        CONNECT_FAILED.code, LOGIN_FAILED.code -> {
+                            _commands.send(Command.ShowError(R.string.sync_connect_login_error, failure.reason))
+                            isPolling = false
+                        }
+                    }
+                }
+        }
     }
 
     private suspend fun startV2Presentation() {
@@ -99,15 +165,18 @@ class SyncExchangeViewModel @Inject constructor(
                 }
 
                 is DispatchOutcome.HostConfirmationRequested -> {
-                    logcat { "TODO" }
+                    _commands.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
                 }
 
                 is DispatchOutcome.JoinerConfirmationRequested -> {
-                    logcat { "TODO" }
+                    _commands.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
                 }
 
                 is DispatchOutcome.LoggedIn -> {
-                    logcat { "TODO" }
+                    pixels.fireLoginPixel()
+                    pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
+                    _commands.send(Command.SetSuccessResult)
+                    _commands.send(Command.Close)
                 }
 
                 is DispatchOutcome.AlreadyConnected -> {
@@ -153,6 +222,16 @@ class SyncExchangeViewModel @Inject constructor(
     )
 
     internal sealed interface Command {
+        data class AskJoinerConfirmation(
+            val peerName: String?,
+            val peerKind: PeerKind? = null,
+        ) : Command
+
+        data class AskHostConfirmation(
+            val peerName: String?,
+            val peerKind: PeerKind? = null,
+        ) : Command
+
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
@@ -162,8 +241,38 @@ class SyncExchangeViewModel @Inject constructor(
             val content: V2PairingErrorContent,
         ) : Command
 
+        data class ShowMessage(
+            @StringRes val message: Int,
+        ) : Command
+
+        data class ShareCode(
+            val code: String,
+        ) : Command
+
         data object SetFailureResult : Command
 
+        data object SetSuccessResult : Command
+
         data object Close : Command
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(source: String?): SyncExchangeViewModel
+
+        class Provider(
+            private val assistedFactory: Factory,
+            private val source: String?,
+        ) : ViewModelProvider.Factory {
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(source) as T
+            }
+        }
+    }
+
+    companion object {
+        private val POLLING_INTERVAL_CONNECT_FLOW = 5.seconds
     }
 }
