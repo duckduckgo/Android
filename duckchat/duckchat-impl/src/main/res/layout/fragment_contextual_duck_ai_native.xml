@@ -79,8 +79,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            android:drawableStart="@drawable/ic_duck_ai_color_24"
-            android:drawablePadding="@dimen/keyline_2"
             android:gravity="center"
             android:text="@string/duck_chat_title"
             app:layout_constraintEnd_toEndOf="parent"
@@ -129,9 +127,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_4"
-            android:gravity="bottom"
-            android:paddingTop="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_1">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/contextualHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_5"
+                android:gravity="center"
+                tools:text="@string/duckAIContextualHeader"
+                app:typography="h1" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsView
                 android:id="@+id/contextualSuggestionsView"

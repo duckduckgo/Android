@@ -64,6 +64,7 @@ import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -125,6 +126,7 @@ import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class DuckChatContextualFragment :
@@ -538,6 +540,22 @@ class DuckChatContextualFragment :
         configureBehaviour(bottomSheetBehavior)
         configureButtons()
         configureSuggestions()
+        configureHeader()
+    }
+
+    private fun configureHeader() {
+        val header = getString(R.string.duckAIContextualHeader)
+        val placeholder = "%1\$s"
+        val placeholderIndex = header.indexOf(placeholder)
+        if (placeholderIndex < 0) {
+            binding.contextualHeader.text = header
+            return
+        }
+        val textBeforeIcon = header.substring(0, placeholderIndex).trimEnd()
+        val textAfterIcon = header.substring(placeholderIndex + placeholder.length)
+        binding.contextualHeader.text = requireContext()
+            .appendIconToText(textBeforeIcon, CommonR.drawable.ic_shield_color_24_rebrand)
+            .append(textAfterIcon)
     }
 
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {

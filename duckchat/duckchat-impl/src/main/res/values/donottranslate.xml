@@ -27,4 +27,7 @@
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
 
+    <!-- Contextual sheet header -->
+    <string name="duckAIContextualHeader" instruction="%1$s is replaced by a shield icon">All chats are %1$s private</string>
+
 </resources>
