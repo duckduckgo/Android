@@ -127,7 +127,7 @@
             android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
-            android:name=".ui.v2.SyncAnotherDeviceActivity"
+            android:name=".ui.v2.ExchangeSyncCodeActivity"
             android:exported="false"
             android:label="@string/sync_scanner_v2_qr_code_screen_title"
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"

@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 
 @InjectWith(ActivityScope::class)
-class SyncAnotherDeviceActivity : DuckDuckGoActivity() {
+class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     private val syncUrl get() = requireNotNull(intent.getStringExtra(SYNC_URL_EXTRA_KEY)) {
         "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
     }
@@ -62,7 +62,7 @@ class SyncAnotherDeviceActivity : DuckDuckGoActivity() {
             syncUrl: String,
             launchSource: String?,
         ): Intent {
-            return Intent(context, SyncAnotherDeviceActivity::class.java).apply {
+            return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_URL_EXTRA_KEY, syncUrl)
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }

@@ -19,14 +19,14 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.v2.SyncAnotherDeviceContract.Input
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Input
 
-class SyncAnotherDeviceContract : ActivityResultContract<Input, Unit>() {
+class ExchangeSyncCodeContract : ActivityResultContract<Input, Unit>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return SyncAnotherDeviceActivity.intent(
+        return ExchangeSyncCodeActivity.intent(
             context = context,
             syncUrl = input.syncUrl,
             launchSource = input.launchSource,

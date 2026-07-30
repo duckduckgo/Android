@@ -66,7 +66,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val syncAnotherDeviceLauncher = registerForActivityResult(SyncAnotherDeviceContract()) {
+    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) {
         finish()
     }
 
@@ -100,11 +100,11 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is StartSyncProcess -> {
-                val input = SyncAnotherDeviceContract.Input(
+                val input = ExchangeSyncCodeContract.Input(
                     syncUrl = command.syncCode,
                     launchSource = launchSource,
                 )
-                syncAnotherDeviceLauncher.launch(input)
+                exchangeSyncCodeLauncher.launch(input)
             }
         }
     }
