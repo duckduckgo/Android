@@ -340,13 +340,11 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            is AskRemoveDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskRemoveDevice -> Unit
 
-            is AskSetupSyncDeepLink -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskSetupSyncDeepLink -> Unit
 
             is AskToCopyRecoveryCode -> {
                 authenticate {
@@ -354,9 +352,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            is AskTurnOffSync -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskTurnOffSync -> Unit
 
             is CheckIfUserHasStoragePermission -> {
                 if (appBuildConfig.sdkInt < 30) {
@@ -438,9 +435,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
 
-            is ShowRecoveryCode -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is ShowRecoveryCode -> Unit
 
             is SyncWithAnotherDevice -> {
                 authenticate {
