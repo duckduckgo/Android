@@ -54,7 +54,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             val enabled = withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
-            if (!enabled) return@launch
+            if (!enabled) {
+                _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+                return@launch
+            }
             _viewState.value = ViewState(suggestions = emptyList(), loading = true)
             delay(TIMEOUT_MS)
             if (_viewState.value.loading) {
@@ -82,7 +85,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
         url: String?,
         pageTypeSignals: PageTypeSignals?,
     ) = withContext(dispatchers.io()) {
-        if (!duckChatFeature.contextualSuggestedPrompts().isEnabled()) return@withContext
+        if (!duckChatFeature.contextualSuggestedPrompts().isEnabled()) {
+            _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+            return@withContext
+        }
         val input = ResolvePageSuggestionsInput(
             pageTypeSignals = pageTypeSignals,
             url = url,
