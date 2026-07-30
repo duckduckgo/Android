@@ -75,13 +75,16 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 interface PirActionsRunner {
     /**
@@ -152,6 +155,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             return Result.success(Unit)
         }
 
+        val runContinuationHolder = RunContinuationHolder()
+
         withContext(dispatcherProvider.main()) {
             logcat {
                 "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} " +
@@ -169,6 +174,9 @@ class RealPirActionsRunner @AssistedInject constructor(
                     onPageLoadFailed = {
                         onLoadingFailed(it)
                     },
+                    onRendererGone = {
+                        onRendererGone(runContinuationHolder, it)
+                    },
                 )
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
@@ -177,7 +185,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         engine = engineFactory.create(runType, brokerSteps, profileQuery)
         engine!!.dispatch(Started)
 
-        return awaitResult()
+        return awaitResult(runContinuationHolder)
     }
 
     override suspend fun startOn(
@@ -189,6 +197,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             logcat { "PIR-RUNNER ($this): No broker steps to execute ${Thread.currentThread().name}" }
             return Result.success(Unit)
         }
+
+        val runContinuationHolder = RunContinuationHolder()
 
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokerSteps" }
@@ -203,6 +213,9 @@ class RealPirActionsRunner @AssistedInject constructor(
                     onPageLoadFailed = {
                         onLoadingFailed(it)
                     },
+                    onRendererGone = {
+                        onRendererGone(runContinuationHolder, it)
+                    },
                 )
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
@@ -211,7 +224,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         engine = engineFactory.create(runType, brokerSteps, profileQuery)
         engine!!.dispatch(Started)
 
-        return awaitResult()
+        return awaitResult(runContinuationHolder)
     }
 
     private fun onLoadingComplete(url: String?) {
@@ -239,13 +252,36 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private suspend fun awaitResult(): Result<Unit> =
+    private fun onRendererGone(
+        runContinuationHolder: RunContinuationHolder,
+        didCrash: Boolean,
+    ) {
+        val continuation = runContinuationHolder.continuation.getAndSet(null)
+        if (continuation == null || !continuation.isActive) {
+            logcat {
+                "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash - stale/no-op, ignoring"
+            }
+            return
+        }
+
+        if (timerJob.isActive) {
+            timerJob.cancel()
+        }
+        if (engineJob.isActive) {
+            engineJob.cancel()
+        }
+        logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash - failing current run" }
+        continuation.resumeWithException(PirRendererGoneException(didCrash))
+    }
+
+    private suspend fun awaitResult(runContinuationHolder: RunContinuationHolder): Result<Unit> =
         suspendCancellableCoroutine { continuation ->
+            runContinuationHolder.continuation.set(continuation)
             engineJob +=
                 coroutineScope.launch {
                     engine!!.sideEffect.collect { effect ->
                         if (effect is CompleteExecution) {
-                            continuation.resume(Result.success(Unit))
+                            runContinuationHolder.continuation.getAndSet(null)?.resume(Result.success(Unit))
                         } else {
                             handleEffect(effect)
                         }
@@ -253,6 +289,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 }
 
             continuation.invokeOnCancellation {
+                runContinuationHolder.continuation.getAndSet(null)
                 engineJob.cancel()
             }
         }
@@ -557,5 +594,9 @@ class RealPirActionsRunner @AssistedInject constructor(
         }?.also {
             engine?.dispatch(it)
         }
+    }
+
+    private class RunContinuationHolder {
+        val continuation: AtomicReference<CancellableContinuation<Result<Unit>>?> = AtomicReference(null)
     }
 }

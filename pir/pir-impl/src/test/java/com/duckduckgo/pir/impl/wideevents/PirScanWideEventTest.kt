@@ -1252,6 +1252,47 @@ class PirScanWideEventTest {
         )
     }
 
+    @Test
+    fun whenRunFailedWithRendererGoneAndSystemKillThenFlowFinishedAsFailureWithDidCrashFalse() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
+
+        // When
+        testee.onRunFailed(
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            reason = PirScanWideEvent.FailureReason.RENDERER_GONE,
+            didCrash = false,
+        )
+
+        // Then
+        verify(wideEventClient).flowFinish(
+            wideEventId = 50L,
+            status = FlowStatus.Failure(reason = "renderer_gone"),
+            metadata = mapOf("did_crash" to "false"),
+        )
+    }
+
+    @Test
+    fun whenRunFailedWithoutDidCrashThenFlowFinishedWithEmptyMetadata() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(51L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
+
+        // When (existing callers pass no didCrash)
+        testee.onRunFailed(
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            reason = PirScanWideEvent.FailureReason.IO_EXCEPTION,
+        )
+
+        // Then
+        verify(wideEventClient).flowFinish(
+            wideEventId = 51L,
+            status = FlowStatus.Failure(reason = "io_exception"),
+            metadata = emptyMap(),
+        )
+    }
+
     private class FakeTimeProvider : CurrentTimeProvider {
         var elapsed: Long = 0L
         override fun elapsedRealtime(): Long = elapsed

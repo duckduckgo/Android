@@ -72,7 +72,7 @@ interface PirScanWideEvent {
 
     suspend fun onOptOutSkipped(executionType: PirExecutionType)
 
-    suspend fun onRunFailed(executionType: PirExecutionType, reason: FailureReason)
+    suspend fun onRunFailed(executionType: PirExecutionType, reason: FailureReason, didCrash: Boolean? = null)
 
     suspend fun onRunCancelled(executionType: PirExecutionType, reason: CancellationReason)
 
@@ -116,14 +116,16 @@ interface PirScanWideEvent {
         IO_EXCEPTION("io_exception"),
         SQLITE_EXCEPTION("sqlite_exception"),
         TIMEOUT_CANCELLATION_EXCEPTION("timeout_cancellation_exception"),
+        RENDERER_GONE("renderer_gone"),
         UNKNOWN_ERROR("unknown_error"),
         ;
 
         companion object {
             // Order is intentional: more specific subclasses must come before their supertypes.
-            // TIMEOUT_CANCELLATION_EXCEPTION is intentionally not handled here — TimeoutCancellationException
-            // extends CancellationException, which the runner catches separately and routes via an
-            // explicit catch block ahead of the generic Exception catch that calls this helper.
+            // TIMEOUT_CANCELLATION_EXCEPTION and RENDERER_GONE are intentionally not handled here —
+            // TimeoutCancellationException extends CancellationException, and PirRendererGoneException
+            // is caught by an explicit catch block ahead of the generic Exception catch that calls
+            // this helper, so both are routed without going through fromException.
             fun fromException(e: Exception): FailureReason = when (e) {
                 is SQLiteException -> SQLITE_EXCEPTION
                 is IOException -> IO_EXCEPTION
@@ -215,9 +217,13 @@ class PirScanWideEventImpl @Inject constructor(
         stateFor(executionType).onOptOutSkipped()
     }
 
-    override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) {
+    override suspend fun onRunFailed(
+        executionType: PirExecutionType,
+        reason: PirScanWideEvent.FailureReason,
+        didCrash: Boolean?,
+    ) {
         if (!isFeatureEnabled()) return
-        stateFor(executionType).onRunFailed(reason)
+        stateFor(executionType).onRunFailed(reason, didCrash)
     }
 
     override suspend fun onRunCancelled(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) {
@@ -526,7 +532,7 @@ class PirScanWideEventImpl @Inject constructor(
             }
         }
 
-        suspend fun onRunFailed(reason: PirScanWideEvent.FailureReason) {
+        suspend fun onRunFailed(reason: PirScanWideEvent.FailureReason, didCrash: Boolean?) {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
                 closeOpenIntervalsLocked(flowId)
@@ -535,6 +541,7 @@ class PirScanWideEventImpl @Inject constructor(
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Failure(reason = reason.value),
+                    metadata = didCrash?.let { mapOf(KEY_DID_CRASH to it.toString()) } ?: emptyMap(),
                 )
                 clearStateLocked()
             }
@@ -671,6 +678,7 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_LAST_STEP = "last_step"
         const val KEY_LAST_STEP_ELAPSED = "last_step_elapsed_ms_bucketed"
         const val KEY_CANCELLATION_REASON = "cancellation_reason"
+        const val KEY_DID_CRASH = "did_crash"
 
         const val STEP_STARTED = "started"
         const val STEP_PROGRESS_PREFIX = "progress_"

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Message
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -46,12 +47,15 @@ interface PirDetachedWebViewProvider {
      * @param context in which the webview should run - could be service/activity
      * @param scriptToLoad the JS script that is needed for PIR to run.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
+     * @param onPageLoadFailed callback to receive whenever a url has failed to load.
+     * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
      */
     fun createInstance(
         context: Context,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView
 
     /**
@@ -60,12 +64,15 @@ interface PirDetachedWebViewProvider {
      * @param webView in which PIR should run
      * @param scriptToLoad the JS script that is needed for PIR to run.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
+     * @param onPageLoadFailed callback to receive whenever a url has failed to load.
+     * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
      */
     fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView
 }
 
@@ -82,8 +89,9 @@ class RealPirDetachedWebViewProvider @Inject constructor(
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
-        return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed)
+        return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed, onRendererGone)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -92,6 +100,7 @@ class RealPirDetachedWebViewProvider @Inject constructor(
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
         return webView.apply {
             webChromeClient = object : WebChromeClient() {
@@ -172,6 +181,17 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                         onPageLoadFailed(requestedUrl)
                     }
                     super.onReceivedError(view, request, error)
+                }
+
+                override fun onRenderProcessGone(
+                    view: WebView?,
+                    detail: RenderProcessGoneDetail?,
+                ): Boolean {
+                    val didCrash = detail?.didCrash() == true
+                    logcat { "PIR-SCAN: onRenderProcessGone didCrash=$didCrash - keeping :pir process alive" }
+                    onRendererGone(didCrash)
+                    // keep host process alive
+                    return true
                 }
             }
             settings.apply {
