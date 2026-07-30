@@ -129,14 +129,13 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
-    fun `when resolved suggestions include summarize-page then it is filtered out`() = runTest {
-        val tailored = ContextualSuggestedPrompt("key-takeaways", "What are the key takeaways?", "Key takeaways?", "summary")
-        val summarize = ContextualSuggestedPrompt("summarize-page", "Summarize this page", "Summarize this page.", "summary")
-        stubProvider(listOf(summarize, tailored))
+    fun `when provider returns the summarize-page fallback then it is rendered`() = runTest {
+        val fallback = ContextualSuggestedPrompt("summarize-page", "Summarize this page", "Summarize this page.", "summary")
+        stubProvider(listOf(fallback))
 
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
 
-        assertEquals(listOf(tailored), viewModel.viewState.value.suggestions)
+        assertEquals(listOf(fallback), viewModel.viewState.value.suggestions)
     }
 
     @Test

@@ -89,7 +89,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
             uiLocale = Locale.getDefault().toLanguageTag(),
         )
         val resolved = suggestedPromptsProvider.resolveSuggestions(input)
-            .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
         _viewState.value = ViewState(suggestions = resolved, loading = false)
     }
 
@@ -112,6 +111,5 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     companion object {
         private const val TIMEOUT_MS = 5_000L
-        private const val SUGGESTION_ID_SUMMARIZE_PAGE = "summarize-page"
     }
 }
