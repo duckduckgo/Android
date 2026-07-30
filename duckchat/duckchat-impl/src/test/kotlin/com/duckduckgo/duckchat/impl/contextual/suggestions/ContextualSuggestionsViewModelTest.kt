@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual.suggestions
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -180,6 +181,26 @@ class ContextualSuggestionsViewModelTest {
         viewModel.clear()
 
         assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+        assertFalse(viewModel.viewState.value.loading)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `when start surface cycles then stale timeout from previous cycle cannot cut the new load short`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.advanceTimeBy(1_000)
+        viewModel.clear()
+
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+        assertTrue(viewModel.viewState.value.loading)
+
+        coroutineRule.testDispatcher.scheduler.advanceTimeBy(4_500)
+
+        assertTrue(viewModel.viewState.value.loading)
+        verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertFalse(viewModel.viewState.value.loading)
     }
 }

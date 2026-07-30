@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,8 +48,11 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
+    private var loadJob: Job? = null
+
     fun load() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             val enabled = withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
             if (!enabled) return@launch
             _viewState.value = ViewState(suggestions = emptyList(), loading = true)
@@ -70,6 +74,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     fun clear() {
+        loadJob?.cancel()
         _viewState.value = ViewState(suggestions = emptyList(), loading = false)
     }
 
