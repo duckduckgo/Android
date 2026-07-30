@@ -2759,6 +2759,43 @@ class DuckChatContextualViewModelTest {
         )
 
     @Test
+    fun `when suggestion selected with valid page context then context is attached and submitted`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = """{"title":"Recipe","url":"https://bbc.co.uk/food","content":"ingredients"}"""
+        val suggestion = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
+    fun `when suggestion selected without valid page context then submitted without context`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = ""
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithoutContextNative()
+    }
+
+    @Test
+    fun `when user removed context then suggestion tap re-attaches it`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = """{"title":"Recipe","url":"https://bbc.co.uk/food","content":"ingredients"}"""
+        testee.removePageContext()
+        val suggestion = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
     fun `when suggestion selected then prompt submitted and chat opened`() = runTest {
         testee = buildViewModel()
         val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
