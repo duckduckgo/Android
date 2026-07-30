@@ -41,15 +41,15 @@ import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 /**
- * A reusable yellow pill for short status labels (e.g. "Beta", "New").
+ * A reusable pill for short status labels (e.g. "Beta", "New").
  *
- * The palette is intentionally identical in light and dark, matching the View `DaxYellowPill`.
+ * The palette is intentionally identical in light and dark.
  * Callers supply their own (localised) label.
  *
  * @param text Pill label; rendered upper-cased.
  * @param modifier Modifier applied to the pill container.
  *
- * Asana task: https://app.asana.com/1/137249556945/project/1215496415658080/task/1211659112661214
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217020584206032
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=6032-13783
  */
 @Composable

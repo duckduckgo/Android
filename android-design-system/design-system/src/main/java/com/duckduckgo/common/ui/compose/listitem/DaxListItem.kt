@@ -48,7 +48,34 @@ import com.duckduckgo.common.ui.compose.pill.DaxPill
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import androidx.compose.material3.Icon as M3Icon
 
+/**
+ * Layout and behaviour core shared by every list-item variant ([DaxOneLineListItem],
+ * [DaxTwoLineListItem], [DaxSettingsListItem]).
+ *
+ * It stays internal: the variants are the public surface and each decides which parameters to
+ * expose, wrapping `String` as [AnnotatedString] at its own boundary. A variant restates any
+ * rendering-affecting default it relies on rather than inheriting it from here.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217019219692521
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=7394-53145
+ *
+ * @param primaryText Primary label.
+ * @param modifier Modifier applied to the list item row.
+ * @param secondaryText Secondary caption shown beneath the primary label; `null` = one-line layout.
+ * @param pillText Optional pill rendered inline after the primary text; `null` = no pill.
+ * @param primaryTextColor Primary label colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
+ * @param secondaryTextColor Secondary caption colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
+ * @param primaryMaxLines Maximum lines for the primary label.
+ * @param secondaryMaxLines Maximum lines for the secondary caption.
+ * @param leadingContent Optional leading slot — use [DaxListItemLeadingScope] members.
+ * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
+ * @param onClick Optional click handler; when non-null the row becomes clickable.
+ * @param onLongClick Optional long-click handler; when non-null the row becomes long-clickable.
+ * @param enabled Whether the row is enabled and interactive. Disabled rows are dimmed, and both
+ * scopes pass the state on to their members so slot content is disabled rather than only dimmed.
+ */
 @Composable
 internal fun DaxListItem(
     primaryText: AnnotatedString,
@@ -81,6 +108,7 @@ internal fun DaxListItem(
     }
     val leadingScope = DaxListItemLeadingScope(enabled)
     val trailingScope = DaxListItemTrailingScope(enabled)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -93,6 +121,7 @@ internal fun DaxListItem(
             leadingScope.leadingContent()
             Spacer(Modifier.width(DaxListItemDefaults.LeadingGap))
         }
+
         Column(Modifier.weight(1f).alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DaxText(
@@ -107,6 +136,7 @@ internal fun DaxListItem(
                     DaxPill(text = pillText)
                 }
             }
+
             if (secondaryText != null) {
                 DaxText(
                     text = secondaryText,
@@ -116,6 +146,7 @@ internal fun DaxListItem(
                 )
             }
         }
+
         if (trailingContent != null) {
             Spacer(Modifier.width(DaxListItemDefaults.TrailingGap))
             trailingScope.trailingContent()
@@ -123,8 +154,29 @@ internal fun DaxListItem(
     }
 }
 
+/**
+ * Receiver scope for a list item's leading slot.
+ *
+ * Typing the slot as a receiver on this scope is what restricts leading content to the design
+ * system's own composables; the `DaxListItemContentDetector` lint rule enforces it at build time.
+ *
+ * Members combine the owning row's enabled state with their own, so a disabled row disables its
+ * slot content rather than only dimming it.
+ */
 @Stable
 class DaxListItemLeadingScope internal constructor(private val parentEnabled: Boolean) {
+
+    /**
+     * Leading icon.
+     *
+     * @param painter Icon artwork.
+     * @param contentDescription Accessibility description; `null` for a decorative icon.
+     * @param modifier Modifier applied to the icon container.
+     * @param size Icon size; independent of [background].
+     * @param background Container drawn behind the icon; independent of [size].
+     * @param tint Icon tint; `null` renders the painter's own colours, for artwork that carries
+     * them already (e.g. a favicon).
+     */
     @Composable
     fun Icon(
         painter: Painter,
@@ -146,11 +198,12 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
                     .clip(CircleShape)
                     .background(DuckDuckGoTheme.colors.backgrounds.container)
         }
+
         Box(
             modifier = containerModifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
             contentAlignment = Alignment.Center,
         ) {
-            androidx.compose.material3.Icon(
+            M3Icon(
                 painter = painter,
                 contentDescription = contentDescription,
                 tint = tint ?: Color.Unspecified,
@@ -160,8 +213,26 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
     }
 }
 
+/**
+ * Receiver scope for a list item's trailing slot.
+ *
+ * Typing the slot as a receiver on this scope is what restricts trailing content to the design
+ * system's own composables; the `DaxListItemContentDetector` lint rule enforces it at build time.
+ *
+ * Members combine the owning row's enabled state with their own, so a disabled row disables its
+ * slot content rather than only dimming it.
+ */
 @Stable
 class DaxListItemTrailingScope internal constructor(private val parentEnabled: Boolean) {
+
+    /**
+     * Trailing switch.
+     *
+     * @param checked Whether the switch is on.
+     * @param onCheckedChange Called when the user toggles the switch; `null` = read-only.
+     * @param modifier Modifier applied to the switch.
+     * @param enabled Whether the switch itself is enabled, on top of the row's enabled state.
+     */
     @Composable
     fun Switch(
         checked: Boolean,
@@ -175,8 +246,14 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
     /**
      * Trailing icon. [onClick] = null ⇒ decorative (non-clickable); non-null ⇒ clickable.
      *
+     * @param painter Icon artwork.
+     * @param contentDescription Accessibility description; `null` for a decorative icon.
+     * @param modifier Modifier applied to the icon.
+     * @param onClick Called when the icon is tapped; `null` makes the icon decorative.
+     * @param size Icon size.
      * @param tint Honoured only for the decorative case (`onClick == null`). Clickable icons
      * render the painter's own colours via [DaxIconButton], which exposes no tint.
+     * @param enabled Whether the icon itself is enabled, on top of the row's enabled state.
      */
     @Composable
     fun Icon(
@@ -193,6 +270,7 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
             DaxListItemTrailingIconSize.Small -> DaxListItemDefaults.TrailingIconSmall
             DaxListItemTrailingIconSize.Medium -> DaxListItemDefaults.TrailingIconMedium
         }
+
         if (onClick != null) {
             DaxIconButton(
                 onClick = onClick,
@@ -204,7 +282,7 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                     .alpha(if (effectiveEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
             )
         } else {
-            androidx.compose.material3.Icon(
+            M3Icon(
                 painter = painter,
                 contentDescription = contentDescription,
                 tint = tint ?: Color.Unspecified,
@@ -215,6 +293,14 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
         }
     }
 
+    /**
+     * Trailing ghost button.
+     *
+     * @param text Button label.
+     * @param onClick Called when the button is tapped.
+     * @param modifier Modifier applied to the button.
+     * @param enabled Whether the button itself is enabled, on top of the row's enabled state.
+     */
     @Composable
     fun Button(
         text: String,
@@ -225,6 +311,12 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
         DaxGhostButton(text = text, onClick = onClick, modifier = modifier, enabled = enabled && parentEnabled)
     }
 
+    /**
+     * Trailing status indicator, the fixed trailing element of [DaxSettingsListItem].
+     *
+     * @param status Status to display.
+     * @param modifier Modifier applied to the indicator.
+     */
     @Composable
     fun StatusIndicator(status: Status, modifier: Modifier = Modifier) {
         DaxStatusIndicator(status = status, modifier = modifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha))
