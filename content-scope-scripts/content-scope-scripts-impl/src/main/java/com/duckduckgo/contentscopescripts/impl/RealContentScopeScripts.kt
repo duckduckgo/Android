@@ -25,10 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
@@ -54,8 +52,7 @@ interface CoreContentScopeScripts {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = CoreContentScopeScripts::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@ContributesBinding(AppScope::class)
 class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val userAllowListRepository: UserAllowListRepository,
@@ -64,7 +61,7 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
-) : CoreContentScopeScripts, PrivacyConfigCallbackPlugin {
+) : CoreContentScopeScripts {
     // These adapters must be declared before cachedContentScopeJson.
     private val reusableMoshi: Moshi = Builder().build()
     private val userUnprotectedDomainsAdapter: JsonAdapter<List<String>> =
@@ -74,21 +71,13 @@ class RealContentScopeScripts @Inject constructor(
     private val experimentsAdapter: JsonAdapter<List<Experiment>> =
         reusableMoshi.adapter(Types.newParameterizedType(List::class.java, Experiment::class.java))
 
-    // Plugin config() is driven only by privacy-config persistence, so we cache the assembled
-    // config string and refresh it only when a new config is persisted/downloaded, rather than
-    // iterating every plugin on every navigation. Set from onPrivacyConfigPersisted() (worker
-    // thread) and read in getScript() (main), hence @Volatile.
-    @Volatile private var pluginConfigNeedsRebuild: Boolean = true
-
-    // Startup latch: feature repos load their persisted config into memory asynchronously and
-    // expose no completion signal, so we keep refreshing the plugin config on every call until it
-    // stops changing (repos settled), then trust pluginConfigNeedsRebuild. Only touched from getScript().
-    // On a config download the repos reload synchronously inside PrivacyFeaturePlugin.store(), before
-    // onPrivacyConfigPersisted() is dispatched, so the latch only has to cover process startup.
-    private var pluginConfigSettled: Boolean = false
+    // Compared against a freshly assembled config on every call, not used to skip assembling it: the
+    // feature repos load their persisted config into memory asynchronously and expose no completion
+    // signal, so any attempt to decide up front that the config cannot have changed risks serving
+    // default protections for the rest of the process.
     private var cachedPluginConfig: String = ""
 
-    private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimizeInjectionEnabled())
+    private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimized = true)
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
     private var cachedUserUnprotectedDomainsJson: String = EMPTY_JSON_LIST
@@ -132,11 +121,6 @@ class RealContentScopeScripts @Inject constructor(
     ): String {
         var updateJS = false
 
-        // This path maintains cachedContentScopeJson but not cachedPluginConfig, so the optimized path
-        // must re-derive it if the flag is ever flipped back mid-session. Write-only here: nothing below
-        // reads it, so legacy behaviour is unaffected.
-        pluginConfigNeedsRebuild = true
-
         val pluginParameters = getPluginParameters()
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
@@ -167,10 +151,9 @@ class RealContentScopeScripts @Inject constructor(
         return cachedContentScopeJS
     }
 
-    // Optimized path: the expensive plugin config() assembly is cached and refreshed only when the
-    // privacy config is persisted (plus a startup stabilisation latch, see field docs), and the
-    // content scope JSON is re-serialized only when one of its two inputs actually changed. The
-    // cheaper per-call inputs (allow list, preferences, cohorts) are unchanged.
+    // Optimized path: every input is still read on every call, so nothing here can go stale. What it
+    // avoids is the work downstream of an unchanged input — re-serializing the unprotected temporary
+    // exceptions, rebuilding the content scope JSON, and reassembling the script template.
     private fun getOptimizedScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
@@ -178,15 +161,11 @@ class RealContentScopeScripts @Inject constructor(
         var updateJS = false
         var contentScopeChanged = false
 
-        if (pluginConfigNeedsRebuild || !pluginConfigSettled) {
-            pluginConfigNeedsRebuild = false
-            val pluginConfig = getPluginConfig()
-            // An empty config means the repos have not finished loading yet, so never latch on it.
-            pluginConfigSettled = pluginConfig.isNotEmpty() && pluginConfig == cachedPluginConfig
-            if (pluginConfig != cachedPluginConfig) {
-                cachedPluginConfig = pluginConfig
-                contentScopeChanged = true
-            }
+        val pluginParameters = getPluginParameters()
+
+        if (cachedPluginConfig != pluginParameters.config) {
+            cachedPluginConfig = pluginParameters.config
+            contentScopeChanged = true
         }
 
         val unprotectedTemporaryExceptions = unprotectedTemporary.unprotectedTemporaryExceptions
@@ -206,7 +185,7 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(getPluginPreferences(), isDesktopMode, activeExperiments, optimized = true)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments, optimized = true)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
@@ -227,18 +206,6 @@ class RealContentScopeScripts @Inject constructor(
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
 
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
-
-    override fun onPrivacyConfigDownloaded() {
-        // No-op: invalidation is handled in onPrivacyConfigPersisted(), which fires on every persist
-        // (both the startup local-config load and each remote download), whereas this fires on
-        // downloads only.
-    }
-
-    override fun onPrivacyConfigPersisted() {
-        // Invalidate the cached plugin config so the next getScript() rebuilds it. Fires on every
-        // config persist (startup local load and each remote download).
-        pluginConfigNeedsRebuild = true
-    }
 
     private fun getPluginParameters(): PluginParameters {
         var config = ""
@@ -265,16 +232,6 @@ class RealContentScopeScripts @Inject constructor(
         }
         return PluginParameters(config, preferences)
     }
-
-    private fun getPluginConfig(): String = joinNonEmpty { it.config() }
-
-    private fun getPluginPreferences(): String = joinNonEmpty { it.preferences() }
-
-    private inline fun joinNonEmpty(value: (ContentScopeConfigPlugin) -> String?): String =
-        pluginPoint.getPlugins()
-            .mapNotNull(value)
-            .filter { it.isNotEmpty() }
-            .joinToString(",")
 
     private fun cacheUserUnprotectedDomains(
         userUnprotectedDomains: List<String>,

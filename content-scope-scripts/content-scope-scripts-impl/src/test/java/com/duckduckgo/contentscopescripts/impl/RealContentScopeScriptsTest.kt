@@ -29,7 +29,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -170,61 +169,38 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
-    fun whenOptimizeEnabledAndPluginConfigChangesAfterStabilisingThenNotReflectedUntilPrivacyConfigPersisted() {
+    fun whenOptimizeEnabledAndPluginConfigChangesThenReflectedImmediately() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
-        // Two calls to let the plugin config stabilise (repos "settled").
         testee.getScript(null, listOf())
-        testee.getScript(null, listOf())
-
-        // Plugin config changes with no persist signal: must keep serving the cached config.
-        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        val staleJs = testee.getScript(null, listOf())
-        assertTrue(staleJs.contains("\"features\":{$config1,$config2}"))
-
-        // Persist signal invalidates the cached plugin config; next call rebuilds it.
-        (testee as PrivacyConfigCallbackPlugin).onPrivacyConfigPersisted()
-        val freshJs = testee.getScript(null, listOf())
-        assertTrue(freshJs.contains("\"features\":{$config1}"))
-        assertFalse("stale config2 must be gone after invalidation", freshJs.contains(config2))
-    }
-
-    @Test
-    fun whenOptimizeEnabledAndPluginConfigChangesBeforeStabilisingThenReflectedWithoutPersistSignal() {
-        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
-
-        // First call: the config has not stabilised yet, so the next call must still rebuild it. This is the
-        // cold-start window where the feature repos are still loading their persisted config into memory.
         testee.getScript(null, listOf())
 
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
         val js = testee.getScript(null, listOf())
 
         assertTrue(js.contains("\"features\":{$config1}"))
-        assertFalse("config2 must be gone while the plugin config is still unsettled", js.contains(config2))
+        assertFalse("config2 must be gone on the very next call", js.contains(config2))
     }
 
     @Test
-    fun whenOptimizeEnabledAndPluginConfigIsEmptyThenNeverLatchesAndPicksUpTheLoadedConfig() {
+    fun whenOptimizeEnabledAndPluginConfigLoadsAfterEarlyNavigationsThenItIsStillPickedUp() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
-        // The feature repos have not finished loading their persisted config yet, so every plugin
-        // reports an empty config for the first two sweeps and the real config on the third.
-        whenever(mockPlugin1.config()).thenReturn("", "", config1)
-        whenever(mockPlugin2.config()).thenReturn("")
+        // A feature repo that has not finished its async load reports the entity's default JSON, which is
+        // non-empty ("elementHiding":{} and friends). Repeated identical sweeps therefore say nothing about
+        // whether the repos are done, and must not be taken as a signal to stop sweeping.
+        val configDefault = "\"config1\":{}"
+        whenever(mockPlugin1.config()).thenReturn(configDefault, configDefault, config1)
 
-        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{}"))
-        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{}"))
+        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{$configDefault,$config2}"))
+        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{$configDefault,$config2}"))
 
-        // Two identical empty sweeps must not settle the latch, otherwise the loaded config would
-        // never be picked up. No persist signal is sent here on purpose.
         val js = testee.getScript(null, listOf())
-        assertTrue("the loaded config must be picked up without a persist signal", js.contains("\"features\":{$config1}"))
+        assertTrue("a late repo load must be picked up", js.contains("\"features\":{$config1,$config2}"))
+        assertFalse("the default config must not survive the load", js.contains(configDefault))
     }
 
     @Test
-    fun whenOptimizeEnabledAndOnlyUnprotectedTemporaryChangesAfterSettlingThenContentScopeJsonIsRebuilt() {
+    fun whenOptimizeEnabledAndOnlyUnprotectedTemporaryChangesThenContentScopeJsonIsRebuilt() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
-        // Two calls to settle the plugin config, so the rebuild below can only be driven by the
-        // unprotected temporary change and not by the plugin config branch.
         testee.getScript(null, listOf())
         testee.getScript(null, listOf())
 
@@ -232,37 +208,19 @@ class RealContentScopeScriptsTest {
         val js = testee.getScript(null, listOf())
 
         assertTrue(js.contains("\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]"))
-        assertTrue("the settled plugin config must survive the rebuild", js.contains("\"features\":{$config1,$config2}"))
+        assertTrue("the unchanged plugin config must survive the rebuild", js.contains("\"features\":{$config1,$config2}"))
     }
 
     @Test
-    fun whenOptimizeEnabledAndPrivacyConfigDownloadedThenCachedPluginConfigIsNotInvalidated() {
-        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
-        testee.getScript(null, listOf())
-        testee.getScript(null, listOf())
-
-        // Invalidation is deliberately driven by onPrivacyConfigPersisted(), which is a superset of
-        // this callback, so a download on its own must not rebuild the cached plugin config.
-        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        (testee as PrivacyConfigCallbackPlugin).onPrivacyConfigDownloaded()
-
-        val js = testee.getScript(null, listOf())
-        assertTrue(js.contains("\"features\":{$config1,$config2}"))
-    }
-
-    @Test
-    fun whenOptimizeEnabledThenPluginConfigIsOnlyRebuiltUntilSettledAndOnPersist() {
+    fun whenOptimizeEnabledThenPluginConfigIsSweptOnEveryCall() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
 
-        // Calls 1 and 2 both sweep the plugins (call 2 is what settles the latch); calls 3 and 4 must not.
         repeat(4) { testee.getScript(null, listOf()) }
-        verify(mockPlugin1, times(2)).config()
 
-        // A persist signal re-arms the rebuild for exactly one sweep: the config comes back unchanged, so
-        // the latch settles again immediately and the following calls skip the sweep.
-        (testee as PrivacyConfigCallbackPlugin).onPrivacyConfigPersisted()
-        repeat(3) { testee.getScript(null, listOf()) }
-        verify(mockPlugin1, times(3)).config()
+        // Deliberately not cached, see the cachedPluginConfig field comment. The saving is downstream: an
+        // unchanged config means no JSON rebuild and no template reassembly.
+        verify(mockPlugin1, times(4)).config()
+        verify(mockContentScopeJsReader).getContentScopeJS()
     }
 
     @Test
@@ -282,19 +240,19 @@ class RealContentScopeScriptsTest {
     fun whenFlagFlipsBackToOptimizedThenPluginConfigDroppedOnTheLegacyPathIsNotResurrected() {
         val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
 
-        // Settle the cached plugin config on the full plugin set.
+        // Record the plugin config on the full plugin set.
         optimizeFlag.setRawStoredState(State(enable = true))
         testee.getScript(null, listOf())
         testee.getScript(null, listOf())
 
-        // The legacy path takes over and the plugin config shrinks. Legacy recomputes it per call, so it
-        // serves the new config, but it does not maintain the optimized path's cache of it.
+        // The legacy path takes over and the plugin config shrinks. Legacy serves the new config but does
+        // not maintain the comparison baseline the optimized path keeps.
         optimizeFlag.setRawStoredState(State(enable = false))
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
         assertTrue(testee.getScript(null, listOf()).contains("\"features\":{$config1}"))
 
-        // Back to the optimized path with no persist signal, and something else forces a rebuild of the
-        // content scope JSON. It must not be rebuilt from the plugin config captured before the flip.
+        // Back on the optimized path, with something else also forcing a rebuild of the content scope
+        // JSON. It must not be rebuilt from the config recorded before the flip.
         optimizeFlag.setRawStoredState(State(enable = true))
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
         val js = testee.getScript(null, listOf())
