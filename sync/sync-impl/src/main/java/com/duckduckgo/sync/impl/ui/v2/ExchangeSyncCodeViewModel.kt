@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
+class ExchangeSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val syncUrl: String,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
@@ -206,7 +206,7 @@ class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(syncUrl: String): SyncWithAnotherDeviceViewModel
+        fun create(syncUrl: String): ExchangeSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,

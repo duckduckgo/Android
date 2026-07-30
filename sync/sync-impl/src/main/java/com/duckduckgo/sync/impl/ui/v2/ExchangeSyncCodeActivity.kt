@@ -41,17 +41,17 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.RunAcknowledgmentAnimation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowPairingAcknowledgement
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV1Error
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Factory
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Factory.Provider
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory.Provider
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import kotlinx.coroutines.flow.launchIn
@@ -77,7 +77,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
         }
 
-    private val viewModel by viewModels<SyncWithAnotherDeviceViewModel> {
+    private val viewModel by viewModels<ExchangeSyncCodeViewModel> {
         Provider(vmFactory, syncUrl)
     }
 

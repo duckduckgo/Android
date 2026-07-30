@@ -32,16 +32,16 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.RunAcknowledgmentAnimation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowPairingAcknowledgement
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV1Error
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -60,7 +60,7 @@ import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-class SyncWithAnotherDeviceViewModelTest {
+class ExchangeSyncCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -77,7 +77,7 @@ class SyncWithAnotherDeviceViewModelTest {
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
 
-    private fun createTestee() = SyncWithAnotherDeviceViewModel(
+    private fun createTestee() = ExchangeSyncCodeViewModel(
         syncUrl = "sync-url",
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
