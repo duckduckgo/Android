@@ -32,6 +32,8 @@ import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -98,7 +100,7 @@ class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
 
     fun onErrorDialogDismissed() {
         viewModelScope.launch {
-            _commands.send(Command.SetFailureResult)
+            _commands.send(Command.SetPairingResult(SyncPairingResult.Failure))
             _commands.send(Command.Close)
         }
     }
@@ -116,7 +118,7 @@ class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
 
                         else -> {
                             animationCompletionSignal.await()
-                            _commands.send(Command.SetSuccessResult)
+                            _commands.send(Command.SetPairingResult(pairingResult(role = null)))
                             _commands.send(Command.Close)
                         }
                     }
@@ -146,7 +148,7 @@ class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
 
             is DispatchOutcome.LoggedIn -> {
                 animationCompletionSignal.await()
-                _commands.send(Command.SetSuccessResult)
+                _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
                 _commands.send(Command.Close)
             }
 
@@ -187,11 +189,19 @@ class SyncWithAnotherDeviceViewModel @AssistedInject constructor(
             val content: V2PairingErrorContent,
         ) : Command
 
-        data object SetFailureResult : Command
-
-        data object SetSuccessResult : Command
+        data class SetPairingResult(
+            val result: SyncPairingResult,
+        ) : Command
 
         data object Close : Command
+    }
+
+    private suspend fun pairingResult(role: Role?): SyncPairingResult = withContext(dispatchers.io()) {
+        accountRepository
+            .getThisConnectedDevice()
+            ?.let(ParcelableDevice::fromConnectedDevice)
+            ?.let { device -> SyncPairingResult.Success(device, role, PairingMethod.ScannedCode) }
+            ?: SyncPairingResult.Failure
     }
 
     @AssistedFactory

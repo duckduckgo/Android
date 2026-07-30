@@ -43,7 +43,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2EditDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_KEY
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_EXTRA_KEY
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_EDITED
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_REMOVED
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_SYNC_TURNED_OFF
@@ -79,8 +79,8 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel by viewModels<EditDeviceViewModel> {
-        val device = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_KEY, ParcelableDevice::class.java)) {
-            "Missing intent extra: '$DEVICE_KEY'"
+        val device = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_EXTRA_KEY, ParcelableDevice::class.java)) {
+            "Missing intent extra: '$DEVICE_EXTRA_KEY'"
         }
 
         Provider(vmFactory, device.toConnectedDevice())
@@ -298,7 +298,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
             context: Context,
             device: ParcelableDevice,
         ): Intent {
-            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_KEY, device)
+            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_EXTRA_KEY, device)
         }
     }
 }

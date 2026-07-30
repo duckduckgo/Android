@@ -166,8 +166,8 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeadline() {
-        val deviceName = requireNotNull(intent.getStringExtra(DEVICE_NAME_KEY)) {
-            "Missing intent extra: '$DEVICE_NAME_KEY'"
+        val deviceName = requireNotNull(intent.getStringExtra(DEVICE_NAME_EXTRA_KEY)) {
+            "Missing intent extra: '$DEVICE_NAME_EXTRA_KEY'"
         }
         binding.headlineText.text = getString(R.string.sync_device_v2_recovery_code_headline, deviceName)
     }
@@ -219,13 +219,13 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val DEVICE_NAME_KEY = "device_name"
+        private const val DEVICE_NAME_EXTRA_KEY = "device_name"
 
         fun intent(
             context: Context,
             deviceName: String,
         ): Intent {
-            return Intent(context, RecoveryCodeActivity::class.java).putExtra(DEVICE_NAME_KEY, deviceName)
+            return Intent(context, RecoveryCodeActivity::class.java).putExtra(DEVICE_NAME_EXTRA_KEY, deviceName)
         }
     }
 }

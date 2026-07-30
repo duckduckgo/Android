@@ -46,8 +46,7 @@ import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.Ask
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.RunAcknowledgmentAnimation
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowPairingAcknowledgement
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.SyncWithAnotherDeviceViewModel.Command.ShowV2Error
@@ -113,8 +112,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowPairingAcknowledgement -> showPairingAcknowledgmentDialog()
             is RunAcknowledgmentAnimation -> runAcknowledgementAnimation()
-            is SetSuccessResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_SUCCESS)
-            is SetFailureResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_FAILURE)
+            is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
             is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()

@@ -91,6 +91,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -146,12 +147,11 @@ class SyncActivity : DuckDuckGoActivity() {
                 recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.deviceName))
             }
 
-            is SyncThisDeviceContract.Output.Canceled -> {
-                viewModel.onSyncThisDeviceCanceled()
-                viewModel.onConnectionCancelled()
+            is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
+                handlePairingResult(result.result)
             }
 
-            is SyncThisDeviceContract.Output.RequestSyncWithAnotherDevice -> {
+            is SyncThisDeviceContract.Output.Dismissed -> {
                 viewModel.onSyncThisDeviceCanceled()
                 viewModel.onConnectionCancelled()
             }
@@ -174,7 +174,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 viewModel.onTurnOffSyncConfirmed(result.device)
             }
 
-            is EditDeviceContract.Output.NoOp -> Unit
+            is EditDeviceContract.Output.Dismissed -> Unit
         }
     }
 
@@ -189,7 +189,30 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val readSyncCodeLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
-    ) { /* No-op, auto-refresh will update the device list */ }
+    ) { result ->
+        when (result) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> handlePairingResult(result.result)
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val addAnotherDeviceLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { result ->
+        when (result) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                when (result.result) {
+                    is SyncPairingResult.Success -> {
+                        viewModel.onDeviceConnected()
+                    }
+
+                    is SyncPairingResult.Failure -> viewModel.onConnectionCancelled()
+                }
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
 
     private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -301,7 +324,9 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is AddAnotherDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                }
             }
 
             is AskDeleteAccount -> {
@@ -430,6 +455,23 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun handlePairingResult(result: SyncPairingResult) {
+        when (result) {
+            is SyncPairingResult.Success -> {
+                viewModel.onDeviceConnected()
+                when (result.method) {
+                    PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                    PairingMethod.DisplayedCode -> Unit
+                }
+            }
+
+            is SyncPairingResult.Failure -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
@@ -451,7 +493,7 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onSyncWithAnotherDevice()
         }
         binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
-            viewModel.onSyncWithAnotherDevice()
+            viewModel.onAddAnotherDevice()
         }
     }
 
