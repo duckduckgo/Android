@@ -967,6 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Überspringen</string>
 
     <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingDockStepTitle">Füge mich zu deiner Favoritenzeile hinzu.</string>
     <string name="preOnboardingAddToDockBody">Suche auf deinem Startbildschirm das DuckDuckGo-Symbol. Ziehe es an die richtige Stelle. Das war es schon!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Verstanden.</string>
 

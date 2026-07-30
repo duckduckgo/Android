@@ -985,6 +985,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Izlaist</string>
 
     <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingDockStepTitle">Pievieno mani izlases joslai.</string>
     <string name="preOnboardingAddToDockBody">Atrodi DuckDuckGo ikonu sākuma ekrānā. Pēc tam piespied un ievelc vietā. Tik vienkārši!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Sapratu!</string>
 
