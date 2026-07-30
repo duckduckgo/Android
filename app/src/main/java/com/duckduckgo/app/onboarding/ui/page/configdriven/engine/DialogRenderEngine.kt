@@ -105,6 +105,7 @@ class DialogRenderEngine(
                     cardStage.fadeInContent(handle.fadeTargets, animating(animate)) {
                         if (bound !== handle) return@fadeInContent
                         playAfterFade(handle, animating(animate))
+                        handle.onContentReady?.invoke()
                         isAnimating = false
                     }
                 }

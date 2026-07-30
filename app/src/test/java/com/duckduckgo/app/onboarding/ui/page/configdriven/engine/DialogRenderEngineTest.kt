@@ -187,6 +187,54 @@ class DialogRenderEngineTest {
     }
 
     @Test
+    fun `content ready runs once the entrance settles, not before`() = runTest {
+        var readyCount = 0
+        content.onContentReady = { readyCount++ }
+        cardStage.autoComplete = false
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+        assertEquals(0, readyCount)
+
+        cardStage.completePendingStages()
+
+        assertEquals(1, readyCount)
+    }
+
+    @Test
+    fun `content ready runs once on a snapped render`() = runTest {
+        var readyCount = 0
+        content.onContentReady = { readyCount++ }
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
+
+        assertEquals(1, readyCount)
+    }
+
+    @Test
+    fun `content ready runs once when the entrance is skipped`() = runTest {
+        var readyCount = 0
+        content.onContentReady = { readyCount++ }
+        cardStage.autoComplete = false
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        testee.skipRunningAnimations()
+
+        assertEquals(1, readyCount)
+    }
+
+    @Test
+    fun `content ready does not run for an entrance abandoned by release`() = runTest {
+        var readyCount = 0
+        content.onContentReady = { readyCount++ }
+        cardStage.autoComplete = false
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        testee.release()
+
+        assertEquals(0, readyCount)
+    }
+
+    @Test
     fun `release unbinds the content and cancels the after-fade animator`() = runTest {
         val animator: Animator = mock()
         content.afterFade = { animator }
@@ -253,6 +301,7 @@ private class FakeContentController : ContentController {
     var bindCount = 0
     var hidden = false
     var afterFade: (() -> Animator)? = null
+    var onContentReady: (() -> Unit)? = null
     var handleResult: (() -> NewUserOnboardingEvent)? = null
     var unbindCount = 0
 
@@ -266,6 +315,7 @@ private class FakeContentController : ContentController {
             title = null,
             fadeTargets = emptyList(),
             afterFade = afterFade,
+            onContentReady = onContentReady,
             result = handleResult,
             unbind = { unbindCount++ },
         )
@@ -338,6 +388,7 @@ private class FakeBackgroundController : BackgroundController {
     var applied: Pair<OnboardingBackgroundStep?, OnboardingBackgroundStep>? = null
     var animated = false
     var skipped = false
+    var released = false
 
     override fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean) {
         applied = previous to next
@@ -346,6 +397,10 @@ private class FakeBackgroundController : BackgroundController {
 
     override fun skipRunning() {
         skipped = true
+    }
+
+    override fun release() {
+        released = true
     }
 }
 
