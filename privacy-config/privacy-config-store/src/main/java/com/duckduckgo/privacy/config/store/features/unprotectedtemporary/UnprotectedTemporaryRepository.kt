@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 interface UnprotectedTemporaryRepository {
     fun updateAll(exceptions: List<UnprotectedTemporaryEntity>)
 
-    /** Immutable snapshot. A caller may hold the reference: it is replaced, never mutated. */
     val exceptions: List<FeatureException>
 }
 
@@ -41,9 +40,6 @@ class RealUnprotectedTemporaryRepository(
     private val unprotectedTemporaryDao: UnprotectedTemporaryDao =
         database.unprotectedTemporaryDao()
 
-    // Reloaded on a worker thread while readers are on the main thread, so it is published in a single
-    // assignment: a reader sees either the previous list or the complete new one. Refilling in place would
-    // let a reader observe any prefix of the list mid-reload.
     @Volatile
     private var snapshot: List<FeatureException> = emptyList()
 

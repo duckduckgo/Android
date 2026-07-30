@@ -75,12 +75,11 @@ class RealContentScopeScripts @Inject constructor(
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimized = true)
 
-    // Legacy-path baselines. Defensive copies, because the flag-off path is frozen as it shipped.
+    // Legacy-path baselines.
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
     private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
 
-    // Optimized-path baselines. Both repositories publish their list as an immutable snapshot in a single
-    // assignment, so holding the reference is enough and no copy is needed.
+    // Optimized-path baselines.
     private var lastUserUnprotectedDomains: List<String> = emptyList()
     private var lastUnprotectedTemporaryExceptions: List<FeatureException> = emptyList()
 
@@ -123,10 +122,8 @@ class RealContentScopeScripts @Inject constructor(
     ): String {
         var updateJS = false
 
-        // This path rewrites the shared JSON fields but keeps its own baselines, so the optimized baselines are
-        // dropped here. Without this, a mid-session flag flip followed by an input returning to its pre-flip
-        // value would leave the optimized path seeing no change while the shared JSON still holds what this
-        // path last wrote. Writes only: nothing below reads them, so legacy behaviour is unaffected.
+        // A mid-session flag flip followed by an input returning to its pre-flip value would leave the optimized path
+        // seeing no change. Writes only: nothing below reads them, so legacy behaviour is unaffected.
         cachedPluginConfig = ""
         lastUserUnprotectedDomains = emptyList()
         lastUnprotectedTemporaryExceptions = emptyList()
@@ -282,8 +279,6 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
-    // Frozen twins of the cacheOptimized* pair above: they copy the incoming list into a
-    // CopyOnWriteArrayList, which is what the flag-off path shipped with. Deleted with the flag.
     private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
         cachedUserUnprotectedDomains.clear()
         if (userUnprotectedDomains.isEmpty()) {

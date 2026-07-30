@@ -42,9 +42,6 @@ class RealUserAllowListRepository @Inject constructor(
     @IsMainProcess isMainProcess: Boolean,
 ) : UserAllowListRepository {
 
-    // Replaced on a worker thread while readers are on the main thread, so it is published in a single
-    // assignment rather than refilled in place. That also lets a caller hold the reference returned by
-    // domainsInUserAllowList() and detect a change by comparing it, instead of copying and deep-comparing.
     @Volatile
     private var userAllowList: List<String> = emptyList()
 
