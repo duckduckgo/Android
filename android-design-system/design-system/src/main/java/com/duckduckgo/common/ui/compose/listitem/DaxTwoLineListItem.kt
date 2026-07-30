@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.R
  * The primary label defaults to a single ellipsised line; the secondary caption is unbounded (wraps),
  * matching the View. Sibling overloads accept [AnnotatedString] for HTML / inline-styled text.
  *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217021145638316
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=6032-13665
  *
  * @param primaryText Primary label.

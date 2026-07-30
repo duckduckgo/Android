@@ -33,6 +33,9 @@ import com.duckduckgo.mobile.android.R
  *
  * The trailing slot is fixed to a [DaxListItemTrailingScope.StatusIndicator] driven by [status]; it is not a free slot like the other variants.
  *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217018486992588
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=13115-55051
+ *
  * @param primaryText Primary label.
  * @param status Status to display in the trailing slot — one of [Status.AlwaysOn], [Status.On], [Status.Off].
  * @param modifier Modifier applied to the list item row.
