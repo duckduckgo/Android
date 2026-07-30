@@ -76,4 +76,12 @@
     <string name="sync_scanner_v2_manual_entry_invalid_code_pasted">Sorry, the pasted code is invalid.</string>
     <string name="sync_another_device_v2_headline">Sync &amp; Backup is end-to-end encrypted on all your devices.</string>
     <string name="sync_another_device_v2_body">Connecting…</string>
+    <string name="sync_simplified_pairing_dialog_host_confirmation_title">Sync New Device?</string>
+    <string name="sync_simplified_pairing_dialog_host_positive_cta">Sync Now</string>
+    <string name="sync_simplified_pairing_dialog_host_negative_cta">Cancel</string>
+    <string name="sync_simplified_pairing_dialog_joiner_confirmation_title">Sync New Device?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_positive_cta">Sync Now</string>
+    <string name="sync_simplified_pairing_dialog_joiner_negative_cta">Cancel</string>
+    <string name="sync_simplified_pairing_dialog_confirm_title">Confirm on your other device…</string>
+    <string name="sync_simplified_pairing_dialog_confirm_cta">Got It</string>
 </resources>
