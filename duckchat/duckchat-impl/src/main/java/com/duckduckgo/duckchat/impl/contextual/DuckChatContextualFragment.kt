@@ -113,7 +113,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -535,6 +537,7 @@ class DuckChatContextualFragment :
 
         configureBehaviour(bottomSheetBehavior)
         configureButtons()
+        configureSuggestions()
     }
 
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -770,6 +773,7 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
+                        binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
                     }
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
@@ -780,6 +784,9 @@ class DuckChatContextualFragment :
                         logcat { "Duck.ai Contextual: OpenSheet" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
+                        if (viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.load()
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed -> {
@@ -793,6 +800,16 @@ class DuckChatContextualFragment :
         viewModel.viewState
             .onEach { viewState ->
                 renderViewState(viewState)
+            }.launchIn(lifecycleScope)
+
+        viewModel.viewState
+            .map { it.sheetMode }
+            .distinctUntilChanged()
+            .onEach { sheetMode ->
+                when (sheetMode) {
+                    DuckChatContextualViewModel.SheetMode.INPUT -> binding.contextualSuggestionsView.load()
+                    DuckChatContextualViewModel.SheetMode.WEBVIEW -> binding.contextualSuggestionsView.clear()
+                }
             }.launchIn(lifecycleScope)
 
         observeSubscriptionEventDataChannel()
@@ -811,8 +828,7 @@ class DuckChatContextualFragment :
             binding.contextualFullScreen.gone()
         }
 
-        binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
-        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        applyQuickActionVisibility(viewState)
         binding.legacyInputField.setHint(viewState.chatHintResId)
 
         if (viewState.showChatsIcon) {
@@ -892,6 +908,34 @@ class DuckChatContextualFragment :
 
     private fun showFireConfirmationDialog() {
         duckChatSharedViewModel.onContextualFireButtonClicked()
+    }
+
+    private fun applyQuickActionVisibility(viewState: DuckChatContextualViewModel.ViewState) {
+        val isSummarizeQuickAction =
+            viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE ||
+                viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE
+
+        if (isSummarizeQuickAction && binding.contextualSuggestionsView.hasContent()) {
+            binding.contextualPromptQuickAction.gone()
+        } else {
+            binding.contextualPromptQuickAction.show()
+            binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+            binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        }
+    }
+
+    private fun configureSuggestions() {
+        binding.contextualSuggestionsView.onSuggestionSelected = { suggestion ->
+            val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                binding.contextualNativeInputWidget.text
+            } else {
+                binding.legacyInputField.text.toString()
+            }
+            viewModel.onSuggestionSelected(suggestion, currentInput)
+        }
+        binding.contextualSuggestionsView.onContentChanged = {
+            applyQuickActionVisibility(viewModel.viewState.value)
+        }
     }
 
     private fun showChatsPopup(showNewChatHeader: Boolean, recentChats: List<ChatHistoryItem>) {

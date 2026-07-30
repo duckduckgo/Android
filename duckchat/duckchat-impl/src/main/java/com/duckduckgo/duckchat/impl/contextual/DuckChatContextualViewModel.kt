@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -780,6 +781,16 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onSuggestionSelected(
+        suggestion: ContextualSuggestedPrompt,
+        currentInput: String,
+    ) {
+        onPromptSent(
+            prompt = suggestion.prompt,
+            followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+        )
     }
 
     fun onAskAboutPageClicked() {
