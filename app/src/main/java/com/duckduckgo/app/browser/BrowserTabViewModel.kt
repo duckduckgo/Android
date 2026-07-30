@@ -1299,8 +1299,21 @@ class BrowserTabViewModel @Inject constructor(
         currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
             lastAutoCompleteState = it
             autoCompleteViewState.value = it
+            fireAutoCompleteDisplayedPixels(previous = currentViewState, updated = it)
         }
     }
+
+    private fun fireAutoCompleteDisplayedPixels(
+        previous: AutoCompleteViewState,
+        updated: AutoCompleteViewState,
+    ) {
+        if (updated.suggestionsDisplayed() && !previous.suggestionsDisplayed()) {
+            pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+            pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        }
+    }
+
+    private fun AutoCompleteViewState.suggestionsDisplayed(): Boolean = showSuggestions && searchResults.suggestions.isNotEmpty()
 
     @VisibleForTesting
     public override fun onCleared() {
@@ -5467,10 +5480,6 @@ class BrowserTabViewModel @Inject constructor(
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
-                if (suggestions.isNotEmpty()) {
-                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
-                    pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
-                }
                 if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
                 }
