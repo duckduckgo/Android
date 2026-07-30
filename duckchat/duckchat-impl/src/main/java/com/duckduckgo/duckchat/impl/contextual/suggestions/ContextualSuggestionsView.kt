@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.core.view.doOnAttach
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -80,11 +81,23 @@ class ContextualSuggestionsView @JvmOverloads constructor(
             .launchIn(scope)
     }
 
-    fun load() = viewModel.load()
+    fun load() {
+        doOnAttach {
+            viewModel.load()
+        }
+    }
 
-    fun onPageContextUpdated(serializedPageContext: String) = viewModel.onPageContextUpdated(serializedPageContext)
+    fun onPageContextUpdated(serializedPageContext: String) {
+        doOnAttach {
+            viewModel.onPageContextUpdated(serializedPageContext)
+        }
+    }
 
-    fun clear() = viewModel.clear()
+    fun clear() {
+        doOnAttach {
+            viewModel.clear()
+        }
+    }
 
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
 
