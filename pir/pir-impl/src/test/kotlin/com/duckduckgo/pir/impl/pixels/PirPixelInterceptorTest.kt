@@ -200,6 +200,42 @@ class PirPixelInterceptorTest {
     }
 
     @Test
+    fun whenInterceptRendererGoneCountPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_scan_renderer-gone_c")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
+    }
+
+    @Test
+    fun whenInterceptRendererGoneDailyPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_scan_renderer-gone_d")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
+    }
+
+    @Test
     fun whenInterceptInitialScanIncompletePixelThenAddsManufacturerParameter() = runTest {
         val request = Request.Builder()
             .url("https://example.com/m_dbp_initial-scan_incomplete")
