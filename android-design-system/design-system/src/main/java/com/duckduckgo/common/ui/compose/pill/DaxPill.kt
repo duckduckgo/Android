@@ -25,9 +25,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -35,19 +37,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.duckduckgo.common.ui.compose.theme.Black
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.Yellow50
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 /**
  * A reusable yellow pill for short status labels (e.g. "Beta", "New").
  *
- * Fixed palette in both light and dark (DuckDuckGo yellow background, black text) — it is not
- * theme-tokened and draws its own text colour, matching the View [DaxYellowPill]. Callers supply
- * their own (localised) label.
+ * The palette is intentionally identical in light and dark, matching the View `DaxYellowPill`.
+ * Callers supply their own (localised) label.
  *
  * @param text Pill label; rendered upper-cased.
  * @param modifier Modifier applied to the pill container.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1215496415658080/task/1211659112661214
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=6032-13783
  */
 @Composable
 fun DaxPill(
@@ -58,13 +61,13 @@ fun DaxPill(
         modifier = modifier
             .height(DaxPillDefaults.Height)
             .clip(RoundedCornerShape(DaxPillDefaults.CornerRadius))
-            .background(Yellow50)
+            .background(DaxPillDefaults.colors.background)
             .padding(horizontal = DaxPillDefaults.HorizontalPadding),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text.uppercase(),
-            color = Black,
+            color = DaxPillDefaults.colors.text,
             style = DuckDuckGoTheme.typography.caption.asTextStyle.copy(
                 fontSize = DaxPillDefaults.FontSize,
                 fontWeight = FontWeight.Bold,
@@ -80,7 +83,24 @@ internal object DaxPillDefaults {
     val CornerRadius = 2.dp
     val HorizontalPadding = 4.dp
     val FontSize = 10.sp
+
+    val colors: DaxPillColors
+        @Composable
+        get() = DaxPillColors(
+            background = DuckDuckGoTheme.colors.brand.accentYellow,
+            text = Black,
+        )
 }
+
+/**
+ * Fixed pill palette. [text] has no semantic equivalent in [DuckDuckGoTheme] because the label is
+ * black on yellow in both light and dark.
+ */
+@Immutable
+internal data class DaxPillColors(
+    val background: Color,
+    val text: Color,
+)
 
 @PreviewLightDark
 @Composable
