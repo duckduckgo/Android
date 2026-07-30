@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
-class SyncExchangeViewModel @AssistedInject constructor(
+class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val source: String?,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
@@ -258,7 +258,7 @@ class SyncExchangeViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(source: String?): SyncExchangeViewModel
+        fun create(source: String?): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,

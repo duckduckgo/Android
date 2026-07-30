@@ -20,9 +20,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:showIn="@layout/fragment_sync_v2_camera_scanner">
+    tools:showIn="@layout/fragment_sync_v2_read_sync_code_camera">
 
-    <com.duckduckgo.sync.impl.ui.v2.CodeExchangeHeaderView
+    <com.duckduckgo.sync.impl.ui.v2.SyncPairingHeaderView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
@@ -36,7 +36,7 @@
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginVertical="@dimen/keyline_5"
         android:layout_weight="1"
-        android:background="@drawable/background_code_exchange_panel"
+        android:background="@drawable/background_read_sync_code_panel"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="@dimen/keyline_4">
@@ -45,15 +45,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:importantForAccessibility="no"
-            app:srcCompat="@drawable/ic_no_camera_hardware_128" />
+            app:srcCompat="@drawable/ic_no_camera_permission_128" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
-            android:text="@string/sync_camera_unavailable"
+            android:text="@string/sync_camera_permission_required"
             app:typography="h3" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:gravity="center_horizontal"
+            android:text="@string/sync_camera_permission_required_description"
+            app:textType="secondary"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/goToPermissionsSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/sync_go_to_settings"
+            app:daxButtonSize="large" />
 
     </LinearLayout>
 

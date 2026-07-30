@@ -43,21 +43,21 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.databinding.FragmentSyncV2CameraScannerBinding
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ExpandScannerCutout
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.PlayIntroAnimation
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.RequestCameraPermission
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ResumeCamera
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.ViewMode
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.ViewState
+import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeCameraBinding
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.RequestCameraPermission
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewMode
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class CameraScannerFragment : DuckDuckGoFragment() {
-    private var _binding: FragmentSyncV2CameraScannerBinding? = null
+class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
+    private var _binding: FragmentSyncV2ReadSyncCodeCameraBinding? = null
     private val binding
         get() = requireNotNull(_binding) {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
@@ -66,7 +66,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val animationViewModel by viewModels<IntroAnimationViewModel> { viewModelFactory }
+    private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
     private val cameraPermissionLauncher = registerForActivityResult(RequestPermission()) {
         animationViewModel.onCameraPermissionResult()
@@ -80,7 +80,7 @@ class CameraScannerFragment : DuckDuckGoFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentSyncV2CameraScannerBinding.inflate(inflater)
+        _binding = FragmentSyncV2ReadSyncCodeCameraBinding.inflate(inflater)
         return binding.root
     }
 

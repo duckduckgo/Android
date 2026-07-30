@@ -20,10 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ExpandScannerCutout
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.PlayIntroAnimation
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.RequestCameraPermission
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ResumeCamera
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.RequestCameraPermission
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
-class IntroAnimationViewModel @Inject constructor(
+class ReadSyncCodeCameraIntroViewModel @Inject constructor(
     private val cameraAccess: CameraAccess,
 ) : ViewModel() {
     private val isCameraHardwareAvailable = cameraAccess.isHardwareAvailable()

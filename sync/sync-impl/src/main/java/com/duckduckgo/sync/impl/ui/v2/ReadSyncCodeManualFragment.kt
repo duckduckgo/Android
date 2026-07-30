@@ -23,11 +23,11 @@ import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ManualCodeEntryBinding
+import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeManualBinding
 
 @InjectWith(FragmentScope::class)
-class ManualCodeEntryFragment : DuckDuckGoFragment() {
-    private var _binding: FragmentSyncV2ManualCodeEntryBinding? = null
+class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
+    private var _binding: FragmentSyncV2ReadSyncCodeManualBinding? = null
     private val binding
         get() = requireNotNull(_binding) {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
@@ -38,7 +38,7 @@ class ManualCodeEntryFragment : DuckDuckGoFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentSyncV2ManualCodeEntryBinding.inflate(inflater)
+        _binding = FragmentSyncV2ReadSyncCodeManualBinding.inflate(inflater)
         return binding.root
     }
 

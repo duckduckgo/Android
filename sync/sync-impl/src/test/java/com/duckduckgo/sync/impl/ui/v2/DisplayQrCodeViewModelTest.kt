@@ -40,16 +40,16 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.BitmapWithCode
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.SetSuccessResult
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowError
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.v2.SyncExchangeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.BitmapWithCode
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -73,7 +73,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @RunWith(AndroidJUnit4::class)
-class SyncExchangeViewModelTest {
+class DisplayQrCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -98,7 +98,7 @@ class SyncExchangeViewModelTest {
         whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
     }
 
-    private fun createTestee(source: String? = null) = SyncExchangeViewModel(
+    private fun createTestee(source: String? = null) = DisplayQrCodeViewModel(
         source = source,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,

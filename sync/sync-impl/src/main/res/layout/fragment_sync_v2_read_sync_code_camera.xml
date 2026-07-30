@@ -21,20 +21,20 @@
 
     <include
         android:id="@+id/includeNoHardware"
-        layout="@layout/fragment_sync_v2_camera_scanner_no_hardware"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_no_hardware"
         android:visibility="gone" />
 
     <include
         android:id="@+id/includeNoPermission"
-        layout="@layout/fragment_sync_v2_camera_scanner_no_permission"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_no_permission"
         android:visibility="gone" />
 
     <include
         android:id="@+id/includeIntro"
-        layout="@layout/fragment_sync_v2_camera_scanner_intro" />
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_intro" />
 
     <include
         android:id="@+id/includeCamera"
-        layout="@layout/fragment_sync_v2_camera_scanner_camera"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_preview"
         android:visibility="gone" />
 </FrameLayout>

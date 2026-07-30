@@ -18,11 +18,11 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ExpandScannerCutout
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.PlayIntroAnimation
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.RequestCameraPermission
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.Command.ResumeCamera
-import com.duckduckgo.sync.impl.ui.v2.IntroAnimationViewModel.ViewMode
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.RequestCameraPermission
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewMode
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,14 +32,14 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class IntroAnimationViewModelTest {
+class ReadSyncCodeCameraIntroViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val cameraAccess = mock<CameraAccess>()
 
     // Created lazily because the view model reads the camera hardware state at construction
-    private val testee by lazy { IntroAnimationViewModel(cameraAccess) }
+    private val testee by lazy { ReadSyncCodeCameraIntroViewModel(cameraAccess) }
 
     @Test
     fun `when camera hardware is available then the intro is shown`() = runTest {
