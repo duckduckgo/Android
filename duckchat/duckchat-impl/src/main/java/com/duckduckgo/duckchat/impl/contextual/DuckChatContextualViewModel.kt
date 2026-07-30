@@ -670,21 +670,24 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPlaceholderContextTapped()
         }
         viewModelScope.launch {
-            val isContextValid = isContextValid(currentPageContext, reportInvalidPixels = true)
-            if (isContextValid) {
-                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
-                val json = JSONObject(currentPageContext)
+            if (isContextValid(currentPageContext, reportInvalidPixels = true)) {
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
-                _viewState.update { current ->
-                    logcat { "Duck.ai Contextual: addPageContext $current context $currentPageContext" }
-                    current.copy(
-                        showContext = true,
-                        userRemovedContext = false,
-                        contextTitle = json.optString("title"),
-                        contextUrl = json.optString("url"),
-                    )
-                }
+                attachCurrentPageContext()
             }
+        }
+    }
+
+    private fun attachCurrentPageContext() {
+        pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+        val json = JSONObject(currentPageContext)
+        _viewState.update { current ->
+            logcat { "Duck.ai Contextual: attachCurrentPageContext $current context $currentPageContext" }
+            current.copy(
+                showContext = true,
+                userRemovedContext = false,
+                contextTitle = json.optString("title"),
+                contextUrl = json.optString("url"),
+            )
         }
     }
 
@@ -787,10 +790,17 @@ class DuckChatContextualViewModel @Inject constructor(
         suggestion: ContextualSuggestedPrompt,
         currentInput: String,
     ) {
+        attachPageContextForSuggestion()
         onPromptSent(
             prompt = suggestion.prompt,
             followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
         )
+    }
+
+    private fun attachPageContextForSuggestion() {
+        if (_viewState.value.showContext) return
+        if (!isContextValid(currentPageContext)) return
+        attachCurrentPageContext()
     }
 
     fun onAskAboutPageClicked() {
