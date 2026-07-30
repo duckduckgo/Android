@@ -1255,7 +1255,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedWithRendererGoneAndSystemKillThenFlowFinishedAsFailureWithDidCrashFalse() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(50L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
         runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
 
         // When
@@ -1276,7 +1276,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedWithoutDidCrashThenFlowFinishedWithEmptyMetadata() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(51L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(51L))
         runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
 
         // When (existing callers pass no didCrash)
