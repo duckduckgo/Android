@@ -967,6 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
 
     <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingDockStepTitle">Adj hozzá a kedvencek sorához.</string>
     <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Rendben!</string>
 
