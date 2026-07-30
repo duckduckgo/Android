@@ -110,6 +110,7 @@ class DataClearingWideEventImpl @Inject constructor(
             flowEntryPoint = entryPoint.value,
             metadata = metadata,
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = SAMPLING_PROBABILITY,
         ).getOrNull()
 
         cachedFlowId?.let { flowId ->
@@ -230,6 +231,7 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private companion object {
         const val FLOW_NAME = "data-clearing"
+        const val SAMPLING_PROBABILITY = 0.05f
         const val KEY_CLEAR_OPTIONS = "clear_options"
         const val KEY_TOTAL_DURATION_MS_BUCKETED = "total_duration_ms_bucketed"
         const val KEY_BROWSER_MODE = "browser_mode"
