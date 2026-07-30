@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2023 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,12 +14,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="qrSizeXLarge">220dp</dimen>
-    <dimen name="qrSizeLarge">192dp</dimen>
-    <dimen name="qrSizeMedium">160dp</dimen>
-    <dimen name="qrSizeSmall">96dp</dimen>
-    <dimen name="qrBarcodeSize">360dp</dimen>
-    <dimen name="simplifiedSyncQrSize">270dp</dimen>
-    <dimen name="syncOtherDevicesMaxItemWidth">600dp</dimen>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/daxColorBackground" />
+    <corners android:radius="28dp" />
+</shape>

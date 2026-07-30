@@ -62,4 +62,8 @@
     <string name="sync_scanner_v2_scan_button_cta">I’m Ready to Scan</string>
     <string name="sync_scanner_v2_enter_code_manually_tab_item_label">Enter Code</string>
     <string name="sync_scanner_v2_qr_code_screen_title">QR Code</string>
+    <string name="sync_scanner_v2_qr_code_screen_headline">Scan from another device</string>
+    <string name="sync_scanner_v2_qr_code_screen_body">On another device, open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation>\n<annotation type="gap">\n</annotation>and scan this code:</string>
+    <string name="sync_scanner_v2_qr_code_copy_button">Copy Text Code</string>
+    <string name="sync_scanner_v2_qr_code_share_button">Share</string>
 </resources>
