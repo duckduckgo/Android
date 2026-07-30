@@ -55,6 +55,36 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
+    fun `when fireWidgetAddedFromOnboardingMetric then sends widget_added_onboarding day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+        metrics.fireWidgetAddedFromOnboardingMetric()
+
+        val sent = fakeMetricsPixelExtension.sentMetrics.single()
+        assertEquals("widget_added_onboarding", sent.metric)
+        assertEquals("1", sent.value)
+        assertEquals(MetricType.NORMAL, sent.type)
+        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            toggles.addToDockAndWidgetExperimentJul25().featureName().name,
+            sent.toggle.featureName().name,
+        )
+    }
+
+    @Test
+    fun `when fireWidgetAddedFromSettingsMetric then sends widget_added_settings day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+        metrics.fireWidgetAddedFromSettingsMetric()
+
+        val sent = fakeMetricsPixelExtension.sentMetrics.single()
+        assertEquals("widget_added_settings", sent.metric)
+        assertEquals("1", sent.value)
+        assertEquals(MetricType.NORMAL, sent.type)
+        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            toggles.addToDockAndWidgetExperimentJul25().featureName().name,
+            sent.toggle.featureName().name,
+        )
+    }
+
+    @Test
     fun `when fireWidgetSearchMetric then sends widget_search day5-7 NORMAL metric bound to the experiment toggle`() = runTest {
         metrics.fireWidgetSearchMetric()
 

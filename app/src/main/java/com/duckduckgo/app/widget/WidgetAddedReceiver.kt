@@ -67,9 +67,18 @@ class WidgetAddedReceiver @Inject constructor(
         context: Context?,
         intent: Intent?,
     ) {
-        val source = AddWidgetSource.fromName(intent?.getStringExtra(AppWidgetManagerAddWidgetLauncher.EXTRA_WIDGET_ADD_SOURCE))
-        if (source == AddWidgetSource.ONBOARDING || source == AddWidgetSource.HOME_SCREEN_PROMPT) {
-            appCoroutineScope.launch { onboardingPromptsExperimentMetrics.fireWidgetAddedMetric() }
+        appCoroutineScope.launch {
+            onboardingPromptsExperimentMetrics.fireWidgetAddedMetric()
+            val source = AddWidgetSource.fromName(intent?.getStringExtra(AppWidgetManagerAddWidgetLauncher.EXTRA_WIDGET_ADD_SOURCE))
+            when (source) {
+                AddWidgetSource.ONBOARDING, AddWidgetSource.HOME_SCREEN_PROMPT ->
+                    onboardingPromptsExperimentMetrics.fireWidgetAddedFromOnboardingMetric()
+
+                AddWidgetSource.SETTINGS ->
+                    onboardingPromptsExperimentMetrics.fireWidgetAddedFromSettingsMetric()
+
+                AddWidgetSource.UNKNOWN -> Unit
+            }
         }
 
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {

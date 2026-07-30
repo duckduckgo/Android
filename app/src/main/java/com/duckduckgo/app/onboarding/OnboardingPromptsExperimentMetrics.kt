@@ -22,11 +22,16 @@ import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import javax.inject.Inject
 
 interface OnboardingPromptsExperimentMetrics {
 
     suspend fun fireWidgetAddedMetric()
+
+    suspend fun fireWidgetAddedFromOnboardingMetric()
+
+    suspend fun fireWidgetAddedFromSettingsMetric()
 
     suspend fun fireWidgetSearchMetric()
 
@@ -39,6 +44,7 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
 ) : OnboardingPromptsExperimentMetrics {
 
     override suspend fun fireWidgetAddedMetric() {
+        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire widget added metric" }
         MetricsPixel(
             metric = "widget_added",
             type = MetricType.NORMAL,
@@ -48,7 +54,28 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
         ).send()
     }
 
+    override suspend fun fireWidgetAddedFromOnboardingMetric() {
+        MetricsPixel(
+            metric = "widget_added_onboarding",
+            type = MetricType.NORMAL,
+            value = "1",
+            toggle = toggles.addToDockAndWidgetExperimentJul25(),
+            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+        ).send()
+    }
+
+    override suspend fun fireWidgetAddedFromSettingsMetric() {
+        MetricsPixel(
+            metric = "widget_added_settings",
+            type = MetricType.NORMAL,
+            value = "1",
+            toggle = toggles.addToDockAndWidgetExperimentJul25(),
+            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+        ).send()
+    }
+
     override suspend fun fireWidgetSearchMetric() {
+        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire widget search metric" }
         MetricsPixel(
             metric = "widget_search",
             type = MetricType.NORMAL,
@@ -59,6 +86,7 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
     }
 
     override suspend fun fireOnboardingCompletedMetric() {
+        logcat(tag = "OnboardingPromptsExperimentMetricsImpl") { "Fire onboarding completed metric" }
         MetricsPixel(
             metric = "onboarding_completed",
             type = MetricType.NORMAL,
