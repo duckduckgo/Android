@@ -37,14 +37,16 @@
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/syncWithAnotherDeviceButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_5"
         android:layout_marginBottom="60dp"
         android:text="@string/sync_setup_with_another_device_cta_title"
         app:daxButtonSize="large"
-        app:icon="@drawable/ic_qr2_24" />
+        app:icon="@drawable/ic_qr2_24"
+        app:iconGravity="textStart" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
