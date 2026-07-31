@@ -1743,7 +1743,8 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
+        verify(mockUriLoadedManager).sendUriLoadedPixels()
+        verify(mockUriLoadedManager).sendSurfaceUsagePixels(false)
     }
 
     @Test
@@ -1757,7 +1758,8 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, DDG_URL, null)
         testee.onPageFinished(mockWebView, DDG_URL)
 
-        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
+        verify(mockUriLoadedManager).sendUriLoadedPixels()
+        verify(mockUriLoadedManager).sendSurfaceUsagePixels(false)
     }
 
     @Test
@@ -1768,10 +1770,29 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(100)
 
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(EXAMPLE_SERP_URL)).thenReturn(true)
+
         testee.onPageStarted(mockWebView, EXAMPLE_SERP_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_SERP_URL)
 
-        verify(mockUriLoadedManager).sendUriLoadedPixels(false)
+        verify(mockUriLoadedManager).sendUriLoadedPixels()
+        verify(mockUriLoadedManager).sendSurfaceUsagePixels(true)
+    }
+
+    @Test
+    fun whenDuckAiPageLoadsThenSurfaceUsagePixelsAreNotFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockDuckChat.isDuckChatUrl(DUCK_AI_URL.toUri())).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, DUCK_AI_URL, null)
+        testee.onPageFinished(mockWebView, DUCK_AI_URL)
+
+        verify(mockUriLoadedManager).sendUriLoadedPixels()
+        verify(mockUriLoadedManager, never()).sendSurfaceUsagePixels(any())
     }
 
     @Test
@@ -1999,5 +2020,6 @@ class BrowserWebViewClientTest {
         const val EXAMPLE_URL = "https://example.com"
         const val DDG_URL = "https://duckduckgo.com"
         const val EXAMPLE_SERP_URL = "https://duckduckgo.com/?q=test"
+        const val DUCK_AI_URL = "https://duck.ai/?q=test"
     }
 }
