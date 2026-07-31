@@ -58,9 +58,12 @@ import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.ViewState
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
@@ -289,7 +292,10 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         binding.lockAnimation.addAnimatorListener(
             object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    viewModel.onAnimationComplete()
+                    lifecycleScope.launch {
+                        delay(1.seconds)
+                        viewModel.onAnimationComplete()
+                    }
                 }
             },
         )
