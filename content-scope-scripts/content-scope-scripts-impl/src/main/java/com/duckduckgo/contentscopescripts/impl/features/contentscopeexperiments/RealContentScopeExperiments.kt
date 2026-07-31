@@ -66,12 +66,8 @@ class RealContentScopeExperiments @Inject constructor(
     private val resolveMutex = Mutex()
 
     override suspend fun getActiveExperiments(): List<Toggle> {
-        // Returning without suspending matters as much as holding the result: the caller awaits this on the main
-        // thread before injecting, so dispatching to io() and back would cost a main looper turn even for a hit.
         activeExperiments?.let { return it }
 
-        // Resolving straight through, rather than under the mutex, keeps the disabled path exactly as it shipped:
-        // concurrent navigations in different tabs resolve in parallel instead of queueing behind each other.
         if (!cachingEnabled()) return resolve()
 
         return resolveMutex.withLock {

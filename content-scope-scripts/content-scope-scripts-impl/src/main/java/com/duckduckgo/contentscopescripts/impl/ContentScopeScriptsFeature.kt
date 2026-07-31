@@ -56,9 +56,7 @@ interface ContentScopeScriptsFeature {
     fun optimizeContentScopeMessaging(): Toggle
 
     /**
-     * Kill-switch for holding the resolved contentScope experiments between privacy config updates. Separate from
-     * [optimizeContentScopeInjection] because it is the only part of that work that changes behaviour rather than
-     * just cost: enrolment is re-evaluated when a new config lands instead of on every navigation.
+     * Kill-switch for holding the resolved contentScope experiments between privacy config updates.
      * @return `true` when the remote config has the global "cacheContentScopeExperiments" clientContentFeatures
      * sub-feature flag enabled.
      * If the remote feature is not present defaults to `internal`
