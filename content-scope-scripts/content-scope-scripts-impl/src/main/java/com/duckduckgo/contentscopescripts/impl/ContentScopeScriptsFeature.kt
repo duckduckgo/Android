@@ -46,8 +46,7 @@ interface ContentScopeScriptsFeature {
     fun optimizeContentScopeInjection(): Toggle
 
     /**
-     * Kill-switch for the ContentScopeScripts inbound messaging performance work. Separate from
-     * [optimizeContentScopeInjection] so that either can be rolled back on its own.
+     * Kill-switch for the ContentScopeScripts inbound messaging performance work.
      * When enabled, inbound JS messages are queued and routed off the WebView JavaBridge thread.
      * @return `true` when the remote config has the global "optimizeContentScopeMessaging" clientContentFeatures
      * sub-feature flag enabled.

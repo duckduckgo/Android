@@ -123,8 +123,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     /**
      * Handler lookup by feature name and method, so routing a message doesn't have to build every registered handler.
      * The plugins are a fixed multibinding and their `featureName`/`methods` are constants, so the index is built once;
-     * the matched handler is still rebuilt per message because `allowedDomains` isn't constant — internal builds can
-     * change the Duck.ai host at runtime.
+     * the matched handler is still rebuilt per message because `allowedDomains` isn't constant.
      */
     private val handlersByFeatureAndMethod: Map<String, Map<String, List<ContentScopeJsMessageHandlersPlugin>>> by lazy {
         val index = mutableMapOf<String, MutableMap<String, MutableList<ContentScopeJsMessageHandlersPlugin>>>()
@@ -183,8 +182,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (context != jsMessage.context) return
         val registration = this.registration ?: return
 
-        // Produce and return: reading the url here would block the page's JS, since JavaBridge calls are synchronous from
-        // the page's point of view. Domain restricted features still have it read now, just without waiting for it.
         val url =
             if (allowedDomains.isNotEmpty() || jsMessage.featureName in domainRestrictedFeatures) {
                 appCoroutineScope.async(dispatcherProvider.main()) {
@@ -194,7 +191,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 null
             }
         if (!inboundQueue.offer(QueuedMessage(registration, jsMessage, url))) {
-            // Nothing will await it, and cancelling before the main thread reaches it spares the dispatch entirely.
             url?.cancel()
             logcat(WARN) { "Inbound queue full, dropping ${jsMessage.featureName}.${jsMessage.method}" }
             reportOverflow()
@@ -212,12 +208,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         pixel.fire(INBOUND_QUEUE_FULL, type = Daily())
     }
 
-    /**
-     * Parsed here rather than with Moshi because [JsMessage] has no generated adapter, so Moshi falls back to reflection:
-     * that measured as roughly 40% of the work this does on the JavaBridge thread, which is time the page's JS spends
-     * blocked. Returns null for anything we could not route, and the caller drops it. [processLegacy] keeps using Moshi so
-     * that the flag-off path stays exactly as it shipped.
-     */
     private fun parseJsMessage(message: String): JsMessage? =
         runCatching {
             val json = JSONObject(message)
@@ -231,8 +221,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                         featureName = featureName,
                         method = method,
                         params = json.optJSONObject("params") ?: JSONObject(),
-                        // isNull() covers both an absent id and an explicit JSON null, which optString() would otherwise
-                        // hand back as the string "null".
                         id = if (json.isNull("id")) null else json.optString("id").takeUnless { it.isEmpty() },
                     )
             }
@@ -256,25 +244,18 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                         }
                     }
                 } finally {
-                    // Released in a finally, and only while we still own it: anything escaping the loop (cancellation,
-                    // an Error) would otherwise leave the flag set with no consumer running, and no later message could
-                    // ever start one again.
                     queueConsumerActive.set(false)
                 }
                 if (inboundQueue.isEmpty()) {
                     overflowReported.set(false)
                     return@launch
                 }
-                // A message queued while we were stopping found the consumer still active and started none of its own,
-                // so re-acquire rather than leave it unhandled. Losing the race means someone else took over.
                 if (!queueConsumerActive.compareAndSet(false, true)) return@launch
             }
         }
     }
 
     private suspend fun handle(queued: QueuedMessage) {
-        // Identity, not equality: a message belonging to a WebView that has since been replaced must not be routed
-        // against the one that took its place.
         if (queued.registration !== this.registration) {
             queued.url?.cancel()
             return
@@ -369,26 +350,18 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        // Registering again (the WebView is recreated, see BrowserTabFragment.resetWebView) leaves anything still queued
-        // belonging to a document that is gone: handling it would route it against the new WebView, and if the flag
-        // sampled below has since been disabled nothing would ever consume it. Swapped before the drain so a message
-        // offered during it still carries the previous registration.
         this.registration = Registration(webView, jsMessageCallback)
         drainQueue()
         this.optimizedProcessing = contentScopeScriptsFeature.optimizeContentScopeMessaging().isEnabled()
         webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
 
-        // The handler indexes are built on first use, which is otherwise the JavaBridge thread handling the first message
-        // of the page — time the page's JS spends blocked. Registration happens well before page scripts run.
         appCoroutineScope.launch(dispatcherProvider.io()) { domainRestrictedFeatures }
     }
 
-    // Drains rather than clears so the url reads of discarded messages can be cancelled: nothing will await them.
     private fun drainQueue() {
         val discarded = mutableListOf<QueuedMessage>()
         inboundQueue.drainTo(discarded)
         discarded.forEach { it.url?.cancel() }
-        // The queue is empty again, so the next overflow is a new episode even if no consumer got to observe this one.
         overflowReported.set(false)
     }
 
