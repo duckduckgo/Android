@@ -28,10 +28,10 @@ If the emulator crashes, disappears from ADB, or fails to capture screenshots, r
 ```sh
 emulator -avd ddg_pixel9_api35 -no-window -no-snapshot-save -no-boot-anim -gpu lavapipe
 ```
-Record the GPU mode used in the reproduction summary. Keep the proxy, URL, app package, and screenshot workflow unchanged between attempts.
+Record the GPU mode used in the required output. Keep the proxy, URL, app package, and screenshot workflow unchanged between attempts.
 
 ### ADB reliability
-- Wrap long or failure-prone ADB calls with `timeout`, especially `screencap`, `dumpsys`, `uiautomator`, and cleanup `adb shell` commands.
+- Wrap long or failure-prone ADB calls with `timeout`, especially `screencap`, `dumpsys`, `uiautomator`, and clean up `adb shell` commands.
 - If a retry starts another AVD, use explicit serial targeting for all later commands:
 ```sh
 adb -s <serial> ...
@@ -62,7 +62,6 @@ If screenshots are blocked by `Application Not Responding: com.google.android.ap
 adb shell input keyevent BACK
 adb shell am force-stop com.google.android.apps.nexuslauncher
 ```
-
 Then relaunch the URL activity and report the cleanup in the required output.
 
 ## Runtime configuration cleanup
