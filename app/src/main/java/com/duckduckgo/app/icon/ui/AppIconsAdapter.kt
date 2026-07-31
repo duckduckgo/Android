@@ -24,7 +24,10 @@ import com.duckduckgo.app.browser.databinding.ItemAppIconBinding
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.R as CommonR
 
-class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) -> Unit) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
+class AppIconsAdapter(
+    private val metrics: AppIconCellMetrics,
+    private val onClick: (ChangeIconViewModel.IconViewData) -> Unit,
+) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
 
     private var iconViewData: MutableList<ChangeIconViewModel.IconViewData> = mutableListOf()
 
@@ -44,7 +47,6 @@ class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) ->
     }
 
     private fun View.applySelectionOutline() {
-        val metrics = AppIconCellMetrics(resources)
         setPadding(metrics.selectionInset, metrics.selectionInset, metrics.selectionInset, metrics.selectionInset)
         foreground = AppIconOutlineDrawable(
             strokeWidthPx = metrics.selectionStrokeWidth,
