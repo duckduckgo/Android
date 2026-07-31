@@ -51,7 +51,6 @@
                 android:layout_marginVertical="@dimen/keyline_5"
                 android:layout_weight="1"
                 android:background="@drawable/background_qr_code_panel"
-                android:padding="20dp"
                 android:theme="@style/Theme.DuckDuckGo.Light">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,6 +74,7 @@
                         android:id="@+id/qrCodeImage"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:layout_marginHorizontal="@dimen/keyline_5"
                         android:layout_marginTop="@dimen/keyline_5"
                         android:importantForAccessibility="no"
                         app:layout_constraintDimensionRatio="1:1"
@@ -92,26 +92,11 @@
                         android:ellipsize="end"
                         android:gravity="center_horizontal"
                         android:maxLines="2"
-                        app:layout_constraintBottom_toTopOf="@+id/copyCodeButton"
                         app:layout_constraintEnd_toEndOf="@+id/qrCodeImage"
                         app:layout_constraintStart_toStartOf="@+id/qrCodeImage"
                         app:layout_constraintTop_toBottomOf="@+id/qrCodeImage"
-                        app:layout_constraintVertical_bias="0"
                         app:textType="secondary"
                         app:typography="body1_mono" />
-
-                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                        android:id="@+id/copyCodeButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/keyline_5"
-                        android:text="@string/sync_simplified_qr_code_copy_button"
-                        app:daxButtonSize="large"
-                        app:icon="@drawable/ic_copy_24"
-                        app:iconGravity="textStart"
-                        app:layout_constraintBottom_toTopOf="@+id/shareButton"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                         android:id="@+id/shareButton"
@@ -119,12 +104,27 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_3"
                         android:text="@string/sync_simplified_qr_code_share_button"
-                        app:daxButtonSize="large"
+                        app:daxButtonSize="small"
                         app:icon="@drawable/ic_share_android_24"
                         app:iconGravity="textStart"
+                        app:layout_constraintBottom_toTopOf="@+id/copyCodeButton"
+                        app:layout_constraintEnd_toEndOf="@+id/qrCodeImage"
+                        app:layout_constraintStart_toStartOf="@+id/qrCodeImage"
+                        app:layout_constraintTop_toBottomOf="@+id/qrCodeText"
+                        app:layout_constraintVertical_bias="1" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:id="@+id/copyCodeButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/keyline_5"
+                        android:text="@string/sync_simplified_qr_code_copy_button"
+                        app:daxButtonSize="small"
+                        app:icon="@drawable/ic_copy_24"
+                        app:iconGravity="textStart"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintEnd_toEndOf="@+id/qrCodeImage"
+                        app:layout_constraintStart_toStartOf="@+id/qrCodeImage" />
 
                     <androidx.constraintlayout.widget.Group
                         android:id="@+id/qrCodeContent"

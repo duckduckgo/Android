@@ -84,7 +84,7 @@
 
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Scan QR&#160;code to sync</string>
-    <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo&#160;for&#160;Desktop</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo&#160;for&#160;Desktop</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">I’m Ready to Scan</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Sorry, the scanned code is invalid.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Camera Permission is Required</string>
@@ -94,7 +94,7 @@
 
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Enter the Sync&#160;code</string>
-    <string name="sync_simplified_scanner_manual_entry_header_body">Open your other <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo&#160;App</annotation></b>\n<annotation type="gap">\n</annotation>Go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation> › <annotation type="highlight">Copy&#160;Text&#160;Code</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Open your other <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo&#160;App</annotation></b>\n<annotation type="gap">\n</annotation>Go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation> › <annotation type="highlight">Copy&#160;Text&#160;Code</annotation></string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Example Code:</string>
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Paste Sync Code</string>
@@ -103,7 +103,7 @@
     <!-- QR Code screen -->
     <string name="sync_simplified_qr_code_screen_title">QR Code</string>
     <string name="sync_simplified_qr_code_header_headline">Scan from another device</string>
-    <string name="sync_simplified_qr_code_header_body">On another device, open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation>\n<annotation type="gap">\n</annotation>and scan this code:</string>
+    <string name="sync_simplified_qr_code_header_body">On another device, open <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation> and scan this code:</string>
     <string name="sync_simplified_qr_code_copy_button">Copy Text Code</string>
     <string name="sync_simplified_qr_code_share_button">Share</string>
     <string name="sync_simplified_qr_code_copied_message">Recovery Code Copied</string>
