@@ -18,9 +18,12 @@ package com.duckduckgo.app.appearance
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -194,6 +197,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
+                    if (it.showAppIconSettingFirst) {
+                        moveAppIconSettingFirst()
+                    }
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode && viewState.canForceDarkMode
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
@@ -251,6 +257,19 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private fun launchAppIconChange() {
         changeIconFlow.launch(null)
+    }
+
+    /** Reordered here rather than in the layout so the screen is untouched when the flag is off. */
+    private fun moveAppIconSettingFirst() {
+        val container = binding.changeAppIconSetting.parent as ViewGroup
+        if (container.indexOfChild(binding.changeAppIconSetting) == 0) return
+
+        container.removeView(binding.changeAppIconSetting)
+        container.addView(binding.changeAppIconSetting, 0)
+        binding.changeAppIconSetting.updateLayoutParams<MarginLayoutParams> {
+            topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+        }
+        binding.selectedThemeSetting.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
     }
 
     private fun launchThemeSelector(theme: DuckDuckGoTheme) {
