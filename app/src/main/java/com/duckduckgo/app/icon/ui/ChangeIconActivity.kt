@@ -19,6 +19,7 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -74,9 +75,22 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecycler() {
-        binding.appIconsList.layoutManager = GridLayoutManager(this, 4)
-        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, CommonR.dimen.keyline_1))
+        val iconSize = resources.getDimensionPixelSize(CommonR.dimen.changeAppIconSize)
+        val horizontalPadding = binding.appIconsList.paddingStart + binding.appIconsList.paddingEnd
+        val layoutManager = GridLayoutManager(this, spanCountFor(resources.displayMetrics.widthPixels - horizontalPadding))
+        binding.appIconsList.layoutManager = layoutManager
+        binding.appIconsList.addItemDecoration(AppIconSpacingDecoration(iconSize))
         binding.appIconsList.adapter = iconsAdapter
+        binding.appIconsList.doOnLayout {
+            layoutManager.spanCount = spanCountFor(it.width - it.paddingStart - it.paddingEnd)
+        }
+    }
+
+    /** Fits as many columns as the width allows while keeping at least [CommonR.dimen.keyline_5] between icons. */
+    private fun spanCountFor(availableWidth: Int): Int {
+        val iconSize = resources.getDimensionPixelSize(CommonR.dimen.changeAppIconSize)
+        val minGap = resources.getDimensionPixelSize(CommonR.dimen.keyline_5)
+        return ((availableWidth + minGap) / (iconSize + minGap)).coerceAtLeast(1)
     }
 
     private fun observeViewModel() {
