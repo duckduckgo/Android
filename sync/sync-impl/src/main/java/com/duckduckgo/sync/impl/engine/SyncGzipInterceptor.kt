@@ -54,8 +54,11 @@ class SyncGzipInterceptor @Inject constructor(
             return chain.proceed(chain.request())
         }
 
+        // The /sync/devices endpoint rejects gzip bodies as invalid_json, so skip compression here until the backend supports it.
+        val isDevicesEndpoint = chain.request().url.encodedPath.endsWith("/sync/devices")
+
         // check if it's http operation is PATCH
-        if (chain.request().method == "PATCH" && syncFeature.gzipPatchRequests().isEnabled()) {
+        if (chain.request().method == "PATCH" && !isDevicesEndpoint && syncFeature.gzipPatchRequests().isEnabled()) {
             kotlin.runCatching {
                 val originalRequest = chain.request()
                 val body = originalRequest.body ?: return chain.proceed(originalRequest)

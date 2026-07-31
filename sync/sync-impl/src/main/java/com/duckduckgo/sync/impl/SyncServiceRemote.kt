@@ -76,6 +76,18 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<DeviceEntries>
 
+    /**
+     * Update this device's `name`, `type` and `info`. All three fields are sent every time — the server clears `info` when it is omitted.
+     *
+     * Returns the server's post-update device list.
+     */
+    fun patchThisDevice(
+        token: String,
+        encryptedName: String,
+        encryptedType: String,
+        deviceInfo: String,
+    ): Result<PatchDevicesResponse>
+
     fun getBookmarks(
         token: String,
         since: String,
@@ -250,6 +262,29 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) {
             val devices = response.body()?.devices ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
+        }
+    }
+
+    override fun patchThisDevice(
+        token: String,
+        encryptedName: String,
+        encryptedType: String,
+        deviceInfo: String,
+    ): Result<PatchDevicesResponse> {
+        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "PatchDevices: no device id")
+
+        val response = runCatching {
+            val update = DeviceUpdate(id = deviceId, name = encryptedName, type = encryptedType, info = deviceInfo)
+            syncService.patchDevices("Bearer $token", PatchDevicesRequest(listOf(update))).execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val body = response.body() ?: return@onSuccess Result.Error(reason = "PatchDevices: empty body")
+            logcat(INFO) { "Sync-UnifiedDevices: patchDevices ok — ${body.devicesV2.size} devices_v2 returned" }
+            Result.Success(body)
         }
     }
 
