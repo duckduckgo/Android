@@ -23,7 +23,5 @@ import android.view.View
  */
 data class SettledDecoration(
     val view: View,
-    val anchorsCardOnPhone: Boolean,
-    val anchoredCardBiasPhone: Float,
-    val anchoredCardBiasTablet: Float,
+    val placement: EmbellishmentPlacement.Placement,
 )

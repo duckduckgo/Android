@@ -203,4 +203,16 @@
         tools:lottie_progress="0.5"
         tools:visibility="visible" />
 
+    <!--
+      ~ Reserves the room a decoration would occupy on a screen that declares none, so the card sits at a
+      ~ comparable height either way. Never drawn; only its height is set, by the embellishment axis.
+      -->
+    <Space
+        android:id="@+id/undecoratedBand"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

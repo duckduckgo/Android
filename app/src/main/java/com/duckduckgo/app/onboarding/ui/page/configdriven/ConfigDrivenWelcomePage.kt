@@ -44,6 +44,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.BackgroundControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.CardAnchorControllerImpl
+import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.CardAnchorResolver
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.CardArrowControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.CardStageImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.ContentControllerImpl
@@ -142,7 +143,7 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             windowInsets
         }
 
-        val cardAnchor = CardAnchorControllerImpl(binding, deviceInfo.isTablet())
+        val cardAnchor = CardAnchorControllerImpl(binding, CardAnchorResolver(deviceInfo.isTablet()))
 
         engine = DialogRenderEngine(
             content = ContentControllerImpl(

@@ -30,32 +30,28 @@ interface CardAnchorController {
 
 class CardAnchorControllerImpl(
     private val binding: ContentOnboardingWelcomePageUpdateBinding,
-    private val isTablet: Boolean,
+    private val resolver: CardAnchorResolver,
 ) : CardAnchorController {
 
     /**
-     * @param settled The decoration the embellishment axis settled on, or null when there is none or the fit
-     *   check vetoed it. The card anchors above [SettledDecoration.view] when non-null and either [isTablet] or
-     *   [SettledDecoration.anchorsCardOnPhone] is true; otherwise it pins to the parent bottom.
-     *
      * Arrow visibility is deliberately not handled here: it is screen data off the config, whereas the depth
      * below follows from what the embellishment axis settled on.
      */
     override fun apply(settled: SettledDecoration?) {
-        val card = binding.daxDialogCta.root
+        val resolution = resolver.resolve(settled)
 
-        card.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            if (settled != null && (isTablet || settled.anchorsCardOnPhone)) {
-                bottomToTop = settled.view.id
+        binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            val anchorTo = resolution.anchorTo
+            if (anchorTo != null) {
+                bottomToTop = anchorTo.id
                 bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-                verticalBias = if (isTablet) settled.anchoredCardBiasTablet else settled.anchoredCardBiasPhone
             } else {
                 bottomToTop = ConstraintLayout.LayoutParams.UNSET
                 bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                verticalBias = if (isTablet) 0.5f else 0f
             }
+            verticalBias = resolution.verticalBias
         }
 
-        binding.daxDialogCta.cardView.setArrowDepthFraction(if (settled != null) 1f else 0f)
+        binding.daxDialogCta.cardView.setArrowDepthFraction(resolution.arrowDepthFraction)
     }
 }

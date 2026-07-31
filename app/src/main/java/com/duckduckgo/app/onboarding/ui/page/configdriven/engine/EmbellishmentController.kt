@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.PathInterpolator
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
@@ -89,6 +88,7 @@ class EmbellishmentControllerImpl(
         Embellishment.BottomWing to buildBottomWing(),
         Embellishment.LeftWing to buildLeftWing(),
         Embellishment.BobbingDax to buildBobbingDax(),
+        Embellishment.None to buildUndecoratedBand(),
     )
 
     init {
@@ -113,7 +113,7 @@ class EmbellishmentControllerImpl(
 
         val exiting = previous?.let { decorations[it] }
         val animatedExit = exiting?.takeIf { animate && it.view.isVisible }
-        if (exiting != null && animatedExit == null) instantHide(exiting.view)
+        if (exiting != null && animatedExit == null) exiting.hide()
 
         val settled = applyFit(next)
         if (settled != null) {
@@ -124,7 +124,7 @@ class EmbellishmentControllerImpl(
                 entering.snap()
             }
         } else {
-            decorations[next]?.let { instantHide(it.view) }
+            decorations[next]?.hide()
         }
 
         // Started last so the outgoing decoration begins leaving in the same frame the incoming one enters, which
@@ -184,8 +184,8 @@ class EmbellishmentControllerImpl(
             rootView = binding.root,
             dialogView = binding.daxDialogCta.root,
             decorationView = decoration.view,
-            maxHeightPx = decoration.maxHeightDp.toPx(),
-            minHeightPx = decoration.minHeightDp.toPx(),
+            maxHeightPx = decoration.maxHeightPx(),
+            minHeightPx = decoration.minHeightPx(),
             bottomOverlapPx = decoration.bottomOverlapPx(),
         )
         if (fitHeightPx == null) {
@@ -197,16 +197,11 @@ class EmbellishmentControllerImpl(
         decoration.view.updateLayoutParams { height = fitHeightPx }
         fitCorrector.track(
             decoration.view,
-            minHeightPx = decoration.minHeightDp.toPx(),
-            maxHeightPx = decoration.maxHeightDp.toPx(),
+            minHeightPx = decoration.minHeightPx(),
+            maxHeightPx = decoration.maxHeightPx(),
             bottomOverlapPx = decoration.bottomOverlapPx(),
         )
-        return SettledDecoration(
-            view = decoration.view,
-            anchorsCardOnPhone = decoration.anchorsCardOnPhone,
-            anchoredCardBiasPhone = decoration.anchoredCardBiasPhone,
-            anchoredCardBiasTablet = decoration.anchoredCardBiasTablet,
-        )
+        return SettledDecoration(view = decoration.view, placement = decoration.placement)
     }
 
     // A bottom-anchored predecessor can leave a bottom inset on the card. Clear it before measuring so it does not
@@ -224,21 +219,14 @@ class EmbellishmentControllerImpl(
         return (cardBottomMargin - LEFT_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
     }
 
-    private fun instantHide(view: LottieAnimationView) {
-        view.cancelAnimation()
-        view.isVisible = false
-    }
-
     private fun buildWalkingDax(): Decoration {
         val view = binding.welcomeScreenWalkingDax
+        val hide = instantHideOf(view)
         return Decoration(
             view = view,
-            anchorsCardOnPhone = true,
-            // Bias 1 keeps the card pressed down against the dax, on phone and tablet alike.
-            anchoredCardBiasPhone = 1f,
-            anchoredCardBiasTablet = 1f,
-            maxHeightDp = WALKING_DAX_MAX_HEIGHT_DP,
-            minHeightDp = WALKING_DAX_MIN_HEIGHT_DP,
+            placement = EmbellishmentPlacement.of(Embellishment.WalkingDax),
+            maxHeightPx = { WALKING_DAX_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = { WALKING_DAX_MIN_HEIGHT_DP.toPx() },
             enter = {
                 val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
                     .setDuration(WALKING_DAX_FADE_DURATION)
@@ -264,9 +252,10 @@ class EmbellishmentControllerImpl(
                 listOf(set)
             },
             exit = {
-                instantHide(view)
+                hide()
                 emptyList()
             },
+            hide = hide,
             snap = {
                 view.cancelAnimation()
                 view.isVisible = true
@@ -277,15 +266,46 @@ class EmbellishmentControllerImpl(
         )
     }
 
+    /** Cancels [view]'s animation and drops its layout footprint, for a snapped render or a fit veto. */
+    private fun instantHideOf(view: LottieAnimationView): () -> Unit = {
+        view.cancelAnimation()
+        view.isVisible = false
+    }
+
+    /**
+     * A screen with no decoration still reserves the room one would have taken, so its card sits at a
+     * comparable height rather than dropping to the parent bottom. The floor is the card's bottom inset,
+     * because the card anchors above the band and so never reserves that inset itself.
+     */
+    private fun buildUndecoratedBand(): Decoration {
+        val view = binding.undecoratedBand
+        val show = { view.isVisible = true }
+        val hide = { view.isVisible = false }
+        return Decoration(
+            view = view,
+            placement = EmbellishmentPlacement.of(Embellishment.None),
+            maxHeightPx = { UNDECORATED_BAND_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = cardBottomInsetPx,
+            enter = {
+                show()
+                emptyList()
+            },
+            exit = {
+                hide()
+                emptyList()
+            },
+            hide = hide,
+            snap = show,
+        )
+    }
+
     private fun buildBottomWing(): Decoration {
         val view = binding.bottomWingAnimation
         return Decoration(
             view = view,
-            anchorsCardOnPhone = true,
-            anchoredCardBiasPhone = 0f,
-            anchoredCardBiasTablet = 0.5f,
-            maxHeightDp = BOTTOM_WING_MAX_HEIGHT_DP,
-            minHeightDp = BOTTOM_WING_MIN_HEIGHT_DP,
+            placement = EmbellishmentPlacement.of(Embellishment.BottomWing),
+            maxHeightPx = { BOTTOM_WING_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = { BOTTOM_WING_MIN_HEIGHT_DP.toPx() },
             enter = {
                 view.isVisible = true
                 view.alpha = 0f
@@ -308,9 +328,10 @@ class EmbellishmentControllerImpl(
                 view.setMinProgress(WING_STOP_PROGRESS)
                 view.setMaxProgress(1f)
                 view.speed = 1f
-                exitViaLottie(view, applyFinalState = { view.isInvisible = true })
+                exitViaLottie(view, applyFinalState = { view.isGone = true })
                 emptyList()
             },
+            hide = instantHideOf(view),
             snap = {
                 view.cancelAnimation()
                 view.isVisible = true
@@ -324,12 +345,9 @@ class EmbellishmentControllerImpl(
         val view = binding.leftWingAnimation
         return Decoration(
             view = view,
-            anchorsCardOnPhone = false,
-            // Anchors the card on tablet only, so the phone bias is never read.
-            anchoredCardBiasPhone = 0f,
-            anchoredCardBiasTablet = 0.5f,
-            maxHeightDp = LEFT_WING_MAX_HEIGHT_DP,
-            minHeightDp = LEFT_WING_MIN_HEIGHT_DP,
+            placement = EmbellishmentPlacement.of(Embellishment.LeftWing),
+            maxHeightPx = { LEFT_WING_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = { LEFT_WING_MIN_HEIGHT_DP.toPx() },
             bottomOverlapPx = { leftWingBottomOverlapPx() },
             enter = {
                 view.isVisible = true
@@ -356,6 +374,7 @@ class EmbellishmentControllerImpl(
                 exitViaLottie(view, applyFinalState = { view.isGone = true })
                 emptyList()
             },
+            hide = instantHideOf(view),
             snap = {
                 view.cancelAnimation()
                 view.isVisible = true
@@ -370,12 +389,9 @@ class EmbellishmentControllerImpl(
         val view = binding.bobbingDaxAnimation
         return Decoration(
             view = view,
-            anchorsCardOnPhone = false,
-            // Anchors the card on tablet only, so the phone bias is never read.
-            anchoredCardBiasPhone = 0f,
-            anchoredCardBiasTablet = 0.5f,
-            maxHeightDp = BOBBING_DAX_MAX_HEIGHT_DP,
-            minHeightDp = BOBBING_DAX_MIN_HEIGHT_DP,
+            placement = EmbellishmentPlacement.of(Embellishment.BobbingDax),
+            maxHeightPx = { BOBBING_DAX_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = { BOBBING_DAX_MIN_HEIGHT_DP.toPx() },
             enter = {
                 val screenWidth = binding.root.rootView.width.toFloat()
                 view.isVisible = true
@@ -434,6 +450,7 @@ class EmbellishmentControllerImpl(
                 animator.start()
                 listOf(animator)
             },
+            hide = instantHideOf(view),
             snap = {
                 view.isVisible = true
                 view.alpha = 1f
@@ -469,15 +486,15 @@ class EmbellishmentControllerImpl(
     }
 
     private class Decoration(
-        val view: LottieAnimationView,
-        val anchorsCardOnPhone: Boolean,
-        val anchoredCardBiasPhone: Float,
-        val anchoredCardBiasTablet: Float,
-        val maxHeightDp: Int,
-        val minHeightDp: Int,
+        val view: View,
+        val placement: EmbellishmentPlacement.Placement,
+        val maxHeightPx: () -> Int,
+        val minHeightPx: () -> Int,
         val bottomOverlapPx: () -> Int = { 0 },
         val enter: () -> List<Animator>,
         val exit: () -> List<Animator>,
+        /** Removes the view and its layout footprint at once, for a snapped render or a fit veto. */
+        val hide: () -> Unit,
         val snap: () -> Unit,
     )
 
@@ -506,6 +523,9 @@ class EmbellishmentControllerImpl(
         const val LEFT_WING_CARD_GAP_DP = 8
         const val BOBBING_DAX_MAX_HEIGHT_DP = 156
         const val BOBBING_DAX_MIN_HEIGHT_DP = 130
+
+        // Matches the two wings, so a screen with no decoration lands within a few dp of a wing screen.
+        const val UNDECORATED_BAND_MAX_HEIGHT_DP = 199
 
         val WALKING_DAX_INTERPOLATOR = PathInterpolator(0.33f, 0f, 0.67f, 1f)
     }

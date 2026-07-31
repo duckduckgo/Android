@@ -37,6 +37,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -107,6 +108,16 @@ class DialogRenderEngineTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
 
         assertEquals(listOf("anchor", "morph"), callOrder)
+    }
+
+    @Test
+    fun `the settled decoration reaches the card anchor`() = runTest {
+        val settled = SettledDecoration(view = mock(), placement = EmbellishmentPlacement.of(Embellishment.None))
+        embellishments.settledResult = settled
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertSame(settled, cardAnchor.appliedWith)
     }
 
     @Test
@@ -452,9 +463,11 @@ private class FakeCardArrowController : CardArrowController {
 private class FakeCardAnchorController(private val record: (String) -> Unit = {}) : CardAnchorController {
 
     var applied = false
+    var appliedWith: SettledDecoration? = null
 
     override fun apply(settled: SettledDecoration?) {
         applied = true
+        appliedWith = settled
         record("anchor")
     }
 }
@@ -466,6 +479,8 @@ private class FakeEmbellishmentController : EmbellishmentController {
     var skipped = false
     var released = false
 
+    var settledResult: SettledDecoration? = null
+
     override fun transition(
         previous: Embellishment?,
         next: Embellishment,
@@ -473,7 +488,7 @@ private class FakeEmbellishmentController : EmbellishmentController {
     ): SettledDecoration? {
         applied = previous to next
         animated = animate
-        return null
+        return settledResult
     }
 
     override fun skipRunning() {
