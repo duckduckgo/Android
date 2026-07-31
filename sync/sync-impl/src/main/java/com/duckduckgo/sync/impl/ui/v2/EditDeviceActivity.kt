@@ -145,7 +145,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
             if (showShimmer) startShimmer() else stopShimmer()
         }
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
-        binding.syncThisDeviceToggleContainer.isVisible = viewState.device.thisDevice
+        binding.syncThisDeviceToggle.isVisible = viewState.device.thisDevice
 
         binding.removeNoticeLabel.setText(
             if (viewState.device.thisDevice) {
