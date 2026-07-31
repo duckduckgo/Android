@@ -53,11 +53,15 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_4" />
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_recover_section_header" />
+
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/recoverDataItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_sync_recovery_24"
         app:primaryText="@string/sync_simplified_settings_recover_data_item" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider

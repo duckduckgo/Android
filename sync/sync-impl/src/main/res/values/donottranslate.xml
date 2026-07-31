@@ -28,7 +28,8 @@
     <!-- Sync settings screen: sync disabled state -->
     <string name="sync_simplified_settings_sync_this_device_item">Sync This Device</string>
     <string name="sync_simplified_settings_sync_with_another_device_button">Sync With Another Device</string>
-    <string name="sync_simplified_settings_recover_data_item">Recover Synced Data</string>
+    <string name="sync_simplified_settings_recover_section_header">Recover Synced Data</string>
+    <string name="sync_simplified_settings_recover_data_item">I Have a Recovery Code</string>
 
     <!-- Sync settings screen: sync enabled state -->
     <string name="sync_simplified_settings_devices_section_header">My Devices</string>
