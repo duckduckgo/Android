@@ -2,7 +2,7 @@
 // pixel added with the buffering feedback work; the older duckplayer_* pixels are not yet backfilled here.
 {
     "duckplayer_buffering_hold_removed": {
-        "description": "Fires when the Duck Player buffering hold (poster + spinner shown while the YouTube player buffers) stops holding, reporting why and how long it lasted. Used to tune the give-up timeout and to spot holds that never resolve on their own. A hold whose give-up timer expires reports twice: once as 'gave_up' when the spinner withdraws, then again when the poster it leaves behind is removed.",
+        "description": "Fires when the Duck Player buffering hold (poster + spinner shown while the YouTube player buffers) stops holding, reporting why and how long it lasted. Used to tune the spinner timeout and to spot holds that never resolve on their own. Fires once per hold, at removal; whether the spinner timeout elapsed first is carried by timed_out rather than by its own report.",
         "owners": ["CrisBarreiro"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -11,8 +11,14 @@
             {
                 "key": "reason",
                 "type": "string",
-                "description": "What ended the hold: the first video frame arrived, the video errored, the give-up timer elapsed, the user tapped to dismiss (before or after the give-up point), or the overlay was torn down (e.g. a navigation).",
-                "enum": ["frame", "error", "gave_up", "tap", "tap_after_give_up", "torn_down"]
+                "description": "What ended the hold: the first video frame arrived, the video errored, the user tapped to dismiss once the spinner had timed out, or the overlay was torn down (e.g. a navigation).",
+                "enum": ["frame", "error", "tap_after_timeout", "torn_down"]
+            },
+            {
+                "key": "timed_out",
+                "type": "string",
+                "description": "Whether the spinner timeout elapsed before the hold was removed, meaning the wait was already being treated as hopeless.",
+                "enum": ["0", "1"]
             },
             {
                 "key": "duration",
