@@ -36,7 +36,7 @@ data class DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_DUCK_AI_FIRE_BUTTON,
     description = R.string.onboardingDuckAiFireButtonDaxDialogDescription,
-    buttonText = null,
+    buttonText = R.string.onboardingFireButtonDaxDialogOkButton,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
     cancelPixel = null,
@@ -49,7 +49,7 @@ data class DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
     backgroundRes = R.drawable.bg_onboarding_fire_button,
 ),
     OnboardingDaxDialogCta.ShowsWingBottom {
-    override val activeIncludeId: Int = R.id.contextualBrandDesignNoCtaContent
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override val showArrow: Boolean = true
 
@@ -61,5 +61,11 @@ data class DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
             ?.setText(R.string.onboardingDuckAiFireButtonDaxDialogTitle)
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
             context.getString(R.string.onboardingDuckAiFireButtonDaxDialogDescription).html(context)
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }

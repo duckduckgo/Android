@@ -13,6 +13,12 @@ and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
 
 ---
 
+## Before you implement
+
+Before writing code, assess whether the change will touch a public `-api` surface or is cross-cutting (spans multiple modules / adds a new integration). If so, tell the user at planning time that it will need an approved **API Proposal** and/or **Tech Design** — start these before implementation, don't surface them for the first time at PR time. See the *API Proposals* and *Tech Design* sections of `.cursor/rules/contributions.mdc`.
+
+---
+
 ## Build System
 
 ### Module Discovery
@@ -151,6 +157,31 @@ These rules are enforced in the root `build.gradle`. Violations fail the build.
 - Google Java Format in AOSP style for Java
 - Max line length: 150 characters
 - Ratchet from `origin/develop` (only enforces formatting on changed code)
+
+---
+
+## Code Comments
+
+Comments explain the **why** (intent, assumptions, non-obvious decisions), not the **what** the code already shows.
+Default to no comment: prefer self-documenting code (clear names, small functions), and add one only where code alone can't carry the reasoning, and only if it still answers *"why was this done this way?"* for someone reading it two years from now.
+`-api` module declarations may carry KDoc describing the contract, that's documentation for consumers, not narration.
+
+Never add:
+- **narration** of trivial code
+- **conversational / temporal residue**
+- **process / plan references**
+
+Examples of comments to avoid:
+
+```kotlin
+count++ // increment the counter -> narration of trivial code
+val user = repo.load() // fixes the bug from the previous task -> temporal residue
+val state = flow // changed from LiveData -> temporal residue
+cache.clear() // step 3 of the plan -> process / plan reference
+retryCount = 3 // per the Asana task -> process / plan reference
+```
+
+When reviewing a diff, flag any added comment that doesn't follow these rules.
 
 ---
 

@@ -296,6 +296,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
                 syncJweCrypto = syncJweCrypto,
                 nativeLib = nativeLib,
                 errorPrefix = "MintAiChatsKey",
+                keySizeBits = AI_CHATS_RSA_KEY_SIZE,
             )
         ) {
             is Success -> r.data
@@ -494,6 +495,9 @@ class RealThirdPartyCredentialManager @Inject constructor(
     }
 
     companion object {
+        // RSA modulus size (bits) for the ai_chats protected keypair.
+        private const val AI_CHATS_RSA_KEY_SIZE = 2048
+
         const val MAX_RATE_LIMIT_RETRIES = 3
         private const val RATE_LIMIT_RETRY_DELAY_MILLIS = 1_000L
 

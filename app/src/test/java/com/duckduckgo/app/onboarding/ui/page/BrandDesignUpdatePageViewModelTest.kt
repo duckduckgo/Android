@@ -937,7 +937,16 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region Widget prompt (orchestrator-driven flow)
+    // region Add to Dock / Widget prompt (orchestrator-driven flow)
+
+    private fun addToDockStep() =
+        NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
+            pixelName = null,
+            showsStepIndicator = true,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
+        )
 
     private fun widgetPromptStep() =
         NewUserOnboardingActivityStep(
@@ -962,6 +971,19 @@ class BrandDesignUpdatePageViewModelTest {
             currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
             currentStepIndex = 0,
         )
+
+    @Test
+    fun whenAddToDockPrimaryCtaThenContinueClickedEmitted() = runTest {
+        orchestratorState.value = inProgressOn(addToDockStep())
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertEquals(PreOnboardingDialogType.ADD_TO_DOCK, testee.viewState.value.currentDialog)
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.ContinueClicked)
+    }
 
     @Test
     fun whenWidgetPromptPrimaryThenAddWidgetRequestedEmitted() = runTest {

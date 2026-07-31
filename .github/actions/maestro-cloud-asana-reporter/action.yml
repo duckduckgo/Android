@@ -110,7 +110,7 @@ runs:
     - name: Create Asana task when Maestro tests failed
       if: always() && inputs.create_asana_error_task == 'true' && steps.analyze-maestro.outputs.flow_summary_status == 'failure' && github.event_name != 'workflow_dispatch'
       id: create-maestro-failure-task
-      uses: duckduckgo/native-github-asana-sync@v2.0
+      uses: duckduckgo/native-github-asana-sync@v2.6.0
       with:
         asana-pat: ${{ inputs.asana_pat }}
         asana-project: ${{ inputs.asana_project_id }}
@@ -125,7 +125,7 @@ runs:
 
     - name: Adding as a release blocker
       if: always() && inputs.is_release_blocker == 'true' && steps.create-maestro-failure-task.outputs.taskId != ''
-      uses: duckduckgo/native-github-asana-sync@v2.0
+      uses: duckduckgo/native-github-asana-sync@v2.6.0
       with:
         asana-pat: ${{ inputs.asana_pat }}
         asana-project: ${{ inputs.asana_releases_project_id }}

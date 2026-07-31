@@ -293,7 +293,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private fun showAtPosition(popup: PopupWindow) {
         val button = getChildAt(0) ?: this
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
-        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
+        val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, loc[0], y)
     }
 
     private fun dismissPopup() {

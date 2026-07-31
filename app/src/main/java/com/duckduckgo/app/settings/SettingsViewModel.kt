@@ -63,7 +63,6 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScree
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
@@ -170,7 +169,6 @@ class SettingsViewModel @Inject constructor(
         data object LaunchPrivateSearchWebPage : Command()
         data object LaunchWebTrackingProtectionScreen : Command()
         data object LaunchCookiePopupProtectionScreen : Command()
-        data object LaunchFireButtonScreen : Command()
         data object LaunchDataClearingSettingsScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchDuckChatScreen : Command()
@@ -440,13 +438,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onFireButtonSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                command.send(Command.LaunchDataClearingSettingsScreen)
-            } else {
-                command.send(LaunchFireButtonScreen)
-            }
-        }
+        viewModelScope.launch { command.send(Command.LaunchDataClearingSettingsScreen) }
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 

@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Настройки на Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Попитайте за раздела</string>
+    <string name="duckChatContextualAskAboutPage">Попитайте за страницата</string>
 </resources>

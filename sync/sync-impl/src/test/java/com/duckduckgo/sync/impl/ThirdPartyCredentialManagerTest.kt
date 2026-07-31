@@ -237,7 +237,7 @@ class ThirdPartyCredentialManagerTest {
         // call, eliminating the native-vs-embedded-FE race documented in 1216006812462330.
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(emptyList()))
-        whenever(syncJweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
+        whenever(syncJweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
         whenever(syncJweCrypto.extractJwkComponents(anyString())).thenReturn("modulus" to "AQAB")
         whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey)))
             .thenReturn(EncryptBytesResult(0, "ddg_wrapped".toByteArray()))
@@ -245,6 +245,8 @@ class ThirdPartyCredentialManagerTest {
         val result = manager.create()
 
         assertEquals(Success(true), result)
+        // The locally-minted ai_chats keypair must use 2048-bit size
+        verify(syncJweCrypto).generateRsaKeyPair(2048)
         // getProtectedKeys called once (no re-fetch after local mint).
         verify(syncApi, times(1)).getProtectedKeys(token)
         verify(syncApi).createAccessCredential(

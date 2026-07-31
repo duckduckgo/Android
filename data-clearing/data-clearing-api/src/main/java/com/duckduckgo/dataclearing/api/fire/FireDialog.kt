@@ -19,7 +19,7 @@ package com.duckduckgo.dataclearing.api.fire
 import androidx.fragment.app.FragmentManager
 
 /**
- * Common interface for Fire dialog variants (Legacy and Granular).
+ * Interface for displaying the Fire dialog.
  *
  * To receive lifecycle events from the dialog, use FragmentManager.setFragmentResultListener
  * with REQUEST_KEY and check RESULT_KEY_EVENT for the event type.

@@ -3109,6 +3109,8 @@ class BrowserTabFragment :
                 browserActivity?.launchFire()
             }
 
+            is Command.LaunchDuckAiOnboardingFireDialog -> browserActivity?.launchFire(isDuckAiOnboarding = true)
+
             is Command.SwitchToTab -> {
                 binding.focusedView.gone()
                 if (binding.autoCompleteSuggestionsList.isVisible) {

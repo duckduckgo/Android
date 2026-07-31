@@ -125,7 +125,6 @@
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Mazání karet a dat</string>
-    <string name="fireClearAllPlusDuckChats">Smazat karty, data a chaty Duck.ai</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
 
@@ -228,7 +227,6 @@
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Vymazání dat</string>
     <string name="dataClearingDescription">Smazání dat může pomoct chránit tvoje soukromí na internetu. Tlačítkem Fire Button vymažeš data ručně. Můžeš taky nastavit automatické mazání.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -247,26 +245,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Smažou se všechny chaty včetně připnutých</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Vyber, co chceš smazat</string>
     <string name="dataClearingOptionTabs">Karty</string>
     <string name="dataClearingOptionData">Soubory cookie a data webu</string>
     <string name="dataClearingDuckAiChats">Chaty Duck.ai</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Smazat všechny chaty</string>
-    <string name="fireDialogDeleteButton">Smazat</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zavřít kartu</item>
-        <item quantity="few">Zavřít %1$d karty</item>
-        <item quantity="many">Zavřít všech %1$d karet</item>
-        <item quantity="other">Zavřít všech %1$d karet</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Může tě to odhlásit z účtů.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Žádný</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Smazat z 1 webu. Může tě to odhlásit z účtů.</item>
-        <item quantity="few">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
-        <item quantity="many">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
-        <item quantity="other">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Vymazat karty a data stránek?</string>
@@ -296,8 +277,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
-
-    <string name="settingsAutomaticallyClearData">Automaticky vymazat data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -314,9 +293,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Mazání chatů Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Tlačítko Fire Button taky smaže historii Duck.ai, včetně připnutých chatů.</string>
-    <string name="settingsClearDataActionSecondaryText">Vymaže všechny karty a data všech webů, které nechrání funkce Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Vymaže všechny karty, chaty Duck.ai a data všech webů, které nechrání funkce Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Informace</string>
@@ -983,6 +959,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
@@ -1018,6 +995,17 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Teď si vyzkoušej soukromý chat s AI!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš si z nastavit DuckDuckGo jako výchozí prohlížeč?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Vyzkoušej náš widget na domovskou obrazovku.</string>
+    <string name="preOnboardingWidgetPromptBody">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Přidat widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Přeskočit</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockBody">Najdi ikonu DuckDuckGo na ploše. Pak ji podrž a přetáhni na místo. A je to!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Chápu!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Nabízíme také placené předplatné s pokročilými modely umělé inteligence s vyššími limity pro chat od GPT a Claude, zabezpečenou VPN a dalšími funkcemi.</string>

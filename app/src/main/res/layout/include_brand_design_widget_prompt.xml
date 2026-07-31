@@ -20,33 +20,12 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <FrameLayout
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+        android:id="@+id/widgetPromptTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/keyline_3">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/widgetPromptTitleHidden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:text="@string/preOnboardingWidgetPromptTitle"
-            android:visibility="invisible"
-            app:typography="onboarding_title" />
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/widgetPromptTitle"
-            style="@style/Typography.DuckDuckGo.Onboarding.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:textColor="?attr/daxColorPrimaryText" />
-
-    </FrameLayout>
+        android:paddingHorizontal="@dimen/keyline_3"
+        android:text="@string/experimentHomeScreenWidgetBottomSheetDialogTitle" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/widgetPromptBody"
@@ -57,7 +36,7 @@
         android:gravity="center"
         android:includeFontPadding="false"
         android:paddingHorizontal="@dimen/keyline_3"
-        android:text="@string/preOnboardingWidgetPromptBody"
+        android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSubTitle"
         app:typography="onboarding_body"
         tools:alpha="1" />
 

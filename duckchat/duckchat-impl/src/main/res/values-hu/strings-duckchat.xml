@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Duck.ai-beállítások</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Kérdés a lapról</string>
+    <string name="duckChatContextualAskAboutPage">Kérdés az oldalról</string>
 </resources>

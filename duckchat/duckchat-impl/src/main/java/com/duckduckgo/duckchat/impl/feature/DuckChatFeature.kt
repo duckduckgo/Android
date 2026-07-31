@@ -218,13 +218,6 @@ interface DuckChatFeature {
     fun duckAiVoiceEntryPoint(): Toggle
 
     /**
-     * @return `true` when the "Default Toggle Position" setting should be visible in AI Features Settings.
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun rememberTogglePosition(): Toggle
-
-    /**
      * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
      * allowing the user to clear their current chat.
      * If the remote feature is not present defaults to `internal`

@@ -30,7 +30,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_2">
+        android:paddingEnd="@dimen/keyline_1">
 
         <FrameLayout
             android:id="@+id/inputFieldFireIconMenu"
@@ -57,9 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_1"
             android:layout_weight="1"
             app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardCornerRadius="26dp"
+            app:cardCornerRadius="@dimen/largeShapeCornerRadius"
             app:cardElevation="3dp"
             app:cardUseCompatPadding="false">
 
@@ -73,6 +74,15 @@
                 android:paddingBottom="@dimen/keyline_2" />
 
         </com.google.android.material.card.MaterialCardView>
+
+        <include
+            android:id="@+id/inlineNavButtonsContainer"
+            layout="@layout/input_mode_nav_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="-2dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 </com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>

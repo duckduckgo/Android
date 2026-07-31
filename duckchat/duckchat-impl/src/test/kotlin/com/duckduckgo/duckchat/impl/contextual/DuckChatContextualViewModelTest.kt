@@ -32,7 +32,6 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -78,17 +76,11 @@ class DuckChatContextualViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val contextualSheetImprovementsToggle: Toggle = mock()
-    private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val singleTabFireDialogToggle: Toggle = mock()
-    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
-        parentName = "androidBrowserConfig",
-        name = "singleTabFireDialog",
-    )
 
     @Before
     fun setup() {
@@ -96,9 +88,6 @@ class DuckChatContextualViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
@@ -445,7 +434,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -856,7 +844,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -898,7 +885,6 @@ class DuckChatContextualViewModelTest {
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
-                    featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
@@ -1099,6 +1085,62 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet opened fresh with improvements enabled then ask about page shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when sheet opened in legacy mode then ask about page shown pixel not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, never()).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when sheet reopened in input mode with improvements enabled then ask about page shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Once when the sheet is opened, once when it is reopened showing the pill again.
+        verify(duckChatPixels, times(2)).reportContextualAskAboutPageShown()
+    }
+
+    @Test
+    fun `when page context removed reverting to ask about page then shown pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE, attaches context
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        // Once when the sheet is opened, once when removing the attachment reverts the pill to Ask About Page.
+        verify(duckChatPixels, times(2)).reportContextualAskAboutPageShown()
+    }
+
+    @Test
     fun `when prompt sent then attached page context is cleared from input`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
@@ -1139,6 +1181,76 @@ class DuckChatContextualViewModelTest {
             val command = expectMostRecentItem()
             assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
             assertFalse((command as DuckChatContextualViewModel.Command.ChangeSheetState).hideKeyboard)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice search result received in input state then search opens in a new tab`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "cats", isDuckAiResult = false)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenSearchInNewTab)
+            assertEquals("cats", (command as DuckChatContextualViewModel.Command.OpenSearchInNewTab).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice search result received while chat is running then search still opens in a new tab`() = runTest {
+        val testee = buildViewModel()
+        testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "cats", isDuckAiResult = false)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenSearchInNewTab)
+            assertEquals("cats", (command as DuckChatContextualViewModel.Command.OpenSearchInNewTab).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice duck ai result received in input state then duck ai opens with prompt`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "why is the sky blue", isDuckAiResult = true)
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt)
+            assertEquals("why is the sky blue", (command as DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice duck ai result received while chat is running then it is submitted to the current chat`() = runTest {
+        val testee = buildViewModel()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+            awaitItem() // consume the initial prompt event
+
+            testee.onVoiceRecognitionSuccess(query = "follow up question", isDuckAiResult = true)
+
+            val event = awaitItem()
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertEquals("follow up question", event.params.getJSONObject("query").getString("prompt"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when voice result is blank then no action is taken`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onVoiceRecognitionSuccess(query = "   ", isDuckAiResult = true)
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1914,9 +2026,8 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when both fire flags enabled then isFireButtonEnabled is true`() = runTest {
+    fun `when contextual fire button flag enabled then isFireButtonEnabled is true`() = runTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
 
         assertTrue(testee.viewState.value.isFireButtonEnabled)
@@ -1925,25 +2036,6 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when contextual fire button flag disabled then isFireButtonEnabled is false`() = runTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
-        val testee = buildViewModel()
-
-        assertFalse(testee.viewState.value.isFireButtonEnabled)
-    }
-
-    @Test
-    fun `when singleTabFireDialog flag disabled then isFireButtonEnabled is false`() = runTest {
-        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
-        val testee = buildViewModel()
-
-        assertFalse(testee.viewState.value.isFireButtonEnabled)
-    }
-
-    @Test
-    fun `when singleTabFireDialog toggle does not exist then isFireButtonEnabled is false`() = runTest {
-        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
-        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(emptyList())
         val testee = buildViewModel()
 
         assertFalse(testee.viewState.value.isFireButtonEnabled)
@@ -2575,7 +2667,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when ask about tab clicked with valid context then showContext true and no prompt sent`() =
+    fun `when ask about page clicked with valid context then showContext true and no prompt sent`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2592,7 +2684,7 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived(tabId, serializedPageData)
 
             testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutTabClicked()
+                testee.onAskAboutPageClicked()
                 expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -2600,18 +2692,18 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when ask about tab clicked without valid context then showContext stays false`() =
+    fun `when ask about page clicked without valid context then showContext stays false`() =
         runTest {
             testee.onSheetOpened("tab-1")
             testee.currentPageContext = ""
 
-            testee.onAskAboutTabClicked()
+            testee.onAskAboutPageClicked()
 
             assertFalse(testee.viewState.value.showContext)
         }
 
     @Test
-    fun `when ask about tab clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
+    fun `when ask about page clicked with valid context then quick action transitions to SUBMIT_SUMMARIZE`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2625,7 +2717,7 @@ class DuckChatContextualViewModelTest {
             testee.onSheetOpened(tabId)
             testee.onPageContextReceived(tabId, serializedPageData)
 
-            testee.onAskAboutTabClicked()
+            testee.onAskAboutPageClicked()
 
             assertEquals(
                 DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
@@ -2634,7 +2726,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when ask about tab clicked with valid context then focus input command emitted`() =
+    fun `when ask about page clicked with valid context then focus input command emitted`() =
         runTest {
             val tabId = "tab-1"
             val serializedPageData =
@@ -2649,52 +2741,8 @@ class DuckChatContextualViewModelTest {
             testee.onPageContextReceived(tabId, serializedPageData)
 
             testee.commands.test {
-                testee.onAskAboutTabClicked()
+                testee.onAskAboutPageClicked()
                 assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when ask about page clicked with context then submits ask about page prompt with pageContext`() =
-        runTest {
-            val tabId = "tab-1"
-            val serializedPageData =
-                """
-                {
-                    "title": "Page Title",
-                    "url": "https://example.com",
-                    "content": "Extracted DOM text...",
-                    "truncated": false,
-                    "fullContentLength": 1234
-                }
-                """.trimIndent()
-            testee.onSheetOpened(tabId)
-            testee.onPageContextReceived(tabId, serializedPageData)
-            testee.addPageContext()
-
-            testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutPageClicked()
-
-                val event = awaitItem()
-                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
-                val params = event.params
-                val query = params.getJSONObject("query")
-                assertEquals(context.getString(R.string.duckChatContextualAskAboutPage), query.getString("prompt"))
-                val pageContext = params.getJSONObject("pageContext")
-                assertEquals("https://example.com", pageContext.getString("url"))
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when ask about page clicked without context then no prompt sent`() =
-        runTest {
-            testee.onSheetOpened("tab-1")
-
-            testee.subscriptionEventDataFlow.test {
-                testee.onAskAboutPageClicked()
-                expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -2719,7 +2767,6 @@ class DuckChatContextualViewModelTest {
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
         duckChatFeature = duckChatFeature,
-        featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
         contextualNativeInputManager = contextualNativeInputManager,
         chatHistoryRepository = chatHistoryRepository,

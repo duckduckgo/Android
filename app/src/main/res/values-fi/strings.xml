@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista välilehdet ja tiedot</string>
-    <string name="fireClearAllPlusDuckChats">Poista välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire-painike</string>
     <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
     <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Poista tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen poisto.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Poista kaikki keskustelut, myös kiinnitetyt keskustelut</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Valitse, mitä poistetaan</string>
     <string name="dataClearingOptionTabs">Välilehdet</string>
     <string name="dataClearingOptionData">Evästeet ja sivuston tiedot</string>
     <string name="dataClearingDuckAiChats">Duck.ai-keskustelut</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Poista kaikki keskustelut</string>
-    <string name="fireDialogDeleteButton">Poista</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Sulje välilehti</item>
-        <item quantity="other">Sulje kaikki %1$d välilehteä</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Saattaa kirjata sinut ulos tileiltä.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Ei mitään</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Poista yhdeltä sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
-        <item quantity="other">Poista %1$d sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Poistetaanko välilehdet ja sivuston tiedot?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
-
-    <string name="settingsAutomaticallyClearData">Tyhjennä tiedot automaattisesti...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
     <string name="settingsClearAiDataTitle">Poista Duck.ai-keskustelut</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button poistaa myös Duck.ai-historian, mukaan lukien kiinnitetyt keskustelut.</string>
-    <string name="settingsClearDataActionSecondaryText">Tyhjentää kaikki välilehdet ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tyhjentää kaikki välilehdet, Duck.ai-keskustelut ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
     <string name="aboutActivityTitleNew">Tietoa meistä</string>
@@ -943,6 +923,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hei!</string>
     <string name="preOnboardingWelcomeDialogBody1">Oletko valmis nopeampaan selaimeen, joka antaa sinulle hallinnan?</string>
     <string name="preOnboardingWelcomeDialogBody2">Tekoäly on aina valinnainen, ja yksityisyyden suoja on aina päällä.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">miten sanotaan \"ankka\" espanjaksi</string>
@@ -978,6 +959,17 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Kokeile nyt yksityistä tekoälykeskustelua!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Asetetaanko DuckDuckGo oletusselaimeksi?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Kokeile aloitusnäytön widgetiä.</string>
+    <string name="preOnboardingWidgetPromptBody">Lisää haku-widgetimme aloitusnäytöllesi, jotta löydät sen nopeasti ja helposti.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Lisää widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Ohita</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockBody">Etsi DuckDuckGo-kuvake aloitusnäytöltäsi. Paina ja vedä se sitten paikalleen. Siinä kaikki!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Selvä!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Tarjoamme myös maksullisen tilauksen, joka sisältää edistyneitä tekoälymalleja, joilla on korkeammat GPT:n ja Clauden keskustelurajoitukset, turvallinen VPN ja paljon muuta.</string>

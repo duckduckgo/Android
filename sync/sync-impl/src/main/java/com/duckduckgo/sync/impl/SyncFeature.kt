@@ -105,4 +105,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useSimplifiedSync(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun updateSyncActivityViewStateAtomically(): Toggle
 }

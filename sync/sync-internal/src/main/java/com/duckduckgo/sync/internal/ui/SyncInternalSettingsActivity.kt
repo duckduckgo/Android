@@ -23,6 +23,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Base64
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -98,6 +99,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val testSyncWarningListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.enableTestSyncWarning(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
@@ -151,6 +156,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.testSyncWarningToggle.setOnCheckedChangeListener(testSyncWarningListener)
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
@@ -178,6 +184,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.fetchAccessCredentialsButton.setOnClickListener { viewModel.onFetchAccessCredentialsClicked() }
         binding.requestScopedTokenButton.setOnClickListener { viewModel.onRequestScopedTokenClicked() }
         binding.fetchKeysButton.setOnClickListener { viewModel.onFetchKeysClicked() }
+        binding.createAccountInfoKeyButton.setOnClickListener { viewModel.onCreateAccountInfoKeyClicked() }
+        binding.showCachedAccountInfoKeyButton.setOnClickListener { viewModel.onShowCachedAccountInfoKeyClicked() }
+        binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
         binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
         binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }
@@ -333,6 +342,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText
         binding.keysTextView.text = viewState.keysText
+        binding.accountInfoKeyResultTextView.text = viewState.accountInfoKeyResult
+        binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
@@ -342,5 +353,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
                 }
             }
         }
+        binding.testSyncWarningToggle.quietlySetIsChecked(viewState.isTestSyncWarningEnabled, testSyncWarningListener)
     }
 }

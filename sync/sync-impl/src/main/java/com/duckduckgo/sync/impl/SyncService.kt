@@ -136,6 +136,16 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<ProtectedKeysResponse>
 
+    /**
+     * First-writer-wins registration for a purpose-scoped protected key.
+     */
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/keys/purpose/{purpose}/set-if-absent")
+    fun setKeysIfAbsent(
+        @Header("Authorization") token: String,
+        @Path("purpose") purpose: String,
+        @Body request: SetKeysIfAbsentRequest,
+    ): Call<SetKeyIfAbsentResponse>
+
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/access-credentials")
     fun getAccessCredentials(
         @Header("Authorization") token: String,
@@ -272,6 +282,24 @@ data class TokenRescopeResponse(
 /** Response from GET /sync/keys — the account's protected keys for all purposes. */
 data class ProtectedKeysResponse(
     val keys: List<ProtectedKeyEntry>,
+)
+
+/**
+ * Request body for POST /sync/keys/purpose/{purpose}/set-if-absent
+ * one entry per credential (ddg/3party) so both wrapped copies are stored atomically.
+ * */
+data class SetKeysIfAbsentRequest(
+    val keys: List<ProtectedKeyEntry>,
+)
+
+data class SetKeyIfAbsentResponse(
+    val keys: List<AccountInfoKeyWire> = emptyList(),
+)
+
+// Response only returns the winning key ID + public key
+data class AccountInfoKeyWire(
+    val kid: String,
+    @field:Json(name = "public_key") val publicKey: RsaJwk? = null,
 )
 
 data class AccessCredentialsResponse(

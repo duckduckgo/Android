@@ -61,7 +61,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
@@ -152,7 +151,6 @@ interface NativeInputWidget {
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     )
@@ -231,9 +229,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val viewModel: NativeInputModeWidgetViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NativeInputModeWidgetViewModel::class.java]
     }
-
-    @Inject
-    lateinit var duckChatFeature: DuckChatFeature
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -344,7 +339,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     private var pendingIsContextual: Boolean = false
-    private var pendingAskAboutTab: (() -> Unit)? = null
     private var pendingAskAboutPage: (() -> Unit)? = null
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
@@ -455,7 +449,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.isContextual = pendingIsContextual
-            pluginView.onAskAboutTab = pendingAskAboutTab
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
@@ -642,7 +635,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
         val suppress = nativeInputState?.shouldSuppressBottomRow() == true
         val visible = isChatTabSelected() &&
-            (inputField.hasFocus() || previewEnterFocus) &&
+            (inputField.hasFocus() || previewEnterFocus || isContextualWidget) &&
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
@@ -1097,7 +1090,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun applyDefaultTogglePosition() {
         doOnAttach {
-            if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
                 // Wait for the first state emission so we know whether the toggle row is even shown.
                 // For SEARCH_ONLY users (input-screen setting off) the toggle is hidden, and flipping
@@ -1119,7 +1111,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun saveLastUsedTogglePosition(isChat: Boolean) {
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
             viewModel.saveLastUsedTogglePosition(position.name)
@@ -1245,17 +1236,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
 
     override fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     ) {
         pendingIsContextual = true
-        pendingAskAboutTab = onAskAboutTab
         pendingAskAboutPage = onAskAboutPage
         pendingOnPageContextRemoved = onPageContextRemoved
         attachmentView?.let { view ->
             view.isContextual = true
-            view.onAskAboutTab = onAskAboutTab
             view.onAskAboutPage = onAskAboutPage
             view.onPageContextRemoved = onPageContextRemoved
         }
@@ -1316,11 +1304,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         (card.layoutParams as? MarginLayoutParams)?.let { lp ->
             lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetHorizontalMargin - card.paddingLeft
-            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+            lp.marginStart = targetStartMargin - card.paddingLeft
+            lp.marginEnd = targetEndMargin - card.paddingRight
             card.layoutParams = lp
         }
     }

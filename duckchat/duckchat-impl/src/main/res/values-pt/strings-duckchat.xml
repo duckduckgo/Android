@@ -263,4 +263,8 @@
 
     <!-- Settings -->
     <string name="duckAiSettingsTitle">Definições do Duck.ai</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Perguntar sobre o separador</string>
+    <string name="duckChatContextualAskAboutPage">Perguntar sobre a página</string>
 </resources>

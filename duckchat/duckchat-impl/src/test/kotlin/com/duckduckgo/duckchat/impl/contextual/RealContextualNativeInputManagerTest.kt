@@ -23,11 +23,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +58,17 @@ class RealContextualNativeInputManagerTest {
 
     private val duckChatInternal: DuckChatInternal = mock()
     private val publisher: NativeInputStatePublisher = mock()
-    private val testee = RealContextualNativeInputManager(duckChatInternal, publisher)
+    private val showVoiceChatEntry = MutableStateFlow(false)
+    private val showVoiceSearchToggle = MutableStateFlow(true)
+    private val duckAiFeatureState: DuckAiFeatureState = mock {
+        whenever(it.showVoiceChatEntry).thenReturn(showVoiceChatEntry)
+        whenever(it.showVoiceSearchToggle).thenReturn(showVoiceSearchToggle)
+    }
+    private val voiceSearchAvailable = MutableStateFlow(false)
+    private val voiceSearchAvailability: VoiceSearchAvailability = mock {
+        whenever(it.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailable)
+    }
+    private val testee = RealContextualNativeInputManager(duckChatInternal, publisher, duckAiFeatureState, voiceSearchAvailability)
 
     @Test
     fun `when onContextualClosed called with blank tabId then publisher is not touched`() {
@@ -293,6 +305,176 @@ class RealContextualNativeInputManagerTest {
 
         assertEquals("hello", submitted?.prompt)
         verify(jsMessaging, never()).sendSubscriptionEvent(any())
+    }
+
+    @Test
+    fun `when voice chat entry enabled then widget voice chat is made available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        showVoiceChatEntry.value = true
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceChatAvailable(true)
+    }
+
+    @Test
+    fun `when voice chat entry disabled then widget voice chat is not available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        showVoiceChatEntry.value = false
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceChatAvailable(false)
+    }
+
+    @Test
+    fun `when init then widget voice chat click is wired to requested callback`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        var voiceChatRequested = false
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onVoiceChatRequested = { voiceChatRequested = true },
+        )
+
+        val captor = argumentCaptor<() -> Unit>()
+        verify(widget).onVoiceChatClick = captor.capture()
+        captor.firstValue.invoke()
+
+        assertTrue(voiceChatRequested)
+    }
+
+    @Test
+    fun `when voice search device available and duck ai toggle on then widget voice search is made available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = true
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceSearchAvailable(true)
+    }
+
+    @Test
+    fun `when voice search device unavailable then widget voice search is not available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = false
+        showVoiceSearchToggle.value = true
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceSearchAvailable(false)
+    }
+
+    @Test
+    fun `when voice search device available but duck ai toggle off then widget voice search is not available`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = false
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        verify(widget).setVoiceSearchAvailable(false)
+    }
+
+    @Test
+    fun `when duck ai voice search toggle turns off then widget voice search becomes unavailable`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        voiceSearchAvailable.value = true
+        showVoiceSearchToggle.value = true
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+        verify(widget).setVoiceSearchAvailable(true)
+
+        // Toggling the Duck.ai voice-search entry point off must re-emit and hide the mic immediately.
+        showVoiceSearchToggle.value = false
+
+        verify(widget).setVoiceSearchAvailable(false)
+    }
+
+    @Test
+    fun `when init then widget voice search click is wired to requested callback`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        var voiceSearchRequested = false
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onVoiceSearchRequested = { voiceSearchRequested = true },
+        )
+
+        val captor = argumentCaptor<() -> Unit>()
+        verify(widget).onVoiceSearchClick = captor.capture()
+        captor.firstValue.invoke()
+
+        assertTrue(voiceSearchRequested)
     }
 
     private fun mockCard(): MaterialCardView {

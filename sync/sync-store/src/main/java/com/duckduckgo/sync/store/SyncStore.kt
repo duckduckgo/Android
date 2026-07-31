@@ -15,6 +15,11 @@ import kotlinx.coroutines.launch
 @JvmInline
 value class ScopedPassword(val raw: String)
 
+/**
+ * Cached public half of the account-wide `account_info` protected key (RSA-OAEP-256 JWK components).
+ */
+data class AccountInfoPublicKey(val keyId: String, val modulus: String, val exponent: String)
+
 interface SyncStore {
     var syncingDataEnabled: Boolean
     var userId: String?
@@ -29,6 +34,9 @@ interface SyncStore {
 
     /** Scoped password (SP primary key) for the 3party credential. Only present when a 3party credential exists. */
     var scopedPassword: ScopedPassword?
+
+    /** Cached public key for the account's `account_info` protected key, once registered. */
+    var accountInfoPublicKey: AccountInfoPublicKey?
 
     fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
@@ -163,6 +171,27 @@ constructor(
             }
         }
 
+    override var accountInfoPublicKey: AccountInfoPublicKey?
+        get() {
+            val keyId = encryptedPreferences?.getString(KEY_ACCOUNT_INFO_KID, null) ?: return null
+            val modulus = encryptedPreferences?.getString(KEY_ACCOUNT_INFO_MODULUS, null) ?: return null
+            val exponent = encryptedPreferences?.getString(KEY_ACCOUNT_INFO_EXPONENT, null) ?: return null
+            return AccountInfoPublicKey(keyId, modulus, exponent)
+        }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_ACCOUNT_INFO_KID)
+                    remove(KEY_ACCOUNT_INFO_MODULUS)
+                    remove(KEY_ACCOUNT_INFO_EXPONENT)
+                } else {
+                    putString(KEY_ACCOUNT_INFO_KID, value.keyId)
+                    putString(KEY_ACCOUNT_INFO_MODULUS, value.modulus)
+                    putString(KEY_ACCOUNT_INFO_EXPONENT, value.exponent)
+                }
+            }
+        }
+
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
@@ -207,5 +236,8 @@ constructor(
         private const val KEY_SK = "KEY_SK"
         private const val KEY_CREDENTIAL_ID = "KEY_CREDENTIAL_ID"
         private const val KEY_SCOPED_PASSWORD = "KEY_SCOPED_PASSWORD"
+        private const val KEY_ACCOUNT_INFO_KID = "KEY_ACCOUNT_INFO_KID"
+        private const val KEY_ACCOUNT_INFO_MODULUS = "KEY_ACCOUNT_INFO_MODULUS"
+        private const val KEY_ACCOUNT_INFO_EXPONENT = "KEY_ACCOUNT_INFO_EXPONENT"
     }
 }

@@ -26,7 +26,7 @@ tags:
           timeout: 30000
       - tapOn: "I've been here before"
       - assertVisible:
-          text: ".*Want to customize anything?.*"
+          text: ".*Want to customize.anything?.*"
 
       - tapOn: "Address bar position"
       - assertVisible:

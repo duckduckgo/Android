@@ -39,7 +39,6 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -73,7 +72,6 @@ class DuckChatContextualViewModel @Inject constructor(
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
-    private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
     private val chatHistoryRepository: ChatHistoryRepository,
@@ -159,6 +157,8 @@ class DuckChatContextualViewModel @Inject constructor(
         ) : Command()
         data object LaunchChatHistory : Command()
         data object FocusInput : Command()
+        data class OpenSearchInNewTab(val query: String) : Command()
+        data class OpenDuckAiWithPrompt(val query: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -184,10 +184,6 @@ class DuckChatContextualViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            val isSingleTabFireEnabled = featureTogglesInventory
-                .getAllTogglesForParent("androidBrowserConfig")
-                .find { it.featureName().name == "singleTabFireDialog" }
-                ?.isEnabled() == true
             isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
             val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
                 QuickActionState.ASK_ABOUT_PAGE
@@ -201,7 +197,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
             _viewState.update {
                 it.copy(
-                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
+                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled(),
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
                     showChatsIcon = isContextualSheetImprovementsEnabled,
@@ -276,6 +272,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 withContext(dispatchers.main()) {
                     logcat { "Duck.ai: reopenSheet in Input mode" }
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    if (_viewState.value.showsAskAboutPageQuickAction()) {
+                        duckChatPixels.reportContextualAskAboutPageShown()
+                    }
                 }
             }
         }
@@ -357,6 +356,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 if (_viewState.value.showsAttachContextPlaceholder()) {
                     duckChatPixels.reportContextualPlaceholderContextShown()
                 }
+                if (_viewState.value.showsAskAboutPageQuickAction()) {
+                    duckChatPixels.reportContextualAskAboutPageShown()
+                }
                 return@launch
             }
 
@@ -430,6 +432,24 @@ class DuckChatContextualViewModel @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    fun onVoiceRecognitionSuccess(
+        query: String,
+        isDuckAiResult: Boolean,
+    ) {
+        if (query.isBlank()) return
+        when {
+            !isDuckAiResult -> emitCommand(Command.OpenSearchInNewTab(query))
+            _viewState.value.sheetMode == SheetMode.WEBVIEW -> onPromptSent(query)
+            else -> emitCommand(Command.OpenDuckAiWithPrompt(query))
+        }
+    }
+
+    private fun emitCommand(command: Command) {
+        viewModelScope.launch(dispatchers.main()) {
+            commandChannel.trySend(command)
         }
     }
 
@@ -634,6 +654,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (_viewState.value.showsAttachContextPlaceholder()) {
             duckChatPixels.reportContextualPlaceholderContextShown()
         }
+        if (_viewState.value.showsAskAboutPageQuickAction()) {
+            duckChatPixels.reportContextualAskAboutPageShown()
+        }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
@@ -697,6 +720,10 @@ class DuckChatContextualViewModel @Inject constructor(
             quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
             !showContext
 
+    private fun ViewState.showsAskAboutPageQuickAction(): Boolean =
+        sheetMode == SheetMode.INPUT &&
+            quickActionState == QuickActionState.ASK_ABOUT_PAGE
+
     fun replacePrompt(
         input: String,
         prompt: String,
@@ -755,7 +782,7 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onAskAboutTabClicked() {
+    fun onAskAboutPageClicked() {
         if (!isContextValid(currentPageContext)) {
             // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
             return
@@ -763,15 +790,6 @@ class DuckChatContextualViewModel @Inject constructor(
         addPageContext()
         commandChannel.trySend(Command.FocusInput)
         _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
-    }
-
-    fun onAskAboutPageClicked() {
-        if (!_viewState.value.showContext) {
-            // Context not attached; nothing to ask about.
-            return
-        }
-        commandChannel.trySend(Command.FocusInput)
-        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
     }
 
     fun onPromptCleared() {
@@ -1002,6 +1020,9 @@ class DuckChatContextualViewModel @Inject constructor(
 
                     if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
                         duckChatPixels.reportContextualPlaceholderContextShown()
+                    }
+                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAskAboutPageQuickAction()) {
+                        duckChatPixels.reportContextualAskAboutPageShown()
                     }
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)

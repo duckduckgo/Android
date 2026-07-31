@@ -123,7 +123,6 @@
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
     <string name="fireClearAll">Ta bort flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Ta bort flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -226,7 +225,6 @@
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
 
     <!-- Fire Button -->
-    <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
     <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställ in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
@@ -243,22 +241,9 @@
     <string name="dataClearingAutomaticChatsOptionDescription">Ta bort alla chattar, inklusive fästa chattar</string>
 
     <!-- Fire Dialog Granular Options -->
-    <string name="fireDialogTitle">Välj vad som ska raderas</string>
     <string name="dataClearingOptionTabs">Flikar</string>
     <string name="dataClearingOptionData">Cookies och webbplatsdata</string>
     <string name="dataClearingDuckAiChats">Duck.ai-chattar</string>
-    <string name="fireDialogOptionDuckAiChatsDescription">Radera alla chattar</string>
-    <string name="fireDialogDeleteButton">Ta bort</string>
-    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Stäng flik</item>
-        <item quantity="other">Stäng alla %1$d flikar</item>
-    </plurals>
-    <string name="fireDialogOptionDataDescriptionNoHistory">Kan logga ut dig från konton.</string>
-    <string name="fireDialogOptionDescriptionNothingToDelete">Inga</string>
-    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Ta bort från 1 webbplats. Kan logga ut dig från konton.</item>
-        <item quantity="other">Ta bort från %1$d webbplatser. Kan logga ut dig från konton.</item>
-    </plurals>
 
     <!-- Single tab burning -->
     <string name="singleTabFireDialogTitle">Ta bort flikar och webbplatsdata?</string>
@@ -286,8 +271,6 @@
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
-
-    <string name="settingsAutomaticallyClearData">Rensa data automatiskt …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>
@@ -304,9 +287,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
     <string name="settingsClearAiDataTitle">Ta bort Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
-    <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
-    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
-
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Om</string>
@@ -943,6 +923,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hej!</string>
     <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare\nsom ger dig kontroll?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och integritetsskydd är alltid på.</string>
+
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on, for example, 1 of 5">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
@@ -978,6 +959,17 @@
     <string name="preOnboardingInputModeDemoTitleCustomAi">Prova en privat AI-chatt nu!</string>
     <!-- Pre-onboarding: browser comparison screen -->
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vill du göra DuckDuckGo till din standardwebbläsare?</string>
+
+    <!-- Pre-onboarding: widget prompt -->
+    <string name="preOnboardingWidgetPromptTitle">Prova vår widget för startsidan.</string>
+    <string name="preOnboardingWidgetPromptBody">Lägg till vår sök-widget på startsidan för snabb och enkel åtkomst.</string>
+    <string name="preOnboardingWidgetPromptPrimaryCta">Lägg till widget</string>
+    <string name="preOnboardingWidgetPromptSecondaryCta">Hoppa över</string>
+
+    <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingAddToDockBody">Leta upp DuckDuckGo-ikonen på startskärmen. Tryck och dra den därefter på plats. Sedan är det klart!</string>
+    <string name="preOnboardingAddToDockPrimaryCta">Jag förstår!</string>
+
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi erbjuder även en betald prenumeration med avancerade AI-modeller med högre chattgränser från GPT och Claude, ett säkert VPN och mer.</string>

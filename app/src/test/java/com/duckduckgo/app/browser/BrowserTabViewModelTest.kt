@@ -11430,27 +11430,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteVisitedAndFeatureEnabledThenDomainRecorded() = runTest {
-        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
-
+    fun whenOnSiteVisitedThenDomainRecorded() = runTest {
         testee.onSiteVisited("https://sub.example.com/path", null)
 
         verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
     }
 
     @Test
-    fun whenOnSiteVisitedAndFeatureDisabledThenNothingRecorded() = runTest {
-        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = false))
-
-        testee.onSiteVisited("https://sub.example.com/path", null)
-
-        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
-    }
-
-    @Test
     fun whenOnSiteVisitedWithNoHostThenNothingRecorded() = runTest {
-        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
-
         testee.onSiteVisited("about:blank", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
@@ -11480,7 +11467,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnSiteVisitedInFireModeThenVisitedSiteStillRecordedForBurnScope() = runTest {
-        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
         browserMode = BrowserMode.FIRE
         resetChannels()
         initialiseViewModel()
@@ -12435,6 +12421,17 @@ class BrowserTabViewModelTest {
         testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenBrandDesignDuckAiFireButtonCtaOkClickedThenFireDialogLaunchedAndCtaNotDismissed() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.onUserClickCtaOkButton(brandDesignDuckAiFireButtonCta())
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.LaunchDuckAiOnboardingFireDialog>()
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
     }
 
     @Test

@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
+import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -125,11 +126,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
     private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
+    private val isProgressBarIndeterminateEnabled =
+        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
@@ -143,6 +147,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
+            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
         ),
     )
 
@@ -263,6 +268,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val inputScreenEnabled: Boolean = false,
         val isSearchOnly: Boolean = false,
+        val searchOnlyRestoreEnabled: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
@@ -271,6 +277,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
+        val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
     ) {
         /**
@@ -291,7 +298,8 @@ class OmnibarLayoutViewModel @Inject constructor(
          * focuses it directly. Derived from flags + viewMode so it can't drift out of sync.
          */
         val showTextInputClickCatcher: Boolean
-            get() = inputScreenEnabled || (isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly))
+            get() = inputScreenEnabled ||
+                (isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly || searchOnlyRestoreEnabled))
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -353,13 +361,15 @@ class OmnibarLayoutViewModel @Inject constructor(
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
-        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, inputModeCapability ->
+            nativeInputSearchOnlyFeature.self().enabled(),
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
             _viewState.update {
                 it.copy(
                     inputScreenEnabled = inputScreenEnabled,
                     isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
                     isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
+                    searchOnlyRestoreEnabled = searchOnlyRestoreEnabled,
                 )
             }
         }.launchIn(viewModelScope)

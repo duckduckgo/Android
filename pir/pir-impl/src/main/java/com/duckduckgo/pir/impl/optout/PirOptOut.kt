@@ -30,7 +30,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
-import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
@@ -113,6 +113,7 @@ class RealPirOptOut @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewDataCleaner: PirWebViewDataCleaner,
+    private val pirWebViewCountProvider: PirWebViewCountProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -152,7 +153,7 @@ class RealPirOptOut @Inject constructor(
         }
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(processedJobRecords.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
@@ -348,7 +349,7 @@ class RealPirOptOut @Inject constructor(
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
-        maxWebViewCount = minOf(allSteps.size, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(allSteps.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         // Assign steps to runners based on the maximum number of WebViews we can use
         val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)

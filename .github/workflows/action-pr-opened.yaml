@@ -13,7 +13,7 @@ jobs:
       - name: Find Asana Task ID
         if: ${{ github.event.pull_request.base.ref == github.event.repository.default_branch }}
         id: find-asana-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: ${{ vars.ASANA_TASK_TRIGGER_PHRASE }}
@@ -22,7 +22,7 @@ jobs:
       - name: Add comment with PR link in Asana task
         continue-on-error: true
         if: ${{ github.actor == github.event.pull_request.user.login && ( github.event.action == 'opened' || github.event.action == 'reopened') }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: ${{ vars.ASANA_TASK_TRIGGER_PHRASE }}
@@ -31,7 +31,7 @@ jobs:
 
       - name: Add task to Asana project section
         if: ${{ steps.find-asana-task.outcome == 'success' && steps.find-asana-task.outputs.asanaTaskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
