@@ -228,6 +228,8 @@ class EmbellishmentControllerImpl(
             maxHeightPx = { WALKING_DAX_MAX_HEIGHT_DP.toPx() },
             minHeightPx = { WALKING_DAX_MIN_HEIGHT_DP.toPx() },
             enter = {
+                view.isVisible = true
+                view.alpha = 0f
                 val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
                     .setDuration(WALKING_DAX_FADE_DURATION)
                 val slide = ObjectAnimator.ofFloat(
