@@ -27,7 +27,7 @@ class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return ReadSyncCodeActivity.intent(context, input.source)
+        return ReadSyncCodeActivity.intent(context, input.source, input.isRecoveryFlow)
     }
 
     override fun parseResult(
@@ -48,6 +48,7 @@ class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val source: String?,
+        val isRecoveryFlow: Boolean = false,
     )
 
     sealed interface Output {

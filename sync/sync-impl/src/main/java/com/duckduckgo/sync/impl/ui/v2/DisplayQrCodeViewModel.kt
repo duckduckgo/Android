@@ -44,7 +44,7 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -143,7 +143,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     if (isSynced) {
                         pixels.fireSignupConnectPixel(source)
                         pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
-                        _commands.send(Command.SetPairingResult(pairingResult(role = null)))
+
+                        val result = pairingResult(Path.Pairing(role = null, method = PairingMethod.DisplayedCode))
+                        _commands.send(Command.SetPairingResult(result))
                         _commands.send(Command.Close)
                         isPolling = false
                     }
@@ -176,7 +178,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
-                    _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
+                    _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingPath(PairingMethod.DisplayedCode))))
                     _commands.send(Command.Close)
                 }
 
@@ -204,11 +206,11 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         _viewState.update { it.copy(bitmap = bitmapWithCode) }
     }
 
-    private suspend fun pairingResult(role: Role?): SyncPairingResult = withContext(dispatchers.io()) {
+    private suspend fun pairingResult(path: Path): SyncPairingResult = withContext(dispatchers.io()) {
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, role, PairingMethod.DisplayedCode) }
+            ?.let { device -> SyncPairingResult.Success(device, path) }
             ?: SyncPairingResult.Failure
     }
 

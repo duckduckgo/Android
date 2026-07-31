@@ -91,6 +91,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -137,17 +138,17 @@ class SyncActivity : DuckDuckGoActivity() {
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
 
-    private val backupDeviceLauncher = registerForActivityResult(
+    private val syncThisDeviceLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
-    ) { result ->
-        when (result) {
+    ) { output ->
+        when (output) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.deviceName))
+                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(output.device.deviceName))
             }
 
             is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
-                handlePairingResult(result.result)
+                handlePairingResult(output.result, showConfirmationScreen = true)
             }
 
             is SyncThisDeviceContract.Output.Dismissed -> {
@@ -186,30 +187,39 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val readSyncCodeLauncher = registerForActivityResult(
+    private val syncWithAnotherDeviceLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
-    ) { result ->
-        when (result) {
-            is ReadSyncCodeContract.Output.SyncCompleted -> handlePairingResult(result.result)
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result, showConfirmationScreen = true)
+            }
+
             is ReadSyncCodeContract.Output.Dismissed -> Unit
         }
     }
 
     private val addAnotherDeviceLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
-    ) { result ->
-        when (result) {
+    ) { output ->
+        when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
-                when (result.result) {
-                    is SyncPairingResult.Success -> {
-                        viewModel.onDeviceConnected()
-                    }
-
-                    is SyncPairingResult.Failure -> viewModel.onConnectionCancelled()
-                }
+                handlePairingResult(output.result, showConfirmationScreen = false)
             }
 
             is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val recoverSyncedDataLauncher = registerForActivityResult(
+        RecoverSyncedDataContract(),
+    ) { output ->
+        when (output) {
+            is RecoverSyncedDataContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result, showConfirmationScreen = true)
+            }
+
+            is RecoverSyncedDataContract.Output.Dismissed -> Unit
         }
     }
 
@@ -252,6 +262,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureSyncThisDeviceCta()
         configureSyncWithAnotherDeviceCta()
+        configureRecoverDataCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
         configureWarningMessages()
@@ -384,13 +395,15 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        backupDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
+                        syncThisDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
                     },
                 )
             }
 
             is IntroRecoverSyncData -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    recoverSyncedDataLauncher.launch(RecoverSyncedDataContract.Input(launchSource))
+                }
             }
 
             is LaunchLearnMore -> {
@@ -440,19 +453,28 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource))
                 }
             }
         }
     }
 
-    private fun handlePairingResult(result: SyncPairingResult) {
+    private fun handlePairingResult(
+        result: SyncPairingResult,
+        showConfirmationScreen: Boolean,
+    ) {
         when (result) {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
-                when (result.method) {
-                    PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
-                    PairingMethod.DisplayedCode -> Unit
+                if (showConfirmationScreen) {
+                    when (val path = result.path) {
+                        is Path.Pairing -> when (path.method) {
+                            PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                            PairingMethod.DisplayedCode -> Unit
+                        }
+
+                        is Path.Recovery -> startActivity(SyncEnabledActivity.intent(this))
+                    }
                 }
             }
 
@@ -485,6 +507,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
         binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
             viewModel.onAddAnotherDevice()
+        }
+    }
+
+    private fun configureRecoverDataCta() {
+        binding.includeDisabledView.recoverDataItem.setOnClickListener {
+            viewModel.onRecoverYourSyncedData()
         }
     }
 

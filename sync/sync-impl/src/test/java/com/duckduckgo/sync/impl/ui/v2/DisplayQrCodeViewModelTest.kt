@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
@@ -167,7 +168,10 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, role = null, method = PairingMethod.DisplayedCode), command.result)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(role = null, method = PairingMethod.DisplayedCode)),
+                command.result,
+            )
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -301,7 +305,10 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, role = null, method = PairingMethod.DisplayedCode), command.result)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(role = null, method = PairingMethod.DisplayedCode)),
+                command.result,
+            )
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -321,7 +328,7 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Role.Host, PairingMethod.DisplayedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(Role.Host, PairingMethod.DisplayedCode)), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

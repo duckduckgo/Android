@@ -84,4 +84,8 @@
     <string name="sync_simplified_pairing_dialog_joiner_negative_cta">Cancel</string>
     <string name="sync_simplified_pairing_dialog_confirm_title">Confirm on your other device…</string>
     <string name="sync_simplified_pairing_dialog_confirm_cta">Got It</string>
+    <string name="sync_recovering_data_v2_headline">Recovering data</string>
+    <string name="sync_enabled_v2_headline">Sync &amp; Backup enabled</string>
+    <string name="sync_enabled_v2_body">End-to-end encrypted on all your devices.</string>
+    <string name="sync_enabled_v2_primary_button">Done</string>
 </resources>

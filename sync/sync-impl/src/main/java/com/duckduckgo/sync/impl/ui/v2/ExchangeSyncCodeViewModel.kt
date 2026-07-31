@@ -23,17 +23,19 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -123,8 +125,13 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
                         }
 
                         else -> {
+                            val path = if (authCode is SyncAuthCode.Recovery) {
+                                Path.Recovery
+                            } else {
+                                Path.Pairing(role = null, method = PairingMethod.ScannedCode)
+                            }
                             animationCompletionSignal.await()
-                            _commands.send(Command.SetPairingResult(pairingResult(role = null)))
+                            _commands.send(Command.SetPairingResult(pairingResult(path)))
                             _commands.send(Command.Close)
                         }
                     }
@@ -154,8 +161,13 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
 
             is DispatchOutcome.LoggedIn -> {
                 _viewState.update { it.copy(isLoggedIn = true) }
+                if (outcome.path == SetupPath.RECOVERY) {
+                    _commands.send(Command.RunAcknowledgmentAnimation)
+                }
                 animationCompletionSignal.await()
-                _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
+
+                val path = outcome.toPairingPath(PairingMethod.ScannedCode)
+                _commands.send(Command.SetPairingResult(pairingResult(path)))
                 _commands.send(Command.Close)
             }
 
@@ -207,11 +219,11 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
         data object Close : Command
     }
 
-    private suspend fun pairingResult(role: Role?): SyncPairingResult = withContext(dispatchers.io()) {
+    private suspend fun pairingResult(path: Path): SyncPairingResult = withContext(dispatchers.io()) {
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, role, PairingMethod.ScannedCode) }
+            ?.let { device -> SyncPairingResult.Success(device, path) }
             ?: SyncPairingResult.Failure
     }
 

@@ -22,6 +22,7 @@ import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -59,6 +60,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val isRecoveryFlow get() = intent.getBooleanExtra(IS_RECOVERY_FLOW_EXTRA_KEY, false)
 
     private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { output ->
         when (output) {
@@ -107,6 +110,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
                 val input = ExchangeSyncCodeContract.Input(
                     syncUrl = command.syncCode,
                     launchSource = launchSource,
+                    isRecoveryFlow = isRecoveryFlow,
                 )
                 exchangeSyncCodeLauncher.launch(input)
             }
@@ -132,6 +136,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         binding.closeButton.setOnClickListener {
             finish()
         }
+        binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
             qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource))
         }
@@ -178,13 +183,16 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         private const val SCANNER_POSITION = 0
         private const val MANUAL_CODE_ENTRY_POSITION = 1
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val IS_RECOVERY_FLOW_EXTRA_KEY = "is_recovery_flow"
 
         fun intent(
             context: Context,
             source: String?,
+            isRecoveryFlow: Boolean,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(IS_RECOVERY_FLOW_EXTRA_KEY, isRecoveryFlow)
             }
         }
     }

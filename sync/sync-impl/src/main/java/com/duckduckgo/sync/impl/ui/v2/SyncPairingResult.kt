@@ -22,25 +22,41 @@ import androidx.core.content.IntentCompat
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import kotlinx.parcelize.Parcelize
 
 /**
  * Terminal outcome of a sync-with-another-device attempt. Produced by the leaf activity
- * ([SyncAnotherDeviceActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
+ * ([ExchangeSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
  * back stack so that [SyncActivity] can decide which completion screen to show.
  */
 sealed interface SyncPairingResult : Parcelable {
-
     @Parcelize
     data class Success(
         val device: ParcelableDevice,
-        val role: Role?,
-        val method: PairingMethod,
+        val path: Path,
     ) : SyncPairingResult
 
     @Parcelize
     data object Failure : SyncPairingResult
+
+    /**
+     * Which setup flow actually completed. Carried in the result because the entry point does not
+     * determine it: a recovery code can be scanned from the pairing screen and a pairing code from
+     * the recovery screen.
+     */
+    sealed interface Path : Parcelable {
+        @Parcelize
+        data class Pairing(
+            val role: Role?,
+            val method: PairingMethod,
+        ) : Path
+
+        @Parcelize
+        data object Recovery : Path
+    }
 
     enum class Role {
         Host,
@@ -63,11 +79,14 @@ sealed interface SyncPairingResult : Parcelable {
     }
 }
 
-internal fun DispatchOutcome.LoggedIn.toPairingRole(): Role? = when (path) {
-    SetupPath.PAIRING -> when (myRole) {
-        SetupRole.HOST -> Role.Host
-        SetupRole.JOINER -> Role.Joiner
-        null -> null
-    }
-    SetupPath.RECOVERY -> null
+internal fun DispatchOutcome.LoggedIn.toPairingPath(method: PairingMethod): Path = when (path) {
+    SetupPath.PAIRING -> Path.Pairing(
+        role = when (myRole) {
+            SetupRole.HOST -> Role.Host
+            SetupRole.JOINER -> Role.Joiner
+            null -> null
+        },
+        method = method,
+    )
+    SetupPath.RECOVERY -> Path.Recovery
 }

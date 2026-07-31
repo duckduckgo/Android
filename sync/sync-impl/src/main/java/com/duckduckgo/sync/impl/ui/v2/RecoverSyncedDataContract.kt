@@ -19,20 +19,15 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Input
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Output
+import com.duckduckgo.sync.impl.ui.v2.RecoverSyncedDataContract.Input
+import com.duckduckgo.sync.impl.ui.v2.RecoverSyncedDataContract.Output
 
-class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
+class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return ExchangeSyncCodeActivity.intent(
-            context = context,
-            syncUrl = input.syncUrl,
-            launchSource = input.launchSource,
-            isRecoveryFlow = input.isRecoveryFlow,
-        )
+        return RecoverSyncedDataActivity.intent(context, input.source)
     }
 
     override fun parseResult(
@@ -52,9 +47,7 @@ class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val syncUrl: String,
-        val launchSource: String?,
-        val isRecoveryFlow: Boolean,
+        val source: String?,
     )
 
     sealed interface Output {

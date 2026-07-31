@@ -132,5 +132,19 @@
             android:label="@string/sync_screen_title"
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.RecoverSyncedDataActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.SyncEnabledActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
