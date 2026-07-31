@@ -260,15 +260,15 @@
     <!-- Legacy Raw -->
     <color name="translucentDark">#b000</color>
 
-    <color name="ic_launcher_red_background">#DE5833</color>
+    <color name="ic_launcher_red_background">@color/mandarin50</color>
     <color name="ic_launcher_white_background">#FFFFFF</color>
-    <color name="ic_launcher_gold_background">#EEA849</color>
+    <color name="ic_launcher_gold_background">#E8932C</color>
     <color name="ic_launcher_silhouette_background">#222222</color>
-    <color name="ic_launcher_green_background">#5FAD3E</color>
-    <color name="ic_launcher_purple_background">#7A4BDC</color>
-    <color name="ic_launcher_blue_background">#4179ED</color>
-    <color name="ic_launcher_black_background">#262626</color>
-    <color name="ic_launcher_pink_background">#E37089</color>
+    <color name="ic_launcher_green_background">@color/lilypad60</color>
+    <color name="ic_launcher_purple_background">@color/blossom60</color>
+    <color name="ic_launcher_blue_background">@color/pondwater60</color>
+    <color name="ic_launcher_black_background">#212121</color>
+    <color name="ic_launcher_pink_background">#D576A4</color>
 
     <!-- The new color system is defined by categories and sub-categories-->
     <!-- Backgrounds / Text / Icons / Lines / Controls / Tone -->
