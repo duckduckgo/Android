@@ -342,6 +342,7 @@ class SyncActivityViewModel @Inject constructor(
                     command.send(Command.LaunchOriginalFlow(originalFlow))
                 }
                 is Error -> {
+                    updateViewState { it.setThisDeviceSyncIdle() }
                     syncPixels.fireAutoRestorePreservedAccountClearFailed(
                         source = source,
                         errorCode = result.code.toString(),
