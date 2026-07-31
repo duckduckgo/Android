@@ -35,7 +35,7 @@
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
 
     <!-- App Components -->
-    <dimen name="changeAppIconSize">75dp</dimen>
+    <dimen name="changeAppIconSize">80dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
     <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
 
