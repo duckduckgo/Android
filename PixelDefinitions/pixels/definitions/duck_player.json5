@@ -23,8 +23,8 @@
             {
                 "key": "duration",
                 "type": "string",
-                "description": "Bucketed hold lifetime in seconds, coarse enough to see the median and tail without carrying a per-session timing fingerprint.",
-                "enum": ["0-1", "1-3", "3-10", "10-20", "20-30", "30+"]
+                "description": "Bucketed hold lifetime in seconds, coarse enough to see the median and tail without carrying a per-session timing fingerprint. Boundaries are inclusive at the bottom, so a 5.0s hold reports '5-10'.",
+                "enum": ["0-5", "5-10", "10-30", "30+"]
             }
         ],
         "expires": "2027-04-30"
