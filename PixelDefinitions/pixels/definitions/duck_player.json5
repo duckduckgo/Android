@@ -1,5 +1,3 @@
-// Duck Player buffering hold instrumentation. Documents only the buffering-hold-removed
-// pixel added with the buffering feedback work; the older duckplayer_* pixels are not yet backfilled here.
 {
     "duckplayer_buffering_hold_removed": {
         "description": "Fires when the Duck Player buffering hold (poster + spinner shown while the YouTube player buffers) stops holding, reporting why and how long it lasted. Used to tune the spinner timeout and to spot holds that never resolve on their own. Fires once per hold, at removal; whether the spinner timeout elapsed first is carried by timed_out rather than by its own report.",

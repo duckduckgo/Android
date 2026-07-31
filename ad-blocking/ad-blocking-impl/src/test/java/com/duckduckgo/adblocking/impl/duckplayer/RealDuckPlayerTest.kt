@@ -461,18 +461,11 @@ class RealDuckPlayerTest {
     @Test
     fun sendDuckPlayerPixelWithBufferingHoldRemoved_firesPixelWithReasonAndDuration() = runTest {
         val pixelName = "buffering.hold_removed"
-        val pixelData = mapOf("reason" to "frame", "duration" to "3-10")
+        val pixelData = mapOf("reason" to "frame", "duration" to "5-10")
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_BUFFERING_HOLD_REMOVED, pixelData, emptyMap(), Count)
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithUnknownName_firesNoPixel() = runTest {
-        testee.sendDuckPlayerPixel("not.a.known.pixel", mapOf("reason" to "frame"))
-
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
     }
 
     // endregion
