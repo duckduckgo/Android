@@ -24,6 +24,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 
+/**
+ * @param onDecorationHidden the tracked decoration no longer fits and has been hidden. The card's own constraints
+ *   are the host's to write, including re-anchoring it to the parent bottom now the decoration is gone: a second
+ *   writer here would compete with whatever rule the host applies at render time.
+ */
 class OnboardingDecorationFitCorrector(
     private val root: View,
     private val dialog: View,
@@ -116,11 +121,6 @@ class OnboardingDecorationFitCorrector(
 
         if (target == null) {
             deco.isGone = true
-            dialog.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                verticalBias = 0f
-                bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-            }
             onDecorationHidden()
             return false
         }

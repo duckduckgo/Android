@@ -169,8 +169,9 @@ class OnboardingDecorationFitCorrectorTest {
     }
 
     @Test
-    fun whenSlackBelowMinThenDecorationHiddenAndCardFillsParent() {
+    fun whenSlackBelowMinThenDecorationHiddenAndCardConstraintsLeftToTheHost() {
         // overflow = 1100 - 1080 = 20. dialogSpace = 1080 + 20 = 1100. slack = 1116 - 1100 = 16 < min 247 -> null.
+        var hidden = false
         val h = harness(
             rootHeight = 1200,
             rootPaddingBottom = 84,
@@ -180,14 +181,22 @@ class OnboardingDecorationFitCorrectorTest {
             decorationHeight = 299,
             minHeightPx = 247,
             maxHeightPx = 299,
+            onDecorationHidden = { hidden = true },
         )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            verticalBias = 1f
+            bottomToTop = h.decoration.id
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+        }
 
         assertFalse(h.corrector.correctOnce())
+
         assertTrue(h.decoration.isGone)
+        assertTrue(hidden)
         val lp = h.dialog.layoutParams as ConstraintLayout.LayoutParams
-        assertEquals(0f, lp.verticalBias)
-        assertEquals(ConstraintLayout.LayoutParams.UNSET, lp.bottomToTop)
-        assertEquals(ConstraintLayout.LayoutParams.PARENT_ID, lp.bottomToBottom)
+        assertEquals(1f, lp.verticalBias)
+        assertEquals(h.decoration.id, lp.bottomToTop)
+        assertEquals(ConstraintLayout.LayoutParams.UNSET, lp.bottomToBottom)
     }
 
     @Test

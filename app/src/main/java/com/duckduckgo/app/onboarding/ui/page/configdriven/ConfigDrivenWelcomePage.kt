@@ -142,6 +142,8 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             windowInsets
         }
 
+        val cardAnchor = CardAnchorControllerImpl(binding, deviceInfo.isTablet())
+
         engine = DialogRenderEngine(
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
@@ -157,10 +159,12 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
             ),
             embellishments = EmbellishmentControllerImpl(
                 binding = binding,
-                onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
+                // A decoration that stops fitting leaves the card anchored to a hidden view, so re-run the same
+                // anchor rule the render applies, which drops the arrow's depth along with it.
+                onDecorationHidden = { cardAnchor.apply(null) },
                 cardBottomInsetPx = { cardBottomInsetPx },
             ),
-            cardAnchor = CardAnchorControllerImpl(binding, deviceInfo.isTablet()),
+            cardAnchor = cardAnchor,
             cardArrow = CardArrowControllerImpl(binding.daxDialogCta.cardView),
             stepIndicator = StepIndicatorControllerImpl(binding.daxDialogCta.stepIndicator),
             emit = viewModel::onEvent,
