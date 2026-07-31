@@ -70,6 +70,7 @@ class DataClearingWideEventTest {
             flowEntryPoint = "single_tab_fire_dialog",
             metadata = mapOf("clear_options" to "tabs,data", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
         verify(wideEventClient).intervalStart(wideEventId = 123L, key = "total_duration_ms_bucketed")
     }
@@ -86,6 +87,7 @@ class DataClearingWideEventTest {
             flowEntryPoint = "app_shortcut",
             metadata = mapOf("clear_options" to "tabs", "browser_mode" to "fire"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
     }
 
@@ -112,6 +114,7 @@ class DataClearingWideEventTest {
                 "tab_count" to "11-20",
             ),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
     }
 
@@ -133,6 +136,7 @@ class DataClearingWideEventTest {
                 flowEntryPoint = "single_tab_fire_dialog",
                 metadata = mapOf("clear_options" to "", "browser_mode" to "regular", "tab_count" to bucket),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+                samplingProbability = 0.05f,
             )
         }
     }
@@ -149,6 +153,7 @@ class DataClearingWideEventTest {
             flowEntryPoint = "app_shortcut",
             metadata = mapOf("clear_options" to "", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
     }
 
@@ -165,6 +170,7 @@ class DataClearingWideEventTest {
             flowEntryPoint = "single_tab_fire_dialog",
             metadata = mapOf("clear_options" to "duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
     }
 
@@ -181,6 +187,7 @@ class DataClearingWideEventTest {
             flowEntryPoint = "single_tab_fire_dialog",
             metadata = mapOf("clear_options" to "tabs,data,duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.05f,
         )
         verify(wideEventClient).intervalStart(wideEventId = 124L, key = "total_duration_ms_bucketed")
     }
