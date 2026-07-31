@@ -58,7 +58,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_sync_create_account" />
+                android:src="@drawable/ic_sync_create_account_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/headlineText"
