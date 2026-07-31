@@ -53,8 +53,6 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -169,7 +167,7 @@ class DisplayQrCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(role = null, method = PairingMethod.DisplayedCode)),
+                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -306,7 +304,7 @@ class DisplayQrCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(role = null, method = PairingMethod.DisplayedCode)),
+                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -328,7 +326,7 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(Role.Host, PairingMethod.DisplayedCode)), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

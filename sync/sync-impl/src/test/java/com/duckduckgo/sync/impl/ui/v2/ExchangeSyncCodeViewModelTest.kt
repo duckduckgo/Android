@@ -42,8 +42,6 @@ import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPair
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -130,7 +128,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Recovery), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -152,7 +150,7 @@ class ExchangeSyncCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(role = null, method = PairingMethod.ScannedCode)),
+                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -252,7 +250,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(Role.Joiner, PairingMethod.ScannedCode)), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -270,7 +268,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Pairing(Role.Host, PairingMethod.ScannedCode)), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -305,7 +303,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Path.Recovery), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

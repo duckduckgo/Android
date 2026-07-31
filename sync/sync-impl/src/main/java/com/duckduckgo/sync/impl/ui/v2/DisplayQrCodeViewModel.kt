@@ -44,7 +44,6 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -144,7 +143,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                         pixels.fireSignupConnectPixel(source)
                         pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
 
-                        val result = pairingResult(Path.Pairing(role = null, method = PairingMethod.DisplayedCode))
+                        val result = pairingResult()
                         _commands.send(Command.SetPairingResult(result))
                         _commands.send(Command.Close)
                         isPolling = false
@@ -178,7 +177,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
-                    _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingPath(PairingMethod.DisplayedCode))))
+                    _commands.send(Command.SetPairingResult(pairingResult()))
                     _commands.send(Command.Close)
                 }
 
@@ -206,11 +205,11 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         _viewState.update { it.copy(bitmap = bitmapWithCode) }
     }
 
-    private suspend fun pairingResult(path: Path): SyncPairingResult = withContext(dispatchers.io()) {
+    private suspend fun pairingResult(): SyncPairingResult = withContext(dispatchers.io()) {
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, path) }
+            ?.let { device -> SyncPairingResult.Success(device, PairingMethod.DisplayedCode) }
             ?: SyncPairingResult.Failure
     }
 

@@ -91,7 +91,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Path
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -467,13 +466,9 @@ class SyncActivity : DuckDuckGoActivity() {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
                 if (showConfirmationScreen) {
-                    when (val path = result.path) {
-                        is Path.Pairing -> when (path.method) {
-                            PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
-                            PairingMethod.DisplayedCode -> Unit
-                        }
-
-                        is Path.Recovery -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                    when (result.method) {
+                        PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                        PairingMethod.DisplayedCode -> Unit
                     }
                 }
             }
