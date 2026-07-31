@@ -103,15 +103,39 @@ class RealContentScopeScripts @Inject constructor(
         "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
     }
 
+    private var lastCallWasOptimized: Boolean? = null
+
     override fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String {
-        return if (optimizeInjectionEnabled()) {
+        val optimized = optimizeInjectionEnabled()
+        // The paths keep their own change-detection baselines but write the same JSON caches, so after a
+        // mid-session flag flip a baseline no longer describes what the cache holds. Dropping both together
+        // is the only state either path can safely resume from.
+        if (lastCallWasOptimized != null && lastCallWasOptimized != optimized) {
+            resetCaches()
+        }
+        lastCallWasOptimized = optimized
+
+        return if (optimized) {
             getOptimizedScript(isDesktopMode, activeExperiments)
         } else {
             getLegacyScript(isDesktopMode, activeExperiments)
         }
+    }
+
+    private fun resetCaches() {
+        cachedPluginConfig = ""
+        cachedUserUnprotectedDomains.clear()
+        cachedUnprotectTemporaryExceptions.clear()
+        lastUserUnprotectedDomains = emptyList()
+        lastUnprotectedTemporaryExceptions = emptyList()
+        cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
+        cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
+        cachedContentScopeJson = buildContentScopeJson("", EMPTY_JSON_LIST)
+        // Never equal to a built preferences string, so the next call also reassembles the script.
+        cachedUserPreferencesJson = EMPTY_JSON
     }
 
     // Original implementation, left intact. Used when optimizeContentScopeInjection is disabled, and
@@ -121,12 +145,6 @@ class RealContentScopeScripts @Inject constructor(
         activeExperiments: List<Toggle>,
     ): String {
         var updateJS = false
-
-        // A mid-session flag flip followed by an input returning to its pre-flip value would leave the optimized path
-        // seeing no change. Writes only: nothing below reads them, so legacy behaviour is unaffected.
-        cachedPluginConfig = ""
-        lastUserUnprotectedDomains = emptyList()
-        lastUnprotectedTemporaryExceptions = emptyList()
 
         val pluginParameters = getLegacyPluginParameters()
 
