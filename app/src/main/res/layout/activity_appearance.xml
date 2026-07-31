@@ -39,28 +39,11 @@
             android:paddingBottom="@dimen/keyline_5"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/selectedThemeSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:primaryText="@string/settingsTheme"
-                app:primaryTextTruncated="false"
-                app:secondaryText="@string/settingsSystemTheme" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/experimentalNightMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/appearanceNightModeTitle"
-                app:primaryTextTruncated="false"
-                app:showSwitch="true"
-                app:secondaryText="@string/appearanceNightModeSecondary" />
-
             <LinearLayout
                 android:id="@+id/changeAppIconSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
@@ -87,6 +70,23 @@
                     tools:srcCompat="@drawable/ic_ddg_logo" />
 
             </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/selectedThemeSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsTheme"
+                app:primaryTextTruncated="false"
+                app:secondaryText="@string/settingsSystemTheme" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/experimentalNightMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/appearanceNightModeTitle"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true"
+                app:secondaryText="@string/appearanceNightModeSecondary" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/addressBarPositionSettingDivider"
