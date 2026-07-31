@@ -41,8 +41,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_5"
-                app:bodyText="@string/sync_scanner_v2_qr_code_screen_body"
-                app:headlineText="@string/sync_scanner_v2_qr_code_screen_headline" />
+                app:bodyText="@string/sync_simplified_qr_code_header_body"
+                app:headlineText="@string/sync_simplified_qr_code_header_headline" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -105,7 +105,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_5"
-                        android:text="@string/sync_scanner_v2_qr_code_copy_button"
+                        android:text="@string/sync_simplified_qr_code_copy_button"
                         app:daxButtonSize="large"
                         app:icon="@drawable/ic_copy_24"
                         app:iconGravity="textStart"
@@ -118,7 +118,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_3"
-                        android:text="@string/sync_scanner_v2_qr_code_share_button"
+                        android:text="@string/sync_simplified_qr_code_share_button"
                         app:daxButtonSize="large"
                         app:icon="@drawable/ic_share_android_24"
                         app:iconGravity="textStart"

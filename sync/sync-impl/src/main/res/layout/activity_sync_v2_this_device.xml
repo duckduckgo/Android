@@ -67,7 +67,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/sync_setup_v2_header_headline"
+                android:text="@string/sync_simplified_setup_header_headline"
                 app:textType="primary"
                 app:typography="h1" />
 
@@ -78,7 +78,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/sync_setup_v2_header_body"
+                android:text="@string/sync_simplified_setup_header_body"
                 app:textType="primary"
                 app:typography="body1" />
 
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_5"
         android:layout_marginTop="@dimen/keyline_5"
-        android:text="@string/sync_setup_with_another_device_cta_title"
+        android:text="@string/sync_simplified_setup_primary_button"
         app:daxButtonSize="large"
         app:icon="@drawable/ic_qr2_24"
         app:iconGravity="textStart" />
@@ -103,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_2"
-        android:text="@string/sync_setup_v2_this_device_cta_title"
+        android:text="@string/sync_simplified_setup_secondary_button"
         app:daxButtonSize="large"
         app:iconGravity="textStart" />
 

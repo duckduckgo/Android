@@ -88,7 +88,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
                 result = Error(reason = e.message.orEmpty()),
                 type = SyncAccountOperation.CREATE_PDF,
             )
-            _commands.send(Command.ShowError(R.string.sync_recovery_pdf_error))
+            _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_recovery_pdf_body))
         }
     }
 
@@ -122,7 +122,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
             val code = viewState.first { it.recoveryCode != null }.recoveryCode ?: return@launch
             val isNotificationShown = clipboard.copyToClipboard(code, isSensitive = true)
             if (!isNotificationShown) {
-                showMessage(R.string.sync_code_copied_message)
+                showMessage(R.string.sync_simplified_recovery_code_copied_message)
             }
         }
     }
@@ -155,7 +155,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
 
                 is Error -> {
                     syncSetupWideEvent.onRecoveryCodeGenerationFailed()
-                    _commands.send(Command.ShowError(R.string.sync_device_v2_recovery_code_get_code_error, result.reason))
+                    _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_recovery_code_body, result.reason))
                 }
             }
         }
@@ -170,7 +170,7 @@ class RecoveryCodeActivityViewModel @Inject constructor(
                     }
 
                     is Error -> {
-                        _commands.send(Command.ShowError(R.string.sync_create_account_generic_error))
+                        _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_create_account_body))
                     }
                 }
             }

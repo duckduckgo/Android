@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_duckduckgo_silhouette_onlight_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/syncGetAppsOnOtherPlatforms" />
+        app:primaryText="@string/sync_simplified_settings_get_other_devices_item" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/getDesktopBrowserItem"
@@ -37,6 +37,6 @@
         android:visibility="gone"
         app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/getDesktopBrowserSettingItemTitle"
-        app:secondaryText="@string/getDesktopBrowserSettingItemSubtitleTitle" />
+        app:primaryText="@string/sync_simplified_settings_get_desktop_browser_item"
+        app:secondaryText="@string/sync_simplified_settings_get_desktop_browser_item_hint" />
 </merge>

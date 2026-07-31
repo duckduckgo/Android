@@ -121,7 +121,7 @@ class EditDeviceViewModelTest {
 
             val command = awaitItem()
             assertIs<ShowError>(command)
-            assertEquals(R.string.sync_edit_device_error, command.message)
+            assertEquals(R.string.sync_simplified_error_dialog_edit_device_body, command.message)
             assertEquals("boom", command.reason)
 
             cancel()

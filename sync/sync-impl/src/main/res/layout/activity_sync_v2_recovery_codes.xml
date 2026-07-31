@@ -58,7 +58,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_6"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/sync_device_v2_recovery_code_body"
+                android:text="@string/sync_simplified_recovery_code_body"
                 app:textType="secondary"
                 app:typography="body1" />
 
@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/keyline_3"
                         android:layout_marginVertical="@dimen/keyline_4"
-                        android:text="@string/sync_device_v2_recovery_code_download_code_button"
+                        android:text="@string/sync_simplified_recovery_code_download_button"
                         app:daxButtonSize="small" />
 
                 </LinearLayout>
@@ -122,8 +122,8 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:background="@drawable/background_card_container"
-                app:primaryText="@string/sync_restore_on_reinstall_title"
-                app:secondaryText="@string/sync_restore_on_reinstall_description"
+                app:primaryText="@string/sync_simplified_recovery_code_restore_on_reinstall_item"
+                app:secondaryText="@string/sync_simplified_recovery_code_restore_on_reinstall_item_hint"
                 app:showSwitch="true" />
 
         </LinearLayout>
@@ -137,7 +137,7 @@
         android:layout_marginHorizontal="@dimen/keyline_5"
         android:layout_marginTop="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_2"
-        android:text="@string/sync_device_v2_recovery_code_done_button"
+        android:text="@string/sync_simplified_recovery_code_primary_button"
         app:daxButtonSize="large" />
 
 </LinearLayout>

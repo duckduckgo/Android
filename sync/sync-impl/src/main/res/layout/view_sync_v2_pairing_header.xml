@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         app:typography="h1"
-        tools:text="@string/sync_scanner_v2_scan_qr_code_headline" />
+        tools:text="@string/sync_simplified_scanner_camera_header_headline" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/bodyText"
@@ -38,5 +38,5 @@
         android:gravity="center"
         app:textType="secondary"
         app:typography="body1"
-        tools:text="@string/sync_scanner_v2_scan_qr_code_body" />
+        tools:text="@string/sync_simplified_scanner_camera_header_body" />
 </merge>

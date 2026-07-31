@@ -63,7 +63,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                 } else {
                     syncSetupWideEvent.onAccountCreationFailed()
                     _commands.send(
-                        Command.ShowError(R.string.sync_create_account_generic_error),
+                        Command.ShowError(R.string.sync_simplified_error_dialog_create_account_body),
                     )
                 }
             }
@@ -82,7 +82,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                         syncSetupWideEvent.onAccountCreationFailed()
                         _commands.send(
                             Command.ShowError(
-                                R.string.sync_create_account_generic_error,
+                                R.string.sync_simplified_error_dialog_create_account_body,
                                 result.reason,
                             ),
                         )

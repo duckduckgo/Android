@@ -226,7 +226,7 @@ class SyncActivity : DuckDuckGoActivity() {
         if (isGranted) {
             viewModel.generateRecoveryCode(this)
         } else {
-            Snackbar.make(binding.root, R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root, R.string.sync_simplified_settings_storage_permission_message, Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -386,7 +386,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     onError = { message ->
                         viewModel.onSyncThisDeviceCanceled()
                         lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
-                        showError(ShowError(R.string.sync_general_error, message))
+                        showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, message))
                     },
                     onSuccess = { hasValidAuth ->
                         if (hasValidAuth) {
@@ -408,7 +408,10 @@ class SyncActivity : DuckDuckGoActivity() {
             is LaunchLearnMore -> {
                 globalActivityStarter.start(
                     this,
-                    SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
+                    SettingsWebViewScreenWithParams(
+                        url = command.url,
+                        screenTitle = getString(R.string.sync_simplified_settings_learn_more_screen_title),
+                    ),
                 )
             }
 
@@ -582,7 +585,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureDataExpirationNotice() {
         binding.includeEnabledView.expirationNoticeLabel.addClickableSpan(
-            textSequence = getText(R.string.sync_settings_data_expiration),
+            textSequence = getText(R.string.sync_simplified_settings_data_expiration_notice),
             spans = listOf(
                 "learn_more_link" to object : DuckDuckGoClickableSpan() {
                     override fun onClick(widget: View) {
@@ -604,9 +607,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun launchDeviceAuthEnrollment(forSyncThisDevice: Boolean) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_require_device_passcode_dialog_title)
-            .setMessage(getString(R.string.sync_require_device_passcode_dialog_body))
-            .setPositiveButton(R.string.sync_require_device_passcode_dialog_action)
+            .setTitle(R.string.sync_simplified_settings_require_passcode_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_settings_require_passcode_dialog_body))
+            .setPositiveButton(R.string.sync_simplified_settings_require_passcode_dialog_primary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onDialogShown() {
@@ -629,10 +632,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun showDeleteAccountDialog() {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_settings_v2_delete_server_data_dialog_title)
-            .setMessage(getString(R.string.sync_settings_v2_delete_server_data_dialog_body))
-            .setPositiveButton(R.string.sync_delete_server_data_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_delete_server_data_dialog_secondary_button, GHOST_ALT)
+            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body))
+            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -654,16 +657,16 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun showError(error: ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
             .setMessage(getString(error.message) + "\n" + error.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .show()
     }
 
     private fun authenticate(
         config: AuthConfiguration = AuthConfiguration(),
         onError: (reason: String) -> Unit = { reason ->
-            showError(ShowError(R.string.sync_general_error, reason))
+            showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, reason))
         },
         onCancelled: () -> Unit = {},
         onSuccess: (hasValidAuth: Boolean) -> Unit,

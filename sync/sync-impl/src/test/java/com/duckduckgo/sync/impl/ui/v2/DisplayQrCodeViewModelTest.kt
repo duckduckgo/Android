@@ -589,7 +589,7 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             testee.onCopyCodeClicked()
-            assertEquals(ShowMessage(R.string.sync_code_copied_message), awaitItem())
+            assertEquals(ShowMessage(R.string.sync_simplified_qr_code_copied_message), awaitItem())
 
             cancel()
         }

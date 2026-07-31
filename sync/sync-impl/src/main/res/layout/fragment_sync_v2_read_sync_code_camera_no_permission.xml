@@ -27,8 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_5"
-        app:bodyText="@string/sync_scanner_v2_scan_qr_code_body"
-        app:headlineText="@string/sync_scanner_v2_scan_qr_code_headline" />
+        app:bodyText="@string/sync_simplified_scanner_camera_header_body"
+        app:headlineText="@string/sync_simplified_scanner_camera_header_headline" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
-            android:text="@string/sync_camera_permission_required"
+            android:text="@string/sync_simplified_scanner_no_permission_headline"
             app:typography="h3" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:gravity="center_horizontal"
-            android:text="@string/sync_camera_permission_required_description"
+            android:text="@string/sync_simplified_scanner_no_permission_body"
             app:textType="secondary"
             app:typography="body2" />
 
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/sync_go_to_settings"
+            android:text="@string/sync_simplified_scanner_no_permission_primary_button"
             app:daxButtonSize="large" />
 
     </LinearLayout>

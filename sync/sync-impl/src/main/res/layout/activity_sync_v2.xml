@@ -49,8 +49,8 @@
                     android:visibility="gone"
                     app:contentOrientation="start"
                     app:dismissIcon="true"
-                    app:primaryText="@string/sync_notify_me_title"
-                    app:secondaryText="@string/sync_notify_me_description"
+                    app:primaryText="@string/sync_simplified_settings_notify_me_title"
+                    app:secondaryText="@string/sync_simplified_settings_notify_me_body"
                     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
             </FrameLayout>
 

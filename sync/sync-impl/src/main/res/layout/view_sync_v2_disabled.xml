@@ -31,7 +31,7 @@
             android:id="@+id/syncThisDeviceToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/sync_settings_v2_this_device_cta_title"
+            app:primaryText="@string/sync_simplified_settings_sync_this_device_item"
             app:showSwitch="true" />
     </FrameLayout>
 
@@ -43,7 +43,7 @@
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_5"
         android:layout_marginBottom="60dp"
-        android:text="@string/sync_setup_with_another_device_cta_title"
+        android:text="@string/sync_simplified_settings_sync_with_another_device_button"
         app:daxButtonSize="large"
         app:icon="@drawable/ic_qr2_24"
         app:iconGravity="textStart" />
@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_sync_recovery_24"
-        app:primaryText="@string/sync_setup_single_recover_data_cta_title" />
+        app:primaryText="@string/sync_simplified_settings_recover_data_item" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"

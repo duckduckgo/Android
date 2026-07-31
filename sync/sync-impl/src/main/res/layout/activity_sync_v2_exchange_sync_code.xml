@@ -50,7 +50,7 @@
             android:gravity="center"
             app:textType="primary"
             app:typography="h1"
-            tools:text="@string/sync_another_device_v2_headline" />
+            tools:text="@string/sync_simplified_pairing_headline" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/connectingLabel"
@@ -60,7 +60,7 @@
             android:layout_marginTop="@dimen/keyline_5"
             android:drawablePadding="@dimen/keyline_3"
             android:gravity="center"
-            android:text="@string/sync_another_device_v2_body"
+            android:text="@string/sync_simplified_pairing_body"
             app:iconGravity="textStart"
             app:textType="primary"
             app:typography="body1" />
