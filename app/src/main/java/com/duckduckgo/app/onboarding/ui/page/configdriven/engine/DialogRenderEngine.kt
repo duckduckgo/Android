@@ -140,6 +140,7 @@ class DialogRenderEngine(
         afterFadeAnimator?.cancel()
         afterFadeAnimator = null
         unbindCurrent()
+        background.release()
         cardStage.release()
         embellishments.release()
         stepIndicator.release()
