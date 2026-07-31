@@ -1979,6 +1979,7 @@ class BrowserTabFragment :
 
     private fun onForwardArrowClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
         viewModel.onUserPressedForward()
     }
 
