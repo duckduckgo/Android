@@ -20,10 +20,10 @@
     <!-- Sync settings screen: header -->
     <string name="sync_simplified_settings_header_headline_disabled">Keep DuckDuckGo in sync!</string>
     <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo is in sync.</string>
-    <string name="sync_simplified_settings_header_body_disabled">Sync your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo&#160;apps.</string>
-    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Sync your autofill data, bookmarks, and Duck.ai&#160;chats, end-to-end encrypted across your DuckDuckGo&#160;apps.</string>
-    <string name="sync_simplified_settings_header_body_enabled">Your autofill data and bookmarks are being synced with end-to-end encryption.</string>
-    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Your autofill data, bookmarks, and Duck.ai&#160;chats, are being synced with end-to-end encryption.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Sync and back up your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo&#160;apps.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Sync and back up your autofill data, bookmarks, and Duck.ai&#160;chats, end-to-end encrypted across your DuckDuckGo&#160;apps.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Your bookmarks and autofill data are being synced and backed up with end-to-end encryption.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Your bookmarks, autofill data, and Duck.ai&#160;chats, are being synced and backed up with end-to-end encryption.</string>
 
     <!-- Sync settings screen: sync disabled state -->
     <string name="sync_simplified_settings_sync_this_device_item">Sync This Device</string>
@@ -83,7 +83,7 @@
     <string name="sync_simplified_scanner_manual_entry_tab_label">Enter Code</string>
 
     <!-- Scanner screen: camera tab -->
-    <string name="sync_simplified_scanner_camera_header_headline">Scan QR&#160;Code</string>
+    <string name="sync_simplified_scanner_camera_header_headline">Scan QR&#160;code to sync</string>
     <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo&#160;for&#160;Desktop</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">I’m Ready to Scan</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Sorry, the scanned code is invalid.</string>
@@ -93,7 +93,7 @@
     <string name="sync_simplified_scanner_no_hardware_headline">Camera Unavailable</string>
 
     <!-- Scanner screen: manual entry tab -->
-    <string name="sync_simplified_scanner_manual_entry_header_headline">Enter the Sync&#160;Code</string>
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Enter the Sync&#160;code</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Open your other <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo&#160;App</annotation></b>\n<annotation type="gap">\n</annotation>Go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation> › <annotation type="highlight">Copy&#160;Text&#160;Code</annotation></string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Example Code:</string>
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
