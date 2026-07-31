@@ -23,32 +23,13 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <FrameLayout
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+        android:id="@+id/inputScreenPreviewTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:paddingHorizontal="12dp">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/inputScreenPreviewTitleHidden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/preOnboardingInputModeDemoTitle"
-            android:visibility="invisible"
-            app:typography="onboarding_title" />
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/inputScreenPreviewTitle"
-            style="@style/Typography.DuckDuckGo.Onboarding.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:textColor="?attr/daxColorPrimaryText" />
-
-    </FrameLayout>
+        android:paddingHorizontal="12dp"
+        android:text="@string/preOnboardingInputModeDemoTitle" />
 
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeToggle"

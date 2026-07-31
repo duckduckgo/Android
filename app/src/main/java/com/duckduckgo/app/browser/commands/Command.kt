@@ -484,6 +484,8 @@ sealed class Command {
         val onboardingCta: OnboardingDaxDialogCta,
     ) : Command()
 
+    data object LaunchDuckAiOnboardingFireDialog : Command()
+
     data class SwitchToTab(
         val tabId: String,
     ) : Command()

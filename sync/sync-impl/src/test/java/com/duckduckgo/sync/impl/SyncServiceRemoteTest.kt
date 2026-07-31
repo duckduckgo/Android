@@ -85,7 +85,8 @@ class SyncServiceRemoteTest {
 
     private val syncService: SyncService = mock()
     private val syncStore: SyncStore = mock()
-    private val syncRemote = SyncServiceRemote(syncService, syncStore)
+    private val setKeysIfAbsentCall: SetKeysIfAbsentCall = mock()
+    private val syncRemote = SyncServiceRemote(syncService, syncStore, setKeysIfAbsentCall)
 
     @Test
     fun whenCreateAccountSucceedsThenReturnAccountCreatedSuccess() {
@@ -407,5 +408,15 @@ class SyncServiceRemoteTest {
         val result = syncRemote.getAccessCredentials(token)
 
         assertEquals(Result.Error(reason = "GetAccessCredentials: empty body"), result)
+    }
+
+    @Test
+    fun whenSetKeysIfAbsentReturnsInvalidCredentialsThenClearStore() {
+        whenever(setKeysIfAbsentCall.execute(any(), any(), any()))
+            .thenReturn(Result.Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unexpected status code"))
+
+        syncRemote.setKeysIfAbsent(token, "account_info", emptyList())
+
+        verify(syncStore).clearAll()
     }
 }

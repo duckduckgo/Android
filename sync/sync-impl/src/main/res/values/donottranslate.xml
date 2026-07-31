@@ -62,4 +62,14 @@
     <string name="sync_scanner_v2_scan_button_cta">I’m Ready to Scan</string>
     <string name="sync_scanner_v2_enter_code_manually_tab_item_label">Enter Code</string>
     <string name="sync_scanner_v2_qr_code_screen_title">QR Code</string>
+    <string name="sync_scanner_v2_qr_code_screen_headline">Scan from another device</string>
+    <string name="sync_scanner_v2_qr_code_screen_body">On another device, open <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation>\n<annotation type="gap">\n</annotation>and scan this code:</string>
+    <string name="sync_scanner_v2_qr_code_copy_button">Copy Text Code</string>
+    <string name="sync_scanner_v2_qr_code_share_button">Share</string>
+    <string name="sync_scanner_v2_manual_entry_screen_headline">Enter the Sync Code</string>
+    <string name="sync_scanner_v2_manual_entry_screen_body">Open your other <annotation type="icon">&#65532;</annotation> <b><annotation type="highlight">DuckDuckGo App</annotation></b>\n<annotation type="gap">\n</annotation>Go to <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation> › <annotation type="highlight">Copy Text Code</annotation></string>
+    <string name="sync_scanner_v2_manual_entry_example_code_label">Example Code:</string>
+    <string name="sync_scanner_v2_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+    <string name="sync_scanner_v2_manual_entry_paste_button">Paste Sync Code</string>
+    <string name="sync_scanner_v2_manual_entry_invalid_code_pasted">Sorry, the pasted code is invalid.</string>
 </resources>

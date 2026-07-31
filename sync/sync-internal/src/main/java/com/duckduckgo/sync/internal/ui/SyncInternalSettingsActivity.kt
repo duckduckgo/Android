@@ -184,6 +184,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.fetchAccessCredentialsButton.setOnClickListener { viewModel.onFetchAccessCredentialsClicked() }
         binding.requestScopedTokenButton.setOnClickListener { viewModel.onRequestScopedTokenClicked() }
         binding.fetchKeysButton.setOnClickListener { viewModel.onFetchKeysClicked() }
+        binding.createAccountInfoKeyButton.setOnClickListener { viewModel.onCreateAccountInfoKeyClicked() }
+        binding.showCachedAccountInfoKeyButton.setOnClickListener { viewModel.onShowCachedAccountInfoKeyClicked() }
+        binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
         binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
         binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }
@@ -339,6 +342,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText
         binding.keysTextView.text = viewState.keysText
+        binding.accountInfoKeyResultTextView.text = viewState.accountInfoKeyResult
+        binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)

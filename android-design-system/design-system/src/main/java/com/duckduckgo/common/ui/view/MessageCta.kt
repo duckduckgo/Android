@@ -34,6 +34,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.signature.ObjectKey
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -179,16 +180,16 @@ class MessageCta : FrameLayout {
         @DrawableRes drawableRes: Int?,
     ) {
         // Check if imageUrl is a local file path
-        val imageSource: Any = if (imageUrl.startsWith("/")) {
-            File(imageUrl)
-        } else {
-            imageUrl
-        }
+        val localFile = if (imageUrl.startsWith("/")) File(imageUrl) else null
+        val imageSource: Any = localFile ?: imageUrl
 
         Glide
             .with(imageView)
             .load(imageSource)
             .apply {
+                if (localFile != null) {
+                    signature(ObjectKey(localFile.lastModified()))
+                }
                 if (drawableRes != null) {
                     error(AppCompatResources.getDrawable(context, drawableRes))
                 }

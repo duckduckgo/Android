@@ -25,9 +25,6 @@
         <shape android:shape="rectangle">
             <solid android:color="?attr/daxColorContainer" />
             <corners android:radius="@dimen/chipCornerRadius" />
-            <stroke
-                android:width="@dimen/chipStrokeWidth"
-                android:color="?attr/daxColorLines" />
         </shape>
     </item>
 </ripple>

@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -111,6 +112,11 @@ class SyncActivityViewModelTest {
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
+    private val syncFeature = FakeFeatureToggleFactory.create(
+        SyncFeature::class.java,
+        ioDispatcher = coroutineTestRule.testDispatcher,
+    )
+
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
     private lateinit var testee: SyncActivityViewModel
@@ -132,6 +138,7 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
+            syncFeature = syncFeature,
         )
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -139,6 +146,7 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         whenever(syncAutoRestore.canRestore()).thenReturn(false)
+        syncFeature.updateSyncActivityViewStateAtomically().setRawStoredState(State(true))
     }
 
     @Test

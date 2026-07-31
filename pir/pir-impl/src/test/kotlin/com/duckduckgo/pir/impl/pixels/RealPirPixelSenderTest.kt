@@ -22,6 +22,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -1251,5 +1253,27 @@ class RealPirPixelSenderTest {
         assert(typeCaptor.firstValue is Pixel.PixelType.Unique)
         assert(paramsCaptor.firstValue["is_authenticated"] == "true")
         assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportRendererGoneThenEnqueuesCountAndDailyWithDidCrashAndScanTrigger() = runTest {
+        testee.reportRendererGone(
+            executionType = PirExecutionType.SCHEDULED,
+            didCrash = false,
+        )
+
+        val nameCaptor = argumentCaptor<String>()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender, times(2)).enqueueFire(
+            pixelName = nameCaptor.capture(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertTrue(nameCaptor.allValues.contains("m_dbp_scan_renderer-gone_c"))
+        assertTrue(nameCaptor.allValues.contains("m_dbp_scan_renderer-gone_d"))
+        assertEquals("false", paramsCaptor.firstValue["did_crash"])
+        assertEquals("scheduled", paramsCaptor.firstValue["scan_trigger"])
     }
 }

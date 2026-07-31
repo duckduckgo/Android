@@ -29,6 +29,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import com.duckduckgo.sync.impl.AccountInfoKeyManager
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
@@ -81,6 +82,7 @@ constructor(
     private val appBuildConfig: AppBuildConfig,
     private val syncApi: SyncApi,
     private val testSyncWarningState: TestSyncWarningPlugin.StateHolder,
+    private val accountInfoKeyManager: AccountInfoKeyManager,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -123,6 +125,8 @@ constructor(
         val createThirdPartyResult: String = "",
         val keysText: String = "",
         val isTestSyncWarningEnabled: Boolean = false,
+        val accountInfoKeyResult: String = "",
+        val cachedAccountInfoKeyResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -306,6 +310,10 @@ constructor(
                 canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
+                // Clear per-session dev-tool results once signed out so stale keys aren't shown.
+                keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
+                accountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.accountInfoKeyResult else "",
+                cachedAccountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.cachedAccountInfoKeyResult else "",
             ),
         )
     }
@@ -613,6 +621,49 @@ constructor(
                 viewState.update { it.copy(keysText = text) }
                 command.send(ShowMessage(text))
             }
+        }
+    }
+
+    fun onCreateAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: creating & registering account_info key from dev screen" }
+            when (val result = accountInfoKeyManager.ensureKeyRegistered()) {
+                is Success -> {
+                    val outcome = if (result.data.created) "created (ours won)" else "adopted existing"
+                    val text = "kid=${result.data.kid}, wraps_sent=${result.data.wrapsSent}, outcome=$outcome"
+                    logcat { "Sync-UnifiedDevices: $text" }
+                    viewState.update { it.copy(accountInfoKeyResult = text) }
+                    command.send(ShowMessage(text))
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-UnifiedDevices: create/register key failed: $text" }
+                    viewState.update { it.copy(accountInfoKeyResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    fun onShowCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val cached = syncStore.accountInfoPublicKey
+            val text = if (cached == null) {
+                "No cached account_info key"
+            } else {
+                "keyId=${cached.keyId}, modulus=${cached.modulus.take(24)}…, exponent=${cached.exponent}"
+            }
+            logcat { "Sync-UnifiedDevices: cached account_info key: $text" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = text) }
+        }
+    }
+
+    fun onDeleteCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncStore.accountInfoPublicKey = null
+            logcat { "Sync-UnifiedDevices: cleared cached account_info key" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = "Cached account_info key cleared") }
+            command.send(ShowMessage("Cached account_info key cleared"))
         }
     }
 

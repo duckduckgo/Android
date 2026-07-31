@@ -1979,6 +1979,7 @@ class BrowserTabFragment :
 
     private fun onForwardArrowClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
         viewModel.onUserPressedForward()
     }
 
@@ -3106,6 +3107,8 @@ class BrowserTabFragment :
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
             }
+
+            is Command.LaunchDuckAiOnboardingFireDialog -> browserActivity?.launchFire(isDuckAiOnboarding = true)
 
             is Command.SwitchToTab -> {
                 binding.focusedView.gone()

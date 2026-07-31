@@ -16,12 +16,16 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -32,19 +36,39 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ActivitySyncV2CodeExchangeBinding
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class CodeExchangeActivity : DuckDuckGoActivity() {
-    private val binding by viewBinding<ActivitySyncV2CodeExchangeBinding>()
+class ReadSyncCodeActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncV2ReadSyncCodeBinding>()
+
+    private val viewModel by bindViewModel<ReadSyncCodeViewModel>()
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { result ->
+        when (result) {
+            is DisplayQrCodeContract.Output.Success -> finish()
+            is DisplayQrCodeContract.Output.Failure -> finish()
+            is DisplayQrCodeContract.Output.NoOp -> Unit
+        }
+    }
+
+    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) {
+        finish()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +85,28 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureContentAdapter()
         configureContentCorners()
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is StartSyncProcess -> {
+                val input = ExchangeSyncCodeContract.Input(
+                    syncUrl = command.syncCode,
+                    launchSource = launchSource,
+                )
+                exchangeSyncCodeLauncher.launch(input)
+            }
+        }
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -74,7 +120,7 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
             finish()
         }
         binding.showQrCodeButton.setOnClickListener {
-            startActivity(Intent(this, QrCodeActivity::class.java))
+            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource))
         }
     }
 
@@ -85,8 +131,8 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    SCANNER_POSITION -> CameraScannerFragment()
-                    MANUAL_CODE_ENTRY_POSITION -> ManualCodeEntryFragment()
+                    SCANNER_POSITION -> ReadSyncCodeCameraFragment()
+                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment()
                     else -> error("Unknown position: $position")
                 }
             }
@@ -118,5 +164,15 @@ class CodeExchangeActivity : DuckDuckGoActivity() {
     companion object {
         private const val SCANNER_POSITION = 0
         private const val MANUAL_CODE_ENTRY_POSITION = 1
+        private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+
+        fun intent(
+            context: Context,
+            source: String?,
+        ): Intent {
+            return Intent(context, ReadSyncCodeActivity::class.java).apply {
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+            }
+        }
     }
 }

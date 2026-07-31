@@ -151,7 +151,6 @@ interface NativeInputWidget {
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     )
@@ -340,7 +339,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     private var pendingIsContextual: Boolean = false
-    private var pendingAskAboutTab: (() -> Unit)? = null
     private var pendingAskAboutPage: (() -> Unit)? = null
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
@@ -451,7 +449,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.isContextual = pendingIsContextual
-            pluginView.onAskAboutTab = pendingAskAboutTab
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
@@ -774,6 +771,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateNewLineButtonVisibility()
         updateSendButtonIcon()
         applyOmnibarShape()
+        if (!isChatTabSelected()) {
+            val searchOnly = state.inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
+                state.inputContext == NativeInputState.InputContext.BROWSER
+            // Search-only browser input uses the shorter "Search" placeholder.
+            val searchHint = if (searchOnly) R.string.input_screen_search_only_hint else R.string.input_screen_search_hint
+            inputField.hint = context.getString(searchHint)
+        }
         // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position,
         // chatId) change, or on the first emission. This corrects stale IME setup from a tab listener
         // that fired before the state-flow caught up.
@@ -1239,17 +1243,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
 
     override fun setContextualAttachmentActions(
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     ) {
         pendingIsContextual = true
-        pendingAskAboutTab = onAskAboutTab
         pendingAskAboutPage = onAskAboutPage
         pendingOnPageContextRemoved = onPageContextRemoved
         attachmentView?.let { view ->
             view.isContextual = true
-            view.onAskAboutTab = onAskAboutTab
             view.onAskAboutPage = onAskAboutPage
             view.onPageContextRemoved = onPageContextRemoved
         }
@@ -1310,11 +1311,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         (card.layoutParams as? MarginLayoutParams)?.let { lp ->
             lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetHorizontalMargin - card.paddingLeft
-            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+            lp.marginStart = targetStartMargin - card.paddingLeft
+            lp.marginEnd = targetEndMargin - card.paddingRight
             card.layoutParams = lp
         }
     }

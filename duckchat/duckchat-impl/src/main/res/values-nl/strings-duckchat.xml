@@ -59,6 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Zoek of voer een adres in</string>
+    <string name="input_screen_search_only_hint">Zoeken</string>
     <string name="input_screen_chat_hint">Vraag privé</string>
     <string name="input_screen_user_pref_without_ai">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai">Zoeken en Duck.ai</string>

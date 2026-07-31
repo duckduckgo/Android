@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2023 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<resources>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    <declare-styleable name="OnboardingDialogTitleView">
+        <attr name="android:text" />
+    </declare-styleable>
 
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
-
-</LinearLayout>
+</resources>

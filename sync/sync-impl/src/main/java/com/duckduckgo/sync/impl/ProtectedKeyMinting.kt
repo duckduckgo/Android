@@ -25,7 +25,7 @@ import java.util.UUID
 /** A freshly-minted protected key with its ddg-wrap [entry] and the underlying raw private bytes,
  *  so callers can produce additional wrappings (e.g. 3party) under the same `kid` without
  *  decrypting the ddg-wrap a second time. */
-internal data class MintedProtectedKey(
+class MintedProtectedKey(
     val entry: ProtectedKeyEntry,
     val rawPrivateKeyBytes: ByteArray,
 )

@@ -30,6 +30,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -217,8 +219,8 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_device_v2_remove_device_dialog_title)
             .setMessage(getString(R.string.sync_device_v2_remove_device_dialog_body, currentDevice.deviceName))
-            .setPositiveButton(R.string.sync_device_v2_remove_device_dialog_primary_button)
-            .setNegativeButton(R.string.sync_device_v2_remove_device_dialog_secondary_button)
+            .setPositiveButton(R.string.sync_device_v2_remove_device_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_device_v2_remove_device_dialog_secondary_button, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

@@ -41,6 +41,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
         val webViewRef = AtomicReference<WebView>()
         val latch = CountDownLatch(1)
@@ -68,6 +69,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
+        onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
         val latch = CountDownLatch(1)
 

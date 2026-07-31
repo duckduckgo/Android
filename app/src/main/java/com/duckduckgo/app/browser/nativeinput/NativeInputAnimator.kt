@@ -103,7 +103,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     private var widgetCompatPaddingHeight = 0
     private var isBottomCard = false
 
-    // In bottom mode the card is a weighted LinearLayout child (width=0dp), which ignores an
+    // The card is a weighted LinearLayout child (width=0dp), which ignores an
     // explicit width. We zero the weight for the duration of the morph so the width lerps take
     // effect, saving the original here to restore the resting layout afterwards.
     private var savedCardWeight = 0f
@@ -180,6 +180,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     ) {
         // Morph only — hideNativeInput may already be sliding the nav bar out in parallel.
         cancelMorphAnimation()
+        // Search-only sessions skip the enter morph, so init() never captured these — capture now so the exit doesn't morph from 0f.
+        captureCardProperties(widgetCard, omnibarCard)
         clearLayoutTransitions(widgetView)
         (widgetView as? ViewGroup)?.clipChildren = false
         (widgetView.parent as? ViewGroup)?.clipChildren = false
@@ -390,8 +392,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         params.height = omnibarHeight + widgetCompatPaddingHeight
         params.topMargin = 0
         params.bottomMargin = 0
-        // Gravity only applies to FrameLayout children. For the LinearLayout (bottom) case the card's
-        // horizontal placement is driven by translationX toward the omnibar, so no gravity is needed.
+        // Gravity only applies to FrameLayout children. For the LinearLayout case the
+        // card's horizontal placement is driven by translationX toward the omnibar, so no gravity is needed.
         if (params is FrameLayout.LayoutParams) {
             params.gravity = Gravity.CENTER_HORIZONTAL or if (isBottom) Gravity.BOTTOM else Gravity.TOP
         }
@@ -528,7 +530,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         params.topMargin = margins.top
         params.bottomMargin = margins.bottom
         when (params) {
-            // Bottom mode: restore the card's XML resting state (width=0dp + weight) and hand width
+            // Both positions: restore the card's XML resting state (width=0dp + weight) and hand width
             // distribution back to the LinearLayout, undoing detachWeightForMorph.
             is LinearLayout.LayoutParams -> {
                 params.width = 0
@@ -545,8 +547,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         card.translationY = 0f
     }
 
-    // Bottom mode: a weighted (width=0dp) child ignores explicit widths, so zero the weight for the
-    // morph and remember it. restoreLayout puts it back (enter); exit ends in widget removal.
+    // A weighted (width=0dp) LinearLayout child, which ignores explicit
+    // widths, so zero the weight for the morph and remember it. restoreLayout puts it back (enter); exit
+    // ends in widget removal.
     private fun detachWeightForMorph(params: ViewGroup.MarginLayoutParams) {
         if (params is LinearLayout.LayoutParams) {
             savedCardWeight = params.weight

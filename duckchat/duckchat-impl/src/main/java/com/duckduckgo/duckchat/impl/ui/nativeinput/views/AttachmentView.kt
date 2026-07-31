@@ -64,7 +64,6 @@ class AttachmentView(
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     var isContextual: Boolean = false
-    var onAskAboutTab: (() -> Unit)? = null
     var onAskAboutPage: (() -> Unit)? = null
     var onPageContextRemoved: (() -> Unit)? = null
 
@@ -295,8 +294,9 @@ class AttachmentView(
         val state = viewModel?.attachmentState?.value
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
+        val showAskAboutPage = isContextual && viewModel?.getPageContext() == null
 
-        if (!supportsImages && supportedFileTypes.isEmpty() && !isContextual) return
+        if (!supportsImages && supportedFileTypes.isEmpty() && !showAskAboutPage) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -350,19 +350,14 @@ class AttachmentView(
             }
         }
 
-        if (isContextual) {
-            val pageContextAttached = viewModel?.getPageContext() != null
+        if (showAskAboutPage) {
             addMenuItem(
                 container = container,
                 iconRes = R.drawable.ic_page_content_attach_24,
-                titleRes = if (pageContextAttached) {
-                    R.string.duckChatContextualAskAboutPage
-                } else {
-                    R.string.duckChatContextualAskAboutTab
-                },
+                titleRes = R.string.duckChatContextualAskAboutPage,
             ) {
                 popup.dismiss()
-                if (pageContextAttached) onAskAboutPage?.invoke() else onAskAboutTab?.invoke()
+                onAskAboutPage?.invoke()
             }
         }
 
@@ -384,7 +379,8 @@ class AttachmentView(
     private fun showAtPosition(popup: PopupWindow) {
         val button = getChildAt(0) ?: this
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
-        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
+        val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, loc[0], y)
     }
 
     private fun dismissPopup() {

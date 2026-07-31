@@ -512,7 +512,6 @@ class DuckChatContextualFragment :
                     filesJson = submitted.filesJson,
                 )
             },
-            onAskAboutTab = { viewModel.onAskAboutTabClicked() },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {

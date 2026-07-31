@@ -346,6 +346,10 @@ enum class PirPixel(
         baseName = "m_dbp_user-eligible",
         type = Daily(),
     ),
+    PIR_SCAN_RENDERER_GONE(
+        baseName = "m_dbp_scan_renderer-gone",
+        types = setOf(Count, Daily()),
+    ),
     ;
 
     constructor(

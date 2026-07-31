@@ -121,6 +121,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@null"
+                        android:ellipsize="end"
                         android:fontFamily="sans-serif"
                         android:gravity="start|center_vertical"
                         android:hint="@string/input_screen_search_hint"

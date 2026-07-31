@@ -81,6 +81,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_VALIDATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_RENDERER_GONE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_EMAIL_GET_DATA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
@@ -697,6 +698,11 @@ interface PirPixelSender {
     )
 
     fun reportUserReset()
+
+    fun reportRendererGone(
+        executionType: PirExecutionType,
+        didCrash: Boolean,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -1640,6 +1646,17 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_MANUAL_RESET)
     }
 
+    override fun reportRendererGone(
+        executionType: PirExecutionType,
+        didCrash: Boolean,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_DID_CRASH to didCrash.toString(),
+            PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
+        )
+        enqueueFire(PIR_SCAN_RENDERER_GONE, params)
+    }
+
     private fun usageParams(): Map<String, String> = mapOf(
         // hardcoded values for now until we support freemium
         PARAM_KEY_IS_AUTHENTICATED to "true",
@@ -1739,5 +1756,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
         private const val PARAM_KEY_SCAN_TRIGGER = "scan_trigger"
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
+        private const val PARAM_KEY_DID_CRASH = "did_crash"
     }
 }

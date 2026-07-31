@@ -967,6 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Jäta vahele</string>
 
     <!-- Pre-onboarding: add to home screen -->
+    <string name="preOnboardingDockStepTitle">Lisa mind oma lemmikute reale.</string>
     <string name="preOnboardingAddToDockBody">Leia oma avakuvalt DuckDuckGo ikoon. Seejärel vajuta ja lohista see oma kohale. See ongi kõik!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Sain aru!</string>
 

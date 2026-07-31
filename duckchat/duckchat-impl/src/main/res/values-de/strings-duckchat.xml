@@ -59,6 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
+    <string name="input_screen_search_only_hint">Suche</string>
     <string name="input_screen_chat_hint">Privat fragen</string>
     <string name="input_screen_user_pref_without_ai">Nur Suchen</string>
     <string name="input_screen_user_pref_with_ai">Suche &amp; Duck.ai</string>

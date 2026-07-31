@@ -15,18 +15,26 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorSurface">
+    android:background="?daxColorSurface">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Manual Entry UI"
-        android:textSize="24sp"
-        tools:ignore="HardcodedText" />
+    <include
+        android:id="@+id/includeNoHardware"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_no_hardware"
+        android:visibility="gone" />
 
+    <include
+        android:id="@+id/includeNoPermission"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_no_permission"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/includeIntro"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_intro" />
+
+    <include
+        android:id="@+id/includeCamera"
+        layout="@layout/fragment_sync_v2_read_sync_code_camera_preview"
+        android:visibility="gone" />
 </FrameLayout>

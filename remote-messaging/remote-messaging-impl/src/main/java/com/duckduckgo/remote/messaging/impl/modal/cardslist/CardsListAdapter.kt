@@ -30,6 +30,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.signature.ObjectKey
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -263,12 +264,18 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
             listener: RequestListener<Drawable>? = null,
         ) {
             if (!imageUrl.isNullOrEmpty()) {
-                val imageSource: Any = imageFilePath?.let { File(it) } ?: imageUrl
+                val localFile = imageFilePath?.let { File(it) }
+                val imageSource: Any = localFile ?: imageUrl
                 Glide.with(imageView)
                     .load(imageSource)
                     .centerCrop()
                     .error(placeholder.drawable(true))
-                    .apply { if (listener != null) addListener(listener) }
+                    .apply {
+                        if (localFile != null) {
+                            signature(ObjectKey(localFile.lastModified()))
+                        }
+                        if (listener != null) addListener(listener)
+                    }
                     .transition(withCrossFade())
                     .into(imageView)
             } else {

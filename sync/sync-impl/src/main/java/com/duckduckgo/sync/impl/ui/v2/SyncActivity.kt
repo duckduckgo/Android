@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.ui.v2
 
 import android.Manifest
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -187,6 +186,10 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onConnectionCancelled()
         }
     }
+
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { /* No-op, auto-refresh will update the device list */ }
 
     private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -421,7 +424,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    startActivity(Intent(this, CodeExchangeActivity::class.java))
+                    readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
                 }
             }
         }
