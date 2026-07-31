@@ -297,7 +297,7 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_pairing_failed_generic_message, command.content.message)
+            assertEquals(R.string.sync_simplified_pairing_failed_generic_message, command.content.message)
             assertEquals("boom", command.content.reason)
 
             cancel()
