@@ -51,7 +51,7 @@ Prefer device-file screenshots; avoid `adb exec-out screencap -p` because it may
 
 ```sh
 adb shell screencap -p /sdcard/screenshot_initial.png
-adb pull /sdcard/screenshot_initial.png /opt/cursor/artifacts/<dir>/screenshot_intial.png
+adb pull /sdcard/screenshot_initial.png /opt/cursor/artifacts/<dir>/screenshot_initial.png
 ```
 
 ## System UI recovery
