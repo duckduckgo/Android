@@ -473,7 +473,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             PairingMethod.DisplayedCode -> Unit
                         }
 
-                        is Path.Recovery -> startActivity(SyncEnabledActivity.intent(this))
+                        is Path.Recovery -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
                     }
                 }
             }
