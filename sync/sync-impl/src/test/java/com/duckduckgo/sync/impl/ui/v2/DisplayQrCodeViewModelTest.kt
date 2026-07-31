@@ -23,8 +23,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.DispatchOutcome
@@ -38,6 +40,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -107,6 +110,7 @@ class DisplayQrCodeViewModelTest {
         whenever(codeDispatcher.presentV2()).thenReturn(emptyFlow())
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
         whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = false))
     }
 
     private fun createTestee(source: String? = null) = DisplayQrCodeViewModel(
@@ -207,6 +211,129 @@ class DisplayQrCodeViewModelTest {
 
         verify(accountRepository).getConnectQR()
         verify(codeDispatcher, never()).presentV2()
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in then the exchange invitation code is shown as a QR code`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(BitmapWithCode(bitmap, "invitation-code", "invitation-code"), awaitItem().bitmap)
+            verify(qrEncoder).encodeAsBitmap(eq("invitation-code"), any(), any())
+            verify(accountRepository, never()).getConnectQR()
+            verify(codeDispatcher, never()).presentV2()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and the peer acknowledges then a success result is set and the screen closes`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        givenThisConnectedDevice()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                command.result,
+            )
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, null, null, null)
+        verify(pixels, never()).fireLoginPixel()
+        verify(pixels, never()).fireSignupConnectPixel(anyOrNull())
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and the invitation code cannot be generated then an error is shown`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode()).thenReturn(Result.Error(reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_generic_error, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and polling fails then an error is shown`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement())
+            .thenReturn(Result.Error(code = EXCHANGE_FAILED.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_pairing_failed_generic_message, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when v2 and exchange keys are disabled and this device is signed in then the recovery code is shown without polling`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
+        whenever(accountRepository.getRecoveryCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "recovery-code", rawCode = "recovery-code")))
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(BitmapWithCode(bitmap, "recovery-code", "recovery-code"), awaitItem().bitmap)
+
+            cancel()
+        }
+        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+        verify(accountRepository, never()).generateExchangeInvitationCode()
+        verify(accountRepository, never()).getConnectQR()
+    }
+
+    @Test
+    fun `when this device is signed in then v2 pixels report the exchange screen`() = runTest {
+        givenV2Enabled()
+        givenSignedIn()
+        givenThisConnectedDevice()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+
+        createTestee()
+
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -543,6 +670,14 @@ class DisplayQrCodeViewModelTest {
 
     private fun givenThisConnectedDevice() {
         whenever(accountRepository.getThisConnectedDevice()).thenReturn(thisDevice)
+    }
+
+    private fun givenSignedIn() {
+        whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = true))
+    }
+
+    private fun givenExchangeKeysEnabled() {
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
     }
 
     private fun givenV2Enabled() {
