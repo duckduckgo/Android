@@ -38,15 +38,14 @@ import com.duckduckgo.common.ui.view.toPx
 
 interface EmbellishmentController {
     /**
-     * [onSettled] reports what the fit check settled on. When a decoration is leaving, it fires only once that
-     * exit has finished: the card must keep its anchor until the outgoing decoration is gone.
+     * Returns what the fit check settled on, synchronously: the caller anchors the card to it in the same frame,
+     * so the card's reposition is picked up by the render's card morph instead of snapping into place later.
      */
     fun transition(
         previous: Embellishment?,
         next: Embellishment,
         animate: Boolean,
-        onSettled: (SettledDecoration?) -> Unit,
-    )
+    ): SettledDecoration?
 
     fun skipRunning()
     fun release()
@@ -73,13 +72,6 @@ class EmbellishmentControllerImpl(
      * cancel() itself. Only one decoration is ever leaving at a time, so a single slot covers it.
      */
     private var pendingExit: LottieExit? = null
-
-    /**
-     * Bumped by every [transition]; each call captures the value, and every deferred continuation of that call
-     * re-checks it before acting. A transition superseded before it settled sees a mismatch and no-ops, so it
-     * never reports a stale [SettledDecoration].
-     */
-    private var generation = 0
 
     /** The fit-approved decoration on stage, or null when the current screen shows none. What [skipRunning] snaps. */
     private var currentDecoration: Decoration? = null
@@ -108,57 +100,37 @@ class EmbellishmentControllerImpl(
         previous: Embellishment?,
         next: Embellishment,
         animate: Boolean,
-        onSettled: (SettledDecoration?) -> Unit,
-    ) {
-        generation++
-        val gen = generation
-
-        // An earlier transition's exit may still be running, with a continuation that belongs to that older
-        // generation. Draining it now keeps two exits off the stage at once, and the generation check turns the
-        // drained continuation into a no-op.
+    ): SettledDecoration? {
+        // An earlier transition's exit may still be running. Draining it now keeps two exits off the stage at once.
         drainInFlight()
 
         if (previous == next) {
             // The drain may have cut this decoration's own entrance short, so snap it to where that entrance was
             // heading before reporting the fit.
             decorations[next]?.snap()
-            onSettled(applyFit(next))
-            return
+            return applyFit(next)
         }
 
         val exiting = previous?.let { decorations[it] }
+        val animatedExit = exiting?.takeIf { animate && it.view.isVisible }
+        if (exiting != null && animatedExit == null) instantHide(exiting.view)
 
-        fun applyNext(): SettledDecoration? {
-            val settled = applyFit(next)
-            if (settled != null) {
-                val entering = decorations.getValue(next)
-                if (animate) {
-                    track(entering.enter())
-                } else {
-                    entering.snap()
-                }
+        val settled = applyFit(next)
+        if (settled != null) {
+            val entering = decorations.getValue(next)
+            if (animate) {
+                track(entering.enter())
             } else {
-                decorations[next]?.let { instantHide(it.view) }
+                entering.snap()
             }
-            return settled
+        } else {
+            decorations[next]?.let { instantHide(it.view) }
         }
 
-        when {
-            exiting == null -> onSettled(applyNext())
-            animate && exiting.view.isVisible -> {
-                // The incoming decoration needs to enter in the same frame the outgoing one starts leaving to keep in sync with background.
-                val settled = applyNext()
-                track(
-                    exiting.exit {
-                        if (gen == generation) onSettled(settled)
-                    },
-                )
-            }
-            else -> {
-                instantHide(exiting.view)
-                onSettled(applyNext())
-            }
-        }
+        // Started last so the outgoing decoration begins leaving in the same frame the incoming one enters, which
+        // keeps both in sync with the background.
+        animatedExit?.let { track(it.exit()) }
+        return settled
     }
 
     override fun skipRunning() {
@@ -291,9 +263,8 @@ class EmbellishmentControllerImpl(
                 set.start()
                 listOf(set)
             },
-            exit = { onEnd ->
+            exit = {
                 instantHide(view)
-                onEnd()
                 emptyList()
             },
             snap = {
@@ -333,11 +304,11 @@ class EmbellishmentControllerImpl(
                 fadeIn.start()
                 listOf(fadeIn)
             },
-            exit = { onEnd ->
+            exit = {
                 view.setMinProgress(WING_STOP_PROGRESS)
                 view.setMaxProgress(1f)
                 view.speed = 1f
-                exitViaLottie(view, onEnd = onEnd, applyFinalState = { view.isInvisible = true })
+                exitViaLottie(view, applyFinalState = { view.isInvisible = true })
                 emptyList()
             },
             snap = {
@@ -378,11 +349,11 @@ class EmbellishmentControllerImpl(
                 fadeIn.start()
                 listOf(fadeIn)
             },
-            exit = { onEnd ->
+            exit = {
                 view.setMinProgress(WING_STOP_PROGRESS)
                 view.setMaxProgress(1f)
                 view.speed = 1f
-                exitViaLottie(view, onEnd = onEnd, applyFinalState = { view.isGone = true })
+                exitViaLottie(view, applyFinalState = { view.isGone = true })
                 emptyList()
             },
             snap = {
@@ -434,7 +405,7 @@ class EmbellishmentControllerImpl(
                 animator.start()
                 listOf(animator)
             },
-            exit = { onEnd ->
+            exit = {
                 val screenWidth = binding.root.rootView.width.toFloat()
                 var cancelled = false
                 val animator = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -456,7 +427,6 @@ class EmbellishmentControllerImpl(
                                 view.isVisible = false
                                 view.cancelAnimation()
                                 view.translationX = 0f
-                                onEnd()
                             }
                         },
                     )
@@ -473,10 +443,9 @@ class EmbellishmentControllerImpl(
         )
     }
 
-    /** Plays [view]'s Lottie to its end and reports through [onEnd]. Both the listener and a drain reach the same finish, which runs once. */
+    /** Plays [view]'s Lottie to its end. Both the listener and a drain reach the same finish, which runs once. */
     private fun exitViaLottie(
         view: LottieAnimationView,
-        onEnd: () -> Unit,
         applyFinalState: () -> Unit,
     ) {
         var finished = false
@@ -487,7 +456,6 @@ class EmbellishmentControllerImpl(
                 view.removeAnimatorListener(listener)
                 applyFinalState()
                 pendingExit = null
-                onEnd()
             }
         }
         listener = object : AnimatorListenerAdapter() {
@@ -509,7 +477,7 @@ class EmbellishmentControllerImpl(
         val minHeightDp: Int,
         val bottomOverlapPx: () -> Int = { 0 },
         val enter: () -> List<Animator>,
-        val exit: (onEnd: () -> Unit) -> List<Animator>,
+        val exit: () -> List<Animator>,
         val snap: () -> Unit,
     )
 

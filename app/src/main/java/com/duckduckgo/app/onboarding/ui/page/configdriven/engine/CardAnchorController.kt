@@ -38,9 +38,8 @@ class CardAnchorControllerImpl(
      *   check vetoed it. The card anchors above [SettledDecoration.view] when non-null and either [isTablet] or
      *   [SettledDecoration.anchorsCardOnPhone] is true; otherwise it pins to the parent bottom.
      *
-     * Arrow visibility is deliberately not handled here: it is screen data the engine applies synchronously at
-     * render time, whereas this fires from the embellishment axis's settle, which waits out a previous
-     * decoration's exit.
+     * Arrow visibility is deliberately not handled here: it is screen data off the config, whereas the depth
+     * below follows from what the embellishment axis settled on.
      */
     override fun apply(settled: SettledDecoration?) {
         val card = binding.daxDialogCta.root

@@ -49,11 +49,13 @@ class DialogRenderEngineTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
+    private val callOrder = mutableListOf<String>()
+
     private val content = FakeContentController()
-    private val cardStage = FakeCardStage()
+    private val cardStage = FakeCardStage(record = { callOrder += it })
     private val background = FakeBackgroundController()
     private val embellishments = FakeEmbellishmentController()
-    private val cardAnchor = FakeCardAnchorController()
+    private val cardAnchor = FakeCardAnchorController(record = { callOrder += it })
     private val cardArrow = FakeCardArrowController()
     private val stepIndicator = FakeStepIndicatorController()
 
@@ -98,6 +100,13 @@ class DialogRenderEngineTest {
             StepProgress(current = 1, total = 2) to StepProgress(current = 2, total = 2),
             stepIndicator.applied,
         )
+    }
+
+    @Test
+    fun `the card anchor is applied before the morph so the card's reposition rides the transition`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertEquals(listOf("anchor", "morph"), callOrder)
     }
 
     @Test
@@ -326,7 +335,7 @@ private class FakeContentController : ContentController {
     }
 }
 
-private class FakeCardStage : CardStage {
+private class FakeCardStage(private val record: (String) -> Unit = {}) : CardStage {
 
     /** When false, stage continuations queue up in [pending] so a test can settle them explicitly. */
     var autoComplete = true
@@ -341,7 +350,10 @@ private class FakeCardStage : CardStage {
 
     override fun reveal(animate: Boolean, onEnd: () -> Unit) = stage(animate, onEnd)
 
-    override fun morph(animate: Boolean, onEnd: () -> Unit) = stage(animate, onEnd)
+    override fun morph(animate: Boolean, onEnd: () -> Unit) {
+        record("morph")
+        stage(animate, onEnd)
+    }
 
     override fun fadeInContent(contentTargets: List<View>, animate: Boolean, onEnd: () -> Unit) {
         fadeCount++
@@ -437,12 +449,13 @@ private class FakeCardArrowController : CardArrowController {
     }
 }
 
-private class FakeCardAnchorController : CardAnchorController {
+private class FakeCardAnchorController(private val record: (String) -> Unit = {}) : CardAnchorController {
 
     var applied = false
 
     override fun apply(settled: SettledDecoration?) {
         applied = true
+        record("anchor")
     }
 }
 
@@ -457,11 +470,10 @@ private class FakeEmbellishmentController : EmbellishmentController {
         previous: Embellishment?,
         next: Embellishment,
         animate: Boolean,
-        onSettled: (SettledDecoration?) -> Unit,
-    ) {
+    ): SettledDecoration? {
         applied = previous to next
         animated = animate
-        onSettled(null)
+        return null
     }
 
     override fun skipRunning() {

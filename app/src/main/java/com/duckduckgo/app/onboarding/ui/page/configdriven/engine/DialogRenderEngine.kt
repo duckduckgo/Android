@@ -91,9 +91,9 @@ class DialogRenderEngine(
         cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
         if (animate) cardStage.prepareEntrance(handle.fadeTargets)
 
-        embellishments.transition(previous?.embellishment, config.embellishment, animate) { settled ->
-            cardAnchor.apply(settled)
-        }
+        // Anchored before the morph below starts its transition, so the card's move to its new anchor is smooth
+        val settledDecoration = embellishments.transition(previous?.embellishment, config.embellishment, animate)
+        cardAnchor.apply(settledDecoration)
 
         // Every deferred stage below bails if the bound view has changed since dispatch
         cardStage.reveal(animate) {
