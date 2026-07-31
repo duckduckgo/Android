@@ -107,7 +107,7 @@ class EmbellishmentControllerImpl(
         if (previous == next) {
             // The drain may have cut this decoration's own entrance short, so snap it to where that entrance was
             // heading before reporting the fit.
-            decorations[next]?.snap()
+            decorations[next]?.snap?.invoke()
             return applyFit(next)
         }
 
@@ -124,7 +124,7 @@ class EmbellishmentControllerImpl(
                 entering.snap()
             }
         } else {
-            decorations[next]?.hide()
+            decorations[next]?.hide?.invoke()
         }
 
         // Started last so the outgoing decoration begins leaving in the same frame the incoming one enters, which
@@ -135,7 +135,7 @@ class EmbellishmentControllerImpl(
 
     override fun skipRunning() {
         drainInFlight()
-        currentDecoration?.snap()
+        currentDecoration?.snap?.invoke()
     }
 
     override fun release() {
