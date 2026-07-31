@@ -26,6 +26,31 @@ appId: com.duckduckgo.mobile.android
       true: ${SET_AS_DEFAULT != 'true'}
     commands:
       - tapOn: "cancel"
+# The "Add to Dock" / "Widget prompt" onboarding pages only show for some cohorts of the
+# addToDockAndWidgetExperimentJul25 experiment (see OnboardingPromptsToggles); both are optional so
+# this flow stays deterministic regardless of which cohort a run gets enrolled into.
+- extendedWaitUntil:
+    visible:
+      id: "addToDockTitle"
+    timeout: 3000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "addToDockTitle"
+    commands:
+      - tapOn: "Got it!"
+- extendedWaitUntil:
+    visible:
+      id: "widgetPromptTitle"
+    timeout: 3000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "widgetPromptTitle"
+    commands:
+      - tapOn: "Not Now"
 - assertVisible:
     text: ".*where should I put your address.bar?.*"
 - tapOn: "next"
