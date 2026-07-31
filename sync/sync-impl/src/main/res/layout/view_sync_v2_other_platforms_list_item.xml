@@ -30,13 +30,12 @@
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_simplified_settings_get_other_devices_item" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/getDesktopBrowserItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_simplified_settings_get_desktop_browser_item"
-        app:secondaryText="@string/sync_simplified_settings_get_desktop_browser_item_hint" />
+        app:primaryText="@string/sync_simplified_settings_get_desktop_browser_item" />
 </merge>

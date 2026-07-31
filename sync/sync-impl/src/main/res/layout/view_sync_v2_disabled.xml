@@ -69,6 +69,11 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_4" />
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_download_section_header" />
+
     <com.duckduckgo.sync.impl.ui.v2.GetOnOtherPlatformsListItem
         android:id="@+id/get_on_other_platforms_item"
         android:layout_width="match_parent"

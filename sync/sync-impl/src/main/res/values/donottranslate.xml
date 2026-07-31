@@ -53,7 +53,6 @@
     <string name="sync_simplified_settings_notify_me_body">Get notified in the event Sync&#160;&amp;&#160;Backup encounters an error.</string>
     <string name="sync_simplified_settings_get_other_devices_item">Get DuckDuckGo on Other Devices</string>
     <string name="sync_simplified_settings_get_desktop_browser_item">Get Desktop Browser</string>
-    <string name="sync_simplified_settings_get_desktop_browser_item_hint">DuckDuckGo for Mac and Windows</string>
 
     <!-- Sync settings screen: delete server data dialog -->
     <string name="sync_simplified_settings_delete_server_data_dialog_title">Turn Off Sync&#160;&amp;&#160;Backup and Delete Server Data?</string>
