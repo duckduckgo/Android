@@ -510,7 +510,7 @@ platform :android do
                 skip_git_hooks: true
             )
 
-            UI.important(text:"Hotfix branch created. Apply your changes that need to be included in the hotfix now. Run `fastlane hotfix-finish` when you've made your changes and are happy it all works.")
+            UI.important(text:"Hotfix branch created. Apply your changes that need to be included in the hotfix now. Prefer the 'Hotfix - Orchestrate' GitHub Actions workflow, which runs the full release-blocking test suite (the same suite that gates LGC creation) before finishing. Only run `fastlane hotfix-finish` directly if you have separately confirmed the release-blocking checks pass on the hotfix branch.")
        end
 
        desc "Finish a hotfix in progress"

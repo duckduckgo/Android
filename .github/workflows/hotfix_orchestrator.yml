@@ -1,0 +1,68 @@
+name: Hotfix - Orchestrate (prepare, verify, finish)
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+      commit-hashes:
+        description: 'Commit SHA(s) to cherry-pick into the hotfix (space- or comma-separated)'
+        required: true
+        type: string
+      release-notes:
+        description: 'Release notes for the Play Store listing'
+        required: false
+        default: 'Bug fixes and other improvements'
+        type: string
+
+jobs:
+  prepare:
+    uses: ./.github/workflows/hotfix_prepare.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+      commit-hashes: ${{ inputs.commit-hashes }}
+      release-notes: ${{ inputs.release-notes }}
+    secrets: inherit
+
+  # Create the Asana hotfix tracking task up-front; mirrors the manual "task first, then tag" order
+  create-hotfix-task:
+    needs: prepare
+    uses: ./.github/workflows/hotfix_create_task.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+      commit-hashes: ${{ inputs.commit-hashes }}
+    secrets: inherit
+
+  resolve-hotfix-sha:
+    name: Resolve hotfix branch HEAD SHA
+    needs: prepare
+    runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+    steps:
+      - name: Checkout hotfix branch
+        uses: actions/checkout@v4
+        with:
+          ref: hotfix/${{ inputs.app-version }}
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 1
+      - name: Resolve SHA
+        id: resolve
+        run: echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  release-blocking-checks:
+    needs: resolve-hotfix-sha
+    uses: ./.github/workflows/release_blocking_checks.yml
+    with:
+      commit: ${{ needs.resolve-hotfix-sha.outputs.commit_sha }}
+      create_asana_tasks: false
+    secrets: inherit
+
+  finish:
+    needs: release-blocking-checks
+    uses: ./.github/workflows/hotfix_finish.yml
+    with:
+      app-version: ${{ inputs.app-version }}
+    secrets: inherit
