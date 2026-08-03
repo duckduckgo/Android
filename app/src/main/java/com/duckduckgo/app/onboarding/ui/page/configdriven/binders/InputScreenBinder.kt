@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
 import android.view.View
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignInputScreenBinding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -65,25 +62,9 @@ class InputScreenBinder(
         ContentHandle(
             title = inputScreenTitle,
             fadeTargets = listOf(inputScreenPicker, inputScreenDescription),
-            afterFade = { withAiFlourishTrigger() },
+            onContentReady = { inputScreenPicker.startWithAiAnimation(delayedStart = true) },
             result = { NewUserOnboardingEvent.InputModeConfirmed(state.value.withAi) },
             unbind = { inputScreenPicker.cancelLottieAnimations() },
         )
     }
-
-    /**
-     * The picker's flourish runs on its own coroutine, not on an animator timeline, so there is nothing to hand
-     * the engine directly. This zero-duration animator exists only so the engine still owns starting it.
-     */
-    private fun withAiFlourishTrigger(): Animator =
-        ValueAnimator.ofInt(0, 1).apply {
-            duration = 0L
-            addListener(
-                object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator) {
-                        binding.inputScreenPicker.startWithAiAnimation(delayedStart = true)
-                    }
-                },
-            )
-        }
 }
