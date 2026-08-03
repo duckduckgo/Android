@@ -88,6 +88,20 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        NewUserOnboardingActivityDialog.AddToDock -> DialogConfig(
+            background = OnboardingBackgroundStep.AddToDock,
+            embellishment = Embellishment.None,
+            cardArrow = CardArrowConfig.Hidden,
+            content = ContentConfig.AddToDock(
+                title = TextConfig.Resource(R.string.preOnboardingDockStepTitle),
+                body = TextConfig.Resource(R.string.preOnboardingAddToDockBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingAddToDockPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
         NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
             background = OnboardingBackgroundStep.InputType,
             embellishment = Embellishment.LeftWing,
@@ -122,7 +136,6 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        NewUserOnboardingActivityDialog.AddToDock,
         NewUserOnboardingActivityDialog.WidgetPrompt,
         is NewUserOnboardingActivityDialog.QuickSetup,
         -> null // to be implemented in following tasks
