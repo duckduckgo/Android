@@ -457,10 +457,20 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is LaunchOriginalFlow -> {
                 when (command.originalFlow) {
-                    OriginalFlow.SYNC_THIS_DEVICE -> syncThisDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
-                    OriginalFlow.SYNC_WITH_ANOTHER ->
-                        syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_WITH_ANOTHER))
-                    OriginalFlow.RECOVER_SYNCED_DATA -> recoverSyncedDataLauncher.launch(RecoverSyncedDataContract.Input(launchSource))
+                    OriginalFlow.SYNC_THIS_DEVICE -> {
+                        val input = SyncThisDeviceContract.Input(launchSource)
+                        syncThisDeviceLauncher.launch(input)
+                    }
+
+                    OriginalFlow.SYNC_WITH_ANOTHER -> {
+                        val input = ReadSyncCodeContract.Input(launchSource, command.originalFlow)
+                        syncWithAnotherDeviceLauncher.launch(input)
+                    }
+
+                    OriginalFlow.RECOVER_SYNCED_DATA -> {
+                        val input = RecoverSyncedDataContract.Input(launchSource)
+                        recoverSyncedDataLauncher.launch(input)
+                    }
                 }
             }
 
