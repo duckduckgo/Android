@@ -531,6 +531,29 @@ platform :android do
 
        end
 
+       desc "Dummy lane: create a 'test' branch, bump version.properties and push it"
+       lane :"dummy-push-test-branch" do
+            currentVersion = property_file_read(file: "app/version/version.properties")["VERSION"]
+            major, minor, patch = currentVersion.split('.').map(&:to_i)
+            newVersion = "#{major}.#{minor}.#{patch + 1}"
+
+            sh("git checkout -b bypass-test")
+
+            File.open('../app/version/version.properties', 'w') do |file|
+                file.write("VERSION=#{newVersion}")
+            end
+
+            git_commit(
+                message: "Dummy version bump #{currentVersion} -> #{newVersion}",
+                path: "app/version/version.properties",
+                skip_git_hooks: true
+            )
+
+            sh("git push origin bypass-test")
+
+            UI.header("🎉 Branch 'bypass-test' pushed with version #{newVersion}.")
+       end
+
        desc "Prompt for version number"
        private_lane :"determine_version_number" do |options|
             release_number = options[:release_number]

@@ -3,11 +3,6 @@ name: Test - Workflow for Testing
 on:
   workflow_dispatch:
 
-    inputs:
-      ref:
-        description: 'This is an example of an input'
-        required: true
-
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
@@ -18,9 +13,27 @@ jobs:
     name: Add here whatever steps you want to test
 
     steps:
+      # Submodules are intentionally not checked out: this job only does git plumbing
+      # (branch, commit, push) and never reads submodule contents.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          ref: ${{ github.ref_name }}
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Create test branch, bump version and push
+        run: |
+          bundle exec fastlane dummy-push-test-branch
