@@ -61,6 +61,11 @@ sealed interface ContentConfig {
         val body: TextConfig,
     ) : ContentConfig
 
+    data class WidgetPrompt(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
     data class InputScreenPreview(
         override val title: TextConfig,
         val isSearchDefault: Boolean,
