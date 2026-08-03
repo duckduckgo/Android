@@ -146,10 +146,11 @@ class PirResultsActivity : DuckDuckGoActivity() {
                     stringBuilder.append("NAME: ${profile.name}\n")
                     stringBuilder.append("FULL NAME: ${profile.fullName}\n")
                     stringBuilder.append("AGE: ${profile.age}\n")
-                    stringBuilder.append("ADDRESSES: ${profile.addresses.joinToString { "${it.city}, ${it.state}" }}\n")
+                    stringBuilder.append("ADDRESSES: ${profile.addresses.joinToString(" | ") { "${it.city}, ${it.state} ${it.extras}" }}\n")
                     stringBuilder.append("RELATIVES: ${profile.relatives.joinToString()}\n")
                     stringBuilder.append("PROFILE URL: ${profile.profileUrl}\n")
                     stringBuilder.append("IDENTIFIER: ${profile.identifier}\n")
+                    stringBuilder.append("PROFILE EXTRAS: ${profile.extras}\n")
                     stringBuilder.append("DEPRECATED: ${profile.deprecated}\n")
                     stringBuilder.toString()
                 }.also {

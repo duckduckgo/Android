@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.scheduling
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.withoutExtras
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -615,7 +616,7 @@ class RealJobRecordUpdater @Inject constructor(
             name = name,
             alternativeNames = alternativeNames,
             age = age,
-            addresses = addresses,
+            addresses = addresses.withoutExtras(),
             phoneNumbers = phoneNumbers,
             relatives = relatives,
             reportId = reportId,

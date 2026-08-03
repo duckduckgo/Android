@@ -59,10 +59,12 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRM
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -401,7 +403,46 @@ class RealPirRunStateHandlerTest {
                 testBrokerName,
                 testProfileQueryId,
             )
-            inOrder.verify(mockRepository).saveNewExtractedProfiles(listOf(expectedExtractedProfile))
+            inOrder.verify(mockRepository).saveExtractedProfiles(listOf(expectedExtractedProfile))
+        }
+
+    @Test
+    fun whenHandleBrokerScanActionSucceededWithExtrasThenSavesProfileAndAddressExtras() =
+        runTest {
+            val extractedResponse =
+                ExtractedResponse(
+                    actionID = "extract123",
+                    actionType = "extract",
+                    response = listOf(
+                        testScriptExtractedProfile.copy(
+                            addresses = listOf(
+                                ScriptAddressCityState(
+                                    city = "New York",
+                                    state = "NY",
+                                    fullAddress = "123 Main St",
+                                    extras = mapOf("street" to "123 Main St", "zip" to "10001"),
+                                ),
+                            ),
+                            extras = mapOf("county" to "New York County"),
+                        ),
+                    ),
+                )
+            val state =
+                BrokerScanActionSucceeded(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    pirSuccessResponse = extractedResponse,
+                )
+            whenever(mockJobRecordUpdater.markReappearedOptOutJobRecords(any(), any(), any()))
+                .thenReturn(emptyList())
+
+            testee.handleState(state)
+
+            val captor = argumentCaptor<List<ExtractedProfile>>()
+            verify(mockRepository).saveExtractedProfiles(captor.capture())
+            val savedProfile = captor.firstValue.single()
+            assertEquals(mapOf("county" to "New York County"), savedProfile.extras)
+            assertEquals(mapOf("street" to "123 Main St", "zip" to "10001"), savedProfile.addresses.single().extras)
         }
 
     @Test
