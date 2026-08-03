@@ -268,21 +268,21 @@ interface DuckChatFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun digitalAssistantDuckAi(): Toggle
 
     /**
      * @return `true` when the Duck.ai voice chat foreground service (microphone) should be started
      * and stopped during a voice session.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiVoiceChatService(): Toggle
 
     /**
      * @return `true` when the contextual Duck.ai sheet improvements are enabled.
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualSheetImprovements(): Toggle
 
     /**
@@ -303,7 +303,7 @@ interface DuckChatFeature {
      * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
      * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun removeChatHistory(): Toggle
 
     /**
