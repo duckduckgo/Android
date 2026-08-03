@@ -40,14 +40,20 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
-    fun `when fireWidgetAddedMetric then sends widget_added day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+    fun `when fireWidgetAddedMetric then sends widget_added d0 and d0-14 NORMAL metric for the experiment toggle`() = runTest {
         metrics.fireWidgetAddedMetric()
 
         val sent = fakeMetricsPixelExtension.sentMetrics.single()
         assertEquals("widget_added", sent.metric)
         assertEquals("1", sent.value)
         assertEquals(MetricType.NORMAL, sent.type)
-        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
+            sent.conversionWindow,
+        )
         assertEquals(
             toggles.addToDockAndWidgetExperimentJul25().featureName().name,
             sent.toggle.featureName().name,
@@ -55,14 +61,20 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
-    fun `when fireWidgetAddedFromOnboardingMetric then sends widget_added_onboarding day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+    fun `when fireWidgetAddedFromOnboardingMetric then sends widget_added_onboarding d0 and d0-14 NORMAL metric`() = runTest {
         metrics.fireWidgetAddedFromOnboardingMetric()
 
         val sent = fakeMetricsPixelExtension.sentMetrics.single()
         assertEquals("widget_added_onboarding", sent.metric)
         assertEquals("1", sent.value)
         assertEquals(MetricType.NORMAL, sent.type)
-        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
+            sent.conversionWindow,
+        )
         assertEquals(
             toggles.addToDockAndWidgetExperimentJul25().featureName().name,
             sent.toggle.featureName().name,
@@ -70,14 +82,20 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
-    fun `when fireWidgetAddedFromSettingsMetric then sends widget_added_settings day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+    fun `when fireWidgetAddedFromSettingsMetric then sends widget_added_settings d0 and d0-14 NORMAL metric for the experiment toggle`() = runTest {
         metrics.fireWidgetAddedFromSettingsMetric()
 
         val sent = fakeMetricsPixelExtension.sentMetrics.single()
         assertEquals("widget_added_settings", sent.metric)
         assertEquals("1", sent.value)
         assertEquals(MetricType.NORMAL, sent.type)
-        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
+            sent.conversionWindow,
+        )
         assertEquals(
             toggles.addToDockAndWidgetExperimentJul25().featureName().name,
             sent.toggle.featureName().name,
@@ -85,7 +103,7 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
-    fun `when fireWidgetSearchMetric then sends widget_search day5-7 NORMAL metric bound to the experiment toggle`() = runTest {
+    fun `when fireWidgetSearchMetric then sends widget_search d5-7 NORMAL metric for the experiment toggle`() = runTest {
         metrics.fireWidgetSearchMetric()
 
         val sent = fakeMetricsPixelExtension.sentMetrics.single()
@@ -100,14 +118,20 @@ class OnboardingPromptsExperimentMetricsTest {
     }
 
     @Test
-    fun `when fireOnboardingCompletedMetric then sends onboarding_completed day-0 NORMAL metric bound to the experiment toggle`() = runTest {
+    fun `when fireOnboardingCompletedMetric then sends onboarding_completed d0 and d0-14 NORMAL metric for the experiment toggle`() = runTest {
         metrics.fireOnboardingCompletedMetric()
 
         val sent = fakeMetricsPixelExtension.sentMetrics.single()
         assertEquals("onboarding_completed", sent.metric)
         assertEquals("1", sent.value)
         assertEquals(MetricType.NORMAL, sent.type)
-        assertEquals(listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)), sent.conversionWindow)
+        assertEquals(
+            listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
+            sent.conversionWindow,
+        )
         assertEquals(
             toggles.addToDockAndWidgetExperimentJul25().featureName().name,
             sent.toggle.featureName().name,

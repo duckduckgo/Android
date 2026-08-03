@@ -48,7 +48,10 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
             type = MetricType.NORMAL,
             value = "1",
             toggle = toggles.addToDockAndWidgetExperimentJul25(),
-            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
         ).send()
     }
 
@@ -58,7 +61,10 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
             type = MetricType.NORMAL,
             value = "1",
             toggle = toggles.addToDockAndWidgetExperimentJul25(),
-            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
         ).send()
     }
 
@@ -68,7 +74,10 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
             type = MetricType.NORMAL,
             value = "1",
             toggle = toggles.addToDockAndWidgetExperimentJul25(),
-            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
         ).send()
     }
 
@@ -88,7 +97,10 @@ class OnboardingPromptsExperimentMetricsImpl @Inject constructor(
             type = MetricType.NORMAL,
             value = "1",
             toggle = toggles.addToDockAndWidgetExperimentJul25(),
-            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                ConversionWindow(lowerWindow = 0, upperWindow = 14),
+            ),
         ).send()
     }
 }
