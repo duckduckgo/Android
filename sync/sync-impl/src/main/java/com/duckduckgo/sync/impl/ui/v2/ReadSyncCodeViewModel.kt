@@ -27,7 +27,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 @ContributesViewModel(ActivityScope::class)
 class ReadSyncCodeViewModel @Inject constructor(
@@ -61,9 +60,5 @@ class ReadSyncCodeViewModel @Inject constructor(
         data class StartSyncProcess(
             val syncCode: String,
         ) : Command
-    }
-
-    companion object {
-        private val SCAN_CODE_DEBOUNCE_DURATION = 5.seconds
     }
 }
