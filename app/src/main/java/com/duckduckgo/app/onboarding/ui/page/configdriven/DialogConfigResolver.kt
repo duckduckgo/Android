@@ -102,6 +102,24 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        NewUserOnboardingActivityDialog.WidgetPrompt -> DialogConfig(
+            background = OnboardingBackgroundStep.AddWidget,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.WidgetPrompt(
+                title = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle),
+                body = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.AddWidgetRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton),
+                action = CtaAction.Emit(NewUserOnboardingEvent.WidgetPromptSkipped),
+            ),
+        )
+
         NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
             background = OnboardingBackgroundStep.InputType,
             embellishment = Embellishment.LeftWing,
@@ -136,7 +154,6 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        NewUserOnboardingActivityDialog.WidgetPrompt,
         is NewUserOnboardingActivityDialog.QuickSetup,
         -> null // to be implemented in following tasks
     }
