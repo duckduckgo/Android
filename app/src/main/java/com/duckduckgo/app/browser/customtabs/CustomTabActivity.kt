@@ -63,8 +63,10 @@ class CustomTabActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         viewModel.onShowCustomTab()
 
+        val toolbarColor =
+            intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
+
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
             val barStyle = if (isDarkThemeEnabled()) {
                 SystemBarStyle.dark(toolbarColor)
             } else {
@@ -78,8 +80,6 @@ class CustomTabActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         val url = intent.intentText
-        val toolbarColor =
-            intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
 
         logcat { "onCreate called with url=$url and toolbar color=$toolbarColor" }
 

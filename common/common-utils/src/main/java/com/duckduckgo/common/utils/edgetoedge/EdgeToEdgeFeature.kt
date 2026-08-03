@@ -27,33 +27,33 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface EdgeToEdgeFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun browser(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun settings(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun autofill(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sync(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun vpn(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun webview(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun onboarding(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun misc(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun bottomSheets(): Toggle
 }
