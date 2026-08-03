@@ -150,6 +150,20 @@ interface SyncApi {
     fun deleteExchangeChannel(channelId: String): Result<Unit>
 }
 
+/**
+ * Turn a failed response into a [Result.Error] for endpoints whose error body we don't parse,
+ * distinguishing "the server said something we don't understand" from "the server said nothing".
+ * Reading the body consumes the stream, so it happens exactly once here.
+ */
+internal fun Response<*>.toUnparsedError(): Result.Error {
+    val hasErrorBody = runCatching { !errorBody()?.string().isNullOrEmpty() }.getOrDefault(false)
+    return if (hasErrorBody) {
+        Result.Error(code = code(), reason = "unexpected status code")
+    } else {
+        Result.Error(code = code(), reason = "empty response")
+    }
+}
+
 sealed class SetKeysIfAbsentResult {
     /** Our posted keys won (server returned 201). */
     data object Created : SetKeysIfAbsentResult()
@@ -521,15 +535,7 @@ class SyncServiceRemote @Inject constructor(
     }
 
     private fun mapRescopeTokenError(response: Response<TokenRescopeResponse?>): Result<String> {
-        val errorBody = response.errorBody()
-        val hasErrorBody = runCatching {
-            errorBody != null && errorBody.string().isNotEmpty()
-        }.getOrDefault(false)
-        val error = if (hasErrorBody) {
-            Result.Error(code = response.code(), reason = "unexpected status code")
-        } else {
-            Result.Error(code = response.code(), reason = "empty response")
-        }
+        val error = response.toUnparsedError()
         error.removeKeysIfInvalid()
         return error
     }

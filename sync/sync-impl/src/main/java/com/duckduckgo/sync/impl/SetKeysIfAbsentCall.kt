@@ -22,7 +22,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import retrofit2.HttpException
-import retrofit2.Response
 import javax.inject.Inject
 
 /** Runs the POST /sync/keys/purpose/{purpose}/set-if-absent request and maps its outcome. */
@@ -68,7 +67,7 @@ class RealSetKeysIfAbsentCall @Inject constructor(
                 logcat { "Sync-UnifiedDevices: set-if-absent 409 — a different key already exists; will fetch" }
                 Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired)
             } else {
-                mapError(response)
+                response.toUnparsedError()
             }
         }.getOrElse { throwable ->
             logcat(INFO) { "Sync-UnifiedDevices: setKeysIfAbsent error ${throwable.localizedMessage}" }
@@ -77,18 +76,6 @@ class RealSetKeysIfAbsentCall @Inject constructor(
             } else {
                 Result.Error(reason = "internal error")
             }
-        }
-    }
-
-    private fun mapError(response: Response<SetKeyIfAbsentResponse?>): Result<SetKeysIfAbsentResult> {
-        val errorBody = response.errorBody()
-        val hasErrorBody = runCatching {
-            errorBody != null && errorBody.string().isNotEmpty()
-        }.getOrDefault(false)
-        return if (hasErrorBody) {
-            Result.Error(code = response.code(), reason = "unexpected status code")
-        } else {
-            Result.Error(code = response.code(), reason = "empty response")
         }
     }
 

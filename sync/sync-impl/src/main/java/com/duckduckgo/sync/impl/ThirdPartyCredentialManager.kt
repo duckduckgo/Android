@@ -73,6 +73,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
     private val syncFeature: SyncFeature,
+    private val protectedKeyUnwrapper: ProtectedKeyUnwrapper,
 ) : ThirdPartyCredentialManager {
 
     /** Base linear-backoff between rate-limit retries. Overridable in tests to keep them fast. */
@@ -223,7 +224,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
         val spMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(newSpBase64, hkdfSalt, "Main Key", 32) }
             .getOrElse { return it.asLoggedError("CreateThirdPartyCredential: failed to derive 3party MEK") }
         val accountSecretKey = syncStore.secretKey
-            ?: return Error(reason = "CreateThirdPartyCredential: no account secret key for ddg-side decrypt")
+            ?: return Error(reason = "CreateThirdPartyCredential: no account secret key to mint against")
 
         val ddgKeys = when (val r = retryingOnRateLimit { syncApi.getProtectedKeys(token) }) {
             is Success -> r.data.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
@@ -253,11 +254,10 @@ class RealThirdPartyCredentialManager @Inject constructor(
         logcat { "Sync-ScopedToken: ${ddgKeys.size} existing ddg key(s) to re-encrypt for 3party" }
         val reWrapResults = ddgKeys.map { key ->
             kotlin.runCatching {
-                // ddg key arrives base64url-encoded; convert to standard base64 then libsodium-decrypt.
-                val encryptedBytes = Base64.decode(key.encryptedPrivateKey.removeUrlSafetyToRestoreB64(), Base64.NO_WRAP)
-                val rawKeyBytes = nativeLib.decryptData(encryptedBytes, accountSecretKey).also {
-                    it.checkResult("CreateThirdPartyCredential: failed to libsodium-decrypt ddg key ${key.kid}")
-                }.decryptedData
+                val rawKeyBytes = when (val unwrapped = protectedKeyUnwrapper.unwrap(key)) {
+                    is Success -> unwrapped.data
+                    is Error -> error(unwrapped.reason)
+                }
                 val reEncryptedJwe = syncJweCrypto.jweEncryptSymmetric(rawKeyBytes, spMek, kid = CREDENTIAL_ID_3PARTY)
                 ProtectedKeyEntry(
                     kid = key.kid,

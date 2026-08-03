@@ -62,6 +62,7 @@ class ThirdPartyCredentialManagerTest {
     private val syncApi: SyncApi = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val nativeLib: SyncLib = mock()
+    private val protectedKeyUnwrapper: ProtectedKeyUnwrapper = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     // A ddg-wrapped key already on the account; used by the happy-path tests.
@@ -77,7 +78,7 @@ class ThirdPartyCredentialManagerTest {
 
     @Before
     fun before() {
-        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, syncFeature)
+        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, syncFeature, protectedKeyUnwrapper)
     }
 
     // ---- create() ----
@@ -532,5 +533,6 @@ class ThirdPartyCredentialManagerTest {
         whenever(syncApi.getAccessCredentials(token)).thenReturn(Success(emptyList()))
         whenever(syncApi.createAccessCredential(anyString(), anyString(), any())).thenReturn(Success(true))
         whenever(nativeLib.decryptData(any<ByteArray>(), eq(secretKey))).thenReturn(DecryptBytesResult(0, "raw_key".toByteArray()))
+        whenever(protectedKeyUnwrapper.unwrap(any())).thenReturn(Success("raw_key".toByteArray()))
     }
 }
