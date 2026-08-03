@@ -1,7 +1,7 @@
 {
   "name": "PrivateReports",
   "url": "privatereports.com",
-  "version": "0.997.0",
+  "version": "0.998.0",
   "optOutUrl": "https://www.privatereports.com/api/helper/optOutLight/search",
   "steps": [
     {
@@ -528,8 +528,8 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 48,
-    "confirmOptOutScan": 72,
+    "retryError": 72,
+    "confirmOptOutScan": 96,
     "maintenanceScan": 240
   },
   "addedDatetime": 1737035696264,
