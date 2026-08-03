@@ -502,4 +502,173 @@ class PirUtilsTest {
 
         assertTrue(result)
     }
+
+    @Test
+    fun whenMatchesWithAddressesDifferingOnlyByExtrasThenReturnsTrue() {
+        val profile1 = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "City", state = "State")),
+        )
+
+        val profile2 = ExtractedProfile(
+            profileQueryId = 456L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "City", state = "State", extras = mapOf("zip" to "12345"))),
+        )
+
+        val result = profile1.matches(profile2)
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenToParamsWithExtrasThenForwardsProfileAndAddressExtras() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(
+                AddressCityState(
+                    city = "Springfield",
+                    state = "IL",
+                    fullAddress = "100 Sample Dr, Springfield, IL 62701",
+                    extras = mapOf("street" to "100 Sample Dr", "zip" to "62701"),
+                ),
+            ),
+            phoneNumbers = listOf("555-1234"),
+            relatives = listOf("Jane Doe"),
+            identifier = "id123",
+            extras = mapOf("county" to "Sangamon"),
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertEquals("35", result.age)
+        assertEquals(listOf("555-1234"), result.phoneNumbers)
+        assertEquals(listOf("Jane Doe"), result.relatives)
+        assertEquals("id123", result.identifier)
+        assertEquals(mapOf("county" to "Sangamon"), result.extras)
+        assertEquals(1, result.addresses.size)
+        assertEquals("Springfield", result.addresses[0].city)
+        assertEquals("IL", result.addresses[0].state)
+        assertEquals(mapOf("street" to "100 Sample Dr", "zip" to "62701"), result.addresses[0].extras)
+    }
+
+    @Test
+    fun whenToParamsWithoutExtrasThenSendsEmptyMaps() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertNull(result.age)
+        assertNull(result.identifier)
+        assertTrue(result.extras.isEmpty())
+        assertTrue(result.addresses.isEmpty())
+        assertTrue(result.phoneNumbers.isEmpty())
+        assertTrue(result.relatives.isEmpty())
+    }
+
+    @Test
+    fun whenRefreshedWithThenKeepsLocallyOwnedAttributesAndTakesScrapedOnes() {
+        val stored = ExtractedProfile(
+            dbId = 42L,
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            relatives = listOf("Jane Doe"),
+            dateAddedInMillis = 1000L,
+            deprecated = true,
+        )
+
+        val scraped = ExtractedProfile(
+            dbId = 0L,
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "36",
+            relatives = listOf("Jane Doe", "Jack Doe"),
+            dateAddedInMillis = 0L,
+            deprecated = false,
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(42L, result.dbId)
+        assertEquals(1000L, result.dateAddedInMillis)
+        assertTrue(result.deprecated)
+        assertEquals("36", result.age)
+        assertEquals(listOf("Jane Doe", "Jack Doe"), result.relatives)
+    }
+
+    @Test
+    fun whenRefreshedWithThenMergesProfileExtrasKeepingKeysMissingFromTheScrape() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            extras = mapOf("county" to "Sangamon", "middleName" to "Michael"),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            extras = mapOf("county" to "Cook"),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(mapOf("county" to "Cook", "middleName" to "Michael"), result.extras)
+    }
+
+    @Test
+    fun whenRefreshedWithThenMergesExtrasOfTheAddressWithTheSameCityAndState() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(
+                AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr", "zip" to "62701")),
+                AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101")),
+            ),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(
+                AddressCityState(city = "Springfield", state = "IL", extras = mapOf("zip" to "62702")),
+            ),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(1, result.addresses.size)
+        assertEquals(mapOf("street" to "100 Sample Dr", "zip" to "62702"), result.addresses[0].extras)
+    }
+
+    @Test
+    fun whenRefreshedWithNewAddressThenKeepsOnlyItsOwnExtras() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr"))),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101"))),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(listOf(AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101"))), result.addresses)
+    }
 }
