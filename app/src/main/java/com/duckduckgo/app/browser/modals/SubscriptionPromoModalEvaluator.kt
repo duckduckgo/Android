@@ -28,14 +28,6 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-/**
- * Coordinates the Privacy Pro promo modal. Runs on [ModalTrigger.APP_RESUME] (app foreground),
- * replacing the previous `checkSubscriptionPromoOnForeground` path so the promo now respects the
- * coordinator's priority ordering and 24-hour cooldown alongside the other app-originated modals.
- *
- * The promo is a bottom sheet owned by the visible browser tab, so rendering is delegated to the
- * [NewTabPageModalPresenter] that tab registers.
- */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = ModalEvaluator::class,
@@ -62,9 +54,7 @@ class SubscriptionPromoModalEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
-        val shown = withContext(dispatchers.main()) {
-            presenter.showSubscriptionPromo(decision.flow, decision.isFreeTrialCopy)
-        }
+        val shown = presenter.showSubscriptionPromo(decision.flow, decision.isFreeTrialCopy)
         if (shown) {
             ModalEvaluator.EvaluationResult.ModalShown
         } else {

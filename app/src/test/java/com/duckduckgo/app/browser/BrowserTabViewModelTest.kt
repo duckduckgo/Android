@@ -486,7 +486,6 @@ class BrowserTabViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    // Default (unstubbed) decide() returns null, i.e. no promo eligible.
     private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
@@ -3984,8 +3983,6 @@ class BrowserTabViewModelTest {
         }
     }
 
-    // The Privacy Pro promo is now decided by the modal coordinator; the view-model only renders it
-    // (via showSubscriptionPromo) subject to the surface guards below.
     @Test
     fun whenShowSubscriptionPromoModalCtaAndOnDuckAiUrlThenNotShown() =
         runTest {
@@ -4029,7 +4026,6 @@ class BrowserTabViewModelTest {
         runTest {
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
             setBrowserShowing(false)
-            // An onboarding CTA already owns the NTP slot: the promo must not clobber it.
             val onboardingCta = DaxBubbleCta.DaxSubscriptionCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
@@ -4047,7 +4043,6 @@ class BrowserTabViewModelTest {
     fun whenShowSubscriptionPromoModalCtaAndMaliciousSiteWarningShowingThenNotShown() =
         runTest {
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
-            // A malicious-site warning reports browserShowing = false with maliciousSiteBlocked = true.
             testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
 
             val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
@@ -4074,8 +4069,6 @@ class BrowserTabViewModelTest {
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
             loadUrl(exampleUrl, isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
-            // The slot guard is scoped to the New Tab Page; over a website the promo keeps its
-            // long-standing behaviour of taking the slot.
             setCta(
                 DaxBubbleCta.DaxSubscriptionCta(
                     mockOnboardingStore,
@@ -4118,7 +4111,6 @@ class BrowserTabViewModelTest {
         runTest {
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
             setBrowserShowing(false)
-            // A higher-priority CTA already owns the NTP slot: Add Widget must not clobber it.
             setCta(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
 
             val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
@@ -10020,7 +10012,6 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
             flowSelectedTab.emit(initialTab)
 
-            // isPromoOnboardingDialogShowing() now delegates to the decider, so stub it directly.
             whenever(mockSubscriptionPromoModalDecider.decide()).thenReturn(
                 SubscriptionPromoModalDecision(flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING, isFreeTrialCopy = false),
             )

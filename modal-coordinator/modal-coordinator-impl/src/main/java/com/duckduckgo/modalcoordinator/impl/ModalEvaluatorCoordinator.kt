@@ -40,10 +40,7 @@ import javax.inject.Inject
  * Coordinates evaluation of modal evaluators with priority ordering and 24-hour blocking.
  *
  * Key behaviors:
- * - Each coordinated pass is started by a [ModalTrigger] and only considers evaluators declaring
- *   that trigger (see [ModalEvaluator.trigger]); evaluators on different triggers never compete
- * - [ModalTrigger.APP_RESUME] passes run on process foreground (onResume)
- * - [ModalTrigger.NTP_RENDER] passes run when a host reports a New Tab Page render
+ * - A pass only considers evaluators declaring the [ModalTrigger] that started it
  * - Evaluators are sorted by priority (lowest number = highest priority)
  * - Only one evaluator runs per coordinated pass
  * - Evaluators blocked by 24-hour window are skipped entirely (evaluate() not called)

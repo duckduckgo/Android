@@ -49,7 +49,6 @@ class AddWidgetModalEvaluatorTest {
 
     @Before
     fun before() = runTest {
-        // Default: eligible (onboarding complete, no widgets installed, not dismissed, no linear-plan widget prompt).
         whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
@@ -134,12 +133,12 @@ class AddWidgetModalEvaluatorTest {
         var widgetShown = false
         var shownSupportsAutomaticAdd: Boolean? = null
 
-        override fun showSubscriptionPromo(
+        override suspend fun showSubscriptionPromo(
             flow: SubscriptionPromoFlow,
             isFreeTrialCopy: Boolean,
         ): Boolean = false
 
-        override fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean {
+        override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean {
             widgetShown = true
             shownSupportsAutomaticAdd = supportsAutomaticAdd
             return widgetResult

@@ -17,22 +17,14 @@
 package com.duckduckgo.modalcoordinator.api
 
 /**
- * Declares which lifecycle event should cause the coordinator to evaluate a [ModalEvaluator].
- *
- * A single coordinated evaluation only considers evaluators matching the trigger that started it,
- * so evaluators opting into different triggers never compete within the same pass.
+ * Which lifecycle event causes the coordinator to evaluate a [ModalEvaluator]. A pass only considers
+ * evaluators matching the trigger that started it, so different triggers never compete.
  */
 enum class ModalTrigger {
 
-    /**
-     * Evaluated when the app process comes to the foreground (process-level onResume).
-     * This is the default and matches the historical behaviour of every evaluator.
-     */
+    /** The app process came to the foreground (process-level onResume). */
     APP_RESUME,
 
-    /**
-     * Evaluated when the New Tab Page is rendered, including mid-session renders (e.g. opening a
-     * fresh tab while the app is already foregrounded) that do not produce an [APP_RESUME].
-     */
+    /** The New Tab Page was rendered, including mid-session renders that produce no [APP_RESUME]. */
     NTP_RENDER,
 }

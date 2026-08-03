@@ -94,7 +94,7 @@ class SubscriptionPromoModalEvaluatorTest {
         var shownFlow: SubscriptionPromoFlow? = null
         var shownFreeTrialCopy = false
 
-        override fun showSubscriptionPromo(
+        override suspend fun showSubscriptionPromo(
             flow: SubscriptionPromoFlow,
             isFreeTrialCopy: Boolean,
         ): Boolean {
@@ -104,6 +104,6 @@ class SubscriptionPromoModalEvaluatorTest {
             return subscriptionResult
         }
 
-        override fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = false
+        override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = false
     }
 }

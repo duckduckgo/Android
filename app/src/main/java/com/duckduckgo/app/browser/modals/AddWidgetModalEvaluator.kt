@@ -33,12 +33,8 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Coordinates the "Add Widget" promo. Runs on [ModalTrigger.NTP_RENDER] because the promo is
- * render-bound to the empty New Tab Page (including mid-session new tabs that produce no app
- * foreground), so it cannot rely on [ModalTrigger.APP_RESUME] alone.
- *
- * The promo is a bottom sheet owned by the visible browser tab, so rendering is delegated to the
- * [NewTabPageModalPresenter] that tab registers.
+ * Coordinates the "Add Widget" promo. Uses [ModalTrigger.NTP_RENDER] because mid-session new tabs
+ * render the NTP without foregrounding the app.
  */
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -59,8 +55,6 @@ class AddWidgetModalEvaluator @Inject constructor(
     override val trigger: ModalTrigger = ModalTrigger.NTP_RENDER
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
-        // Onboarding CTAs own the NTP during onboarding (as they did when Add Widget lived in
-        // getHomeCta); don't interrupt them.
         if (!onboardingFlowChecker.isOnboardingComplete()) {
             logcat { "AddWidgetModalEvaluator: skipped, onboarding not complete" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
@@ -81,9 +75,7 @@ class AddWidgetModalEvaluator @Inject constructor(
             logcat { "AddWidgetModalEvaluator: skipped, no presenter registered" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
-        val shown = withContext(dispatchers.main()) {
-            presenter.showAddWidgetPromo(widgetCapabilities.supportsAutomaticWidgetAdd)
-        }
+        val shown = presenter.showAddWidgetPromo(widgetCapabilities.supportsAutomaticWidgetAdd)
         if (shown) {
             ModalEvaluator.EvaluationResult.ModalShown
         } else {

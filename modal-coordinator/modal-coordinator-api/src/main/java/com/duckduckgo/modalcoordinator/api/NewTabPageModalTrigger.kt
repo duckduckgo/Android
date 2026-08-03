@@ -17,18 +17,11 @@
 package com.duckduckgo.modalcoordinator.api
 
 /**
- * Lets New Tab Page hosts notify the coordinator that the NTP has just been rendered, so that
- * evaluators declaring [ModalTrigger.NTP_RENDER] can be coordinated.
- *
- * This is the counterpart to the process-level onResume trigger the coordinator observes itself:
- * mid-session NTP renders (e.g. opening a fresh tab while foregrounded) do not produce an
- * [ModalTrigger.APP_RESUME], so hosts must surface them explicitly.
+ * Lets New Tab Page hosts report a render, which the coordinator cannot observe itself: mid-session
+ * NTP renders produce no [ModalTrigger.APP_RESUME].
  */
 interface NewTabPageModalTrigger {
 
-    /**
-     * Notifies the coordinator that the New Tab Page has been rendered. Safe to call on every
-     * render; the coordinator applies its own mutex, cooldown and priority rules.
-     */
+    /** Safe to call on every render; the coordinator applies its own mutex, cooldown and priority. */
     fun onNewTabPageShown()
 }

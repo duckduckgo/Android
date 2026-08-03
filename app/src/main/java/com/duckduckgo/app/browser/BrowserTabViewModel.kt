@@ -1319,7 +1319,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
-        // This tab is the visible one, so it owns the NTP modal presenter surface.
         newTabPageModalPresenterRegistry.register(this)
         setAdClickActiveTabData(url)
 
@@ -3772,50 +3771,37 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
-    /**
-     * [NewTabPageModalPresenter] entry point for the Privacy Pro promo, called by the modal
-     * coordinator. Must be called on the main thread. Returns true if accepted for display.
-     */
-    override fun showSubscriptionPromo(
+    override suspend fun showSubscriptionPromo(
         flow: SubscriptionPromoFlow,
         isFreeTrialCopy: Boolean,
-    ): Boolean {
-        if (currentGlobalLayoutState() !is Browser) return false
+    ): Boolean = withContext(dispatchers.main()) {
+        if (!canShowPromo()) return@withContext false
         val currentUrl = url
-        if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) return false
-        // A malicious-site warning owns the screen; a promo must never obscure a security warning.
-        if (currentBrowserViewState().maliciousSiteBlocked) return false
-        if (!currentBrowserViewState().browserShowing && currentCtaViewState().cta != null) return false
+        if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) return@withContext false
+        if (!currentBrowserViewState().browserShowing && currentCtaViewState().cta != null) return@withContext false
         ctaViewState.value = currentCtaViewState().copy(
             cta = SubscriptionPromoModalCta(isFreeTrialCopy = isFreeTrialCopy, flow = flow),
             isBrowserShowing = currentBrowserViewState().browserShowing,
-            isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+            isErrorShowing = false,
         )
-        return true
+        true
     }
 
-    /**
-     * [NewTabPageModalPresenter] entry point for the Add Widget promo, called by the modal
-     * coordinator. Only shown on the New Tab Page. Must be called on the main thread. Returns true
-     * if accepted for display.
-     */
-    override fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean {
-        if (currentGlobalLayoutState() !is Browser) return false
-        if (currentBrowserViewState().browserShowing) return false
-        // A malicious-site warning also reports browserShowing = false, and a promo must never
-        // obscure a security warning.
-        if (currentBrowserViewState().maliciousSiteBlocked) return false
-        // Add Widget is the lowest-priority home CTA: it must never replace a CTA that already owns
-        // the NTP slot (RMF message, subscription promo, etc.).
-        if (currentCtaViewState().cta != null) return false
+    override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = withContext(dispatchers.main()) {
+        if (!canShowPromo()) return@withContext false
+        if (currentBrowserViewState().browserShowing) return@withContext false
+        if (currentCtaViewState().cta != null) return@withContext false
         val cta = if (supportsAutomaticAdd) HomePanelCta.AddWidgetAutoOnboarding else HomePanelCta.AddWidgetInstructions
         ctaViewState.value = currentCtaViewState().copy(
             cta = cta,
             isBrowserShowing = false,
-            isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+            isErrorShowing = false,
         )
-        return true
+        true
     }
+
+    private fun canShowPromo(): Boolean =
+        currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it

@@ -32,18 +32,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Decides whether the Privacy Pro promo modal is currently eligible to be shown, and with which
- * flow and copy. This is the single source of truth shared by the modal coordinator's
- * [com.duckduckgo.app.cta.ui.SubscriptionPromoModalEvaluator] and by [CtaViewModel] (which uses it
- * to know when a pending promo should suppress other onboarding surfaces).
- *
- * The eligibility rules mirror the historical `getPromoCtaOnForeground` logic exactly.
+ * Single source of truth for Privacy Pro promo modal eligibility, shared by the modal evaluator and
+ * by [CtaViewModel], which uses it to suppress other onboarding surfaces while a promo is pending.
  */
 interface SubscriptionPromoModalDecider {
 
-    /**
-     * @return the promo to show, or null when no promo is currently eligible.
-     */
+    /** @return the promo to show, or null when none is eligible. */
     suspend fun decide(): SubscriptionPromoModalDecision?
 }
 

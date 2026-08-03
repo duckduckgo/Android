@@ -34,11 +34,8 @@ interface ModalEvaluator {
     val evaluatorId: String
 
     /**
-     * Declares which lifecycle event should cause the coordinator to evaluate this modal.
-     *
-     * Defaults to [ModalTrigger.APP_RESUME] so existing evaluators keep their process-foreground
-     * behaviour without any change. Evaluators tied to the New Tab Page (e.g. inline promos) should
-     * override this with [ModalTrigger.NTP_RENDER].
+     * Which lifecycle event causes the coordinator to evaluate this modal. Evaluators tied to the
+     * New Tab Page should override with [ModalTrigger.NTP_RENDER].
      */
     val trigger: ModalTrigger
         get() = ModalTrigger.APP_RESUME

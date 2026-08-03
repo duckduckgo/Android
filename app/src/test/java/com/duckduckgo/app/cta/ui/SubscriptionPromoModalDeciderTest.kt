@@ -55,7 +55,6 @@ class SubscriptionPromoModalDeciderTest {
 
     @Before
     fun before() = runTest {
-        // Defaults: subscription is available but neither promo toggle is enabled -> not eligible.
         whenever(mockToggles.subscriptionPromoModalCta()).thenReturn(disabledToggle)
         whenever(mockToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(disabledToggle)
         whenever(mockToggles.privacyProCta()).thenReturn(enabledToggle)
