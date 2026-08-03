@@ -63,7 +63,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -136,9 +135,6 @@ class CtaViewModel @Inject constructor(
             .launchIn(coroutineScope)
     }
 
-    private suspend fun isSubscriptionCtaAvailable(): Boolean =
-        subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
-
     private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
     }
@@ -188,12 +184,12 @@ class CtaViewModel @Inject constructor(
         return when {
             onboardingStore.isDuckAiOnboardingFlow() -> {
                 mutableListOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON, CtaId.DAX_DUCK_AI_END).also {
-                    if (isSubscriptionCtaAvailable()) {
+                    if (subscriptionPromoModalDecider.isSubscriptionCtaAvailable()) {
                         it.add(CtaId.DAX_INTRO_PRIVACY_PRO)
                     }
                 }
             }
-            isSubscriptionCtaAvailable() -> {
+            subscriptionPromoModalDecider.isSubscriptionCtaAvailable() -> {
                 listOf(
                     CtaId.DAX_INTRO,
                     CtaId.DAX_DIALOG_SERP,
@@ -515,7 +511,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {
-        if (hideTips() || daxDialogSubscriptionShown() || !isSubscriptionCtaAvailable()) return false
+        if (hideTips() || daxDialogSubscriptionShown() || !subscriptionPromoModalDecider.isSubscriptionCtaAvailable()) return false
 
         return daxOnboardingActive()
     }
@@ -684,7 +680,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val isLastContextDialogShown = when {
-                isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
+                subscriptionPromoModalDecider.isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
                 onboardingStore.isDuckAiOnboardingFlow() -> duckAiEndShown()
                 else -> daxDialogEndShown()
             }
@@ -830,8 +826,6 @@ class CtaViewModel @Inject constructor(
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
     suspend fun isPromoOnboardingDialogShowing(): Boolean = subscriptionPromoModalDecider.decide() != null
-
-    private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2

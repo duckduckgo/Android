@@ -325,6 +325,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.modalcoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -472,6 +473,8 @@ class BrowserTabViewModelTest {
     private val mockPixel: Pixel = mock()
 
     private val mockNewTabPixels: NewTabPixels = mock()
+
+    private val mockNewTabPageModalTrigger: NewTabPageModalTrigger = mock()
 
     private val mockHttpErrorPixels: HttpErrorPixels = mock()
 
@@ -832,6 +835,7 @@ class BrowserTabViewModelTest {
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
+            whenever(mockSubscriptionPromoModalDecider.isSubscriptionCtaAvailable()).thenReturn(false)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
@@ -1071,7 +1075,7 @@ class BrowserTabViewModelTest {
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
                 newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
-                newTabPageModalTrigger = mock(),
+                newTabPageModalTrigger = mockNewTabPageModalTrigger,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3982,6 +3986,39 @@ class BrowserTabViewModelTest {
             assertEquals("funnel_modal_android__subscriptionnudge", uri.getQueryParameter("origin"))
         }
     }
+
+    @Test
+    fun whenViewVisibleOnNewTabPageAndNoCtaThenModalTriggerNotified() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = false)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger).onNewTabPageShown()
+        }
+
+    @Test
+    fun whenViewVisibleWhileBrowsingThenModalTriggerNotNotified() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger, never()).onNewTabPageShown()
+        }
+
+    @Test
+    fun whenViewVisibleAndMaliciousSiteBlockedThenModalTriggerNotNotified() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger, never()).onNewTabPageShown()
+        }
 
     @Test
     fun whenShowSubscriptionPromoModalCtaAndOnDuckAiUrlThenNotShown() =

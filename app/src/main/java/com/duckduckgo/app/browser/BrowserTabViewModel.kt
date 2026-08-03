@@ -3822,6 +3822,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
+        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserClickCtaOkButton(cta)
         }
@@ -3848,12 +3849,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaSecondaryButton(cta: Cta) {
+        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
         }
+    }
+
+    private fun releaseAddWidgetModalSlot(cta: Cta) {
+        if (cta !is HomePanelCta) return
+        ctaViewState.value = currentCtaViewState().copy(cta = null)
     }
 
     fun onPrivacyProSkippedOnboardingDismissed() {
@@ -3869,6 +3876,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaDismissButton(cta: Cta) {
+        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {

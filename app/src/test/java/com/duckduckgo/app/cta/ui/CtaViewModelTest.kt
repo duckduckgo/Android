@@ -119,7 +119,7 @@ class CtaViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
+    private lateinit var subscriptionPromoModalDecider: SubscriptionPromoModalDecider
 
     private val mockDismissedCtaDao: DismissedCtaDao = mock()
 
@@ -201,7 +201,6 @@ class CtaViewModelTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
-        whenever(mockSubscriptionPromoModalDecider.decide()).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
@@ -220,10 +219,19 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
 
+        subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+            appInstallStore = mockAppInstallStore,
+            settingsDataStore = mockSettingsDataStore,
+            dismissedCtaDao = mockDismissedCtaDao,
+            subscriptions = mockSubscriptions,
+            dispatchers = coroutineRule.testDispatcherProvider,
+        )
+
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            subscriptionPromoModalDecider = mockSubscriptionPromoModalDecider,
+            subscriptionPromoModalDecider = subscriptionPromoModalDecider,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,

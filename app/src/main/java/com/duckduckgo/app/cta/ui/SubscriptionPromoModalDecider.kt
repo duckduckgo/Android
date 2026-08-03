@@ -39,6 +39,9 @@ interface SubscriptionPromoModalDecider {
 
     /** @return the promo to show, or null when none is eligible. */
     suspend fun decide(): SubscriptionPromoModalDecision?
+
+    /** Whether a Privacy Pro CTA can be offered at all, regardless of which promo flow wants it. */
+    suspend fun isSubscriptionCtaAvailable(): Boolean
 }
 
 data class SubscriptionPromoModalDecision(
@@ -88,7 +91,7 @@ class RealSubscriptionPromoModalDecider @Inject constructor(
 
     private fun subscriptionPromoModalShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
-    private suspend fun isSubscriptionCtaAvailable(): Boolean =
+    override suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() &&
             subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN &&
             extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
