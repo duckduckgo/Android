@@ -243,7 +243,7 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         data object SyncWithAnotherDevice : Command()
         data object AddAnotherDevice : Command()
-        data class DeepLinkIntoSetup(val barcodeSyncUrl: SyncBarcodeUrl) : Command()
+        data class DeepLinkIntoSetup(val barcodeSyncUrl: SyncBarcodeUrl, val isSignedIn: Boolean) : Command()
         data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
         data object IntroCreateAccount : Command()
         data object IntroRecoverSyncData : Command()
@@ -722,7 +722,7 @@ class SyncActivityViewModel @Inject constructor(
                     // (the Joiner/Host confirmation surfaced by the runner)
                     logcat { "Sync-setup: v2 deep link; bypassing legacy confirmation dialog" }
                     requiresSetupAuthentication {
-                        command.send(Command.DeepLinkIntoSetup(parsed))
+                        command.send(Command.DeepLinkIntoSetup(parsed, syncAccountRepository.isSignedIn()))
                     }
                 }
             }
@@ -732,7 +732,7 @@ class SyncActivityViewModel @Inject constructor(
     fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: SyncBarcodeUrl) {
         viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
-                command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl))
+                command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl, syncAccountRepository.isSignedIn()))
             }
         }
     }
