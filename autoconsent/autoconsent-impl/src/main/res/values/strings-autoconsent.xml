@@ -29,7 +29,7 @@
     <string name="autoconsentPopupDescriptionWithFeatureEnabled">"We can save you a click and accept these cookies for you."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Accept cookies that can\'t be rejected"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"I\'ll keep accepting them myself"</string>
-    <string name="autoconsentPopupTitleWithFeatureDisabled">"Tired of cookie pop-ups that won’t leave you alone?"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Tired of cookie pop-ups that won\'t leave you alone?"</string>
     <string name="autoconsentPopupDescriptionWithFeatureDisabled">"We\'ll aim to reject as many cookies as possible. If there\'s no reject option, we\'ll save you a click and accept these cookies for you."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Reject when possible or accept for me"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"I\'ll keep handling them myself"</string>
