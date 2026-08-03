@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.modals
 
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -45,7 +44,6 @@ class AddWidgetModalEvaluator @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
     private val presenterRegistry: NewTabPageModalPresenterRegistry,
-    private val onboardingFlowChecker: OnboardingFlowChecker,
     private val onboardingStore: OnboardingStore,
     private val dispatchers: DispatcherProvider,
 ) : ModalEvaluator {
@@ -55,11 +53,6 @@ class AddWidgetModalEvaluator @Inject constructor(
     override val trigger: ModalTrigger = ModalTrigger.NTP_RENDER
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
-        if (!onboardingFlowChecker.isOnboardingComplete()) {
-            logcat { "AddWidgetModalEvaluator: skipped, onboarding not complete" }
-            return@withContext ModalEvaluator.EvaluationResult.Skipped
-        }
-
         if (!canShowWidgetCta()) {
             logcat {
                 "AddWidgetModalEvaluator: skipped, not eligible " +

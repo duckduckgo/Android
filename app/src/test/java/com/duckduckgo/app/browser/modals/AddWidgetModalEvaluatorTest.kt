@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.modals
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,14 +41,12 @@ class AddWidgetModalEvaluatorTest {
     private val widgetCapabilities: WidgetCapabilities = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val registry = NewTabPageModalPresenterRegistry()
-    private val onboardingFlowChecker: OnboardingFlowChecker = mock()
     private val onboardingStore: OnboardingStore = mock()
 
     private lateinit var testee: AddWidgetModalEvaluator
 
     @Before
     fun before() = runTest {
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
         whenever(dismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -59,18 +56,9 @@ class AddWidgetModalEvaluatorTest {
             widgetCapabilities,
             dismissedCtaDao,
             registry,
-            onboardingFlowChecker,
             onboardingStore,
             coroutineRule.testDispatcherProvider,
         )
-    }
-
-    @Test
-    fun whenOnboardingNotCompleteThenSkipped() = runTest {
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
-        registry.register(FakePresenter())
-
-        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
     }
 
     @Test
