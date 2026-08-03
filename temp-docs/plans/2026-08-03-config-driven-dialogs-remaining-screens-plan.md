@@ -765,10 +765,13 @@ Legacy: `BrandDesignUpdateWelcomePage.kt:1347-1450` (animated), `:2100-2200` reg
 `showDialogWithoutAnimation` (snap), toggle application `updateAiChatToggleState` `:2950-2961`, description
 `:1442-1444` (`preventWidows()` then `.html()`).
 
-The picker's Lottie "with AI" flourish is not `Animator`-based, so it is wrapped in a zero-duration
-`ValueAnimator` whose only job is to start it from `onAnimationStart` — same trick as
-`ComparisonChartBinder.avdStartTrigger`. The engine calls `start()` then, on a snapped render, `end()`, so the
-flourish also runs on the snap path, matching legacy's snap-path `Transition.ANIMATE`.
+The picker's Lottie "with AI" flourish is not `Animator`-based, so it goes on `ContentHandle.onContentReady`,
+which exists for exactly this: entrance work the engine cannot own as an `Animator` — an unbounded loop, or an
+animation driven outside the animator framework. It runs once per render, animated or snapped.
+
+Legacy's snap path starts the loop with no initial delay (`Transition.ANIMATE`, `BrandDesignUpdateWelcomePage.kt:2123`),
+where `onContentReady` passes `delayedStart = true` on every path and so waits `LOTTIE_INITIAL_DELAY` (2s). That
+divergence is accepted: the loop is decorative, and a snapped render only happens on rotation or process restore.
 
 The state collector drops its replayed first value: `collect` replays immediately and
 `Transition.CROSSFADE_ANIMATE` starts Lottie unconditionally, which would defeat the entrance-gated trigger.
@@ -860,9 +863,6 @@ Create `InputScreenBinder.kt`:
 ```kotlin
 package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
 import android.view.View
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignInputScreenBinding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -909,27 +909,11 @@ class InputScreenBinder(
         ContentHandle(
             title = inputScreenTitle,
             fadeTargets = listOf(inputScreenPicker, inputScreenDescription),
-            afterFade = { withAiFlourishTrigger() },
+            onContentReady = { inputScreenPicker.startWithAiAnimation(delayedStart = true) },
             result = { NewUserOnboardingEvent.InputModeConfirmed(state.value.withAi) },
             unbind = { inputScreenPicker.cancelLottieAnimations() },
         )
     }
-
-    /**
-     * The picker's flourish runs on its own coroutine, not on an animator timeline, so there is nothing to hand
-     * the engine directly. This zero-duration animator exists only so the engine still owns starting it.
-     */
-    private fun withAiFlourishTrigger(): Animator =
-        ValueAnimator.ofInt(0, 1).apply {
-            duration = 0L
-            addListener(
-                object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator) {
-                        binding.inputScreenPicker.startWithAiAnimation(delayedStart = true)
-                    }
-                },
-            )
-        }
 }
 ```
 
@@ -2476,9 +2460,10 @@ Do not enable the flag by default and do not open a PR as part of this plan.
 - Spec coverage: screens (tasks 1-6), shown pixels (task 7), command-only dialogs (task 8), content interactions
   (tasks 5-6), quick-setup bottom sheets and re-sync (task 6), add-to-dock video (task 2), testing and
   verification (each task plus task 9). Intro animation is explicitly out of scope per the spec.
-- Two deliberate divergences from the spec text, both noted at their task: the add-to-dock video starts from the
-  surface-available callback rather than `onContentReady` (that is what gates playback, and it matches legacy),
-  and `ContentConfig.QuickSetup` drops `isReinstallUser` because nothing in the view layer reads it.
+- Three deliberate divergences from the spec text, each noted at its task: the add-to-dock video starts from the
+  surface-available callback rather than `onContentReady` (that is what gates playback, and it matches legacy);
+  `ContentConfig.QuickSetup` drops `isReinstallUser` because nothing in the view layer reads it; and the input
+  screen's Lottie flourish always takes the 2s initial delay, where legacy's snap path started it immediately.
 - `ContentConfig.Welcome` carries an explicit `body1AsHtml` flag rather than inferring HTML from `body2 == null`,
   which is what the POC did.
 - The quick-setup card arrow, left as "derived from legacy" in the spec, is resolved: `AtEnd`
