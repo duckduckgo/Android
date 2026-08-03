@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Cookie Pop-Up Protection</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Let DuckDuckGo handle cookie pop-ups</string>
-    <string name="autoconsentAutoManageToggle">Auto-Manage Cookie Pop-Ups</string>
-    <string name="autoconsentAutoManageDescription">We\'ll aim to only select the most private cookie options available for you, then close these pop-ups.</string>
+    <string name="autoconsentAutoManageToggle">Reject optional cookies</string>
+    <string name="autoconsentAutoManageDescription">We\'ll aim to reject as many cookies as possible for you, then close the pop-ups.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo can auto-manage cookie preferences to maximize privacy, minimize cookies, and close these pop-ups.\n<a href="">Learn More</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pop-Ups Without Opt-Outs</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Also let DuckDuckGo save you a click by accepting cookies on your behalf to close pop-ups that don\'t let you opt out.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Accept cookies that can\'t be rejected</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">If there\'s no reject option, we\'ll save you a click, accept these cookies for you, and close the pop-ups.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Tired of cookie pop-ups that don\'t let you opt out?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"We can save you a click and accept these cookies for you."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Accept cookies that can\'t be rejected"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"I\'ll keep accepting them myself"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Tired of cookie pop-ups that won’t leave you alone?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"We\'ll aim to reject as many cookies as possible. If there\'s no reject option, we\'ll save you a click and accept these cookies for you."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Reject when possible or accept for me"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"I\'ll keep handling them myself"</string>
+    <string name="autoconsentPopupConfirmButton">"Confirm"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[You can adjust anytime in <b>Settings > Cookie Pop-Up Protection.</b>]]></string>
+
+
 </resources>
