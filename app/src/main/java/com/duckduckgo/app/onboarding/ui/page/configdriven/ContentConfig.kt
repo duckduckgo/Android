@@ -49,6 +49,14 @@ sealed interface ContentConfig {
         override fun initialState() = AddressBarContentState(position = initialPosition)
     }
 
+    data class InputScreen(
+        override val title: TextConfig,
+        val description: TextConfig,
+        val initialWithAi: Boolean,
+    ) : ContentConfig, Stateful<InputScreenContentState> {
+        override fun initialState() = InputScreenContentState(withAi = initialWithAi)
+    }
+
     data class AddToDock(
         override val title: TextConfig,
         val body: TextConfig,
@@ -61,3 +69,5 @@ sealed interface ContentConfig {
 }
 
 data class AddressBarContentState(val position: OmnibarType)
+
+data class InputScreenContentState(val withAi: Boolean)

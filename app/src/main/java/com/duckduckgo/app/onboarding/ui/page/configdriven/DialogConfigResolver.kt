@@ -118,11 +118,25 @@ class DialogConfigResolver @Inject constructor() {
             ),
         )
 
+        NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
+            background = OnboardingBackgroundStep.InputType,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtStart,
+            content = ContentConfig.InputScreen(
+                title = TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated),
+                description = TextConfig.Resource(R.string.preOnboardingInputScreenDescription),
+                initialWithAi = true,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        NewUserOnboardingActivityDialog.InputScreen,
         is NewUserOnboardingActivityDialog.InputScreenPreview,
         is NewUserOnboardingActivityDialog.QuickSetup,
         -> null // to be implemented in following tasks
