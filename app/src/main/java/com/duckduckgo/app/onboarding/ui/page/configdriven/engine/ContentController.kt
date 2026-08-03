@@ -26,6 +26,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentValueStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WelcomeBinder
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 
@@ -49,6 +50,7 @@ class ContentControllerImpl(
 
     private val comparisonChart = ComparisonChartBinder(binding.comparisonChartContent)
     private val addressBar = AddressBarBinder(binding.addressBarContent, isLightMode)
+    private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
     private val welcome = WelcomeBinder(binding.welcomeContent)
 
     private var boundView: View? = null
@@ -81,6 +83,10 @@ class ContentControllerImpl(
             is ContentConfig.AddressBar -> {
                 boundView = addressBar.view
                 addressBar.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.InputScreen -> {
+                boundView = inputScreen.view
+                inputScreen.bind(content, contentValues.contentState(stepId, content), scope)
             }
         }
         boundView?.isVisible = true

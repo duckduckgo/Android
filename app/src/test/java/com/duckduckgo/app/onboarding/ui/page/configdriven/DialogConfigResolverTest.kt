@@ -179,4 +179,22 @@ class DialogConfigResolverTest {
             config.secondaryCta,
         )
     }
+
+    @Test
+    fun `resolves the input screen with a submitting cta and ai preselected`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(Embellishment.LeftWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
+        val content = config.content as ContentConfig.InputScreen
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated), content.title)
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenDescription), content.description)
+        assertEquals(InputScreenContentState(withAi = true), content.initialState())
+        assertEquals(
+            CtaConfig(TextConfig.Resource(R.string.preOnboardingInputScreenButton), CtaAction.Submit),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
 }
