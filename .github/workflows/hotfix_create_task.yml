@@ -1,18 +1,25 @@
-name: Release - Create Release Task in Asana
+name: Hotfix - Create Hotfix Task in Asana
 
 on:
   workflow_call:
     inputs:
       app-version:
-        description: 'App Version for Release'
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+      commit-hashes:
+        description: 'Commit SHA(s) cherry-picked into the hotfix (space- or comma-separated)'
         required: true
         type: string
   workflow_dispatch:
     inputs:
       app-version:
-        description: 'App Version for Release'
+        description: 'Hotfix version to release (e.g. 5.284.1)'
         required: true
-        default: 'PLACEHOLDER'
+        type: string
+      commit-hashes:
+        description: 'Commit SHA(s) cherry-picked into the hotfix (space- or comma-separated)'
+        required: true
         type: string
 
 env:
@@ -24,8 +31,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  create_release_task:
-    name: Create Android App Release Task in Asana
+  create_hotfix_task:
+    name: Create Android App Hotfix Task in Asana
     runs-on: macos-latest
 
     steps:
@@ -34,20 +41,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install dependencies for create-asana-public-release task
+      - name: Install dependencies for create-asana-hotfix-release task
         run: |
           python -m pip install --upgrade pip
           pip install -r scripts/release/requirements.txt
 
-      - name: Create Asana release task
+      - name: Create Asana hotfix task
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         shell: bash
         run: |
           set -eo pipefail
-          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-public-release.py \
+          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-hotfix-release.py \
           --android-repo-path . \
           --tag "${{ inputs.app-version }}" \
+          --commit-hashes "${{ inputs.commit-hashes }}" \
           --trigger-phrase 'Task/Issue URL:' \
           --asana-project-id "${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}" \
           --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
@@ -57,7 +65,7 @@ jobs:
           echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
 
       - name: Assign task to Github Actor
-        id: assign-release-task
+        id: assign-hotfix-task
         uses: ./.github/actions/assign-release-task
         with:
           task_name: 'Android Release ${{ inputs.app-version }}'
@@ -70,7 +78,7 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          asana-task-id: ${{ steps.assign-hotfix-task.outputs.task_id }}
           action: 'get-asana-task-permalink'
 
       - name: Notify Mattermost of Task created
@@ -80,7 +88,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
+          mattermost-message: ${{env.emoji_info}} Hotfix task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
@@ -90,8 +98,8 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Create Android App Release Task
-          asana-task-description: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Create Android App Hotfix Task
+          asana-task-description: The Create Android App Hotfix Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
 
       - name: Notify Mattermost when workflow failed
@@ -102,5 +110,5 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{ env.emoji_info }} The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          mattermost-message: ${{ env.emoji_info }} The Create Android App Hotfix Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
