@@ -58,6 +58,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -75,6 +77,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockShownPixels: OnboardingDialogShownPixels = mock()
 
     // Default harness: mock orchestrator left NotStarted, so the view model renders no dialog and emits no
     // commands on its own — the interaction tests drive a single method and assert exactly what it emits.
@@ -108,6 +111,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         orchestrator = orchestrator,
         newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         dialogConfigResolver = DialogConfigResolver(mockOnboardingStore),
+        shownPixels = mockShownPixels,
         dispatchers = coroutineRule.testDispatcherProvider,
         widgetCapabilities = mockWidgetCapabilities,
         defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
@@ -393,5 +397,21 @@ class ConfigDrivenOnboardingPageViewModelTest {
             listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = true)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `fires the shown pixel for a dialog it renders`() = runTest {
+        startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        verify(mockShownPixels).fireFor(NewUserOnboardingActivityDialog.ComparisonChart)
+    }
+
+    @Test
+    fun `fires no shown pixel for a command only dialog`() = runTest {
+        startAt(NewUserOnboardingActivityDialog.NotificationPermission)
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockShownPixels)
     }
 }
