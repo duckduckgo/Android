@@ -39,11 +39,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeCameraBinding
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
@@ -52,8 +55,13 @@ import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.R
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewMode
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -66,6 +74,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var syncFeature: SyncFeature
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
@@ -238,8 +252,24 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     private fun configureScanner() {
-        binding.includeCamera.barcodeView.decodeContinuous { barcode ->
-            syncCodeViewModel.processScannedCode(barcode.text)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val restrictToQr = withContext(dispatchers.io()) {
+                syncFeature.restrictScannedBarcodesToQrTypes().isEnabled()
+            }
+            if (restrictToQr) {
+                binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
+            }
+
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                binding.includeCamera.barcodeView.decodeSingle { barcode ->
+                    syncCodeViewModel.processScannedCode(barcode.text)
+                }
+                try {
+                    awaitCancellation()
+                } finally {
+                    binding.includeCamera.barcodeView.stopDecoding()
+                }
+            }
         }
     }
 

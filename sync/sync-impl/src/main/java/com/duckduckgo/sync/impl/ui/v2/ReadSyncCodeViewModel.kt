@@ -23,9 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,32 +36,19 @@ class ReadSyncCodeViewModel @Inject constructor(
     private val _commands = Channel<Command>(Channel.BUFFERED)
     val commands = _commands.receiveAsFlow()
 
-    private var scanCodeJob: Job? = null
-
     fun pasteSyncCode() {
         val code = clipboard.pasteFromClipboard()
         viewModelScope.launch {
-            processCode(code, invalidCodeMessage = R.string.sync_scanner_v2_manual_entry_invalid_code_pasted)
+            if (code.isBlank()) {
+                _commands.send(Command.ShowMessage(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted))
+            } else {
+                _commands.send(Command.StartSyncProcess(code))
+            }
         }
     }
 
     fun processScannedCode(code: String) {
-        // The camera decodes continuously, emitting the same barcode for every frame it stays in
-        // view, so without debouncing a single scan would repeatedly start the sync flow.
-        if (scanCodeJob?.isActive == true) return
-        scanCodeJob = viewModelScope.launch {
-            processCode(code, invalidCodeMessage = R.string.sync_scanner_v2_scan_qr_code_invalid_code_scanned)
-            delay(SCAN_CODE_DEBOUNCE_DURATION)
-        }
-    }
-
-    private suspend fun processCode(
-        code: String,
-        @StringRes invalidCodeMessage: Int,
-    ) {
-        if (code.isBlank()) {
-            _commands.send(Command.ShowMessage(invalidCodeMessage))
-        } else {
+        viewModelScope.launch {
             _commands.send(Command.StartSyncProcess(code))
         }
     }
