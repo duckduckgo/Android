@@ -49,13 +49,47 @@ class DialogConfigResolver @Inject constructor() {
             ),
         )
 
+        NewUserOnboardingActivityDialog.Initial -> welcome(
+            content = welcomeContent(isCustomAiFlow),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.InitialReinstallUser -> welcome(
+            content = welcomeContent(isCustomAiFlow),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1SecondaryButton),
+                action = CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.SyncRestore -> welcome(
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
+                body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
+                body1AsHtml = true,
+                body2 = null,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.syncRestoreDialogPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.RestoreRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.syncRestoreDialogSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        NewUserOnboardingActivityDialog.SyncRestore,
-        NewUserOnboardingActivityDialog.InitialReinstallUser,
-        NewUserOnboardingActivityDialog.Initial,
         NewUserOnboardingActivityDialog.AddToDock,
         NewUserOnboardingActivityDialog.WidgetPrompt,
         NewUserOnboardingActivityDialog.InputScreen,
@@ -73,5 +107,27 @@ class DialogConfigResolver @Inject constructor() {
             text = TextConfig.Resource(chart.primaryCtaTextRes),
             action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
         ),
+    )
+
+    private fun welcome(
+        content: ContentConfig.Welcome,
+        primaryCta: CtaConfig,
+        secondaryCta: CtaConfig? = null,
+    ) = DialogConfig(
+        background = OnboardingBackgroundStep.Welcome,
+        embellishment = Embellishment.WalkingDax,
+        cardArrow = CardArrowConfig.AtStart,
+        content = content,
+        primaryCta = primaryCta,
+        secondaryCta = secondaryCta,
+    )
+
+    private fun welcomeContent(isCustomAiFlow: Boolean) = ContentConfig.Welcome(
+        title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+        body1 = TextConfig.Resource(
+            if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1,
+        ),
+        body1AsHtml = isCustomAiFlow,
+        body2 = if (isCustomAiFlow) null else TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
     )
 }
