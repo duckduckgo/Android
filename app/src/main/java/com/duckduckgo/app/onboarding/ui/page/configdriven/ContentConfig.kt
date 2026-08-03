@@ -48,6 +48,11 @@ sealed interface ContentConfig {
     ) : ContentConfig, Stateful<AddressBarContentState> {
         override fun initialState() = AddressBarContentState(position = initialPosition)
     }
+
+    data class AddToDock(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
 }
 
 data class AddressBarContentState(val position: OmnibarType)

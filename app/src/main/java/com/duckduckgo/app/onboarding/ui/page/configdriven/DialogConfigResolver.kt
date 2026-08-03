@@ -86,11 +86,24 @@ class DialogConfigResolver @Inject constructor() {
             ),
         )
 
+        NewUserOnboardingActivityDialog.AddToDock -> DialogConfig(
+            background = OnboardingBackgroundStep.AddToDock,
+            embellishment = Embellishment.None,
+            cardArrow = CardArrowConfig.Hidden,
+            content = ContentConfig.AddToDock(
+                title = TextConfig.Resource(R.string.preOnboardingDockStepTitle),
+                body = TextConfig.Resource(R.string.preOnboardingAddToDockBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingAddToDockPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        NewUserOnboardingActivityDialog.AddToDock,
         NewUserOnboardingActivityDialog.WidgetPrompt,
         NewUserOnboardingActivityDialog.InputScreen,
         is NewUserOnboardingActivityDialog.InputScreenPreview,
