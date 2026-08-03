@@ -72,6 +72,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
@@ -592,7 +593,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAddHomeScreenWidget() {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
-        addWidgetLauncher.launchAddWidget(this, true)
+        addWidgetLauncher.launchAddWidget(this, true, source = AddWidgetSource.SETTINGS)
     }
 
     private fun launchFeedback() {
