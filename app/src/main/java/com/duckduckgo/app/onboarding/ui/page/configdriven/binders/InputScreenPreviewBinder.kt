@@ -79,17 +79,16 @@ class InputScreenPreviewBinder(
         }
         applyMode(content, state.value.isSearchSelected, scope)
 
-        inputModeToggle.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    state.update { it.copy(isSearchSelected = tab.position == SEARCH_TAB_INDEX) }
-                }
+        val tabListener = object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                state.update { it.copy(isSearchSelected = tab.position == SEARCH_TAB_INDEX) }
+            }
 
-                override fun onTabUnselected(tab: TabLayout.Tab) = Unit
+            override fun onTabUnselected(tab: TabLayout.Tab) = Unit
 
-                override fun onTabReselected(tab: TabLayout.Tab) = Unit
-            },
-        )
+            override fun onTabReselected(tab: TabLayout.Tab) = Unit
+        }
+        inputModeToggle.addOnTabSelectedListener(tabListener)
         scope.coroutineScope.launch {
             state.collect {
                 applyMode(content, it.isSearchSelected, scope)
@@ -107,6 +106,7 @@ class InputScreenPreviewBinder(
             fadeTargets = listOfNotNull(inputModeToggle.takeIf { content.showModeToggle }, inputModeDemoCard),
             afterFade = { suggestionButtonsAnimator() },
             onContentReady = { showKeyboardIfRoom() },
+            unbind = { inputModeToggle.removeOnTabSelectedListener(tabListener) },
         )
     }
 
