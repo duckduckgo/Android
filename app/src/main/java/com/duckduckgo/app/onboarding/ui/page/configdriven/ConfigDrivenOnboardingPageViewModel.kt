@@ -425,17 +425,15 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             // If there's no new dialog to draw (e.g. we're displaying a system prompt), keep the current one.
             // None only when there was never anything to keep.
             _viewState.update { state -> if (state.screen == null) state.copy(screen = Screen.None) else state }
-            advancePastUnrenderedDialog(dialog)
+            handleCommandOnlyDialog(dialog)
         }
     }
 
     /**
-     * Handle commands and dialogs the renderer doesn't support yet by advancing past them, without reporting
-     * them as presented.
-     *
-     * Temporary until all dialogs are implemented in the renderer.
+     * The four dialogs [DialogConfigResolver] maps to null: they have no card to render, only a side effect.
+     * Config-producing dialogs are listed exhaustively so the compiler keeps the two mappings in step.
      */
-    private suspend fun advancePastUnrenderedDialog(dialog: NewUserOnboardingActivityDialog) {
+    private suspend fun handleCommandOnlyDialog(dialog: NewUserOnboardingActivityDialog) {
         when (dialog) {
             NewUserOnboardingActivityDialog.NotificationPermission -> {
                 if (!notificationPermissionFlowStarted) {
@@ -462,27 +460,18 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.SyncRestore -> emit(NewUserOnboardingEvent.SkipRequested)
-
+            NewUserOnboardingActivityDialog.SyncRestore,
             NewUserOnboardingActivityDialog.InitialReinstallUser,
             NewUserOnboardingActivityDialog.Initial,
-            NewUserOnboardingActivityDialog.AddToDock,
-            -> emit(NewUserOnboardingEvent.ContinueClicked)
-
-            NewUserOnboardingActivityDialog.WidgetPrompt -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
-
-            NewUserOnboardingActivityDialog.InputScreen -> emit(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
-
-            is NewUserOnboardingActivityDialog.InputScreenPreview -> emit(NewUserOnboardingEvent.ContinueClicked)
-
-            is NewUserOnboardingActivityDialog.QuickSetup -> emit(
-                NewUserOnboardingEvent.QuickSetupConfirmed(type = OmnibarType.SINGLE_TOP, withAi = true),
-            )
-
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
+            NewUserOnboardingActivityDialog.AddToDock,
+            NewUserOnboardingActivityDialog.WidgetPrompt,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
+            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreenPreview,
+            is NewUserOnboardingActivityDialog.QuickSetup,
             -> Unit
         }
     }
