@@ -66,6 +66,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
     private val dialogConfigResolver: DialogConfigResolver,
+    private val shownPixels: OnboardingDialogShownPixels,
     private val dispatchers: DispatcherProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
@@ -408,6 +409,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
         val config = dialogConfigResolver.resolve(dialog, customAiOnboardingStore.isEnabled())
         if (config != null) {
+            shownPixels.fireFor(dialog)
             _viewState.update {
                 it.copy(
                     screen = Screen.Dialog(
