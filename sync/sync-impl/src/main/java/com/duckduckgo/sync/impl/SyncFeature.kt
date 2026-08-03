@@ -114,4 +114,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canReadUnifiedDeviceList(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun preventStaleTokenLogout(): Toggle
 }
