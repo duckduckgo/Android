@@ -28,7 +28,15 @@ class BindScope(
 )
 
 /** Interactions a bound screen raises outside the shared CTA buttons interactions. */
-sealed interface ContentInteraction
+sealed interface ContentInteraction {
+
+    /** The input demo's typed query, IME action or suggestion tap. */
+    data class SubmitInput(
+        val query: String,
+        val isChat: Boolean,
+        val fromSuggestion: Boolean,
+    ) : ContentInteraction
+}
 
 /** Binds a stateless [ContentConfig] to its include layout. */
 interface DialogBinder<C : ContentConfig> {

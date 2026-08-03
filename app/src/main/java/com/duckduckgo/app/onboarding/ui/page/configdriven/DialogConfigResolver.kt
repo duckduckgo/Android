@@ -20,11 +20,14 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import javax.inject.Inject
 
-class DialogConfigResolver @Inject constructor() {
+class DialogConfigResolver @Inject constructor(
+    private val onboardingStore: OnboardingStore,
+) {
 
     fun resolve(
         dialog: NewUserOnboardingActivityDialog,
@@ -133,11 +136,25 @@ class DialogConfigResolver @Inject constructor() {
             ),
         )
 
+        is NewUserOnboardingActivityDialog.InputScreenPreview -> DialogConfig(
+            background = OnboardingBackgroundStep.InputType,
+            embellishment = Embellishment.None,
+            cardArrow = CardArrowConfig.Hidden,
+            content = ContentConfig.InputScreenPreview(
+                title = TextConfig.Resource(
+                    if (isCustomAiFlow) R.string.preOnboardingInputModeDemoTitleCustomAi else R.string.preOnboardingInputModeDemoTitle,
+                ),
+                isSearchDefault = dialog.isSearchDefault,
+                showModeToggle = !isCustomAiFlow,
+                searchSuggestions = onboardingStore.getSearchOptions(),
+                chatSuggestions = onboardingStore.getChatSuggestions(),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        is NewUserOnboardingActivityDialog.InputScreenPreview,
         is NewUserOnboardingActivityDialog.QuickSetup,
         -> null // to be implemented in following tasks
     }
