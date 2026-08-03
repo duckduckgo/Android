@@ -84,6 +84,8 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
 
     private var acknowledgementDialog: TextAlertDialogBuilder? = null
 
+    private var isAcknowledgementAnimationExecuted = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -208,6 +210,8 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun runAcknowledgementAnimation() {
+        if (isAcknowledgementAnimationExecuted) return
+        isAcknowledgementAnimationExecuted = true
         binding.lockAnimation.playAnimation()
     }
 
