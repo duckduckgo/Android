@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Screen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -48,6 +49,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -152,10 +154,10 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
         advanceUntilIdle()
 
-        val state = testee.viewState.value
-        assertEquals("step", state.stepId)
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, state.config!!.background)
-        assertTrue(state.animateEntry)
+        val screen = testee.viewState.value.screen as Screen.Dialog
+        assertEquals("step", screen.stepId)
+        assertEquals(OnboardingBackgroundStep.ComparisonChart, screen.config.background)
+        assertTrue(screen.animateEntry)
     }
 
     @Test
@@ -165,7 +167,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         testee.onDialogRendered("step")
 
-        assertFalse(testee.viewState.value.animateEntry)
+        assertFalse((testee.viewState.value.screen as Screen.Dialog).animateEntry)
     }
 
     @Test
@@ -175,7 +177,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         testee.onDialogRendered("a_different_step")
 
-        assertTrue(testee.viewState.value.animateEntry)
+        assertTrue((testee.viewState.value.screen as Screen.Dialog).animateEntry)
     }
 
     @Test
@@ -232,5 +234,148 @@ class ConfigDrivenOnboardingPageViewModelTest {
             advanceUntilIdle()
             assertEquals(Command.HandOffToBrowserActivity, awaitItem())
         }
+    }
+
+    @Test
+    fun `asks for the intro to play on the intro step, passing through withDuckAi`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = true))
+        advanceUntilIdle()
+
+        assertEquals(Screen.Intro.Play(withDuckAi = true), testee.viewState.value.screen)
+    }
+
+    @Test
+    fun `asks for the intro to be restored once it has started, without waiting for it to finish`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = true))
+        advanceUntilIdle()
+
+        testee.onIntroAnimationStarted()
+
+        assertEquals(Screen.Intro.Restore(withDuckAi = true), testee.viewState.value.screen)
+    }
+
+    @Test
+    fun `keeps the intro on screen while the flow crosses a step with no dialog to render`() = runTest {
+        val introStep = NewUserOnboardingActivityStep(
+            id = "intro",
+            pixelName = null,
+            transition = { event ->
+                if (event is NewUserOnboardingEvent.IntroAnimationFinished) {
+                    LinearOnboardingTransition.Advance
+                } else {
+                    LinearOnboardingTransition.Stay
+                }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = true) },
+        )
+        val promptStep = NewUserOnboardingActivityStep(
+            id = "prompt",
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
+        )
+        realOrchestrator.startPlan(
+            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(introStep, promptStep)),
+        )
+        val testee = createViewModel(realOrchestrator)
+        advanceUntilIdle()
+        testee.onIntroAnimationStarted()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+
+        assertEquals(Screen.Intro.Restore(withDuckAi = true), testee.viewState.value.screen)
+    }
+
+    @Test
+    fun `keeps the last dialog on screen while the flow crosses a step with no dialog to render`() = runTest {
+        val comparisonStep = NewUserOnboardingActivityStep(
+            id = "comparison",
+            pixelName = null,
+            transition = { event ->
+                if (event is NewUserOnboardingEvent.IntroAnimationFinished) {
+                    LinearOnboardingTransition.Advance
+                } else {
+                    LinearOnboardingTransition.Stay
+                }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
+        )
+        val promptStep = NewUserOnboardingActivityStep(
+            id = "prompt",
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
+        )
+        realOrchestrator.startPlan(
+            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(comparisonStep, promptStep)),
+        )
+        val testee = createViewModel(realOrchestrator)
+        advanceUntilIdle()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+
+        assertEquals("comparison", (testee.viewState.value.screen as Screen.Dialog).stepId)
+    }
+
+    @Test
+    fun `asks for nothing to be drawn on a step with no dialog to render`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.DefaultBrowserPrompt)
+        advanceUntilIdle()
+
+        assertEquals(Screen.None, testee.viewState.value.screen)
+    }
+
+    @Test
+    fun `asks for nothing before the flow has reached a step`() = runTest {
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        assertNull(testee.viewState.value.screen)
+    }
+
+    @Test
+    fun `stops asking for the intro once the flow leaves the intro step`() = runTest {
+        val introStep = NewUserOnboardingActivityStep(
+            id = "intro",
+            pixelName = null,
+            transition = { event ->
+                if (event is NewUserOnboardingEvent.IntroAnimationFinished) {
+                    LinearOnboardingTransition.Advance
+                } else {
+                    LinearOnboardingTransition.Stay
+                }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.IntroAnimation() },
+        )
+        val comparisonStep = NewUserOnboardingActivityStep(
+            id = "comparison",
+            pixelName = null,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
+        )
+        realOrchestrator.startPlan(
+            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(introStep, comparisonStep)),
+        )
+        val testee = createViewModel(realOrchestrator)
+        advanceUntilIdle()
+        testee.onIntroAnimationStarted()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+
+        assertEquals("comparison", (testee.viewState.value.screen as Screen.Dialog).stepId)
+    }
+
+    @Test
+    fun `emits IntroAnimationFinished to the orchestrator when the intro finishes`() = runTest {
+        val testee = startAt(dialog = NewUserOnboardingActivityDialog.IntroAnimation())
+        advanceUntilIdle()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.IntroAnimationFinished), recordedEvents)
     }
 }

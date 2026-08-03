@@ -75,10 +75,35 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val stepId: LinearOnboardingStepId? = null,
-        val config: DialogConfig? = null,
-        val animateEntry: Boolean = true,
+        val screen: Screen? = null,
     )
+
+    sealed interface Screen {
+
+        sealed interface Intro : Screen {
+            val withDuckAi: Boolean
+
+            data class Play(override val withDuckAi: Boolean) : Intro
+
+            /**
+             * A view already started the intro.
+             * Ignore this state if the view played the intro, snap to end state if the view hasn't (for example, when recreated).
+             */
+            data class Restore(override val withDuckAi: Boolean) : Intro
+        }
+
+        data class Dialog(
+            val stepId: LinearOnboardingStepId,
+            val config: DialogConfig,
+            val animateEntry: Boolean,
+        ) : Screen
+
+        /**
+         * The flow is on a step this view draws nothing for and there is no earlier screen to keep showing, which
+         * only happens on a fresh view model, for example after a mid-flow re-entry.
+         */
+        data object None : Screen
+    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -103,6 +128,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     /** Last step id a [DialogConfig] was published for; drives the [ViewState.animateEntry] policy. */
     private var lastPresentedStepId: LinearOnboardingStepId? = null
 
+    private var introStarted = false
+
     private var notificationPermissionFlowStarted = false
 
     private var addWidgetPromptFlowStarted = false
@@ -116,12 +143,31 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     fun onContentInteraction(interaction: ContentInteraction) = Unit // No-op until dialogs with local state are implemented in follow-ups.
 
     fun onDialogRendered(stepId: LinearOnboardingStepId) {
-        _viewState.update {
+        _viewState.update { state ->
+            val screen = state.screen
             // The dialog for this step has been rendered.
             // Disable entry animation for potential re-draws (like config change/rotation).
-            if (it.stepId == stepId) it.copy(animateEntry = false) else it
+            if (screen is Screen.Dialog && screen.stepId == stepId) {
+                state.copy(screen = screen.copy(animateEntry = false))
+            } else {
+                state
+            }
         }
     }
+
+    fun onIntroAnimationStarted() {
+        introStarted = true
+        _viewState.update { state ->
+            val screen = state.screen
+            if (screen is Screen.Intro.Play) {
+                state.copy(screen = Screen.Intro.Restore(withDuckAi = screen.withDuckAi))
+            } else {
+                state
+            }
+        }
+    }
+
+    fun onIntroAnimationFinished() = emit(NewUserOnboardingEvent.IntroAnimationFinished)
 
     fun onResume() {
         checkAddWidgetPromptResult()
@@ -224,18 +270,37 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         state: LinearOnboardingState.InProgress,
     ) {
         val dialog = step.resolveDialog()
+
+        if (dialog is NewUserOnboardingActivityDialog.IntroAnimation) {
+            _viewState.update {
+                it.copy(
+                    screen = if (introStarted) {
+                        Screen.Intro.Restore(withDuckAi = dialog.withDuckAi)
+                    } else {
+                        Screen.Intro.Play(withDuckAi = dialog.withDuckAi)
+                    },
+                )
+            }
+            return
+        }
+
         val config = dialogConfigResolver.resolve(dialog, customAiOnboardingStore.isEnabled())
         if (config != null) {
             _viewState.update {
                 it.copy(
-                    stepId = step.id,
-                    config = config.copy(stepIndicator = state.stepIndicatorProgress()),
-                    animateEntry = step.id != lastPresentedStepId,
+                    screen = Screen.Dialog(
+                        stepId = step.id,
+                        config = config.copy(stepIndicator = state.stepIndicatorProgress()),
+                        animateEntry = step.id != lastPresentedStepId,
+                    ),
                 )
             }
             lastPresentedStepId = step.id
             emit(NewUserOnboardingEvent.Presented)
         } else {
+            // If there's no new dialog to draw (e.g. we're displaying a system prompt), keep the current one.
+            // None only when there was never anything to keep.
+            _viewState.update { state -> if (state.screen == null) state.copy(screen = Screen.None) else state }
             advancePastUnrenderedDialog(dialog)
         }
     }
@@ -248,8 +313,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
      */
     private suspend fun advancePastUnrenderedDialog(dialog: NewUserOnboardingActivityDialog) {
         when (dialog) {
-            is NewUserOnboardingActivityDialog.IntroAnimation -> emit(NewUserOnboardingEvent.IntroAnimationFinished)
-
             NewUserOnboardingActivityDialog.NotificationPermission -> {
                 if (!notificationPermissionFlowStarted) {
                     notificationPermissionFlowStarted = true
@@ -292,6 +355,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 NewUserOnboardingEvent.QuickSetupConfirmed(type = OmnibarType.SINGLE_TOP, withAi = true),
             )
 
+            is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
