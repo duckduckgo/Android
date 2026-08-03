@@ -83,8 +83,100 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves no config for a dialog that has no config-driven screen yet`() {
-        assertNull(testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false))
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.NotificationPermission, isCustomAiFlow = false))
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false))
+    }
+
+    @Test
+    fun `resolves the initial welcome dialog with a continue cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(Embellishment.WalkingDax, config.embellishment)
+        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
+                body1AsHtml = false,
+                body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the initial welcome dialog with single line html copy in the custom ai flow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = true)!!
+
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBodyCustomAi),
+                body1AsHtml = true,
+                body2 = null,
+            ),
+            config.content,
+        )
+    }
+
+    @Test
+    fun `resolves the reinstall welcome dialog with a skip secondary cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InitialReinstallUser, isCustomAiFlow = false)!!
+
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
+                body1AsHtml = false,
+                body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingDaxDialog1SecondaryButton),
+                CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+            config.secondaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves the sync restore dialog with its own copy and restore cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.SyncRestore, isCustomAiFlow = true)!!
+
+        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
+                body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
+                body1AsHtml = true,
+                body2 = null,
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.syncRestoreDialogPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.RestoreRequested),
+            ),
+            config.primaryCta,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.syncRestoreDialogSecondaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+            config.secondaryCta,
+        )
     }
 }
