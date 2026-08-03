@@ -22,11 +22,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.js.messaging.api.JsErrorDetails
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.JsRequestResponse
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.test.runTest
@@ -38,6 +40,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -177,6 +180,49 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
             assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when no handler matches and message has id then send method not found error`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"unknownMethod","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(0, callback.counter)
+            verify(jsMessageHelper).sendJsResponse(
+                JsRequestResponse.Error(
+                    context = "contentScopeScripts",
+                    featureName = "webCompat",
+                    method = "unknownMethod",
+                    id = "myId",
+                    error = JsErrorDetails(code = -32601, message = "Method not found"),
+                ),
+                "callbackName",
+                "secret",
+                mockWebView,
+            )
+        }
+
+    @Test
+    fun `when no handler matches and message has no id then do not send error response`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","method":"unknownMethod","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(0, callback.counter)
+            verify(jsMessageHelper, never()).sendJsResponse(any(), any(), any(), any())
         }
 
     @Test
