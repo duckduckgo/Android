@@ -85,6 +85,15 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(NewUserOnboardingActivityDialog.AddToDock)
         testee.fireFor(NewUserOnboardingActivityDialog.WidgetPrompt)
         testee.fireFor(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true))
+        testee.fireFor(
+            NewUserOnboardingActivityDialog.QuickSetup(
+                showSplitOption = true,
+                hideSetDefaultBrowserRow = false,
+                hideAddWidgetRow = false,
+                hideAddressBarRow = false,
+                isReinstallUser = false,
+            ),
+        )
 
         verifyNoInteractions(pixel)
     }

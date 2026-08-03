@@ -176,7 +176,7 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        -> null // to be implemented in following tasks
+        -> null // command-only: no card to render
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig) = DialogConfig(
