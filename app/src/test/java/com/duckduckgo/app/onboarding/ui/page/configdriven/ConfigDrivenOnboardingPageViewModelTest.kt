@@ -46,6 +46,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingResult
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -60,8 +61,10 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi")
 class ConfigDrivenOnboardingPageViewModelTest {
 
@@ -152,11 +155,14 @@ class ConfigDrivenOnboardingPageViewModelTest {
         isReinstallUser = false,
     )
 
-    private fun quickSetupState(testee: ConfigDrivenOnboardingPageViewModel): QuickSetupContentState {
+    private fun quickSetupStateFlow(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<QuickSetupContentState> {
         val dialog = testee.viewState.value.screen as Screen.Dialog
         val content = dialog.config.content as ContentConfig.QuickSetup
-        return testee.contentValues.contentState(dialog.stepId, content).value
+        return testee.contentValues.contentState(dialog.stepId, content)
     }
+
+    private fun quickSetupState(testee: ConfigDrivenOnboardingPageViewModel): QuickSetupContentState =
+        quickSetupStateFlow(testee).value
 
     private suspend fun startAtBrowserStep(): ConfigDrivenOnboardingPageViewModel {
         val browserStep = NewUserBrowserActivityStep(
@@ -452,7 +458,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
     }
 
     @Test
-    fun `mirrors the default browser toggle into the quick setup state before showing the system dialog`() = runTest {
+    fun `mirrors the default browser toggle into the quick setup state and shows the system dialog`() = runTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
         val testee = startAt(quickSetupDialog)
         advanceUntilIdle()
@@ -480,7 +486,12 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
     @Test
     fun `asks for the remove widget instructions when the widget toggle is turned off`() = runTest {
+        // Seeded true so the mirror assertion below is meaningful: the state's own initial value is already
+        // false, so turning the switch off would leave it unchanged whether or not the mirror ran.
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+        testee.onResume()
         advanceUntilIdle()
 
         testee.commands.test {
@@ -504,5 +515,76 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val state = quickSetupState(testee)
         assertTrue(state.defaultBrowserChecked)
         assertTrue(state.widgetChecked)
+    }
+
+    // Endpoint-only assertions can't tell a real correction from a no-op: the corrected value here equals the
+    // pre-toggle value, so it would read the same whether or not the mirror ever ran. Collecting the flow pins
+    // the actual sequence of writes instead — with the mirror removed, the flow after the toggle would never
+    // emit at all, since a MutableStateFlow drops writes that don't change the value.
+    @Test
+    fun `corrects the default browser switch back to unset after the system dialog is declined`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        quickSetupStateFlow(testee).test {
+            assertFalse(awaitItem().defaultBrowserChecked)
+
+            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            advanceUntilIdle()
+            assertTrue(awaitItem().defaultBrowserChecked)
+
+            testee.onQuickSetupDefaultBrowserNotSet()
+            testee.onResume()
+            advanceUntilIdle()
+            assertFalse(awaitItem().defaultBrowserChecked)
+        }
+    }
+
+    @Test
+    fun `restores the widget switch after the remove widget sheet is dismissed without removing it`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+        testee.onResume()
+        advanceUntilIdle()
+
+        quickSetupStateFlow(testee).test {
+            assertTrue(awaitItem().widgetChecked)
+
+            testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = false))
+            advanceUntilIdle()
+            assertFalse(awaitItem().widgetChecked)
+
+            testee.syncQuickSetupSwitches()
+            advanceUntilIdle()
+            assertTrue(awaitItem().widgetChecked)
+        }
+    }
+
+    @Test
+    fun `does not treat the quick setup add-widget toggle as the standalone add-widget step`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = true))
+        advanceUntilIdle()
+        testee.onResume()
+        advanceUntilIdle()
+
+        assertEquals(emptyList<LinearOnboardingEvent>(), recordedEvents)
+    }
+
+    @Test
+    fun `records the quick setup default browser result without advancing the plan or firing the shared pixel`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onQuickSetupDefaultBrowserSet()
+        advanceUntilIdle()
+
+        assertEquals(emptyList<LinearOnboardingEvent>(), recordedEvents)
+        verifyNoInteractions(pixel)
     }
 }
