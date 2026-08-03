@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Intent
 import android.os.Parcelable
 import androidx.core.content.IntentCompat
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -31,20 +31,11 @@ sealed interface SyncPairingResult : Parcelable {
     @Parcelize
     data class Success(
         val device: ParcelableDevice,
-        val method: PairingMethod,
+        val originalFlow: OriginalFlow,
     ) : SyncPairingResult
 
     @Parcelize
     data object Failure : SyncPairingResult
-
-    /**
-     * Which screen produced the result. The completion flow differs: a code scanned or entered on
-     * this device offers the recovery code afterwards, whereas a code displayed by this device does not.
-     */
-    enum class PairingMethod {
-        ScannedCode,
-        DisplayedCode,
-    }
 
     companion object {
         const val RESULT_SYNC_COMPLETED = 210

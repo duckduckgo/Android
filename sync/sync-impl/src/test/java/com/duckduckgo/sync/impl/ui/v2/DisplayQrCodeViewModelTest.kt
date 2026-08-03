@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.BitmapWithCode
@@ -52,7 +53,6 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -111,6 +111,7 @@ class DisplayQrCodeViewModelTest {
 
     private fun createTestee(source: String? = null) = DisplayQrCodeViewModel(
         source = source,
+        originalFlow = OriginalFlow.SYNC_THIS_DEVICE,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         pixels = pixels,
@@ -167,7 +168,7 @@ class DisplayQrCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode),
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -304,7 +305,7 @@ class DisplayQrCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode),
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -326,7 +327,7 @@ class DisplayQrCodeViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.DisplayedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

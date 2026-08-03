@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.core.content.IntentCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -38,6 +39,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2DisplayQrCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
@@ -77,8 +79,15 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
+    private val originalFlow
+        get() = requireNotNull(
+            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
+        ) {
+            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+        }
+
     private val viewModel by viewModels<DisplayQrCodeViewModel> {
-        Provider(vmFactory, launchSource)
+        Provider(vmFactory, launchSource, originalFlow)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -215,13 +224,16 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
 
         fun intent(
             context: Context,
             source: String?,
+            originalFlow: OriginalFlow,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
             }
         }
     }

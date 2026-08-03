@@ -86,11 +86,11 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -147,7 +147,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
-                handlePairingResult(output.result, showConfirmationScreen = true)
+                handlePairingResult(output.result)
             }
 
             is SyncThisDeviceContract.Output.Dismissed -> {
@@ -191,7 +191,7 @@ class SyncActivity : DuckDuckGoActivity() {
     ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result, showConfirmationScreen = true)
+                handlePairingResult(output.result)
             }
 
             is ReadSyncCodeContract.Output.Dismissed -> Unit
@@ -203,7 +203,7 @@ class SyncActivity : DuckDuckGoActivity() {
     ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result, showConfirmationScreen = false)
+                handlePairingResult(output.result)
             }
 
             is ReadSyncCodeContract.Output.Dismissed -> Unit
@@ -215,7 +215,7 @@ class SyncActivity : DuckDuckGoActivity() {
     ) { output ->
         when (output) {
             is RecoverSyncedDataContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result, showConfirmationScreen = true)
+                handlePairingResult(output.result)
             }
 
             is RecoverSyncedDataContract.Output.Dismissed -> Unit
@@ -334,7 +334,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_WITH_ANOTHER))
                 }
             }
 
@@ -452,24 +452,21 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_THIS_DEVICE))
                 }
             }
         }
     }
 
-    private fun handlePairingResult(
-        result: SyncPairingResult,
-        showConfirmationScreen: Boolean,
-    ) {
+    private fun handlePairingResult(result: SyncPairingResult) {
         when (result) {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
-                if (showConfirmationScreen) {
-                    when (result.method) {
-                        PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
-                        PairingMethod.DisplayedCode -> Unit
-                    }
+                when (result.originalFlow) {
+                    OriginalFlow.SYNC_THIS_DEVICE, OriginalFlow.RECOVER_SYNCED_DATA ->
+                        recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+
+                    OriginalFlow.SYNC_WITH_ANOTHER -> Unit
                 }
             }
 

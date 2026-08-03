@@ -37,13 +37,13 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -62,6 +62,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val source: String?,
+    @Assisted private val originalFlow: OriginalFlow,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -209,7 +210,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, PairingMethod.DisplayedCode) }
+            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
             ?: SyncPairingResult.Failure
     }
 
@@ -267,16 +268,20 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(source: String?): DisplayQrCodeViewModel
+        fun create(
+            source: String?,
+            originalFlow: OriginalFlow,
+        ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val source: String?,
+            private val originalFlow: OriginalFlow,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source) as T
+                return assistedFactory.create(source, originalFlow) as T
             }
         }
     }

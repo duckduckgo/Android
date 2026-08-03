@@ -29,11 +29,11 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -51,6 +51,7 @@ import logcat.logcat
 
 class ExchangeSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val syncUrl: String,
+    @Assisted private val originalFlow: OriginalFlow,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val dispatchers: DispatcherProvider,
@@ -215,22 +216,26 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, PairingMethod.ScannedCode) }
+            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
             ?: SyncPairingResult.Failure
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(syncUrl: String): ExchangeSyncCodeViewModel
+        fun create(
+            syncUrl: String,
+            originalFlow: OriginalFlow,
+        ): ExchangeSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val syncUrl: String,
+            private val originalFlow: OriginalFlow,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(syncUrl) as T
+                return assistedFactory.create(syncUrl, originalFlow) as T
             }
         }
     }

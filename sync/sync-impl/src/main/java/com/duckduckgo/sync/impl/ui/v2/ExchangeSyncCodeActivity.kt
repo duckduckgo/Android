@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +39,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ExchangeSyncCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
@@ -78,8 +80,15 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
         }
 
+    private val originalFlow
+        get() = requireNotNull(
+            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
+        ) {
+            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+        }
+
     private val viewModel by viewModels<ExchangeSyncCodeViewModel> {
-        Provider(vmFactory, syncUrl)
+        Provider(vmFactory, syncUrl, originalFlow)
     }
 
     private var acknowledgementDialog: TextAlertDialogBuilder? = null
@@ -233,7 +242,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeadline() {
-        val text = if (intent.getBooleanExtra(IS_RECOVERY_FLOW_EXTRA_KEY, false)) {
+        val text = if (originalFlow == OriginalFlow.RECOVER_SYNCED_DATA) {
             R.string.sync_recovering_data_v2_headline
         } else {
             R.string.sync_another_device_v2_headline
@@ -267,18 +276,18 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     companion object {
         private const val SYNC_URL_EXTRA_KEY = "sync_url"
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
-        private const val IS_RECOVERY_FLOW_EXTRA_KEY = "is_recovery_flow"
+        private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
 
         fun intent(
             context: Context,
             syncUrl: String,
             launchSource: String?,
-            isRecoveryFlow: Boolean = false,
+            originalFlow: OriginalFlow,
         ): Intent {
             return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_URL_EXTRA_KEY, syncUrl)
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
-                putExtra(IS_RECOVERY_FLOW_EXTRA_KEY, isRecoveryFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
             }
         }
     }

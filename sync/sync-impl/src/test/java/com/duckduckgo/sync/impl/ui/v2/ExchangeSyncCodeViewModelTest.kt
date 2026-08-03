@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
@@ -41,7 +42,6 @@ import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairi
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -79,6 +79,7 @@ class ExchangeSyncCodeViewModelTest {
 
     private fun createTestee() = ExchangeSyncCodeViewModel(
         syncUrl = "sync-url",
+        originalFlow = OriginalFlow.SYNC_THIS_DEVICE,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -128,7 +129,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -150,7 +151,7 @@ class ExchangeSyncCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode),
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -250,7 +251,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -268,7 +269,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -303,7 +304,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

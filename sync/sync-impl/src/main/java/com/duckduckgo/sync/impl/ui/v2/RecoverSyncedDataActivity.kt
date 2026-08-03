@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2RecoverSyncedDataBinding
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -82,7 +83,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     private fun configureRecoverDataCta() {
         binding.recoverDataButton.setOnClickListener {
-            readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, isRecoveryFlow = true))
+            readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.RECOVER_SYNCED_DATA))
         }
     }
 
