@@ -151,11 +151,31 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        is NewUserOnboardingActivityDialog.QuickSetup -> DialogConfig(
+            background = OnboardingBackgroundStep.QuickSetup,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.QuickSetup(
+                title = TextConfig.Resource(R.string.preOnboardingReinstallQuickSetupTitle),
+                showSplitOption = dialog.showSplitOption,
+                hideSetDefaultBrowserRow = dialog.hideSetDefaultBrowserRow,
+                hideAddWidgetRow = dialog.hideAddWidgetRow,
+                hideAddressBarRow = dialog.hideAddressBarRow,
+                initialAddressBarPosition = OmnibarType.SINGLE_TOP,
+                initialWithAi = true,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(
+                    if (isCustomAiFlow) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingReinstallStartBrowsing,
+                ),
+                action = CtaAction.Submit,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
-        is NewUserOnboardingActivityDialog.QuickSetup,
         -> null // to be implemented in following tasks
     }
 
