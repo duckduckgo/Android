@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBind
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.QuickSetupBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WelcomeBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WidgetPromptBinder
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
@@ -55,6 +56,7 @@ class ContentControllerImpl(
     private val addressBar = AddressBarBinder(binding.addressBarContent, isLightMode)
     private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
     private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent)
+    private val quickSetup = QuickSetupBinder(binding.reinstallerQuickSetupContent)
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val addToDock = AddToDockBinder(binding.addToDockContent)
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
@@ -97,6 +99,10 @@ class ContentControllerImpl(
             is ContentConfig.InputScreenPreview -> {
                 boundView = inputScreenPreview.view
                 inputScreenPreview.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.QuickSetup -> {
+                boundView = quickSetup.view
+                quickSetup.bind(content, contentValues.contentState(stepId, content), scope)
             }
             is ContentConfig.AddToDock -> {
                 boundView = addToDock.view

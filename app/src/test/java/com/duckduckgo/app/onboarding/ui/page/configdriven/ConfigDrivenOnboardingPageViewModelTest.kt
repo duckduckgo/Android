@@ -21,6 +21,8 @@ import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
@@ -75,6 +77,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private val pixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
+    private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
@@ -115,6 +118,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         shownPixels = mockShownPixels,
         dispatchers = coroutineRule.testDispatcherProvider,
         widgetCapabilities = mockWidgetCapabilities,
+        defaultBrowserDetector = mockDefaultBrowserDetector,
         defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
         context = mockContext,
         pixel = pixel,
@@ -143,6 +147,20 @@ class ConfigDrivenOnboardingPageViewModelTest {
     ): ConfigDrivenOnboardingPageViewModel {
         realOrchestrator.startPlan(planAt(dialog, id, transition, result))
         return createViewModel(realOrchestrator)
+    }
+
+    private val quickSetupDialog = NewUserOnboardingActivityDialog.QuickSetup(
+        showSplitOption = true,
+        hideSetDefaultBrowserRow = false,
+        hideAddWidgetRow = false,
+        hideAddressBarRow = false,
+        isReinstallUser = false,
+    )
+
+    private fun quickSetupState(testee: ConfigDrivenOnboardingPageViewModel): QuickSetupContentState {
+        val dialog = testee.viewState.value.screen as Screen.Dialog
+        val content = dialog.config.content as ContentConfig.QuickSetup
+        return testee.contentValues.contentState(dialog.stepId, content).value
     }
 
     private suspend fun startAtBrowserStep(): ConfigDrivenOnboardingPageViewModel {
@@ -424,5 +442,98 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val content = (testee.viewState.value.screen as Screen.Dialog).config.content as ContentConfig.Welcome
         assertEquals(TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle), content.title)
         assertTrue(recordedEvents.isEmpty())
+    }
+
+    @Test
+    fun `asks for the address bar bottom sheet with the current quick setup selection`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onContentInteraction(ContentInteraction.EditAddressBarPosition)
+            advanceUntilIdle()
+            assertEquals(
+                Command.ShowQuickSetupAddressBarPositionBottomSheet(
+                    initialSelection = OmnibarType.SINGLE_TOP,
+                    showSplitOption = true,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `writes the address bar bottom sheet result into the quick setup state`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onAddressBarBottomSheetResult(OmnibarType.SINGLE_BOTTOM)
+
+        assertEquals(OmnibarType.SINGLE_BOTTOM, quickSetupState(testee).addressBarPosition)
+    }
+
+    @Test
+    fun `writes the search options bottom sheet result into the quick setup state`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onSearchOptionsBottomSheetResult(withAi = false)
+
+        assertFalse(quickSetupState(testee).withAi)
+    }
+
+    @Test
+    fun `mirrors the default browser toggle into the quick setup state before showing the system dialog`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            advanceUntilIdle()
+            assertTrue(quickSetupState(testee).defaultBrowserChecked)
+            assertTrue(awaitItem() is Command.ShowQuickSetupDefaultBrowserDialog)
+        }
+    }
+
+    @Test
+    fun `opens the system browser settings when no default browser dialog is available`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(null)
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            advanceUntilIdle()
+            assertEquals(Command.OpenDefaultBrowserSystemSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun `asks for the remove widget instructions when the widget toggle is turned off`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = false))
+            advanceUntilIdle()
+            assertFalse(quickSetupState(testee).widgetChecked)
+            assertEquals(Command.ShowRemoveWidgetBottomSheet, awaitItem())
+        }
+    }
+
+    @Test
+    fun `resyncs the quick setup switches from the system on resume`() = runTest {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onResume()
+        advanceUntilIdle()
+
+        val state = quickSetupState(testee)
+        assertTrue(state.defaultBrowserChecked)
+        assertTrue(state.widgetChecked)
     }
 }
