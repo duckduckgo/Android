@@ -120,7 +120,6 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
@@ -495,9 +494,8 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenDuckChatEnabledAndVoiceEntryPointEnabledThenShowVoiceChatEntryIsTrue() = runTest {
+    fun whenDuckChatEnabledThenShowVoiceChatEntryIsTrue() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
 
@@ -508,22 +506,8 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenVoiceEntryPointDisabledThenShowVoiceChatEntryIsFalse() = runTest {
-        duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = false))
-        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-
-        testee.onPrivacyConfigDownloaded()
-        coroutineRule.testScope.advanceUntilIdle()
-
-        assertFalse(testee.showVoiceChatEntry.value)
-    }
-
-    @Test
     fun whenDuckChatFeatureDisabledThenShowVoiceChatEntryIsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = false))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
 
@@ -536,7 +520,6 @@ class RealDuckChatTest {
     @Test
     fun whenDuckChatUserDisabledThenShowVoiceChatEntryIsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
 
@@ -550,7 +533,6 @@ class RealDuckChatTest {
     fun whenShouldShowInVoiceSearchSettingFalseThenShowVoiceChatEntryStillTrue() = runTest {
         // showVoiceChatEntry must be independent of the in-voice-search toggle user setting
         duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
@@ -564,7 +546,6 @@ class RealDuckChatTest {
     @Test
     fun whenShouldShowInVoiceChatSettingFalseThenShowVoiceChatEntryIsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
 
@@ -583,7 +564,6 @@ class RealDuckChatTest {
     @Test
     fun whenSetShowInVoiceChatUserSettingThenShowVoiceChatEntryReflectsChange() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()

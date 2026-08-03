@@ -211,13 +211,6 @@ interface DuckChatFeature {
     fun chatTabAttachments(): Toggle
 
     /**
-     * @return `true` when the duck.ai voice entry point button is enabled in the input screen
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiVoiceEntryPoint(): Toggle
-
-    /**
      * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
      * allowing the user to clear their current chat.
      * If the remote feature is not present defaults to `internal`

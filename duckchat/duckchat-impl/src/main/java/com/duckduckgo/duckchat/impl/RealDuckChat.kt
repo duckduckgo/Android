@@ -197,11 +197,6 @@ interface DuckChatInternal : DuckChat {
     fun isVoiceSearchEntryPointEnabled(): Boolean
 
     /**
-     * Returns whether voice chat entry point is enabled or not.
-     */
-    fun isVoiceChatEntryPointEnabled(): Boolean
-
-    /**
      * Returns whether DuckChat is user enabled or not.
      */
     fun isDuckChatUserEnabled(): Boolean
@@ -441,7 +436,6 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isVoiceSearchEntryPointEnabled: Boolean = false
-    private var isVoiceChatEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
     private var isStandaloneMigrationEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
@@ -594,7 +588,6 @@ class RealDuckChat @Inject constructor(
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
     override fun isVoiceSearchEntryPointEnabled(): Boolean = isVoiceSearchEntryPointEnabled
-    override fun isVoiceChatEntryPointEnabled(): Boolean = isVoiceChatEntryPointEnabled
 
     override fun isDuckChatUserEnabled(): Boolean = isDuckChatUserEnabled
 
@@ -930,7 +923,6 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isVoiceSearchEntryPointEnabled = duckChatFeature.duckAiVoiceSearch().isEnabled()
-            isVoiceChatEntryPointEnabled = duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
             _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
@@ -1000,7 +992,7 @@ class RealDuckChat @Inject constructor(
 
             val showVoiceChatEntry =
                 duckChatFeatureRepository.shouldShowInVoiceChat() &&
-                    isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceChatEntryPointEnabled
+                    isDuckChatFeatureEnabled && isDuckChatUserEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
 
             // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
