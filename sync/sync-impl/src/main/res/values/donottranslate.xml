@@ -86,7 +86,6 @@
     <string name="sync_simplified_scanner_camera_header_headline">Scan QR&#160;code to sync</string>
     <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo&#160;for&#160;Desktop</annotation></b>\n<annotation type="gap">\n</annotation>and go to <annotation type="highlight">Sync&#160;&amp;&#160;Backup</annotation> › <annotation type="highlight">Sync&#160;With&#160;Another&#160;Device</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">I’m Ready to Scan</string>
-    <string name="sync_simplified_scanner_camera_invalid_code_message">Sorry, the scanned code is invalid.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Camera Permission is Required</string>
     <string name="sync_simplified_scanner_no_permission_body">Please go to your device’s settings and grant permission for this app to access your camera.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Go to Settings</string>
