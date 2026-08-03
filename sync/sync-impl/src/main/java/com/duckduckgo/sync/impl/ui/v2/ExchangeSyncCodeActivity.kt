@@ -52,6 +52,7 @@ import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Er
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory.Provider
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.ViewState
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import kotlinx.coroutines.flow.launchIn
@@ -81,6 +82,8 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         Provider(vmFactory, syncUrl)
     }
 
+    private var acknowledgementDialog: TextAlertDialogBuilder? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,11 +102,27 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    override fun onDestroy() {
+        acknowledgementDialog = null
+        super.onDestroy()
+    }
+
     private fun observeViewModel() {
         viewModel.commands
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        if (viewState.isLoggedIn) {
+            dismissPairingAcknowledgementDialog()
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -166,17 +185,26 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun showPairingAcknowledgmentDialog() {
-        TextAlertDialogBuilder(this)
+        if (viewModel.viewState.value.isLoggedIn) {
+            viewModel.runAcknowledgementAnimation()
+            return
+        }
+        acknowledgementDialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_confirm_title)
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_confirm_cta)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onPairingAcknowledged()
+                    override fun onDialogDismissed() {
+                        viewModel.runAcknowledgementAnimation()
                     }
                 },
             )
-            .show()
+        acknowledgementDialog?.show()
+    }
+
+    private fun dismissPairingAcknowledgementDialog() {
+        acknowledgementDialog?.dismiss()
+        acknowledgementDialog = null
     }
 
     private fun runAcknowledgementAnimation() {

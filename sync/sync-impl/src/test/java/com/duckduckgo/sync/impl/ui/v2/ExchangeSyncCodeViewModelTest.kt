@@ -194,6 +194,15 @@ class ExchangeSyncCodeViewModelTest {
     }
 
     @Test
+    fun `when the login completes then the logged in view state is set`() = runTest {
+        givenV2Outcomes(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
+
+        val testee = createTestee()
+
+        assertTrue(testee.viewState.value.isLoggedIn)
+    }
+
+    @Test
     fun `when the login completes then the screen does not close until the animation completes`() = runTest {
         givenV2Outcomes(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
 
@@ -376,13 +385,13 @@ class ExchangeSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the pairing is acknowledged then the acknowledgment animation runs`() = runTest {
+    fun `when the acknowledgement animation is requested then the acknowledgment animation runs`() = runTest {
         givenV2Outcomes()
 
         val testee = createTestee()
 
         testee.commands.test {
-            testee.onPairingAcknowledged()
+            testee.runAcknowledgementAnimation()
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
 
             cancel()

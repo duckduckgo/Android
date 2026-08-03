@@ -41,7 +41,10 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -55,6 +58,9 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
     private val _commands = Channel<Command>(Channel.BUFFERED)
     internal val commands = _commands.receiveAsFlow()
 
+    private val _viewState = MutableStateFlow(ViewState())
+    internal val viewState = _viewState.asStateFlow()
+
     private val animationCompletionSignal = CompletableDeferred<Unit>()
 
     init {
@@ -63,6 +69,12 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
                 is RouteDecision.Legacy -> handleV1CodeDecision(decision)
                 is RouteDecision.V2InProgress -> handleV2CodeDecision(decision)
             }
+        }
+    }
+
+    fun runAcknowledgementAnimation() {
+        viewModelScope.launch {
+            _commands.send(Command.RunAcknowledgmentAnimation)
         }
     }
 
@@ -86,12 +98,6 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
 
     fun onJoinerDenied() {
         codeDispatcher.denyJoiner()
-    }
-
-    fun onPairingAcknowledged() {
-        viewModelScope.launch {
-            _commands.send(Command.RunAcknowledgmentAnimation)
-        }
     }
 
     fun onAnimationComplete() {
@@ -147,6 +153,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
             }
 
             is DispatchOutcome.LoggedIn -> {
+                _viewState.update { it.copy(isLoggedIn = true) }
                 animationCompletionSignal.await()
                 _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
                 _commands.send(Command.Close)
@@ -165,6 +172,10 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
             }
         }
     }
+
+    internal data class ViewState(
+        val isLoggedIn: Boolean = false,
+    )
 
     internal sealed interface Command {
         data class AskJoinerConfirmation(
