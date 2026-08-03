@@ -152,7 +152,14 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            subscriptionPromoModalDecider = mock(),
+            subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
+                extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+                appInstallStore = mockAppInstallStore,
+                settingsDataStore = mockSettingsDataStore,
+                dismissedCtaDao = mockDismissedCtaDao,
+                subscriptions = mockSubscriptions,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,

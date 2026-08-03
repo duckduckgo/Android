@@ -129,7 +129,14 @@ class OnboardingDaxDialogTests {
         testee = CtaViewModel(
             appInstallStore,
             pixel,
-            mock<SubscriptionPromoModalDecider>(),
+            RealSubscriptionPromoModalDecider(
+                extendedOnboardingFeatureToggles,
+                appInstallStore,
+                settingsDataStore,
+                dismissedCtaDao,
+                mockSubscriptions,
+                coroutineRule.testDispatcherProvider,
+            ),
             dismissedCtaDao,
             userAllowListRepository,
             settingsDataStore,
