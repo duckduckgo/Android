@@ -18,17 +18,29 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 class DialogConfigResolverTest {
 
-    private val testee = DialogConfigResolver()
+    private val searchOptions = listOf(DaxDialogIntroOption(optionText = "search", iconRes = 0, link = "how to fix a bike"))
+    private val chatSuggestions = listOf(DaxDialogIntroOption(optionText = "chat", iconRes = 0, link = "explain quantum computing"))
+    private val onboardingStore: OnboardingStore = mock {
+        on { getSearchOptions() } doReturn searchOptions
+        on { getChatSuggestions() } doReturn chatSuggestions
+    }
+
+    private val testee = DialogConfigResolver(onboardingStore)
 
     @Test
     fun `resolves the comparison chart with the browser chart config`() {
@@ -196,5 +208,36 @@ class DialogConfigResolverTest {
             config.primaryCta,
         )
         assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the input screen preview with store suggestions and no cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true), isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(Embellishment.None, config.embellishment)
+        assertEquals(CardArrowConfig.Hidden, config.cardArrow)
+        assertEquals(
+            ContentConfig.InputScreenPreview(
+                title = TextConfig.Resource(R.string.preOnboardingInputModeDemoTitle),
+                isSearchDefault = true,
+                showModeToggle = true,
+                searchSuggestions = searchOptions,
+                chatSuggestions = chatSuggestions,
+            ),
+            config.content,
+        )
+        assertNull(config.primaryCta)
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the input screen preview without a mode toggle in the custom ai flow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false), isCustomAiFlow = true)!!
+
+        val content = config.content as ContentConfig.InputScreenPreview
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputModeDemoTitleCustomAi), content.title)
+        assertFalse(content.showModeToggle)
+        assertEquals(InputScreenPreviewContentState(isSearchSelected = false), content.initialState())
     }
 }

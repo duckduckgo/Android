@@ -138,7 +138,17 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onEvent(event: NewUserOnboardingEvent) = emit(event)
 
-    fun onContentInteraction(interaction: ContentInteraction) = Unit // No-op until dialogs with local state are implemented in follow-ups.
+    fun onContentInteraction(interaction: ContentInteraction) {
+        when (interaction) {
+            is ContentInteraction.SubmitInput -> emit(
+                NewUserOnboardingEvent.InputDemoQuerySubmitted(
+                    query = interaction.query,
+                    isChat = interaction.isChat,
+                    fromSuggestion = interaction.fromSuggestion,
+                ),
+            )
+        }
+    }
 
     fun onDialogRendered(stepId: LinearOnboardingStepId) {
         _viewState.update { state ->
