@@ -96,7 +96,30 @@ class DialogConfigResolverTest {
     @Test
     fun `resolves no config for a dialog that has no config-driven screen yet`() {
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.NotificationPermission, isCustomAiFlow = false))
-        assertNull(testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false))
+    }
+
+    @Test
+    fun `resolves the add to dock dialog with no decoration and no arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.AddToDock, config.background)
+        assertEquals(Embellishment.None, config.embellishment)
+        assertEquals(CardArrowConfig.Hidden, config.cardArrow)
+        assertEquals(
+            ContentConfig.AddToDock(
+                title = TextConfig.Resource(R.string.preOnboardingDockStepTitle),
+                body = TextConfig.Resource(R.string.preOnboardingAddToDockBody),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingAddToDockPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
     }
 
     @Test
