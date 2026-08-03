@@ -53,6 +53,11 @@ sealed interface ContentConfig {
         override val title: TextConfig,
         val body: TextConfig,
     ) : ContentConfig
+
+    data class WidgetPrompt(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
 }
 
 data class AddressBarContentState(val position: OmnibarType)

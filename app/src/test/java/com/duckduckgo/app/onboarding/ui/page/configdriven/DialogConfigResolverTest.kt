@@ -202,4 +202,34 @@ class DialogConfigResolverTest {
             config.secondaryCta,
         )
     }
+
+    @Test
+    fun `resolves the widget prompt dialog with add and skip ctas`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.WidgetPrompt, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.AddWidget, config.background)
+        assertEquals(Embellishment.LeftWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(
+            ContentConfig.WidgetPrompt(
+                title = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle),
+                body = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingWidgetPromptPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.AddWidgetRequested),
+            ),
+            config.primaryCta,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton),
+                CtaAction.Emit(NewUserOnboardingEvent.WidgetPromptSkipped),
+            ),
+            config.secondaryCta,
+        )
+    }
 }
