@@ -881,10 +881,14 @@ class RealNativeInputManager @Inject constructor(
                     isSubscriptionEligible -> DuckAiTier.Free
                     else -> DuckAiTier.FreeNoUpgrade
                 }
-                omnibarController.updateTierTitle(tier) {
-                    fireChatHeaderUpgradeTapped(tier)
-                    launchPurchase()
-                }
+                omnibarController.updateTierTitle(
+                    tier,
+                    onUpgradeClicked = {
+                        fireChatHeaderUpgradeTapped(tier)
+                        launchPurchase()
+                    },
+                    onUpgradeShown = { fireFreeLabelShown() },
+                )
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -1428,7 +1432,17 @@ class RealNativeInputManager @Inject constructor(
      */
     internal fun fireChatHeaderUpgradeTapped(tier: DuckAiTier) {
         val userTier = if (tier is DuckAiTier.Paid) "plus" else "free"
-        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED, mapOf("user_tier" to userTier))
+        pixel.fire(
+            AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
+            mapOf("user_tier" to userTier, "origin" to PURCHASE_ORIGIN),
+        )
+    }
+
+    /**
+     * Invoked by the omnibar controller when the upgradeable free pill becomes visible.
+     */
+    private fun fireFreeLabelShown() {
+        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_FREE_LABEL_SHOWN, mapOf("origin" to PURCHASE_ORIGIN))
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */

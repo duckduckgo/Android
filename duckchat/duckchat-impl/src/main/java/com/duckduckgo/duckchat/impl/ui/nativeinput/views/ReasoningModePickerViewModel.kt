@@ -128,6 +128,10 @@ class ReasoningModePickerViewModel @Inject constructor(
     private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands: Flow<UpsellCommand> = command.receiveAsFlow()
 
+    fun onPickerShown(surface: PickerSurface) {
+        duckChatPixels.fireReasoningEffortPickerShown(surface.origin)
+    }
+
     fun onModeTapped(mode: ReasoningMode, surface: PickerSurface) {
         // Drop taps that race past the picker hiding (loading, mismatch, no accessible rows).
         if (!state.value.visible) return
@@ -165,6 +169,7 @@ class ReasoningModePickerViewModel @Inject constructor(
                 currentTier = userTier.toParam(),
                 requiredTier = requiredTier.toParam(),
                 flowType = upsell.toFlowTypeParam(),
+                origin = surface.origin,
             )
             command.trySend(upsell)
         }

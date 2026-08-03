@@ -60,7 +60,7 @@ interface NativeInputOmnibarController : OmnibarState {
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
-    fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit)
+    fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit, onUpgradeShown: () -> Unit)
 
     /** Hide/show the subscription-tier indicator (Free pill / paid title) in the Duck.ai header. */
     fun setTierVisible(visible: Boolean)
@@ -156,6 +156,11 @@ class RealNativeInputOmnibarController(
     private var currentUpgradeClick: (() -> Unit)? = null
     private var tierVisible: Boolean = true
 
+    // Fired when the upgradeable Free pill becomes visible, for the free-label subscription impression pixel.
+    private var onUpgradeShown: (() -> Unit)? = null
+
+    private var upgradePillShown = false
+
     private fun showDuckAiTitle(omnibarView: View) {
         val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
         omnibarView.findViewById<View?>(R.id.aiIcon)?.gone()
@@ -165,9 +170,10 @@ class RealNativeInputOmnibarController(
         applyTierText(omnibarView)
     }
 
-    override fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit) {
+    override fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit, onUpgradeShown: () -> Unit) {
         currentTier = tier
         currentUpgradeClick = onUpgradeClicked
+        this.onUpgradeShown = onUpgradeShown
         val omnibarView = omnibar.omnibarView as? View ?: return
         applyTierText(omnibarView)
     }
@@ -178,6 +184,15 @@ class RealNativeInputOmnibarController(
     }
 
     private fun applyTierText(omnibarView: View) {
+        val pillSuppressedByKillSwitch = nativeInputStateBugKillSwitch.self().isEnabled() && !overlayActive
+
+        // Fire the free-label impression from the same conditions that render the upgradeable Free pill
+        // (below), so it measures an actual on-screen impression. This is triggered only once
+        // per hidden→shown  transition, resetting when it hides so the next display re-fires.
+        val upgradeablePillVisible = tierVisible && !pillSuppressedByKillSwitch && currentTier is DuckAiTier.Free
+        if (upgradeablePillVisible && !upgradePillShown) onUpgradeShown?.invoke()
+        upgradePillShown = upgradeablePillVisible
+
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
         val freePillUpgrade = omnibarView.findViewById<View?>(R.id.duckAIFreePillUpgrade)
@@ -188,7 +203,7 @@ class RealNativeInputOmnibarController(
             freePill?.setOnClickListener(null)
             return
         }
-        if (nativeInputStateBugKillSwitch.self().isEnabled() && !overlayActive) {
+        if (pillSuppressedByKillSwitch) {
             freePill?.gone()
             freePill?.setOnClickListener(null)
             return
@@ -248,6 +263,8 @@ class RealNativeInputOmnibarController(
         overlayActive = false
         currentTier = DuckAiTier.Unknown
         currentUpgradeClick = null
+        onUpgradeShown = null
+        upgradePillShown = false
         tierVisible = true
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }
         restoreOmnibarColors()

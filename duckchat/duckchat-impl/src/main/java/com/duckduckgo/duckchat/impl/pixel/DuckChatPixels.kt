@@ -207,7 +207,14 @@ interface DuckChatPixels {
     /** FE recovery flow: a prompt submitted after recovering the chat's model. */
     fun fireSubmitChangeModelPromptSent(surface: DuckChatPixelSurface)
 
-    fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
+    /** Subscription upsell triggered by tapping a gated model or reasoning option. */
+    fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String, origin: String)
+
+    /** Subscription-funnel impression: the model picker was shown. [origin] identifies the entry point. */
+    fun fireModelPickerShown(origin: String)
+
+    /** Subscription-funnel impression: the reasoning effort picker was shown. [origin] identifies the entry point. */
+    fun fireReasoningEffortPickerShown(origin: String)
     fun fireImageAttached(source: String, surface: DuckChatPixelSurface)
     fun fireImageValidationFailed(reason: String, surface: DuckChatPixelSurface)
     fun fireImageRemoved(surface: DuckChatPixelSurface)
@@ -687,7 +694,7 @@ class RealDuckChatPixels @Inject constructor(
         )
     }
 
-    override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String) {
+    override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String, origin: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(
                 DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED,
@@ -696,7 +703,26 @@ class RealDuckChatPixels @Inject constructor(
                     DuckChatPixelParameters.UPSELL_CURRENT_TIER to currentTier,
                     DuckChatPixelParameters.UPSELL_REQUIRED_TIER to requiredTier,
                     DuckChatPixelParameters.UPSELL_FLOW_TYPE to flowType,
+                    DuckChatPixelParameters.ORIGIN to origin,
                 ),
+            )
+        }
+    }
+
+    override fun fireModelPickerShown(origin: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN,
+                parameters = mapOf(DuckChatPixelParameters.ORIGIN to origin),
+            )
+        }
+    }
+
+    override fun fireReasoningEffortPickerShown(origin: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN,
+                parameters = mapOf(DuckChatPixelParameters.ORIGIN to origin),
             )
         }
     }
@@ -1129,6 +1155,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT("m_aichat_unified_input_voice_search_tapped_count"),
     DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_DAILY("m_aichat_unified_input_voice_search_tapped_daily"),
     DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED("m_aichat_unified_input_stop_generation_tapped"),
+
+    // Subscription-funnel impressions. The matching "click" is DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED.
+    DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN("m_aichat_unified_input_model_picker_shown"),
+    DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN("m_aichat_unified_input_reasoning_effort_picker_shown"),
 }
 
 object DuckChatPixelParameters {
@@ -1155,6 +1185,9 @@ object DuckChatPixelParameters {
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
     const val UPSELL_FLOW_TYPE = "flow_type"
+
+    // Subscription-funnel telemetry: the entry-point origin (e.g. funnel_duckai_android__modelpicker)
+    const val ORIGIN = "origin"
 
     // ai_features_state_daily
     const val DUCK_AI = "duck_ai"

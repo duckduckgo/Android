@@ -338,13 +338,24 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        val isSubscriptionUrl by lazy {
-            runCatching { subscriptions.isSubscriptionUrl(params.url.toUri()) }.getOrDefault(false)
-        }
-        if (savedInstanceState == null && isSubscriptionUrl) {
+        // Seed the launch origin so the subscribe-CTA click keeps it across process death
+        viewModel.setLaunchOrigin(params.origin)
+        if (savedInstanceState == null && isOfferPageUrl(params.url, params.origin)) {
             viewModel.paywallShown()
         }
     }
+
+    /**
+     * True when [url] is a subscription offer page, used to gate the offer-screen impression: the standard
+     * purchase offer ([Subscriptions.isSubscriptionUrl]), or the Plus→Pro upgrade offer (`/plans`) when
+     * opened from a funnel. The upgrade case requires a non-null [origin].
+     */
+    private fun isOfferPageUrl(url: String, origin: String?): Boolean = runCatching {
+        val uri = url.toUri()
+        val upgradeUri = subscriptionsUrlProvider.upgradeToProUrl.toUri()
+        subscriptions.isSubscriptionUrl(uri) ||
+            (origin != null && uri.host == upgradeUri.host && uri.path == upgradeUri.path)
+    }.getOrDefault(false)
 
     private fun recoverFromRenderProcessCrash(): Boolean {
         if (!subscriptionsFeature.handleSubscriptionsWebViewRenderProcessCrash().isEnabled()) return false

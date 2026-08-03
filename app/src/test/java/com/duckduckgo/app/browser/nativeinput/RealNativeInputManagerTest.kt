@@ -192,22 +192,22 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenChatHeaderUpgradeTappedByFreeUserThenPixelFiredWithFreeTier() {
+    fun whenChatHeaderUpgradeTappedByFreeUserThenPixelFiredWithFreeTierAndOrigin() {
         testee.fireChatHeaderUpgradeTapped(DuckAiTier.Free)
 
         verify(pixel).fire(
             AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
-            mapOf("user_tier" to "free"),
+            mapOf("user_tier" to "free", "origin" to "funnel_duckai_android__freelabel"),
         )
     }
 
     @Test
-    fun whenChatHeaderUpgradeTappedByPaidUserThenPixelFiredWithPlusTier() {
+    fun whenChatHeaderUpgradeTappedByPaidUserThenPixelFiredWithPlusTierAndOrigin() {
         testee.fireChatHeaderUpgradeTapped(DuckAiTier.Paid)
 
         verify(pixel).fire(
             AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
-            mapOf("user_tier" to "plus"),
+            mapOf("user_tier" to "plus", "origin" to "funnel_duckai_android__freelabel"),
         )
     }
 

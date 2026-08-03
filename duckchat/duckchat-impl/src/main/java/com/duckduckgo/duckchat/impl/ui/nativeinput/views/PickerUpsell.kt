@@ -20,11 +20,14 @@ import com.duckduckgo.duckchat.impl.models.UserTier
 import logcat.logcat
 
 enum class PickerSurface(val origin: String) {
-    MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_android__modelpicker"),
+    MODEL_PICKER_ADDRESS_BAR("funnel_addressbar_android__modelpicker"),
     MODEL_PICKER_DUCK_AI_TAB("funnel_duckai_android__modelpicker"),
-    REASONING_PICKER_ADDRESS_BAR("funnel_nativeinput_android__reasoningpicker"),
-    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_android__reasoningpicker"),
+    REASONING_PICKER_ADDRESS_BAR("funnel_addressbar_android__reasoningdropdown"),
+    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_android__reasoningdropdown"),
 }
+
+/** Subscription origin for the FE model-recovery ("switch model") flow */
+const val SWITCH_MODEL_ORIGIN = "funnel_duckai_android__switchmodel"
 
 sealed class UpsellCommand {
     data class LaunchPurchase(val origin: String) : UpsellCommand()
