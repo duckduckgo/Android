@@ -168,19 +168,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val syncNewAccountLauncher = registerForActivityResult(
-        ReadSyncCodeContract(),
-    ) { output ->
-        when (output) {
-            is ReadSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result)
-            }
-
-            is ReadSyncCodeContract.Output.Dismissed -> Unit
-        }
-    }
-
-    private val addDeviceLauncher = registerForActivityResult(
+    private val syncWithAnotherDeviceLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
     ) { output ->
         when (output) {
@@ -395,7 +383,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addDeviceLauncher.launch(
+                    syncWithAnotherDeviceLauncher.launch(
                         ReadSyncCodeContract.Input(
                             syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
                             launchSource = launchSource,
@@ -522,9 +510,12 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
 
                     SyncEntryPoint.ADD_DEVICE -> {
-                        syncNewAccountLauncher.launch(
+                        syncWithAnotherDeviceLauncher.launch(
                             ReadSyncCodeContract.Input(
-                                syncEntryPoint = command.syncEntryPoint,
+                                // The view model is shared between the legacy and simplified UI, so we can't change the VM
+                                // logic for the simplified flow without breaking the legacy logic. Once the legacy flow is
+                                // removed we can fix the root cause and not hardcode SYNC_NEW_ACCOUNT below.
+                                syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
                                 launchSource = launchSource,
                             ),
                         )
@@ -598,7 +589,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    syncNewAccountLauncher.launch(
+                    syncWithAnotherDeviceLauncher.launch(
                         ReadSyncCodeContract.Input(
                             syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
                             launchSource = launchSource,
