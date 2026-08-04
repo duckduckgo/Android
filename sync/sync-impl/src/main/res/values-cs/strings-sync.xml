@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Už se synchronizuje.</string>
     <string name="sync_v2_already_paired_message">Tato zařízení jsou již připojena k Sync &amp; Backup.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Udržuj si DuckDuckGo synchronizovaný!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo je synchronizován.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Synchronizuj a zálohuj si data pro automatické vyplnění a záložky ve všech svých aplikacích DuckDuckGo se šifrováním end-to-end.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Synchronizuj a zálohuj si data pro automatické vyplnění, záložky a chaty Duck.ai, vše šifrované end-to-end napříč tvými aplikacemi DuckDuckGo.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Tvoje záložky a data pro automatické vyplňování se synchronizují a zálohují se šifrováním end-to-end.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Tvoje záložky, data pro automatické vyplňování a chaty Duck.ai se synchronizují a zálohují se šifrováním end-to-end.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Synchronizovat toto zařízení</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Synchronizovat s jiným zařízením</string>
+    <string name="sync_simplified_settings_recover_section_header">Obnovit synchronizovaná data</string>
+    <string name="sync_simplified_settings_recover_data_item">Mám kód pro obnovení</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Moje zařízení</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Tohle zařízení</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Synchronizovat s jiným zařízením</string>
+    <string name="sync_simplified_settings_download_section_header">Stáhnout</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Záložky</string>
+    <string name="sync_simplified_settings_recovery_section_header">Obnova</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Obnovit při přeinstalaci aplikace</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Pokud přeinstaluješ aplikaci DuckDuckGo, zeptáme se tě, jestli chceš obnovit data na tomto zařízení.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Zkopíruj si kód pro obnovení</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Stáhni si kód pro obnovení</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Tenhle kód můžeš použít k obnovení svých dat, pokud k tomuhle zařízení ztratíš přístup. Bezpečně si ho ulož.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Data Sync &amp; Backup nelze obnovit po 18 měsících nečinnosti. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Vypnout a smazat data serveru</string>
+    <string name="sync_simplified_settings_storage_permission_message">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Oznámení jsou vypnutá</string>
+    <string name="sync_simplified_settings_notify_me_body">Nech si poslat upozornění v případě, že dojde k chybě Sync &amp; Backup.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Nainstaluj si DuckDuckGo na další zařízení</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Nainstaluj si prohlížeč pro počítač</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Vypnout Sync &amp; Backup a smazat data na serveru?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Dojde k odpojení všech zařízení používajících Sync &amp; Backup a smazání synchronizovaných dat ze serveru.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Smazat data ze serveru</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Zrušit</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Zabezpeč své zařízení, ať můžeš používat funkci Sync &amp; Backup</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Pro použití funkce Sync &amp; Backup jsou nutné biometrické údaje, gesto nebo PIN k zařízení.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Přejít do Nastavení</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Synchronizuj toto zařízení s blízkým počítačem.</string>
+    <string name="sync_simplified_setup_header_body">Pomůžeme ti synchronizovat tvá zařízení.</string>
+    <string name="sync_simplified_setup_primary_button">Synchronizovat s jiným zařízením</string>
+    <string name="sync_simplified_setup_secondary_button">Synchronizovat pouze toto zařízení</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Připojování…</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Obnovují se tvá synchronizovaná data</string>
+    <string name="sync_simplified_recover_data_body">Budeš potřebovat kód pro obnovení, který jsi dostal(a) při zřizování Sync &amp; Backup. Možná ho máš uložený jako PDF na zařízení, na kterém sis ho založil(a).</string>
+    <string name="sync_simplified_recover_data_primary_button">Obnovit synchronizovaná data</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Tvoje předchozí relace Sync &amp; Backup je připravena.</string>
+    <string name="sync_simplified_previous_session_body">Obnov svou relaci Sync &amp; Backup a obnovíš si záložky, hesla a další položky, anebo pokračuj v nastavování od nuly.</string>
+    <string name="sync_simplified_previous_session_primary_button">Obnovit Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Založit nový Sync</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Zobrazit QR kód</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Naskenuj QR kód</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Zadej kód</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Naskenuj QR kód.</string>
+    <string name="sync_simplified_scanner_camera_header_body">Otevři <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pro počítač</annotation></b>\n<annotation type="gap">\n</annotation>a přejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizace s jiným zařízením</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Můžu začít skenovat</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Naskenovaný kód je bohužel neplatný.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Je potřeba přístup k fotoaparátu</string>
+    <string name="sync_simplified_scanner_no_permission_body">Přejdi do nastavení zařízení a povol aplikaci přístup k fotoaparátu.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Přejít do Nastavení</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Fotoaparát není dostupný</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Zadej kód Sync</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Otevři druhou <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikaci DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Přejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizace s jiným zařízením</annotation> › <annotation type="highlight">Zkopírovat textový kód</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Příklad kódu:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Vložit kód Sync</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Vložený kód je bohužel neplatný.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR kód</string>
+    <string name="sync_simplified_qr_code_header_headline">Naskenuj z jiného zařízení</string>
+    <string name="sync_simplified_qr_code_header_body">Na jiném zařízení otevři <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>a přejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizace s jiným zařízením</annotation> a naskenuj tenhle kód:</string>
+    <string name="sync_simplified_qr_code_copy_button">Zkopírovat textový kód</string>
+    <string name="sync_simplified_qr_code_share_button">Sdílet</string>
+    <string name="sync_simplified_qr_code_copied_message">Kód pro obnovení byl zkopírován</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Funkce Sync &amp; Backup používá end-to-end šifrování na všech tvých zařízeních.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Obnovují se data</string>
+    <string name="sync_simplified_pairing_body">Připojování…</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Synchronizovat nové zařízení?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Synchronizovat teď</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Zrušit</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Synchronizovat nové zařízení?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Synchronizovat teď</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Zrušit</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Potvrď na druhém zařízení…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Rozumím</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Zařízení %1$s bylo přidáno do Sync &amp; Backup.</string>
+    <string name="sync_simplified_recovery_code_body">Použij tento kód k případnému obnovení dat, pokud ztratíš přístup k tomuto zařízení. Bezpečně si ho ulož.</string>
+    <string name="sync_simplified_recovery_code_label">Kód pro obnovení</string>
+    <string name="sync_simplified_recovery_code_download_button">Stáhni si kód pro obnovení</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Obnovit při přeinstalaci aplikace</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Pokud přeinstaluješ aplikaci DuckDuckGo, zeptáme se tě, jestli chceš obnovit data na tomto zařízení.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Hotovo</string>
+    <string name="sync_simplified_recovery_code_copied_message">Kód pro obnovení byl zkopírován</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Synchronizováno</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Upravit název</string>
+    <string name="sync_simplified_edit_device_remove_item">Smazat zařízení</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Synchronizovat toto zařízení</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Pokud toto zařízení odebereš, už nebude mít přístup k tvým synchronizovaným datům.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Pokud tuhle možnost vypneš, tohle zařízení už nebude mít přístup k tvým synchronizovaným datům.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Upravit název</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Hotovo</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Zrušit</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Odstranit zařízení?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k synchronizovaným datům.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Odstranit</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Zrušit</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Vypnout Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Tohle zařízení už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Vypnout</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Zrušit</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">OK</string>
+    <string name="sync_simplified_error_dialog_generic_body">Něco se pokazilo</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Nejde se připojit k serveru.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Název zařízení nejde aktualizovat.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Soubor PDF pro obnovení nejde vytvořit.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Kód pro obnovení se nepodařilo získat.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Něco se pokazilo.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Synchronizovat nové zařízení?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ bude moct přistupovat k tvým synchronizovaným datům DuckDuckGo.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Synchronizovat teď</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Zrušit</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Nastavit Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Pokud chceš nastavit funkci Sync &amp; Backup, odemkni zařízení</string>
 </resources>
