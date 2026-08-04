@@ -123,33 +123,39 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/contextualModePrompts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/keyline_4"
-            android:gravity="bottom"
-            android:paddingTop="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_1">
+            android:fillViewport="true">
 
-            <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsView
-                android:id="@+id/contextualSuggestionsView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/contextualPromptQuickAction"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/duck_ai_prompt_background"
-                android:drawableStart="@drawable/ic_arrow_down_right_16"
-                android:drawablePadding="@dimen/keyline_2"
-                android:padding="@dimen/keyline_2"
-                tools:text="@string/duckAIContextualPromptSummarize"
-                app:typography="body2_bold" />
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/keyline_4"
+                android:gravity="bottom"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_1">
 
-        </LinearLayout>
+                <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsView
+                    android:id="@+id/contextualSuggestionsView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/contextualPromptQuickAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/duck_ai_prompt_background"
+                    android:drawableStart="@drawable/ic_arrow_down_right_16"
+                    android:drawablePadding="@dimen/keyline_2"
+                    android:padding="@dimen/keyline_2"
+                    tools:text="@string/duckAIContextualPromptSummarize"
+                    app:typography="body2_bold" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <FrameLayout
             android:id="@+id/contextualWebviewContainer"
