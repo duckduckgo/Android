@@ -1046,28 +1046,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_tapped_daily": {
         "description": "(Daily Pixel) User tapped the voice chat button in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_search_tapped_count": {
         "description": "User tapped the in-field microphone for voice search in the Unified Input",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_search_tapped_daily": {
         "description": "(Daily Pixel) User tapped the in-field microphone for voice search in the Unified Input",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_attached_count": {
         "description": "User attached an image in the Unified Input",

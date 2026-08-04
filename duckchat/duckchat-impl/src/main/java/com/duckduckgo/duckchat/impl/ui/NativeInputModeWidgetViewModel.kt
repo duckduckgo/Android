@@ -260,9 +260,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat()
 
-    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
+    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped(currentSurface())
 
-    fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped()
+    fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
     fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
 

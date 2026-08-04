@@ -214,8 +214,8 @@ interface DuckChatPixels {
     fun fireFileAttached(surface: DuckChatPixelSurface)
     fun fireFileRemoved(surface: DuckChatPixelSurface)
     fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface)
-    fun fireVoiceTapped()
-    fun fireVoiceSearchTapped()
+    fun fireVoiceTapped(surface: DuckChatPixelSurface)
+    fun fireVoiceSearchTapped(surface: DuckChatPixelSurface)
     fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
     fun fireDuckAiChatHistorySuggestionClicked()
     fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
@@ -746,14 +746,16 @@ class RealDuckChatPixels @Inject constructor(
         ),
     )
 
-    override fun fireVoiceTapped() = fireCountAndDaily(
+    override fun fireVoiceTapped(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
+        surfaceParams(surface),
     )
 
-    override fun fireVoiceSearchTapped() = fireCountAndDaily(
+    override fun fireVoiceSearchTapped(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_DAILY,
+        surfaceParams(surface),
     )
 
     override fun fireStopGenerationTapped(surface: DuckChatPixelSurface) {

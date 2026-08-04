@@ -147,24 +147,26 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenVoiceTappedThenCountAndDaily() = runTest {
-        testee.fireVoiceTapped()
+        testee.fireVoiceTapped(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT, parameters = emptyMap())
+        val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
     fun whenVoiceSearchTappedThenCountAndDaily() = runTest {
-        testee.fireVoiceSearchTapped()
+        testee.fireVoiceSearchTapped(DuckChatPixelSurface.DUCK_AI)
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT, parameters = emptyMap())
+        val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT, parameters = surfaceParams)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_DAILY,
-            parameters = emptyMap(),
+            parameters = surfaceParams,
             type = Pixel.PixelType.Daily(),
         )
     }
