@@ -23,11 +23,11 @@ import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface UnprotectedTemporaryRepository {
     fun updateAll(exceptions: List<UnprotectedTemporaryEntity>)
-    val exceptions: CopyOnWriteArrayList<FeatureException>
+
+    val exceptions: List<FeatureException>
 }
 
 class RealUnprotectedTemporaryRepository(
@@ -39,7 +39,11 @@ class RealUnprotectedTemporaryRepository(
 
     private val unprotectedTemporaryDao: UnprotectedTemporaryDao =
         database.unprotectedTemporaryDao()
-    override val exceptions = CopyOnWriteArrayList<FeatureException>()
+
+    @Volatile
+    private var snapshot: List<FeatureException> = emptyList()
+
+    override val exceptions get() = snapshot
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -55,7 +59,6 @@ class RealUnprotectedTemporaryRepository(
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        unprotectedTemporaryDao.getAll().map { exceptions.add(it.toFeatureException()) }
+        snapshot = unprotectedTemporaryDao.getAll().map { it.toFeatureException() }
     }
 }

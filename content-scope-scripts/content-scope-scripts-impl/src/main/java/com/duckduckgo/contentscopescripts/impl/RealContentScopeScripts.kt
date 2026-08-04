@@ -75,13 +75,18 @@ class RealContentScopeScripts @Inject constructor(
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList(), optimized = true)
 
+    // Legacy-path baselines.
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
+    private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
+
+    // Optimized-path baselines.
+    private var lastUserUnprotectedDomains: List<String> = emptyList()
+    private var lastUnprotectedTemporaryExceptions: List<FeatureException> = emptyList()
+
     private var cachedUserUnprotectedDomainsJson: String = EMPTY_JSON_LIST
+    private var cachedUnprotectTemporaryExceptionsJson: String = EMPTY_JSON_LIST
 
     private var cachedUserPreferencesJson: String = EMPTY_JSON
-
-    private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
-    private var cachedUnprotectTemporaryExceptionsJson: String = EMPTY_JSON_LIST
 
     private lateinit var cachedContentScopeJS: String
 
@@ -98,15 +103,39 @@ class RealContentScopeScripts @Inject constructor(
         "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
     }
 
+    private var lastCallWasOptimized: Boolean? = null
+
     override fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String {
-        return if (optimizeInjectionEnabled()) {
+        val optimized = optimizeInjectionEnabled()
+        // The paths keep their own change-detection baselines but write the same JSON caches, so after a
+        // mid-session flag flip a baseline no longer describes what the cache holds. Dropping both together
+        // is the only state either path can safely resume from.
+        if (lastCallWasOptimized != null && lastCallWasOptimized != optimized) {
+            resetCaches()
+        }
+        lastCallWasOptimized = optimized
+
+        return if (optimized) {
             getOptimizedScript(isDesktopMode, activeExperiments)
         } else {
             getLegacyScript(isDesktopMode, activeExperiments)
         }
+    }
+
+    private fun resetCaches() {
+        cachedPluginConfig = ""
+        cachedUserUnprotectedDomains.clear()
+        cachedUnprotectTemporaryExceptions.clear()
+        lastUserUnprotectedDomains = emptyList()
+        lastUnprotectedTemporaryExceptions = emptyList()
+        cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
+        cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
+        cachedContentScopeJson = buildContentScopeJson("", EMPTY_JSON_LIST)
+        // Never equal to a built preferences string, so the next call also reassembles the script.
+        cachedUserPreferencesJson = EMPTY_JSON
     }
 
     // Original implementation, left intact. Used when optimizeContentScopeInjection is disabled, and
@@ -120,7 +149,7 @@ class RealContentScopeScripts @Inject constructor(
         val pluginParameters = getLegacyPluginParameters()
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions, optimized = false)
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
             updateJS = true
         }
 
@@ -131,7 +160,7 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
-            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList(), optimized = false)
+            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
             updateJS = true
         }
 
@@ -165,8 +194,8 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         val unprotectedTemporaryExceptions = unprotectedTemporary.unprotectedTemporaryExceptions
-        if (cachedUnprotectTemporaryExceptions != unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions, optimized = true)
+        if (lastUnprotectedTemporaryExceptions.differsFrom(unprotectedTemporaryExceptions)) {
+            cacheOptimizedUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions)
             contentScopeChanged = true
         }
 
@@ -176,8 +205,8 @@ class RealContentScopeScripts @Inject constructor(
         }
 
         val userUnprotectedDomains = userAllowListRepository.domainsInUserAllowList()
-        if (cachedUserUnprotectedDomains != userUnprotectedDomains) {
-            cacheUserUnprotectedDomains(userUnprotectedDomains, optimized = true)
+        if (lastUserUnprotectedDomains.differsFrom(userUnprotectedDomains)) {
+            cacheOptimizedUserUnprotectedDomains(userUnprotectedDomains)
             updateJS = true
         }
 
@@ -248,28 +277,42 @@ class RealContentScopeScripts @Inject constructor(
         append(value)
     }
 
-    private fun cacheUserUnprotectedDomains(
-        userUnprotectedDomains: List<String>,
-        optimized: Boolean,
-    ) {
+    private fun <T> List<T>.differsFrom(other: List<T>): Boolean = this !== other && this != other
+
+    private fun cacheOptimizedUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
+        lastUserUnprotectedDomains = userUnprotectedDomains
+        cachedUserUnprotectedDomainsJson = if (userUnprotectedDomains.isEmpty()) {
+            EMPTY_JSON_LIST
+        } else {
+            getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized = true)
+        }
+    }
+
+    private fun cacheOptimizedUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
+        lastUnprotectedTemporaryExceptions = unprotectedTemporaryExceptions
+        cachedUnprotectTemporaryExceptionsJson = if (unprotectedTemporaryExceptions.isEmpty()) {
+            EMPTY_JSON_LIST
+        } else {
+            getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized = true)
+        }
+    }
+
+    private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
         cachedUserUnprotectedDomains.clear()
         if (userUnprotectedDomains.isEmpty()) {
             cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
         } else {
-            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized)
+            cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains, optimized = false)
             cachedUserUnprotectedDomains.addAll(userUnprotectedDomains)
         }
     }
 
-    private fun cacheUserUnprotectedTemporaryExceptions(
-        unprotectedTemporaryExceptions: List<FeatureException>,
-        optimized: Boolean,
-    ) {
+    private fun cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
         cachedUnprotectTemporaryExceptions.clear()
         if (unprotectedTemporaryExceptions.isEmpty()) {
             cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
         } else {
-            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized)
+            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions, optimized = false)
             cachedUnprotectTemporaryExceptions.addAll(unprotectedTemporaryExceptions)
         }
     }
