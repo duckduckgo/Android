@@ -43,6 +43,8 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
+import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -102,7 +104,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     fun onErrorDialogDismissed() {
         viewModelScope.launch {
-            _commands.send(Command.SetFailureResult)
+            _commands.send(Command.SetPairingResult(SyncPairingResult.Failure))
             _commands.send(Command.Close)
         }
     }
@@ -141,7 +143,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     if (isSynced) {
                         pixels.fireSignupConnectPixel(source)
                         pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
-                        _commands.send(Command.SetSuccessResult)
+                        _commands.send(Command.SetPairingResult(pairingResult(role = null)))
                         _commands.send(Command.Close)
                         isPolling = false
                     }
@@ -174,7 +176,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
-                    _commands.send(Command.SetSuccessResult)
+                    _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
                     _commands.send(Command.Close)
                 }
 
@@ -200,6 +202,14 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         val displayCode = SyncBarcodeUrl.parseUrl(url)?.webSafeB64EncodedCode ?: url
         val bitmapWithCode = BitmapWithCode(bitmap, url, displayCode)
         _viewState.update { it.copy(bitmap = bitmapWithCode) }
+    }
+
+    private suspend fun pairingResult(role: Role?): SyncPairingResult = withContext(dispatchers.io()) {
+        accountRepository
+            .getThisConnectedDevice()
+            ?.let(ParcelableDevice::fromConnectedDevice)
+            ?.let { device -> SyncPairingResult.Success(device, role, PairingMethod.DisplayedCode) }
+            ?: SyncPairingResult.Failure
     }
 
     private suspend fun protocolVersion(): ProtocolVersion = withContext(dispatchers.io()) {
@@ -247,9 +257,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
             val code: String,
         ) : Command
 
-        data object SetFailureResult : Command
-
-        data object SetSuccessResult : Command
+        data class SetPairingResult(
+            val result: SyncPairingResult,
+        ) : Command
 
         data object Close : Command
     }

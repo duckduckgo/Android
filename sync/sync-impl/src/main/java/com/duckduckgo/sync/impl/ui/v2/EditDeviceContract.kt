@@ -35,15 +35,15 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
         intent: Intent?,
     ): Output {
         val device = intent
-            ?.let { IntentCompat.getParcelableExtra(it, DEVICE_KEY, ParcelableDevice::class.java) }
+            ?.let { IntentCompat.getParcelableExtra(it, DEVICE_EXTRA_KEY, ParcelableDevice::class.java) }
             ?.toConnectedDevice()
-            ?: return Output.NoOp
+            ?: return Output.Dismissed
 
         return when (resultCode) {
             RESULT_DEVICE_EDITED -> Output.DeviceEdited(device)
             RESULT_DEVICE_REMOVED -> Output.RemoveDeviceConfirmed(device)
             RESULT_SYNC_TURNED_OFF -> Output.TurnOffSyncConfirmed(device)
-            else -> Output.NoOp
+            else -> Output.Dismissed
         }
     }
 
@@ -64,15 +64,15 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
             val device: ConnectedDevice,
         ) : Output
 
-        data object NoOp : Output
+        data object Dismissed : Output
     }
 
     companion object {
-        const val DEVICE_KEY = "device"
+        const val DEVICE_EXTRA_KEY = "device"
         const val RESULT_DEVICE_EDITED = 200
         const val RESULT_DEVICE_REMOVED = 201
         const val RESULT_SYNC_TURNED_OFF = 202
 
-        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
+        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_EXTRA_KEY, ParcelableDevice.fromConnectedDevice(device))
     }
 }

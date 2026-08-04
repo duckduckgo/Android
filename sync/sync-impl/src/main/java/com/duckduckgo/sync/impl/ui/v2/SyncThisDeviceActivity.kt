@@ -35,7 +35,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ThisDeviceBinding
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
-import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_SYNC_WITH_ANOTHER_DEVICE
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -62,6 +61,17 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
     private lateinit var progressDrawable: IndeterminateDrawable<CircularProgressIndicatorSpec>
+
+    private val readSyncCodeLauncher = registerForActivityResult(ReadSyncCodeContract()) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))
+                finish()
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,8 +138,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
-                setResult(RESULT_SYNC_WITH_ANOTHER_DEVICE)
-                finish()
+                readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
             }
         }
     }

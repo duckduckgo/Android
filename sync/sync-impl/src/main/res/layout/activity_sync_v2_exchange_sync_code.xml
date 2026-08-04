@@ -36,7 +36,7 @@
             android:layout_marginTop="20dp"
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
-            app:lottie_autoPlay="true"
+            app:lottie_autoPlay="false"
             app:lottie_loop="false"
             app:lottie_rawRes="@raw/sync_exchange_sync_code_animation" />
 

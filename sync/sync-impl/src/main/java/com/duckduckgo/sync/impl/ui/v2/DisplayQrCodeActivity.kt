@@ -45,8 +45,7 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
@@ -135,8 +134,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
-            is SetSuccessResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_SUCCESS)
-            is SetFailureResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_FAILURE)
+            is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
             is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
@@ -145,10 +143,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private fun showHostConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setTitle(R.string.sync_simplified_pairing_dialog_host_confirmation_title)
             .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
-            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
-            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .setPositiveButton(R.string.sync_simplified_pairing_dialog_host_positive_cta)
+            .setNegativeButton(R.string.sync_simplified_pairing_dialog_host_negative_cta)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -165,10 +163,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private fun showJoinerConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setTitle(R.string.sync_simplified_pairing_dialog_joiner_confirmation_title)
             .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
-            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
-            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .setPositiveButton(R.string.sync_simplified_pairing_dialog_joiner_positive_cta)
+            .setNegativeButton(R.string.sync_simplified_pairing_dialog_joiner_negative_cta)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

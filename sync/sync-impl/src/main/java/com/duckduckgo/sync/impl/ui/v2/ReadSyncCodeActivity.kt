@@ -60,16 +60,18 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { result ->
-        when (result) {
-            is DisplayQrCodeContract.Output.Success -> finish()
-            is DisplayQrCodeContract.Output.Failure -> finish()
-            is DisplayQrCodeContract.Output.NoOp -> Unit
+    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { output ->
+        when (output) {
+            is DisplayQrCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is DisplayQrCodeContract.Output.Dismissed -> Unit
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) {
-        finish()
+    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) { output ->
+        when (output) {
+            is ExchangeSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is ExchangeSyncCodeContract.Output.Dismissed -> Unit
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,6 +115,11 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
                 Snackbar.make(binding.root, command.message, Snackbar.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun finishWithResult(result: SyncPairingResult) {
+        setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(result))
+        finish()
     }
 
     private fun configureEdgeToEdgeInsets() {
