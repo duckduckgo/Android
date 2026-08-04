@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Protección contra ventanas emergentes de cookies</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo intentará seleccionar la configuración más privada disponible y ocultar estas ventanas emergentes por ti.<a href=\"\">Más información</a>]]></string>
     <string name="autoconsentToggle">Deja que DuckDuckGo gestione las ventanas emergentes de cookies</string>
-    <string name="autoconsentAutoManageToggle">Gestionar automáticamente las ventanas emergentes de cookies</string>
-    <string name="autoconsentAutoManageDescription">Intentaremos seleccionar solo las opciones de cookies más privadas disponibles para ti y, a continuación, cerrar estas ventanas emergentes.</string>
+    <string name="autoconsentAutoManageToggle">Rechazar cookies opcionales</string>
+    <string name="autoconsentAutoManageDescription">Intentaremos rechazar el mayor número de cookies posible por ti y, a continuación, cerrar las ventanas emergentes.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo puede gestionar automáticamente tus preferencias de cookies para maximizar la privacidad, minimizar las cookies y cerrar estas ventanas emergentes.\n<a href=\"\">Más información</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ventanas emergentes sin opción de rechazarlas</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Deja también que DuckDuckGo te ahorre un clic al aceptar las cookies en tu nombre para cerrar las ventanas emergentes que no te dejan rechazarlas.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Aceptar cookies sin opción de rechazarlas</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Si no hay opción de rechazarlas, te ahorraremos un clic, aceptaremos estas cookies por ti y cerraremos las ventanas emergentes.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"¿Cansado de las ventanas emergentes de cookies que no te dejan rechazarlas?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Podemos ahorrarte un clic y aceptar estas cookies por ti."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Aceptar cookies sin opción de rechazarlas"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Seguiré aceptándolas por mi cuenta"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"¿Cansado de las ventanas emergentes de cookies que no te dejan en paz?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Intentaremos rechazar el mayor número de cookies posible. Si no hay opción de rechazarlas, te ahorraremos un clic y aceptaremos estas cookies por ti."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Rechazar cuando sea posible o aceptar por mí"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Seguiré gestionándolas por mi cuenta"</string>
+    <string name="autoconsentPopupConfirmButton">"Confirmar"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Puedes ajustar esto en cualquier momento en <b>Ajustes > Protección contra ventanas emergentes de cookies.</b>]]></string>
+
+
 </resources>
