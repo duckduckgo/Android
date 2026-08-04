@@ -203,10 +203,21 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         // A retained view model emits before a recreated view has been laid out, and the decoration fit
         // check measures the root's height, so measuring at 0 would hide the decoration for good.
         if (!binding.root.isLaidOut) {
-            binding.root.doOnLayout { renderConfig(viewModel.viewState.value) }
+            binding.root.doOnLayout {
+                // isLaidOut is only set after the layout listeners have run, it still reads false from in here,
+                // so we need to dispatch to a separate function
+                render(engine, viewModel.viewState.value)
+            }
             return
         }
 
+        render(engine, state)
+    }
+
+    private fun render(
+        engine: DialogRenderEngine,
+        state: ConfigDrivenOnboardingPageViewModel.ViewState,
+    ) {
         val stepId = state.stepId ?: return
         val config = state.config ?: return
         engine.render(stepId, config, state.animateEntry)

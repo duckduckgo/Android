@@ -64,6 +64,9 @@ class DialogRenderEngine(
 
     /**
      * Renders [config] for [stepId], animated when [animate].
+     *
+     * Re-rendering the [stepId] + [config] that is currently bound is a no-op, [animate] included, so a caller that can fire more
+     * than once for one state does not need to de-duplicate itself.
      */
     fun render(
         stepId: LinearOnboardingStepId,
