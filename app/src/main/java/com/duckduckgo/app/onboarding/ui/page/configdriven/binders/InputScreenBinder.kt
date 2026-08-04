@@ -64,7 +64,10 @@ class InputScreenBinder(
             fadeTargets = listOf(inputScreenPicker, inputScreenDescription),
             onContentReady = { inputScreenPicker.startWithAiAnimation(delayedStart = true) },
             result = { NewUserOnboardingEvent.InputModeConfirmed(state.value.withAi) },
-            unbind = { inputScreenPicker.cancelLottieAnimations() },
+            unbind = {
+                inputScreenPicker.setOnSelectionChangedListener {}
+                inputScreenPicker.cancelLottieAnimations()
+            },
         )
     }
 }

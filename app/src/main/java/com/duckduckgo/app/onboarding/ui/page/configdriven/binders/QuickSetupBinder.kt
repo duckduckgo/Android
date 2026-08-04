@@ -74,6 +74,12 @@ class QuickSetupBinder(
             title = quickSetupTitle,
             fadeTargets = listOf(quickSetupOptionsContainer),
             result = { NewUserOnboardingEvent.QuickSetupConfirmed(state.value.addressBarPosition, state.value.withAi) },
+            unbind = {
+                setDefaultBrowserItem.setOnCheckedChangeListener {}
+                addWidgetItem.setOnCheckedChangeListener {}
+                addressBarPositionItem.setOnClickListener(null)
+                addressBarSearchOptionsItem.setOnClickListener(null)
+            },
         )
     }
 
