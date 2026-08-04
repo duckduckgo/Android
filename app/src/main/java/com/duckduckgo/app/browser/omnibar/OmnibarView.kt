@@ -22,9 +22,9 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.NativeInputLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.StateChange
@@ -46,7 +46,7 @@ interface OmnibarView {
     fun setOmnibarTextListener(textListener: TextListener)
     fun setOmnibarItemPressedListener(itemPressedListener: ItemPressedListener)
     fun setLogoClickListener(logoClickListener: LogoClickListener)
-    fun setInputScreenLaunchListener(listener: InputScreenLaunchListener)
+    fun setNativeInputLaunchListener(listener: NativeInputLaunchListener)
     fun decorate(decoration: Decoration)
     fun reduce(stateChange: StateChange)
     fun isPulseAnimationPlaying(): Boolean

@@ -14,7 +14,7 @@ import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
@@ -106,7 +106,6 @@ class OmnibarLayoutViewModelTest {
     private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
-    private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val nativeChatInputEnabledFlow = MutableStateFlow(false)
     private val fakeNativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
@@ -155,7 +154,6 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
-        whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
         fakeNativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
@@ -1619,19 +1617,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
-        duckAiShowInputScreenFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
-        duckAiShowInputScreenFlow.value = false
+    fun whenNativeInputFieldDisabledThenShowClickCatcherFalse() = runTest {
+        nativeInputFieldSettingFlow.value = false
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -1710,8 +1697,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LaunchInputScreen)
-            assertEquals("draft", (command as LaunchInputScreen).query)
+            assertTrue(command is LaunchNativeInput)
+            assertEquals("draft", (command as LaunchNativeInput).query)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1726,8 +1713,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LaunchInputScreen)
-            assertEquals("test", (command as LaunchInputScreen).query)
+            assertTrue(command is LaunchNativeInput)
+            assertEquals("test", (command as LaunchNativeInput).query)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1744,8 +1731,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LaunchInputScreen)
-            assertEquals(RANDOM_URL, (command as LaunchInputScreen).query)
+            assertTrue(command is LaunchNativeInput)
+            assertEquals(RANDOM_URL, (command as LaunchNativeInput).query)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -2495,20 +2482,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
-        duckAiShowInputScreenFlow.value = true
-        testee.onDuckAiHeaderClicked()
-
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is LaunchInputScreen)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDuckAiHeaderPressedAndInputScreenDisabledThenFocusInputFieldCommandSent() = runTest {
-        duckAiShowInputScreenFlow.value = false
+    fun whenDuckAiHeaderPressedAndNativeInputDisabledThenFocusInputFieldCommandSent() = runTest {
+        nativeInputFieldSettingFlow.value = false
         givenDuckAILoaded()
         testee.onDuckAiHeaderClicked()
 
@@ -2526,14 +2501,13 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiHeaderPressedAndNativeInputEnabledThenInputScreenShown() = runTest {
-        duckAiShowInputScreenFlow.value = false
+    fun whenDuckAiHeaderPressedAndNativeInputEnabledThenNativeInputShown() = runTest {
         nativeInputFieldSettingFlow.value = true
         testee.onDuckAiHeaderClicked()
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LaunchInputScreen)
+            assertTrue(command is LaunchNativeInput)
             cancelAndIgnoreRemainingEvents()
         }
     }

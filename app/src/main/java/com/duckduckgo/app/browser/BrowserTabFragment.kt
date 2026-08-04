@@ -1406,7 +1406,7 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
-        configureInputScreenLauncher()
+        configureNativeInputLauncher()
         configureLogoClickListener()
     }
 
@@ -1420,14 +1420,10 @@ class BrowserTabFragment :
         )
     }
 
-    private fun configureInputScreenLauncher() {
-        omnibar.configureInputScreenLaunchListener { query ->
-            if (!nativeInputManager.isNativeInputEnabled()) {
-                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab, launchOnChat = omnibar.viewMode == ViewMode.DuckAI)
-            } else {
-                removeDuckChatContextualSheet()
-                showNativeInput(query)
-            }
+    private fun configureNativeInputLauncher() {
+        omnibar.configureNativeInputLaunchListener { query ->
+            removeDuckChatContextualSheet()
+            showNativeInput(query)
         }
     }
 
