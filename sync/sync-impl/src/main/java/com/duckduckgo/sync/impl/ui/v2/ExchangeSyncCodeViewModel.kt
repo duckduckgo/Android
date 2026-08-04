@@ -35,7 +35,7 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.toV1PairingError
@@ -58,7 +58,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class ExchangeSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val syncUrl: String,
-    @Assisted private val originalFlow: OriginalFlow,
+    @Assisted private val syncEntryPoint: SyncEntryPoint,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val syncFeature: SyncFeature,
@@ -252,7 +252,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
+            ?.let { device -> SyncPairingResult.Success(device, syncEntryPoint) }
             ?: SyncPairingResult.Failure
     }
 
@@ -294,18 +294,18 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             syncUrl: String,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): ExchangeSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val syncUrl: String,
-            private val originalFlow: OriginalFlow,
+            private val syncEntryPoint: SyncEntryPoint,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(syncUrl, originalFlow) as T
+                return assistedFactory.create(syncUrl, syncEntryPoint) as T
             }
         }
     }

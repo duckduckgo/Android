@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Intent
 import android.os.Parcelable
 import androidx.core.content.IntentCompat
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -31,7 +31,7 @@ sealed interface SyncPairingResult : Parcelable {
     @Parcelize
     data class Success(
         val device: ParcelableDevice,
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
     ) : SyncPairingResult
 
     @Parcelize

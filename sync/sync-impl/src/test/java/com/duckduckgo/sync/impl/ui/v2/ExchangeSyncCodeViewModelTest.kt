@@ -39,7 +39,7 @@ import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskSwitchAccount
@@ -88,7 +88,7 @@ class ExchangeSyncCodeViewModelTest {
 
     private fun createTestee() = ExchangeSyncCodeViewModel(
         syncUrl = "sync-url",
-        originalFlow = OriginalFlow.SYNC_THIS_DEVICE,
+        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         syncFeature = syncFeature,
@@ -139,7 +139,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -161,7 +161,7 @@ class ExchangeSyncCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -206,7 +206,7 @@ class ExchangeSyncCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -344,7 +344,7 @@ class ExchangeSyncCodeViewModelTest {
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
             assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
                 command.result,
             )
             assertIs<Close>(awaitItem())
@@ -474,7 +474,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -492,7 +492,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -527,7 +527,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

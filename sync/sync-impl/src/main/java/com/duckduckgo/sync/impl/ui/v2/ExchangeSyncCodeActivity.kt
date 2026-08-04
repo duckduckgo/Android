@@ -39,7 +39,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ExchangeSyncCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
@@ -84,15 +84,15 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
         }
 
-    private val originalFlow
+    private val syncEntryPoint
         get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
+            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java),
         ) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
     private val viewModel by viewModels<ExchangeSyncCodeViewModel> {
-        Provider(vmFactory, syncUrl, originalFlow)
+        Provider(vmFactory, syncUrl, syncEntryPoint)
     }
 
     private var acknowledgementDialog: TextAlertDialogBuilder? = null
@@ -267,7 +267,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeadline() {
-        val text = if (originalFlow == OriginalFlow.RECOVER_SYNCED_DATA) {
+        val text = if (syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
             R.string.sync_simplified_pairing_headline_recovery
         } else {
             R.string.sync_simplified_pairing_headline
@@ -310,12 +310,12 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             context: Context,
             syncUrl: String,
             launchSource: String?,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_URL_EXTRA_KEY, syncUrl)
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }
     }

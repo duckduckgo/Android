@@ -39,7 +39,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
@@ -63,14 +63,14 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val originalFlow
+    private val syncEntryPoint
         get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
+            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java),
         ) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
-    private val isRecoveryFlow get() = originalFlow == OriginalFlow.RECOVER_SYNCED_DATA
+    private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
 
     private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { output ->
         when (output) {
@@ -119,7 +119,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
                 val input = ExchangeSyncCodeContract.Input(
                     syncUrl = command.syncCode,
                     launchSource = launchSource,
-                    originalFlow = originalFlow,
+                    syncEntryPoint = syncEntryPoint,
                 )
                 exchangeSyncCodeLauncher.launch(input)
             }
@@ -147,7 +147,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
         binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
-            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, originalFlow))
+            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, syncEntryPoint))
         }
     }
 
@@ -197,11 +197,11 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             source: String?,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }
     }

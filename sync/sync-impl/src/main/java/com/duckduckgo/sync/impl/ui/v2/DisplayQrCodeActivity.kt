@@ -39,7 +39,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2DisplayQrCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
@@ -79,15 +79,15 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val originalFlow
+    private val syncEntryPoint
         get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
+            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java),
         ) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
     private val viewModel by viewModels<DisplayQrCodeViewModel> {
-        Provider(vmFactory, launchSource, originalFlow)
+        Provider(vmFactory, launchSource, syncEntryPoint)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -229,11 +229,11 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             source: String?,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }
     }

@@ -39,7 +39,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
@@ -64,7 +64,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val source: String?,
-    @Assisted private val originalFlow: OriginalFlow,
+    @Assisted private val syncEntryPoint: SyncEntryPoint,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -265,7 +265,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
+            ?.let { device -> SyncPairingResult.Success(device, syncEntryPoint) }
             ?: SyncPairingResult.Failure
     }
 
@@ -325,18 +325,18 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             source: String?,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val source: String?,
-            private val originalFlow: OriginalFlow,
+            private val syncEntryPoint: SyncEntryPoint,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source, originalFlow) as T
+                return assistedFactory.create(source, syncEntryPoint) as T
             }
         }
     }

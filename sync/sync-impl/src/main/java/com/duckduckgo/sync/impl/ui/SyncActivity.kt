@@ -55,7 +55,6 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -81,7 +80,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncSetup.WithAnotherDevice
@@ -167,7 +165,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private var pendingOriginalFlow: OriginalFlow? = null
+    private var pendingSyncEntryPoint: SyncEntryPoint? = null
 
     private val recoverAccountLauncher = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
@@ -181,8 +179,8 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncPreviousSessionReadyResult.Resumed -> viewModel.onDeviceConnected()
             is SyncPreviousSessionReadyResult.ContinueSetup -> {
-                viewModel.onContinueSetupAfterSkipRestore(pendingOriginalFlow)
-                pendingOriginalFlow = null
+                viewModel.onContinueSetupAfterSkipRestore(pendingSyncEntryPoint)
+                pendingSyncEntryPoint = null
             }
             is SyncPreviousSessionReadyResult.Cancelled -> viewModel.onConnectionCancelled()
         }
@@ -224,7 +222,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         savedInstanceState?.getString(KEY_PENDING_ORIGINAL_FLOW)?.let { name ->
-            pendingOriginalFlow = OriginalFlow.valueOf(name)
+            pendingSyncEntryPoint = SyncEntryPoint.valueOf(name)
         }
 
         binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
@@ -248,7 +246,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        pendingOriginalFlow?.let { outState.putString(KEY_PENDING_ORIGINAL_FLOW, it.name) }
+        pendingSyncEntryPoint?.let { outState.putString(KEY_PENDING_ORIGINAL_FLOW, it.name) }
     }
 
     private fun syncSetup(): SyncSetup? {
@@ -449,12 +447,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
             )
             is ShowPreviousSessionReady -> {
-                pendingOriginalFlow = command.originalFlow
+                pendingSyncEntryPoint = command.syncEntryPoint
                 authenticate {
-                    previousSessionReadyLauncher.launch(command.originalFlow.toPixelSource())
+                    previousSessionReadyLauncher.launch(command.syncEntryPoint.toAutoRestorePixelSource())
                 }
             }
-            is LaunchOriginalFlow -> launchOriginalFlow(command.originalFlow)
+            is LaunchOriginalFlow -> launchOriginalFlow(command.syncEntryPoint)
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,
@@ -648,12 +646,12 @@ class SyncActivity : DuckDuckGoActivity() {
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
     }
 
-    private fun launchOriginalFlow(originalFlow: OriginalFlow?) {
+    private fun launchOriginalFlow(syncEntryPoint: SyncEntryPoint?) {
         val source = extractSource()
-        when (originalFlow) {
-            OriginalFlow.SYNC_THIS_DEVICE -> syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, source))
-            OriginalFlow.SYNC_WITH_ANOTHER -> connectFlow.launch(ConnectFlowContractInput(source))
-            OriginalFlow.RECOVER_SYNCED_DATA -> recoverAccountLauncher.launch(null)
+        when (syncEntryPoint) {
+            SyncEntryPoint.SYNC_NEW_ACCOUNT -> syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, source))
+            SyncEntryPoint.ADD_DEVICE -> connectFlow.launch(ConnectFlowContractInput(source))
+            SyncEntryPoint.RECOVER_SYNCED_DATA -> recoverAccountLauncher.launch(null)
             null -> {}
         }
     }
@@ -661,12 +659,6 @@ class SyncActivity : DuckDuckGoActivity() {
     companion object {
         private const val KEY_PENDING_ORIGINAL_FLOW = "pendingOriginalFlow"
     }
-}
-
-private fun OriginalFlow.toPixelSource(): String = when (this) {
-    OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
-    OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
-    OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
 }
 
 data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams

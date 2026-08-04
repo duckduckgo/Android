@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Input
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Output
 
@@ -32,7 +32,7 @@ class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
             context = context,
             syncUrl = input.syncUrl,
             launchSource = input.launchSource,
-            originalFlow = input.originalFlow,
+            syncEntryPoint = input.syncEntryPoint,
         )
     }
 
@@ -55,7 +55,7 @@ class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
     data class Input(
         val syncUrl: String,
         val launchSource: String?,
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
     )
 
     sealed interface Output {

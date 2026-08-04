@@ -87,7 +87,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
@@ -238,13 +238,13 @@ class SyncActivity : DuckDuckGoActivity() {
                     ExchangeSyncCodeContract.Input(
                         syncUrl = output.recoveryCode,
                         launchSource = launchSource,
-                        originalFlow = OriginalFlow.RECOVER_SYNCED_DATA,
+                        syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
                     ),
                 )
             }
 
             is PreviousSessionReadyContract.Output.ContinueSetup -> {
-                viewModel.onContinueSetupAfterSkipRestore(output.originalFlow)
+                viewModel.onContinueSetupAfterSkipRestore(output.syncEntryPoint)
             }
 
             is PreviousSessionReadyContract.Output.Dismissed -> {
@@ -389,7 +389,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_WITH_ANOTHER))
+                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.ADD_DEVICE))
                 }
             }
 
@@ -433,16 +433,16 @@ class SyncActivity : DuckDuckGoActivity() {
                     displayTextResource = R.string.sync_simplified_deep_link_auth_prompt_message,
                 )
                 authenticate(config = authConfig) {
-                    val originalFlow = if (command.isSignedIn) {
-                        OriginalFlow.SYNC_WITH_ANOTHER
+                    val syncEntryPoint = if (command.isSignedIn) {
+                        SyncEntryPoint.ADD_DEVICE
                     } else {
-                        OriginalFlow.SYNC_THIS_DEVICE
+                        SyncEntryPoint.SYNC_NEW_ACCOUNT
                     }
                     exchangeSyncCodeLauncher.launch(
                         ExchangeSyncCodeContract.Input(
                             syncUrl = command.barcodeSyncUrl.asUrl(),
                             launchSource = launchSource,
-                            originalFlow = originalFlow,
+                            syncEntryPoint = syncEntryPoint,
                         ),
                     )
                 }
@@ -487,18 +487,18 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchOriginalFlow -> {
-                when (command.originalFlow) {
-                    OriginalFlow.SYNC_THIS_DEVICE -> {
+                when (command.syncEntryPoint) {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
                         val input = SyncThisDeviceContract.Input(launchSource)
                         syncThisDeviceLauncher.launch(input)
                     }
 
-                    OriginalFlow.SYNC_WITH_ANOTHER -> {
-                        val input = ReadSyncCodeContract.Input(launchSource, command.originalFlow)
+                    SyncEntryPoint.ADD_DEVICE -> {
+                        val input = ReadSyncCodeContract.Input(launchSource, command.syncEntryPoint)
                         syncWithAnotherDeviceLauncher.launch(input)
                     }
 
-                    OriginalFlow.RECOVER_SYNCED_DATA -> {
+                    SyncEntryPoint.RECOVER_SYNCED_DATA -> {
                         val input = RecoverSyncedDataContract.Input(launchSource)
                         recoverSyncedDataLauncher.launch(input)
                     }
@@ -549,7 +549,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        previousSessionReadyLauncher.launch(PreviousSessionReadyContract.Input(command.originalFlow))
+                        previousSessionReadyLauncher.launch(PreviousSessionReadyContract.Input(command.syncEntryPoint))
                     },
                 )
             }
@@ -559,7 +559,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_THIS_DEVICE))
+                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT))
                 }
             }
         }
@@ -569,11 +569,11 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
-                when (result.originalFlow) {
-                    OriginalFlow.SYNC_THIS_DEVICE, OriginalFlow.RECOVER_SYNCED_DATA ->
+                when (result.syncEntryPoint) {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT, SyncEntryPoint.RECOVER_SYNCED_DATA ->
                         recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
 
-                    OriginalFlow.SYNC_WITH_ANOTHER -> Unit
+                    SyncEntryPoint.ADD_DEVICE -> Unit
                 }
             }
 
