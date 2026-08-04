@@ -79,12 +79,12 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(
-        ExchangeSyncCodeContract(),
+    private val processSyncCodeLauncher = registerForActivityResult(
+        ProcessSyncCodeContract(),
     ) { output ->
         when (output) {
-            is ExchangeSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
-            is ExchangeSyncCodeContract.Output.Dismissed -> Unit
+            is ProcessSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is ProcessSyncCodeContract.Output.Dismissed -> Unit
         }
     }
 
@@ -118,8 +118,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is StartSyncProcess -> {
-                exchangeSyncCodeLauncher.launch(
-                    ExchangeSyncCodeContract.Input(
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
                         syncCode = command.syncCode,
                         syncEntryPoint = syncEntryPoint,
                         launchSource = launchSource,

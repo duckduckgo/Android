@@ -20,15 +20,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Input
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeContract.Output
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeContract.Input
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeContract.Output
 
-class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
+class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return ExchangeSyncCodeActivity.intent(
+        return ProcessSyncCodeActivity.intent(
             context = context,
             syncCode = input.syncCode,
             syncEntryPoint = input.syncEntryPoint,

@@ -40,15 +40,15 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskSwitchAccount
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskSwitchAccount
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.RunAcknowledgmentAnimation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.SetPairingResult
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowPairingAcknowledgement
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowV1Error
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -67,7 +67,7 @@ import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-class ExchangeSyncCodeViewModelTest {
+class ProcessSyncCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -86,7 +86,7 @@ class ExchangeSyncCodeViewModelTest {
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
-    private fun createTestee() = ExchangeSyncCodeViewModel(
+    private fun createTestee() = ProcessSyncCodeViewModel(
         syncCode = "sync-url",
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         accountRepository = accountRepository,

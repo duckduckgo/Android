@@ -24,7 +24,7 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * Terminal outcome of a sync-with-another-device attempt. Produced by the leaf activity
- * ([ExchangeSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
+ * ([ProcessSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
  * back stack so that [SyncActivity] can decide which completion screen to show.
  */
 sealed interface SyncPairingResult : Parcelable {

@@ -37,25 +37,25 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ExchangeSyncCodeBinding
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ProcessSyncCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskSwitchAccount
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Factory.Provider
-import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.AskSwitchAccount
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.RunAcknowledgmentAnimation
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.SetPairingResult
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowPairingAcknowledgement
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowV1Error
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Factory
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.Factory.Provider
+import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeViewModel.ViewState
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import kotlinx.coroutines.delay
@@ -67,8 +67,8 @@ import kotlin.time.Duration.Companion.seconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
-    private val binding by viewBinding<ActivitySyncV2ExchangeSyncCodeBinding>()
+class ProcessSyncCodeActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncV2ProcessSyncCodeBinding>()
 
     @Inject
     lateinit var vmFactory: Factory
@@ -89,7 +89,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
-    private val viewModel by viewModels<ExchangeSyncCodeViewModel> {
+    private val viewModel by viewModels<ProcessSyncCodeViewModel> {
         Provider(vmFactory, syncCode, syncEntryPoint)
     }
 
@@ -310,7 +310,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
             syncEntryPoint: SyncEntryPoint,
             launchSource: String?,
         ): Intent {
-            return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
+            return Intent(context, ProcessSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_CODE_EXTRA_KEY, syncCode)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)

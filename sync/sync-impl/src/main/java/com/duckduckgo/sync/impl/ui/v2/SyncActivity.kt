@@ -209,8 +209,8 @@ class SyncActivity : DuckDuckGoActivity() {
     ) { output ->
         when (output) {
             is PreviousSessionReadyContract.Output.Resume -> {
-                exchangeSyncCodeLauncher.launch(
-                    ExchangeSyncCodeContract.Input(
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
                         syncCode = output.recoveryCode,
                         syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
                         launchSource = launchSource,
@@ -238,15 +238,15 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(
-        ExchangeSyncCodeContract(),
+    private val processSyncCodeLauncher = registerForActivityResult(
+        ProcessSyncCodeContract(),
     ) { output ->
         when (output) {
-            is ExchangeSyncCodeContract.Output.SyncCompleted -> {
+            is ProcessSyncCodeContract.Output.SyncCompleted -> {
                 handlePairingResult(output.result)
             }
 
-            is ExchangeSyncCodeContract.Output.Dismissed -> {
+            is ProcessSyncCodeContract.Output.Dismissed -> {
                 viewModel.onSyncThisDeviceCanceled()
                 viewModel.onConnectionCancelled()
             }
@@ -455,8 +455,8 @@ class SyncActivity : DuckDuckGoActivity() {
                     } else {
                         SyncEntryPoint.SYNC_NEW_ACCOUNT
                     }
-                    exchangeSyncCodeLauncher.launch(
-                        ExchangeSyncCodeContract.Input(
+                    processSyncCodeLauncher.launch(
+                        ProcessSyncCodeContract.Input(
                             syncCode = command.barcodeSyncUrl.asUrl(),
                             syncEntryPoint = syncEntryPoint,
                             launchSource = launchSource,

@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
-class ExchangeSyncCodeViewModel @AssistedInject constructor(
+class ProcessSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val syncCode: String,
     @Assisted private val syncEntryPoint: SyncEntryPoint,
     private val accountRepository: SyncAccountRepository,
@@ -295,7 +295,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
         fun create(
             syncCode: String,
             syncEntryPoint: SyncEntryPoint,
-        ): ExchangeSyncCodeViewModel
+        ): ProcessSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
