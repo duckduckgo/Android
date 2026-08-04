@@ -100,6 +100,34 @@ class DialogConfigResolverTest {
     }
 
     @Test
+    fun `resolves the initial welcome dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves the reinstall welcome dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InitialReinstallUser, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves the sync restore dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.SyncRestore, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves a mid-flow dialog with an immediate card entry`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ComparisonChart, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.Immediate, config.cardEntry)
+    }
+
+    @Test
     fun `resolves the initial welcome dialog with a continue cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
 
