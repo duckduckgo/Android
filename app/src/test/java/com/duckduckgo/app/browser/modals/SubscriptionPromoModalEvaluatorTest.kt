@@ -20,8 +20,8 @@ import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecision
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
-import com.duckduckgo.modalcoordinator.api.ModalTrigger
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
+import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

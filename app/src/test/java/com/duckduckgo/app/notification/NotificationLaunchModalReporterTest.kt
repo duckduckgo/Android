@@ -20,7 +20,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.BadParcelableException
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.modalcoordinator.api.ModalShownReporter
+import com.duckduckgo.promptscoordinator.api.ModalShownReporter
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

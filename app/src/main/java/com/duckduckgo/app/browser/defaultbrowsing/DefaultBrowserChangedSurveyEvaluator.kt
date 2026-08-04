@@ -25,7 +25,7 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn

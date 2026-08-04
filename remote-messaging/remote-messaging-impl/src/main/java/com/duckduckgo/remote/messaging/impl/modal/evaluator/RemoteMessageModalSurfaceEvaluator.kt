@@ -24,8 +24,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles

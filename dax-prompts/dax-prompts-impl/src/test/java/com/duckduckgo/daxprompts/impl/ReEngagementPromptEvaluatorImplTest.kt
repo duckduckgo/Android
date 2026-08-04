@@ -32,8 +32,8 @@ import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
