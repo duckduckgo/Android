@@ -158,6 +158,18 @@ class RealDuckChatPixelsAttachmentsTest {
     }
 
     @Test
+    fun whenVoiceSearchTappedThenCountAndDaily() = runTest {
+        testee.fireVoiceSearchTapped()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_DAILY,
+            parameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
     fun whenStopTappedThenSingleCount() = runTest {
         testee.fireStopGenerationTapped(DuckChatPixelSurface.DUCK_AI)
 

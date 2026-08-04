@@ -1639,6 +1639,12 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenVoiceSearchTappedThenVoiceSearchPixel() {
+        testee.fireVoiceSearchTapped()
+        verify(duckChatPixels).fireVoiceSearchTapped()
+    }
+
+    @Test
     fun whenStopGenerationTappedThenStopPixel() {
         testee.fireStopGenerationTapped()
         verify(duckChatPixels).fireStopGenerationTapped(any())

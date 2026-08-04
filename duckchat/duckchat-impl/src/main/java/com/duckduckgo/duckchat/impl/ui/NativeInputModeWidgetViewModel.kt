@@ -262,6 +262,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
 
+    fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped()
+
     fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
