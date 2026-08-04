@@ -35,6 +35,7 @@ interface DeviceInfoDecryptor {
     fun openSession(): Result<Session>
 
     /** Decrypts `device_info` blobs with a private key held only for this session's lifetime. */
+    @WorkerThread
     interface Session {
         fun decrypt(deviceInfoJwe: String): Result<DeviceInfoPayload>
     }
