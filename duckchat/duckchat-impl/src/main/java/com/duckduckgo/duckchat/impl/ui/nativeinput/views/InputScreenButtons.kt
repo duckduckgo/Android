@@ -36,7 +36,7 @@ class InputScreenButtons @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     useTopBar: Boolean = true,
-    @LayoutRes layoutResId: Int = R.layout.view_input_screen_buttons,
+    @LayoutRes layoutResId: Int,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val actionSend: ImageView by lazy { findViewById(R.id.actionSend) }

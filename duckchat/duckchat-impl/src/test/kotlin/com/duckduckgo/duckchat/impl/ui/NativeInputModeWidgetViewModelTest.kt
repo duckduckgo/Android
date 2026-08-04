@@ -58,7 +58,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -114,7 +113,6 @@ class NativeInputModeWidgetViewModelTest {
     private val autoComplete: AutoComplete = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
-    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
@@ -166,7 +164,6 @@ class NativeInputModeWidgetViewModelTest {
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
         testee = createViewModel()
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
@@ -186,7 +183,6 @@ class NativeInputModeWidgetViewModelTest {
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             dispatchers = coroutineRule.testDispatcherProvider,
-            inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             duckChatPixels = duckChatPixels,
             nativeInputStatePublisher = nativeInputStatePublisher,

@@ -34,7 +34,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
-import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsAdapter
@@ -57,14 +56,12 @@ import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputChatSuggestionsBinderTest {
-    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private lateinit var binder: NativeInputChatSuggestionsBinder
 
     @Before
     fun setUp() {
-        whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
         whenever(duckAiFeatureState.showClearDuckAIChatHistory).thenReturn(MutableStateFlow(true))
         binder = binderWith()
     }
@@ -339,7 +336,6 @@ class NativeInputChatSuggestionsBinderTest {
 
     private fun binderWith(vararg plugins: NativeInputChatTabItemPlugin): NativeInputChatSuggestionsBinder =
         NativeInputChatSuggestionsBinder(
-            inputScreenConfigResolver,
             object : ActivePluginPoint<NativeInputChatTabItemPlugin> {
                 override suspend fun getPlugins(): Collection<NativeInputChatTabItemPlugin> = plugins.toList()
             },

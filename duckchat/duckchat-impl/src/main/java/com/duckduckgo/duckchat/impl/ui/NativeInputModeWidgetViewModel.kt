@@ -56,7 +56,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -106,7 +105,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val dispatchers: DispatcherProvider,
-    private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
     private val duckChatPixels: DuckChatPixels,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
@@ -118,7 +116,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
-        AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+        AutoComplete.Config(showInstalledApps = false),
         browserMode,
     )
 

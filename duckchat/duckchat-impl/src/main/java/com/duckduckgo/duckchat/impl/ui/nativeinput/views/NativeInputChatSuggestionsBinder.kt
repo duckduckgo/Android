@@ -30,7 +30,6 @@ import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
-import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSearchSuggestionAdapter
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
@@ -47,7 +46,6 @@ import javax.inject.Inject
  * (priority) order, above the built-in sections. See [Binding.loadPluginItems].
  */
 class NativeInputChatSuggestionsBinder @Inject constructor(
-    private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
     private val inputModeState: DuckChatInputModeState,
     private val duckChatFeature: DuckChatFeature,
@@ -195,7 +193,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
             autoCompleteDeleteClickListener = { if (removeChatHistoryEnabled) onChatUrlSuggestionDeleteClicked(it) },
-            omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
+            omnibarType = OmnibarType.SINGLE_TOP,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
             isDeleteButtonVisible = removeChatHistoryEnabled,
