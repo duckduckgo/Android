@@ -46,6 +46,7 @@ import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskSwitchAccount
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
@@ -141,6 +142,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         when (command) {
             is AskHostConfirmation -> showHostConfirmationDialog(command.peerName, command.peerKind)
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
+            is AskSwitchAccount -> showSwitchAccountDialog(command.encodedStringCode)
             is ShowPairingAcknowledgement -> showPairingAcknowledgmentDialog()
             is RunAcknowledgmentAnimation -> runAcknowledgementAnimation()
             is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
@@ -190,6 +192,26 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
 
                     override fun onNegativeButtonClicked() {
                         viewModel.onJoinerDenied()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showSwitchAccountDialog(encodedStringCode: String) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_switch_account_header)
+            .setMessage(R.string.sync_dialog_switch_account_description)
+            .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
+            .setNegativeButton(R.string.sync_dialog_switch_account_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAcceptedSwitchingAccount(encodedStringCode)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserCancelledSwitchingAccount()
                     }
                 },
             )

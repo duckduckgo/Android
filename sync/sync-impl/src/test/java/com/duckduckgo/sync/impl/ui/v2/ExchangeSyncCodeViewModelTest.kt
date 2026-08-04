@@ -18,11 +18,16 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.DispatchOutcome
+import com.duckduckgo.sync.impl.ExchangeResult
+import com.duckduckgo.sync.impl.InvitationCode
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
@@ -31,11 +36,13 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
+import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskSwitchAccount
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.RunAcknowledgmentAnimation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairingResult
@@ -65,6 +72,7 @@ class ExchangeSyncCodeViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val recoveryAuthCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = "primary-key", userId = "user-id"))
+    private val exchangeAuthCode = SyncAuthCode.Exchange(InvitationCode(keyId = "key-id", publicKey = "public-key"))
 
     private val thisDevice = ConnectedDevice(
         thisDevice = true,
@@ -76,12 +84,14 @@ class ExchangeSyncCodeViewModelTest {
 
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private fun createTestee() = ExchangeSyncCodeViewModel(
         syncUrl = "sync-url",
         originalFlow = OriginalFlow.SYNC_THIS_DEVICE,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
+        syncFeature = syncFeature,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -174,6 +184,219 @@ class ExchangeSyncCodeViewModelTest {
             assertIs<ShowV1Error>(command)
             assertEquals(R.string.sync_connect_login_error, command.content.message)
             assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when processing a legacy exchange code succeeds then the recovery key is polled until login completes`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.Pending), Result.Success(ExchangeResult.LoggedIn))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            testee.onAnimationComplete()
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                command.result,
+            )
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the exchange login completes then the screen does not close until the animation completes`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin()).thenReturn(Result.Success(ExchangeResult.LoggedIn))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when polling for the recovery key fails then a v1 error is shown`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin()).thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_login_error, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when processing fails on an already signed in device and seamless switching is enabled then the user is asked to switch`() = runTest {
+        givenSeamlessAccountSwitching(enabled = true)
+        givenLegacyCode(recoveryAuthCode)
+        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertEquals(AskSwitchAccount("sync-url"), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when processing fails on an already signed in device and seamless switching is disabled then an error is shown`() = runTest {
+        givenSeamlessAccountSwitching(enabled = false)
+        givenLegacyCode(recoveryAuthCode)
+        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_login_authenticated_device_error, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when polling fails on an already signed in device and seamless switching is enabled then the user is asked to switch`() = runTest {
+        givenSeamlessAccountSwitching(enabled = true)
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertEquals(AskSwitchAccount("sync-url"), awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when polling requires account switching then the user is asked to switch accounts`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertEquals(AskSwitchAccount("encoded-code"), awaitItem())
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user accepts switching accounts then the account is switched and a success result is set`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+        whenever(accountRepository.logoutAndJoinNewAccount("encoded-code")).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+
+            testee.onAnimationComplete()
+            testee.onUserAcceptedSwitchingAccount("encoded-code")
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                command.result,
+            )
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+        verify(accountRepository).logoutAndJoinNewAccount("encoded-code")
+    }
+
+    @Test
+    fun `when switching accounts fails then a v1 error is shown`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+        whenever(accountRepository.logoutAndJoinNewAccount("encoded-code"))
+            .thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+
+            testee.onUserAcceptedSwitchingAccount("encoded-code")
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_login_error, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user cancels switching accounts then the failure result is set and the screen closes`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+
+            testee.onUserCancelledSwitchingAccount()
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Failure, command.result)
+            assertIs<Close>(awaitItem())
 
             cancel()
         }
@@ -467,6 +690,10 @@ class ExchangeSyncCodeViewModelTest {
 
     private fun givenLegacyCode(authCode: SyncAuthCode) {
         whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.Legacy(authCode))
+    }
+
+    private fun givenSeamlessAccountSwitching(enabled: Boolean) {
+        syncFeature.seamlessAccountSwitching().setRawStoredState(State(enabled))
     }
 
     private fun givenV2Outcomes(vararg outcomes: DispatchOutcome) {
