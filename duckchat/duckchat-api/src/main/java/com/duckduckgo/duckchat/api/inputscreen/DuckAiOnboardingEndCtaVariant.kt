@@ -17,14 +17,15 @@
 package com.duckduckgo.duckchat.api.inputscreen
 
 /**
- * Provides animation resources for activity transitions between browser and input screen.
+ * Which variant of the Duck.AI onboarding end CTA should be rendered.
  */
-interface BrowserAndInputScreenTransitionProvider {
-    fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int
+enum class DuckAiOnboardingEndCtaVariant {
+    /** Don't render the end CTA. */
+    NONE,
 
-    fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int
+    /** Legacy visual style. */
+    LEGACY,
 
-    fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int
-
-    fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int
+    /** Brand-design redesign of the end CTA. */
+    BRAND_DESIGN_UPDATE,
 }
