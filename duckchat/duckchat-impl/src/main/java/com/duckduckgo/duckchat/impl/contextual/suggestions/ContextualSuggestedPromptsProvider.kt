@@ -50,13 +50,13 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
     override suspend fun resolveSuggestions(
         input: ResolvePageSuggestionsInput,
     ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
-        val catalog = bundledCatalog ?: return@withContext DECODE_FAILURE_FALLBACK
+        val catalog = bundledCatalog ?: return@withContext emptyList()
         ContextualSuggestionsMatcher.resolve(input, catalog)
             .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
     }
 
     override suspend fun maxSuggestedPrompts(): Int = withContext(dispatcherProvider.io()) {
-        bundledCatalog?.maxSuggestedPrompts ?: DECODE_FAILURE_FALLBACK.size
+        bundledCatalog?.maxSuggestedPrompts ?: 1
     }
 
     override suspend fun prioritySuggestionIds(): Set<String> = withContext(dispatcherProvider.io()) {
@@ -76,13 +76,5 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
     companion object {
         private const val CATALOG_ASSET_PATH = "PageSuggestionsCatalog.json"
         private const val SUGGESTION_ID_SUMMARIZE_PAGE = "summarize-page"
-        private val DECODE_FAILURE_FALLBACK = listOf(
-            ContextualSuggestedPrompt(
-                id = SUGGESTION_ID_SUMMARIZE_PAGE,
-                label = "Summarize this page",
-                prompt = "Summarize this page.",
-                icon = "summary",
-            ),
-        )
     }
 }

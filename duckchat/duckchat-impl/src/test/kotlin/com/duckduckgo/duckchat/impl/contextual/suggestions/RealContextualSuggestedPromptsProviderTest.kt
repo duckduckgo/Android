@@ -98,7 +98,7 @@ class RealContextualSuggestedPromptsProviderTest {
     }
 
     @Test
-    fun whenCatalogAssetMissingThenBudgetMatchesFallbackAndNoPriorityIds() = runTest {
+    fun whenCatalogAssetMissingThenMinimalBudgetAndNoPriorityIds() = runTest {
         provider.catalogAssetPath = "DoesNotExist.json"
 
         assertEquals(1, provider.maxSuggestedPrompts())
@@ -106,7 +106,7 @@ class RealContextualSuggestedPromptsProviderTest {
     }
 
     @Test
-    fun whenCatalogAssetMissingThenReturnsSummarizePageFallback() = runTest {
+    fun whenCatalogAssetMissingThenReturnsNoSuggestions() = runTest {
         provider.catalogAssetPath = "DoesNotExist.json"
 
         val result = provider.resolveSuggestions(
@@ -117,7 +117,6 @@ class RealContextualSuggestedPromptsProviderTest {
             ),
         )
 
-        assertEquals(1, result.size)
-        assertEquals("summarize-page", result.first().id)
+        assertTrue(result.isEmpty())
     }
 }

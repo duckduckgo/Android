@@ -133,7 +133,7 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
-    fun `when provider returns the summarize-page fallback then it is rendered`() = runTest {
+    fun `when provider returns a summarize-page suggestion then it is rendered`() = runTest {
         val fallback = ContextualSuggestedPrompt("summarize-page", "Summarize this page", "Summarize this page.", "summary")
         stubProvider(listOf(fallback))
 
