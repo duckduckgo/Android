@@ -54,4 +54,13 @@ interface ContentScopeScriptsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun optimizeContentScopeMessaging(): Toggle
+
+    /**
+     * Kill-switch for holding the resolved contentScope experiments between privacy config updates.
+     * @return `true` when the remote config has the global "cacheContentScopeExperiments" clientContentFeatures
+     * sub-feature flag enabled.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun cacheContentScopeExperiments(): Toggle
 }
