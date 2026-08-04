@@ -40,7 +40,7 @@ class BackgroundControllerImpl(private val animator: OnboardingBackgroundAnimato
         if (previous == next) return
         if (animate) {
             transitioningTo = next
-            animator.transitionTo(next)
+            animator.transitionTo(next, onAnimationEnd = { if (transitioningTo == next) transitioningTo = null })
         } else {
             transitioningTo = null
             animator.snapTo(next)

@@ -56,6 +56,9 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
 
     private val runningAnimators = mutableListOf<Animator>()
 
+    private val morphScene: ViewGroup
+        get() = binding.daxDialogCta.root
+
     /**
      * The morph continuation waiting on a `ChangeBounds` that has not ended yet. Held so [settle] can run it
      * early, and nulled first so the transition's own `onTransitionEnd` does not run it a second time.
@@ -91,9 +94,9 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
     }
 
     override fun morph(animate: Boolean, onEnd: () -> Unit) {
-        // A delayed transition no-ops on a root that has not been laid out and its end callback never fires, so
-        // the continuation has to run directly; the first layout pass places everything anyway.
-        if (!animate || !binding.root.isLaidOut) {
+        // A delayed transition no-ops on a scene root that has not been laid out and its end callback never
+        // fires, so the continuation has to run directly; the first layout pass places everything anyway.
+        if (!animate || !morphScene.isLaidOut) {
             onEnd()
             return
         }
@@ -108,11 +111,9 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
             },
         )
         pendingMorph = onEnd
-        // ViewBinding types the root as View because the layout has multiple variants; the page root is always
-        // a ViewGroup.
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+        TransitionManager.beginDelayedTransition(morphScene, transition)
         // Guarantees a layout pass is observed even if none of this render's view mutations triggered one.
-        binding.root.requestLayout()
+        morphScene.requestLayout()
     }
 
     override fun showCtaButtons(
@@ -162,7 +163,7 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
     override fun settle() {
         // Ends the transition: a superseded ChangeBounds is paused and resumed by the
         // next beginDelayedTransition rather than ended, so it would otherwise fire into the next render's slot.
-        TransitionManager.endTransitions(binding.root as ViewGroup)
+        TransitionManager.endTransitions(morphScene)
         pendingMorph?.let { continuation ->
             pendingMorph = null
             continuation()
