@@ -35,7 +35,6 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2PreviousSessionReadyBinding
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.toAutoRestorePixelSource
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyViewModel.Command
@@ -168,4 +167,3 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
         }
     }
 }
-
