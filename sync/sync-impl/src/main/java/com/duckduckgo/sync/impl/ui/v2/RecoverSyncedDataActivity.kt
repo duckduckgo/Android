@@ -87,8 +87,8 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
         binding.recoverDataButton.setOnClickListener {
             readSyncCodeLauncher.launch(
                 ReadSyncCodeContract.Input(
-                    launchSource = launchSource,
                     syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
+                    launchSource = launchSource,
                 ),
             )
         }

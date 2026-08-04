@@ -307,13 +307,13 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncCode: String,
-            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): Intent {
             return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_CODE_EXTRA_KEY, syncCode)
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

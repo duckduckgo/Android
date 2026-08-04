@@ -31,8 +31,8 @@ class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
         return ExchangeSyncCodeActivity.intent(
             context = context,
             syncCode = input.syncCode,
-            launchSource = input.launchSource,
             syncEntryPoint = input.syncEntryPoint,
+            launchSource = input.launchSource,
         )
     }
 
@@ -54,8 +54,8 @@ class ExchangeSyncCodeContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val syncCode: String,
-        val launchSource: String?,
         val syncEntryPoint: SyncEntryPoint,
+        val launchSource: String?,
     )
 
     sealed interface Output {

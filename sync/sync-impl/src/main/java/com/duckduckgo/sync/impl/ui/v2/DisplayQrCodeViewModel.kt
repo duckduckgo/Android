@@ -63,8 +63,8 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
-    @Assisted private val launchSource: String?,
     @Assisted private val syncEntryPoint: SyncEntryPoint,
+    @Assisted private val launchSource: String?,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -324,19 +324,19 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val launchSource: String?,
             private val syncEntryPoint: SyncEntryPoint,
+            private val launchSource: String?,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource, syncEntryPoint) as T
+                return assistedFactory.create(syncEntryPoint, launchSource) as T
             }
         }
     }

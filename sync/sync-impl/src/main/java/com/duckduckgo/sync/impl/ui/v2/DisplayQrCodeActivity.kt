@@ -85,7 +85,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         }
 
     private val viewModel by viewModels<DisplayQrCodeViewModel> {
-        Provider(vmFactory, launchSource, syncEntryPoint)
+        Provider(vmFactory, syncEntryPoint, launchSource)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -226,12 +226,12 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

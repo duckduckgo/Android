@@ -145,8 +145,8 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
                 readSyncCodeLauncher.launch(
                     ReadSyncCodeContract.Input(
-                        launchSource = launchSource,
                         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        launchSource = launchSource,
                     ),
                 )
             }

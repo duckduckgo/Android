@@ -212,8 +212,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 exchangeSyncCodeLauncher.launch(
                     ExchangeSyncCodeContract.Input(
                         syncCode = output.recoveryCode,
-                        launchSource = launchSource,
                         syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
+                        launchSource = launchSource,
                     ),
                 )
             }
@@ -397,8 +397,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     addDeviceLauncher.launch(
                         ReadSyncCodeContract.Input(
-                            launchSource = launchSource,
                             syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
+                            launchSource = launchSource,
                         ),
                     )
                 }
@@ -458,8 +458,8 @@ class SyncActivity : DuckDuckGoActivity() {
                     exchangeSyncCodeLauncher.launch(
                         ExchangeSyncCodeContract.Input(
                             syncCode = command.barcodeSyncUrl.asUrl(),
-                            launchSource = launchSource,
                             syncEntryPoint = syncEntryPoint,
+                            launchSource = launchSource,
                         ),
                     )
                 }
@@ -524,8 +524,8 @@ class SyncActivity : DuckDuckGoActivity() {
                     SyncEntryPoint.ADD_DEVICE -> {
                         syncNewAccountLauncher.launch(
                             ReadSyncCodeContract.Input(
-                                launchSource = launchSource,
                                 syncEntryPoint = command.syncEntryPoint,
+                                launchSource = launchSource,
                             ),
                         )
                     }
@@ -600,8 +600,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     syncNewAccountLauncher.launch(
                         ReadSyncCodeContract.Input(
-                            launchSource = launchSource,
                             syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                            launchSource = launchSource,
                         ),
                     )
                 }
