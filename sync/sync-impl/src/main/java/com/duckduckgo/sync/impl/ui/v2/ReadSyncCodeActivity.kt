@@ -64,9 +64,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
     private val syncEntryPoint
-        get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java),
-        ) {
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
@@ -120,12 +118,13 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is StartSyncProcess -> {
-                val input = ExchangeSyncCodeContract.Input(
-                    syncUrl = command.syncCode,
-                    launchSource = launchSource,
-                    syncEntryPoint = syncEntryPoint,
+                exchangeSyncCodeLauncher.launch(
+                    ExchangeSyncCodeContract.Input(
+                        syncUrl = command.syncCode,
+                        launchSource = launchSource,
+                        syncEntryPoint = syncEntryPoint,
+                    )
                 )
-                exchangeSyncCodeLauncher.launch(input)
             }
 
             is ShowMessage -> {
@@ -151,7 +150,12 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
         binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
-            showQrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, syncEntryPoint))
+            showQrCodeLauncher.launch(
+                DisplayQrCodeContract.Input(
+                    source = launchSource,
+                    syncEntryPoint = syncEntryPoint,
+                )
+            )
         }
     }
 

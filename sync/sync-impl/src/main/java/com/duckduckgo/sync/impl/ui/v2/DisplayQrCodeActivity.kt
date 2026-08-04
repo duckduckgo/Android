@@ -80,9 +80,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
     private val syncEntryPoint
-        get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java),
-        ) {
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 

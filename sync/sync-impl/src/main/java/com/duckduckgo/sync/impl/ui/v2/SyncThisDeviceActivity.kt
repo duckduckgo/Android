@@ -143,7 +143,12 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
-                readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT))
+                readSyncCodeLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        source = launchSource,
+                        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                    )
+                )
             }
         }
     }

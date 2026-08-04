@@ -150,7 +150,11 @@ class SyncActivity : DuckDuckGoActivity() {
         when (output) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                showRecoveryCodeLauncher.launch(RecoveryCodeContract.Input(output.device.deviceName))
+                showRecoveryCodeLauncher.launch(
+                    RecoveryCodeContract.Input(
+                        deviceName = output.device.deviceName,
+                    )
+                )
             }
 
             is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
@@ -391,7 +395,12 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.ADD_DEVICE))
+                    addDeviceLauncher.launch(
+                        ReadSyncCodeContract.Input(
+                            source = launchSource,
+                            syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
+                        )
+                    )
                 }
             }
 
@@ -403,14 +412,20 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskEditDevice -> {
                 authenticate {
-                    editDeviceLauncher.launch(EditDeviceContract.Input(command.device))
+                    editDeviceLauncher.launch(
+                        EditDeviceContract.Input(
+                            device = command.device,
+                        )
+                    )
                 }
             }
 
             // No-op in the simplified flow.
             is AskRemoveDevice -> Unit
 
-            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
+            is AskSetupSyncDeepLink -> {
+                askSetupSyncDeepLink(command.syncBarcodeUrl)
+            }
 
             is AskToCopyRecoveryCode -> {
                 authenticate {
@@ -467,14 +482,22 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        backupNewAccountLauncher.launch(SyncThisDeviceContract.Input(launchSource))
+                        backupNewAccountLauncher.launch(
+                            SyncThisDeviceContract.Input(
+                                source = launchSource,
+                            )
+                        )
                     },
                 )
             }
 
             is IntroRecoverSyncData -> {
                 authenticate {
-                    recoverSyncedDataLauncher.launch(RecoverSyncedDataContract.Input(launchSource))
+                    recoverSyncedDataLauncher.launch(
+                        RecoverSyncedDataContract.Input(
+                            source = launchSource,
+                        )
+                    )
                 }
             }
 
@@ -491,18 +514,28 @@ class SyncActivity : DuckDuckGoActivity() {
             is LaunchOriginalFlow -> {
                 when (command.syncEntryPoint) {
                     SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
-                        val input = SyncThisDeviceContract.Input(launchSource)
-                        backupNewAccountLauncher.launch(input)
+                        backupNewAccountLauncher.launch(
+                            SyncThisDeviceContract.Input(
+                                source = launchSource,
+                            )
+                        )
                     }
 
                     SyncEntryPoint.ADD_DEVICE -> {
-                        val input = ReadSyncCodeContract.Input(launchSource, command.syncEntryPoint)
-                        syncNewAccountLauncher.launch(input)
+                        syncNewAccountLauncher.launch(
+                            ReadSyncCodeContract.Input(
+                                source = launchSource,
+                                syncEntryPoint = command.syncEntryPoint,
+                            )
+                        )
                     }
 
                     SyncEntryPoint.RECOVER_SYNCED_DATA -> {
-                        val input = RecoverSyncedDataContract.Input(launchSource)
-                        recoverSyncedDataLauncher.launch(input)
+                        recoverSyncedDataLauncher.launch(
+                            RecoverSyncedDataContract.Input(
+                                source = launchSource,
+                            )
+                        )
                     }
                 }
             }
@@ -551,7 +584,11 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        restoreSavedAccountLauncher.launch(PreviousSessionReadyContract.Input(command.syncEntryPoint))
+                        restoreSavedAccountLauncher.launch(
+                            PreviousSessionReadyContract.Input(
+                                syncEntryPoint = command.syncEntryPoint,
+                            )
+                        )
                     },
                 )
             }
@@ -561,7 +598,12 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    syncNewAccountLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT))
+                    syncNewAccountLauncher.launch(
+                        ReadSyncCodeContract.Input(
+                            source = launchSource,
+                            syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        )
+                    )
                 }
             }
         }
@@ -572,8 +614,14 @@ class SyncActivity : DuckDuckGoActivity() {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
                 when (result.syncEntryPoint) {
-                    SyncEntryPoint.SYNC_NEW_ACCOUNT, SyncEntryPoint.RECOVER_SYNCED_DATA ->
-                        showRecoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT, SyncEntryPoint.RECOVER_SYNCED_DATA -> {
+                        showRecoveryCodeLauncher.launch(
+                            RecoveryCodeContract.Input(
+                                deviceName = result.device.name,
+                            )
+                        )
+                    }
+
 
                     SyncEntryPoint.ADD_DEVICE -> Unit
                 }
