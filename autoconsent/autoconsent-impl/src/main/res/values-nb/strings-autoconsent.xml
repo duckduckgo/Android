@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo prøver å velge de mest private innstillingene som er tilgjengelige, og skjule disse popup-vinduene for deg.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="autoconsentToggle">La DuckDuckGo håndtere popup-vinduer om informasjonskapsler</string>
-    <string name="autoconsentAutoManageToggle">Administrer popup-vinduer om informasjonskapsler automatisk</string>
-    <string name="autoconsentAutoManageDescription">Vi prøver å velge de mest private alternativene for informasjonskapsler som er tilgjengelige, og så lukker vi disse popup-vinduene.</string>
+    <string name="autoconsentAutoManageToggle">Avvis valgfrie informasjonskapsler</string>
+    <string name="autoconsentAutoManageDescription">Vi prøver å avvise så mange informasjonskapsler som mulig for deg, og lukker deretter popup-vinduene.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan administrere innstillinger for informasjonskapsler automatisk for å maksimere personvernet, minimere informasjonskapsler og lukke disse popup-vinduene.\n<a href=\"\">Finn ut mer</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Popup-vinduer uten mulighet til å reservere seg</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Du kan også la DuckDuckGo spare deg for et klikk ved å godta informasjonskapsler på dine vegne, og dermed lukke popup-vinduer som ikke gir deg muligheten til å reservere deg.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Godta informasjonskapsler som ikke kan avvises</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Hvis det ikke finnes noe alternativ for å avvise dem, sparer vi deg for et klikk, godtar disse informasjonskapslene for deg og lukker popup-vinduene.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Lei av popup-vinduer om informasjonskapsler som ikke gir deg muligheten til å reservere deg mot dem?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Vi kan spare deg for et klikk og godta disse kapslene for deg."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Godta informasjonskapsler som ikke kan avvises"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Jeg vil fortsette å godta dem selv"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Er du lei av popup-vinduer om informasjonskapsler?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Vi prøver å avvise så mange informasjonskapsler som mulig. Hvis det ikke finnes noe alternativ for å avvise dem, sparer vi deg for et klikk ved å godta dem for deg."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Avvis når det er mulig, eller godta for meg"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Jeg vil fortsette å håndtere dem selv"</string>
+    <string name="autoconsentPopupConfirmButton">"Bekreft"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Du kan når som helst gjøre endringer i <b>Innstillinger > Beskyttelse mot popup-vinduer om informasjonskapsler.</b>]]></string>
+
+
 </resources>
