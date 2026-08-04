@@ -198,6 +198,7 @@ class DialogConfigResolver @Inject constructor(
         background = OnboardingBackgroundStep.Welcome,
         embellishment = Embellishment.WalkingDax,
         cardArrow = CardArrowConfig.AtStart,
+        cardEntry = CardEntry.AfterBackgroundTransition,
         content = content,
         primaryCta = primaryCta,
         secondaryCta = secondaryCta,
