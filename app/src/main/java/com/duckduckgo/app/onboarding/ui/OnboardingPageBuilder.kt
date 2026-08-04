@@ -20,12 +20,12 @@ import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateDefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePage
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
 
 interface OnboardingPageBuilder {
     fun buildWelcomePage(): WelcomePage
     fun buildBrandDesignUpdateWelcomePage(): BrandDesignUpdateWelcomePage
-    fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePage
+    fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePageFragment
     fun buildDefaultBrowserPage(): DefaultBrowserPage
     fun buildBrandDesignUpdateDefaultBrowserPage(): BrandDesignUpdateDefaultBrowserPage
 
@@ -42,7 +42,7 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildWelcomePage() = WelcomePage()
     override fun buildBrandDesignUpdateWelcomePage() = BrandDesignUpdateWelcomePage()
-    override fun buildConfigDrivenWelcomePage() = ConfigDrivenWelcomePage()
+    override fun buildConfigDrivenWelcomePage() = ConfigDrivenWelcomePageFragment()
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
     override fun buildBrandDesignUpdateDefaultBrowserPage() = BrandDesignUpdateDefaultBrowserPage()
 }

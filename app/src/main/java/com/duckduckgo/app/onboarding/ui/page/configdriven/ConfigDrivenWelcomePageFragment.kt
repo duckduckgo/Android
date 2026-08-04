@@ -66,7 +66,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_update) {
+class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_update) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory

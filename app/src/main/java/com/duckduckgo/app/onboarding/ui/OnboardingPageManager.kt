@@ -29,7 +29,7 @@ import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePage
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -104,7 +104,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         return onboardingPageBuilder.buildBrandDesignUpdateWelcomePage()
     }
 
-    private fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePage {
+    private fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePageFragment {
         return onboardingPageBuilder.buildConfigDrivenWelcomePage()
     }
 
