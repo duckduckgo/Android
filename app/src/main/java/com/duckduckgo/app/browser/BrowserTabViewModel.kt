@@ -115,7 +115,6 @@ import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchDuckAiOnboardingFireDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
-import com.duckduckgo.app.browser.commands.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
@@ -270,7 +269,6 @@ import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
@@ -445,7 +443,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
@@ -557,7 +554,6 @@ class BrowserTabViewModel @Inject constructor(
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
-    private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
@@ -765,7 +761,6 @@ class BrowserTabViewModel @Inject constructor(
     private var faviconRequestedForDomain: String? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
-    private var selectedTabObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var hasExitedFixedProgress = false
@@ -1034,56 +1029,6 @@ class BrowserTabViewModel @Inject constructor(
         observeAccessibilitySettings()
         observeRefreshTriggers()
         observeBrokenSiteReportTriggers()
-    }
-
-    fun observeSelectedTab(isRestored: Boolean) {
-        viewModelScope.launch {
-            val isTabRestorationFixEnabled = withContext(dispatchers.io()) {
-                androidBrowserConfig.tabStateRestorationFix().isEnabled()
-            }
-            // auto-launch input screen for new, empty tabs (New Tab Page)
-            selectedTabObserver?.cancel()
-            selectedTabObserver = tabRepository.flowSelectedTab
-                .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
-                .let {
-                    if (isRestored && isTabRestorationFixEnabled) {
-                        // Skip the first emission on restore to avoid a loop
-                        // where closing InputScreenActivity would return to a restored NTP,
-                        // which would restart this flow and reopen InputScreenActivity again.
-                        // This happens when memory pressure destroys BrowserActivity while
-                        // InputScreenActivity is in the foreground.
-                        it.drop(1)
-                    } else {
-                        it
-                    }
-                }
-                .filter { selectedTab ->
-                    // fire event when activating a new, empty tab
-                    // (has no URL and wasn't opened from another tab)
-                    val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
-                    val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                    val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
-                    showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
-                }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
-                .onEach {
-                    val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
-                    val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
-                    val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
-
-                    if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar) {
-                        viewModelScope.launch {
-                            // whenever an event fires, so the user switched to a new tab page, launch the input screen
-                            // unless an onboarding promo message is displayed
-                            val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
-                            if (!hasPendingOnboardingPromo) {
-                                val duckAiEndCtaVariant = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
-                                val launchOnChat = customAiOnboardingStore.consumeOpenInputOnDuckAiTab()
-                                command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant, launchOnChat = launchOnChat)
-                            }
-                        }
-                    }
-                }.launchIn(viewModelScope)
-        }
     }
 
     fun observeAccessibilitySettings() {
@@ -1791,11 +1736,7 @@ class BrowserTabViewModel @Inject constructor(
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
-                    if (duckAiFeatureState.showInputScreen.value) {
-                        command.value = LaunchInputScreen()
-                    } else {
-                        command.value = ShowKeyboard
-                    }
+                    command.value = ShowKeyboard
                 } else {
                     command.value = LaunchNewTab
                 }
@@ -3861,18 +3802,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun releaseAddWidgetModalSlot(cta: Cta) {
         if (cta !is HomePanelCta) return
         ctaViewState.value = currentCtaViewState().copy(cta = null)
-    }
-
-    fun onPrivacyProSkippedOnboardingDismissed() {
-        if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-            command.value = LaunchInputScreen()
-        }
-    }
-
-    fun onDuckAiEndCtaInputScreenResult(okClicked: Boolean) {
-        viewModelScope.launch {
-            ctaViewModel.onDuckAiEndCtaInteraction(okClicked)
-        }
     }
 
     fun onUserClickCtaDismissButton(cta: Cta) {

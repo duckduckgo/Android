@@ -75,7 +75,6 @@ import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -199,9 +198,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var modeSwitchRecreateSignal: ModeSwitchRecreateSignal
-
-    @Inject
-    lateinit var externalIntentProcessingState: ExternalIntentProcessingState
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
@@ -484,7 +480,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.onChatDeleteCancelled()
                     }
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
-                    externalIntentProcessingState.onPendingSnackbarDisplayed()
                 }
                 FireDialog.EVENT_ON_CLEAR_STARTED -> {
                     isDataClearingInProgress = true
@@ -494,8 +489,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     if (pendingDuckAiOnboardingFire) {
                         currentTab?.dismissDuckAiFireOnboardingCta()
-                    } else {
-                        externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     }
                 }
                 FireDialog.EVENT_ON_CHAT_CLEAR_COMPLETE -> {
@@ -552,7 +545,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun showSnackbar(messageResId: Int) {
         showSnackbar(getString(messageResId))
-        externalIntentProcessingState.onPendingSnackbarDisplayed()
     }
 
     private fun showSnackbar(message: String) {
@@ -823,9 +815,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
-            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToChangeTab()
-            }
             launchNewTab()
             return
         }
@@ -848,9 +837,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
-            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToChangeTab()
-            }
             openExistingTab(existingTabId)
             return
         }
@@ -858,9 +844,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             closeDuckChat()
-            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToChangeTab()
-            }
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
@@ -1085,10 +1068,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchDuckAi(url: String?, duckChatSessionActive: Boolean = false, sourceTabId: String? = null) {
         isDuckChatVisible = true
-        if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-            externalIntentProcessingState.onIntentRequestToOpenDuckAi()
-        }
-
         if (duckAiFeatureState.showFullScreenMode.value) {
             // The tab to return to when this Duck.ai tab is closed.
             // Use to the current tab if no explicit tab id is passed.
@@ -1107,13 +1086,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun closeDuckChatFullScreen() {
         isDuckChatVisible = false
-        externalIntentProcessingState.onDuckAiClosed()
         currentTab?.closeCurrentTab()
     }
 
     fun closeDuckChat() {
         isDuckChatVisible = false
-        externalIntentProcessingState.onDuckAiClosed()
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
             animateDuckAiFragmentOut {
