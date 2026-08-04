@@ -173,6 +173,19 @@ class RealContentScopeExperimentsTest {
 
         assertEquals(3, fakeFeatureTogglesInventory.togglesForParentCallCount)
     }
+
+    @Test
+    fun whenCachingFlagFlipsToEnabledThenNextCallStartsCachingWithoutInvalidation() = runTest {
+        fakeContentScopeScriptsFeature.cacheContentScopeExperiments().setRawStoredState(Toggle.State(false))
+        givenExperimentsFeatureEnabled()
+
+        testee.getActiveExperiments()
+        fakeContentScopeScriptsFeature.cacheContentScopeExperiments().setRawStoredState(Toggle.State(true))
+        testee.getActiveExperiments()
+        testee.getActiveExperiments()
+
+        assertEquals(2, fakeFeatureTogglesInventory.togglesForParentCallCount)
+    }
 }
 
 class FakeFeatureTogglesInventory(private val feature: ContentScopeExperimentsFeature) : FeatureTogglesInventory {

@@ -55,14 +55,6 @@ class RealContentScopeExperiments @Inject constructor(
     @Volatile
     private var activeExperiments: List<Toggle>? = null
 
-    /**
-     * Sampled rather than read per call because the flag is itself a toggle: reading it on every navigation would put
-     * back a chunk of the cost this is here to remove. Cleared alongside the result so a remote change to the
-     * kill-switch takes effect at the next privacy config update rather than needing a restart.
-     */
-    @Volatile
-    private var cachingEnabled: Boolean? = null
-
     private val resolveMutex = Mutex()
 
     override suspend fun getActiveExperiments(): List<Toggle> {
@@ -85,13 +77,12 @@ class RealContentScopeExperiments @Inject constructor(
 
     private fun invalidate() {
         activeExperiments = null
-        cachingEnabled = null
     }
 
     private suspend fun cachingEnabled(): Boolean =
-        cachingEnabled ?: withContext(dispatcherProvider.io()) {
+        withContext(dispatcherProvider.io()) {
             contentScopeScriptsFeature.cacheContentScopeExperiments().isEnabled()
-        }.also { cachingEnabled = it }
+        }
 
     private suspend fun resolve(): List<Toggle> =
         withContext(dispatcherProvider.io()) {
