@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Evästeiden ponnahdusikkuna -suojaus</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo yrittää valita valittavissa olevista asetuksista yksityisimmät ja piilottaa nämä ponnahdusikkunat puolestasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="autoconsentToggle">Anna DuckDuckGo hoitaa evästeiden ponnahdusikkunat</string>
-    <string name="autoconsentAutoManageToggle">Evästeponnahdusikkunoiden automaattinen hallinta</string>
-    <string name="autoconsentAutoManageDescription">Pyrimme valitsemaan sinulle vain yksityisyyttä parhaiten suojaavat evästeasetukset ja sulkemaan sitten nämä ponnahdusikkunat.</string>
+    <string name="autoconsentAutoManageToggle">Hylkää valinnaiset evästeet</string>
+    <string name="autoconsentAutoManageDescription">Pyrimme hylkäämään puolestasi mahdollisimman monta evästettä ja sulkemaan sitten ponnahdusikkunat.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo voi hallinnoida evästeasetuksia automaattisesti yksityisyyden maksimoimiseksi, evästeiden minimoimiseksi ja näiden ponnahdusikkunoiden sulkemiseksi.\n<a href=\"\">Lue lisää</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ponnahdusikkunat ilman kieltäytymismahdollisuutta</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Anna myös DuckDuckGon säästää sinulta yhden klikkauksen hyväksymällä evästeet puolestasi, jotta se voi sulkea ponnahdusikkunat, joissa ei voi kieltäytyä evästeistä.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Hyväksy evästeet, joita ei voi hylätä</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Jos hylkäämisvaihtoehtoa ei ole, säästämme sinulta yhden klikkauksen, hyväksymme nämä evästeet puolestasi ja suljemme ponnahdusikkunat.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Oletko kyllästynyt evästeiden ponnahdusikkunoihin, joista et voi kieltäytyä?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Voimme säästää sinulta yhden klikkauksen ja hyväksyä nämä evästeet puolestasi."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Hyväksy evästeet, joita ei voi hylätä"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Hyväksyn ne jatkossakin itse"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Oletko kyllästynyt evästeiden ponnahdusikkunoihin, jotka eivät jätä sinua rauhaan?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Pyrimme hylkäämään mahdollisimman monta evästettä. Jos hylkäämisvaihtoehtoa ei ole, säästämme sinulta yhden klikkauksen ja hyväksymme nämä evästeet puolestasi."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Hylkää, jos mahdollista, tai hyväksy puolestani"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Hoidan ne jatkossakin itse"</string>
+    <string name="autoconsentPopupConfirmButton">"Vahvista"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Voit muuttaa tätä milloin tahansa kohdassa <b>Asetukset > Evästeiden ponnahdusikkunasuojaus.</b>]]></string>
+
+
 </resources>
