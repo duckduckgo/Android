@@ -99,6 +99,12 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         }
     }
 
+    fun setReservedQuickActionSlots(count: Int) {
+        doOnAttach {
+            viewModel.onReservedQuickActionSlotsChanged(count)
+        }
+    }
+
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
 
     private fun render(viewState: ContextualSuggestionsViewModel.ViewState) {

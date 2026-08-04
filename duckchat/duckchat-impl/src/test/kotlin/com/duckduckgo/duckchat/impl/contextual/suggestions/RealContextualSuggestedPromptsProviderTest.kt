@@ -92,6 +92,20 @@ class RealContextualSuggestedPromptsProviderTest {
     }
 
     @Test
+    fun whenRealCatalogThenBudgetAndPriorityIdsComeFromCatalog() = runTest {
+        assertEquals(4, provider.maxSuggestedPrompts())
+        assertEquals(setOf("translate-page"), provider.prioritySuggestionIds())
+    }
+
+    @Test
+    fun whenCatalogAssetMissingThenBudgetMatchesFallbackAndNoPriorityIds() = runTest {
+        provider.catalogAssetPath = "DoesNotExist.json"
+
+        assertEquals(1, provider.maxSuggestedPrompts())
+        assertEquals(emptySet<String>(), provider.prioritySuggestionIds())
+    }
+
+    @Test
     fun whenCatalogAssetMissingThenReturnsSummarizePageFallback() = runTest {
         provider.catalogAssetPath = "DoesNotExist.json"
 

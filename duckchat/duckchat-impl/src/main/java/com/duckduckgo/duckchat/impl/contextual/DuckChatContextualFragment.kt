@@ -915,6 +915,10 @@ class DuckChatContextualFragment :
             viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE ||
                 viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE
 
+        binding.contextualSuggestionsView.setReservedQuickActionSlots(
+            if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) 1 else 0,
+        )
+
         if (isSummarizeQuickAction && binding.contextualSuggestionsView.hasContent()) {
             binding.contextualPromptQuickAction.gone()
         } else {

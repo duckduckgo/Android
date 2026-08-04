@@ -56,7 +56,11 @@ class ContextualSuggestionsViewModelTest {
     fun setup() {
         whenever(duckChatFeature.contextualSuggestedPrompts()).thenReturn(suggestedPromptsToggle)
         whenever(suggestedPromptsToggle.isEnabled()).thenReturn(true)
-        runBlocking { stubProvider(emptyList()) }
+        runBlocking {
+            stubProvider(emptyList())
+            whenever(suggestedPromptsProvider.maxSuggestedPrompts()).thenReturn(4)
+            whenever(suggestedPromptsProvider.prioritySuggestionIds()).thenReturn(setOf("translate-page"))
+        }
     }
 
     private suspend fun stubProvider(result: List<ContextualSuggestedPrompt>) {
@@ -195,6 +199,53 @@ class ContextualSuggestionsViewModelTest {
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com/next","content":"c"}""")
 
         assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun `when quick action slot reserved then at most three suggestions shown with priority included`() = runTest {
+        val regular = (1..3).map { ContextualSuggestedPrompt("regular-$it", "Label $it", "Prompt $it.", null) }
+        val translate = ContextualSuggestedPrompt("translate-page", "Translate this page", "Translate.", "translate")
+        stubProvider(regular + translate)
+
+        viewModel.onReservedQuickActionSlotsChanged(1)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        assertEquals(listOf("regular-1", "regular-2", "translate-page"), viewModel.viewState.value.suggestions.map { it.id })
+    }
+
+    @Test
+    fun `when no quick action slot reserved then four suggestions shown`() = runTest {
+        val regular = (1..3).map { ContextualSuggestedPrompt("regular-$it", "Label $it", "Prompt $it.", null) }
+        val translate = ContextualSuggestedPrompt("translate-page", "Translate this page", "Translate.", "translate")
+        stubProvider(regular + translate)
+
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        assertEquals(4, viewModel.viewState.value.suggestions.size)
+    }
+
+    @Test
+    fun `when reserved slot released then full suggestion list restored`() = runTest {
+        val regular = (1..3).map { ContextualSuggestedPrompt("regular-$it", "Label $it", "Prompt $it.", null) }
+        val translate = ContextualSuggestedPrompt("translate-page", "Translate this page", "Translate.", "translate")
+        stubProvider(regular + translate)
+        viewModel.onReservedQuickActionSlotsChanged(1)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        viewModel.onReservedQuickActionSlotsChanged(0)
+
+        assertEquals(4, viewModel.viewState.value.suggestions.size)
+    }
+
+    @Test
+    fun `when fewer suggestions than budget and slot reserved then list unchanged`() = runTest {
+        val suggestions = (1..2).map { ContextualSuggestedPrompt("regular-$it", "Label $it", "Prompt $it.", null) }
+        stubProvider(suggestions)
+
+        viewModel.onReservedQuickActionSlotsChanged(1)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        assertEquals(2, viewModel.viewState.value.suggestions.size)
     }
 
     @Test

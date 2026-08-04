@@ -29,6 +29,8 @@ import javax.inject.Inject
 
 interface ContextualSuggestedPromptsProvider {
     suspend fun resolveSuggestions(input: ResolvePageSuggestionsInput): List<ContextualSuggestedPrompt>
+    suspend fun maxSuggestedPrompts(): Int
+    suspend fun prioritySuggestionIds(): Set<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,6 +53,15 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
         val catalog = bundledCatalog ?: return@withContext DECODE_FAILURE_FALLBACK
         ContextualSuggestionsMatcher.resolve(input, catalog)
             .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
+    }
+
+    override suspend fun maxSuggestedPrompts(): Int = withContext(dispatcherProvider.io()) {
+        bundledCatalog?.maxSuggestedPrompts ?: DECODE_FAILURE_FALLBACK.size
+    }
+
+    override suspend fun prioritySuggestionIds(): Set<String> = withContext(dispatcherProvider.io()) {
+        val catalog = bundledCatalog ?: return@withContext emptySet()
+        catalog.defaults.filter { catalog.catalog[it]?.condition != null }.toSet()
     }
 
     private fun loadBundledCatalog(): SuggestionCatalog? {

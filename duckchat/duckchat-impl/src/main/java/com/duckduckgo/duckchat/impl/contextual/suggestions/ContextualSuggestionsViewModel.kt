@@ -27,6 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -49,6 +50,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     private var loadJob: Job? = null
+    private var resolvedSuggestions: List<ContextualSuggestedPrompt> = emptyList()
+    private var maxSuggestedPrompts: Int = 1
+    private var prioritySuggestionIds: Set<String> = emptySet()
+    private var reservedQuickActionSlots: Int = 0
 
     fun load() {
         loadJob?.cancel()
@@ -78,7 +83,23 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun clear() {
         loadJob?.cancel()
+        resolvedSuggestions = emptyList()
         _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+    }
+
+    fun onReservedQuickActionSlotsChanged(count: Int) {
+        if (reservedQuickActionSlots == count) return
+        reservedQuickActionSlots = count
+        _viewState.update { it.copy(suggestions = visibleSuggestions()) }
+    }
+
+    private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
+        val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
+        if (resolvedSuggestions.size <= capacity) return resolvedSuggestions
+        val prioritySuggestions = resolvedSuggestions.filter { it.id in prioritySuggestionIds }
+        val regularSuggestions = resolvedSuggestions.filterNot { it.id in prioritySuggestionIds }
+        val priorityCount = minOf(prioritySuggestions.size, capacity)
+        return regularSuggestions.take(capacity - priorityCount) + prioritySuggestions.take(priorityCount)
     }
 
     private suspend fun resolve(
@@ -95,7 +116,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
             uiLocale = Locale.getDefault().toLanguageTag(),
         )
         val resolved = suggestedPromptsProvider.resolveSuggestions(input)
-        _viewState.value = ViewState(suggestions = resolved, loading = false)
+        maxSuggestedPrompts = suggestedPromptsProvider.maxSuggestedPrompts()
+        prioritySuggestionIds = suggestedPromptsProvider.prioritySuggestionIds()
+        resolvedSuggestions = resolved
+        _viewState.value = ViewState(suggestions = visibleSuggestions(), loading = false)
     }
 
     private fun parsePageTypeSignals(pageContextJson: JSONObject): PageTypeSignals? {
