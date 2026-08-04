@@ -19,7 +19,9 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
+import com.duckduckgo.app.onboarding.ui.page.configdriven.CardEntry
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentInteraction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaAction
@@ -101,8 +103,15 @@ class DialogRenderEngine(
         val settledDecoration = embellishments.transition(previous?.embellishment, config.embellishment, animate)
         cardAnchor.apply(settledDecoration)
 
+        // A snapped background is already in place, so there is nothing for the card to wait on.
+        val revealDelayMs = if (config.cardEntry == CardEntry.AfterBackgroundTransition && animateBackground) {
+            OnboardingBackgroundAnimator.EXIT_DURATION
+        } else {
+            0L
+        }
+
         // Every deferred stage below bails if the bound view has changed since dispatch
-        cardStage.reveal(animate) {
+        cardStage.reveal(animate, revealDelayMs) {
             if (bound !== handle) return@reveal
             cardStage.morph(animating(animate)) {
                 if (bound !== handle) return@morph

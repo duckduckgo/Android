@@ -22,9 +22,11 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardArrowConfig
+import com.duckduckgo.app.onboarding.ui.page.configdriven.CardEntry
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaAction
@@ -118,6 +120,34 @@ class DialogRenderEngineTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
 
         assertSame(settled, cardAnchor.appliedWith)
+    }
+
+    @Test
+    fun `a card entry that follows the background waits for the background transition to end`() = runTest {
+        testee.render(WELCOME_STEP, welcomeConfig(), animate = true, animateBackground = true)
+
+        assertEquals(listOf(OnboardingBackgroundAnimator.EXIT_DURATION), cardStage.revealDelaysMs)
+    }
+
+    @Test
+    fun `a card entry that follows the background does not wait when the background snaps`() = runTest {
+        testee.render(WELCOME_STEP, welcomeConfig(), animate = true, animateBackground = false)
+
+        assertEquals(listOf(0L), cardStage.revealDelaysMs)
+    }
+
+    @Test
+    fun `an immediate card entry never waits for the background`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true, animateBackground = true)
+
+        assertEquals(listOf(0L), cardStage.revealDelaysMs)
+    }
+
+    @Test
+    fun `a snapped render does not wait for the background`() = runTest {
+        testee.render(WELCOME_STEP, welcomeConfig(), animate = false)
+
+        assertEquals(listOf(0L), cardStage.revealDelaysMs)
     }
 
     @Test
@@ -306,6 +336,24 @@ class DialogRenderEngineTest {
     private companion object {
         const val COMPARISON_STEP: LinearOnboardingStepId = "comparison_chart"
         const val ADDRESS_BAR_STEP: LinearOnboardingStepId = "address_bar_position"
+        const val WELCOME_STEP: LinearOnboardingStepId = "welcome"
+
+        fun welcomeConfig() = DialogConfig(
+            background = OnboardingBackgroundStep.Welcome,
+            embellishment = Embellishment.WalkingDax,
+            cardArrow = CardArrowConfig.AtStart,
+            cardEntry = CardEntry.AfterBackgroundTransition,
+            content = ContentConfig.Welcome(
+                title = TextConfig.Literal("welcome"),
+                body1 = TextConfig.Literal("body one"),
+                body1AsHtml = false,
+                body2 = null,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Literal("next"),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
 
         fun comparisonConfig() = DialogConfig(
             background = OnboardingBackgroundStep.ComparisonChart,
@@ -376,12 +424,16 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     var released = false
     var fadeCount = 0
     val animateFlags = mutableListOf<Boolean>()
+    val revealDelaysMs = mutableListOf<Long>()
 
     private val pending = mutableListOf<() -> Unit>()
     private var primary: CtaConfig? = null
     private var onCtaClick: ((CtaConfig) -> Unit)? = null
 
-    override fun reveal(animate: Boolean, onEnd: () -> Unit) = stage(animate, onEnd)
+    override fun reveal(animate: Boolean, extraStartDelayMs: Long, onEnd: () -> Unit) {
+        revealDelaysMs += extraStartDelayMs
+        stage(animate, onEnd)
+    }
 
     override fun morph(animate: Boolean, onEnd: () -> Unit) {
         record("morph")
