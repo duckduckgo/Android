@@ -79,9 +79,9 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val syncUrl
-        get() = requireNotNull(intent.getStringExtra(SYNC_URL_EXTRA_KEY)) {
-            "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
+    private val syncCode
+        get() = requireNotNull(intent.getStringExtra(SYNC_CODE_EXTRA_KEY)) {
+            "Missing intent extra: '$SYNC_CODE_EXTRA_KEY'"
         }
 
     private val syncEntryPoint
@@ -90,7 +90,7 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
         }
 
     private val viewModel by viewModels<ExchangeSyncCodeViewModel> {
-        Provider(vmFactory, syncUrl, syncEntryPoint)
+        Provider(vmFactory, syncCode, syncEntryPoint)
     }
 
     private var acknowledgementDialog: TextAlertDialogBuilder? = null
@@ -300,18 +300,18 @@ class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val SYNC_URL_EXTRA_KEY = "sync_url"
+        private const val SYNC_CODE_EXTRA_KEY = "sync_code"
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
         private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
 
         fun intent(
             context: Context,
-            syncUrl: String,
+            syncCode: String,
             launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, ExchangeSyncCodeActivity::class.java).apply {
-                putExtra(SYNC_URL_EXTRA_KEY, syncUrl)
+                putExtra(SYNC_CODE_EXTRA_KEY, syncCode)
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }

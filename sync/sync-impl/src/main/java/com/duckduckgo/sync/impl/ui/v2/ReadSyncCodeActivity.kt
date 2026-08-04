@@ -120,7 +120,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
             is StartSyncProcess -> {
                 exchangeSyncCodeLauncher.launch(
                     ExchangeSyncCodeContract.Input(
-                        syncUrl = command.syncCode,
+                        syncCode = command.syncCode,
                         launchSource = launchSource,
                         syncEntryPoint = syncEntryPoint,
                     )

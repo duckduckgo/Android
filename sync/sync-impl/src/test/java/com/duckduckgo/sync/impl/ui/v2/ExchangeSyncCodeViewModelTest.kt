@@ -87,7 +87,7 @@ class ExchangeSyncCodeViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private fun createTestee() = ExchangeSyncCodeViewModel(
-        syncUrl = "sync-url",
+        syncCode = "sync-url",
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,

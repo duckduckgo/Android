@@ -211,7 +211,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is PreviousSessionReadyContract.Output.Resume -> {
                 exchangeSyncCodeLauncher.launch(
                     ExchangeSyncCodeContract.Input(
-                        syncUrl = output.recoveryCode,
+                        syncCode = output.recoveryCode,
                         launchSource = launchSource,
                         syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
                     ),
@@ -457,7 +457,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
                     exchangeSyncCodeLauncher.launch(
                         ExchangeSyncCodeContract.Input(
-                            syncUrl = command.barcodeSyncUrl.asUrl(),
+                            syncCode = command.barcodeSyncUrl.asUrl(),
                             launchSource = launchSource,
                             syncEntryPoint = syncEntryPoint,
                         ),
