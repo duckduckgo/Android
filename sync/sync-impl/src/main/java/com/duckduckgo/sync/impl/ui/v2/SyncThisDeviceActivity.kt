@@ -63,7 +63,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private lateinit var progressDrawable: IndeterminateDrawable<CircularProgressIndicatorSpec>
 
-    private val readSyncCodeLauncher = registerForActivityResult(ReadSyncCodeContract()) { output ->
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
                 setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))

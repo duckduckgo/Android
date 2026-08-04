@@ -72,14 +72,18 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
 
-    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { output ->
+    private val showQrCodeLauncher = registerForActivityResult(
+        DisplayQrCodeContract(),
+    ) { output ->
         when (output) {
             is DisplayQrCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
             is DisplayQrCodeContract.Output.Dismissed -> Unit
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) { output ->
+    private val exchangeSyncCodeLauncher = registerForActivityResult(
+        ExchangeSyncCodeContract(),
+    ) { output ->
         when (output) {
             is ExchangeSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
             is ExchangeSyncCodeContract.Output.Dismissed -> Unit
@@ -147,7 +151,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
         binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
-            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, syncEntryPoint))
+            showQrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, syncEntryPoint))
         }
     }
 

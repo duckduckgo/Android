@@ -144,13 +144,13 @@ class SyncActivity : DuckDuckGoActivity() {
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
 
-    private val syncThisDeviceLauncher = registerForActivityResult(
+    private val backupNewAccountLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
     ) { output ->
         when (output) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(output.device.deviceName))
+                showRecoveryCodeLauncher.launch(RecoveryCodeContract.Input(output.device.deviceName))
             }
 
             is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
@@ -158,6 +158,91 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val syncNewAccountLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val addDeviceLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val recoverSyncedDataLauncher = registerForActivityResult(
+        RecoverSyncedDataContract(),
+    ) { output ->
+        when (output) {
+            is RecoverSyncedDataContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is RecoverSyncedDataContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val restoreSavedAccountLauncher = registerForActivityResult(
+        PreviousSessionReadyContract(),
+    ) { output ->
+        when (output) {
+            is PreviousSessionReadyContract.Output.Resume -> {
+                exchangeSyncCodeLauncher.launch(
+                    ExchangeSyncCodeContract.Input(
+                        syncUrl = output.recoveryCode,
+                        launchSource = launchSource,
+                        syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
+                    ),
+                )
+            }
+
+            is PreviousSessionReadyContract.Output.ContinueSetup -> {
+                viewModel.onContinueSetupAfterSkipRestore(output.syncEntryPoint)
+            }
+
+            is PreviousSessionReadyContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val showRecoveryCodeLauncher = registerForActivityResult(
+        RecoveryCodeContract(),
+    ) { isSuccess ->
+        if (!isSuccess) {
+            viewModel.onSyncThisDeviceCanceled()
+            viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val exchangeSyncCodeLauncher = registerForActivityResult(
+        ExchangeSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ExchangeSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ExchangeSyncCodeContract.Output.Dismissed -> {
                 viewModel.onSyncThisDeviceCanceled()
                 viewModel.onConnectionCancelled()
             }
@@ -184,92 +269,9 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val recoveryCodeLauncher = registerForActivityResult(
-        RecoveryCodeContract(),
-    ) { isSuccess ->
-        if (!isSuccess) {
-            viewModel.onSyncThisDeviceCanceled()
-            viewModel.onConnectionCancelled()
-        }
-    }
-
-    private val syncWithAnotherDeviceLauncher = registerForActivityResult(
-        ReadSyncCodeContract(),
-    ) { output ->
-        when (output) {
-            is ReadSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result)
-            }
-
-            is ReadSyncCodeContract.Output.Dismissed -> Unit
-        }
-    }
-
-    private val addAnotherDeviceLauncher = registerForActivityResult(
-        ReadSyncCodeContract(),
-    ) { output ->
-        when (output) {
-            is ReadSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result)
-            }
-
-            is ReadSyncCodeContract.Output.Dismissed -> Unit
-        }
-    }
-
-    private val recoverSyncedDataLauncher = registerForActivityResult(
-        RecoverSyncedDataContract(),
-    ) { output ->
-        when (output) {
-            is RecoverSyncedDataContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result)
-            }
-
-            is RecoverSyncedDataContract.Output.Dismissed -> Unit
-        }
-    }
-
-    private val previousSessionReadyLauncher = registerForActivityResult(
-        PreviousSessionReadyContract(),
-    ) { output ->
-        when (output) {
-            is PreviousSessionReadyContract.Output.Resume -> {
-                exchangeSyncCodeLauncher.launch(
-                    ExchangeSyncCodeContract.Input(
-                        syncUrl = output.recoveryCode,
-                        launchSource = launchSource,
-                        syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
-                    ),
-                )
-            }
-
-            is PreviousSessionReadyContract.Output.ContinueSetup -> {
-                viewModel.onContinueSetupAfterSkipRestore(output.syncEntryPoint)
-            }
-
-            is PreviousSessionReadyContract.Output.Dismissed -> {
-                viewModel.onSyncThisDeviceCanceled()
-                viewModel.onConnectionCancelled()
-            }
-        }
-    }
-
-    private val exchangeSyncCodeLauncher = registerForActivityResult(
-        ExchangeSyncCodeContract(),
-    ) { output ->
-        when (output) {
-            is ExchangeSyncCodeContract.Output.SyncCompleted -> {
-                handlePairingResult(output.result)
-            }
-
-            is ExchangeSyncCodeContract.Output.Dismissed -> {
-                viewModel.onSyncThisDeviceCanceled()
-                viewModel.onConnectionCancelled()
-            }
-        }
-    }
-
-    private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+    private val downloadPdfPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) { isGranted ->
         if (isGranted) {
             viewModel.generateRecoveryCode(this)
         } else {
@@ -389,7 +391,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.ADD_DEVICE))
+                    addDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.ADD_DEVICE))
                 }
             }
 
@@ -465,7 +467,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        syncThisDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
+                        backupNewAccountLauncher.launch(SyncThisDeviceContract.Input(launchSource))
                     },
                 )
             }
@@ -490,12 +492,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 when (command.syncEntryPoint) {
                     SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
                         val input = SyncThisDeviceContract.Input(launchSource)
-                        syncThisDeviceLauncher.launch(input)
+                        backupNewAccountLauncher.launch(input)
                     }
 
                     SyncEntryPoint.ADD_DEVICE -> {
                         val input = ReadSyncCodeContract.Input(launchSource, command.syncEntryPoint)
-                        syncWithAnotherDeviceLauncher.launch(input)
+                        syncNewAccountLauncher.launch(input)
                     }
 
                     SyncEntryPoint.RECOVER_SYNCED_DATA -> {
@@ -549,7 +551,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        previousSessionReadyLauncher.launch(PreviousSessionReadyContract.Input(command.syncEntryPoint))
+                        restoreSavedAccountLauncher.launch(PreviousSessionReadyContract.Input(command.syncEntryPoint))
                     },
                 )
             }
@@ -559,7 +561,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT))
+                    syncNewAccountLauncher.launch(ReadSyncCodeContract.Input(launchSource, syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT))
                 }
             }
         }
@@ -571,7 +573,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 viewModel.onDeviceConnected()
                 when (result.syncEntryPoint) {
                     SyncEntryPoint.SYNC_NEW_ACCOUNT, SyncEntryPoint.RECOVER_SYNCED_DATA ->
-                        recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+                        showRecoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
 
                     SyncEntryPoint.ADD_DEVICE -> Unit
                 }

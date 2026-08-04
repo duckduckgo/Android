@@ -42,7 +42,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val readSyncCodeLauncher = registerForActivityResult(ReadSyncCodeContract()) { output ->
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
                 setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))

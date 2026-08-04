@@ -75,7 +75,9 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
         viewModel.changeRestoreOnReinstall(isChecked)
     }
 
-    private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+    private val downloadPdfPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) { isGranted ->
         if (isGranted) {
             lifecycleScope.launch { viewModel.generateRecoveryCodeSheet(this@RecoveryCodeActivity) }
         } else {
