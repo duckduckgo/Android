@@ -16,11 +16,13 @@
 
 package com.duckduckgo.sync.impl.ui.v2
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -36,11 +38,25 @@ class ReadSyncCodeViewModel @Inject constructor(
     fun pasteSyncCode() {
         val code = clipboard.pasteFromClipboard()
         viewModelScope.launch {
+            if (code.isBlank()) {
+                _commands.send(Command.ShowMessage(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted))
+            } else {
+                _commands.send(Command.StartSyncProcess(code))
+            }
+        }
+    }
+
+    fun processScannedCode(code: String) {
+        viewModelScope.launch {
             _commands.send(Command.StartSyncProcess(code))
         }
     }
 
     sealed interface Command {
+        data class ShowMessage(
+            @StringRes val message: Int,
+        ) : Command
+
         data class StartSyncProcess(
             val syncCode: String,
         ) : Command

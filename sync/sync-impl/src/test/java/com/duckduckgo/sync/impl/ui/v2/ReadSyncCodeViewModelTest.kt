@@ -20,7 +20,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -32,6 +35,7 @@ import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ReadSyncCodeViewModelTest {
     @get:Rule
@@ -54,6 +58,35 @@ class ReadSyncCodeViewModelTest {
             assertIs<StartSyncProcess>(command)
             assertEquals("sync-code", command.syncCode)
 
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when a sync code is scanned then the sync process starts with the scanned url`() = runTest {
+        testee.commands.test {
+            testee.processScannedCode("sync-code")
+
+            val command = awaitItem()
+            assertIs<StartSyncProcess>(command)
+            assertEquals("sync-code", command.syncCode)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when a blank code is pasted then an invalid pasted code message is shown instead of starting the sync process`() = runTest {
+        whenever(clipboard.pasteFromClipboard()).thenReturn("")
+
+        testee.commands.test {
+            testee.pasteSyncCode()
+
+            val command = awaitItem()
+            assertIs<ShowMessage>(command)
+            assertEquals(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted, command.message)
+
+            expectNoEvents()
             cancel()
         }
     }
