@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Felugró sütiablak elleni védelem</string>
     <string name="autoconsentDescription"><![CDATA[A DuckDuckGo megpróbálja kiválasztani a rendelkezésre álló leginkább privát beállításokat, és elrejteni az ilyen felugró ablakokat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="autoconsentToggle">A DuckDuckGo kezelje a felugró sütiablakokat</string>
-    <string name="autoconsentAutoManageToggle">Felugró sütiablakok automatikus kezelése</string>
-    <string name="autoconsentAutoManageDescription">Igyekszünk kiválasztani az elérhető legdiszkrétebb sütibeállításokat, és bezárni ezeket a felugró ablakokat.</string>
+    <string name="autoconsentAutoManageToggle">Opcionális sütik elutasítása</string>
+    <string name="autoconsentAutoManageDescription">Igyekszünk a lehető legtöbb sütit elutasítani, és bezárni a felugró ablakokat.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[A DuckDuckGo az adatvédelem maximalizálása, a sütik minimalizálása és a felugró ablakok bezárása érdekében képes a sütikre vonatkozó beállítások automatikus kezelésére.\n<a href=\"\">További részletek</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Le nem tiltható felugró ablakok</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Engedd, hogy a DuckDuckGo egy kattintást megspórolva elfogadja helyetted a sütiket, és bezárja a le nem tiltható felugró ablakokat.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Nem letiltható sütik elfogadása</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ha nincs lehetőség az elutasításra, megspórolunk neked egy kattintást, elfogadjuk helyetted ezeket a sütiket, és bezárjuk a felugró ablakokat.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Eleged van már a folyton felugró sütiablakokból, amelyek nem tilthatók le?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Egy kattintást megspórolva elfogadhatjuk helyetted ezeket a sütiket."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Nem letiltható sütik elfogadása"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Továbbra is én fogadom el őket"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Eleged van már a folyton felugró sütiablakokból?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Igyekszünk a lehető legtöbb sütit elutasítani. Ha nincs lehetőség az elutasításra, megspórolunk neked egy kattintást, és elfogadjuk helyetted ezeket a sütiket."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Elutasítás, ha lehetséges; egyébként elfogadás helyettem"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Továbbra is magam kezelem őket"</string>
+    <string name="autoconsentPopupConfirmButton">"Megerősítés"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Ezt bármikor módosíthatod a <b>Beállítások > Felugró sütiablak elleni védelem</b> menüpontban.]]></string>
+
+
 </resources>
