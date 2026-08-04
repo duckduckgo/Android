@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2DisplayQrCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command
@@ -47,8 +48,8 @@ import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory.Provider
@@ -136,7 +137,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
             is ShareCode -> shareText(command.code)
             is SetSuccessResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_SUCCESS)
             is SetFailureResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_FAILURE)
-            is ShowError -> showError(command)
+            is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
         }
@@ -190,19 +191,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         shareAction.shareText(this, text)
     }
 
-    private fun showError(error: ShowError) {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
-            .setMessage(getString(error.message) + "\n" + error.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onErrorDialogDismissed()
-                    }
-                },
-            )
-            .show()
+    private fun showV1Error(error: ShowV1Error) {
+        showV1PairingError(error.content) {
+            viewModel.onErrorDialogDismissed()
+        }
     }
 
     private fun showV2Error(error: ShowV2Error) {

@@ -16,6 +16,7 @@
 
 <resources>
     <!-- Simplified Sync  -->
+    <string name="sync_pairing_failed_generic_message">Something went wrong.</string>
     <string name="sync_settings_v2_header_headline_disabled">Keep DuckDuckGo in sync!</string>
     <string name="sync_settings_v2_header_headline_enabled">DuckDuckGo is in sync.</string>
     <string name="sync_settings_v2_header_body_disabled">Sync your autofill data and bookmarks end-to-end encrypted across your DuckDuckGo apps.</string>

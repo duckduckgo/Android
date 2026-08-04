@@ -23,8 +23,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
-import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -39,9 +37,11 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
+import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
+import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
@@ -128,7 +128,10 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     private suspend fun startV1Presentation() = coroutineScope {
         val qrCodeResult = accountRepository.getConnectQR()
             .onSuccess { showQrCode(it.qrCode) }
-            .onFailure { _commands.send(Command.ShowError(R.string.sync_connect_generic_error, it.reason)) }
+            .onFailure { failure ->
+                val content = V1PairingErrorContent(R.string.sync_connect_generic_error, failure.reason)
+                _commands.send(Command.ShowV1Error(content))
+            }
 
         var isPolling = qrCodeResult is Result.Success
         while (isPolling) {
@@ -144,12 +147,8 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     }
                 }
                 .onFailure { failure ->
-                    when (failure.code) {
-                        CONNECT_FAILED.code, LOGIN_FAILED.code -> {
-                            _commands.send(Command.ShowError(R.string.sync_connect_login_error, failure.reason))
-                            isPolling = false
-                        }
-                    }
+                    _commands.send(Command.ShowV1Error(failure.toV1PairingError()))
+                    isPolling = false
                 }
         }
     }
@@ -232,9 +231,8 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
             val peerKind: PeerKind? = null,
         ) : Command
 
-        data class ShowError(
-            @StringRes val message: Int,
-            val reason: String = "",
+        data class ShowV1Error(
+            val content: V1PairingErrorContent,
         ) : Command
 
         data class ShowV2Error(
