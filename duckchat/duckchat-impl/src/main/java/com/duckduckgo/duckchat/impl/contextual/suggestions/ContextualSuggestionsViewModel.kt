@@ -105,10 +105,11 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private suspend fun resolve(
         url: String?,
         pageTypeSignals: PageTypeSignals?,
-    ) = withContext(dispatchers.io()) {
-        if (!duckChatFeature.contextualSuggestedPrompts().isEnabled()) {
+    ) {
+        val enabled = withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
+        if (!enabled) {
             _viewState.value = ViewState(suggestions = emptyList(), loading = false)
-            return@withContext
+            return
         }
         val input = ResolvePageSuggestionsInput(
             pageTypeSignals = pageTypeSignals,
