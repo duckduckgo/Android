@@ -191,6 +191,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.renameDeviceButton.setOnClickListener { viewModel.onRenameDeviceClicked() }
         binding.fetchDecryptDevicesButton.setOnClickListener { viewModel.onFetchAndDecryptDevicesClicked() }
+        binding.runMigrationButton.setOnClickListener { viewModel.onRunMigrationClicked() }
+        binding.resetMigrationMarkerButton.setOnClickListener { viewModel.onResetMigrationMarkerClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
         binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
         binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }
@@ -374,6 +376,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
         binding.renameDeviceResultTextView.text = viewState.renameDeviceResult
         binding.fetchDecryptDevicesResultTextView.text = viewState.fetchDecryptDevicesResult
+        binding.canWriteUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canWriteUnifiedDeviceListEnabled) { _, enabled ->
+            viewModel.onCanWriteUnifiedDeviceListFlagChanged(enabled)
+        }
+        binding.migrationStatusTextView.text = viewState.migrationStatusText
+        binding.migrationResultTextView.text = viewState.migrationResult
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
