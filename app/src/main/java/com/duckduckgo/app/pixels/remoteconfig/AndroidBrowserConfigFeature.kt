@@ -79,6 +79,13 @@ interface AndroidBrowserConfigFeature {
     fun cachedEntityLookup(): Toggle
 
     /**
+     * Zeroes IME insets before they reach the browser WebView, so the WebView does not additionally
+     * shrink its visual viewport for a keyboard the browser layout already resizes for.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripWebViewImeInsets(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`
