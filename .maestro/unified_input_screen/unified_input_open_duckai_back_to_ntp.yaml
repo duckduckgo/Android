@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "UnifiedInput: open duck.ai via icon (AI off) and back to NTP × omnibar positions"
-tags:
-  - unifiedInputTest
+# DISABLED: untagged so it is excluded from the tagged (unifiedInputTest) CI suite.
+tags: []
 ---
 # 1/3 — omnibar top
 - retry:

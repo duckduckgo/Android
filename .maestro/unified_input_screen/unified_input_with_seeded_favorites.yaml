@@ -51,50 +51,52 @@ tags:
       - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/assert_seeded_favorites_visible.yaml
 
-# 4/6 — AI off, omnibar top
-- retry:
-    maxRetries: 3
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
-            omnibarPosition: "top"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
-
-# 5/6 — AI off, omnibar bottom
-- retry:
-    maxRetries: 3
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
-            omnibarPosition: "bottom"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
-
-# 6/6 — AI off, omnibar split
-- retry:
-    maxRetries: 3
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
-            omnibarPosition: "split"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+# DISABLED: combos with nativeInputToggle=true, inputWithAiToggle=false (AI off) are commented out below.
+#
+# # 4/6 — AI off, omnibar top
+# - retry:
+#     maxRetries: 3
+#     commands:
+#       - launchApp:
+#           clearState: true
+#           stopApp: true
+#           arguments:
+#             isMaestro: "true"
+#             nativeInputToggle: "true"
+#             inputWithAiToggle: "false"
+#             omnibarPosition: "top"
+#             addFavorites: "example.com;duckduckgo.com;privacytest.com"
+#       - runFlow: shared/launch_and_skip_onboarding.yaml
+#       - runFlow: shared/assert_seeded_favorites_visible.yaml
+#
+# # 5/6 — AI off, omnibar bottom
+# - retry:
+#     maxRetries: 3
+#     commands:
+#       - launchApp:
+#           clearState: true
+#           stopApp: true
+#           arguments:
+#             isMaestro: "true"
+#             nativeInputToggle: "true"
+#             inputWithAiToggle: "false"
+#             omnibarPosition: "bottom"
+#             addFavorites: "example.com;duckduckgo.com;privacytest.com"
+#       - runFlow: shared/launch_and_skip_onboarding.yaml
+#       - runFlow: shared/assert_seeded_favorites_visible.yaml
+#
+# # 6/6 — AI off, omnibar split
+# - retry:
+#     maxRetries: 3
+#     commands:
+#       - launchApp:
+#           clearState: true
+#           stopApp: true
+#           arguments:
+#             isMaestro: "true"
+#             nativeInputToggle: "true"
+#             inputWithAiToggle: "false"
+#             omnibarPosition: "split"
+#             addFavorites: "example.com;duckduckgo.com;privacytest.com"
+#       - runFlow: shared/launch_and_skip_onboarding.yaml
+#       - runFlow: shared/assert_seeded_favorites_visible.yaml
