@@ -33,8 +33,11 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
 
 interface CardStage {
-    /** Fades the card root in. Nothing to do once the card is on stage, so only the first render of a run fades. */
-    fun reveal(animate: Boolean, onEnd: () -> Unit)
+    /**
+     * Fades the card root in, after [extraStartDelayMs] on top of the stage's own lead-in. Nothing to do once the
+     * card is on stage, so only the first render of a run fades.
+     */
+    fun reveal(animate: Boolean, extraStartDelayMs: Long = 0L, onEnd: () -> Unit)
 
     /** Tweens the card's bounds from the outgoing screen's size to the newly bound one's. */
     fun morph(animate: Boolean, onEnd: () -> Unit)
@@ -67,7 +70,11 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
 
     private var ctaViews = emptyList<View>()
 
-    override fun reveal(animate: Boolean, onEnd: () -> Unit) {
+    override fun reveal(
+        animate: Boolean,
+        extraStartDelayMs: Long,
+        onEnd: () -> Unit,
+    ) {
         val card = binding.daxDialogCta.root
         card.isVisible = true
         // Alpha already 1 means the card is on stage from an earlier render, so there is nothing to fade.
@@ -81,7 +88,7 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
             return
         }
         val reveal = ObjectAnimator.ofFloat(card, View.ALPHA, 1f).apply {
-            startDelay = CARD_FADE_IN_START_DELAY_MS
+            startDelay = CARD_FADE_IN_START_DELAY_MS + extraStartDelayMs
             duration = CARD_FADE_IN_DURATION_MS
             addListener(
                 object : AnimatorListenerAdapter() {
