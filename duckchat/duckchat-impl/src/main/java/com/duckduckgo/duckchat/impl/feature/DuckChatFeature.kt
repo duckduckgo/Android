@@ -266,7 +266,7 @@ interface DuckChatFeature {
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
      * @return `true` when the remote config has the "digitalAssistantDuckAi"
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun digitalAssistantDuckAi(): Toggle
@@ -280,7 +280,7 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the contextual Duck.ai sheet improvements are enabled.
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualSheetImprovements(): Toggle
@@ -301,7 +301,7 @@ interface DuckChatFeature {
 
     /**
      * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun removeChatHistory(): Toggle
