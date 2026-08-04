@@ -680,8 +680,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when openDuckChat called and tabs are null then command is sent with 0 tabs`() = runTest {
-        doReturn(MutableLiveData(null)).whenever(mockTabRepository).liveTabs
+    fun `when openDuckChat called then command is sent`() = runTest {
         initTestee()
 
         testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
@@ -689,25 +688,6 @@ class BrowserViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertTrue(command is Command.OpenDuckChat)
-            command as Command.OpenDuckChat
-            assertEquals(0, command.tabs)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when openDuckChat called then command is sent with correct tab count`() = runTest {
-        val tabs = listOf(TabEntity("1", "", "", position = 0))
-        doReturn(MutableLiveData(tabs)).whenever(mockTabRepository).liveTabs
-        initTestee()
-
-        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.OpenDuckChat)
-            command as Command.OpenDuckChat
-            assertEquals(tabs.size, command.tabs)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -131,7 +131,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -990,7 +989,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 command.duckChatUrl,
                 command.duckChatSessionActive,
                 command.withTransition,
-                command.tabs,
             )
 
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
@@ -1105,16 +1103,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         url: String?,
         duckChatSessionActive: Boolean,
         withTransition: Boolean,
-        tabs: Int,
     ) {
         duckAiFragment?.let { fragment ->
             if (duckChatSessionActive) {
                 restoreDuckChat(fragment, withTransition)
             } else {
-                launchNewDuckChat(url, withTransition, tabs)
+                launchNewDuckChat(url, withTransition)
             }
         } ?: run {
-            launchNewDuckChat(url, withTransition, tabs)
+            launchNewDuckChat(url, withTransition)
         }
 
         currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
@@ -1125,7 +1122,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun launchNewDuckChat(
         duckChatUrl: String?,
         withTransition: Boolean,
-        tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
         val fragment =
@@ -1133,7 +1129,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 arguments =
                     Bundle().apply {
                         duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
-                        putInt(KEY_DUCK_AI_TABS, tabs)
                     }
             }
 

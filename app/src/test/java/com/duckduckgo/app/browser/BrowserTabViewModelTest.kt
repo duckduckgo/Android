@@ -533,8 +533,6 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
 
-    private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
-
     private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
 
     private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
@@ -837,7 +835,6 @@ class BrowserTabViewModelTest {
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
-            whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
