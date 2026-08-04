@@ -27,11 +27,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -51,7 +48,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.ui.store.AppTheme
@@ -67,7 +63,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -92,7 +87,7 @@ import kotlin.coroutines.CoroutineContext
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
-    private val widgetCapabilities: WidgetCapabilities,
+    private val subscriptionPromoModalDecider: SubscriptionPromoModalDecider,
     private val dismissedCtaDao: DismissedCtaDao,
     private val userAllowListRepository: UserAllowListRepository,
     private val settingsDataStore: SettingsDataStore,
@@ -139,9 +134,6 @@ class CtaViewModel @Inject constructor(
             .onEach { completeStageIfDaxOnboardingCompleted() }
             .launchIn(coroutineScope)
     }
-
-    private suspend fun isSubscriptionCtaAvailable(): Boolean =
-        subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
@@ -192,12 +184,12 @@ class CtaViewModel @Inject constructor(
         return when {
             onboardingStore.isDuckAiOnboardingFlow() -> {
                 mutableListOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON, CtaId.DAX_DUCK_AI_END).also {
-                    if (isSubscriptionCtaAvailable()) {
+                    if (subscriptionPromoModalDecider.isSubscriptionCtaAvailable()) {
                         it.add(CtaId.DAX_INTRO_PRIVACY_PRO)
                     }
                 }
             }
-            isSubscriptionCtaAvailable() -> {
+            subscriptionPromoModalDecider.isSubscriptionCtaAvailable() -> {
                 listOf(
                     CtaId.DAX_INTRO,
                     CtaId.DAX_DIALOG_SERP,
@@ -355,24 +347,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPromoCtaOnForeground(): Cta? {
-        return withContext(dispatchers.io()) {
-            when {
-                canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                    flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING,
-                )
-
-                canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                    flow = SubscriptionPromoFlow.NUDGE,
-                )
-
-                else -> null
-            }
-        }
-    }
-
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
@@ -516,16 +490,6 @@ class CtaViewModel @Inject constructor(
                     )
                 }
             }
-
-            // Add Widget
-            canShowWidgetCta() -> {
-                if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                    AddWidgetAutoOnboarding
-                } else {
-                    AddWidgetInstructions
-                }
-            }
-
             else -> null
         }
     }
@@ -547,31 +511,9 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {
-        if (hideTips() || daxDialogSubscriptionShown() || !isSubscriptionCtaAvailable()) return false
+        if (hideTips() || daxDialogSubscriptionShown() || !subscriptionPromoModalDecider.isSubscriptionCtaAvailable()) return false
 
         return daxOnboardingActive()
-    }
-
-    @WorkerThread
-    private suspend fun canShowSubscriptionCtaForSkippedOnboarding(): Boolean =
-        extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
-            hideTips() &&
-            appInstallStore.daysInstalled() >= SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS &&
-            !daxDialogSubscriptionShown() &&
-            isSubscriptionCtaAvailable()
-
-    @WorkerThread
-    private suspend fun canShowSubscriptionPromoCta(): Boolean =
-        extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers().isEnabled() &&
-            appInstallStore.daysInstalled() >= SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS &&
-            !daxDialogSubscriptionShown() &&
-            isSubscriptionCtaAvailable()
-
-    @WorkerThread
-    private fun canShowWidgetCta(): Boolean {
-        return !widgetCapabilities.hasInstalledWidgets &&
-            !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-            !onboardingStore.linearPlanWidgetPromptShown
     }
 
     private suspend fun freeTrialCopyAvailable(): Boolean =
@@ -738,7 +680,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val isLastContextDialogShown = when {
-                isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
+                subscriptionPromoModalDecider.isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
                 onboardingStore.isDuckAiOnboardingFlow() -> duckAiEndShown()
                 else -> daxDialogEndShown()
             }
@@ -883,15 +825,9 @@ class CtaViewModel @Inject constructor(
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
-    suspend fun isPromoOnboardingDialogShowing(): Boolean =
-        withContext(dispatchers.io()) {
-            canShowSubscriptionCtaForSkippedOnboarding() || canShowSubscriptionPromoCta()
-        }
-
-    private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
+    suspend fun isPromoOnboardingDialogShowing(): Boolean = subscriptionPromoModalDecider.decide() != null
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
     }
 }

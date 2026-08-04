@@ -34,6 +34,13 @@ interface ModalEvaluator {
     val evaluatorId: String
 
     /**
+     * Which lifecycle event causes the coordinator to evaluate this modal. Evaluators tied to the
+     * New Tab Page should override with [ModalTrigger.NTP_RENDER].
+     */
+    val trigger: ModalTrigger
+        get() = ModalTrigger.APP_RESUME
+
+    /**
      * Evaluates whether this modal should be shown.
      * Called by coordinator only if not blocked by 24-hour window (cooldown period).
      *

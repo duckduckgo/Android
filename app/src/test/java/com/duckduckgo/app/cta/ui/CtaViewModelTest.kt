@@ -119,6 +119,8 @@ class CtaViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
+    private lateinit var subscriptionPromoModalDecider: SubscriptionPromoModalDecider
+
     private val mockDismissedCtaDao: DismissedCtaDao = mock()
 
     private val mockPixel: Pixel = mock()
@@ -217,10 +219,19 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
 
+        subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+            appInstallStore = mockAppInstallStore,
+            settingsDataStore = mockSettingsDataStore,
+            dismissedCtaDao = mockDismissedCtaDao,
+            subscriptions = mockSubscriptions,
+            dispatchers = coroutineRule.testDispatcherProvider,
+        )
+
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            widgetCapabilities = mockWidgetCapabilities,
+            subscriptionPromoModalDecider = subscriptionPromoModalDecider,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
@@ -469,37 +480,6 @@ class CtaViewModelTest {
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
         )
-        assertNull(value)
-    }
-
-    @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnAddWidgetAutoOnboardingExperiment() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is HomePanelCta.AddWidgetAutoOnboarding)
-    }
-
-    @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is HomePanelCta.AddWidgetInstructions)
-    }
-
-    @Test
-    fun whenRefreshCtaOnHomeTabAndLinearPlanWidgetPromptShownThenReturnNull() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        whenever(mockOnboardingStore.linearPlanWidgetPromptShown).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertNull(value)
     }
 
@@ -1458,40 +1438,6 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
         )
         assertFalse(value is SubscriptionPromoModalCta)
-    }
-
-    @Test
-    fun givenForegroundAndEligibleWhenGetPromoCtaOnForegroundThenReturnSubscriptionPromoModalCta() = runTest {
-        givenSubscriptionPromoEligible()
-        val value = testee.getPromoCtaOnForeground()
-        assertTrue(value is SubscriptionPromoModalCta)
-    }
-
-    @Test
-    fun givenForegroundButToggleDisabledWhenGetPromoCtaOnForegroundThenDontReturnSubscriptionPromoModalCta() = runTest {
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(8))
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        val value = testee.getPromoCtaOnForeground()
-        assertFalse(value is SubscriptionPromoModalCta)
-    }
-
-    @Test
-    fun givenForegroundAndSubscriptionModalAlreadyShownWhenGetPromoCtaOnForegroundThenDontReturnSubscriptionPromoModalCta() = runTest {
-        givenSubscriptionPromoEligible()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
-        val value = testee.getPromoCtaOnForeground()
-        assertFalse(value is SubscriptionPromoModalCta)
-    }
-
-    @Test
-    fun givenForegroundWithFreeTrialCopyWhenGetPromoCtaOnForegroundThenReturnSubscriptionPromoModalCtaWithFreeTrialCopy() = runTest {
-        givenSubscriptionPromoEligible()
-        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockEnabledToggle)
-        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
-        val value = testee.getPromoCtaOnForeground()
-        assertTrue(value is SubscriptionPromoModalCta)
-        assertTrue((value as SubscriptionPromoModalCta).isFreeTrialCopy)
     }
 
     @Test

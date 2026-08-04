@@ -161,7 +161,14 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            widgetCapabilities = mockWidgetCapabilities,
+            subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
+                extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+                appInstallStore = mockAppInstallStore,
+                settingsDataStore = mockSettingsDataStore,
+                dismissedCtaDao = mockDismissedCtaDao,
+                subscriptions = mockSubscriptions,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
