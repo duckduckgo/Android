@@ -35,6 +35,7 @@ import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -190,7 +191,10 @@ class WinBackPromptEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        // Deciding alone launches nothing: the activity starts only once the show action runs.
+        verify(mockApplicationContext, never()).startActivity(any(), any())
+        assertTrue(result is ModalEvaluator.EvaluationResult.WantsToShow)
+        assertTrue((result as ModalEvaluator.EvaluationResult.WantsToShow).show())
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
         verify(mockIntent).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
