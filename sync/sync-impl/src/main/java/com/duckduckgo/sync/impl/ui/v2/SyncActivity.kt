@@ -144,7 +144,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
 
-    private val backupNewAccountLauncher = registerForActivityResult(
+    private val backUpNewAccountLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
     ) { output ->
         when (output) {
@@ -482,7 +482,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        backupNewAccountLauncher.launch(
+                        backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
                             ),
@@ -514,7 +514,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is LaunchOriginalFlow -> {
                 when (command.syncEntryPoint) {
                     SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
-                        backupNewAccountLauncher.launch(
+                        backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
                             ),
