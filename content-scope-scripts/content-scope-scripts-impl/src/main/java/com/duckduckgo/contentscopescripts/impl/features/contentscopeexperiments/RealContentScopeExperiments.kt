@@ -29,6 +29,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -57,13 +58,22 @@ class RealContentScopeExperiments @Inject constructor(
 
     private val resolveMutex = Mutex()
 
+    private val invalidationCount = AtomicInteger(0)
+
     override suspend fun getActiveExperiments(): List<Toggle> {
         activeExperiments?.let { return it }
 
         if (!cachingEnabled()) return resolve()
 
         return resolveMutex.withLock {
-            activeExperiments ?: resolve().also { activeExperiments = it }
+            activeExperiments ?: run {
+                val count = invalidationCount.get()
+                resolve().also {
+                    if (invalidationCount.get() == count) {
+                        activeExperiments = it
+                    }
+                }
+            }
         }
     }
 
@@ -76,6 +86,7 @@ class RealContentScopeExperiments @Inject constructor(
     }
 
     private fun invalidate() {
+        invalidationCount.incrementAndGet()
         activeExperiments = null
     }
 

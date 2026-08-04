@@ -175,6 +175,32 @@ class RealContentScopeExperimentsTest {
     }
 
     @Test
+    fun whenPrivacyConfigPersistedWhileResolvingThenResultIsNotCached() = runTest {
+        givenExperimentsFeatureEnabled()
+
+        fakeFeatureTogglesInventory.onResolveStarted = { testee.onPrivacyConfigPersisted() }
+        testee.getActiveExperiments()
+        fakeFeatureTogglesInventory.onResolveStarted = null
+
+        testee.getActiveExperiments()
+
+        assertEquals(2, fakeFeatureTogglesInventory.togglesForParentCallCount)
+    }
+
+    @Test
+    fun whenPrivacyConfigDownloadedWhileResolvingThenResultIsNotCached() = runTest {
+        givenExperimentsFeatureEnabled()
+
+        fakeFeatureTogglesInventory.onResolveStarted = { testee.onPrivacyConfigDownloaded() }
+        testee.getActiveExperiments()
+        fakeFeatureTogglesInventory.onResolveStarted = null
+
+        testee.getActiveExperiments()
+
+        assertEquals(2, fakeFeatureTogglesInventory.togglesForParentCallCount)
+    }
+
+    @Test
     fun whenCachingFlagFlipsToEnabledThenNextCallStartsCachingWithoutInvalidation() = runTest {
         fakeContentScopeScriptsFeature.cacheContentScopeExperiments().setRawStoredState(Toggle.State(false))
         givenExperimentsFeatureEnabled()
@@ -192,12 +218,15 @@ class FakeFeatureTogglesInventory(private val feature: ContentScopeExperimentsFe
     var togglesForParentCallCount = 0
         private set
 
+    var onResolveStarted: (() -> Unit)? = null
+
     override suspend fun getAll(): List<Toggle> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getAllTogglesForParent(name: String): List<Toggle> {
         togglesForParentCallCount++
+        onResolveStarted?.invoke()
         return listOf(feature.test(), feature.bloops())
     }
 }
