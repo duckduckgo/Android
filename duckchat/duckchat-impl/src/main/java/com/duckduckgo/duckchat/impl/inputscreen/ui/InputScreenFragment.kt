@@ -91,14 +91,15 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentPopup
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
-import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.InputModeWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.InputScreenButtons
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager

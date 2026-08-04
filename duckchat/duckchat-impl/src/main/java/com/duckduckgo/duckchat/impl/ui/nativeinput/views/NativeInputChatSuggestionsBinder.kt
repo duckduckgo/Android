@@ -29,13 +29,13 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAdapter
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
+import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatHistoryShortcutAdapter
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSearchSuggestionAdapter
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsAdapter
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.SectionDividerAdapter
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 

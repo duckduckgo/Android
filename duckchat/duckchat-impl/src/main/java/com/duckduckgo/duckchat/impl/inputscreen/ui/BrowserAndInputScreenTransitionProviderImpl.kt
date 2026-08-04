@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.R
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolverImpl.Companion.useTopBar
+import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolverImpl.Companion.useTopBar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

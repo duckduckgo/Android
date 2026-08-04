@@ -212,8 +212,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt"
@@ -223,8 +223,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
@@ -234,8 +234,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelOrchestratorTest.kt"
@@ -245,8 +245,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProvider.kt"
@@ -256,8 +256,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProviderTest.kt"
@@ -1136,8 +1136,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/OnboardingInputScreenSelectionObserver.kt"
@@ -1147,8 +1147,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/onboarding/OnboardingInputScreenSelectionObserverTest.kt"
@@ -2412,8 +2412,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePageViewModel.kt"
@@ -2423,8 +2423,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/onboarding/ui/page/WelcomePageViewModelTest.kt"

@@ -28,9 +28,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)

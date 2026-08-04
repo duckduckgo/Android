@@ -37,7 +37,6 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenFragment
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.RestoreAutoCompleteScrollPosition
@@ -46,6 +45,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.RecyclerBottomSpacingDecoration
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.InputScreenConfigResolver
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import kotlinx.coroutines.flow.firstOrNull
