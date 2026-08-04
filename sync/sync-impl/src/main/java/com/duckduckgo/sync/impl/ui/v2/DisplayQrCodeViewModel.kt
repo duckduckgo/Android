@@ -63,7 +63,7 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
-    @Assisted private val source: String?,
+    @Assisted private val launchSource: String?,
     @Assisted private val syncEntryPoint: SyncEntryPoint,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
@@ -158,7 +158,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
             accountRepository.pollConnectionKeys()
                 .onSuccess { isSynced ->
                     if (isSynced) {
-                        pixels.fireSignupConnectPixel(source)
+                        pixels.fireSignupConnectPixel(launchSource)
                         pixels.fireSyncSetupFinishedSuccessfully(syncType)
 
                         _commands.send(Command.SetPairingResult(pairingResult()))
@@ -324,19 +324,19 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            source: String?,
+            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val source: String?,
+            private val launchSource: String?,
             private val syncEntryPoint: SyncEntryPoint,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source, syncEntryPoint) as T
+                return assistedFactory.create(launchSource, syncEntryPoint) as T
             }
         }
     }

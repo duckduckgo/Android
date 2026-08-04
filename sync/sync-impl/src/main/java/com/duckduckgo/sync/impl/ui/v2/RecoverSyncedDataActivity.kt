@@ -87,9 +87,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
         binding.recoverDataButton.setOnClickListener {
             readSyncCodeLauncher.launch(
                 ReadSyncCodeContract.Input(
-                    source = launchSource,
+                    launchSource = launchSource,
                     syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
-                )
+                ),
             )
         }
     }
@@ -99,10 +99,10 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

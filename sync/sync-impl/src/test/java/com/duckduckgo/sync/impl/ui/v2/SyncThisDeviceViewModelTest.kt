@@ -74,7 +74,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertIs<FinishSyncing>(awaitItem())
 
             cancel()
@@ -86,7 +86,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertEquals(connectedDevice, (awaitItem() as FinishSyncing).device)
 
             cancel()
@@ -98,7 +98,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             skipItems(1)
 
             verify(syncAccountRepository, never()).createAccount()
@@ -114,7 +114,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertIs<FinishSyncing>(awaitItem())
 
             verify(syncAccountRepository).createAccount()
@@ -130,7 +130,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
         testee.commands.test {
-            testee.syncThisDevice(source = "foo")
+            testee.syncThisDevice(launchSource = "foo")
             skipItems(1)
 
             verify(syncPixels).fireSignupDirectPixel(source = "foo")
@@ -145,7 +145,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreated()
@@ -159,7 +159,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             skipItems(1)
 
             verify(syncSetupWideEvent).onSyncEnabled()
@@ -174,7 +174,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -189,7 +189,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertIs<ShowError>(awaitItem())
 
             verifyNoInteractions(syncPixels)
@@ -204,7 +204,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertIs<ShowError>(awaitItem())
 
             cancel()
@@ -217,7 +217,7 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
 
         testee.commands.test {
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -233,7 +233,7 @@ class SyncThisDeviceViewModelTest {
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
-            testee.syncThisDevice(source = null)
+            testee.syncThisDevice(launchSource = null)
             assertTrue(awaitItem().isSyncing)
             assertFalse(awaitItem().isSyncing)
 

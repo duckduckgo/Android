@@ -123,7 +123,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
                         syncCode = command.syncCode,
                         launchSource = launchSource,
                         syncEntryPoint = syncEntryPoint,
-                    )
+                    ),
                 )
             }
 
@@ -152,9 +152,9 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         binding.showQrCodeButton.setOnClickListener {
             showQrCodeLauncher.launch(
                 DisplayQrCodeContract.Input(
-                    source = launchSource,
+                    launchSource = launchSource,
                     syncEntryPoint = syncEntryPoint,
-                )
+                ),
             )
         }
     }
@@ -204,11 +204,11 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }

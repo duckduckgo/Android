@@ -87,11 +87,11 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
-import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
@@ -153,7 +153,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 showRecoveryCodeLauncher.launch(
                     RecoveryCodeContract.Input(
                         deviceName = output.device.deviceName,
-                    )
+                    ),
                 )
             }
 
@@ -397,9 +397,9 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     addDeviceLauncher.launch(
                         ReadSyncCodeContract.Input(
-                            source = launchSource,
+                            launchSource = launchSource,
                             syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
-                        )
+                        ),
                     )
                 }
             }
@@ -415,7 +415,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     editDeviceLauncher.launch(
                         EditDeviceContract.Input(
                             device = command.device,
-                        )
+                        ),
                     )
                 }
             }
@@ -484,8 +484,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         }
                         backupNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
-                                source = launchSource,
-                            )
+                                launchSource = launchSource,
+                            ),
                         )
                     },
                 )
@@ -495,8 +495,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     recoverSyncedDataLauncher.launch(
                         RecoverSyncedDataContract.Input(
-                            source = launchSource,
-                        )
+                            launchSource = launchSource,
+                        ),
                     )
                 }
             }
@@ -516,25 +516,25 @@ class SyncActivity : DuckDuckGoActivity() {
                     SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
                         backupNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
-                                source = launchSource,
-                            )
+                                launchSource = launchSource,
+                            ),
                         )
                     }
 
                     SyncEntryPoint.ADD_DEVICE -> {
                         syncNewAccountLauncher.launch(
                             ReadSyncCodeContract.Input(
-                                source = launchSource,
+                                launchSource = launchSource,
                                 syncEntryPoint = command.syncEntryPoint,
-                            )
+                            ),
                         )
                     }
 
                     SyncEntryPoint.RECOVER_SYNCED_DATA -> {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
-                                source = launchSource,
-                            )
+                                launchSource = launchSource,
+                            ),
                         )
                     }
                 }
@@ -587,7 +587,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         restoreSavedAccountLauncher.launch(
                             PreviousSessionReadyContract.Input(
                                 syncEntryPoint = command.syncEntryPoint,
-                            )
+                            ),
                         )
                     },
                 )
@@ -600,9 +600,9 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     syncNewAccountLauncher.launch(
                         ReadSyncCodeContract.Input(
-                            source = launchSource,
+                            launchSource = launchSource,
                             syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
-                        )
+                        ),
                     )
                 }
             }
@@ -618,10 +618,9 @@ class SyncActivity : DuckDuckGoActivity() {
                         showRecoveryCodeLauncher.launch(
                             RecoveryCodeContract.Input(
                                 deviceName = result.device.name,
-                            )
+                            ),
                         )
                     }
-
 
                     SyncEntryPoint.ADD_DEVICE -> Unit
                 }

@@ -226,11 +226,11 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
             syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }

@@ -28,7 +28,7 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return DisplayQrCodeActivity.intent(context, input.source, input.syncEntryPoint)
+        return DisplayQrCodeActivity.intent(context, input.launchSource, input.syncEntryPoint)
     }
 
     override fun parseResult(
@@ -48,7 +48,7 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: String?,
+        val launchSource: String?,
         val syncEntryPoint: SyncEntryPoint,
     )
 

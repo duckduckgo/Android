@@ -50,7 +50,7 @@ class SyncThisDeviceViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun syncThisDevice(source: String?) {
+    fun syncThisDevice(launchSource: String?) {
         _viewState.update { it.copy(isSyncing = true) }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -74,7 +74,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                 when (val result = syncAccountRepository.createAccount()) {
                     is Result.Success<*> -> {
                         syncSetupWideEvent.onAccountCreated()
-                        syncPixels.fireSignupDirectPixel(source)
+                        syncPixels.fireSignupDirectPixel(launchSource)
                         getDeviceAndFinish()
                     }
 

@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class PreviousSessionReadyViewModel @AssistedInject constructor(
-    @Assisted private val source: String,
+    @Assisted private val launchSource: String,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncPixels: SyncPixels,
     private val syncSetupWideEvent: SyncSetupWideEvent,
@@ -43,11 +43,11 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     val commands = _commands.receiveAsFlow()
 
     fun onScreenShown() {
-        syncPixels.fireAutoRestoreSettingsReadyShown(source)
+        syncPixels.fireAutoRestoreSettingsReadyShown(launchSource)
     }
 
     fun onResumeClicked() {
-        syncPixels.fireAutoRestoreSettingsRestoreTapped(source)
+        syncPixels.fireAutoRestoreSettingsRestoreTapped(launchSource)
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onSyncRestoreStarted()
             val payload = syncAutoRestoreManager.retrieveRecoveryPayload()
@@ -61,7 +61,7 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     }
 
     fun onContinueSetupClicked() {
-        syncPixels.fireAutoRestoreSettingsSkipRestoreTapped(source)
+        syncPixels.fireAutoRestoreSettingsSkipRestoreTapped(launchSource)
         viewModelScope.launch {
             _commands.send(Command.SetContinueSetupResult)
             _commands.send(Command.Close)
@@ -69,7 +69,7 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     }
 
     fun onCloseClicked() {
-        syncPixels.fireAutoRestoreSettingsCancelled(source)
+        syncPixels.fireAutoRestoreSettingsCancelled(launchSource)
         viewModelScope.launch {
             _commands.send(Command.Close)
         }
@@ -91,16 +91,16 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(source: String): PreviousSessionReadyViewModel
+        fun create(launchSource: String): PreviousSessionReadyViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val source: String,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source) as T
+                return assistedFactory.create(launchSource) as T
             }
         }
     }

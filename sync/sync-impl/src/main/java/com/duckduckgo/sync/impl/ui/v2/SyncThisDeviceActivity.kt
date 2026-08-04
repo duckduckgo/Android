@@ -145,9 +145,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
                 readSyncCodeLauncher.launch(
                     ReadSyncCodeContract.Input(
-                        source = launchSource,
+                        launchSource = launchSource,
                         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
-                    )
+                    ),
                 )
             }
         }
@@ -201,10 +201,10 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
         ): Intent {
             return Intent(context, SyncThisDeviceActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }
