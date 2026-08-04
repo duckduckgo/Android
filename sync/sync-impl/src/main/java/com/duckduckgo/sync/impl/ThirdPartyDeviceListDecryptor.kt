@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -46,7 +45,6 @@ data class DecryptAllResult(
     val undecryptable: List<String>,
 )
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealThirdPartyDeviceListDecryptor @Inject constructor(
     private val deviceFieldDecryptor: DeviceFieldDecryptor,

@@ -26,7 +26,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
 import logcat.logcat
 import javax.inject.Inject
 
@@ -57,7 +56,6 @@ data class DeviceInfoPayload(
     }
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoEncryptor @Inject constructor(
     private val syncStore: SyncStore,

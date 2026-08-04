@@ -24,7 +24,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 /**
@@ -43,7 +42,6 @@ data class EncryptedDeviceFields(
     val type: String,
 )
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceFieldEncryptor @Inject constructor(
     private val syncStore: SyncStore,
