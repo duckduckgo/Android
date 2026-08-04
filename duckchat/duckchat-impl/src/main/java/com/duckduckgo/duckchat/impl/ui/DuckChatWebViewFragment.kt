@@ -37,12 +37,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -69,12 +66,6 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
-import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
@@ -93,7 +84,6 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -122,8 +112,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
     }
-
-    private val browseSharedViewModel: DuckChatSharedViewModel by activityViewModels()
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -174,12 +162,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
-
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
     @Inject
     lateinit var webViewModeInitializer: WebViewModeInitializer
@@ -411,60 +393,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             .launchIn(lifecycleScope)
     }
-
-    private fun launchInputScreen() {
-        // val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
-        // TODO: Support Bottom / Split omnibar
-        val isTopOmnibar = true
-        val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
-        val intent =
-            globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(
-                    query = "",
-                    isTopOmnibar = true,
-                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = tabs),
-                ),
-            )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(true)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(isTopOmnibar)
-        val options =
-            ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                exitTransition,
-            )
-        inputScreenLauncher.launch(intent, options)
-    }
-
-    private val inputScreenLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data
-            when (result.resultCode) {
-                InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
-                        browseSharedViewModel.onSearchRequested(query)
-                    }
-                }
-
-                InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        browseSharedViewModel.openExistingTab(tabId)
-                    }
-                }
-
-                InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                }
-
-                InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
-                    browseSharedViewModel.onTabSwitcherClicked()
-                }
-
-                InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
-                    browseSharedViewModel.onFireButtonClicked()
-                }
-            }
-        }
 
     data class FileChooserRequestedParams(
         val filePickingMode: Int,
