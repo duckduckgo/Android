@@ -46,7 +46,6 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
@@ -325,11 +324,7 @@ class SyncActivityViewModel @Inject constructor(
     fun onContinueSetupAfterSkipRestore(syncEntryPoint: SyncEntryPoint?) {
         if (syncEntryPoint == null) return
         viewModelScope.launch(dispatchers.io()) {
-            val source = when (syncEntryPoint) {
-                SyncEntryPoint.ADD_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
-                SyncEntryPoint.SYNC_NEW_ACCOUNT -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
-                SyncEntryPoint.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
-            }
+            val source = syncEntryPoint.toAutoRestorePixelSource()
             when (val result = syncAutoRestoreManager.clearAutoRestoreData()) {
                 is Success -> {
                     syncPixels.fireAutoRestorePreservedAccountCleared(source)
