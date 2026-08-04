@@ -57,16 +57,18 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     suspend fun initializePages() {
-        val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
-            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        val renderer = withContext(dispatchers.io()) { resolveRenderer() }
+        when (renderer) {
+            OnboardingRenderer.ConfigDriven -> pageLayoutManager.buildConfigDrivenPageBlueprints()
+            OnboardingRenderer.BrandDesignUpdate -> pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
+            OnboardingRenderer.Legacy -> pageLayoutManager.buildPageBlueprints()
         }
-        val isConfigDrivenDialogsEnabled = isBrandDesignUpdateEnabled &&
-            withContext(dispatchers.io()) { onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() }
-        when {
-            isConfigDrivenDialogsEnabled -> pageLayoutManager.buildConfigDrivenPageBlueprints()
-            isBrandDesignUpdateEnabled -> pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
-            else -> pageLayoutManager.buildPageBlueprints()
-        }
+    }
+
+    private fun resolveRenderer(): OnboardingRenderer = when {
+        !onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() -> OnboardingRenderer.Legacy
+        onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() -> OnboardingRenderer.ConfigDriven
+        else -> OnboardingRenderer.BrandDesignUpdate
     }
 
     fun pageCount(): Int {
@@ -156,4 +158,6 @@ class OnboardingViewModel @Inject constructor(
         DUCK_AI_FOCUSED,
         DEFAULT_WITHOUT_INTRO_CTA,
     }
+
+    private enum class OnboardingRenderer { Legacy, BrandDesignUpdate, ConfigDriven }
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.databinding.PreOnboardingDaxDialogCtaBrandDesignUpdateBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
@@ -51,21 +52,14 @@ class ContentControllerImpl(
     private var boundView: View? = null
 
     /**
-     * Covers every content include, not only the ones with a binder: some default to visible in the card
-     * layout, so a first render of any other screen would otherwise leave one stacked above it, reserving
-     * blank height inside the card.
+     * Covers every content include, not only the ones with a binder: `welcomeContent` defaults to visible in the
+     * card layout, so a first render of any other screen would otherwise leave it stacked above, reserving blank
+     * height inside the card. The CTAs share the container but belong to the card stage.
      */
     override fun resetStage() {
-        listOf(
-            binding.welcomeContent.root,
-            binding.comparisonChartContent.root,
-            binding.addressBarContent.root,
-            binding.inputScreenContent.root,
-            binding.inputScreenPreviewContent.root,
-            binding.reinstallerQuickSetupContent.root,
-            binding.addToDockContent.root,
-            binding.widgetPromptContent.root,
-        ).forEach { it.isVisible = false }
+        binding.cardContainer.children
+            .filter { it !== binding.primaryCta && it !== binding.secondaryCta }
+            .forEach { it.isVisible = false }
     }
 
     override fun bind(

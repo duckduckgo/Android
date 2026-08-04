@@ -160,6 +160,9 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
     }
 
     override fun settle() {
+        // Ends the transition: a superseded ChangeBounds is paused and resumed by the
+        // next beginDelayedTransition rather than ended, so it would otherwise fire into the next render's slot.
+        TransitionManager.endTransitions(binding.root as ViewGroup)
         pendingMorph?.let { continuation ->
             pendingMorph = null
             continuation()

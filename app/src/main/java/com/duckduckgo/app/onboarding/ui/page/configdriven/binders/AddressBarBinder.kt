@@ -54,6 +54,7 @@ class AddressBarBinder(
             title = addressBarTitle,
             fadeTargets = listOf(addressBarPicker),
             result = { NewUserOnboardingEvent.AddressBarConfirmed(state.value.position) },
+            unbind = { addressBarPicker.setOnSelectionChangedListener {} },
         )
     }
 }

@@ -108,7 +108,11 @@ class EmbellishmentControllerImpl(
             // The drain may have cut this decoration's own entrance short, so snap it to where that entrance was
             // heading before reporting the fit.
             decorations[next]?.snap?.invoke()
-            return applyFit(next)
+            val settled = applyFit(next)
+            // A reused decoration can stop fitting when the incoming card is taller, and the card anchors to the
+            // parent bottom without it, so it has to leave the stage too.
+            if (settled == null) decorations[next]?.hide?.invoke()
+            return settled
         }
 
         val exiting = previous?.let { decorations[it] }

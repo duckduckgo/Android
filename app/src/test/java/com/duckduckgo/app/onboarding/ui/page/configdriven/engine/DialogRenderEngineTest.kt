@@ -269,6 +269,19 @@ class DialogRenderEngineTest {
     }
 
     @Test
+    fun `release hands teardown to every axis that owns animators`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        testee.release()
+
+        assertTrue(background.released)
+        assertTrue(cardStage.released)
+        assertTrue(embellishments.released)
+        assertTrue(stepIndicator.released)
+        assertTrue(cardArrow.released)
+    }
+
+    @Test
     fun `a superseded render does not continue its pipeline`() = runTest {
         cardStage.autoComplete = false
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
@@ -450,6 +463,7 @@ private class FakeCardArrowController : CardArrowController {
 
     var applied: Pair<CardArrowConfig?, CardArrowConfig>? = null
     var skipped = false
+    var released = false
 
     override fun apply(previous: CardArrowConfig?, next: CardArrowConfig, animate: Boolean) {
         applied = previous to next
@@ -457,6 +471,10 @@ private class FakeCardArrowController : CardArrowController {
 
     override fun skipRunning() {
         skipped = true
+    }
+
+    override fun release() {
+        released = true
     }
 }
 

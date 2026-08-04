@@ -144,6 +144,7 @@ class DialogRenderEngine(
         cardStage.release()
         embellishments.release()
         stepIndicator.release()
+        cardArrow.release()
     }
 
     private fun animating(animate: Boolean) = animate && !settling

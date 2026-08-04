@@ -93,8 +93,6 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
 
-    private var hasRenderedOnce = false
-
     private val requestNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (view?.windowVisibility == View.VISIBLE) {
             viewModel.notificationPermissionFlowFinished(granted)
@@ -200,25 +198,19 @@ class ConfigDrivenWelcomePage : OnboardingPageFragment(R.layout.content_onboardi
 
     private fun renderConfig(state: ConfigDrivenOnboardingPageViewModel.ViewState) {
         val engine = engine ?: return
+        settleIntroViews()
+
+        // A retained view model emits before a recreated view has been laid out, and the decoration fit
+        // check measures the root's height, so measuring at 0 would hide the decoration for good.
+        if (!binding.root.isLaidOut) {
+            binding.root.doOnLayout { renderConfig(viewModel.viewState.value) }
+            return
+        }
+
         val stepId = state.stepId ?: return
         val config = state.config ?: return
-
-        if (!hasRenderedOnce) {
-            hasRenderedOnce = true
-            settleIntroViews()
-            // A retained view model emits before a recreated view has been laid out, and the decoration fit
-            // check measures the root's height — measuring at 0 would hide the decoration for good.
-            binding.root.doOnLayout {
-                val live = viewModel.viewState.value
-                val liveStepId = live.stepId ?: return@doOnLayout
-                val liveConfig = live.config ?: return@doOnLayout
-                engine.render(liveStepId, liveConfig, live.animateEntry)
-                viewModel.onDialogRendered(liveStepId)
-            }
-        } else {
-            engine.render(stepId, config, state.animateEntry)
-            viewModel.onDialogRendered(stepId)
-        }
+        engine.render(stepId, config, state.animateEntry)
+        viewModel.onDialogRendered(stepId)
     }
 
     private fun handleCommand(command: ConfigDrivenOnboardingPageViewModel.Command) {

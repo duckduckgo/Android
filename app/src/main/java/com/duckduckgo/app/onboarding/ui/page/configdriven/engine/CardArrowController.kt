@@ -25,6 +25,7 @@ import com.duckduckgo.common.ui.view.toPx
 interface CardArrowController {
     fun apply(previous: CardArrowConfig?, next: CardArrowConfig, animate: Boolean)
     fun skipRunning()
+    fun release()
 }
 
 /**
@@ -65,6 +66,11 @@ class CardArrowControllerImpl(
 
     override fun skipRunning() {
         slide?.end()
+        slide = null
+    }
+
+    override fun release() {
+        slide?.cancel()
         slide = null
     }
 
