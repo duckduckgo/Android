@@ -37,6 +37,10 @@ interface AppBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
+    /** Off leaves Change app icon below the theme and night mode settings on the Appearance screen. */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun appIcon(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun feature(): Toggle
 }
