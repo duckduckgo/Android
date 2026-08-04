@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -41,6 +42,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ui.SyncActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
+import com.duckduckgo.sync.internal.databinding.DialogRenameDeviceBinding
 import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.LoginSuccess
@@ -187,6 +189,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.createAccountInfoKeyButton.setOnClickListener { viewModel.onCreateAccountInfoKeyClicked() }
         binding.showCachedAccountInfoKeyButton.setOnClickListener { viewModel.onShowCachedAccountInfoKeyClicked() }
         binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
+        binding.renameDeviceButton.setOnClickListener { viewModel.onRenameDeviceClicked() }
+        binding.fetchDecryptDevicesButton.setOnClickListener { viewModel.onFetchAndDecryptDevicesClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
         binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
         binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }
@@ -257,7 +261,31 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
                     },
                 )
             }
+
+            is Command.ShowRenameDeviceDialog -> showRenameDeviceDialog(command)
         }
+    }
+
+    private fun showRenameDeviceDialog(command: Command.ShowRenameDeviceDialog) {
+        val inputBinding = DialogRenameDeviceBinding.inflate(layoutInflater).apply {
+            renameDeviceInput.text = command.currentName
+        }
+        CustomAlertDialogBuilder(this)
+            .setTitle("Rename device (type: ${command.currentType})")
+            .setPositiveButton(android.R.string.ok)
+            .setNegativeButton(android.R.string.cancel)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val newName = inputBinding.renameDeviceInput.text.trim()
+                        if (newName.isNotEmpty()) {
+                            viewModel.onRenameDeviceConfirmed(newName)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun copyToClipboard(label: String, value: String) {
@@ -344,6 +372,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.keysTextView.text = viewState.keysText
         binding.accountInfoKeyResultTextView.text = viewState.accountInfoKeyResult
         binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
+        binding.renameDeviceResultTextView.text = viewState.renameDeviceResult
+        binding.fetchDecryptDevicesResultTextView.text = viewState.fetchDecryptDevicesResult
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)

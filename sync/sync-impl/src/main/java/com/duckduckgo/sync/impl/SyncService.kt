@@ -61,6 +61,12 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/devices")
+    fun patchDevices(
+        @Header("Authorization") token: String,
+        @Body request: PatchDevicesRequest,
+    ): Call<PatchDevicesResponse>
+
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/connect")
     fun connect(
         @Header("Authorization") token: String,
@@ -257,13 +263,38 @@ data class Device(
     @field:Json(name = "jw_iat") val jwIat: String,
 )
 
-// `name` and `type` are encrypted with the credential in `credentialId`.
+/**
+ * `name` and `type` are encrypted with the credential in `credentialId`
+ * `info` is the cross-credential `device_info` JWE (encrypted under the account_info key).
+ */
 data class DeviceV2(
     @field:Json(name = "id") val deviceId: String? = null,
     @field:Json(name = "name") val deviceName: String? = null,
     @field:Json(name = "type") val deviceType: String? = null,
+    @field:Json(name = "info") val deviceInfo: String? = null,
     @field:Json(name = "jw_iat") val jwIat: String? = null,
     @field:Json(name = "credential_id") val credentialId: String? = null,
+)
+
+/** Request body for PATCH /sync/devices. Exactly one [DeviceUpdate], targeting the current device. */
+data class PatchDevicesRequest(
+    val updates: List<DeviceUpdate>,
+)
+
+/**
+ * A single device update. [id] must be the current device id.
+ * A null field is left unchanged, except [info], which the server clears when it is omitted, so always send the current value.
+ */
+data class DeviceUpdate(
+    @field:Json(name = "id") val id: String,
+    @field:Json(name = "name") val name: String? = null,
+    @field:Json(name = "type") val type: String? = null,
+    @field:Json(name = "info") val info: String? = null,
+)
+
+data class PatchDevicesResponse(
+    val devices: List<Device> = emptyList(),
+    @field:Json(name = "devices_v2") val devicesV2: List<DeviceV2> = emptyList(),
 )
 
 data class ErrorResponse(

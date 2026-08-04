@@ -21,6 +21,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import io.jsonwebtoken.Jwts
 import logcat.logcat
 import org.json.JSONObject
+import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -30,6 +31,7 @@ import java.security.SecureRandom
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.RSAPublicKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 import javax.crypto.Cipher
@@ -78,6 +80,13 @@ interface SyncJweCrypto {
      * Returns them as base64url strings ready for use in a JWK.
      */
     fun extractJwkComponents(publicKeyBase64: String): Pair<String, String>
+
+    /**
+     * Build a base64url SPKI-DER public key from RSA JWK components — modulus [n] and exponent [e],
+     * both base64url. The inverse of [extractJwkComponents], so a cached JWK public key can be fed
+     * straight into [jweEncryptRsaOaep].
+     */
+    fun rsaSpkiFromJwkComponents(n: String, e: String): String
 
     /**
      * HKDF-SHA-256 (RFC 5869), restricted to a single HKDF-Expand block ([outBytes] in 1..32).
@@ -208,6 +217,13 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
         val nBytes = rsaPublicKey.modulus.toByteArray().dropLeadingZero()
         val eBytes = rsaPublicKey.publicExponent.toByteArray().dropLeadingZero()
         return b64UrlEncode(nBytes) to b64UrlEncode(eBytes)
+    }
+
+    override fun rsaSpkiFromJwkComponents(n: String, e: String): String {
+        val modulus = BigInteger(1, b64UrlDecode(n))
+        val exponent = BigInteger(1, b64UrlDecode(e))
+        val publicKey = KeyFactory.getInstance("RSA").generatePublic(RSAPublicKeySpec(modulus, exponent))
+        return b64UrlEncode(publicKey.encoded)
     }
 
     /**
