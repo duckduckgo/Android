@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Zaten senkronize edildi.</string>
     <string name="sync_v2_already_paired_message">Bu cihazlar zaten Sync &amp; Backup\'a bağlı.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">DuckDuckGo\'yu senkronize tutun!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo senkronize durumda.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Otomatik doldurma verilerinizi ve yer işaretlerinizi DuckDuckGo uygulamalarınız arasında uçtan uca şifreli olarak senkronize edin ve yedekleyin.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Otomatik doldurma verilerinizi, yer işaretlerinizi ve Duck.ai sohbetlerinizi DuckDuckGo uygulamalarınız arasında uçtan uca şifreli olarak senkronize edin ve yedekleyin.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Yer işaretleriniz ve otomatik doldurma verileriniz uçtan uca şifreleme ile senkronize ediliyor ve yedekleniyor.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Yer işaretleriniz, otomatik doldurma verileriniz ve Duck.ai sohbetleriniz uçtan uca şifreleme ile senkronize ediliyor ve yedekleniyor.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Bu Cihazı Senkronize Et</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Başka Bir Cihazla Senkronize Et</string>
+    <string name="sync_simplified_settings_recover_section_header">Senkronize Edilen Verileri Kurtar</string>
+    <string name="sync_simplified_settings_recover_data_item">Kurtarma Kodum Var</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Cihazlarım</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Bu Cihaz</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Başka Bir Cihazla Senkronize Et</string>
+    <string name="sync_simplified_settings_download_section_header">İndir</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Yer İmleri</string>
+    <string name="sync_simplified_settings_recovery_section_header">Kurtarma</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Uygulama Yeniden Yüklendiğinde Geri Yükle</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">DuckDuckGo uygulamasını yeniden yüklerseniz, verilerinizi bu cihazda geri yüklemek isteyip istemediğinizi sorarız.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Kurtarma Kodunuzu Kopyalayın</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Kurtarma Kodunuzu İndirin</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Bu kodu kaydedin ve güvenli bir yerde tutun. Böylece bu cihaza erişiminizi kaybederseniz verilerinizi kurtarabilirsiniz.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Sunucu Verilerini Kapat ve Sil</string>
+    <string name="sync_simplified_settings_storage_permission_message">Kurtarma PDF\'ini kaydetmek için depolama izni gereklidir</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Bildirimler devre dışı bırakıldı</string>
+    <string name="sync_simplified_settings_notify_me_body">Sync &amp; Backup bir hatayla karşılaştığında bildirim alın.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">DuckDuckGo\'yu Diğer Cihazlarda Edinin</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Masaüstü Tarayıcısını Edinin</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Sync &amp; Backup Kapatılsın ve Sunucu Verileri Silinsin mi?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Sync &amp; Backup kullanan tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Sunucu Verilerini Sil</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">İptal</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Sync &amp; Backup\'ı kullanmak için cihazınızı güvenli hale getirin</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Sync &amp; Backup\'ı kullanmak için cihaz kilit deseni, PIN veya biyometrik bilgi gerekir.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Ayarlar\'a gidin</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Bu cihazı yakındaki bir bilgisayarla senkronize edin.</string>
+    <string name="sync_simplified_setup_header_body">Cihazlarınızı senkronize etmenize yardımcı olacağız.</string>
+    <string name="sync_simplified_setup_primary_button">Başka Bir Cihazla Senkronize Et</string>
+    <string name="sync_simplified_setup_secondary_button">Sadece Bu Cihazı Senkronize Et</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Bağlantı kuruluyor...</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Senkronize edilmiş verilerinizi kurtarın</string>
+    <string name="sync_simplified_recover_data_body">Sync &amp; Backup kurulumunda aldığınız Kurtarma Koduna ihtiyacınız olacak. Kullandığınız cihazda PDF olarak kaydetmiş olabilirsiniz.</string>
+    <string name="sync_simplified_recover_data_primary_button">Senkronize Edilen Verileri Kurtar</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Önceki Sync &amp; Backup oturumunuz hazır.</string>
+    <string name="sync_simplified_previous_session_body">Yer işaretleri, şifreler ve daha fazlasını geri yüklemek için Sync &amp; Backup oturumuna devam edin veya yeni bir kurulum yapın.</string>
+    <string name="sync_simplified_previous_session_primary_button">Sync &amp; Backup\'a devam et</string>
+    <string name="sync_simplified_previous_session_secondary_button">Yeni Senkronizasyon Ayarlayın</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">QR Kodunu Göster</string>
+    <string name="sync_simplified_scanner_camera_tab_label">QR tara</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Kodu gir</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Senkronize etmek için QR kodunu tara</string>
+    <string name="sync_simplified_scanner_camera_header_body"><annotation type="icon">￼</annotation> <b><annotation type="highlight">Masaüstü için DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>uygulamasını açın ve <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Başka Bir Cihazla Senkronize Et</annotation>bölümüne gidin</string>
+    <string name="sync_simplified_scanner_camera_primary_button">Taramaya Hazırım</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Üzgünüz, taranan kod geçersiz.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Kamera İzni Gereklidir</string>
+    <string name="sync_simplified_scanner_no_permission_body">Lütfen cihazınızın ayarlarına gidin ve bu uygulamanın kameranıza erişmesine izin verin.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Ayarlar\'a gidin</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Kamera Kullanılamıyor</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Senkronizasyon kodunu girin</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Diğer <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo Uygulamanızı</annotation></b> açın <annotation type="gap">\n</annotation>Şu sırayı takip edin: <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Başka Bir Cihazla Senkronize Et</annotation> › <annotation type="highlight">Metin Kodunu Kopyala</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Örnek Kod:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Senkronizasyon Kodunu Yapıştır</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Üzgünüz, yapıştırılan kod geçersiz.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR Kodu</string>
+    <string name="sync_simplified_qr_code_header_headline">Başka bir cihazdan tarayın</string>
+    <string name="sync_simplified_qr_code_header_body">Başka bir cihazda <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>uygulamasını açın ve <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation> bölümüne gidip bu kodu tarayın:</string>
+    <string name="sync_simplified_qr_code_copy_button">Metin Kodunu Kopyala</string>
+    <string name="sync_simplified_qr_code_share_button">Paylaş</string>
+    <string name="sync_simplified_qr_code_copied_message">Kurtarma Kodu Kopyalandı</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup tüm cihazlarınızda uçtan uca şifrelenmiştir.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Veriler kurtarılıyor</string>
+    <string name="sync_simplified_pairing_body">Bağlantı kuruluyor...</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Yeni Cihaz Senkronize Edilsin mi?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Şimdi Senkronize Et</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">İptal</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Yeni Cihaz Senkronize Edilsin mi?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Şimdi Senkronize Et</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">İptal</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Diğer cihazınızdan onaylayın…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Anladım</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'a eklendi.</string>
+    <string name="sync_simplified_recovery_code_body">Bu cihaza erişiminizi kaybettiğinizde verilerinizi kurtarmak için bu kodu kullanın. Güvenli bir yerde saklayın.</string>
+    <string name="sync_simplified_recovery_code_label">Kurtarma Kodu</string>
+    <string name="sync_simplified_recovery_code_download_button">Kurtarma Kodunuzu İndirin</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Uygulama Yeniden Yüklendiğinde Geri Yükle</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">DuckDuckGo uygulamasını yeniden yüklerseniz, verilerinizi bu cihazda geri yüklemek isteyip istemediğinizi sorarız.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Bitti</string>
+    <string name="sync_simplified_recovery_code_copied_message">Kurtarma Kodu Kopyalandı</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Kurtarma PDF\'ini kaydetmek için depolama izni gereklidir</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Senkronize edildi</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Adı Düzenle</string>
+    <string name="sync_simplified_edit_device_remove_item">Cihazı Kaldır</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Bu Cihazı Senkronize Et</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Bu cihazı kaldırırsanız, artık senkronize edilen verilerinize erişemeyecektir.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Bu özellik kapatılırsa, bu cihaz artık senkronize edilen verilerinize erişemeyecektir.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Adı Düzenle</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Bitti</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">İptal</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Cihaz Kaldırılsın mı?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık senkronize edilmiş verilerinize erişemeyecek.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Kaldır</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">İptal</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Sync &amp; Backup kapatılsın mı?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Bu cihaz artık diğer cihazlarınızdaki senkronize edilen verilerinize erişemeyecektir.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Kapat</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">İptal</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">Tamam</string>
+    <string name="sync_simplified_error_dialog_generic_body">Bir hata oluştu</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Sunucuya bağlanılamıyor.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Cihaz adı güncellenemiyor.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Kurtarma PDF\'i oluşturulamıyor.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Kurtarma kodu alınamıyor.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Bir hata oluştu.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Yeni Cihaz Senkronize Edilsin mi?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” senkronize edilmiş DuckDuckGo verilerinize erişebilecek.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Şimdi Senkronize Et</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">İptal</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Sync &amp; Backup\'ı ayarlayın</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Sync &amp; Backup kurulumu için cihazın kilidini açın</string>
 </resources>
