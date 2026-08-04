@@ -108,4 +108,10 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun updateSyncActivityViewStateAtomically(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canWriteUnifiedDeviceList(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canReadUnifiedDeviceList(): Toggle
 }
