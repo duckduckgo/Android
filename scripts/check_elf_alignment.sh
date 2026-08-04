@@ -580,23 +580,23 @@ render_elf_result() {
     local kind
     local message
     local result="ERROR"
+    local -a detail_kinds=()
+    local -a detail_messages=()
 
     output="$(check_elf_raw "${elf}" "${readelf_bin}")"
     status=$?
 
     while IFS=$'\t' read -r kind message; do
         case "${kind}" in
-            ERROR)
-                print_detail ERROR "${message}"
+            ERROR|TOOL_ERROR)
+                detail_kinds+=("ERROR")
+                detail_messages+=("${message}")
                 ERROR_COUNT=$((ERROR_COUNT + 1))
                 ;;
             WARN)
-                print_detail WARN "${message}"
+                detail_kinds+=("WARN")
+                detail_messages+=("${message}")
                 WARNING_COUNT=$((WARNING_COUNT + 1))
-                ;;
-            TOOL_ERROR)
-                print_detail ERROR "${message}"
-                ERROR_COUNT=$((ERROR_COUNT + 1))
                 ;;
             RESULT)
                 result="${message}"
@@ -606,21 +606,28 @@ render_elf_result() {
 
     TOTAL_ELFS=$((TOTAL_ELFS + 1))
 
+    local rc
     if [[ ${status} -eq 0 && "${result}" == "PASS" ]]; then
         PASSED_ELFS=$((PASSED_ELFS + 1))
         print_status PASS "ELF  ${elf}"
-        return 0
+        rc=0
+    else
+        FAILED_ELFS=$((FAILED_ELFS + 1))
+        if [[ ${status} -eq 2 ]]; then
+            print_status ERROR "ELF  ${elf}"
+            rc=2
+        else
+            print_status FAIL "ELF  ${elf}"
+            rc=1
+        fi
     fi
 
-    FAILED_ELFS=$((FAILED_ELFS + 1))
+    local i
+    for (( i = 0; i < ${#detail_kinds[@]}; i++ )); do
+        print_detail "${detail_kinds[i]}" "${detail_messages[i]}"
+    done
 
-    if [[ ${status} -eq 2 ]]; then
-        print_status ERROR "ELF  ${elf}"
-        return 2
-    fi
-
-    print_status FAIL "ELF  ${elf}"
-    return 1
+    return "${rc}"
 }
 
 is_relevant_abi_path() {
