@@ -18,39 +18,67 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.FrameLayout
-import android.widget.TextView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ExchangeSyncCodeBinding
+import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
+import com.google.android.material.progressindicator.IndeterminateDrawable
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class ExchangeSyncCodeActivity : DuckDuckGoActivity() {
-    private val syncUrl get() = requireNotNull(intent.getStringExtra(SYNC_URL_EXTRA_KEY)) {
-        "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
-    }
+    private val binding by viewBinding<ActivitySyncV2ExchangeSyncCodeBinding>()
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    private val syncUrl
+        get() = requireNotNull(intent.getStringExtra(SYNC_URL_EXTRA_KEY)) {
+            "Missing intent extra: '$SYNC_URL_EXTRA_KEY'"
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val textView = TextView(this).apply {
-            text = syncUrl
-            setTextColor(Color.BLACK)
-            layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, Gravity.CENTER)
+        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (isEdgeToEdge) {
+            enableTransparentEdgeToEdge()
         }
-        setContentView(
-            FrameLayout(this).apply {
-                setBackgroundColor(Color.MAGENTA)
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-                addView(textView)
-            },
-        )
+        setContentView(binding.root)
+        if (isEdgeToEdge) {
+            configureEdgeToEdgeInsets()
+        }
+
+        configureConnectingLabel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applySystemBarInsets(binding.root)
+    }
+
+    private fun configureConnectingLabel() {
+        val progressDrawableSpec = CircularProgressIndicatorSpec(this, null, 0).apply {
+            indicatorSize = 20.toPx()
+            indicatorInset = 0
+            trackThickness = 3.toPx()
+            indicatorColors = intArrayOf(getColorFromAttr(CommonR.attr.daxColorAccentBlue))
+        }
+        val progressDrawable = IndeterminateDrawable.createCircularDrawable(this, progressDrawableSpec).apply {
+            setVisible(true, false)
+        }
+        binding.connectingLabel.setCompoundDrawablesRelativeWithIntrinsicBounds(progressDrawable, null, null, null)
     }
 
     companion object {

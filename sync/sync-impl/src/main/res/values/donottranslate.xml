@@ -73,4 +73,6 @@
     <string name="sync_scanner_v2_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
     <string name="sync_scanner_v2_manual_entry_paste_button">Paste Sync Code</string>
     <string name="sync_scanner_v2_manual_entry_invalid_code_pasted">Sorry, the pasted code is invalid.</string>
+    <string name="sync_another_device_v2_headline">Sync &amp; Backup is end-to-end encrypted on all your devices.</string>
+    <string name="sync_another_device_v2_body">Connecting…</string>
 </resources>
