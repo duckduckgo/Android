@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_4"
         android:breakStrategy="balanced"
-        android:text="@string/sync_recover_data_recovery_code_label"
+        android:text="@string/sync_simplified_recovery_code_label"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/copyIcon"
         app:layout_constraintHorizontal_bias="0.0"

@@ -43,7 +43,7 @@ internal fun Error.toV1PairingError(): V1PairingErrorContent {
         CONNECT_FAILED.code -> R.string.sync_connect_generic_error
         CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
         INVALID_CODE.code -> R.string.sync_invalid_code_error
-        else -> R.string.sync_pairing_failed_generic_message
+        else -> R.string.sync_simplified_pairing_failed_generic_message
     }
     return V1PairingErrorContent(message, reason)
 }

@@ -63,7 +63,7 @@ class V1PairingErrorTest {
     fun whenCodeIsGenericOrUnknownThenPairingFailedGenericMessage() {
         listOf(GENERIC_ERROR.code, 9999).forEach { code ->
             val content = Error(code = code).toV1PairingError()
-            assertEquals("code $code message", R.string.sync_pairing_failed_generic_message, content.message)
+            assertEquals("code $code message", R.string.sync_simplified_pairing_failed_generic_message, content.message)
         }
     }
 

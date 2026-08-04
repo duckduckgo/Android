@@ -166,8 +166,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
         val mediator = TabLayoutMediator(binding.tabContainer, binding.contentPager) { tab, position ->
             tab.text = when (position) {
-                SCANNER_POSITION -> getString(R.string.sync_scanner_v2_scan_qr_code_tab_item_label)
-                MANUAL_CODE_ENTRY_POSITION -> getString(R.string.sync_scanner_v2_enter_code_manually_tab_item_label)
+                SCANNER_POSITION -> getString(R.string.sync_simplified_scanner_camera_tab_label)
+                MANUAL_CODE_ENTRY_POSITION -> getString(R.string.sync_simplified_scanner_manual_entry_tab_label)
                 else -> error("Unknown position: $position")
             }
         }

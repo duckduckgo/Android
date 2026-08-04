@@ -84,7 +84,7 @@ class ReadSyncCodeViewModelTest {
 
             val command = awaitItem()
             assertIs<ShowMessage>(command)
-            assertEquals(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted, command.message)
+            assertEquals(R.string.sync_simplified_scanner_manual_entry_invalid_code_message, command.message)
 
             expectNoEvents()
             cancel()

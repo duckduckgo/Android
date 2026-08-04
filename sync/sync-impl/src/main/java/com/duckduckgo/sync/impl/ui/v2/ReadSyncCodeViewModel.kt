@@ -39,7 +39,7 @@ class ReadSyncCodeViewModel @Inject constructor(
         val code = clipboard.pasteFromClipboard()
         viewModelScope.launch {
             if (code.isBlank()) {
-                _commands.send(Command.ShowMessage(R.string.sync_scanner_v2_manual_entry_invalid_code_pasted))
+                _commands.send(Command.ShowMessage(R.string.sync_simplified_scanner_manual_entry_invalid_code_message))
             } else {
                 _commands.send(Command.StartSyncProcess(code))
             }

@@ -123,7 +123,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
             val code = viewState.value.bitmap?.url ?: return@launch
             val isNotificationShown = clipboard.copyToClipboard(code, isSensitive = true)
             if (!isNotificationShown) {
-                _commands.send(Command.ShowMessage(R.string.sync_code_copied_message))
+                _commands.send(Command.ShowMessage(R.string.sync_simplified_qr_code_copied_message))
             }
             pixels.fireSyncSetupCodeCopiedToClipboard(syncType)
         }

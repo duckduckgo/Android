@@ -118,7 +118,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: SyncThisDeviceViewModel.ViewState) {
         binding.syncThisDeviceButton.apply {
             icon = if (viewState.isSyncing) progressDrawable else null
-            setText(if (viewState.isSyncing) R.string.sync_enable_connecting else R.string.sync_setup_v2_this_device_cta_title)
+            setText(
+                if (viewState.isSyncing) R.string.sync_simplified_setup_secondary_button_syncing else R.string.sync_simplified_setup_secondary_button,
+            )
         }
     }
 
@@ -174,9 +176,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private fun showError(error: SyncThisDeviceViewModel.Command.ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
             .setMessage(getString(error.message) + "\n" + error.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

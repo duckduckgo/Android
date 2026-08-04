@@ -114,7 +114,7 @@ class RecoveryCodeActivityViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<ShowError>(command)
-            assertEquals(R.string.sync_device_v2_recovery_code_get_code_error, command.message)
+            assertEquals(R.string.sync_simplified_error_dialog_recovery_code_body, command.message)
             assertEquals("boom", command.reason)
 
             cancel()
@@ -156,7 +156,7 @@ class RecoveryCodeActivityViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertIs<ShowError>(command)
-            assertEquals(R.string.sync_create_account_generic_error, command.message)
+            assertEquals(R.string.sync_simplified_error_dialog_create_account_body, command.message)
 
             cancel()
         }
@@ -223,7 +223,7 @@ class RecoveryCodeActivityViewModelTest {
 
             val command = awaitItem()
             assertIs<ShowError>(command)
-            assertEquals(R.string.sync_recovery_pdf_error, command.message)
+            assertEquals(R.string.sync_simplified_error_dialog_recovery_pdf_body, command.message)
 
             cancel()
         }
@@ -255,11 +255,11 @@ class RecoveryCodeActivityViewModelTest {
         givenRecoveryCodeAvailable()
 
         testee.commands.test {
-            testee.showMessage(R.string.sync_code_copied_message)
+            testee.showMessage(R.string.sync_simplified_recovery_code_copied_message)
 
             val command = awaitItem()
             assertIs<ShowMessage>(command)
-            assertEquals(R.string.sync_code_copied_message, command.message)
+            assertEquals(R.string.sync_simplified_recovery_code_copied_message, command.message)
 
             cancel()
         }
@@ -284,7 +284,7 @@ class RecoveryCodeActivityViewModelTest {
 
             val command = awaitItem()
             assertIs<ShowMessage>(command)
-            assertEquals(R.string.sync_code_copied_message, command.message)
+            assertEquals(R.string.sync_simplified_recovery_code_copied_message, command.message)
 
             cancel()
         }

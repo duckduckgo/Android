@@ -114,7 +114,7 @@ private class LocalDeviceViewHolder(
     private var device: ConnectedDevice? = null
 
     init {
-        binding.root.setSecondaryText(itemView.context.getString(R.string.sync_device_this_device_hint))
+        binding.root.setSecondaryText(itemView.context.getString(R.string.sync_simplified_settings_local_device_item_hint))
         binding.root.setOnClickListener {
             device?.let(listener::onDeviceClicked)
         }

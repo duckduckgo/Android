@@ -34,7 +34,7 @@
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_settings_v2_devices_section_header" />
+        app:primaryText="@string/sync_simplified_settings_devices_section_header" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/devicesRecycler"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_qr2_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_setup_with_another_device_cta_title" />
+        app:primaryText="@string/sync_simplified_settings_sync_with_another_device_item" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_settings_v2_download_section_header" />
+        app:primaryText="@string/sync_simplified_settings_download_section_header" />
 
     <com.duckduckgo.sync.impl.ui.v2.GetOnOtherPlatformsListItem
         android:id="@+id/get_on_other_platforms_item"
@@ -73,7 +73,7 @@
         android:id="@+id/bookmarksSectionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_settings_v2_bookmarks_section_header" />
+        app:primaryText="@string/sync_simplified_settings_bookmarks_section_header" />
 
     <LinearLayout
         android:id="@+id/bookmarksSectionContainer"
@@ -90,7 +90,7 @@
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_settings_recovery_section_header" />
+        app:primaryText="@string/sync_simplified_settings_recovery_section_header" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/restoreOnReinstallItem"
@@ -99,8 +99,8 @@
         android:visibility="gone"
         app:leadingIcon="@drawable/device_default_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_restore_on_reinstall_title"
-        app:secondaryText="@string/sync_restore_on_reinstall_description"
+        app:primaryText="@string/sync_simplified_settings_restore_on_reinstall_item"
+        app:secondaryText="@string/sync_simplified_settings_restore_on_reinstall_item_hint"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -109,7 +109,7 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_copy_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_settings_v2_copy_recovery_code_item" />
+        app:primaryText="@string/sync_simplified_settings_copy_recovery_code_item" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/downloadRecoveryCodeItem"
@@ -117,8 +117,8 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_settings_v2_download_recovery_code_item"
-        app:secondaryText="@string/sync_settings_download_recovery_code_item_hint" />
+        app:primaryText="@string/sync_simplified_settings_download_recovery_code_item"
+        app:secondaryText="@string/sync_simplified_settings_download_recovery_code_item_hint" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/expirationNoticeLabel"
@@ -126,7 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginVertical="@dimen/keyline_2"
-        android:text="@string/sync_settings_data_expiration"
+        android:text="@string/sync_simplified_settings_data_expiration_notice"
         app:textType="secondary"
         app:typography="caption" />
 
@@ -142,6 +142,6 @@
         android:layout_marginBottom="@dimen/keyline_4"
         app:leadingIcon="@drawable/ic_trash_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_settings_v2_delete_account_item" />
+        app:primaryText="@string/sync_simplified_settings_delete_account_item" />
 
 </LinearLayout>
