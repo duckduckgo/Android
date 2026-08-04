@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.DispatchOutcome
@@ -32,6 +33,7 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.Close
@@ -40,8 +42,6 @@ import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.SetPairi
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowPairingAcknowledgement
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.ExchangeSyncCodeViewModel.Command.ShowV2Error
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import kotlinx.coroutines.flow.emptyFlow
@@ -79,6 +79,7 @@ class ExchangeSyncCodeViewModelTest {
 
     private fun createTestee() = ExchangeSyncCodeViewModel(
         syncUrl = "sync-url",
+        originalFlow = OriginalFlow.SYNC_THIS_DEVICE,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -115,7 +116,7 @@ class ExchangeSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when processing a legacy code succeeds then after the animation a success result with no role is set and the screen closes`() = runTest {
+    fun `when processing a legacy recovery code succeeds then a recovery success result is set and the screen closes`() = runTest {
         givenLegacyCode(recoveryAuthCode)
         givenProcessCodeSucceeds()
         givenThisConnectedDevice()
@@ -128,7 +129,31 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, role = null, method = PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when processing a legacy connect code succeeds then a pairing success result is set and the screen closes`() = runTest {
+        givenLegacyCode(SyncAuthCode.Connect(ConnectCode(deviceId = "device-id", secretKey = "secret-key")))
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            testee.onAnimationComplete()
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE),
+                command.result,
+            )
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -226,7 +251,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Role.Joiner, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -244,7 +269,7 @@ class ExchangeSyncCodeViewModelTest {
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, Role.Host, PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -252,17 +277,34 @@ class ExchangeSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the login completes without an elected role then a success result with no role is set`() = runTest {
+    fun `when the login completes via recovery then the screen does not close until the animation completes`() = runTest {
         givenV2Outcomes(DispatchOutcome.LoggedIn(path = SetupPath.RECOVERY))
         givenThisConnectedDevice()
 
         val testee = createTestee()
 
         testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            expectNoEvents()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the login completes via recovery then the animation runs and a recovery success result is set`() = runTest {
+        givenV2Outcomes(DispatchOutcome.LoggedIn(path = SetupPath.RECOVERY))
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
             testee.onAnimationComplete()
             val command = awaitItem()
             assertIs<SetPairingResult>(command)
-            assertEquals(SyncPairingResult.Success(thisParcelableDevice, role = null, method = PairingMethod.ScannedCode), command.result)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, OriginalFlow.SYNC_THIS_DEVICE), command.result)
             assertIs<Close>(awaitItem())
 
             cancel()

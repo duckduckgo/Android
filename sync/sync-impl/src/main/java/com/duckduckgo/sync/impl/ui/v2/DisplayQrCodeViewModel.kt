@@ -37,14 +37,13 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
 import com.duckduckgo.sync.impl.ui.toV1PairingError
 import com.duckduckgo.sync.impl.ui.toV2PairingError
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
 import dagger.assisted.Assisted
@@ -63,6 +62,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val source: String?,
+    @Assisted private val originalFlow: OriginalFlow,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -143,7 +143,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     if (isSynced) {
                         pixels.fireSignupConnectPixel(source)
                         pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
-                        _commands.send(Command.SetPairingResult(pairingResult(role = null)))
+
+                        val result = pairingResult()
+                        _commands.send(Command.SetPairingResult(result))
                         _commands.send(Command.Close)
                         isPolling = false
                     }
@@ -176,7 +178,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
-                    _commands.send(Command.SetPairingResult(pairingResult(outcome.toPairingRole())))
+                    _commands.send(Command.SetPairingResult(pairingResult()))
                     _commands.send(Command.Close)
                 }
 
@@ -204,11 +206,11 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         _viewState.update { it.copy(bitmap = bitmapWithCode) }
     }
 
-    private suspend fun pairingResult(role: Role?): SyncPairingResult = withContext(dispatchers.io()) {
+    private suspend fun pairingResult(): SyncPairingResult = withContext(dispatchers.io()) {
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, role, PairingMethod.DisplayedCode) }
+            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
             ?: SyncPairingResult.Failure
     }
 
@@ -266,16 +268,20 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(source: String?): DisplayQrCodeViewModel
+        fun create(
+            source: String?,
+            originalFlow: OriginalFlow,
+        ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val source: String?,
+            private val originalFlow: OriginalFlow,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source) as T
+                return assistedFactory.create(source, originalFlow) as T
             }
         }
     }

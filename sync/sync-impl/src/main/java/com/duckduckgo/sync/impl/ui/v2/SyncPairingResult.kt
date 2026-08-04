@@ -19,38 +19,23 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Intent
 import android.os.Parcelable
 import androidx.core.content.IntentCompat
-import com.duckduckgo.sync.impl.DispatchOutcome
-import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
-import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.Role
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import kotlinx.parcelize.Parcelize
 
 /**
  * Terminal outcome of a sync-with-another-device attempt. Produced by the leaf activity
- * ([SyncAnotherDeviceActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
+ * ([ExchangeSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
  * back stack so that [SyncActivity] can decide which completion screen to show.
  */
 sealed interface SyncPairingResult : Parcelable {
-
     @Parcelize
     data class Success(
         val device: ParcelableDevice,
-        val role: Role?,
-        val method: PairingMethod,
+        val originalFlow: OriginalFlow,
     ) : SyncPairingResult
 
     @Parcelize
     data object Failure : SyncPairingResult
-
-    enum class Role {
-        Host,
-        Joiner,
-    }
-
-    enum class PairingMethod {
-        ScannedCode,
-        DisplayedCode,
-    }
 
     companion object {
         const val RESULT_SYNC_COMPLETED = 210
@@ -61,13 +46,4 @@ sealed interface SyncPairingResult : Parcelable {
         fun fromIntent(intent: Intent): SyncPairingResult? =
             IntentCompat.getParcelableExtra(intent, PAIRING_RESULT_EXTRA_KEY, SyncPairingResult::class.java)
     }
-}
-
-internal fun DispatchOutcome.LoggedIn.toPairingRole(): Role? = when (path) {
-    SetupPath.PAIRING -> when (myRole) {
-        SetupRole.HOST -> Role.Host
-        SetupRole.JOINER -> Role.Joiner
-        null -> null
-    }
-    SetupPath.RECOVERY -> null
 }

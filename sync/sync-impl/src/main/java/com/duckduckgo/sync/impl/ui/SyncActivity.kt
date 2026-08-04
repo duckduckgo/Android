@@ -75,7 +75,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchOriginalF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
@@ -93,7 +92,6 @@ import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
 import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
@@ -407,10 +405,6 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_CODE, extractSource()))
                 }
-            }
-
-            is ShowDeviceConnected -> {
-                syncIntroLauncher.launch(SyncIntroContractInput(SETUP_COMPLETE, extractSource()))
             }
 
             is AskTurnOffSync -> askTurnOffSync(command.device)

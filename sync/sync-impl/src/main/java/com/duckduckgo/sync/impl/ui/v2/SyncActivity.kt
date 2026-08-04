@@ -80,18 +80,17 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchOriginalF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
-import com.duckduckgo.sync.impl.ui.v2.SyncPairingResult.PairingMethod
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -138,17 +137,17 @@ class SyncActivity : DuckDuckGoActivity() {
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
 
-    private val backupDeviceLauncher = registerForActivityResult(
+    private val syncThisDeviceLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
-    ) { result ->
-        when (result) {
+    ) { output ->
+        when (output) {
             is SyncThisDeviceContract.Output.BackedUp -> {
                 viewModel.onDeviceConnected()
-                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.deviceName))
+                recoveryCodeLauncher.launch(RecoveryCodeContract.Input(output.device.deviceName))
             }
 
             is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
-                handlePairingResult(result.result)
+                handlePairingResult(output.result)
             }
 
             is SyncThisDeviceContract.Output.Dismissed -> {
@@ -187,30 +186,39 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val readSyncCodeLauncher = registerForActivityResult(
+    private val syncWithAnotherDeviceLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
-    ) { result ->
-        when (result) {
-            is ReadSyncCodeContract.Output.SyncCompleted -> handlePairingResult(result.result)
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
             is ReadSyncCodeContract.Output.Dismissed -> Unit
         }
     }
 
     private val addAnotherDeviceLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
-    ) { result ->
-        when (result) {
+    ) { output ->
+        when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
-                when (result.result) {
-                    is SyncPairingResult.Success -> {
-                        viewModel.onDeviceConnected()
-                    }
-
-                    is SyncPairingResult.Failure -> viewModel.onConnectionCancelled()
-                }
+                handlePairingResult(output.result)
             }
 
             is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val recoverSyncedDataLauncher = registerForActivityResult(
+        RecoverSyncedDataContract(),
+    ) { output ->
+        when (output) {
+            is RecoverSyncedDataContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is RecoverSyncedDataContract.Output.Dismissed -> Unit
         }
     }
 
@@ -253,6 +261,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureSyncThisDeviceCta()
         configureSyncWithAnotherDeviceCta()
+        configureRecoverDataCta()
         configureDevicesRecyclerView()
         configureBookmarksSection()
         configureWarningMessages()
@@ -325,7 +334,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (command) {
             is AddAnotherDevice -> {
                 authenticate {
-                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                    addAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_WITH_ANOTHER))
                 }
             }
 
@@ -341,13 +350,11 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            is AskRemoveDevice -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskRemoveDevice -> Unit
 
-            is AskSetupSyncDeepLink -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskSetupSyncDeepLink -> Unit
 
             is AskToCopyRecoveryCode -> {
                 authenticate {
@@ -355,9 +362,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            is AskTurnOffSync -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is AskTurnOffSync -> Unit
 
             is CheckIfUserHasStoragePermission -> {
                 if (appBuildConfig.sdkInt < 30) {
@@ -388,13 +394,15 @@ class SyncActivity : DuckDuckGoActivity() {
                             // so only notify that auth was successful if it actually happened
                             lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
                         }
-                        backupDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
+                        syncThisDeviceLauncher.launch(SyncThisDeviceContract.Input(launchSource))
                     },
                 )
             }
 
             is IntroRecoverSyncData -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate {
+                    recoverSyncedDataLauncher.launch(RecoverSyncedDataContract.Input(launchSource))
+                }
             }
 
             is LaunchLearnMore -> {
@@ -422,10 +430,6 @@ class SyncActivity : DuckDuckGoActivity() {
                 launchDeviceAuthEnrollment(command.forSyncThisDevice)
             }
 
-            is ShowDeviceConnected -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
-
             is ShowDeviceUnsupported -> {
                 startActivity(DeviceUnsupportedActivity.intent(this))
                 finish()
@@ -443,13 +447,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
             }
 
-            is ShowRecoveryCode -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
-            }
+            // No-op in the simplified flow.
+            is ShowRecoveryCode -> Unit
 
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                    syncWithAnotherDeviceLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_THIS_DEVICE))
                 }
             }
         }
@@ -459,9 +462,11 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncPairingResult.Success -> {
                 viewModel.onDeviceConnected()
-                when (result.method) {
-                    PairingMethod.ScannedCode -> recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
-                    PairingMethod.DisplayedCode -> Unit
+                when (result.originalFlow) {
+                    OriginalFlow.SYNC_THIS_DEVICE, OriginalFlow.RECOVER_SYNCED_DATA ->
+                        recoveryCodeLauncher.launch(RecoveryCodeContract.Input(result.device.name))
+
+                    OriginalFlow.SYNC_WITH_ANOTHER -> Unit
                 }
             }
 
@@ -494,6 +499,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
         binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
             viewModel.onAddAnotherDevice()
+        }
+    }
+
+    private fun configureRecoverDataCta() {
+        binding.includeDisabledView.recoverDataItem.setOnClickListener {
+            viewModel.onRecoverYourSyncedData()
         }
     }
 

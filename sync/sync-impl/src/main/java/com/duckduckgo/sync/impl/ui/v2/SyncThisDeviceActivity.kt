@@ -34,6 +34,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ThisDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
@@ -138,7 +139,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
-                readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource))
+                readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_THIS_DEVICE))
             }
         }
     }

@@ -16,6 +16,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contentScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -41,14 +42,15 @@
             app:lottie_rawRes="@raw/sync_exchange_sync_code_animation" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/headlineText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_5"
             android:layout_marginTop="@dimen/keyline_5"
             android:gravity="center"
-            android:text="@string/sync_another_device_v2_headline"
             app:textType="primary"
-            app:typography="h1" />
+            app:typography="h1"
+            tools:text="@string/sync_another_device_v2_headline" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/connectingLabel"
