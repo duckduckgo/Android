@@ -77,6 +77,12 @@
     <string name="sync_simplified_recover_data_body">You’ll need the Recovery&#160;Code you got when you set up Sync&#160;&amp;&#160;Backup. You may have saved it as a PDF on the device you used.</string>
     <string name="sync_simplified_recover_data_primary_button">Recover Synced Data</string>
 
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Your previous Sync&#160;&amp;&#160;Backup session is ready.</string>
+    <string name="sync_simplified_previous_session_body">Resume your Sync&#160;&amp;&#160;Backup session to restore your bookmarks, passwords, and more, or continue with a new setup.</string>
+    <string name="sync_simplified_previous_session_primary_button">Resume Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Set Up New Sync</string>
+
     <!-- Scanner screen: toolbar and tabs -->
     <string name="sync_simplified_scanner_show_qr_code_content_description">Show QR Code</string>
     <string name="sync_simplified_scanner_camera_tab_label">Scan QR</string>

@@ -222,6 +222,46 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val previousSessionReadyLauncher = registerForActivityResult(
+        PreviousSessionReadyContract(),
+    ) { output ->
+        when (output) {
+            is PreviousSessionReadyContract.Output.Resume -> {
+                exchangeSyncCodeLauncher.launch(
+                    ExchangeSyncCodeContract.Input(
+                        syncUrl = output.recoveryCode,
+                        launchSource = launchSource,
+                        originalFlow = OriginalFlow.RECOVER_SYNCED_DATA,
+                    ),
+                )
+            }
+
+            is PreviousSessionReadyContract.Output.ContinueSetup -> {
+                viewModel.onContinueSetupAfterSkipRestore(output.originalFlow)
+            }
+
+            is PreviousSessionReadyContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val exchangeSyncCodeLauncher = registerForActivityResult(
+        ExchangeSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ExchangeSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ExchangeSyncCodeContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
     private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
         if (isGranted) {
             viewModel.generateRecoveryCode(this)
@@ -416,7 +456,22 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchOriginalFlow -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                when (command.originalFlow) {
+                    OriginalFlow.SYNC_THIS_DEVICE -> {
+                        val input = SyncThisDeviceContract.Input(launchSource)
+                        syncThisDeviceLauncher.launch(input)
+                    }
+
+                    OriginalFlow.SYNC_WITH_ANOTHER -> {
+                        val input = ReadSyncCodeContract.Input(launchSource, command.originalFlow)
+                        syncWithAnotherDeviceLauncher.launch(input)
+                    }
+
+                    OriginalFlow.RECOVER_SYNCED_DATA -> {
+                        val input = RecoverSyncedDataContract.Input(launchSource)
+                        recoverSyncedDataLauncher.launch(input)
+                    }
+                }
             }
 
             is LaunchSyncGetOnOtherPlatforms -> {
@@ -447,7 +502,25 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is ShowPreviousSessionReady -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                authenticate(
+                    onCancelled = {
+                        viewModel.onSyncThisDeviceCanceled()
+                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
+                    },
+                    onError = { message ->
+                        viewModel.onSyncThisDeviceCanceled()
+                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
+                        showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, message))
+                    },
+                    onSuccess = { hasValidAuth ->
+                        if (hasValidAuth) {
+                            // authenticate() also passes if device is not enrolled into auth,
+                            // so only notify that auth was successful if it actually happened
+                            lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
+                        }
+                        previousSessionReadyLauncher.launch(PreviousSessionReadyContract.Input(command.originalFlow))
+                    },
+                )
             }
 
             // No-op in the simplified flow.

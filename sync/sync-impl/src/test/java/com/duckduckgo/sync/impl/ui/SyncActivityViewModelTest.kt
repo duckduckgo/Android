@@ -357,6 +357,21 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSkipRestoreClearFailsThenThisDeviceSyncIdle() = runTest {
+        whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Error(reason = "error"))
+
+        testee.viewState().test {
+            testee.onSyncThisDevice()
+            assertTrue(expectMostRecentItem().isThisDeviceSyncing)
+
+            testee.onContinueSetupAfterSkipRestore(OriginalFlow.SYNC_THIS_DEVICE)
+            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.onRecoverYourSyncedData()
