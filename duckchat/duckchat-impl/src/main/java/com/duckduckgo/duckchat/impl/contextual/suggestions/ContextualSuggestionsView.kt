@@ -32,6 +32,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
@@ -62,6 +63,8 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     private val loadingView = ContextualSuggestionsLoadingView(context)
     private val cardsContainer = LinearLayout(context).apply { orientation = VERTICAL }
 
+    private val viewStateJob = ConflatedJob()
+
     init {
         orientation = VERTICAL
         addView(
@@ -76,9 +79,14 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
-        viewModel.viewState
+        viewStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(scope)
+    }
+
+    override fun onDetachedFromWindow() {
+        viewStateJob.cancel()
+        super.onDetachedFromWindow()
     }
 
     fun load() {
