@@ -112,7 +112,6 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
             quietlySetIsChecked(viewState.showInVoiceSearch, voiceSearchToggleListener)
         }
         binding.showDuckAiInVoiceChatToggle.apply {
-            isVisible = viewState.shouldShowVoiceChatToggle
             quietlySetIsChecked(viewState.showInVoiceChat, voiceChatToggleListener)
         }
     }

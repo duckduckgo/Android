@@ -157,8 +157,6 @@ class FakeDuckChatInternal(
 
     override fun isVoiceSearchEntryPointEnabled(): Boolean = false
 
-    override fun isVoiceChatEntryPointEnabled(): Boolean = false
-
     override fun isDuckChatUserEnabled(): Boolean = enableDuckChatUserSetting.value
 
     override fun updateChatState(state: ChatState) {

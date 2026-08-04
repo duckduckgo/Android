@@ -39,7 +39,6 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
         val showInVoiceChat: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
         val shouldShowVoiceSearchToggle: Boolean = false,
-        val shouldShowVoiceChatToggle: Boolean = false,
     )
 
     val viewState = combine(
@@ -55,7 +54,6 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
             showInVoiceChat = showInVoiceChat,
             shouldShowAddressBarToggle = duckChat.isAddressBarEntryPointEnabled(),
             shouldShowVoiceSearchToggle = duckChat.isVoiceSearchEntryPointEnabled(),
-            shouldShowVoiceChatToggle = duckChat.isVoiceChatEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

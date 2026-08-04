@@ -211,13 +211,6 @@ interface DuckChatFeature {
     fun chatTabAttachments(): Toggle
 
     /**
-     * @return `true` when the duck.ai voice entry point button is enabled in the input screen
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiVoiceEntryPoint(): Toggle
-
-    /**
      * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
      * allowing the user to clear their current chat.
      * If the remote feature is not present defaults to `internal`
@@ -273,23 +266,23 @@ interface DuckChatFeature {
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
      * @return `true` when the remote config has the "digitalAssistantDuckAi"
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun digitalAssistantDuckAi(): Toggle
 
     /**
      * @return `true` when the Duck.ai voice chat foreground service (microphone) should be started
      * and stopped during a voice session.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiVoiceChatService(): Toggle
 
     /**
      * @return `true` when the contextual Duck.ai sheet improvements are enabled.
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualSheetImprovements(): Toggle
 
     /**
@@ -308,9 +301,9 @@ interface DuckChatFeature {
 
     /**
      * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun removeChatHistory(): Toggle
 
     /**
