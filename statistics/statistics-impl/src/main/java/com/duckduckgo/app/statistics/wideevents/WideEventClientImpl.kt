@@ -43,6 +43,7 @@ class WideEventClientImpl @Inject constructor(
         metadata: Map<String, String>,
         cleanupPolicy: CleanupPolicy,
         samplingProbability: Float,
+        definition: WideEventDefinition,
     ): Result<Long> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
         if (samplingProbability !in 0.0f..1.0f) {
@@ -58,8 +59,8 @@ class WideEventClientImpl @Inject constructor(
                 metadata = metadata,
                 cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
                 samplingProbability = samplingProbability,
-                metaType = WideEventMeta.typeFor(name),
-                metaVersion = WideEventMeta.DEFAULT_VERSION,
+                metaType = definition.type ?: WideEventMeta.typeFor(name),
+                metaVersion = WideEventMeta.versionFor(definition.version),
             )
         }
     }

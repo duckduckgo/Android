@@ -172,7 +172,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenManualInitialRunStartedAndFlagFalseThenFlowStartedWithExpectedMetadata() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(42L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(42L))
 
         testee.onRunStarted(
             executionType = PirExecutionType.MANUAL_INITIAL,
@@ -244,14 +244,14 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenScheduledRunStartedWhileFlowOpenThenScheduledCountIncrementedAndNoNewFlow() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         // foreground=1 after the manual initial run
 
         runStarted(executionType = PirExecutionType.SCHEDULED)
         runStarted(executionType = PirExecutionType.SCHEDULED)
 
-        verify(wideEventClient).flowStart(any(), any(), any(), any(), any())
+        verify(wideEventClient).flowStart(any(), any(), any(), any(), any(), any())
         assertEquals(1L, dataStore.initialScanCompletionFlowId)
         assertEquals(1, dataStore.initialScanCompletionForegroundRunCount)
         assertEquals(2, dataStore.initialScanCompletionScheduledRunCount)
@@ -259,12 +259,12 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenManualEditProfileRunStartedWhileFlowOpenThenForegroundCountIncremented() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
 
         runStarted(executionType = PirExecutionType.MANUAL_EDIT_PROFILE)
 
-        verify(wideEventClient).flowStart(any(), any(), any(), any(), any())
+        verify(wideEventClient).flowStart(any(), any(), any(), any(), any(), any())
         assertEquals(2, dataStore.initialScanCompletionForegroundRunCount)
         assertEquals(0, dataStore.initialScanCompletionScheduledRunCount)
     }
@@ -279,20 +279,20 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenManualInitialResumeRunStartedWhileFlowOpenThenForegroundCountIncremented() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
 
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL_RESUME)
 
         // The resume continues the open journey flow (no second flowStart) and counts as a foreground run.
-        verify(wideEventClient).flowStart(any(), any(), any(), any(), any())
+        verify(wideEventClient).flowStart(any(), any(), any(), any(), any(), any())
         assertEquals(2, dataStore.initialScanCompletionForegroundRunCount)
         assertEquals(0, dataStore.initialScanCompletionScheduledRunCount)
     }
 
     @Test
     fun whenScanCompletedAndAllJobsDoneThenFlowFinishedWithSuccess() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         runStarted(executionType = PirExecutionType.SCHEDULED)
         whenever(pirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
@@ -324,7 +324,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenUnscannedJobBelongsToInactiveBrokerThenFlowStillFinishesSuccess() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         // b3 was never scanned, but its broker is no longer active so the scanner will never run it.
         // It must not block the journey from completing.
@@ -354,7 +354,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenUnscannedJobBelongsToUnparseableBrokerThenFlowStillFinishesSuccess() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         // b3 is active but its scan steps don't parse, so the scanner silently skips it and its job
         // stays unscanned forever. It must not block the journey from completing.
@@ -391,7 +391,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenScanCompletedAndSomeJobsNotDoneThenFlowRemainsOpen() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         whenever(pirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
             listOf(
@@ -423,7 +423,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenOnUserResetCalledAndFlowOpenThenFlowAborted() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(55L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(55L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
 
@@ -444,7 +444,7 @@ class PirInitialScanCompletionWideEventTest {
     fun whenOnUserResetCalledAndFeatureFlagDisabledMidFlightThenInFlightFlowStillAborted() = runTest {
         // Flow opens while flag is ON, then flag flips OFF before user reset. We must still abort
         // the in-flight flow so it doesn't get auto-finished as Unknown by the cleanup timeout.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(55L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(55L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
         pirRemoteFeatures.sendScanWideEvent().setRawStoredState(Toggle.State(false))
@@ -456,7 +456,7 @@ class PirInitialScanCompletionWideEventTest {
 
     @Test
     fun whenJourneySpansMultipleRunsThenSuccessReportsTotalCounts() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(7L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(7L))
 
         // Initial foreground run starts the flow.
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)

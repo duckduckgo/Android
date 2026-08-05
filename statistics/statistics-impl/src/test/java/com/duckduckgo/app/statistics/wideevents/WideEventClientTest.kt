@@ -126,6 +126,37 @@ class WideEventClientTest {
         }
 
     @Test
+    fun `when flowStart called with definition then meta parameters are stored`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(789L)
+
+            val result = wideEventClient.flowStart(
+                name = "test_flow",
+                definition = WideEventDefinition(
+                    version = WideEventDefinition.Version(minor = 2, patch = 3),
+                    type = "android-custom-definition",
+                ),
+            )
+
+            assertTrue(result.isSuccess)
+
+            verify(wideEventRepository).insertWideEvent(
+                name = "test_flow",
+                flowEntryPoint = null,
+                metadata = emptyMap(),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
+                samplingProbability = 1.0f,
+                metaType = "android-custom-definition",
+                metaVersion = "1.2.3",
+            )
+        }
+
+    @Test
     fun `when flowStart encounters repository exception then returns failure`() =
         runTest {
             val exception = RuntimeException("Database error")

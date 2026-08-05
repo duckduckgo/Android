@@ -16,13 +16,18 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
-object WideEventMeta {
-    /** `meta.type` is kebab-case across all platforms, hence the separator normalization. */
-    fun typeFor(eventName: String): String = TYPE_PREFIX + eventName.replace('_', '-')
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
-    /** MAJOR tracks the base template shared by every wide event, so callers only declare MINOR and PATCH. */
-    fun versionFor(version: WideEventDefinition.Version): String = "$BASE_TEMPLATE_MAJOR.${version.minor}.${version.patch}"
+class WideEventMetaTest {
+    @Test
+    fun `version is composed of the base template major and the definition version`() {
+        assertEquals("1.2.3", WideEventMeta.versionFor(WideEventDefinition.Version(minor = 2, patch = 3)))
+    }
 
-    private const val TYPE_PREFIX = "android-"
-    private const val BASE_TEMPLATE_MAJOR = 1
+    @Test
+    fun `type is derived from the event name and normalized to kebab case`() {
+        assertEquals("android-page-load", WideEventMeta.typeFor("page-load"))
+        assertEquals("android-some-event-name", WideEventMeta.typeFor("some_event_name"))
+    }
 }
