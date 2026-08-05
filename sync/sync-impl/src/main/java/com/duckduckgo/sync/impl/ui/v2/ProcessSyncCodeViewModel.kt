@@ -35,7 +35,7 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.V1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.V2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.toV1PairingError
@@ -56,9 +56,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
-class ExchangeSyncCodeViewModel @AssistedInject constructor(
-    @Assisted private val syncUrl: String,
-    @Assisted private val originalFlow: OriginalFlow,
+class ProcessSyncCodeViewModel @AssistedInject constructor(
+    @Assisted private val syncCode: String,
+    @Assisted private val syncEntryPoint: SyncEntryPoint,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val syncFeature: SyncFeature,
@@ -74,7 +74,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            when (val decision = codeDispatcher.route(syncUrl)) {
+            when (val decision = codeDispatcher.route(syncCode)) {
                 is RouteDecision.Legacy -> handleV1CodeDecision(decision)
                 is RouteDecision.V2InProgress -> handleV2CodeDecision(decision)
             }
@@ -196,7 +196,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
 
     private suspend fun emitV1Error(failure: Error) {
         if (failure.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
-            _commands.send(Command.AskSwitchAccount(syncUrl))
+            _commands.send(Command.AskSwitchAccount(syncCode))
         } else {
             _commands.send(Command.ShowV1Error(failure.toV1PairingError()))
         }
@@ -252,7 +252,7 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, originalFlow) }
+            ?.let { device -> SyncPairingResult.Success(device, syncEntryPoint) }
             ?: SyncPairingResult.Failure
     }
 
@@ -293,19 +293,19 @@ class ExchangeSyncCodeViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            syncUrl: String,
-            originalFlow: OriginalFlow,
-        ): ExchangeSyncCodeViewModel
+            syncCode: String,
+            syncEntryPoint: SyncEntryPoint,
+        ): ProcessSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val syncUrl: String,
-            private val originalFlow: OriginalFlow,
+            private val syncCode: String,
+            private val syncEntryPoint: SyncEntryPoint,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(syncUrl, originalFlow) as T
+                return assistedFactory.create(syncCode, syncEntryPoint) as T
             }
         }
     }

@@ -32,7 +32,7 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return SyncThisDeviceActivity.intent(context, input.source)
+        return SyncThisDeviceActivity.intent(context, input.launchSource)
     }
 
     override fun parseResult(
@@ -55,7 +55,7 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: String?,
+        val launchSource: String?,
     )
 
     sealed interface Output {

@@ -46,7 +46,6 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
@@ -268,21 +267,15 @@ class SyncActivityViewModel @Inject constructor(
         data class RequestSetupAuthentication(val forSyncThisDevice: Boolean) : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
-        data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
-        data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
-    }
-
-    enum class OriginalFlow {
-        SYNC_THIS_DEVICE,
-        SYNC_WITH_ANOTHER,
-        RECOVER_SYNCED_DATA,
+        data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
+        data class LaunchOriginalFlow(val syncEntryPoint: SyncEntryPoint) : Command()
     }
 
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
                 if (syncAutoRestore.canRestore()) {
-                    command.send(ShowPreviousSessionReady(OriginalFlow.SYNC_WITH_ANOTHER))
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE))
                 } else {
                     command.send(Command.SyncWithAnotherDevice)
                 }
@@ -307,7 +300,7 @@ class SyncActivityViewModel @Inject constructor(
                 onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
             ) {
                 if (syncAutoRestore.canRestore()) {
-                    command.send(ShowPreviousSessionReady(OriginalFlow.SYNC_THIS_DEVICE))
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT))
                 } else {
                     command.send(IntroCreateAccount)
                 }
@@ -319,7 +312,7 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
                 if (syncAutoRestore.canRestore()) {
-                    command.send(ShowPreviousSessionReady(OriginalFlow.RECOVER_SYNCED_DATA))
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA))
                 } else {
                     syncPixels.fireAutoRestoreSettingsManualRecoveryShown()
                     command.send(Command.IntroRecoverSyncData)
@@ -328,18 +321,14 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onContinueSetupAfterSkipRestore(originalFlow: OriginalFlow?) {
-        if (originalFlow == null) return
+    fun onContinueSetupAfterSkipRestore(syncEntryPoint: SyncEntryPoint?) {
+        if (syncEntryPoint == null) return
         viewModelScope.launch(dispatchers.io()) {
-            val source = when (originalFlow) {
-                OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
-                OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
-                OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
-            }
+            val source = syncEntryPoint.toAutoRestorePixelSource()
             when (val result = syncAutoRestoreManager.clearAutoRestoreData()) {
                 is Success -> {
                     syncPixels.fireAutoRestorePreservedAccountCleared(source)
-                    command.send(Command.LaunchOriginalFlow(originalFlow))
+                    command.send(Command.LaunchOriginalFlow(syncEntryPoint))
                 }
                 is Error -> {
                     updateViewState { it.setThisDeviceSyncIdle() }

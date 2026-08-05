@@ -61,7 +61,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -231,7 +230,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.SYNC_WITH_ANOTHER, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.ADD_DEVICE, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -288,7 +287,7 @@ class SyncActivityViewModelTest {
             testee.onSyncThisDevice()
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.SYNC_THIS_DEVICE, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.SYNC_NEW_ACCOUNT, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -364,7 +363,7 @@ class SyncActivityViewModelTest {
             testee.onSyncThisDevice()
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
-            testee.onContinueSetupAfterSkipRestore(OriginalFlow.SYNC_THIS_DEVICE)
+            testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
             assertFalse(expectMostRecentItem().isThisDeviceSyncing)
 
             cancelAndIgnoreRemainingEvents()
@@ -402,7 +401,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.RECOVER_SYNCED_DATA, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.RECOVER_SYNCED_DATA, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }

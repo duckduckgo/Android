@@ -34,7 +34,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ThisDeviceBinding
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
@@ -63,7 +63,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private lateinit var progressDrawable: IndeterminateDrawable<CircularProgressIndicatorSpec>
 
-    private val readSyncCodeLauncher = registerForActivityResult(ReadSyncCodeContract()) { output ->
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
                 setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))
@@ -141,7 +143,12 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
-                readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.SYNC_THIS_DEVICE))
+                readSyncCodeLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        launchSource = launchSource,
+                    ),
+                )
             }
         }
     }
@@ -194,10 +201,10 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
         ): Intent {
             return Intent(context, SyncThisDeviceActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

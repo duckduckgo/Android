@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Input
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output
 
@@ -28,7 +28,7 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return DisplayQrCodeActivity.intent(context, input.source, input.originalFlow)
+        return DisplayQrCodeActivity.intent(context, input.syncEntryPoint, input.launchSource)
     }
 
     override fun parseResult(
@@ -48,8 +48,8 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: String?,
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
+        val launchSource: String?,
     )
 
     sealed interface Output {

@@ -39,7 +39,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
@@ -63,26 +63,28 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val originalFlow
-        get() = requireNotNull(
-            IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java),
-        ) {
+    private val syncEntryPoint
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
-    private val isRecoveryFlow get() = originalFlow == OriginalFlow.RECOVER_SYNCED_DATA
+    private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
 
-    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { output ->
+    private val showQrCodeLauncher = registerForActivityResult(
+        DisplayQrCodeContract(),
+    ) { output ->
         when (output) {
             is DisplayQrCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
             is DisplayQrCodeContract.Output.Dismissed -> Unit
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) { output ->
+    private val processSyncCodeLauncher = registerForActivityResult(
+        ProcessSyncCodeContract(),
+    ) { output ->
         when (output) {
-            is ExchangeSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
-            is ExchangeSyncCodeContract.Output.Dismissed -> Unit
+            is ProcessSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is ProcessSyncCodeContract.Output.Dismissed -> Unit
         }
     }
 
@@ -116,12 +118,13 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is StartSyncProcess -> {
-                val input = ExchangeSyncCodeContract.Input(
-                    syncUrl = command.syncCode,
-                    launchSource = launchSource,
-                    originalFlow = originalFlow,
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
+                        syncCode = command.syncCode,
+                        syncEntryPoint = syncEntryPoint,
+                        launchSource = launchSource,
+                    ),
                 )
-                exchangeSyncCodeLauncher.launch(input)
             }
 
             is ShowMessage -> {
@@ -147,7 +150,12 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         }
         binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
-            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource, originalFlow))
+            showQrCodeLauncher.launch(
+                DisplayQrCodeContract.Input(
+                    syncEntryPoint = syncEntryPoint,
+                    launchSource = launchSource,
+                ),
+            )
         }
     }
 
@@ -196,12 +204,12 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

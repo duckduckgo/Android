@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeContract.Input
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeContract.Output
 
@@ -28,7 +28,7 @@ class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return ReadSyncCodeActivity.intent(context, input.source, input.originalFlow)
+        return ReadSyncCodeActivity.intent(context, input.syncEntryPoint, input.launchSource)
     }
 
     override fun parseResult(
@@ -48,8 +48,8 @@ class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: String?,
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
+        val launchSource: String?,
     )
 
     sealed interface Output {

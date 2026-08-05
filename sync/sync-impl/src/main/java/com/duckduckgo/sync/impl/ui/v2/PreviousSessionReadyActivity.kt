@@ -35,8 +35,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2PreviousSessionReadyBinding
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.toAutoRestorePixelSource
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyViewModel.Factory.Provider
@@ -52,7 +52,7 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
     lateinit var vmFactory: Factory
 
     private val viewModel by viewModels<PreviousSessionReadyViewModel> {
-        val launchSource = originalFlow.toAutoRestorePixelSource()
+        val launchSource = syncEntryPoint.toAutoRestorePixelSource()
         Provider(vmFactory, launchSource)
     }
 
@@ -62,8 +62,8 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val originalFlow
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java)) {
+    private val syncEntryPoint
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
             "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
         }
 
@@ -136,7 +136,7 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
             is Command.SetContinueSetupResult -> {
                 setResult(
                     PreviousSessionReadyContract.RESULT_CONTINUE_SETUP,
-                    PreviousSessionReadyContract.continueSetupResultIntent(originalFlow),
+                    PreviousSessionReadyContract.continueSetupResultIntent(syncEntryPoint),
                 )
             }
 
@@ -159,17 +159,11 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            originalFlow: OriginalFlow,
+            syncEntryPoint: SyncEntryPoint,
         ): Intent {
             return Intent(context, PreviousSessionReadyActivity::class.java).apply {
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
             }
         }
     }
-}
-
-private fun OriginalFlow.toAutoRestorePixelSource(): String = when (this) {
-    OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
-    OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
-    OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
 }

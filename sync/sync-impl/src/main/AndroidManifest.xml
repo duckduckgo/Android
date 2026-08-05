@@ -127,7 +127,7 @@
             android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
-            android:name=".ui.v2.ExchangeSyncCodeActivity"
+            android:name=".ui.v2.ProcessSyncCodeActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"

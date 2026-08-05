@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.IntentCompat
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyContract.Input
 import com.duckduckgo.sync.impl.ui.v2.PreviousSessionReadyContract.Output
 
@@ -29,7 +29,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return PreviousSessionReadyActivity.intent(context, input.originalFlow)
+        return PreviousSessionReadyActivity.intent(context, input.syncEntryPoint)
     }
 
     override fun parseResult(
@@ -46,7 +46,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
 
             RESULT_CONTINUE_SETUP -> {
                 intent
-                    ?.let { IntentCompat.getSerializableExtra(it, ORIGINAL_FLOW_EXTRA_KEY, OriginalFlow::class.java) }
+                    ?.let { IntentCompat.getSerializableExtra(it, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java) }
                     ?.let(Output::ContinueSetup)
                     ?: Output.Dismissed
             }
@@ -56,7 +56,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
     )
 
     sealed interface Output {
@@ -65,7 +65,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
         ) : Output
 
         data class ContinueSetup(
-            val originalFlow: OriginalFlow,
+            val syncEntryPoint: SyncEntryPoint,
         ) : Output
 
         data object Dismissed : Output
@@ -80,7 +80,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
         internal fun resumeResultIntent(recoveryCode: String): Intent =
             Intent().putExtra(RECOVERY_CODE_EXTRA_KEY, recoveryCode)
 
-        internal fun continueSetupResultIntent(originalFlow: OriginalFlow): Intent =
-            Intent().putExtra(ORIGINAL_FLOW_EXTRA_KEY, originalFlow)
+        internal fun continueSetupResultIntent(syncEntryPoint: SyncEntryPoint): Intent =
+            Intent().putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
     }
 }

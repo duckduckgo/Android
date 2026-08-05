@@ -85,7 +85,9 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> { viewModelFactory }
 
-    private val cameraPermissionLauncher = registerForActivityResult(RequestPermission()) {
+    private val cameraPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) {
         animationViewModel.onCameraPermissionResult()
     }
 

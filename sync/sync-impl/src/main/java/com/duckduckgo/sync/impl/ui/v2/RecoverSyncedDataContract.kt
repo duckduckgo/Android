@@ -27,7 +27,7 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return RecoverSyncedDataActivity.intent(context, input.source)
+        return RecoverSyncedDataActivity.intent(context, input.launchSource)
     }
 
     override fun parseResult(
@@ -47,7 +47,7 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: String?,
+        val launchSource: String?,
     )
 
     sealed interface Output {

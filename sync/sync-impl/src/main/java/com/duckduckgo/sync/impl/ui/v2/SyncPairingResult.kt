@@ -19,19 +19,19 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Intent
 import android.os.Parcelable
 import androidx.core.content.IntentCompat
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import kotlinx.parcelize.Parcelize
 
 /**
  * Terminal outcome of a sync-with-another-device attempt. Produced by the leaf activity
- * ([ExchangeSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
+ * ([ProcessSyncCodeActivity] or [DisplayQrCodeActivity]) and forwarded verbatim up the
  * back stack so that [SyncActivity] can decide which completion screen to show.
  */
 sealed interface SyncPairingResult : Parcelable {
     @Parcelize
     data class Success(
         val device: ParcelableDevice,
-        val originalFlow: OriginalFlow,
+        val syncEntryPoint: SyncEntryPoint,
     ) : SyncPairingResult
 
     @Parcelize

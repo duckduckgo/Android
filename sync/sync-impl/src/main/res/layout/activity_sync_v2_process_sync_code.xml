@@ -39,7 +39,7 @@
             android:importantForAccessibility="no"
             app:lottie_autoPlay="false"
             app:lottie_loop="false"
-            app:lottie_rawRes="@raw/sync_exchange_sync_code_animation" />
+            app:lottie_rawRes="@raw/sync_process_sync_code_animation" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/headlineText"

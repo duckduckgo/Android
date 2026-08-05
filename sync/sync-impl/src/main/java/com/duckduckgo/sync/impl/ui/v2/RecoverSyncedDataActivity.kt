@@ -27,7 +27,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2RecoverSyncedDataBinding
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -42,7 +42,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
-    private val readSyncCodeLauncher = registerForActivityResult(ReadSyncCodeContract()) { output ->
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
         when (output) {
             is ReadSyncCodeContract.Output.SyncCompleted -> {
                 setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))
@@ -83,7 +85,12 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     private fun configureRecoverDataCta() {
         binding.recoverDataButton.setOnClickListener {
-            readSyncCodeLauncher.launch(ReadSyncCodeContract.Input(launchSource, originalFlow = OriginalFlow.RECOVER_SYNCED_DATA))
+            readSyncCodeLauncher.launch(
+                ReadSyncCodeContract.Input(
+                    syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
+                    launchSource = launchSource,
+                ),
+            )
         }
     }
 
@@ -92,10 +99,10 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }
