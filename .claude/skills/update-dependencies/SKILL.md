@@ -1,12 +1,18 @@
 ---
-description: "How to safely update Android library dependencies using refreshVersions"
+name: update-dependencies
+description: >
+  Use this skill to update Android library dependencies via refreshVersions. Invoke when the user
+  asks to update, bump, or refresh dependencies or a specific library version, asks what updates are
+  available, or hands over a dependency-update task from the Asana backlog. Covers running
+  refreshVersions, judging which bumps are safe, handling libraries blocked by the project's Kotlin
+  version, running the E2E suite, and the PR/Asana conventions for the change.
 ---
-# Dependency Update Rules
 
-## Overview
+# Updating dependencies
 
-Dependencies are managed via `versions.properties` using the `refreshVersions` Gradle plugin (v0.60.5).
-The only file that should change in a dependency update PR is `versions.properties`.
+Dependencies are managed via `versions.properties` using the `refreshVersions` Gradle plugin (its
+version is pinned in `settings.gradle`). The only file that should change in a dependency update PR is
+`versions.properties`.
 
 ---
 
@@ -29,19 +35,20 @@ It is required by the refreshVersions plugin at build time. If missing, the buil
 
 ---
 
-## Kotlin Version Compatibility Check
+## Kotlin version compatibility check
 
-This is the most important rule when evaluating a library update.
+This is the most important judgement when evaluating a library update.
 
-**The project's Kotlin version** is declared by `version.kotlin` in `versions.properties`, with
-`languageVersion` pinned in the root `build.gradle`. Some libraries have started publishing
-releases compiled with a newer Kotlin than the project targets. These cause a build failure
-at KSP time:
+Read the project's Kotlin version from `version.kotlin` in `versions.properties`; `languageVersion` is
+pinned in the root `build.gradle`. Some libraries publish releases compiled with a newer Kotlin than
+the project targets, which fails the build at KSP time:
 
 ```
 Module was compiled with an incompatible version of Kotlin.
-The binary version of its metadata is 2.3.0, expected version is 2.2.0.
+The binary version of its metadata is <newer>, expected version is <project>.
 ```
+
+A library needing a Kotlin newer than the project's is a blocker, not something to work around.
 
 ### What to do when a library requires a newer Kotlin version
 
@@ -55,15 +62,9 @@ The binary version of its metadata is 2.3.0, expected version is 2.2.0.
 The engineer may decide to batch multiple blocked libraries into a Kotlin upgrade task,
 or simply defer them. Either way, document the decision in the PR and Asana task.
 
-### Known libraries requiring a newer Kotlin (as of June 2026)
-
-| Library | Last safe version | First breaking version | Reason |
-|---|---|---|---|
-| `io.coil-kt.coil3` | 3.3.0 | 3.4.0 | requires Kotlin 2.3.x |
-
-These libraries look like safe minor/patch bumps but are not — always check Kotlin metadata.
-When a `versions.properties` entry carries a `# Cannot update … because it requires Kotlin …`
-comment, treat that as the current source of truth for the blocker.
+Do not keep a list of blocked libraries here — it goes stale as soon as the project's Kotlin moves.
+The live source of truth is a `# Cannot update … because it requires Kotlin …` comment on the entry in
+`versions.properties`; check for one, and add one when you defer a library for this reason.
 
 ---
 
@@ -75,10 +76,10 @@ comment, treat that as the current source of truth for the blocker.
 
 ### Needs Kotlin version check
 - Any Kotlin-first library (Square, Cash App, JetBrains, etc.)
-- Check if the JAR contains `.kotlin_module` files compiled with a Kotlin newer than 2.2.x (i.e. 2.3.x metadata)
+- Check whether the artifact's `.kotlin_module` metadata is newer than the project's Kotlin version
 
 ### Defer — requires dedicated migration
-- Kotlin itself (2.2.x → 2.3.x)
+- Kotlin itself
 - AGP (Android Gradle Plugin)
 - Room
 - Dagger / Anvil

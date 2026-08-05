@@ -372,7 +372,7 @@ afterEvaluate {
 
 tasks.register('aiConfigCheck') {
     group = 'verification'
-    description = 'Validates AI config (.cursor/rules, .claude/skills) against AGENTS.md and checks for dangling references.'
+    description = 'Validates AI config (.claude/rules, .claude/docs, .claude/skills) against CLAUDE.md and checks for dangling references.'
     def repoRoot = layout.projectDirectory.asFile
     doLast {
         def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)

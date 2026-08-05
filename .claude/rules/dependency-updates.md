@@ -1,1 +1,0 @@
-../../.cursor/rules/dependency-updates.mdc

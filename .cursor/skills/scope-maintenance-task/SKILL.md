@@ -1,1 +1,0 @@
-../../../.claude/skills/scope-maintenance-task/SKILL.md

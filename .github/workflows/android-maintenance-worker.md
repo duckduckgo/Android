@@ -123,7 +123,7 @@ State is derived from live data on every run — the Asana "In Progress" section
 
 1. Read CLAUDE.md at the root of the repository
 2. Read the relevant rule files referenced in CLAUDE.md for the work you are about to do
-   (e.g. .cursor/rules/architecture.mdc for module structure, android-design-system.mdc for UI)
+   (e.g. .claude/rules/architecture.md for module structure, .claude/rules/android-design-system.md for UI)
 
 ### Step 4: Implement the task
 
