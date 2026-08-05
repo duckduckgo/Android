@@ -91,7 +91,7 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
             background = OnboardingBackgroundStep.InputType,
             embellishment = Embellishment.LeftWing,
-            cardArrow = CardArrowConfig.AtStart,
+            cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.InputScreen(
                 title = TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated),
                 description = TextConfig.Resource(R.string.preOnboardingInputScreenDescription),
