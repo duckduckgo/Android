@@ -48,6 +48,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
+import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
@@ -91,12 +92,12 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccoun
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -136,6 +137,12 @@ class SyncActivity : DuckDuckGoActivity() {
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
+
+    private val syncSetupUrl
+        get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private val isAnotherDeviceSync
+        get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
 
     private val syncThisDeviceLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
@@ -311,6 +318,14 @@ class SyncActivity : DuckDuckGoActivity() {
         configureDataDeletionItem()
 
         observeViewModel()
+
+        if (savedInstanceState == null) {
+            val setupUrl = syncSetupUrl
+            when {
+                setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
+                isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
+            }
+        }
     }
 
     override fun onStop() {
@@ -393,8 +408,7 @@ class SyncActivity : DuckDuckGoActivity() {
             // No-op in the simplified flow.
             is AskRemoveDevice -> Unit
 
-            // No-op in the simplified flow.
-            is AskSetupSyncDeepLink -> Unit
+            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
 
             is AskToCopyRecoveryCode -> {
                 authenticate {
@@ -414,7 +428,24 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is DeepLinkIntoSetup -> {
-                logcat { "TODO: Handle ${command.javaClass.simpleName} command" }
+                val authConfig = AuthConfiguration(
+                    displayTitleResource = R.string.sync_simplified_deep_link_auth_prompt_title,
+                    displayTextResource = R.string.sync_simplified_deep_link_auth_prompt_message,
+                )
+                authenticate(config = authConfig) {
+                    val originalFlow = if (command.isSignedIn) {
+                        OriginalFlow.SYNC_WITH_ANOTHER
+                    } else {
+                        OriginalFlow.SYNC_THIS_DEVICE
+                    }
+                    exchangeSyncCodeLauncher.launch(
+                        ExchangeSyncCodeContract.Input(
+                            syncUrl = command.barcodeSyncUrl.asUrl(),
+                            launchSource = launchSource,
+                            originalFlow = originalFlow,
+                        ),
+                    )
+                }
             }
 
             is IntroCreateAccount -> {
@@ -725,6 +756,22 @@ class SyncActivity : DuckDuckGoActivity() {
                 },
             )
             .setCancellable(true)
+            .show()
+    }
+
+    private fun askSetupSyncDeepLink(barcodeSyncUrl: SyncBarcodeUrl) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_deep_link_confirmation_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_deep_link_confirmation_dialog_body, barcodeSyncUrl.deviceName))
+            .setPositiveButton(R.string.sync_simplified_deep_link_confirmation_dialog_primary_button)
+            .setNegativeButton(R.string.sync_simplified_deep_link_confirmation_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+                },
+            )
             .show()
     }
 

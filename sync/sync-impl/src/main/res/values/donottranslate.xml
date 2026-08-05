@@ -129,7 +129,7 @@
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Got It</string>
 
     <!-- Recovery Code screen -->
-    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name">%1$s has been added to Sync&#160;&amp;&#160;Backup.</string>
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s has been added to Sync&#160;&amp;&#160;Backup.</string>
     <string name="sync_simplified_recovery_code_body">Use this code to restore your data if you lose access to this device. Keep it safe.</string>
     <string name="sync_simplified_recovery_code_label">Recovery Code</string>
     <string name="sync_simplified_recovery_code_download_button">Download Your Recovery Code</string>
@@ -154,7 +154,7 @@
 
     <!-- Edit Device screen: remove device dialog -->
     <string name="sync_simplified_edit_device_remove_dialog_title">Remove Device?</string>
-    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name">“%1$s” will no longer be able to access your synced data.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Remove</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Cancel</string>
 
@@ -173,4 +173,12 @@
     <string name="sync_simplified_error_dialog_recovery_pdf_body">Unable to create the recovery PDF.</string>
     <string name="sync_simplified_error_dialog_recovery_code_body">Unable to get recovery code.</string>
     <string name="sync_simplified_pairing_failed_generic_message">Something went wrong.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Sync New Device?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will be able to access your synced DuckDuckGo&#160;data.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Sync Now</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Cancel</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Set up Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Unlock device to set up Sync&#160;&amp;&#160;Backup</string>
 </resources>
