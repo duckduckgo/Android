@@ -412,8 +412,6 @@ class RealDuckChat @Inject constructor(
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
-    private val _showFullScreenMode = MutableStateFlow(false)
-    private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
@@ -442,7 +440,6 @@ class RealDuckChat @Inject constructor(
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
-    private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
@@ -516,7 +513,9 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
-    override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+    // Fullscreen mode is now the only Duck.ai tab experience (the fragment-overlay alternative is
+    // gone), so this tracks Duck.ai feature availability rather than the retired rollout flag.
+    override fun isDuckChatFullScreenModeEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
@@ -626,10 +625,6 @@ class RealDuckChat @Inject constructor(
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
     override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
-
-    override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
-
-    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
 
@@ -994,14 +989,6 @@ class RealDuckChat @Inject constructor(
                 duckChatFeatureRepository.shouldShowInVoiceChat() &&
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
-
-            // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
-            // isDuckChatUserEnabled: users who disabled Duck.ai still get the new UX when navigating directly to a
-            // duck.ai tab. It remains gated on the feature rollout flag/setting only.
-            val showFullScreenMode = isDuckChatFeatureEnabled &&
-                (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
-            isFullscreenModeEnabled = showFullScreenMode
-            _showFullScreenMode.emit(showFullScreenMode)
 
             val isContextualModeKillSwitch = duckChatFeature.contextualModeKillSwitch().isEnabled()
 
