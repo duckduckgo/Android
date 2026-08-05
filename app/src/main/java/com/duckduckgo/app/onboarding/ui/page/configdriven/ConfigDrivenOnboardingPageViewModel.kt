@@ -431,8 +431,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     }
 
     /**
-     * The four dialogs [DialogConfigResolver] maps to null: they have no card to render, only a side effect.
-     * Config-producing dialogs are listed exhaustively so the compiler keeps the two mappings in step.
+     * Handler for dialogs that have no card, only a side effect.
      */
     private suspend fun handleCommandOnlyDialog(dialog: NewUserOnboardingActivityDialog) {
         when (dialog) {
