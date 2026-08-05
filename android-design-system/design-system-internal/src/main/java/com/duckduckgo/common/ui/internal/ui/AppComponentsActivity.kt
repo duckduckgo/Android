@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.internal.ui
 
-import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -44,6 +43,7 @@ import com.duckduckgo.common.ui.applyTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.store.AppComponentsPrefsDataStore
 import com.duckduckgo.common.ui.internal.ui.store.appComponentsDataStore
+import com.duckduckgo.common.ui.isInNightMode
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
@@ -117,10 +117,7 @@ class AppComponentsActivity : AppCompatActivity() {
 
     private fun isDarkThemeEnabled(selectedTheme: DuckDuckGoTheme): Boolean {
         return when (selectedTheme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                uiManager.nightMode == UiModeManager.MODE_NIGHT_YES
-            }
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> isInNightMode()
             DuckDuckGoTheme.DARK -> true
             else -> false
         }
