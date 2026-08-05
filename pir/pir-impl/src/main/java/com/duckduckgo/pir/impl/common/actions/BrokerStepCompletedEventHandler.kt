@@ -36,8 +36,8 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Success
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
@@ -62,7 +62,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val completedEvent = event as BrokerStepCompleted
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
 
         if (completedEvent.needsEmailConfirmation) {
             pirRunStateHandler.handleState(
@@ -85,10 +85,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             )
         }
 
+        // A runner executes exactly one broker step, so completing it completes the run.
         return Next(
             nextState =
             state.copy(
-                currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
                 generatedEmailData = null,
                 emailExtractedData = emptyMap(),
@@ -97,7 +97,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     stageStartMs = currentTimeProvider.currentTimeMillis(),
                 ),
             ),
-            nextEvent = ExecuteNextBrokerStep,
+            sideEffect = CompleteExecution,
         )
     }
 
@@ -106,7 +106,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         totalTimeMillis: Long,
         stepStatus: StepStatus,
     ) {
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val brokerStartTime = state.brokerStepStartTime
         val isSuccess = stepStatus is Success
 
@@ -215,7 +215,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
     }
 
     private fun List<BrokerAction>.getLastActionForSuccess(currentActionIndex: Int): BrokerAction {
-        // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
+        // If success, it means we reached currentActionIndex == currentBrokerStep.step.actions.size, so last action would be -1.
         return this[currentActionIndex - 1]
     }
 

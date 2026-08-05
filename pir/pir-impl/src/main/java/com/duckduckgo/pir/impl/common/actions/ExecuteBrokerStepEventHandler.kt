@@ -31,11 +31,10 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.PreSeedCookies
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
@@ -47,74 +46,62 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteNextBrokerStepEventHandler @Inject constructor(
+class ExecuteBrokerStepEventHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRunStateHandler: PirRunStateHandler,
 ) : EventHandler {
-    override val event: KClass<out Event> = ExecuteNextBrokerStep::class
+    override val event: KClass<out Event> = ExecuteBrokerStep::class
 
     override suspend fun invoke(
         state: State,
         event: Event,
     ): Next {
         /**
-         * - If we have executed ALL brokers, the engine is completed!
-         * - If there are still more brokers to execute,
-         *      - Scan: we reset action index to 0.
-         *      - Opt out:
-         *          - we reset action index AND extracted profile index to 0.
-         *          - We also update the [State] to reference to the extracted profiles for the next broker.
+         * Entry point of execution for the broker step, reached after the initial url has loaded
+         * and after cookie preseeding. We reset the action index to 0 and start executing.
          */
-        return if (state.currentBrokerStepIndex >= state.brokerStepsToExecute.size) {
-            Next(
+        if (shouldPreseedBroker(state)) {
+            return Next(
                 nextState = state,
-                sideEffect = CompleteExecution,
-            )
-        } else {
-            if (shouldPreseedBroker(state)) {
-                return Next(
-                    nextState = state,
-                    nextEvent = PreSeedCookies,
-                )
-            }
-
-            // Entry point of execution for a Broker
-            val nextStage = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
-                PirStageStatus(
-                    currentStage = PirStage.EMAIL_CONFIRM_DECOUPLED,
-                    stageStartMs = currentTimeProvider.currentTimeMillis(),
-                )
-            } else {
-                PirStageStatus(
-                    currentStage = PirStage.START,
-                    stageStartMs = currentTimeProvider.currentTimeMillis(),
-                )
-            }
-
-            emitBrokerStartPixel(state)
-
-            Next(
-                nextState =
-                state.copy(
-                    currentActionIndex = 0,
-                    brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
-                    actionRetryCount = 0,
-                    stageStatus = nextStage,
-                    preseeding = false,
-                ),
-                nextEvent =
-                ExecuteBrokerStepAction(
-                    UserProfile(
-                        userProfile = state.profileQuery,
-                    ),
-                ),
+                nextEvent = PreSeedCookies,
             )
         }
+
+        val nextStage = if (state.brokerStep is EmailConfirmationStep) {
+            PirStageStatus(
+                currentStage = PirStage.EMAIL_CONFIRM_DECOUPLED,
+                stageStartMs = currentTimeProvider.currentTimeMillis(),
+            )
+        } else {
+            PirStageStatus(
+                currentStage = PirStage.START,
+                stageStartMs = currentTimeProvider.currentTimeMillis(),
+            )
+        }
+
+        emitBrokerStartPixel(state)
+
+        return Next(
+            nextState =
+            state.copy(
+                currentActionIndex = 0,
+                brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
+                actionRetryCount = 0,
+                stageStatus = nextStage,
+                preseeding = false,
+            ),
+            nextEvent =
+            ExecuteBrokerStepAction(
+                UserProfile(
+                    userProfile = state.profileQuery,
+                ),
+            ),
+        )
     }
 
     private suspend fun emitBrokerStartPixel(state: State) {
         val runType = state.runType
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
 
         when (runType) {
             MANUAL, SCHEDULED -> {
@@ -154,7 +141,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
     }
 
     private fun shouldPreseedBroker(state: State): Boolean {
-        val currentBrokerStep = state.brokerStepsToExecute.getOrNull(state.currentBrokerStepIndex) ?: return false
+        val currentBrokerStep = state.brokerStep
         return !state.preseeding && currentBrokerStep.broker.name in preSeedList
     }
 }

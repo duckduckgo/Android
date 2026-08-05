@@ -47,10 +47,9 @@ class ConditionExpectationSucceededEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val actionsToAppend = (event as ConditionExpectationSucceeded).conditionActions
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         attemptFireOptOutStagePixel(currentBrokerStep, state)
 
-        val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList()
         val updatedBrokerActions = currentBrokerStep.step.actions.toMutableList().apply {
             this.addAll(
                 state.currentActionIndex + 1,
@@ -78,12 +77,10 @@ class ConditionExpectationSucceededEventHandler @Inject constructor(
             )
         }
 
-        updatedBrokerSteps[state.currentBrokerStepIndex] = updatedBrokerStep
-
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
-                brokerStepsToExecute = updatedBrokerSteps,
+                brokerStep = updatedBrokerStep,
             ),
             nextEvent = ExecuteBrokerStepAction(
                 UserProfile(

@@ -49,7 +49,7 @@ class EmailDataReceivedEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val actualEvent = event as EmailDataReceived
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
 
         val durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs
         val actionId = currentBrokerStep.step.actions[state.currentActionIndex].id

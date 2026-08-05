@@ -29,11 +29,10 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.PreSeedCookies
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -56,11 +55,11 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ExecuteNextBrokerStepEventHandlerTest {
+class ExecuteBrokerStepEventHandlerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: ExecuteNextBrokerStepEventHandler
+    private lateinit var testee: ExecuteBrokerStepEventHandler
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirRunStateHandler: PirRunStateHandler = mock()
 
@@ -128,7 +127,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
 
     @Before
     fun setUp() {
-        testee = ExecuteNextBrokerStepEventHandler(
+        testee = ExecuteBrokerStepEventHandler(
             mockCurrentTimeProvider,
             mockPirRunStateHandler,
         )
@@ -136,73 +135,8 @@ class ExecuteNextBrokerStepEventHandlerTest {
     }
 
     @Test
-    fun whenEventIsExecuteNextBrokerStepThenEventTypeIsCorrect() {
-        assertEquals(ExecuteNextBrokerStep::class, testee.event)
-    }
-
-    @Test
-    fun whenAllBrokersExecutedThenReturnsCompleteExecutionSideEffect() = runTest {
-        val scanStep = ScanStep(
-            broker = testBroker,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 1, // Beyond the list
-            currentActionIndex = 5,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = ExecuteNextBrokerStep
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(state, result.nextState)
-        assertEquals(CompleteExecution, result.sideEffect)
-        assertNull(result.nextEvent)
-    }
-
-    @Test
-    fun whenCurrentBrokerStepIndexEqualsListSizeThenCompletes() = runTest {
-        val scanStep1 = ScanStep(
-            broker = testBroker,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val scanStep2 = ScanStep(
-            broker = testBroker.copy(name = "broker-2"),
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep1, scanStep2),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 2, // Equals size
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = ExecuteNextBrokerStep
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(CompleteExecution, result.sideEffect)
+    fun whenEventIsExecuteBrokerStepThenEventTypeIsCorrect() {
+        assertEquals(ExecuteBrokerStep::class, testee.event)
     }
 
     @Test
@@ -217,9 +151,8 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 5,
             actionRetryCount = 3,
             brokerStepStartTime = 1000L,
@@ -228,7 +161,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
                 stageStartMs = 2000L,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -263,15 +196,14 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         testee.invoke(state, event)
 
@@ -294,16 +226,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             attemptId = "attempt-789",
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -333,16 +264,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(emailConfirmationStep),
+            brokerStep = emailConfirmationStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -357,7 +287,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
     }
 
     @Test
-    fun whenExecuteNextBrokerStepThenResetsActionIndexAndRetryCount() = runTest {
+    fun whenExecuteBrokerStepThenResetsActionIndexAndRetryCount() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -368,9 +298,8 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 10,
             actionRetryCount = 5,
             brokerStepStartTime = 5000L,
@@ -379,7 +308,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
                 stageStartMs = 7000L,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -389,7 +318,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
     }
 
     @Test
-    fun whenExecuteNextBrokerStepThenPreservesOtherStateFields() = runTest {
+    fun whenExecuteBrokerStepThenPreservesOtherStateFields() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -400,9 +329,8 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             transactionID = "txn-123",
             attemptId = "attempt-456",
             pendingUrl = "https://example.com",
@@ -411,7 +339,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -423,7 +351,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
     }
 
     @Test
-    fun whenExecuteNextBrokerStepThenReturnsExecuteBrokerStepActionEvent() = runTest {
+    fun whenExecuteBrokerStepThenReturnsExecuteBrokerStepActionEvent() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -434,15 +362,14 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -467,16 +394,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             preseeding = false,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -499,16 +425,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             preseeding = true,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -534,16 +459,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             preseeding = false,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
@@ -555,7 +479,7 @@ class ExecuteNextBrokerStepEventHandlerTest {
     }
 
     @Test
-    fun whenExecuteNextBrokerStepThenSetsPreseedingToFalse() = runTest {
+    fun whenExecuteBrokerStepThenSetsPreseedingToFalse() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -566,16 +490,15 @@ class ExecuteNextBrokerStepEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             preseeding = true,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
                 stageStartMs = 0,
             ),
         )
-        val event = ExecuteNextBrokerStep
+        val event = ExecuteBrokerStep
 
         val result = testee.invoke(state, event)
 
