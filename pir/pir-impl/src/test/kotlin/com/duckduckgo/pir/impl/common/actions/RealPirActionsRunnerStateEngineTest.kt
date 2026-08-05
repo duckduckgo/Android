@@ -100,11 +100,9 @@ class RealPirActionsRunnerStateEngineTest {
         ),
     )
 
-    private val testBrokerSteps: List<BrokerStep> = listOf(testScanStep)
-
     private val testState = State(
         runType = testRunType,
-        brokerStepsToExecute = testBrokerSteps,
+        brokerStep = testScanStep,
         profileQuery = testProfileQuery,
         stageStatus = PirStageStatus(
             currentStage = PirStage.OTHER,
@@ -120,7 +118,7 @@ class RealPirActionsRunnerStateEngineTest {
     @Test
     fun whenEventDispatchedAndHandlerFoundThenHandlerIsInvoked() = runTest {
         val testEvent = Event.Started
-        val nextState = testState.copy(currentBrokerStepIndex = 1)
+        val nextState = testState.copy(currentActionIndex = 1)
         val next = Next(nextState = nextState)
 
         whenever(mockEventHandler.event).thenReturn(Event.Started::class)
@@ -151,7 +149,7 @@ class RealPirActionsRunnerStateEngineTest {
     @Test
     fun whenMultipleEventsDispatchedThenAllAreHandled() = runTest {
         val event1 = Event.Started
-        val event2 = Event.ExecuteNextBrokerStep
+        val event2 = Event.ExecuteBrokerStep
         var invocationCount = 0
 
         val handler1: EventHandler = mock()
@@ -163,7 +161,7 @@ class RealPirActionsRunnerStateEngineTest {
             Next(nextState = testState)
         }
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer {
             invocationCount++
             Next(nextState = testState)
@@ -184,7 +182,7 @@ class RealPirActionsRunnerStateEngineTest {
     @Test
     fun whenEventHandlerReturnsNextEventThenNextEventIsDispatched() = runTest {
         val firstEvent = Event.Started
-        val nextEvent = Event.ExecuteNextBrokerStep
+        val nextEvent = Event.ExecuteBrokerStep
         var secondHandlerInvoked = false
 
         val handler1: EventHandler = mock()
@@ -198,7 +196,7 @@ class RealPirActionsRunnerStateEngineTest {
             ),
         )
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer {
             secondHandlerInvoked = true
             Next(nextState = testState)
@@ -227,11 +225,11 @@ class RealPirActionsRunnerStateEngineTest {
             invocationOrder.add("handler1")
             Next(
                 nextState = testState,
-                nextEvent = Event.ExecuteNextBrokerStep,
+                nextEvent = Event.ExecuteBrokerStep,
             )
         }
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer {
             invocationOrder.add("handler2")
             Next(
@@ -368,7 +366,7 @@ class RealPirActionsRunnerStateEngineTest {
             ),
         )
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenReturn(
             Next(
                 nextState = testState,
@@ -387,7 +385,7 @@ class RealPirActionsRunnerStateEngineTest {
 
         testee.dispatch(Event.Started)
         advanceUntilIdle()
-        testee.dispatch(Event.ExecuteNextBrokerStep)
+        testee.dispatch(Event.ExecuteBrokerStep)
         advanceUntilIdle()
         job.join()
 
@@ -399,7 +397,7 @@ class RealPirActionsRunnerStateEngineTest {
     @Test
     fun whenEventHandlerReturnsSideEffectAndNextEventThenBothAreProcessed() = runTest {
         val testSideEffect = SideEffect.LoadUrl("https://example.com")
-        val nextEvent = Event.ExecuteNextBrokerStep
+        val nextEvent = Event.ExecuteBrokerStep
         var nextEventHandled = false
 
         val handler1: EventHandler = mock()
@@ -414,7 +412,7 @@ class RealPirActionsRunnerStateEngineTest {
             ),
         )
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer {
             nextEventHandled = true
             Next(nextState = testState)
@@ -468,7 +466,7 @@ class RealPirActionsRunnerStateEngineTest {
 
     @Test
     fun whenHandlerReturnsUpdatedStateThenStateIsUpdatedForNextEvent() = runTest {
-        val updatedState = testState.copy(currentBrokerStepIndex = 1, currentActionIndex = 2)
+        val updatedState = testState.copy(currentActionIndex = 2)
         val capturedStates = mutableListOf<State>()
 
         val handler1: EventHandler = mock()
@@ -480,11 +478,11 @@ class RealPirActionsRunnerStateEngineTest {
             capturedStates.add(state)
             Next(
                 nextState = updatedState,
-                nextEvent = Event.ExecuteNextBrokerStep,
+                nextEvent = Event.ExecuteBrokerStep,
             )
         }
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer { invocation ->
             val state = invocation.getArgument<State>(0)
             capturedStates.add(state)
@@ -499,8 +497,6 @@ class RealPirActionsRunnerStateEngineTest {
         advanceUntilIdle()
 
         assertEquals(2, capturedStates.size)
-        assertEquals(0, capturedStates[0].currentBrokerStepIndex)
-        assertEquals(1, capturedStates[1].currentBrokerStepIndex)
         assertEquals(2, capturedStates[1].currentActionIndex)
     }
 
@@ -522,11 +518,11 @@ class RealPirActionsRunnerStateEngineTest {
             capturedStates.add(state)
             Next(
                 nextState = updatedState,
-                nextEvent = Event.ExecuteNextBrokerStep,
+                nextEvent = Event.ExecuteBrokerStep,
             )
         }
 
-        whenever(handler2.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler2.invoke(any(), any())).thenAnswer { invocation ->
             val state = invocation.getArgument<State>(0)
             capturedStates.add(state)
@@ -559,7 +555,7 @@ class RealPirActionsRunnerStateEngineTest {
         whenever(handler1.invoke(any(), any())).thenAnswer {
             invocationOrder.add("started")
             Next(
-                nextState = testState.copy(currentBrokerStepIndex = 0),
+                nextState = testState.copy(currentActionIndex = 0),
                 sideEffect = SideEffect.LoadUrl("https://step1.com"),
                 nextEvent = Event.LoadUrlComplete("https://step1.com"),
             ).also { returnedSideEffects.add(it.sideEffect) }
@@ -569,16 +565,16 @@ class RealPirActionsRunnerStateEngineTest {
         whenever(handler2.invoke(any(), any())).thenAnswer {
             invocationOrder.add("loadComplete")
             Next(
-                nextState = testState.copy(currentBrokerStepIndex = 1),
-                nextEvent = Event.ExecuteNextBrokerStep,
+                nextState = testState.copy(currentActionIndex = 1),
+                nextEvent = Event.ExecuteBrokerStep,
             ).also { returnedSideEffects.add(it.sideEffect) }
         }
 
-        whenever(handler3.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(handler3.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(handler3.invoke(any(), any())).thenAnswer {
             invocationOrder.add("executeNext")
             Next(
-                nextState = testState.copy(currentBrokerStepIndex = 2),
+                nextState = testState.copy(currentActionIndex = 2),
                 sideEffect = SideEffect.CompleteExecution,
             ).also { returnedSideEffects.add(it.sideEffect) }
         }
@@ -691,7 +687,7 @@ class RealPirActionsRunnerStateEngineTest {
     fun whenRapidEventDispatchesThenAllEventsAreProcessed() = runTest {
         var invocationCount = 0
 
-        whenever(mockEventHandler.event).thenReturn(Event.ExecuteNextBrokerStep::class)
+        whenever(mockEventHandler.event).thenReturn(Event.ExecuteBrokerStep::class)
         whenever(mockEventHandler.invoke(any(), any())).thenAnswer {
             invocationCount++
             Next(nextState = testState)
@@ -701,7 +697,7 @@ class RealPirActionsRunnerStateEngineTest {
         testee = createEngine()
 
         repeat(10) {
-            testee.dispatch(Event.ExecuteNextBrokerStep)
+            testee.dispatch(Event.ExecuteBrokerStep)
         }
         advanceUntilIdle()
 
@@ -1053,7 +1049,7 @@ class RealPirActionsRunnerStateEngineTest {
     private fun createEngine(
         eventHandlers: PluginPoint<EventHandler> = mockEventHandlers,
         runType: RunType = testRunType,
-        brokerSteps: List<BrokerStep> = testBrokerSteps,
+        brokerStep: BrokerStep = testScanStep,
         profileQuery: ProfileQuery = testProfileQuery,
     ): RealPirActionsRunnerStateEngine {
         return RealPirActionsRunnerStateEngine(
@@ -1061,7 +1057,7 @@ class RealPirActionsRunnerStateEngineTest {
             coroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             runType = runType,
-            brokerSteps = brokerSteps,
+            brokerStep = brokerStep,
             profileQuery = profileQuery,
         )
     }

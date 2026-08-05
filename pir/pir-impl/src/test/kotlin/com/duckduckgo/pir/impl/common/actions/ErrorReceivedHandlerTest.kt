@@ -102,9 +102,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -136,9 +135,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 2,
             stageStatus = PirStageStatus(
@@ -174,9 +172,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -211,9 +208,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -244,9 +240,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 2,
             currentActionIndex = 5,
             actionRetryCount = 3,
             brokerStepStartTime = 5000L,
@@ -265,7 +260,6 @@ class ErrorReceivedHandlerTest {
 
         // Verify state is completely unchanged
         assertEquals(state, result.nextState)
-        assertEquals(2, result.nextState.currentBrokerStepIndex)
         assertEquals(5, result.nextState.currentActionIndex)
         assertEquals(3, result.nextState.actionRetryCount)
         assertEquals(5000L, result.nextState.brokerStepStartTime)
@@ -274,47 +268,6 @@ class ErrorReceivedHandlerTest {
         assertEquals("https://example.com", result.nextState.pendingUrl)
         assertEquals(PirStage.FILL_FORM, result.nextState.stageStatus.currentStage)
         assertEquals(7000L, result.nextState.stageStatus.stageStartMs)
-    }
-
-    @Test
-    fun whenBrokerStepIndexExceedsBrokerStepsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
-        val scanStep = ScanStep(
-            broker = testBroker,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 5, // Exceeds broker steps size (1)
-            currentActionIndex = 0,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val testError = CaptchaServiceError(
-            actionID = testAction.id,
-            errorCode = 500,
-            errorDetails = "Service unavailable",
-        )
-        val event = ErrorReceived(error = testError)
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(state, result.nextState)
-        assertNull(result.nextEvent)
-        assertNull(result.sideEffect)
-        verify(mockPirRunStateHandler).handleState(
-            BrokerStepInvalidEvent(
-                broker = Broker.unknown(),
-                runType = RunType.MANUAL,
-            ),
-        )
     }
 
     @Test
@@ -329,9 +282,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 10, // Exceeds actions size (1)
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -370,9 +322,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -411,9 +362,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -448,9 +398,8 @@ class ErrorReceivedHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,

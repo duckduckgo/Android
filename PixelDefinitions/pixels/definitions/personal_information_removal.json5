@@ -2268,6 +2268,11 @@
                 "type": "integer"
             },
             {
+                "key": "feature.data.ext.scheduling",
+                "description": "How scan/opt-out steps were distributed across the WebView runners for this run, as resolved from the workQueueScheduling remote toggle at run start: a shared cost-ordered work queue (queue) or contiguous equal-count chunks per runner (static).",
+                "enum": ["queue", "static"]
+            },
+            {
                 "key": "feature.data.ext.total_opt_out_jobs",
                 "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
                 "type": "integer"
@@ -2588,6 +2593,11 @@
                 "key": "feature.data.ext.web_view_count",
                 "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
                 "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.scheduling",
+                "description": "How scan/opt-out steps were distributed across the WebView runners for this run, as resolved from the workQueueScheduling remote toggle at run start: a shared cost-ordered work queue (queue) or contiguous equal-count chunks per runner (static).",
+                "enum": ["queue", "static"]
             },
             {
                 "key": "feature.data.ext.total_opt_out_jobs",

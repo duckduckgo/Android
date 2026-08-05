@@ -28,6 +28,8 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,12 +42,12 @@ class RealPirActionsRunnerStateEngine(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     runType: RunType,
-    brokerSteps: List<BrokerStep>,
+    brokerStep: BrokerStep,
     profileQuery: ProfileQuery,
 ) : PirActionsRunnerStateEngine {
     private var engineState: State = State(
         runType = runType,
-        brokerStepsToExecute = brokerSteps,
+        brokerStep = brokerStep,
         profileQuery = profileQuery,
         stageStatus = PirStageStatus(
             currentStage = PirStage.OTHER,
@@ -61,8 +63,10 @@ class RealPirActionsRunnerStateEngine(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    private val engineScope = CoroutineScope(coroutineScope.coroutineContext + Job())
+
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        engineScope.launch(dispatcherProvider.io()) {
             eventsFlow.collect {
                 handleEvent(it)
             }
@@ -72,9 +76,13 @@ class RealPirActionsRunnerStateEngine(
     override val sideEffect: Flow<SideEffect> = sideEffectFlow.asSharedFlow()
 
     override fun dispatch(event: Event) {
-        coroutineScope.launch {
+        engineScope.launch {
             eventsFlow.emit(event)
         }
+    }
+
+    override fun close() {
+        engineScope.cancel()
     }
 
     private suspend fun handleEvent(newEvent: Event) {

@@ -50,12 +50,15 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_SCHEDULING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_OPT_OUT_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TRACKER_BLOCKING_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_VPN_CONNECTION_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_WEB_VIEW_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.PER_RUN_DURATION_BUCKETS
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.SCHEDULING_QUEUE
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.SCHEDULING_STATIC
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_SKIPPED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_STARTED
@@ -68,6 +71,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -177,8 +181,47 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+        )
+    }
+
+    @Test
+    fun whenRunStartedWithWorkQueueEnabledThenSchedulingMetadataIsQueue() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
+
+        // Then
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = org.mockito.kotlin.argThat { this[KEY_SCHEDULING] == SCHEDULING_QUEUE },
+            cleanupPolicy = any(),
+            samplingProbability = anyOrNull(),
+        )
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenRunStartedWithWorkQueueDisabledThenSchedulingMetadataIsStatic() = runTest {
+        // Given
+        pirRemoteFeatures.workQueueScheduling().setRawStoredState(Toggle.State(false))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(12L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
+
+        // Then
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = org.mockito.kotlin.argThat { this[KEY_SCHEDULING] == SCHEDULING_STATIC },
+            cleanupPolicy = any(),
+            samplingProbability = anyOrNull(),
         )
     }
 
@@ -247,6 +290,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "connected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -296,6 +340,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -324,6 +369,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -1024,6 +1070,7 @@ class PirScanWideEventTest {
                 KEY_BROKER_COUNT to "0",
                 KEY_TOTAL_SCAN_JOBS to "0",
                 KEY_WEB_VIEW_COUNT to "0",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )

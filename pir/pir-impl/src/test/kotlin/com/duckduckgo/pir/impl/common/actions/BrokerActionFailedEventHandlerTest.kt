@@ -148,9 +148,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 0,
             stageStatus = PirStageStatus(
@@ -183,9 +182,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 1,
             stageStatus = PirStageStatus(
@@ -217,9 +215,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = MAX_RETRY_COUNT_OPTOUT,
             stageStatus = PirStageStatus(
@@ -249,9 +246,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 0,
             stageStatus = PirStageStatus(
@@ -281,9 +277,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = MAX_RETRY_COUNT_SCAN,
             stageStatus = PirStageStatus(
@@ -313,9 +308,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 0,
             stageStatus = PirStageStatus(
@@ -346,9 +340,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 1,
             stageStatus = PirStageStatus(
@@ -367,43 +360,6 @@ class BrokerActionFailedEventHandlerTest {
     }
 
     @Test
-    fun whenBrokerStepIndexExceedsBrokerStepsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
-        val scanStep = ScanStep(
-            broker = testBroker,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testClickAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 1, // Exceeds broker steps size (1)
-            currentActionIndex = 0,
-            actionRetryCount = 0,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = BrokerActionFailed(error = testError, allowRetry = true)
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(state, result.nextState)
-        assertNull(result.nextEvent)
-        assertNull(result.sideEffect)
-        verify(mockPirRunStateHandler).handleState(
-            BrokerStepInvalidEvent(
-                broker = Broker.unknown(),
-                runType = RunType.MANUAL,
-            ),
-        )
-    }
-
-    @Test
     fun whenActionIndexExceedsActionsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
@@ -415,9 +371,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 10, // Exceeds actions size (1)
             actionRetryCount = 0,
             stageStatus = PirStageStatus(
@@ -455,9 +410,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 0,
             stageStatus = PirStageStatus(
@@ -491,9 +445,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 0,
             attemptId = "attempt-1",
@@ -533,9 +486,8 @@ class BrokerActionFailedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = MAX_RETRY_COUNT_OPTOUT,
             stageStatus = PirStageStatus(

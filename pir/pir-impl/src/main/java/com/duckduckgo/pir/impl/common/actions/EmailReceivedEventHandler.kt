@@ -52,7 +52,7 @@ class EmailReceivedEventHandler @Inject constructor(
         state: State,
         event: Event,
     ): Next {
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val emailReceived = event as EmailReceived
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
 
