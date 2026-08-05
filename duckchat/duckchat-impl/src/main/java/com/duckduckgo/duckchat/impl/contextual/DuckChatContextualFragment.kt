@@ -871,7 +871,7 @@ class DuckChatContextualFragment :
                 binding.contextualWebviewContainer.gone()
                 binding.contextualModePrompts.show()
                 binding.contextualInputContainer.setBackgroundColor(
-                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
                 )
                 contextualNativeInputManager.onInputMode()
 
