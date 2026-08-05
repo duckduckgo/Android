@@ -32,8 +32,6 @@ sealed interface ContentConfig {
     data class Welcome(
         override val title: TextConfig,
         val body1: TextConfig,
-        /** The plain welcome copy keeps its raw line breaks; the sync-restore and custom-AI variants carry markup. */
-        val body1AsHtml: Boolean,
         val body2: TextConfig?,
     ) : ContentConfig
 

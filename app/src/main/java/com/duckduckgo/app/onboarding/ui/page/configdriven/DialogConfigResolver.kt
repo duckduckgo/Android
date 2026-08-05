@@ -76,7 +76,6 @@ class DialogConfigResolver @Inject constructor(
             content = ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
                 body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
-                body1AsHtml = true,
                 body2 = null,
             ),
             primaryCta = CtaConfig(
@@ -209,7 +208,6 @@ class DialogConfigResolver @Inject constructor(
         body1 = TextConfig.Resource(
             if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1,
         ),
-        body1AsHtml = isCustomAiFlow,
         body2 = if (isCustomAiFlow) null else TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
     )
 }
