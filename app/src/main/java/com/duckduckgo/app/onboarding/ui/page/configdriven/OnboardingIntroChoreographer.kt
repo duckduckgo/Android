@@ -238,12 +238,8 @@ class OnboardingIntroChoreographer(
         binding.logoAnimation.apply {
             removeAllAnimatorListeners()
             removeAllUpdateListeners()
-            cancelAnimation()
         }
-        binding.duckAiIntroAnimation.apply {
-            removeAllAnimatorListeners()
-            cancelAnimation()
-        }
+        binding.duckAiIntroAnimation.removeAllAnimatorListeners()
         snapIntroViews()
     }
 
@@ -333,6 +329,12 @@ class OnboardingIntroChoreographer(
     private fun snapIntroViews() {
         introAnimatorSet?.cancel()
         backgroundIntroAnimatorSet?.cancel()
+
+        // A Lottie view replays itself on restore, possibly after this snap. Only cancelling drops that pending play,
+        // and it has to come first because it also clears frame calls waiting on a composition.
+        binding.logoAnimation.cancelAnimation()
+        binding.backgroundPrimary.cancelAnimation()
+        binding.duckAiIntroAnimation.cancelAnimation()
 
         with(binding.welcomeTitle) {
             alpha = 1f
