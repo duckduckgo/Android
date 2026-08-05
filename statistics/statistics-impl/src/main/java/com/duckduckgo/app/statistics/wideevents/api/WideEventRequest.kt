@@ -19,10 +19,16 @@ package com.duckduckgo.app.statistics.wideevents.api
 import com.squareup.moshi.Json
 
 data class WideEventRequest(
+    @field:Json(name = "meta") val meta: MetaSection,
     @field:Json(name = "global") val global: GlobalSection,
     @field:Json(name = "app") val app: AppSection,
     @field:Json(name = "feature") val feature: FeatureSection,
     @field:Json(name = "context") val context: ContextSection?,
+)
+
+data class MetaSection(
+    @field:Json(name = "type") val type: String,
+    @field:Json(name = "version") val version: String,
 )
 
 data class GlobalSection(

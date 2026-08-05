@@ -58,6 +58,8 @@ class WideEventClientImpl @Inject constructor(
                 metadata = metadata,
                 cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
                 samplingProbability = samplingProbability,
+                metaType = WideEventMeta.typeFor(name),
+                metaVersion = WideEventMeta.DEFAULT_VERSION,
             )
         }
     }

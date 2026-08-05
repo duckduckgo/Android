@@ -38,6 +38,8 @@ class WideEventRepositoryImpl @Inject constructor(
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
         samplingProbability: Float,
+        metaType: String,
+        metaVersion: String,
     ): Long {
         val entity =
             WideEventEntity(
@@ -50,6 +52,8 @@ class WideEventRepositoryImpl @Inject constructor(
                 cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
                 activeIntervals = emptyList(),
                 samplingProbability = samplingProbability,
+                metaType = metaType,
+                metaVersion = metaVersion,
             )
 
         return wideEventDao.insertWideEvent(entity)
