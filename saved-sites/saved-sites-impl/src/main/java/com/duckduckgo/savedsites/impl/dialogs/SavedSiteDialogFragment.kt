@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.dialogs
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -27,12 +28,16 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.DialogFragmentSavedSiteBinding
@@ -41,9 +46,24 @@ import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
+import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
+import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
+@HasMemberInjections
 abstract class SavedSiteDialogFragment : DialogFragment() {
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     abstract fun onConfirmation()
     abstract fun configureUI()
@@ -106,7 +126,17 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         initialParentFolderId = arguments?.getString(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
         addTextWatchers()
         showKeyboard(binding.titleInput)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)) {
+            configureEdgeToEdgeInsets()
+        }
         return binding.root
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        dialog?.window?.let { WindowCompat.setDecorFitsSystemWindows(it, false) }
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.savedSiteAppBar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.savedSiteContent)
     }
 
     private fun addTextWatchers() {
