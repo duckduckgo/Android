@@ -43,6 +43,7 @@ what you remember of it.
 | Read | When |
 |---|---|
 | `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules — it needs an approved API Proposal and/or Tech Design, and that has to be raised before implementation, not at PR time. Also read it when naming a branch, writing a commit, or opening a PR |
+| `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
 | `.claude/docs/pixels.md` | adding or changing pixel telemetry — including whether a pixel or a wide event is the right instrument |
 | `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're deciding which scope to pass to `@InjectWith` — has the component/subcomponent diagram and the `injectorFactoryMap` lookups |
