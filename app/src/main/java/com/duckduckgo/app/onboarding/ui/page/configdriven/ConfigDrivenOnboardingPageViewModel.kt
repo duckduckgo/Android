@@ -141,7 +141,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onContentInteraction(interaction: ContentInteraction) {
         when (interaction) {
-            is ContentInteraction.SubmitInput -> emit(
+            is ContentInteraction.SubmitInputPreview -> emit(
                 NewUserOnboardingEvent.InputDemoQuerySubmitted(
                     query = interaction.query,
                     isChat = interaction.isChat,

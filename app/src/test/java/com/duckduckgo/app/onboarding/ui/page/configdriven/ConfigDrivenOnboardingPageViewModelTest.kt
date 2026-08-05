@@ -391,7 +391,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
         advanceUntilIdle()
 
-        testee.onContentInteraction(ContentInteraction.SubmitInput(query = "cats", isChat = true, fromSuggestion = true))
+        testee.onContentInteraction(ContentInteraction.SubmitInputPreview(query = "cats", isChat = true, fromSuggestion = true))
         advanceUntilIdle()
 
         assertEquals(
