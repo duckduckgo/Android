@@ -42,13 +42,13 @@ sealed interface ContentInteraction {
         val fromSuggestion: Boolean,
     ) : ContentInteraction
 
-    data object EditAddressBarPosition : ContentInteraction
+    data object QuickSetupEditAddressBarPosition : ContentInteraction
 
-    data object EditSearchOptions : ContentInteraction
+    data object QuickSetupEditSearchOptions : ContentInteraction
 
-    data class SetDefaultBrowserToggled(val checked: Boolean) : ContentInteraction
+    data class QuickSetupSetDefaultBrowser(val checked: Boolean) : ContentInteraction
 
-    data class AddWidgetToggled(val checked: Boolean) : ContentInteraction
+    data class QuickSetupAddWidget(val checked: Boolean) : ContentInteraction
 }
 
 /** Binds a stateless [ContentConfig] to its include layout. */
