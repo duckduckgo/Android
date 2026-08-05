@@ -8,11 +8,15 @@ The DuckDuckGo Android Design System lives in `android-design-system/design-syst
 
 **Never use raw platform widgets** (`Button`, `TextView`, `Switch`, `AlertDialog`, `BottomSheetDialog`, etc.) — lint detects and fails on these. Always use the ADS equivalent.
 
+The same applies in Compose: **never use raw Material3 composables** (`Button`, `Snackbar`, `Surface`, `AlertDialog`, `Switch`, `Checkbox`, `RadioButton`, `HorizontalDivider`, `VerticalDivider`) — lint fails on these outside the design-system module itself. Use the `Dax*` composable equivalent.
+
 ---
 
 ## Package
 
-All components live under `com.duckduckgo.common.ui.view.*`. Use this package in both Kotlin code and XML layouts.
+View-based components live under `com.duckduckgo.common.ui.view.*`. Use this package in both Kotlin code and XML layouts.
+
+Compose components live under `com.duckduckgo.common.ui.compose.*` (e.g. `com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar`, `...compose.button.DaxPrimaryButton`, `...compose.text.DaxText`). Theming for Compose comes from `com.duckduckgo.common.ui.compose.theme.*` — wrap screens in `DuckDuckGoTheme` and take colors from it rather than hardcoding.
 
 ---
 
@@ -117,7 +121,7 @@ fun removeEndIcon()
 fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
 ```
 
-Use `error` only for invalid user input. For network/external errors, use a Snackbar instead.
+Use `error` only for invalid user input. For network/external errors, use a snackbar instead — see *Snackbars* below.
 
 ---
 
@@ -335,6 +339,30 @@ Self-hiding component that shows a notification prompt when system notifications
 
 ---
 
+## Snackbars
+
+Compose only — `com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar`. Never use the raw Material3 `Snackbar`; lint breaks the build.
+
+Two overloads:
+```kotlin
+// Direct — you control visibility
+DaxSnackbar(
+    message: String,
+    modifier: Modifier = Modifier,
+    action: DaxAction? = null,
+)
+
+// Inside a SnackbarHost — driven by SnackbarHostState
+DaxSnackbar(
+    snackbarData: SnackbarData,
+    modifier: Modifier = Modifier,
+)
+```
+
+To show snackbars from a screen, pass the `SnackbarData` overload to a `SnackbarHost`. The optional action takes a `DaxAction` (`text` + `onClick`) and renders as a ghost button.
+
+---
+
 ## Colors
 
 **Never use `@color/` references directly in XML** — lint breaks the build. Always use `?attr/daxColor*` theme attributes.
@@ -412,6 +440,25 @@ These are enforced at compile time:
 | `NoBottomSheetDialogDetector` | Raw `BottomSheetDialog` without ADS style |
 | `SkeletonViewBackgroundDetector` | `background_skeleton` drawable on `SkeletonView` |
 | `WrongStyleDetector` | Styles not prefixed `Widget.DuckDuckGo.` |
+
+Compose-specific rules, also build-breaking. The raw-Material3 substitution rules (`NoRawM3*` / `NoMaterial3*`) are skipped inside the design-system module itself, since that is where the `Dax*` wrappers are built; the `Dax*` usage rules below them apply everywhere.
+
+| Rule | What it prevents |
+|---|---|
+| `NoRawM3ButtonUsageDetector` | Raw Material3 button composables (use `DaxButton` variants) |
+| `NoRawM3SnackbarUsageDetector` | Raw Material3 `Snackbar` (use `DaxSnackbar`) |
+| `NoRawM3SurfaceUsageDetector` | Raw Material3 `Surface` (use `DaxSurface`) |
+| `NoRawM3AlertDialogUsageDetector` | Raw Material3 alert dialogs (use `DaxAlertDialog` / `DaxTextAlertDialog`) |
+| `NoMaterial3SwitchUsageDetector` | Material3 `Switch` (use `DaxSwitch`) |
+| `NoMaterial3CheckboxUsageDetector` | Material3 `Checkbox` (use `DaxCheckbox`) |
+| `NoMaterial3RadioButtonUsageDetector` | Material3 `RadioButton` (use `DaxRadioButton`) |
+| `NoMaterial3DividerUsageDetector` | Material3 `HorizontalDivider` / `VerticalDivider` (use `DaxHorizontalDivider` / `DaxVerticalDivider`) |
+| `DaxTextColorUsageDetector` | `DaxText` colors outside `DuckDuckGoTheme` semantic text colors |
+| `DaxDividerColorUsageDetector` | Divider colors outside `DuckDuckGoTheme` semantic colors |
+| `DaxTextFieldTrailingIconDetector` | `DaxTextField` `trailingIcon` outside `DaxTextFieldTrailingIconScope` |
+| `DaxSecureTextFieldTrailingIconDetector` | `DaxSecureTextField` `trailingIcon` outside `DaxTextFieldTrailingIconScope` |
+| `NoComposeViewUsageDetector` | `ComposeView` in XML layouts or custom views |
+| `NoSetContentDetector` | `setContent` in Activities |
 
 ---
 
