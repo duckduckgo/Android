@@ -401,7 +401,6 @@ class DialogRenderEngineTest {
             content = ContentConfig.Welcome(
                 title = TextConfig.Literal("welcome"),
                 body1 = TextConfig.Literal("body one"),
-                body1AsHtml = false,
                 body2 = null,
             ),
             primaryCta = CtaConfig(

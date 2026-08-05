@@ -138,7 +138,6 @@ class DialogConfigResolverTest {
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
                 body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
-                body1AsHtml = false,
                 body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
             ),
             config.content,
@@ -161,7 +160,6 @@ class DialogConfigResolverTest {
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
                 body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBodyCustomAi),
-                body1AsHtml = true,
                 body2 = null,
             ),
             config.content,
@@ -176,7 +174,6 @@ class DialogConfigResolverTest {
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
                 body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
-                body1AsHtml = false,
                 body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
             ),
             config.content,
@@ -199,7 +196,6 @@ class DialogConfigResolverTest {
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
                 body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
-                body1AsHtml = true,
                 body2 = null,
             ),
             config.content,
