@@ -269,6 +269,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onQuickSetupDefaultBrowserNotSet() {
         recordDefaultBrowserDialogResult(isSet = false, fireTelemetry = false)
+        currentQuickSetup()?.state?.update { it.copy(defaultBrowserChecked = false) }
     }
 
     /**
