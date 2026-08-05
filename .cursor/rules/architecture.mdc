@@ -339,19 +339,38 @@ Use `screenName` to opt into deeplink support:
 
 ## URL vs. Search Classification
 
-Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** use `UriString.isWebUrl()` for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
+Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** call `UriString.isWebUrl()` directly for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
+
+For a simple boolean decision, call `isUrl(query)` — it handles the feature-flag gate, the readiness check, and the fallback for you:
 
 ```kotlin
-private fun isNavigate(query: String): Boolean =
-    if (queryUrlPredictor.isReady()) {
-        queryUrlPredictor.classify(query) is Decision.Navigate
+private fun isNavigate(query: String): Boolean = queryUrlPredictor.isUrl(query)
+```
+
+Under the hood `isUrl` uses the native predictor only when the `useUrlPredictor` remote flag is enabled **and** the native library is ready; otherwise it falls back to `UriString.isWebUrl(query)`:
+
+```kotlin
+override fun isUrl(query: String): Boolean =
+    if (androidBrowserConfigFeature.useUrlPredictor().isEnabled() && isReady()) {
+        classify(query) is Decision.Navigate
     } else {
-        UriString.isWebUrl(query)  // fallback while native lib initialises
+        UriString.isWebUrl(query)
     }
 ```
 
+When you need the resolved value (not just a boolean), call `classify(query)` directly and guard it with `isReady()` yourself — `classify` does not check the feature flag:
+
+```kotlin
+if (queryUrlPredictor.isReady()) {
+    when (val decision = queryUrlPredictor.classify(query)) {
+        is Decision.Navigate -> open(decision.url)
+        is Decision.Search -> search(decision.query)
+    }
+}
+```
+
 - `Decision` is a sealed interface with `Navigate(url)` and `Search(query)` — both are data classes.
-- `isReady()` is false briefly at startup while the native library loads; always guard with a `UriString.isWebUrl` fallback.
+- Classification via the native predictor is gated behind the `useUrlPredictor` remote flag (`AndroidBrowserConfigFeature`). When it is disabled — or briefly at startup while `isReady()` is still false — `isUrl` falls back to `UriString.isWebUrl`.
 - `QueryUrlPredictor` lives in `browser-api` and is injectable at `AppScope`. `Decision` is exported transitively via `browser-api`'s `api` dep on `url-predictor-android`.
 
 ---
