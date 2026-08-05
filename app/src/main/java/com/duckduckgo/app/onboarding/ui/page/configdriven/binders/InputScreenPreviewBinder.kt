@@ -74,9 +74,6 @@ class InputScreenPreviewBinder(
         inputText.isFocusableInTouchMode = true
 
         inputModeToggle.isVisible = content.showModeToggle
-        if (content.showModeToggle && !state.value.isSearchSelected) {
-            inputModeToggle.getTabAt(CHAT_TAB_INDEX)?.select()
-        }
         applyMode(content, state.value.isSearchSelected, scope)
 
         val tabListener = object : TabLayout.OnTabSelectedListener {
