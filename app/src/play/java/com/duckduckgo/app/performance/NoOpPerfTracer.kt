@@ -23,6 +23,8 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class NoOpPerfTracer @Inject constructor() : PerfTracer {
+    override fun isEnabled(): Boolean = false
+
     override fun beginSection(name: String) = Unit
 
     override fun endSection() = Unit

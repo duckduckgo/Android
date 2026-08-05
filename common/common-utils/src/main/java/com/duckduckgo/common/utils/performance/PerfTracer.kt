@@ -25,6 +25,13 @@ package com.duckduckgo.common.utils.performance
  * emits negative-duration slices.
  */
 interface PerfTracer {
+    /**
+     * Whether a trace is actually being recorded. Guard work that exists ONLY to produce trace data
+     * and that would otherwise cost something in a shipped build — not the section calls themselves,
+     * which are already free once the no-op is bound.
+     */
+    fun isEnabled(): Boolean
+
     fun beginSection(name: String)
 
     fun endSection()

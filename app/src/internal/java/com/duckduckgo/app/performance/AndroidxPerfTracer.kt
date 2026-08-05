@@ -30,6 +30,8 @@ class AndroidxPerfTracer @Inject constructor() : PerfTracer {
 
     private val cookieSeq = AtomicInteger(0)
 
+    override fun isEnabled(): Boolean = Trace.isEnabled()
+
     override fun beginSection(name: String) = Trace.beginSection(name)
 
     override fun endSection() = Trace.endSection()

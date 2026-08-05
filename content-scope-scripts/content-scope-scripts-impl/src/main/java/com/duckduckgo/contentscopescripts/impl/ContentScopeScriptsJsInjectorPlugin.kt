@@ -20,7 +20,6 @@ import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.performance.PerfTracer
-import com.duckduckgo.common.utils.performance.trace
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -39,9 +38,35 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     ) {
         if (coreContentScopeScripts.isEnabled()) {
             val script = coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)
-            perfTracer.trace(TRACE_EVALUATE_JAVASCRIPT) {
+            if (perfTracer.isEnabled()) {
+                injectTraced(webView, script)
+            } else {
                 webView.evaluateJavascript("javascript:$script", null)
             }
+        }
+    }
+
+    /**
+     * Brackets the injection with an async section that closes from [WebView.evaluateJavascript]'s
+     * callback, so the slice spans dispatch plus the renderer's parse/compile/execute rather than
+     * just the JNI hand-off. The trade is that it also includes renderer queueing — subtract
+     * `window.__ddgPerf.execMs` to separate waiting from executing.
+     *
+     * Only used while a trace is being recorded: supplying a callback makes WebView serialise the
+     * script's completion value back across the bridge on every page load, which shipped builds
+     * should not pay for.
+     *
+     * The cookie lives in the lambda's closure rather than a field, so concurrent tabs cannot collide
+     * and a callback that never arrives (WebView destroyed mid-flight) costs only its own sample
+     * instead of blocking later ones.
+     */
+    private fun injectTraced(
+        webView: WebView,
+        script: String,
+    ) {
+        val cookie = perfTracer.beginAsyncSection(TRACE_DISPATCH_JAVASCRIPT)
+        webView.evaluateJavascript("javascript:$script") {
+            perfTracer.endAsyncSection(TRACE_DISPATCH_JAVASCRIPT, cookie)
         }
     }
 
@@ -54,6 +79,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     }
 
     companion object {
-        private const val TRACE_EVALUATE_JAVASCRIPT = "ddg.contentScope.evaluateJavascript"
+        private const val TRACE_DISPATCH_JAVASCRIPT = "ddg.contentScope.dispatchJavascript"
     }
 }

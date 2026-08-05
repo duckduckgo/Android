@@ -18,8 +18,20 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.common.utils.performance.PerfTracer
 
-class FakePerfTracer : PerfTracer {
+class FakePerfTracer(
+    private val enabled: Boolean = true,
+) : PerfTracer {
+    data class AsyncEvent(
+        val name: String,
+        val cookie: Int,
+        val begin: Boolean,
+    )
+
     val syncSections = mutableListOf<String>()
+    val asyncEvents = mutableListOf<AsyncEvent>()
+    private var nextCookie = 0
+
+    override fun isEnabled(): Boolean = enabled
 
     override fun beginSection(name: String) {
         syncSections.add(name)
@@ -27,10 +39,16 @@ class FakePerfTracer : PerfTracer {
 
     override fun endSection() = Unit
 
-    override fun beginAsyncSection(name: String): Int = 0
+    override fun beginAsyncSection(name: String): Int {
+        val cookie = nextCookie++
+        asyncEvents.add(AsyncEvent(name, cookie, begin = true))
+        return cookie
+    }
 
     override fun endAsyncSection(
         name: String,
         cookie: Int,
-    ) = Unit
+    ) {
+        asyncEvents.add(AsyncEvent(name, cookie, begin = false))
+    }
 }

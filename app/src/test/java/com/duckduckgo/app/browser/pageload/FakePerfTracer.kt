@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.pageload
 
 import com.duckduckgo.common.utils.performance.PerfTracer
 
-class FakePerfTracer : PerfTracer {
+class FakePerfTracer(
+    private val enabled: Boolean = true,
+) : PerfTracer {
     data class AsyncEvent(
         val name: String,
         val cookie: Int,
@@ -28,6 +30,8 @@ class FakePerfTracer : PerfTracer {
     val syncSections = mutableListOf<String>()
     val asyncEvents = mutableListOf<AsyncEvent>()
     private var nextCookie = 0
+
+    override fun isEnabled(): Boolean = enabled
 
     override fun beginSection(name: String) {
         syncSections.add(name)
