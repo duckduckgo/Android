@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+@file:Suppress("NoImplImportsInAppModule")
+
 package com.duckduckgo.common.ui
 
 import android.content.res.Resources
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.sync.impl.ui.SyncConnectActivity
 import org.junit.Assert.assertEquals
@@ -29,10 +32,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class ThemingRebrandOverlayTest {
 
     private fun resolveDaxButtonPrimary(activity: AppCompatActivity): Int {
