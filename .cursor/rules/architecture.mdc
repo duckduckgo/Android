@@ -271,9 +271,24 @@ class Foo @Inject constructor(private val plugins: ActivePluginPoint<MyPlugin>)
 
 All flags default to `TRUE` so newly contributed plugins are on by default and can be killed remotely.
 
-### Notable active plugin points in the browser
-- `JsInjectorPlugin` — hooks into `onPageStarted` / `onPageFinished` on the browser WebView
-- `ContentScopeJsMessageHandlersPlugin` — handles JS→native messages via content scope scripts
+### Notable plugin points in the browser
+
+Basic (`@ContributesPluginPoint`, consumed as `PluginPoint<T>`, no feature-flag gating):
+
+| Plugin | Point declared by | Purpose |
+|---|---|---|
+| `JsInjectorPlugin` | `UnusedJsInjectorPluginPoint` (`:app`) | hooks into `onPageStarted` / `onPageFinished` on the browser WebView |
+| `ContentScopeJsMessageHandlersPlugin` | `ContentScopeJsMessageHandlersPluginPoint` (`content-scope-scripts-impl`) | handles JS→native messages via content scope scripts |
+
+Active (`@ContributesActivePluginPoint`, consumed as `ActivePluginPoint<T>`, flag-gated):
+
+| Plugin | Plugin point `featureName` |
+|---|---|
+| `NewTabPagePlugin` | `pluginPointNewTabPagePlugin` |
+| `NewTabPageSectionPlugin` | `pluginPointNewTabPageSectionPlugin` |
+| `NewTabPageShortcutPlugin` | `pluginPointNewTabPageShortcutPlugin` |
+| `NativeInputPlugin` | `pluginPointNativeInput` |
+| `NativeInputChatTabItemPlugin` | `pluginPointNativeInputChatTabItemPlugin` |
 
 ---
 
