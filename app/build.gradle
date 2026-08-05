@@ -405,6 +405,7 @@ dependencies {
 
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
+    internalImplementation AndroidX.tracing
 
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
