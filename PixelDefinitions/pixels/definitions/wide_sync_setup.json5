@@ -32,6 +32,11 @@
                 "type": "boolean"
             },
             {
+                "key": "feature.data.ext.ui_version",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
                 "key": "feature.data.ext.account_creation_latency_ms_bucketed",
                 "description": "Latency of the account creation API call in milliseconds, bucketed",
                 "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]

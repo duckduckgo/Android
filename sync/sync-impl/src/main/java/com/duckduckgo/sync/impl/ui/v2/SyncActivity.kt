@@ -199,9 +199,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is PreviousSessionReadyContract.Output.Resume -> {
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        syncCode = output.recoveryCode,
-                        syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
-                        launchSource = launchSource,
+                        source = SyncCodeSource.Restored(output.recoveryCode),
                     ),
                 )
             }
@@ -445,9 +443,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
                     processSyncCodeLauncher.launch(
                         ProcessSyncCodeContract.Input(
-                            syncCode = command.barcodeSyncUrl.asUrl(),
-                            syncEntryPoint = syncEntryPoint,
-                            launchSource = launchSource,
+                            source = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
                         ),
                     )
                 }

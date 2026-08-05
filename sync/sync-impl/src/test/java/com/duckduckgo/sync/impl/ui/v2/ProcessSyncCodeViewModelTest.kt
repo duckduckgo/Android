@@ -22,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
@@ -37,6 +38,13 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.autorestore.RestorePayload
+import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -62,6 +70,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -84,16 +93,26 @@ class ProcessSyncCodeViewModelTest {
 
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
+    private val syncPixels = mock<SyncPixels>()
+    private val syncAutoRestoreManager = mock<SyncAutoRestoreManager>()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
-    private fun createTestee() = ProcessSyncCodeViewModel(
-        syncCode = "sync-url",
-        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
-        accountRepository = accountRepository,
-        codeDispatcher = codeDispatcher,
-        syncFeature = syncFeature,
-        dispatchers = coroutineTestRule.testDispatcherProvider,
-    )
+    private var accountInfo = AccountInfo()
+
+    private fun createTestee(
+        source: SyncCodeSource = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT),
+    ): ProcessSyncCodeViewModel {
+        whenever(accountRepository.getAccountInfo()).thenReturn(accountInfo)
+        return ProcessSyncCodeViewModel(
+            source = source,
+            accountRepository = accountRepository,
+            codeDispatcher = codeDispatcher,
+            syncFeature = syncFeature,
+            syncPixels = syncPixels,
+            syncAutoRestoreManager = syncAutoRestoreManager,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+        )
+    }
 
     @Test
     fun `when a legacy code is routed then the acknowledgment animation runs and the code is processed`() = runTest {
@@ -678,6 +697,211 @@ class ProcessSyncCodeViewModelTest {
 
             cancel()
         }
+    }
+
+    @Test
+    fun `when a scanned v2 code is routed then a v2 barcode parse success pixel is fired`() = runTest {
+        givenV2Outcomes()
+
+        createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        verify(syncPixels).fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V2, SyncCodeType.LINKING)
+    }
+
+    @Test
+    fun `when a pasted v2 code is routed then a v2 pasted parse success pixel is fired`() = runTest {
+        givenV2Outcomes()
+
+        createTestee(source = SyncCodeSource.Pasted("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        verify(syncPixels).fireSyncSetupCodePastedParseSuccess(SYNC_CONNECT, CodeVersion.V2, SyncCodeType.LINKING)
+    }
+
+    @Test
+    fun `when a scanned legacy code is unrecognized then a barcode parse error pixel is fired`() = runTest {
+        givenLegacyCode(SyncAuthCode.Unknown("garbage"))
+
+        createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        verify(syncPixels).fireBarcodeScannerParseError(SYNC_CONNECT, SetupFailureReason.UNRECOGNIZED_CODE)
+    }
+
+    @Test
+    fun `when a scanned legacy v1 code is routed then a v1 barcode parse success pixel is fired`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+
+        createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        verify(syncPixels).fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V1, null)
+    }
+
+    @Test
+    fun `when a legacy recovery login completes then login and setup finished pixels are fired`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+
+        val testee = createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(syncPixels).fireLoginPixel()
+        verify(syncPixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, null, null, null)
+    }
+
+    @Test
+    fun `when a deep link setup starts then the deep link started pixel is fired`() = runTest {
+        givenV2Outcomes()
+
+        createTestee(source = SyncCodeSource.DeepLink("sync-url", SyncEntryPoint.ADD_DEVICE))
+
+        verify(syncPixels).fireSetupDeepLinkFlowStarted()
+    }
+
+    @Test
+    fun `when a deep link setup completes then the deep link success pixel is fired instead of setup finished`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+
+        val testee = createTestee(source = SyncCodeSource.DeepLink("sync-url", SyncEntryPoint.ADD_DEVICE))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(syncPixels).fireLoginPixel()
+        verify(syncPixels).fireSetupDeepLinkFlowSuccess()
+        verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun `when resuming a previous session then the preserved device id is used and the auto restore success pixel is fired`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(syncAutoRestoreManager.retrieveRecoveryPayload())
+            .thenReturn(RestorePayload(recoveryCode = "recovery-code", deviceId = "preserved-device-id"))
+
+        val testee = createTestee(source = SyncCodeSource.Restored("sync-url"))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(accountRepository).processCode(eq(recoveryAuthCode), eq("preserved-device-id"))
+        verify(syncPixels).fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_SETTINGS)
+        verify(syncPixels).fireLoginPixel()
+        verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun `when resuming a previous session fails then the auto restore failure pixel is fired`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
+
+        val testee = createTestee(source = SyncCodeSource.Restored("sync-url"))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<ShowV1Error>(awaitItem())
+            cancel()
+        }
+        verify(syncPixels).fireAutoRestoreFailure(SyncPixelParameters.AUTO_RESTORE_SOURCE_SETTINGS, LOGIN_FAILED.code.toString(), "boom")
+    }
+
+    @Test
+    fun `when the user cancels a scanned setup then no abandoned pixel is fired as the scanner owns it`() = runTest {
+        givenV2Outcomes()
+
+        val testee = createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        testee.onUserCanceled()
+
+        verify(syncPixels, never()).fireSyncSetupAbandoned(any(), anyOrNull())
+    }
+
+    @Test
+    fun `when the user cancels a deep link setup before it finishes then the deep link abandoned pixel is fired`() = runTest {
+        givenV2Outcomes()
+
+        val testee = createTestee(source = SyncCodeSource.DeepLink("sync-url", SyncEntryPoint.ADD_DEVICE))
+
+        testee.onUserCanceled()
+
+        verify(syncPixels).fireSetupDeepLinkFlowAbandoned()
+    }
+
+    @Test
+    fun `when the user is asked to switch accounts then the ask to switch pixel is fired`() = runTest {
+        givenSeamlessAccountSwitching(enabled = true)
+        givenLegacyCode(recoveryAuthCode)
+        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
+
+        val testee = createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+            cancel()
+        }
+        verify(syncPixels).fireAskUserToSwitchAccount()
+    }
+
+    @Test
+    fun `when the user accepts switching accounts then the accepted pixel is fired`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+        whenever(accountRepository.logoutAndJoinNewAccount("encoded-code")).thenReturn(Result.Success(true))
+
+        val testee = createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+            testee.onAnimationComplete()
+            testee.onUserAcceptedSwitchingAccount("encoded-code")
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(syncPixels).fireUserAcceptedSwitchingAccount()
+        verify(syncPixels).fireUserSwitchedAccount()
+    }
+
+    @Test
+    fun `when the user cancels switching accounts then the cancelled pixel is fired`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin())
+            .thenReturn(Result.Success(ExchangeResult.AccountSwitchingRequired("encoded-code")))
+
+        val testee = createTestee(source = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertIs<AskSwitchAccount>(awaitItem())
+            testee.onUserCancelledSwitchingAccount()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(syncPixels).fireUserCancelledSwitchingAccount()
     }
 
     private fun givenProcessCodeSucceeds() {

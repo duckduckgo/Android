@@ -29,6 +29,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
@@ -48,6 +50,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeCameraBinding
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
@@ -72,8 +75,16 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
         }
 
+    private val entryPoint: SyncEntryPoint
+        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), ENTRY_POINT_ARG, SyncEntryPoint::class.java)) {
+            "Missing fragment argument: '$ENTRY_POINT_ARG'"
+        }
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
 
     @Inject
     lateinit var syncFeature: SyncFeature
@@ -83,7 +94,9 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
-    private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> { viewModelFactory }
+    private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> {
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+    }
 
     private val cameraPermissionLauncher = registerForActivityResult(
         RequestPermission(),
@@ -317,6 +330,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     companion object {
+        private const val ENTRY_POINT_ARG = "entry_point"
+
+        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeCameraFragment().apply {
+            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        }
+
         private const val CUTOUT_FRACTION_START = 0.53f
         private const val CUTOUT_FRACTION_END = 0.72f
         private const val CUTOUT_HEADER_GAP_DP = 16

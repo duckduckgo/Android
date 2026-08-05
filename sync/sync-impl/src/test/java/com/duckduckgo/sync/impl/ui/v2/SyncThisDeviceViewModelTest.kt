@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceViewModel.Command.AbortSyncing
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceViewModel.Command.FinishSyncing
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceViewModel.Command.ShowError
@@ -35,10 +36,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class SyncThisDeviceViewModelTest {
@@ -102,7 +103,7 @@ class SyncThisDeviceViewModelTest {
             skipItems(1)
 
             verify(syncAccountRepository, never()).createAccount()
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels, never()).fireSignupDirectPixel(anyOrNull())
 
             cancel()
         }
@@ -192,7 +193,7 @@ class SyncThisDeviceViewModelTest {
             testee.syncThisDevice(launchSource = null)
             assertIs<ShowError>(awaitItem())
 
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels, never()).fireSignupDirectPixel(anyOrNull())
 
             cancel()
         }
@@ -272,9 +273,39 @@ class SyncThisDeviceViewModelTest {
     }
 
     @Test
-    fun `when the user sees the screen then the intro screen shown event is tracked`() = runTest {
-        testee.onScreenShown()
+    fun `when the view model is created then the another device prompt shown pixel is fired`() = runTest {
+        verify(syncPixels).fireSyncAnotherDevicePromptShown()
+    }
+
+    @Test
+    fun `when the view model is created then the intro screen shown event is tracked`() = runTest {
         verify(syncSetupWideEvent).onIntroScreenShown()
+    }
+
+    @Test
+    fun `when syncing this device then the this device only option pixel is fired`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = null)
+            skipItems(1)
+
+            verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user chooses to sync with another device then the another device option pixel is fired`() = runTest {
+        testee.commands.test {
+            testee.onSyncWithAnotherDeviceClicked()
+            skipItems(1)
+
+            verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
+
+            cancel()
+        }
     }
 }
 

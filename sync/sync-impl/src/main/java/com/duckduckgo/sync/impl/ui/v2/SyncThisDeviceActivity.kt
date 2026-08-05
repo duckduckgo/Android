@@ -93,10 +93,6 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         configureSyncWithThisCta()
 
         observeViewModel()
-
-        if (savedInstanceState == null) {
-            viewModel.onScreenShown()
-        }
     }
 
     private fun configureEdgeToEdgeInsets() {

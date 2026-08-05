@@ -74,6 +74,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -564,7 +565,8 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verifyNoInteractions(pixels)
+        verify(pixels).fireSyncBarcodeScreenShown(SYNC_CONNECT)
+        verifyNoMoreInteractions(pixels)
     }
 
     @Test
@@ -619,7 +621,8 @@ class DisplayQrCodeViewModelTest {
         testee.onCopyCodeClicked()
 
         verifyNoInteractions(clipboard)
-        verifyNoInteractions(pixels)
+        verify(pixels).fireSyncBarcodeScreenShown(SYNC_CONNECT)
+        verifyNoMoreInteractions(pixels)
     }
 
     @Test

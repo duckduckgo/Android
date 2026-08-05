@@ -200,6 +200,29 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenViewModelCreatedThenSyncSettingsShownPixelFired() = runTest {
+        verify(syncPixels).fireSyncSettingsShown()
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenBackupThisDeviceTappedPixelFired() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onSyncThisDevice()
+
+        verify(syncPixels).fireBackupThisDeviceTapped()
+    }
+
+    @Test
+    fun whenRecoverYourSyncedDataThenRecoverSyncDataTappedPixelFired() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onRecoverYourSyncedData()
+
+        verify(syncPixels).fireRecoverSyncDataTapped()
+    }
+
+    @Test
     fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.onSyncWithAnotherDevice()

@@ -88,6 +88,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             isSignedIn = accountRepository.getAccountInfo().isSignedIn
+            pixels.fireSyncBarcodeScreenShown(syncType)
             when (protocolVersion()) {
                 ProtocolVersion.V1 -> startV1Presentation()
                 ProtocolVersion.V2 -> startV2Presentation()

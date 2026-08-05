@@ -36,6 +36,12 @@
                 "key": "reason",
                 "description": "The reason for the rescope token failure",
                 "type": "string"
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
