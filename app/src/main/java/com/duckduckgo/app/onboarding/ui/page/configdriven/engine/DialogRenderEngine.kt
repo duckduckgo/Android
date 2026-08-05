@@ -51,11 +51,11 @@ class DialogRenderEngine(
     private var bindScope: CoroutineScope? = null
     private var afterFadeAnimator: Animator? = null
 
-    /** The animation policy of the render that is bound, which a binder-driven card resize follows too. */
-    private var renderAnimating = false
-
-    /** Set once the bound screen's entrance has run its course, animated, snapped or skipped. */
-    private var entranceSettled = false
+    /**
+     * The bound render's animation policy while its entrance is in flight; null once the entrance has run its
+     * course, animated, snapped or skipped, and the policy has expired.
+     */
+    private var entrancePolicy: Boolean? = null
 
     /**
      * While set, every remaining stage runs snapped. Settling an in-flight entrance unwinds the rest of the
@@ -96,8 +96,7 @@ class DialogRenderEngine(
         cardArrow.apply(previous?.cardArrow, config.cardArrow, animate)
 
         if (animate) isAnimating = true
-        renderAnimating = animate
-        entranceSettled = false
+        entrancePolicy = animate
 
         val scope = createBindScope()
         bindScope = scope
@@ -133,7 +132,7 @@ class DialogRenderEngine(
                         if (bound !== handle) return@fadeInContent
                         playAfterFade(handle, animating(animate))
                         handle.onContentReady?.invoke()
-                        entranceSettled = true
+                        entrancePolicy = null
                         isAnimating = false
                     }
                 }
@@ -183,8 +182,7 @@ class DialogRenderEngine(
      * an interaction resizes the card the same way whether the screen animated in or was drawn in place.
      */
     private fun animateCardBounds(durationMs: Long) {
-        if (settling) return
-        if (!entranceSettled && !renderAnimating) return
+        if (settling || entrancePolicy == false) return
         cardStage.beginBoundsTransition(durationMs)
     }
 
