@@ -317,13 +317,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onVoiceChatClick?.invoke()
     }
 
-    // The in-field microphone doubles as the Duck.ai voice entry whenever the Duck.ai tab is selected
-    // — including an active Duck.ai chat page, where configure(isDuckAiMode = true) selects the chat
-    // tab and the bottom-row voice-chat chip is hidden, leaving the mic as the only voice affordance.
-    // Count those as a unified voice tap; a search-tab mic tap is plain voice search, not Duck.ai.
     private val voiceSearchClickWithPixel: () -> Unit = {
         if (isChatTabSelected()) {
-            viewModel.fireVoiceTapped()
+            viewModel.fireVoiceSearchTapped()
         }
         onVoiceSearchClick?.invoke()
     }
