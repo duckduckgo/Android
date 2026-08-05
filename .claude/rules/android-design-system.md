@@ -1,6 +1,3 @@
----
-description: Android Design System components and conventions — buttons, text, inputs, list items, dialogs, bottom sheets, colors, spacing, icons. Read before writing or changing any UI (Kotlin or XML).
----
 # Android Design System (ADS)
 
 The design system lives in `android-design-system/design-system/`; View components are under

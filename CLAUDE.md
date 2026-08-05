@@ -46,10 +46,10 @@ what you remember of it.
 | `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
 | `.claude/docs/pixels.md` | adding or changing pixel telemetry — including whether a pixel or a wide event is the right instrument |
-| `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're adding `@InjectWith` |
-| `.claude/docs/navigation.md` | adding a screen, registering it for navigation, or picking a `GlobalActivityStarter` overload |
-| `.claude/docs/url-classification.md` | routing typed input to navigation vs search |
-| `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet |
+| `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're deciding which scope to pass to `@InjectWith` — has the component/subcomponent diagram and the `injectorFactoryMap` lookups |
+| `.claude/docs/navigation.md` | adding a screen or navigating to one — `ActivityParams`, `@ContributeToActivityStarter`, deeplinks, and which `GlobalActivityStarter` overload to use |
+| `.claude/docs/url-classification.md` | routing typed input to navigation vs search — use `QueryUrlPredictor`, not `UriString.isWebUrl()` |
+| `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet — it must be fetched from the internal Icons repository, never invented |
 
 ---
 

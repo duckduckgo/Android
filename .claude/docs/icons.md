@@ -1,7 +1,5 @@
 # Adding an icon
 
-Read this when a change needs an icon that isn't already in the project.
-
 **Ask the user for the icon name, then fetch it from the internal DDG Icons repository at
 https://dub.duckduckgo.com/duckduckgo/Icons.** Do not guess icon names and do not skip this step —
 inventing a name produces an asset that doesn't match the design system.

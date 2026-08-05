@@ -1,5 +1,4 @@
 ---
-description: Instrumenting a multi-step user journey with WideEventClient — flowStart/flowStep/flowFinish, FlowStatus, sampling, CleanupPolicy, and the registry entry a new wide event needs.
 paths:
   - "**/wideevents/**"
   - "**/*WideEvent*.kt"

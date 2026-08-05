@@ -1,8 +1,5 @@
 # Deciding whether a string is a URL or a search query
 
-Read this when handling omnibar input, or anywhere a typed string has to be routed to navigation or
-to search.
-
 Use `QueryUrlPredictor` (from `browser-api`). Do **not** use `UriString.isWebUrl()` for the decision —
 its regex is too permissive, e.g. `bbc.comcomcomcom` passes.
 

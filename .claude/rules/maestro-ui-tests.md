@@ -1,5 +1,4 @@
 ---
-description: Writing and running Maestro UI tests — build flavours, test organization, shared flows, tags, retries, and remote config patches.
 paths:
   - ".maestro/**"
 ---

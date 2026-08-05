@@ -1,7 +1,5 @@
 # Navigating between screens
 
-Read this when adding a screen, registering it for navigation, or starting one from another module.
-
 Navigation goes through `GlobalActivityStarter` (from `navigation-api`) so screens stay decoupled
 across modules.
 

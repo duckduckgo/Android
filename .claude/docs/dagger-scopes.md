@@ -1,8 +1,5 @@
 # Dagger scope hierarchy and injection crashes
 
-Read this when an injection fails at runtime ("could not find dagger component"), or when adding
-`@InjectWith` to a class and you need to know which component its factory lands in.
-
 The hierarchy determines what dependencies each scope can access, where its factory lookup happens,
 and which `HasDaggerInjector` performs the injection. It is encoded implicitly in the Anvil-generated
 `_SubComponent` files — this diagram is the source of truth:
