@@ -46,4 +46,9 @@ class AndroidxPerfTracer @Inject constructor() : PerfTracer {
         name: String,
         cookie: Int,
     ) = Trace.endAsyncSection(name, cookie)
+
+    override fun counter(
+        name: String,
+        value: Int,
+    ) = Trace.setCounter(name, value)
 }

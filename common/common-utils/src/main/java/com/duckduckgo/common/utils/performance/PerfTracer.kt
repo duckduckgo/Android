@@ -43,6 +43,20 @@ interface PerfTracer {
         name: String,
         cookie: Int,
     )
+
+    /**
+     * Records a point-in-time value on a named counter track.
+     *
+     * Use this instead of a section when the thing being measured spans a thread boundary. Sections
+     * on either side of a hand-off cannot be paired in `trace_processor` — cross-thread slices carry
+     * no parent/child relationship, and a timestamp-containment join silently mixes concurrent
+     * requests together. A counter emitted from inside the measured call stack is attributed
+     * correctly by construction.
+     */
+    fun counter(
+        name: String,
+        value: Int,
+    )
 }
 
 inline fun <T> PerfTracer.trace(

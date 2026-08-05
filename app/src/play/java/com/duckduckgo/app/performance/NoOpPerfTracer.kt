@@ -35,4 +35,9 @@ class NoOpPerfTracer @Inject constructor() : PerfTracer {
         name: String,
         cookie: Int,
     ) = Unit
+
+    override fun counter(
+        name: String,
+        value: Int,
+    ) = Unit
 }

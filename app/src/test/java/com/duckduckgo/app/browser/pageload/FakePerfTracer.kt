@@ -29,6 +29,7 @@ class FakePerfTracer(
 
     val syncSections = mutableListOf<String>()
     val asyncEvents = mutableListOf<AsyncEvent>()
+    val counters = mutableListOf<Pair<String, Int>>()
     private var nextCookie = 0
 
     override fun isEnabled(): Boolean = enabled
@@ -50,5 +51,12 @@ class FakePerfTracer(
         cookie: Int,
     ) {
         asyncEvents.add(AsyncEvent(name, cookie, begin = false))
+    }
+
+    override fun counter(
+        name: String,
+        value: Int,
+    ) {
+        counters.add(name to value)
     }
 }

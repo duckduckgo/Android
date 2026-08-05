@@ -112,6 +112,7 @@ private const val TRACE_ON_PAGE_FINISHED = "ddg.onPageFinished"
 private const val TRACE_JS_INJECT_ON_PAGE_STARTED = "ddg.jsInject.onPageStarted"
 private const val TRACE_INTERCEPT_REQUEST = "ddg.interceptRequest"
 private const val TRACE_INTERCEPT_REQUEST_MAIN_HOP = "ddg.interceptRequest.mainHop"
+private const val COUNTER_INTERCEPT_MAIN_HOP_WAIT_US = "ddg.interceptRequest.mainHopWaitUs"
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -756,7 +757,13 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? =
         runBlocking {
             perfTracer.trace(TRACE_INTERCEPT_REQUEST) {
+                // Timed inside this call stack rather than by pairing the two sections in the trace:
+                // they sit on different threads, and cross-thread slices carry no parent/child link, so
+                // a timestamp join matches whichever concurrent request's hop happens to fall inside
+                // this window. A counter emitted here is attributed to the right request by construction.
+                val hopRequestedAt = System.nanoTime()
                 val documentUrl = withContext(dispatcherProvider.main()) {
+                    perfTracer.counter(COUNTER_INTERCEPT_MAIN_HOP_WAIT_US, ((System.nanoTime() - hopRequestedAt) / 1_000).toInt())
                     perfTracer.trace(TRACE_INTERCEPT_REQUEST_MAIN_HOP) {
                         if (request.method == "POST") {
                             loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))

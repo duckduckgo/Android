@@ -154,6 +154,7 @@ class BrowserWebViewClientTest {
     private val pixel: Pixel = mock()
     private val crashLogger: CrashLogger = mock()
     private val jsPlugins = FakePluginPoint()
+    private val fakePerfTracer = FakePerfTracer()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
@@ -236,7 +237,7 @@ class BrowserWebViewClientTest {
                     mockAppSchemeInterceptionFeature,
                     mockForceWebViewRecompositeFeature,
                     BrowserMode.REGULAR,
-                    FakePerfTracer(),
+                    fakePerfTracer,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -400,6 +401,20 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.method).thenReturn("GET")
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector, never()).onEvent(any())
+    }
+
+    @Test
+    fun whenShouldInterceptRequestThenMainHopWaitIsRecordedOnceAsACounter() {
+        val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("GET")
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        // Emitted from inside the request's own call stack, so it is attributable to this request —
+        // unlike the two sections, which sit on different threads and cannot be paired in a trace.
+        val waits = fakePerfTracer.counters.filter { it.first == "ddg.interceptRequest.mainHopWaitUs" }
+        assertEquals(1, waits.size)
+        assertTrue(waits.single().second >= 0)
     }
 
     @Test
