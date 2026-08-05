@@ -141,6 +141,7 @@ constructor(
         val renameDeviceResult: String = "",
         val fetchDecryptDevicesResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
+        val canReadUnifiedDeviceListEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
     )
@@ -334,6 +335,7 @@ constructor(
                 renameDeviceResult = if (accountInfo.isSignedIn) viewState.value.renameDeviceResult else "",
                 fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
+                canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
                 migrationStatusText = buildMigrationStatusText(),
                 migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
@@ -790,6 +792,14 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-UnifiedDevices: setting canWriteUnifiedDeviceList flag = $enabled" }
             setRawToggleState(syncFeature.canWriteUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onCanReadUnifiedDeviceListFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
+            setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
             updateViewState()
         }
     }
