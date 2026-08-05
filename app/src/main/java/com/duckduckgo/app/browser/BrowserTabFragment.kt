@@ -336,7 +336,6 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.InputMode
@@ -656,9 +655,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireModeAvailability: FireModeAvailability
-
-    @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -1845,11 +1841,7 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                if (duckAiFeatureState.showFullScreenMode.value) {
-                    viewModel.openNewDuckChat(omnibar.viewMode)
-                } else {
-                    viewModel.onDuckChatMenuClicked()
-                }
+                viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckAiNewChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)

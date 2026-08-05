@@ -49,7 +49,6 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Mock
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
-    private val fullscreenModeFlow = MutableStateFlow(false)
     private val popupMenuShortcutFlow = MutableStateFlow(false)
     private val voiceChatEntryFlow = MutableStateFlow(false)
     private val newDownloadState: NewDownloadState = mock()
@@ -59,7 +58,6 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Before
     fun setup() {
-        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
         testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector)
@@ -294,8 +292,6 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Test
     fun `when creating menu in browser mode with fullscreen eanbled we return the proper state`() = runTest {
-        fullscreenModeFlow.emit(true)
-
         val browserViewState = BrowserViewState(
             canGoBack = true,
             canGoForward = true,

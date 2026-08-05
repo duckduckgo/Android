@@ -30,9 +30,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
-import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -51,8 +49,6 @@ class SpecialUrlDetectorImpl(
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
-    private val aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
 ) : SpecialUrlDetector {
@@ -76,10 +72,6 @@ class SpecialUrlDetectorImpl(
             null -> {
                 if (subscriptions.shouldLaunchSubscriptionForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchSubscriptionLink
-                } else if (aiChatQueryDetectionFeature.self()
-                        .isEnabled() && duckChat.isDuckChatUrl(uri) && !duckAiFeatureState.showFullScreenMode.value
-                ) {
-                    UrlType.ShouldLaunchDuckChatLink
                 } else {
                     UrlType.SearchQuery(uriString)
                 }
@@ -119,10 +111,6 @@ class SpecialUrlDetectorImpl(
         }
 
         val uri = uriString.toUri()
-
-        if (duckChat.isDuckChatUrl(uri) && !duckAiFeatureState.showFullScreenMode.value) {
-            return UrlType.ShouldLaunchDuckChatLink
-        }
 
         if (duckPlayer.willNavigateToDuckPlayer(uri)) {
             return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
