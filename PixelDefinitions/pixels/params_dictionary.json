@@ -77,6 +77,16 @@
         "type": "number",
         "description": "Sample rate for this pixel, between 0 and 1"
     },
+    "widePixelMetaType": {
+        "key": "meta.type",
+        "type": "string",
+        "description": "Company unique wide event type identifier"
+    },
+    "widePixelMetaVersion": {
+        "key": "meta.version",
+        "type": "string",
+        "description": "Composed semver of the wide event schema: <base_major>.<event_minor>.<event_patch>"
+    },
     "widePixelFeatureStatus": {
         "key": "feature.status",
         "type": "string",

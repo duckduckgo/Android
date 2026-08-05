@@ -15,6 +15,8 @@
             "widePixelAppName",
             "widePixelFormFactor",
             "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
             {
                 "key": "feature.name",
                 "description": "Feature identifier for this wide event",
