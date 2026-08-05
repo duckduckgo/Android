@@ -29,6 +29,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.contentscopescripts.api.ContentScopeOptimizations
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
@@ -54,8 +55,11 @@ interface PageLoadWideEvent {
      * Called when a page starts loading.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
+     * @param navigationId Identifies this navigation for the measurements that are reported against it later. Must be
+     * unique for the lifetime of the process, and the same value must be passed to [onContentScopeExperimentsResolved]
+     * and [onJsInjectionComplete] for this navigation.
      */
-    fun onPageStarted(tabId: String, url: String)
+    fun onPageStarted(tabId: String, url: String, navigationId: Long)
 
     /**
      * Called when a page becomes visible to the user.
@@ -71,6 +75,24 @@ interface PageLoadWideEvent {
      * @param url The URL of the page being loaded
      */
     fun onProgressChanged(tabId: String, url: String)
+
+    /**
+     * Called once the active content scope experiments have been resolved, which page start awaits before it can inject.
+     *
+     * Attributed by [navigationId] rather than by url, because callers defer this past the point where their navigation
+     * can end: a later load of the same url in the same tab would otherwise be able to claim the measurement.
+     * @param tabId The unique identifier for the tab
+     * @param navigationId The id given to [onPageStarted] for the navigation that triggered the injection
+     */
+    fun onContentScopeExperimentsResolved(tabId: String, navigationId: Long)
+
+    /**
+     * Called once every [com.duckduckgo.browser.api.JsInjectorPlugin] has run for this navigation, content scope
+     * scripts among them.
+     * @param tabId The unique identifier for the tab
+     * @param navigationId The id given to [onPageStarted] for the navigation that triggered the injection
+     */
+    fun onJsInjectionComplete(tabId: String, navigationId: Long)
 
     /**
      * Called when a page finishes loading (either successfully or with an error).
@@ -98,6 +120,7 @@ class RealPageLoadWideEvent @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val contentScopeOptimizations: ContentScopeOptimizations,
     private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -114,8 +137,9 @@ class RealPageLoadWideEvent @Inject constructor(
     private val mutex = Mutex()
     private val activeFlows = ConcurrentHashMap<String, PageLoadState>()
 
-    override fun onPageStarted(tabId: String, url: String) {
+    override fun onPageStarted(tabId: String, url: String, navigationId: Long) {
         if (!shouldTrackUrl(url)) return
+        val startedAt = currentTimeProvider.elapsedRealtime()
         coroutineScope.launch {
             mutex.withLock {
                 if (!isFeatureEnabled()) return@launch
@@ -134,7 +158,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 )
 
                 result.onSuccess { flowId ->
-                    activeFlows[tabId] = PageLoadState(flowId, url)
+                    activeFlows[tabId] = PageLoadState(flowId, url, navigationId, startedAt)
                     logcat { "Page load flow started: tabId=$tabId, url=$url, flowId=$flowId" }
 
                     wideEventClient.flowStep(
@@ -185,6 +209,24 @@ class RealPageLoadWideEvent @Inject constructor(
         }
     }
 
+    override fun onContentScopeExperimentsResolved(tabId: String, navigationId: Long) {
+        recordElapsedSincePageStart(
+            tabId = tabId,
+            navigationId = navigationId,
+            stepName = STEP_CONTENT_SCOPE_EXPERIMENTS_RESOLVED,
+            key = KEY_ELAPSED_TIME_TO_CONTENT_SCOPE_EXPERIMENTS,
+        )
+    }
+
+    override fun onJsInjectionComplete(tabId: String, navigationId: Long) {
+        recordElapsedSincePageStart(
+            tabId = tabId,
+            navigationId = navigationId,
+            stepName = STEP_JS_INJECTION_COMPLETE,
+            key = KEY_ELAPSED_TIME_TO_JS_INJECTION_COMPLETE,
+        )
+    }
+
     override fun onProgressChanged(tabId: String, url: String) {
         updateWideEventAsync(tabId, url) { flowId ->
             wideEventClient.intervalEnd(
@@ -227,6 +269,8 @@ class RealPageLoadWideEvent @Inject constructor(
                 },
             )
 
+            val optimizations = contentScopeOptimizations.current()
+
             val flowStatus = if (isSuccess) {
                 FlowStatus.Success
             } else {
@@ -242,6 +286,9 @@ class RealPageLoadWideEvent @Inject constructor(
                     KEY_IS_TAB_IN_FOREGROUND_ON_FINISH to isTabInForegroundOnFinish.toString(),
                     KEY_ACTIVE_REQUESTS_ON_LOAD_START to activeRequestsOnLoadStart.toString(),
                     KEY_CONCURRENT_REQUESTS_ON_FINISH to concurrentRequestsOnFinish.toString(),
+                    KEY_CONTENT_SCOPE_INJECTION_OPTIMIZED to optimizations.injectionOptimized.toString(),
+                    KEY_CONTENT_SCOPE_MESSAGING_OPTIMIZED to optimizations.messagingOptimized.toString(),
+                    KEY_CONTENT_SCOPE_EXPERIMENTS_CACHED to optimizations.experimentsCached.toString(),
                 ),
             )
 
@@ -251,9 +298,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
     private fun isInProgress(tabId: String, url: String): Boolean {
         val state = activeFlows[tabId] ?: return false
-        val ageMillis = currentTimeProvider.currentTimeMillis() - state.createdAt
-        val isStale = ageMillis > CLEANUP_TIMEOUT.inWholeMilliseconds
-        return state.url == url && !isStale
+        return state.url == url && !state.isStale()
     }
 
     private fun shouldTrackUrl(url: String): Boolean {
@@ -263,6 +308,48 @@ class RealPageLoadWideEvent @Inject constructor(
             PageLoadedSites.perfSites.any { site -> UriString.sameOrSubdomain(url, site) }
         }.getOrDefault(false)
     }
+
+    /**
+     * These durations are milliseconds wide, so they cannot be measured with [WideEventClient.intervalStart] /
+     * [WideEventClient.intervalEnd].
+     */
+    private fun recordElapsedSincePageStart(
+        tabId: String,
+        navigationId: Long,
+        stepName: String,
+        key: String,
+    ) {
+        val measuredAt = currentTimeProvider.elapsedRealtime()
+        coroutineScope.launch {
+            mutex.withLock {
+                if (!isFeatureEnabled()) return@withLock
+                val state = activeFlows[tabId] ?: return@withLock
+                // Matched on the navigation rather than the url: callers defer these measurements past the point where
+                // their navigation can end, and a later load of the same url in this tab must not claim them.
+                if (state.navigationId != navigationId) {
+                    logcat { "Dropping $key from navigation $navigationId, tabId=$tabId is on ${state.navigationId}" }
+                    return@withLock
+                }
+                if (state.isStale()) return@withLock
+                // First value wins, so a callback repeated for this navigation cannot overwrite the measurement already
+                // taken for it.
+                if (!state.recordedMeasurementKeys.add(key)) {
+                    logcat { "Ignoring repeat $key measurement for flowId=${state.flowId}" }
+                    return@withLock
+                }
+                val bucket = lowerBoundBucket(measuredAt - state.startedAt)
+                wideEventClient.flowStep(
+                    wideEventId = state.flowId,
+                    stepName = stepName,
+                    metadata = mapOf(key to bucket),
+                )
+                logcat { "Recorded $key=$bucket for flowId=${state.flowId}" }
+            }
+        }
+    }
+
+    private fun lowerBoundBucket(durationMs: Long): String =
+        (CONTENT_SCOPE_BUCKETS_MS.lastOrNull { it <= durationMs } ?: 0L).toString()
 
     private fun updateWideEventAsync(
         tabId: String,
@@ -301,8 +388,15 @@ class RealPageLoadWideEvent @Inject constructor(
     private inner class PageLoadState(
         val flowId: Long,
         val url: String,
+        val navigationId: Long,
+        val startedAt: Long,
         val createdAt: Long = currentTimeProvider.currentTimeMillis(),
-    )
+    ) {
+        val recordedMeasurementKeys: MutableSet<String> = mutableSetOf()
+
+        fun isStale(): Boolean =
+            currentTimeProvider.currentTimeMillis() - createdAt > CLEANUP_TIMEOUT.inWholeMilliseconds
+    }
 
     private companion object {
         const val ABOUT_BLANK = "about:blank"
@@ -317,14 +411,23 @@ class RealPageLoadWideEvent @Inject constructor(
             30.seconds,
             1.minutes,
         )
+
+        val CONTENT_SCOPE_BUCKETS_MS: List<Long> = listOf(5, 10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400)
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
         const val STEP_PAGE_START = "page_start"
         const val STEP_PAGE_VISIBLE = "page_visible"
         const val STEP_PAGE_ESCAPED_FIXED_PROGRESS = "page_escaped_fixed_progress"
         const val STEP_PAGE_FINISH = "page_finish"
+        const val STEP_CONTENT_SCOPE_EXPERIMENTS_RESOLVED = "page_content_scope_experiments_resolved"
+        const val STEP_JS_INJECTION_COMPLETE = "page_js_injection_complete"
         const val KEY_ELAPSED_TIME_TO_FINISH = "elapsed_time_to_finish_ms_bucketed"
         const val KEY_ELAPSED_TIME_TO_VISIBLE = "elapsed_time_to_visible_ms_bucketed"
         const val KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS = "elapsed_time_to_escaped_fixed_progress_ms_bucketed"
+        const val KEY_ELAPSED_TIME_TO_CONTENT_SCOPE_EXPERIMENTS = "elapsed_time_to_content_scope_experiments_ms_bucketed"
+        const val KEY_ELAPSED_TIME_TO_JS_INJECTION_COMPLETE = "elapsed_time_to_js_injection_complete_ms_bucketed"
+        const val KEY_CONTENT_SCOPE_INJECTION_OPTIMIZED = "content_scope_injection_optimized"
+        const val KEY_CONTENT_SCOPE_MESSAGING_OPTIMIZED = "content_scope_messaging_optimized"
+        const val KEY_CONTENT_SCOPE_EXPERIMENTS_CACHED = "content_scope_experiments_cached"
         const val KEY_PROGRESS = "progress"
         const val KEY_OUTCOME = "outcome"
         const val KEY_ERROR_CODE = "error_code"
