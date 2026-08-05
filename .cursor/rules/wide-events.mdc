@@ -32,8 +32,13 @@ wideEventClient.flowStep(
     metadata = mapOf("platform" to "google"),
 )
 
-// Measure latency between two points (always use bucketed values, not raw ms)
-wideEventClient.intervalStart(wideEventId = flowId, key = "creation_latency_ms_bucketed")
+// Measure latency between two points — the client buckets the duration for you
+wideEventClient.intervalStart(
+    wideEventId = flowId,
+    key = "creation_latency_ms_bucketed",
+    timeout = 10.minutes,                 // optional: auto-finish the flow with Unknown if it elapses
+    buckets = DEFAULT_INTERVAL_BUCKETS,   // optional: null records the raw duration
+)
 // ... operation ...
 wideEventClient.intervalEnd(wideEventId = flowId, key = "creation_latency_ms_bucketed")
 
@@ -67,6 +72,15 @@ FlowStatus.Unknown   // unexpected termination; always pair with a last_step in 
 
 When a flow is sampled out, `flowStart` returns a sentinel ID. All subsequent calls (`flowStep`, `flowFinish`, etc.) with that ID are silent no-ops with zero disk I/O — no special handling needed at the call site. The probability is persisted with the event and sent to the backend so it can weight the data correctly.
 
+### Intervals
+
+`intervalStart` / `intervalEnd` measure the time between two points and record it under `key`.
+
+- **The client buckets the duration for you.** The measured duration is rounded *down* to the nearest boundary in `buckets`, and durations below the smallest boundary are recorded as `0`. `buckets` defaults to `WideEventClient.DEFAULT_INTERVAL_BUCKETS` (1s, 5s, 10s, 30s, 1m, 5m, 10m). Pass a custom `Set<Duration>` when the flow runs on a different time scale (see `PageLoadWideEvent` and `PirScanWideEvent`), or `null` to record the raw duration.
+- **`timeout` is optional.** If it elapses before `intervalEnd`, `flowFinish`, or `flowAbort`, the flow auto-finishes with `FlowStatus.Unknown` and is sent; an explicit finish or abort cancels it. This is the "interval timeout" that `CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true)` defers to.
+
+Durations across the API are `kotlin.time.Duration` (`10.minutes`, `7.days`), not `java.time.Duration`.
+
 ### CleanupPolicy
 
 Defines what happens to flows abandoned due to app termination or timeout:
@@ -80,7 +94,7 @@ CleanupPolicy.OnProcessStart(
 
 // Complete the flow with Unknown status after a duration
 CleanupPolicy.OnTimeout(
-    duration = Duration.ofDays(7),
+    duration = 7.days,
     flowStatus = FlowStatus.Unknown,
 )
 ```
