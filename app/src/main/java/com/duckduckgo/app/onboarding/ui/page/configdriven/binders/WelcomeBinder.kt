@@ -23,7 +23,6 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DialogBinder
-import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 
 class WelcomeBinder(
@@ -35,9 +34,7 @@ class WelcomeBinder(
     override fun bind(content: ContentConfig.Welcome, scope: BindScope): ContentHandle = with(binding) {
         val context = root.context
 
-        // Decoded unconditionally: the copy variants that may carry markup are indistinguishable here, and
-        // decoding is a no-op on the plain ones.
-        bodyText1.text = content.body1.resolve(context).preventWidows().html(context)
+        bodyText1.text = content.body1.resolve(context).preventWidows()
         // Set explicitly: a previous render of the single-line copy leaves this hidden.
         bodyText2.isVisible = content.body2 != null
         content.body2?.let { bodyText2.text = it.resolve(context).preventWidows() }
