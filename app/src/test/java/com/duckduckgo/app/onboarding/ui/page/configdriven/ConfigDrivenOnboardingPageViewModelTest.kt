@@ -572,6 +572,27 @@ class ConfigDrivenOnboardingPageViewModelTest {
         }
     }
 
+    // Unlike the sibling test above, no onResume() follows: ActivityResultRegistry dispatches the declined
+    // result before onResume runs, so the switch must correct itself synchronously from the result alone.
+    @Test
+    fun `corrects the default browser switch back to unset as soon as the system dialog is declined`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        quickSetupStateFlow(testee).test {
+            assertFalse(awaitItem().defaultBrowserChecked)
+
+            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            advanceUntilIdle()
+            assertTrue(awaitItem().defaultBrowserChecked)
+
+            testee.onQuickSetupDefaultBrowserNotSet()
+            advanceUntilIdle()
+            assertFalse(awaitItem().defaultBrowserChecked)
+        }
+    }
+
     @Test
     fun `restores the widget switch after the remove widget sheet is dismissed without removing it`() = runTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -616,5 +637,16 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         assertEquals(emptyList<LinearOnboardingEvent>(), recordedEvents)
         verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `records the quick setup default browser set result against the shared default browser state`() = runTest {
+        val testee = startAt(quickSetupDialog)
+        advanceUntilIdle()
+
+        testee.onQuickSetupDefaultBrowserSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+        verify(mockAppInstallStore).defaultBrowser = true
     }
 }
