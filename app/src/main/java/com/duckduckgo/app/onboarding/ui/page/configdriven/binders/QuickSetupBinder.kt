@@ -56,13 +56,13 @@ class QuickSetupBinder(
         addressBarSearchOptionsDivider.isVisible = !content.hideAddressBarRow
 
         setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
-            scope.execute(ContentInteraction.SetDefaultBrowserToggled(checked))
+            scope.execute(ContentInteraction.QuickSetupSetDefaultBrowser(checked))
         }
         addWidgetItem.setOnCheckedChangeListener { checked ->
-            scope.execute(ContentInteraction.AddWidgetToggled(checked))
+            scope.execute(ContentInteraction.QuickSetupAddWidget(checked))
         }
-        addressBarPositionItem.setOnClickListener { scope.execute(ContentInteraction.EditAddressBarPosition) }
-        addressBarSearchOptionsItem.setOnClickListener { scope.execute(ContentInteraction.EditSearchOptions) }
+        addressBarPositionItem.setOnClickListener { scope.execute(ContentInteraction.QuickSetupEditAddressBarPosition) }
+        addressBarSearchOptionsItem.setOnClickListener { scope.execute(ContentInteraction.QuickSetupEditSearchOptions) }
 
         scope.coroutineScope.launch {
             state.collect { render(it) }

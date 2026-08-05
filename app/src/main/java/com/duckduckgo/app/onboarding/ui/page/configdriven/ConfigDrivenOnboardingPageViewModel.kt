@@ -155,7 +155,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onContentInteraction(interaction: ContentInteraction) {
         when (interaction) {
-            is ContentInteraction.SubmitInput -> emit(
+            is ContentInteraction.SubmitInputPreview -> emit(
                 NewUserOnboardingEvent.InputDemoQuerySubmitted(
                     query = interaction.query,
                     isChat = interaction.isChat,
@@ -163,7 +163,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 ),
             )
 
-            ContentInteraction.EditAddressBarPosition -> {
+            ContentInteraction.QuickSetupEditAddressBarPosition -> {
                 val screen = currentQuickSetup() ?: return
                 viewModelScope.launch {
                     _commands.send(
@@ -175,7 +175,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 }
             }
 
-            ContentInteraction.EditSearchOptions -> {
+            ContentInteraction.QuickSetupEditSearchOptions -> {
                 val screen = currentQuickSetup() ?: return
                 viewModelScope.launch {
                     _commands.send(Command.ShowQuickSetupSearchOptionsBottomSheet(initialWithAi = screen.state.value.withAi))
@@ -185,12 +185,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             // The switch has already flipped itself, so the store has to record that before any side effect: a
             // later corrective write of the old value (declined system dialog, resume resync) would otherwise be
             // deduped as a no-change and never reach the binder.
-            is ContentInteraction.SetDefaultBrowserToggled -> {
+            is ContentInteraction.QuickSetupSetDefaultBrowser -> {
                 currentQuickSetup()?.state?.update { it.copy(defaultBrowserChecked = interaction.checked) }
                 if (interaction.checked) requestDefaultBrowser() else openDefaultBrowserSettings()
             }
 
-            is ContentInteraction.AddWidgetToggled -> {
+            is ContentInteraction.QuickSetupAddWidget -> {
                 currentQuickSetup()?.state?.update { it.copy(widgetChecked = interaction.checked) }
                 viewModelScope.launch {
                     _commands.send(if (interaction.checked) Command.LaunchAddWidgetPrompt else Command.ShowRemoveWidgetBottomSheet)

@@ -414,7 +414,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
         advanceUntilIdle()
 
-        testee.onContentInteraction(ContentInteraction.SubmitInput(query = "cats", isChat = true, fromSuggestion = true))
+        testee.onContentInteraction(ContentInteraction.SubmitInputPreview(query = "cats", isChat = true, fromSuggestion = true))
         advanceUntilIdle()
 
         assertEquals(
@@ -429,7 +429,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         testee.commands.test {
-            testee.onContentInteraction(ContentInteraction.EditAddressBarPosition)
+            testee.onContentInteraction(ContentInteraction.QuickSetupEditAddressBarPosition)
             advanceUntilIdle()
             assertEquals(
                 Command.ShowQuickSetupAddressBarPositionBottomSheet(
@@ -468,7 +468,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         testee.commands.test {
-            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            testee.onContentInteraction(ContentInteraction.QuickSetupSetDefaultBrowser(checked = true))
             advanceUntilIdle()
             assertTrue(quickSetupState(testee).defaultBrowserChecked)
             assertTrue(awaitItem() is Command.ShowQuickSetupDefaultBrowserDialog)
@@ -482,7 +482,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         testee.commands.test {
-            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            testee.onContentInteraction(ContentInteraction.QuickSetupSetDefaultBrowser(checked = true))
             advanceUntilIdle()
             assertEquals(Command.OpenDefaultBrowserSystemSettings, awaitItem())
         }
@@ -499,7 +499,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         testee.commands.test {
-            testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = false))
+            testee.onContentInteraction(ContentInteraction.QuickSetupAddWidget(checked = false))
             advanceUntilIdle()
             assertFalse(quickSetupState(testee).widgetChecked)
             assertEquals(Command.ShowRemoveWidgetBottomSheet, awaitItem())
@@ -535,7 +535,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         quickSetupStateFlow(testee).test {
             assertFalse(awaitItem().defaultBrowserChecked)
 
-            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            testee.onContentInteraction(ContentInteraction.QuickSetupSetDefaultBrowser(checked = true))
             advanceUntilIdle()
             assertTrue(awaitItem().defaultBrowserChecked)
 
@@ -557,7 +557,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         quickSetupStateFlow(testee).test {
             assertFalse(awaitItem().defaultBrowserChecked)
 
-            testee.onContentInteraction(ContentInteraction.SetDefaultBrowserToggled(checked = true))
+            testee.onContentInteraction(ContentInteraction.QuickSetupSetDefaultBrowser(checked = true))
             advanceUntilIdle()
             assertTrue(awaitItem().defaultBrowserChecked)
 
@@ -578,7 +578,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         quickSetupStateFlow(testee).test {
             assertTrue(awaitItem().widgetChecked)
 
-            testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = false))
+            testee.onContentInteraction(ContentInteraction.QuickSetupAddWidget(checked = false))
             advanceUntilIdle()
             assertFalse(awaitItem().widgetChecked)
 
@@ -593,7 +593,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(quickSetupDialog)
         advanceUntilIdle()
 
-        testee.onContentInteraction(ContentInteraction.AddWidgetToggled(checked = true))
+        testee.onContentInteraction(ContentInteraction.QuickSetupAddWidget(checked = true))
         advanceUntilIdle()
         testee.onResume()
         advanceUntilIdle()

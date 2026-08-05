@@ -36,20 +36,19 @@ class BindScope(
 /** Interactions a bound screen raises outside the shared CTA buttons interactions. */
 sealed interface ContentInteraction {
 
-    /** The input demo's typed query, IME action or suggestion tap. */
-    data class SubmitInput(
+    data class SubmitInputPreview(
         val query: String,
         val isChat: Boolean,
         val fromSuggestion: Boolean,
     ) : ContentInteraction
 
-    data object EditAddressBarPosition : ContentInteraction
+    data object QuickSetupEditAddressBarPosition : ContentInteraction
 
-    data object EditSearchOptions : ContentInteraction
+    data object QuickSetupEditSearchOptions : ContentInteraction
 
-    data class SetDefaultBrowserToggled(val checked: Boolean) : ContentInteraction
+    data class QuickSetupSetDefaultBrowser(val checked: Boolean) : ContentInteraction
 
-    data class AddWidgetToggled(val checked: Boolean) : ContentInteraction
+    data class QuickSetupAddWidget(val checked: Boolean) : ContentInteraction
 }
 
 /** Binds a stateless [ContentConfig] to its include layout. */

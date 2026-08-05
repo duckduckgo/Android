@@ -125,7 +125,7 @@ class InputScreenPreviewBinder(
         val submitTypedQuery = {
             val query = inputText.text?.toString().orEmpty().trim()
             if (query.isNotEmpty()) {
-                scope.execute(ContentInteraction.SubmitInput(query, isChat = !isSearchSelected, fromSuggestion = false))
+                scope.execute(ContentInteraction.SubmitInputPreview(query, isChat = !isSearchSelected, fromSuggestion = false))
             }
         }
         inputModeDemoActionIcon.setOnClickListener { submitTypedQuery() }
@@ -170,7 +170,7 @@ class InputScreenPreviewBinder(
             suggestions[index].setOptionView(button)
             button.setOnClickListener {
                 scope.execute(
-                    ContentInteraction.SubmitInput(
+                    ContentInteraction.SubmitInputPreview(
                         query = suggestions[index].link,
                         isChat = !isSearchSelected,
                         fromSuggestion = true,
