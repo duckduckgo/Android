@@ -635,6 +635,39 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
+    fun whenPerfWrapperActiveThenScriptIsWrappedWithPrologueAndTrailer() {
+        val perfWrapperTestee = createTesteeWithPerfWrapperActive()
+
+        val js = perfWrapperTestee.getScript(null, listOf())
+
+        assertTrue(js.startsWith("performance.mark('ddg-cs-start');"))
+        assertTrue(js.trimEnd().endsWith("//# sourceURL=ddg-contentscope.js"))
+    }
+
+    @Test
+    fun whenPerfWrapperActiveThenAssembledContentScopeTemplateIsStillPresentInWrappedOutput() {
+        val perfWrapperTestee = createTesteeWithPerfWrapperActive()
+
+        val js = perfWrapperTestee.getScript(null, listOf())
+
+        assertTrue(js.contains("processConfig({\"features\":{$config1,$config2}"))
+        assertTrue(js.contains("[\"$exampleUrl\"]"))
+    }
+
+    @Test
+    fun whenPerfWrapperActiveAndNoInputChangesThenCachedScriptIsNotReWrappedOnASecondCall() {
+        val perfWrapperTestee = createTesteeWithPerfWrapperActive()
+
+        perfWrapperTestee.getScript(null, listOf())
+        val js = perfWrapperTestee.getScript(null, listOf())
+
+        // A wrap applied at the getScript() boundary instead of at cache-assembly time would fuse a fresh
+        // prologue onto the already-wrapped cached string on every call, accumulating marks.
+        val startMarkOccurrences = js.split("performance.mark('ddg-cs-start')").size - 1
+        assertEquals(1, startMarkOccurrences)
+    }
+
+    @Test
     fun whenContentScopeScriptsIsEnabledThenReturnTrue() {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
         assertTrue(testee.isEnabled())
@@ -863,6 +896,25 @@ class RealContentScopeScriptsTest {
         FakePerfTracer(),
         ContentScopeScriptPerfWrapper(mockPerfWrapperAppBuildConfig),
     )
+
+    // A separate testee wired to its own INTERNAL-stubbed build config, so the wrapper is active without
+    // touching mockAppBuildConfig or mockPerfWrapperAppBuildConfig, which the rest of this suite depends on
+    // staying PLAY (see the comment above mockPerfWrapperAppBuildConfig).
+    private fun createTesteeWithPerfWrapperActive(): CoreContentScopeScripts {
+        val internalPerfWrapperAppBuildConfig: AppBuildConfig = mock()
+        whenever(internalPerfWrapperAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        return RealContentScopeScripts(
+            mockPluginPoint,
+            mockUserAllowListRepository,
+            mockContentScopeJsReader,
+            mockAppBuildConfig,
+            mockUnprotectedTemporary,
+            mockFingerprintProtectionManager,
+            contentScopeScriptsFeature,
+            FakePerfTracer(),
+            ContentScopeScriptPerfWrapper(internalPerfWrapperAppBuildConfig),
+        )
+    }
 
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {
         val matchResult = regex.find(js)

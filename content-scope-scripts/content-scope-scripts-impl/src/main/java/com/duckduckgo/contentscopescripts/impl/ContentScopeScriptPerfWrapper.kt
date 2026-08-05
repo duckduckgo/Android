@@ -54,8 +54,10 @@ class ContentScopeScriptPerfWrapper @Inject constructor(
         |      execMs: m.duration,
         |      sinceNavStartMs: m.startTime,
         |      get fcpMs() {
-        |        var e = performance.getEntriesByName('first-contentful-paint');
-        |        return e.length ? e[0].startTime : null;
+        |        try {
+        |          var e = performance.getEntriesByName('first-contentful-paint');
+        |          return e.length ? e[0].startTime : null;
+        |        } catch (e) { return null; }
         |      }
         |    };
         |  } catch (e) {}

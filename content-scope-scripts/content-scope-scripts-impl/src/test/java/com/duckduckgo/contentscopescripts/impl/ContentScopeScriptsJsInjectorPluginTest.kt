@@ -1,6 +1,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -13,12 +14,13 @@ import org.mockito.kotlin.whenever
 class ContentScopeScriptsJsInjectorPluginTest {
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockWebView: WebView = mock()
+    private val fakePerfTracer = FakePerfTracer()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts, FakePerfTracer())
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts, fakePerfTracer)
     }
 
     @Test
@@ -29,6 +31,7 @@ class ContentScopeScriptsJsInjectorPluginTest {
 
         verify(mockCoreContentScopeScripts).getScript(null, listOf())
         verify(mockWebView).evaluateJavascript(any(), anyOrNull())
+        assertEquals(listOf("ddg.contentScope.evaluateJavascript"), fakePerfTracer.syncSections)
     }
 
     @Test
