@@ -42,6 +42,12 @@ interface CardStage {
     /** Tweens the card's bounds from the outgoing screen's size to the newly bound one's. */
     fun morph(animate: Boolean, onEnd: () -> Unit)
 
+    /**
+     * Tweens the card's bounds over [durationMs] into the layout change its caller makes next, for a resize a
+     * bound screen drives itself rather than one that comes with a new screen.
+     */
+    fun beginBoundsTransition(durationMs: Long)
+
     fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
 
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
@@ -121,6 +127,12 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
         TransitionManager.beginDelayedTransition(morphScene, transition)
         // Guarantees a layout pass is observed even if none of this render's view mutations triggered one.
         morphScene.requestLayout()
+    }
+
+    override fun beginBoundsTransition(durationMs: Long) {
+        // A view that has never been laid out has zero bounds, which the transition would tween the card out of.
+        if (!morphScene.isLaidOut) return
+        TransitionManager.beginDelayedTransition(morphScene, ChangeBounds().setDuration(durationMs))
     }
 
     override fun showCtaButtons(

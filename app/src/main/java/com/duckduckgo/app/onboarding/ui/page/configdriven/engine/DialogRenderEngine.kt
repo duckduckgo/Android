@@ -51,6 +51,9 @@ class DialogRenderEngine(
     private var bindScope: CoroutineScope? = null
     private var afterFadeAnimator: Animator? = null
 
+    /** The animation policy of the render that is bound, which a binder-driven card resize follows too. */
+    private var renderAnimating = false
+
     /**
      * While set, every remaining stage runs snapped. Settling an in-flight entrance unwinds the rest of the
      * chain synchronously, and those stages must land on their end state rather than start fresh animations.
@@ -90,10 +93,15 @@ class DialogRenderEngine(
         cardArrow.apply(previous?.cardArrow, config.cardArrow, animate)
 
         if (animate) isAnimating = true
+        renderAnimating = animate
 
         val scope = createBindScope()
         bindScope = scope
-        val handle = content.bind(stepId, config.content, BindScope(coroutineScope = scope, execute = execute))
+        val handle = content.bind(
+            stepId,
+            config.content,
+            BindScope(coroutineScope = scope, execute = execute, animateCardBounds = ::animateCardBounds),
+        )
         bound = handle
 
         cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
@@ -163,6 +171,11 @@ class DialogRenderEngine(
     }
 
     private fun animating(animate: Boolean) = animate && !settling
+
+    private fun animateCardBounds(durationMs: Long) {
+        if (!animating(renderAnimating)) return
+        cardStage.beginBoundsTransition(durationMs)
+    }
 
     private fun unbindCurrent() {
         val handle = bound ?: return

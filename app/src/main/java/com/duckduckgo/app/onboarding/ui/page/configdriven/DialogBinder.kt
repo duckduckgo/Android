@@ -25,6 +25,12 @@ class BindScope(
     /** Cancelled by the engine at unbind, so state observation dies with the binding. */
     val coroutineScope: CoroutineScope,
     val execute: (ContentInteraction) -> Unit,
+    /**
+     * Asks the card to tween its bounds, over the given duration, into the layout change the binder makes next:
+     * a view it reveals or resizes would otherwise resize the card in a single frame. Call it immediately before
+     * that change. No-op on a render the engine is not animating.
+     */
+    val animateCardBounds: (durationMs: Long) -> Unit = {},
 )
 
 /** Interactions a bound screen raises outside the shared CTA buttons interactions. */
