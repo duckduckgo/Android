@@ -222,7 +222,7 @@ class DialogConfigResolverTest {
 
         assertEquals(OnboardingBackgroundStep.InputType, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)
-        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val content = config.content as ContentConfig.InputScreen
         assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated), content.title)
         assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenDescription), content.description)
