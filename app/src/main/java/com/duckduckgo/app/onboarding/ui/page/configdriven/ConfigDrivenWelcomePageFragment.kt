@@ -94,8 +94,6 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     private var cardBottomInsetPx = 0
 
     private val requestNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        // A result pending across a recreation is dispatched before the new view is attached to the window, so gating
-        // this on the view would swallow it and leave the flow parked on this step for good.
         viewModel.notificationPermissionFlowFinished(granted)
     }
 

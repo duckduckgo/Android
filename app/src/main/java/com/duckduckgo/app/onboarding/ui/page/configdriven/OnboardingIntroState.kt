@@ -19,8 +19,6 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 /**
  * Ordering rules behind [OnboardingIntroChoreographer]: what a call is allowed to do to the intro views given what
  * happened to them already.
- *
- * Split out of the choreographer so the orderings a rotation lands on can be exercised without a view binding.
  */
 class OnboardingIntroState {
 
@@ -34,12 +32,11 @@ class OnboardingIntroState {
 
     private var released = false
 
-    /** Records that this view is playing the intro. */
     fun play() {
         visualsOnScreen = true
     }
 
-    /** @return true when an intro start deferred until layout should still run, false when something overtook it */
+    /** @return true when should run, false when something overtook it */
     fun canStart(): Boolean = !released && !cleared
 
     /** @return true when the caller should snap the intro views to their end state, false when they are there already */
