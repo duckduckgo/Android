@@ -1,426 +1,153 @@
+---
+description: Android Design System components and conventions — buttons, text, inputs, list items, dialogs, bottom sheets, colors, spacing, icons. Read before writing or changing any UI (Kotlin or XML).
+---
 # Android Design System (ADS)
 
-The DuckDuckGo Android Design System lives in `android-design-system/design-system/`. Always use ADS components instead of raw Android/Material widgets. Lint rules will break the build if you bypass ADS.
+The design system lives in `android-design-system/design-system/`; View components are under
+`com.duckduckgo.common.ui.view.*`. Use ADS components instead of raw Android/Material widgets.
+
+This rule is the component index and the constraints. For a component's API, read its class — the
+signatures are not repeated here.
 
 ---
 
-## Core Principle
+## What breaks the build
 
-**Never use raw platform widgets** (`Button`, `TextView`, `Switch`, `AlertDialog`, `BottomSheetDialog`, etc.) — lint detects and fails on these. Always use the ADS equivalent.
+Lint fails the build on all of these (`lint-rules/src/main/java/com/duckduckgo/lint/ui/`):
 
----
-
-## Package
-
-All components live under `com.duckduckgo.common.ui.view.*`. Use this package in both Kotlin code and XML layouts.
-
----
-
-## Buttons
-
-Five variants — pick by intent, never by style:
-
-| Variant | Class | Use for |
-|---|---|---|
-| Primary | `DaxButtonPrimary` | Main CTA |
-| Secondary | `DaxButtonSecondary` | Secondary action |
-| Ghost | `DaxButtonGhost` | Tertiary / low-emphasis |
-| Ghost Alt | `DaxButtonGhostAlt` | Ghost on alternate background |
-| Destructive | `DaxButtonDestructive` | Irreversible/dangerous action |
-| Destructive Ghost | `DaxButtonGhostDestructive` | Destructive low-emphasis |
-
-```xml
-<com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-    android:id="@+id/submitButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/submit"
-    app:buttonSize="large" />
-```
-
-**Accepted attributes:** `android:text`, `android:enabled`, `app:icon`, `app:buttonSize="large|small"` (default: small)
-
-**Forbidden attributes (build breaks):** `android:textStyle`, `android:textColor`, `android:textAppearance`, `android:tint`, `android:textAllCaps`, `android:layout_height`, `style`
-
-**Button spacing:** Use `@dimen/keyline_1` (4dp) between buttons, not 16dp — buttons have 6dp insets top/bottom, so 4+6+6 = 16dp visual spacing.
+- Raw `Button`, `TextView`, `SwitchView` in XML
+- `style=` on any ADS component; a custom style not prefixed `Widget.DuckDuckGo.`
+- `@color/` references in XML — use `?attr/daxColor*` so both themes work
+- A plain `View` used as a divider
+- `AlertDialog` / `MaterialAlertDialog`; a raw `BottomSheetDialog` without the ADS style
+- `background_skeleton` set as the background of a `SkeletonView`
+- On `DaxButton*`: `android:textStyle`, `android:textColor`, `android:textAppearance`,
+  `android:textAllCaps`, `android:tint`, and `android:layout_height` unless `wrap_content`
+- On `DaxTextView`: `android:textAppearance`, `android:textAllCaps`, `android:tint`,
+  `android:textSize`, `android:textStyle`, `android:fontFamily`
 
 ---
 
-## Text — DaxTextView
+## Components
 
-One component for all text. Never use `TextView` or set `android:textAppearance` directly.
+Pick by intent, never by style.
 
-```xml
-<com.duckduckgo.common.ui.view.text.DaxTextView
-    android:id="@+id/title"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/page_title"
-    app:typography="h1"
-    app:textType="primary" />
-```
+### Buttons — `view.button.*`
 
-**`app:typography` values:**
-`title` · `h1` · `h2` · `h3` · `h4` · `h5` · `body1` (default) · `body1_bold` · `body1_mono` · `body2` · `body2_bold` · `button` · `caption` · `caption_allCaps` · `onboarding_title` · `onboarding_body`
+`DaxButtonPrimary` · `DaxButtonSecondary` · `DaxButtonGhost` · `DaxButtonGhostAlt` ·
+`DaxButtonDestructive` · `DaxButtonDestructiveSecondary` · `DaxButtonGhostDestructive`
 
-**`app:textType` values:** `primary` (default) · `secondary`
+`GhostAlt` is a ghost button placed on an alternate (non-default) background. Of the destructive
+variants, pick by emphasis: `Destructive` (filled) → `DestructiveSecondary` → `GhostDestructive`.
 
-**Forbidden attributes (build breaks):** `android:textAppearance`, `android:textAllCaps`, `android:tint`, `android:textSize`, `android:textStyle`, `android:fontFamily`
+Accepted attributes: `android:text`, `android:enabled`, `app:icon`,
+`app:daxButtonSize="large|small"` (default `small` — note the `dax` prefix).
 
-**Typography specs:**
-```
-title         32sp bold,   36sp line height
-h1            24sp bold,   30sp line height
-h2            20sp medium, 24sp line height, 0.3sp letter spacing
-h3            16sp medium, 21sp line height
-h4            14sp medium, 20sp line height
-h5            13sp medium, 16sp line height
-body1         16sp regular, 20sp line height
-body1_bold    16sp bold,   20sp line height
-body1_mono    16sp regular, Roboto Mono, 20sp line height
-body2         14sp regular, 18sp line height
-body2_bold    14sp bold,   18sp line height
-button        15sp bold,   20sp line height
-caption       12sp regular, 16sp line height
-caption_allCaps  12sp regular, uppercase
-onboarding_title 24sp bold,   28sp line height, DuckSans Display
-onboarding_body  18sp regular, 22sp line height, DuckSans Product
-```
+Between stacked buttons use `@dimen/keyline_1` (4dp), not 16dp: buttons carry 6dp insets top and
+bottom, so 4+6+6 gives the intended 16dp of visual spacing.
 
----
+### Text — `view.text.DaxTextView`
 
-## Text Input — DaxTextInput
+One component for all text. Pick `app:typography` by semantic role; never set size or weight.
 
-```xml
-<com.duckduckgo.common.ui.view.text.DaxTextInput
-    android:id="@+id/emailInput"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:hint="@string/email_hint"
-    app:type="single_line"
-    app:editable="true" />
-```
+`title` · `h1` · `h2` · `h3` · `h4` · `h5` · `body1` (default) · `body1_bold` · `body1_mono` ·
+`body2` · `body2_bold` · `button` · `caption` · `caption_allCaps` · `onboarding_title` ·
+`onboarding_body`
 
-**`app:type`:** `single_line` · `multi_line` · `password`
+`app:textType`: `primary` (default) · `secondary`
 
-**Public API:**
-```kotlin
-var text: String
-var hint: String
-var error: String?   // show field-level validation errors only (not network errors)
-var isEditable: Boolean
-fun addTextChangedListener(textWatcher: TextWatcher)
-fun removeTextChangedListener(textWatcher: TextWatcher)
-fun onAction(actionHandler: (Action) -> Unit)
-fun setEndIcon(@DrawableRes endIconRes: Int, contentDescription: String? = null)
-fun removeEndIcon()
-fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
-```
+### Text input — `view.text.DaxTextInput`
 
-Use `error` only for invalid user input. For network/external errors, use a Snackbar instead.
+`app:type`: `single_line` · `multi_line` · `password` · `form_mode` · `ip_address` · `url`.
+`app:editable` toggles editability.
 
----
+Set `error` for invalid user input only. Network and other external failures go in a Snackbar, not
+the field.
 
-## Switch — DaxSwitch
+### List items — `view.listitem.*`
 
-```xml
-<com.duckduckgo.common.ui.view.DaxSwitch
-    android:id="@+id/featureSwitch"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
-```
+All extend `DaxListItem`, which carries the shared primary/secondary text, leading/trailing icon,
+and switch API. Pick by the content you have:
 
-Use the extension to change state without triggering the listener:
-```kotlin
-switch.quietlySetIsChecked(newCheckedState, changeListener)
-```
+| Class | Use for |
+|---|---|
+| `OneLineListItem` | primary text only |
+| `TwoLineListItem` | primary + secondary text |
+| `SectionHeaderListItem` | section title above a group (`app:showOverflowMenu`) |
+| `SettingsListItem` | settings row carrying a `StatusIndicatorView` |
+| `RadioListItem` | single-selection row |
+| `BookmarksListItem` | bookmark / favourite row |
+| `DaxGridItem` | grid cell (favourites) |
 
----
+`app:leadingIconImageBackground`: `none` · `circular` · `rounded`.
+Leading-icon sizes come from `IconSize`: Small, Medium, Large, ExtraLarge.
 
-## List Items
+### Dialogs — `view.dialog.*`
 
-Three main variants:
+Builders taking an `EventListener` for button callbacks: `TextAlertDialogBuilder` (standard alert),
+`StackedAlertDialogBuilder` (three or more vertically stacked options), `RadioListAlertDialogBuilder`
+(single selection).
 
-### OneLineListItem
-48dp height (56dp with large icon).
-```xml
-<com.duckduckgo.common.ui.view.listitem.OneLineListItem
-    android:id="@+id/item"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:primaryText="@string/item_title"
-    app:leadingIconImageBackground="circular" />
-```
+### Bottom sheets
 
-### TwoLineListItem
-56dp height (64dp with large icon).
-```xml
-<com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-    android:id="@+id/item"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:primaryText="@string/title"
-    app:secondaryText="@string/subtitle" />
-```
+`ActionBottomSheetDialog` and `PromoBottomSheetDialog` cover the two standard patterns. A custom
+`BottomSheetDialog` must be constructed with the ADS style
+(`com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog`); a `BottomSheetDialogFragment`
+inherits it from the theme.
 
-### SectionHeaderListItem
-44dp height. Introduces a new section.
-```xml
-<com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:primaryText="@string/section_header"
-    app:showOverflowMenu="false" />
-```
+### Other components
 
-**Common list item API:**
-```kotlin
-fun setPrimaryText(title: CharSequence?)
-fun setSecondaryText(title: CharSequence?)
-fun setLeadingIconResource(@DrawableRes idRes: Int)
-fun setLeadingIconBackgroundType(type: ImageBackground)  // None, Circular, Rounded
-fun setLeadingIconSize(imageSize: IconSize)              // Small, Medium, Large, ExtraLarge
-fun setTrailingIconResource(@DrawableRes idRes: Int)
-fun showSwitch()
-fun setIsChecked(isChecked: Boolean)
-fun setOnCheckedChangeListener(listener: OnCheckedChangeListener)
-fun setClickListener(onClick: () -> Unit)
-fun hideLeadingItems()
-fun hideTrailingItems()
-```
-
-**`app:leadingIconImageBackground`:** `none` · `circular` · `rounded`
-
----
-
-## Dividers
-
-```xml
-<!-- Horizontal -->
-<com.duckduckgo.common.ui.view.divider.HorizontalDivider
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:fullWidth="false"
-    app:defaultPadding="true" />
-
-<!-- Vertical -->
-<com.duckduckgo.common.ui.view.divider.VerticalDivider
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent" />
-```
-
-A lint rule flags `View` used as a divider — always use the ADS divider components.
-
----
-
-## Dialogs
-
-Never use `AlertDialog` or `MaterialAlertDialog` — lint prevents it.
-
-### TextAlertDialogBuilder — standard alert
-```kotlin
-TextAlertDialogBuilder(requireContext())
-    .setTitle(R.string.confirm_title)
-    .setMessage(R.string.confirm_message)
-    .setPositiveButton(R.string.yes)
-    .setNegativeButton(R.string.cancel)
-    .addEventListener(object : TextAlertDialogBuilder.EventListener() {
-        override fun onPositiveButtonClicked() { /* action */ }
-    })
-    .show()
-```
-
-### StackedAlertDialogBuilder — stacked buttons
-```kotlin
-StackedAlertDialogBuilder(requireContext())
-    .setTitle(R.string.title)
-    .setMessage(R.string.message)
-    .setStackedButtons(listOf(
-        StackedAlertDialogBuilder.StackedButton(R.string.option_a) { /* */ },
-        StackedAlertDialogBuilder.StackedButton(R.string.option_b) { /* */ },
-    ))
-    .show()
-```
-
-### RadioListAlertDialogBuilder — single selection
-```kotlin
-RadioListAlertDialogBuilder(requireContext())
-    .setTitle(R.string.title)
-    .setOptions(options, selectedIndex)
-    .setPositiveButton(R.string.ok)
-    .setNegativeButton(R.string.cancel)
-    .addEventListener(...)
-    .show()
-```
-
----
-
-## Bottom Sheets
-
-Never use raw `BottomSheetDialog` or `BottomSheetDialogFragment` without the ADS style — lint prevents it.
-
-For custom bottom sheets use:
-```kotlin
-// BottomSheetDialog — apply the ADS style
-BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog)
-
-// BottomSheetDialogFragment — extend normally (style is inherited from theme)
-class MyBottomSheet : BottomSheetDialogFragment() { ... }
-```
-
-Use `ActionBottomSheetDialog` or `PromoBottomSheetDialog` for the two standard patterns.
-
----
-
-## Menu Components
-
-### MenuItemView — browser menu entries
-```xml
-<com.duckduckgo.common.ui.view.MenuItemView
-    android:id="@+id/newTabMenuItem"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:iconDrawable="@drawable/ic_add_16"
-    app:primaryText="@string/new_tab" />
-```
-
-### PopupMenuItemView — popup/context menus
-```xml
-<com.duckduckgo.common.ui.view.PopupMenuItemView
-    android:id="@+id/deleteItem"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:primaryText="@string/delete"
-    app:primaryTextType="destructive"
-    app:trailingIcon="@drawable/ic_trash_16" />
-```
-
----
-
-## Skeleton / Loading State
-
-Wrap `SkeletonView` elements in `ShimmerFrameLayout`:
-```xml
-<com.facebook.shimmer.ShimmerFrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <include layout="@layout/view_entry_skeleton" />
-</com.facebook.shimmer.ShimmerFrameLayout>
-```
-
-```xml
-<!-- view_entry_skeleton.xml -->
-<com.duckduckgo.common.ui.view.SkeletonView
-    android:layout_width="40dp"
-    android:layout_height="40dp" />
-```
-
-Never set `android:background="@drawable/background_skeleton"` on SkeletonView — lint prevents it.
-
----
-
-## NotifyMeView
-
-Self-hiding component that shows a notification prompt when system notifications are disabled.
-```xml
-<com.duckduckgo.common.ui.view.notifyme.NotifyMeView
-    android:id="@+id/notifyMe"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:dismissIcon="true"
-    app:contentOrientation="start"
-    app:primaryText="@string/notify_title"
-    app:secondaryText="@string/notify_body" />
-```
+| Component | Notes |
+|---|---|
+| `view.DaxSwitch` | `quietlySetIsChecked(state, listener)` changes state without firing the listener |
+| `view.divider.HorizontalDivider` / `VerticalDivider` | `app:fullWidth`, `app:defaultPadding` |
+| `view.MenuItemView` | browser menu entries |
+| `view.PopupMenuItemView` | popup / context menus; `app:primaryTextType="destructive"` |
+| `view.SkeletonView` | loading placeholder — must be wrapped in `com.facebook.shimmer.ShimmerFrameLayout` |
+| `view.notifyme.NotifyMeView` | self-hiding prompt, shown only when system notifications are disabled |
 
 ---
 
 ## Colors
 
-**Never use `@color/` references directly in XML** — lint breaks the build. Always use `?attr/daxColor*` theme attributes.
+Theme attributes, never `@color/`:
 
-```xml
-<!-- WRONG -->
-android:textColor="@color/white"
+`?attr/daxColorBackground` (screen) · `?attr/daxColorSurface` (toolbars, navigation, dialogs) ·
+`?attr/daxColorContainer` (object containers, e.g. favicon background) · `?attr/daxColorPrimaryText` ·
+`?attr/daxColorSecondaryText` · `?attr/daxColorTertiaryText` (hints, placeholders) ·
+`?attr/daxColorPrimaryIcon` · `?attr/daxColorSecondaryIcon` · `?attr/daxColorAccentBlue` (accent,
+CTAs) · `?attr/daxColorDestructive` · `?attr/daxColorLines` (dividers)
 
-<!-- CORRECT -->
-android:textColor="?attr/daxColorPrimaryText"
-```
+In Kotlin: `context.getColorFromAttr(R.attr.daxColorPrimaryText)`.
+In a vector drawable that must follow the theme: `android:fillColor="?attr/daxColorPrimaryIcon"`.
 
-**Key color attributes:**
+---
 
-| Attribute | Use for |
+## Spacing
+
+Use keylines rather than arbitrary dp. The values are here so a dp figure from a design spec can be
+mapped back to the right resource:
+
+| Resource | Value |
 |---|---|
-| `?attr/daxColorBackground` | Screen background |
-| `?attr/daxColorSurface` | Toolbars, navigation, dialogs |
-| `?attr/daxColorContainer` | Object containers (favicon bg) |
-| `?attr/daxColorPrimaryText` | Primary text |
-| `?attr/daxColorSecondaryText` | Secondary/supporting text |
-| `?attr/daxColorTertiaryText` | Hint/placeholder text |
-| `?attr/daxColorPrimaryIcon` | Primary icon tint |
-| `?attr/daxColorSecondaryIcon` | Secondary icon tint |
-| `?attr/daxColorAccentBlue` | Primary accent / CTAs |
-| `?attr/daxColorDestructive` | Destructive actions |
-| `?attr/daxColorLines` | Dividers |
+| `@dimen/keyline_0` | 2dp |
+| `@dimen/keyline_1` | 4dp — between buttons |
+| `@dimen/keyline_2` | 8dp |
+| `@dimen/keyline_3` | 12dp |
+| `@dimen/keyline_4` | 16dp — screen edge → content |
+| `@dimen/keyline_5` | 24dp — dialog edge → content |
+| `@dimen/keyline_6` | 32dp |
+| `@dimen/keyline_7` | 48dp |
 
-For theme-responsive icons set `android:fillColor="?attr/daxColorPrimaryIcon"`.
-
-In Kotlin: `context.getColorFromAttr(R.attr.daxColorPrimaryText)`
-
----
-
-## Spacing / Dimensions
-
-Always use keylines — never hardcode arbitrary dp values:
-
-| Resource | Value | Common use |
-|---|---|---|
-| `@dimen/keyline_0` | 2dp | Fine adjustments |
-| `@dimen/keyline_1` | 4dp | Between buttons |
-| `@dimen/keyline_2` | 8dp | Tight spacing |
-| `@dimen/keyline_3` | 12dp | Medium spacing |
-| `@dimen/keyline_4` | 16dp | Screen edge → content |
-| `@dimen/keyline_5` | 24dp | Dialog edge → content |
-| `@dimen/keyline_6` | 32dp | Large gaps |
-| `@dimen/keyline_7` | 48dp | Extra large |
-
----
-
-## Activities and Fragments
-
-Extend ADS base classes to get theming for free:
-```kotlin
-class MyActivity : DuckDuckGoActivity()
-class MyFragment : DuckDuckGoFragment()
-```
-
----
-
-## Lint Rules (build-breaking)
-
-These are enforced at compile time:
-
-| Rule | What it prevents |
-|---|---|
-| `NoStyleAppliedToDesignSystemComponentDetector` | `style=` on any ADS component |
-| `ColorAttributeInXmlDetector` | `@color/` references in XML |
-| `DeprecatedAndroidWidgetsUsedInXmlDetector` | Raw `Button`, `TextView`, `SwitchView` |
-| `DaxButtonStylingDetector` | Forbidden attributes on `DaxButton*` |
-| `DaxTextViewStylingDetector` | Forbidden attributes on `DaxTextView` |
-| `MissingDividerDetector` | Plain `View` used as divider |
-| `NoAlertDialogDetector` | `AlertDialog` / `MaterialAlertDialog` |
-| `NoBottomSheetDialogDetector` | Raw `BottomSheetDialog` without ADS style |
-| `SkeletonViewBackgroundDetector` | `background_skeleton` drawable on `SkeletonView` |
-| `WrongStyleDetector` | Styles not prefixed `Widget.DuckDuckGo.` |
+Defined in `design-system-dimensions.xml`.
 
 ---
 
 ## Icons
 
-- Source icons from the internal DDG Icons repository at https://dub.duckduckgo.com/duckduckgo/Icons
-- Name SVG files as close as possible to the original `.svg` name
-- Import as vector asset in Android Studio
-- If used in only one feature, keep in that feature's `-impl` module, not `common-ui`
-- For theme-responsive icons: `android:fillColor="?attr/daxColorPrimaryIcon"`
+- Source icons from the internal DDG Icons repository: https://dub.duckduckgo.com/duckduckgo/Icons
+- Keep the SVG file name as close to the original as possible, and import as a vector asset
+- An icon used by one feature belongs in that feature's `-impl` module, not `common-ui`
 
-**When a new icon is needed:** ask the user for the icon name, then fetch it directly from https://dub.duckduckgo.com/duckduckgo/Icons and use it. Do not guess icon names or skip this step.
+**When a new icon is needed:** ask the user for the icon name, then fetch it from the Icons
+repository. Do not guess icon names or skip this step.

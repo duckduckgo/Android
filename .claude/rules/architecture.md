@@ -278,6 +278,17 @@ All flags default to `TRUE` so newly contributed plugins are on by default and c
 
 ## UI Patterns
 
+### Activity and Fragment base classes
+
+Activities extend `DuckDuckGoActivity`, fragments extend `DuckDuckGoFragment`. These are not optional
+conveniences: they are the `DaggerActivity`/`DaggerFragment` subclasses carrying
+`@HasMemberInjections`, so a screen that extends `AppCompatActivity` or `Fragment` directly gets no
+member injection and no `viewModelFactory`. `DuckDuckGoActivity` additionally applies the stored
+theme, listens for theme changes, and handles edge-to-edge setup.
+
+Override `applyFireTheme` to `true` only on activities whose look should follow the fire-mode theme;
+those must inject `BrowserMode` to compute it.
+
 ### ViewModels
 
 Commands are emitted via a `Channel<Command>`:
