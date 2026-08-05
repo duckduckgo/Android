@@ -347,23 +347,19 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.SyncRestore -> emit(NewUserOnboardingEvent.SkipRequested)
-
-            NewUserOnboardingActivityDialog.InitialReinstallUser,
-            NewUserOnboardingActivityDialog.Initial,
-            NewUserOnboardingActivityDialog.AddToDock,
-            -> emit(NewUserOnboardingEvent.ContinueClicked)
+            NewUserOnboardingActivityDialog.AddToDock -> emit(NewUserOnboardingEvent.ContinueClicked)
 
             NewUserOnboardingActivityDialog.WidgetPrompt -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
-
-            NewUserOnboardingActivityDialog.InputScreen -> emit(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
-
-            is NewUserOnboardingActivityDialog.InputScreenPreview -> emit(NewUserOnboardingEvent.ContinueClicked)
 
             is NewUserOnboardingActivityDialog.QuickSetup -> emit(
                 NewUserOnboardingEvent.QuickSetupConfirmed(type = OmnibarType.SINGLE_TOP, withAi = true),
             )
 
+            NewUserOnboardingActivityDialog.SyncRestore,
+            NewUserOnboardingActivityDialog.InitialReinstallUser,
+            NewUserOnboardingActivityDialog.Initial,
+            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,

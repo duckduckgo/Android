@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
@@ -413,5 +414,15 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         verifyNoInteractions(mockShownPixels)
+    }
+
+    @Test
+    fun `renders the sync restore dialog instead of skipping onboarding`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SyncRestore)
+        advanceUntilIdle()
+
+        val content = (testee.viewState.value.screen as Screen.Dialog).config.content as ContentConfig.Welcome
+        assertEquals(TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle), content.title)
+        assertTrue(recordedEvents.isEmpty())
     }
 }
