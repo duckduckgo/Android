@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.impl.common
 
 object PirJobConstants {
-    const val DBP_INITIAL_URL = "dbp://blank"
+    const val DBP_INITIAL_URL = "about:blank"
     const val RECOVERY_URL = "https://duckduckgo.com/"
 
     /**
