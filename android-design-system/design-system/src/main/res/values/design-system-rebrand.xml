@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="InvalidColorAttribute,NewApi">
 
     <attr name="textAppearanceButtonLarge" format="reference" />
 

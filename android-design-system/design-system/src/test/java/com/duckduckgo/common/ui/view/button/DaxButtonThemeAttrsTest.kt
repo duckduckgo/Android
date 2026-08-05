@@ -19,14 +19,14 @@ package com.duckduckgo.common.ui.view.button
 import android.content.Context
 import android.util.AttributeSet
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class DaxButtonThemeAttrsTest {
 
     private fun themedContext(overlay: Boolean): Context {
