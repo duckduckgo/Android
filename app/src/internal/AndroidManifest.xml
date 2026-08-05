@@ -4,6 +4,7 @@
     package="com.duckduckgo.app.browser">
 
     <application>
+        <profileable android:shell="true" />
         <activity
             android:name=".webview.WebViewDevSettingsActivity"
             android:exported="true"

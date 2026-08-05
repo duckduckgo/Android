@@ -139,6 +139,12 @@ android {
                 keyPassword = props['key.alias.password']
             }
         }
+        localDebugFallback {
+            storeFile = file("${System.getProperty('user.home')}/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
     buildTypes {
         debug {
@@ -161,6 +167,9 @@ android {
                 signingConfig = signingConfigs.upload
             } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
+            } else if (isValidSigningConfig(signingConfigs.localDebugFallback)) {
+                println "Signing properties not found, falling back to the local debug keystore."
+                signingConfig = signingConfigs.localDebugFallback
             } else {
                 println "Signing properties not found, release artifacts will not be signed."
                 signingConfig = null
