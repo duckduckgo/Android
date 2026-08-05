@@ -6,7 +6,11 @@ Wide events measure a user's complete journey through a multi-step flow, sending
 
 **Use a pixel when:** recording a single discrete action with no multi-step flow.
 
-For design guidance on naming, status, data selection, latency bucketing, and best practices, refer to the platform-agnostic doc at `windows-browser/.cursor/rules/wide-events.mdc`.
+Cross-platform design guidance on naming, status, data selection and latency bucketing lives in the
+`windows-browser` repository, not here — ask the user for it if you need it.
+
+The privacy invariants in CLAUDE.md apply to every field of a wide event, including bucketing all
+latency values.
 
 ---
 

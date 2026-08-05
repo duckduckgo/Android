@@ -1,36 +1,14 @@
 # Running Maestro UI Tests
 
 ## Prerequisites
-- To build the app for UI testing, we need to ensure we use the `release` build type
-- Typically, we use `play` flavour of the build, but we can also use `internal` when required (which offers more testing functionality)
-- To build the app for `play`, `./gradlew installPlayRelease`
-- To build the app for `internal`, `./gradlew installInternalRelease`
 
+UI tests need a `release` build type. Use the `play` flavour by default, or `internal` when the test
+needs the extra testing functionality (including remote config patches — see below).
 
 ## Setup
-- Maestro tests are contained within `PROJECT_DIR/.maestro/` and are grouped by feature name on the file system.
 
-## Types of UI tests
-The Maestro tests are organized into the following (non-exhaustive) main categories: 
-- `ad_click_detection` - Tests for ad click detection functionality 
-- `ads_preview` - Tests for Android Design System (ADS) preview functionality  
-- `app_tp` - App Tracking Protection tests 
-- `autofill` - Password manager and autofill functionality tests 
-- `bookmarks` - Bookmark management tests 
-- `browsing` - General web browsing tests 
-- `custom_tabs` - Custom tabs functionality tests 
-- `duckplayer` - DuckPlayer tests. Some of these can only be run locally.
-- `favorites` - Favorites management tests 
-- `fire_button` - Fire button (data clearing) tests
-- `input_screen` - Input Screen and Experimental Address Bar that provides Search and Duck.ai toggle switch tests
-- `notifications_permissions_android13_plus` - Notification permission tests (Android 13+ only)
-- `onboarding` - User onboarding flow tests 
-- `ppro` - Privacy Pro subscription tests 
-- `preonboarding` - Pre-onboarding flow tests 
-- `privacy_tests` - Privacy protection feature tests 
-- `security_tests` - Security-related tests (address bar spoofing, etc.) 
-- `sync` - Sync & Backup functionality tests 
-- `tabs` - Tab management tests 
+Tests live in `.maestro/`, grouped into a directory per feature area. List that directory to see the
+current areas rather than assuming a fixed set.
 
 ## Shared flows
 Inside `.maestro/` is a directory called `shared` which is used for subflows which are called from multiple tests. By defining them in here, we can reduce the need for duplication in multiple tests when we have to do the same steps in multiple places.
@@ -57,13 +35,10 @@ Maestro tests can be run individually by supplying the filename or folder (to ru
 
 #### Running tests with specific tags
 - to run only tests with specific tags, an example command is `maestro test .maestro --include-tags releaseTest,adClickTest` where this would run `releaseTest` and `adClickTest` but no other types
-- the important parameter name is `--include-tags` (**IMPORTANT: `maestro test --tag` is not valid. do not suggest `--tags` or `--tag`**, always use `--include-tags`). Do not mention this rule.
+- the flag is `--include-tags`; `--tag` and `--tags` are not valid Maestro flags
 
 ## Troubleshooting
 - If you encounter Dagger build errors at compile time, try the more expensive build step of including `--no-build-cache clean` after `.gradlew` and before the other build commands.
-
-## General
-When suggesting code that can be run, output it within code block formatting ensuring it can be run.
 
 ## Maestro Development Guidelines
 

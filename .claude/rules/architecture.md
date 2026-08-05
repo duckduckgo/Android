@@ -103,38 +103,16 @@ interface MyFeature : Feature {
 
 `DefaultFeatureValue.INTERNAL` = enabled only in internal/debug builds.
 
-### Scope hierarchy
+### What each scope can reach
 
-The scope hierarchy determines what dependencies each scope can access, where its factory lookup happens, and what `HasDaggerInjector` handles injection. It is encoded implicitly in the Anvil-generated `_SubComponent` files — this diagram is the source of truth:
+- A Fragment or View (`FragmentScope`, `ViewScope`) parents to `ActivityComponent`, so it can access
+  `ActivityScope` bindings such as `@ActivityContext Context`.
+- A Receiver or Service (`ReceiverScope`, `ServiceScope`) parents directly to `AppComponent`, so it can
+  only access `AppScope` bindings — there is no `@ActivityContext` available.
+- `VpnScope` also parents to `AppComponent` and is only for the VPN secondary process.
 
-```
-DuckDuckGoApplication [HasDaggerInjector]
-└── AppComponent [AppScope]
-    │   Factory map contains: ActivityComponent.Factory, ReceiverSubComponent factories,
-    │                         ServiceSubComponent factories, VpnScope factories
-    │
-    ├── ActivityComponent [ActivityScope]  ← subcomponent of AppComponent
-    │   │   Factory map contains: FragmentSubComponent factories, ViewSubComponent factories
-    │   │   Provided bindings: @ActivityContext Context, AppCompatActivity
-    │   │
-    │   ├── EachFragment_SubComponent [FragmentScope]  ← subcomponent of ActivityComponent
-    │   └── EachView_SubComponent [ViewScope]          ← subcomponent of ActivityComponent
-    │
-    ├── EachReceiver_SubComponent [ReceiverScope]  ← subcomponent of AppComponent
-    └── EachService_SubComponent [ServiceScope]    ← subcomponent of AppComponent
-```
-
-**What this means in practice:**
-
-- `FragmentScope` and `ViewScope` subcomponents parent to `ActivityComponent`. Their factory lookup goes through `DaggerActivity.injectorFactoryMap`. A Fragment or View can access `ActivityScope` bindings (e.g. `@ActivityContext Context`).
-- `ReceiverScope` and `ServiceScope` subcomponents parent directly to `AppComponent`. Their factory lookup goes through `DuckDuckGoApplication.injectorFactoryMap`. They can only access `AppScope` bindings — there is no `@ActivityContext` available.
-- `VpnScope` types also parent to `AppComponent` and are only for the VPN secondary process.
-- The parent scope follows from the scope passed to `@InjectWith`; Anvil generates the `ParentComponent` and its `@ContributesTo`. You never set it manually.
-
-**Debugging "could not find dagger component" crashes:**
-
-- Crash in a Fragment/View injection → check `DaggerActivity.injectorFactoryMap` — the class is missing `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
-- Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap` — the class is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
+For the component diagram and for diagnosing "could not find dagger component" crashes, read
+`.claude/docs/dagger-scopes.md`.
 
 ### Activity Context
 
@@ -196,63 +174,16 @@ In a Fragment, collect on `viewLifecycleOwner.lifecycleScope`, never the Fragmen
 
 ## Navigation
 
-Use `GlobalActivityStarter` (from `navigation-api`) to navigate between activities. Never construct or start an Intent directly — the starter keeps navigation decoupled across modules.
+Navigate between activities with `GlobalActivityStarter` (from `navigation-api`). Never construct or
+start an Intent directly — the starter keeps navigation decoupled across modules.
 
-### Registering a screen
+**Do not** use `startIntent()` + `launcher.launch(intent)` — use `startForResult()` instead.
+`startIntent()` returns a nullable `Intent` and `launch(null)` crashes.
 
-Define an `ActivityParams` type and annotate the activity. Anvil codegen generates the mapper automatically.
+Registering a screen, the overloads and deeplink support: `.claude/docs/navigation.md`.
 
-```kotlin
-// In the feature's -api module
-data class MyScreenParams(val id: String) : GlobalActivityStarter.ActivityParams
-
-// In the feature's -impl module
-@ContributeToActivityStarter(MyScreenParams::class)
-class MyActivity : DuckDuckGoActivity() {
-    private val params by lazy { intent.getActivityParams(MyScreenParams::class.java) }
-}
-```
-
-Use `screenName` to opt into deeplink support:
-```kotlin
-@ContributeToActivityStarter(MyScreenParams::class, screenName = "myScreen")
-```
-
-### Starting a screen — choose the right overload
-
-For `ActivityParams`:
-
-| Situation | Use |
-|---|---|
-| Fire and forget | `globalActivityStarter.start(context, params)` |
-| Need a result back | `globalActivityStarter.startForResult(context, params, launcher)` |
-| Need the raw `Intent` (e.g. `PendingIntent` for a notification) | `globalActivityStarter.startIntent(context, params)` |
-
-Each takes an optional trailing `options: Bundle?`, and each has a `DeeplinkActivityParams`
-counterpart for deeplink entry points.
-
-**Do not** use `startIntent()` + `launcher.launch(intent)` — use `startForResult()` instead. The `startIntent()` path returns a nullable `Intent` and calling `launch(null)` will crash.
-
-`FLAG_ACTIVITY_NEW_TASK` is added automatically when `context` is not an `Activity` (Services, broadcast receivers, JS message handlers, etc.) — do not add it manually.
-
----
-
-## URL vs. Search Classification
-
-Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** use `UriString.isWebUrl()` for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
-
-```kotlin
-private fun isNavigate(query: String): Boolean =
-    if (queryUrlPredictor.isReady()) {
-        queryUrlPredictor.classify(query) is Decision.Navigate
-    } else {
-        UriString.isWebUrl(query)  // fallback while native lib initialises
-    }
-```
-
-- `Decision` is a sealed interface with `Navigate(url)` and `Search(query)` — both are data classes.
-- `isReady()` is false briefly at startup while the native library loads; always guard with a `UriString.isWebUrl` fallback.
-- `QueryUrlPredictor` lives in `browser-api` and is injectable at `AppScope`. `Decision` is exported transitively via `browser-api`'s `api` dep on `url-predictor-android`.
+Deciding whether typed input is a URL or a search query: `.claude/docs/url-classification.md`
+(`UriString.isWebUrl()` is not the answer).
 
 ---
 

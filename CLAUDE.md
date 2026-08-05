@@ -16,6 +16,25 @@ Notable libraries: Room, Retrofit/OkHttp/Moshi, Coroutines, Jetpack Compose (sel
 
 ---
 
+## Privacy invariants for anything leaving the device
+
+This is a privacy browser; these hold for every outbound value — pixels, wide events, logs, crash
+reports, debug output — not just telemetry you are deliberately designing.
+
+- **No PII.** Never emails, names, account IDs, usernames or phone numbers, in a name or a value.
+- **No URLs, domains or page titles.** Breakage reports are the one controlled exception, with explicit
+  user consent.
+- **No correlation IDs.** No session IDs, GUIDs or exact timestamps — anything that links events to one
+  user session.
+- **Bucket numeric values.** Exact durations, byte counts and item counts fingerprint users; send ranges.
+- **Bounded enums over free-form strings.** High-cardinality unbounded strings are both a privacy risk
+  and unanalysable.
+
+Adding or changing a pixel or the pixel registry also requires privacy triage — see
+`.claude/docs/pixels.md`.
+
+---
+
 ## Read these when the situation applies
 
 These files are not in context. Read the whole file before doing the work it covers — don't rely on
@@ -30,6 +49,10 @@ what you remember of it.
 | `.claude/docs/wide-events.md` | instrumenting a multi-step flow with `WideEventClient` |
 | `.claude/docs/pixel-definitions.md` | writing or editing the pixel/wide-event definition JSON in `PixelDefinitions/` |
 | `.claude/docs/maestro-ui-tests.md` | writing or running Maestro UI tests, incl. remote config patches |
+| `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're adding `@InjectWith` |
+| `.claude/docs/navigation.md` | adding a screen, registering it for navigation, or picking a `GlobalActivityStarter` overload |
+| `.claude/docs/url-classification.md` | routing typed input to navigation vs search |
+| `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet |
 
 ---
 

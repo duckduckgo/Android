@@ -75,7 +75,9 @@ what changed.
 | Rule doc | Code areas it describes |
 |---|---|
 | `.claude/docs/wide-events.md` | `**/wideevents/**`, `**/*WideEvent*.kt`, the wide-events API/impl modules |
-| `.claude/rules/architecture.md` | DI scopes/annotations, module `-api`/`-impl` conventions, navigation |
+| `.claude/rules/architecture.md` | DI scopes/annotations, module `-api`/`-impl` conventions, lint-enforced conventions |
+| `.claude/docs/dagger-scopes.md` | the Anvil-generated subcomponents and `injectorFactoryMap` lookups |
+| `.claude/docs/navigation.md`, `.claude/docs/url-classification.md` | `GlobalActivityStarter`, `@ContributeToActivityStarter`, `QueryUrlPredictor` |
 | `.claude/docs/plugin-system.md` | `@ContributesPluginPoint` / `@ContributesActivePluginPoint` codegen and validation |
 | `.claude/docs/lateinit-hazards.md` | `@Inject lateinit var` in Views, `@InjectWith(ViewScope::class)` |
 | `.claude/rules/android-design-system.md` | the design-system module, ADS components, theme attrs |

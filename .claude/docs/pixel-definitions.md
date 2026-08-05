@@ -218,21 +218,14 @@ Some products use a separate `wide_events/definitions/` directory with a hierarc
 }
 ```
 
-#### Wire Format vs Schema Type (do NOT flag)
+#### Wire format is not the schema type
 
-The pixel/wide-event transport stringifies every value when serializing to URL parameters. Tests therefore assert string values for parameters of every type. This is purely a transport detail — it has nothing to do with the declared schema type, and the ingest pipeline coerces values back to their declared types.
+The transport stringifies every value into URL parameters, so tests assert strings for parameters of
+every type and the ingest pipeline coerces them back. `boolean`, `integer` and `number` are therefore
+all valid declared types, and a test asserting `"true"` or `"5000"` is not evidence of a wrong type.
 
-Do NOT flag a `"type"` declaration as wrong on the basis that:
-- A test asserts the wire value as a string (e.g. asserting `params["...free_trial_eligible"] == "true"` or `params["...latency_ms_bucketed"] == "5000"`).
-- The value appears as a string in a URL parameter, log, or pixel request.
-- The same conceptual field is defined with a different type in a different schema file (e.g. a legacy `pixels/definitions/*.json5` params definition uses `"type": "string"` with `enum: ["true", "false"]` while the corresponding `wide_events/definitions/*.json5` uses `"type": "boolean"`). The two schemas describe different layers and are allowed to diverge.
-
-The following non-string types are valid in both pixel parameter definitions and wide-event definitions even though the wire format stringifies them:
-- `"type": "boolean"` — values `true` / `false` (sent as `"true"` / `"false"`).
-- `"type": "integer"` — values like `5000` (sent as `"5000"`).
-- `"type": "number"` — values like `1.5` (sent as `"1.5"`).
-
-If you are tempted to flag a `boolean`/`integer`/`number` type because the value "is actually a string on the wire", do not flag it. Apply the same logic uniformly: if `account_creation_latency_ms_bucketed` is allowed to be `"type": "integer"` despite the test asserting `"5000"`, then `free_trial_eligible` is allowed to be `"type": "boolean"` despite the test asserting `"true"`.
+The same field may also be declared differently in `pixels/definitions/*.json5` and
+`wide_events/definitions/*.json5` — those describe different layers and are allowed to diverge.
 
 ### Wide Event Definition Checklist
 
@@ -240,10 +233,9 @@ When defining a wide event, ensure:
 
 - `feature.status` includes all possible terminal states (`SUCCESS`, `FAILURE`, `CANCELLED`, `UNKNOWN` as applicable)
 - A `last_step` field is defined for flows that can fail or end unexpectedly
-- All latency parameters use bucketed values, not raw milliseconds
 - Custom fields under `feature.data.ext.*` use bounded enums where possible
-- No PII or high-cardinality unbounded strings appear in any field
 - Error field `failure_reason` is included when the flow can end with `FAILURE` status
+- The CLAUDE.md privacy invariants hold for every field (no PII, bucketed numbers, bounded enums)
 - Sample rate is documented
 
 ## Expiry Dates

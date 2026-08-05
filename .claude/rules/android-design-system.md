@@ -121,6 +121,9 @@ CTAs) · `?attr/daxColorDestructive` · `?attr/daxColorLines` (dividers)
 In Kotlin: `context.getColorFromAttr(R.attr.daxColorPrimaryText)`.
 In a vector drawable that must follow the theme: `android:fillColor="?attr/daxColorPrimaryIcon"`.
 
+Adding an icon the project doesn't have yet: read `.claude/docs/icons.md` — it must be fetched from the
+internal Icons repository, never invented.
+
 ---
 
 ## Spacing
@@ -140,14 +143,3 @@ mapped back to the right resource:
 | `@dimen/keyline_7` | 48dp |
 
 Defined in `design-system-dimensions.xml`.
-
----
-
-## Icons
-
-- Source icons from the internal DDG Icons repository: https://dub.duckduckgo.com/duckduckgo/Icons
-- Keep the SVG file name as close to the original as possible, and import as a vector asset
-- An icon used by one feature belongs in that feature's `-impl` module, not `common-ui`
-
-**When a new icon is needed:** ask the user for the icon name, then fetch it from the Icons
-repository. Do not guess icon names or skip this step.
