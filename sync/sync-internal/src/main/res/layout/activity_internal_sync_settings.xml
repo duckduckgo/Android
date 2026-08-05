@@ -260,6 +260,13 @@
             app:showSwitch="true"
             app:primaryText="canWriteUnifiedDeviceList" />
 
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canReadUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canReadUnifiedDeviceList" />
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/migrationStatusTextView"
             android:layout_width="match_parent"
