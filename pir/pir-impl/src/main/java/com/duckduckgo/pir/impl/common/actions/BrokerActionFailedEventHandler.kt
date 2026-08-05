@@ -59,7 +59,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
          * This means we have received an error from the JS layer for the last action we pushed.
          * We end the run for the broker.
          */
-        if (!isEventValid(state)) {
+        if (!isEventValid(state, event as BrokerActionFailed)) {
             // Stale event: arrived after the broker step / action was already considered completed.
             val broker = state.brokerStep.broker
 
@@ -74,7 +74,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
 
         val currentBrokerStep = state.brokerStep
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
-        val error = (event as BrokerActionFailed).error
+        val error = event.error
 
         // A condition action reports a failure (JsActionFailed, or a local timeout) when its expectation
         // is not met. For a condition that is expected rather than fatal: treat it as "condition not met"
@@ -140,11 +140,18 @@ class BrokerActionFailedEventHandler @Inject constructor(
         )
     }
 
-    private fun isEventValid(state: State): Boolean {
+    private fun isEventValid(
+        state: State,
+        event: BrokerActionFailed,
+    ): Boolean {
         // Broker step actions has probably been considered completed before the js error arrived
         if (state.brokerStep.step.actions.size <= state.currentActionIndex) return false
 
-        return true
+        val currentBrokerStepAction =
+            state.brokerStep.step.actions[state.currentActionIndex]
+
+        // The action IDs don't match, the error is probably for an outdated / old action
+        return !(event.error is PirError.ActionError && event.error.actionID != currentBrokerStepAction.id)
     }
 
     private fun shouldRetryFailedAction(
