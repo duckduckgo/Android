@@ -255,12 +255,24 @@ class DialogRenderEngineTest {
     }
 
     @Test
-    fun `a bound screen's own resize snaps on a snapped render`() = runTest {
+    fun `a resize a snapped entrance asks for snaps too`() = runTest {
+        content.afterFade = {
+            content.boundScope?.animateCardBounds?.invoke(500L)
+            mock()
+        }
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
+
+        assertTrue(cardStage.boundsTransitionsMs.isEmpty())
+    }
+
+    @Test
+    fun `a bound screen's own resize still tweens once a snapped render is on stage`() = runTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
 
         content.boundScope?.animateCardBounds?.invoke(400L)
 
-        assertTrue(cardStage.boundsTransitionsMs.isEmpty())
+        assertEquals(listOf(400L), cardStage.boundsTransitionsMs)
     }
 
     @Test
@@ -275,6 +287,17 @@ class DialogRenderEngineTest {
         testee.skipRunningAnimations()
 
         assertTrue(cardStage.boundsTransitionsMs.isEmpty())
+    }
+
+    @Test
+    fun `a bound screen's own resize still tweens once a skipped entrance is on stage`() = runTest {
+        cardStage.autoComplete = false
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+        testee.skipRunningAnimations()
+
+        content.boundScope?.animateCardBounds?.invoke(400L)
+
+        assertEquals(listOf(400L), cardStage.boundsTransitionsMs)
     }
 
     @Test
