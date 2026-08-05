@@ -48,10 +48,6 @@ import com.duckduckgo.mobile.android.R as CommonR
 /**
  * The mode tabs are the only write path into the state; everything mode-dependent renders from the collector,
  * so a tab tap and a replayed value take the same path.
- *
- * Legacy wraps each mode switch in a `beginDelayedTransition` on the shared card view so the field resizes
- * smoothly between the one-line search input and the three-line chat input. A binder has no handle on the card,
- * so the field snaps to its new size instead.
  */
 class InputScreenPreviewBinder(
     private val binding: IncludeBrandDesignInputScreenPreviewBinding,
@@ -87,7 +83,14 @@ class InputScreenPreviewBinder(
         }
         inputModeToggle.addOnTabSelectedListener(tabListener)
         scope.coroutineScope.launch {
+            var appliedIsSearchSelected = state.value.isSearchSelected
             state.collect {
+                // The field is one line in search and three in chat, so switching modes resizes the card. The
+                // replayed first value is already applied above, and re-emissions of the same mode do not resize.
+                if (it.isSearchSelected != appliedIsSearchSelected) {
+                    appliedIsSearchSelected = it.isSearchSelected
+                    scope.animateCardBounds(MODE_SWITCH_DURATION_MS)
+                }
                 applyMode(content, it.isSearchSelected, scope)
                 val target = if (it.isSearchSelected) SEARCH_TAB_INDEX else CHAT_TAB_INDEX
                 if (inputModeToggle.selectedTabPosition != target) {
@@ -101,7 +104,7 @@ class InputScreenPreviewBinder(
         ContentHandle(
             title = inputScreenPreviewTitle,
             fadeTargets = listOfNotNull(inputModeToggle.takeIf { content.showModeToggle }, inputModeDemoCard),
-            afterFade = { suggestionButtonsAnimator() },
+            afterFade = { suggestionButtonsAnimator(scope) },
             onContentReady = { showKeyboardIfRoom() },
             unbind = { inputModeToggle.removeOnTabSelectedListener(tabListener) },
         )
@@ -183,8 +186,10 @@ class InputScreenPreviewBinder(
      * intercepting touches as the entrance starts, so a button revealed here would otherwise be tappable while
      * still invisible.
      */
-    private fun suggestionButtonsAnimator(): Animator {
+    private fun suggestionButtonsAnimator(scope: BindScope): Animator {
         val buttons = suggestionButtons()
+        // The buttons enter from gone, so the card grows as they are shown; tween it instead of jumping a frame.
+        scope.animateCardBounds(SUGGESTION_FADE_DURATION_MS)
         buttons.forEach {
             it.alpha = 0f
             it.isClickable = false
@@ -231,6 +236,7 @@ class InputScreenPreviewBinder(
         const val CHAT_TAB_INDEX = 1
         const val CHAT_INPUT_LINES = 3
         const val SUGGESTION_FADE_DURATION_MS = 500L
+        const val MODE_SWITCH_DURATION_MS = 400L
         const val SUGGESTIONS_START_DELAY_MS = 500L
         const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
     }

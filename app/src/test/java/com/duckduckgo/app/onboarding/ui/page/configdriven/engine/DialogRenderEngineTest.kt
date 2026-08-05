@@ -246,6 +246,38 @@ class DialogRenderEngineTest {
     }
 
     @Test
+    fun `a bound screen's own resize tweens the card's bounds`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        content.boundScope?.animateCardBounds?.invoke(400L)
+
+        assertEquals(listOf(400L), cardStage.boundsTransitionsMs)
+    }
+
+    @Test
+    fun `a bound screen's own resize snaps on a snapped render`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
+
+        content.boundScope?.animateCardBounds?.invoke(400L)
+
+        assertTrue(cardStage.boundsTransitionsMs.isEmpty())
+    }
+
+    @Test
+    fun `a resize a settling entrance asks for snaps rather than outliving the skip`() = runTest {
+        content.afterFade = {
+            content.boundScope?.animateCardBounds?.invoke(500L)
+            mock()
+        }
+        cardStage.autoComplete = false
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        testee.skipRunningAnimations()
+
+        assertTrue(cardStage.boundsTransitionsMs.isEmpty())
+    }
+
+    @Test
     fun `content ready runs once the entrance settles, not before`() = runTest {
         var readyCount = 0
         content.onContentReady = { readyCount++ }
@@ -394,6 +426,7 @@ private class FakeContentController : ContentController {
     var onContentReady: (() -> Unit)? = null
     var handleResult: (() -> NewUserOnboardingEvent)? = null
     var unbindCount = 0
+    var boundScope: BindScope? = null
 
     override fun resetStage() {
         stageReset = true
@@ -401,6 +434,7 @@ private class FakeContentController : ContentController {
 
     override fun bind(stepId: LinearOnboardingStepId, content: ContentConfig, scope: BindScope): ContentHandle {
         bindCount++
+        boundScope = scope
         return ContentHandle(
             title = null,
             fadeTargets = emptyList(),
@@ -425,6 +459,7 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     var fadeCount = 0
     val animateFlags = mutableListOf<Boolean>()
     val revealDelaysMs = mutableListOf<Long>()
+    val boundsTransitionsMs = mutableListOf<Long>()
 
     private val pending = mutableListOf<() -> Unit>()
     private var primary: CtaConfig? = null
@@ -438,6 +473,10 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     override fun morph(animate: Boolean, onEnd: () -> Unit) {
         record("morph")
         stage(animate, onEnd)
+    }
+
+    override fun beginBoundsTransition(durationMs: Long) {
+        boundsTransitionsMs += durationMs
     }
 
     override fun fadeInContent(contentTargets: List<View>, animate: Boolean, onEnd: () -> Unit) {
