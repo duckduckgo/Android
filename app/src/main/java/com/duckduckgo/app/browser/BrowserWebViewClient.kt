@@ -82,6 +82,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.performance.PerfTracer
+import com.duckduckgo.common.utils.performance.trace
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -105,6 +106,12 @@ import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
 private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
+
+private const val TRACE_ON_PAGE_STARTED = "ddg.onPageStarted"
+private const val TRACE_ON_PAGE_FINISHED = "ddg.onPageFinished"
+private const val TRACE_JS_INJECT_ON_PAGE_STARTED = "ddg.jsInject.onPageStarted"
+private const val TRACE_INTERCEPT_REQUEST = "ddg.interceptRequest"
+private const val TRACE_INTERCEPT_REQUEST_MAIN_HOP = "ddg.interceptRequest.mainHop"
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -523,52 +530,56 @@ class BrowserWebViewClient @Inject constructor(
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
         pageLoadTraceMarker.onPageStarted(url)
 
-        pageCommitVisibleFired = false
-        recompositeScheduled = false
+        perfTracer.trace(TRACE_ON_PAGE_STARTED) {
+            pageCommitVisibleFired = false
+            recompositeScheduled = false
 
-        // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
-        if (url != null && interceptAppSchemeUrl(webView, url)) {
-            logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
-            return
-        }
+            // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
+            if (url != null && interceptAppSchemeUrl(webView, url)) {
+                logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
+                return@trace
+            }
 
-        lastInterceptedAppSchemeUrl = null
+            lastInterceptedAppSchemeUrl = null
 
-        url?.let {
-            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != ABOUT_BLANK && start == null) {
-                start = currentTimeProvider.elapsedRealtime()
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadWideEvent.onPageStarted(tabId, it)
+            url?.let {
+                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+                if (it != ABOUT_BLANK && start == null) {
+                    start = currentTimeProvider.elapsedRealtime()
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        pageLoadWideEvent.onPageStarted(tabId, it)
+                    }
+                    incrementAndTrackLoad() // increment the request counter
+                    requestInterceptor.onPageStarted(url)
                 }
-                incrementAndTrackLoad() // increment the request counter
-                requestInterceptor.onPageStarted(url)
-            }
 
-            handleMediaPlayback(webView, it)
-            autoconsent.injectAutoconsent(webView, url)
-            adClickManager.detectAdDomain(url)
+                handleMediaPlayback(webView, it)
+                autoconsent.injectAutoconsent(webView, url)
+                adClickManager.detectAdDomain(url)
 
-            val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return@let
-            scope.launch(dispatcherProvider.io()) {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri(), browserMode)
+                val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return@let
+                scope.launch(dispatcherProvider.io()) {
+                    thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri(), browserMode)
+                }
             }
-        }
-        val navigationList = webView.safeCopyBackForwardList() ?: return
+            val navigationList = webView.safeCopyBackForwardList() ?: return@trace
 
-        appCoroutineScope.launch(dispatcherProvider.main()) {
-            val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
-            jsPlugins.getPlugins().forEach {
-                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                val activeExperiments = contentScopeExperiments.getActiveExperiments()
+                webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+                perfTracer.trace(TRACE_JS_INJECT_ON_PAGE_STARTED) {
+                    jsPlugins.getPlugins().forEach {
+                        it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+                    }
+                }
             }
+            if (url != null && url == lastPageStarted) {
+                webViewClientListener?.pageRefreshed(url)
+            }
+            lastPageStarted = url
+            browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
+            loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         }
-        if (url != null && url == lastPageStarted) {
-            webViewClientListener?.pageRefreshed(url)
-        }
-        lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
-        loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
     override fun doUpdateVisitedHistory(
@@ -633,75 +644,77 @@ class BrowserWebViewClient @Inject constructor(
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         pageLoadTraceMarker.onPageFinished(url, webView.progress)
 
-        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-        if (webView.progress == 100) {
-            // Without onPageCommitVisible a recycled WebView keeps drawing the previous
-            // navigation's frame until a re-composite. Only worth doing for a foreground tab.
-            // onPageFinished can fire more than once per load (redirects, subframes), so latch
-            // to force at most one re-composite per navigation (reset in onPageStarted).
-            if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired && !recompositeScheduled) {
-                if (isForceRecompositeEnabled.get() && webViewClientListener?.isTabInForeground() == true) {
-                    logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
-                    recompositeScheduled = true
-                    forceWebViewPresent(webView)
+        perfTracer.trace(TRACE_ON_PAGE_FINISHED) {
+            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+            if (webView.progress == 100) {
+                // Without onPageCommitVisible a recycled WebView keeps drawing the previous
+                // navigation's frame until a re-composite. Only worth doing for a foreground tab.
+                // onPageFinished can fire more than once per load (redirects, subframes), so latch
+                // to force at most one re-composite per navigation (reset in onPageStarted).
+                if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired && !recompositeScheduled) {
+                    if (isForceRecompositeEnabled.get() && webViewClientListener?.isTabInForeground() == true) {
+                        logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
+                        recompositeScheduled = true
+                        forceWebViewPresent(webView)
+                    }
                 }
-            }
 
-            jsPlugins.getPlugins().forEach {
-                it.onPageFinished(
-                    webView,
-                    url,
-                    webViewClientListener?.getSite(),
-                )
-            }
+                jsPlugins.getPlugins().forEach {
+                    it.onPageFinished(
+                        webView,
+                        url,
+                        webViewClientListener?.getSite(),
+                    )
+                }
 
-            url?.let {
-                // We call this for any url but it will only be processed for an internal tester verification url
-                internalTestUserChecker.verifyVerificationCompleted(it)
-            }
+                url?.let {
+                    // We call this for any url but it will only be processed for an internal tester verification url
+                    internalTestUserChecker.verifyVerificationCompleted(it)
+                }
 
-            val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.run {
-                pageFinished(webView, WebViewNavigationState(navigationList), url)
-            }
-            flushCookies(webView)
-            printInjector.injectPrint(webView)
+                val navigationList = webView.safeCopyBackForwardList() ?: return@trace
+                webViewClientListener?.run {
+                    pageFinished(webView, WebViewNavigationState(navigationList), url)
+                }
+                flushCookies(webView)
+                printInjector.injectPrint(webView)
 
-            if (url != null && url != ABOUT_BLANK) {
-                start?.let { safeStart ->
-                    val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        pageLoadWideEvent.onPageLoadFinished(
-                            tabId = tabId,
+                if (url != null && url != ABOUT_BLANK) {
+                    start?.let { safeStart ->
+                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                        webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                            pageLoadWideEvent.onPageLoadFinished(
+                                tabId = tabId,
+                                url = url,
+                                errorDescription = null,
+                                isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                            )
+                        }
+
+                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                        pageLoadedHandler.onPageLoaded(
                             url = url,
-                            errorDescription = null,
+                            title = navigationList.currentItem?.title,
+                            start = safeStart,
+                            end = currentTimeProvider.elapsedRealtime(),
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                             activeRequestsOnLoadStart = parallelRequestsOnStart,
                             concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                         )
-                    }
-
-                    // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                    pageLoadedHandler.onPageLoaded(
-                        url = url,
-                        title = navigationList.currentItem?.title,
-                        start = safeStart,
-                        end = currentTimeProvider.elapsedRealtime(),
-                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                        activeRequestsOnLoadStart = parallelRequestsOnStart,
-                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                    )
-                    shouldSendPagePaintedPixel(webView = webView, url = url)
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
-                            duckPlayer.duckPlayerNavigatedToYoutube()
+                        shouldSendPagePaintedPixel(webView = webView, url = url)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                duckPlayer.duckPlayerNavigatedToYoutube()
+                            }
                         }
+                        uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+
+                        webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
+
+                        start = null
                     }
-                    uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
-
-                    webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
-
-                    start = null
                 }
             }
         }
@@ -742,19 +755,23 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? =
         runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) {
-                if (request.method == "POST") {
-                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            perfTracer.trace(TRACE_INTERCEPT_REQUEST) {
+                val documentUrl = withContext(dispatcherProvider.main()) {
+                    perfTracer.trace(TRACE_INTERCEPT_REQUEST_MAIN_HOP) {
+                        if (request.method == "POST") {
+                            loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                        }
+                        webView.url
+                    }
                 }
-                webView.url
+                logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
+                requestInterceptor.shouldIntercept(
+                    request,
+                    webView,
+                    documentUrl?.toUri(),
+                    webViewClientListener,
+                )
             }
-            logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
-            requestInterceptor.shouldIntercept(
-                request,
-                webView,
-                documentUrl?.toUri(),
-                webViewClientListener,
-            )
         }
 
     override fun onRenderProcessGone(
