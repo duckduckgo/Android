@@ -41,6 +41,9 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.duckduckgo.mobile.android.R as CommonR
@@ -83,16 +86,14 @@ class InputScreenPreviewBinder(
         }
         inputModeToggle.addOnTabSelectedListener(tabListener)
         scope.coroutineScope.launch {
-            var appliedIsSearchSelected = state.value.isSearchSelected
-            state.collect {
+            state.map { it.isSearchSelected }.distinctUntilChanged().collectIndexed { index, isSearchSelected ->
                 // The field is one line in search and three in chat, so switching modes resizes the card. The
-                // replayed first value is already applied above, and re-emissions of the same mode do not resize.
-                if (it.isSearchSelected != appliedIsSearchSelected) {
-                    appliedIsSearchSelected = it.isSearchSelected
+                // replayed first value is already applied above, so only a later switch resizes anything.
+                if (index > 0) {
                     scope.animateCardBounds(MODE_SWITCH_DURATION_MS)
                 }
-                applyMode(content, it.isSearchSelected, scope)
-                val target = if (it.isSearchSelected) SEARCH_TAB_INDEX else CHAT_TAB_INDEX
+                applyMode(content, isSearchSelected, scope)
+                val target = if (isSearchSelected) SEARCH_TAB_INDEX else CHAT_TAB_INDEX
                 if (inputModeToggle.selectedTabPosition != target) {
                     inputModeToggle.getTabAt(target)?.select()
                 }
