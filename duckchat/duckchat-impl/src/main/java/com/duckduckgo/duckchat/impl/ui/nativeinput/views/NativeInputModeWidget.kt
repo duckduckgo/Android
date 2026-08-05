@@ -1301,20 +1301,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
         if (isContextualWidget) return
         val state = nativeInputState ?: return
-        if (state.inputContext != NativeInputState.InputContext.BROWSER) return
-        if (state.isBottom) return
-        if (state.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
-        card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-        val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-        val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-        val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
-        (card.layoutParams as? MarginLayoutParams)?.let { lp ->
+        val lp = card.layoutParams as? MarginLayoutParams ?: return
+        // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
+        // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
+        if (state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible && !state.isBottom) {
+            val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
+            val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+            val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+            card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
             lp.topMargin = targetTopMargin - card.paddingTop
             lp.marginStart = targetStartMargin - card.paddingLeft
             lp.marginEnd = targetEndMargin - card.paddingRight
-            card.layoutParams = lp
+        } else {
+            // Reset the start margin so the omnibar value doesn't leak onto the shared Duck.ai card.
+            lp.marginStart = 0
         }
+        card.layoutParams = lp
     }
 
     override fun bindInputEvents(
