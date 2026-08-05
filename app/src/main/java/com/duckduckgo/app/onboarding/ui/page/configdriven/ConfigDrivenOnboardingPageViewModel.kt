@@ -423,17 +423,14 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             // If there's no new dialog to draw (e.g. we're displaying a system prompt), keep the current one.
             // None only when there was never anything to keep.
             _viewState.update { state -> if (state.screen == null) state.copy(screen = Screen.None) else state }
-            advancePastUnrenderedDialog(dialog)
+            handleCommandOnlyDialog(dialog)
         }
     }
 
     /**
-     * Handle commands and dialogs the renderer doesn't support yet by advancing past them, without reporting
-     * them as presented.
-     *
-     * Temporary until all dialogs are implemented in the renderer.
+     * Handler for dialogs that have no card, only a side effect.
      */
-    private suspend fun advancePastUnrenderedDialog(dialog: NewUserOnboardingActivityDialog) {
+    private suspend fun handleCommandOnlyDialog(dialog: NewUserOnboardingActivityDialog) {
         when (dialog) {
             NewUserOnboardingActivityDialog.NotificationPermission -> {
                 if (!notificationPermissionFlowStarted) {
@@ -460,23 +457,18 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.AddToDock -> emit(NewUserOnboardingEvent.ContinueClicked)
-
-            NewUserOnboardingActivityDialog.WidgetPrompt -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
-
-            is NewUserOnboardingActivityDialog.QuickSetup -> emit(
-                NewUserOnboardingEvent.QuickSetupConfirmed(type = OmnibarType.SINGLE_TOP, withAi = true),
-            )
-
             NewUserOnboardingActivityDialog.SyncRestore,
             NewUserOnboardingActivityDialog.InitialReinstallUser,
             NewUserOnboardingActivityDialog.Initial,
-            NewUserOnboardingActivityDialog.InputScreen,
-            is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
+            NewUserOnboardingActivityDialog.AddToDock,
+            NewUserOnboardingActivityDialog.WidgetPrompt,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
+            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreenPreview,
+            is NewUserOnboardingActivityDialog.QuickSetup,
             -> Unit
         }
     }
