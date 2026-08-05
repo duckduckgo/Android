@@ -46,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -82,6 +83,9 @@ class RealPirRepositoryTest {
         whenever(mockDatabase.userProfileDao()).thenReturn(mockUserProfileDao)
         whenever(mockDatabase.extractedProfileDao()).thenReturn(mockExtractedProfileDao)
         whenever(mockBrokerJsonDao.getAllBrokersCount()).thenReturn(0)
+        doAnswer { it.getArgument<Runnable>(0).run() }
+            .whenever(mockDatabase)
+            .runInTransaction(any<Runnable>())
 
         testee = RealPirRepository(
             dispatcherProvider = coroutineRule.testDispatcherProvider,

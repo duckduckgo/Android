@@ -556,28 +556,34 @@ class RealPirRepository(
                 return@withContext
             }
 
+            val db = database.await() ?: return@withContext
+            val userProfileDao = db.userProfileDao()
+            val dao = db.extractedProfileDao()
             val profileQueryId = extractedProfiles.first().profileQueryId
-            val profileQuery = userProfileDao()?.getUserProfile(profileQueryId)
-            if (profileQuery?.deprecated == true) {
-                // we should not store any new extracted profiles for a deprecated user profile
-                // also don't mark them as deprecated as we still want to show them on the UI
-                return@withContext
-            }
 
-            val dao = extractedProfileDao() ?: return@withContext
-            val storedProfiles = extractedProfiles
-                .map { it.brokerName }
-                .distinct()
-                .flatMap { dao.getExtractedProfilesForBrokerAndProfile(it, profileQueryId) }
-                .map { it.toExtractedProfile() }
-                .associateBy { it.storageKey() }
+            db.runInTransaction(
+                Runnable {
+                    if (userProfileDao.getUserProfile(profileQueryId)?.deprecated == true) {
+                        // we should not store any new extracted profiles for a deprecated user profile
+                        // also don't mark them as deprecated as we still want to show them on the UI
+                        return@Runnable
+                    }
 
-            val (alreadyStored, newlyFound) = extractedProfiles.partition { it.storageKey() in storedProfiles }
+                    val storedProfiles = extractedProfiles
+                        .map { it.brokerName }
+                        .distinct()
+                        .flatMap { dao.getExtractedProfilesForBrokerAndProfile(it, profileQueryId) }
+                        .map { it.toExtractedProfile() }
+                        .associateBy { it.storageKey() }
 
-            dao.insertNewExtractedProfiles(newlyFound.map { it.toStoredExtractedProfile() })
-            dao.updateExtractedProfiles(
-                alreadyStored.map { scraped ->
-                    storedProfiles.getValue(scraped.storageKey()).refreshedWith(scraped).toStoredExtractedProfile()
+                    val (alreadyStored, newlyFound) = extractedProfiles.partition { it.storageKey() in storedProfiles }
+
+                    dao.insertNewExtractedProfiles(newlyFound.map { it.toStoredExtractedProfile() })
+                    dao.updateExtractedProfiles(
+                        alreadyStored.map { scraped ->
+                            storedProfiles.getValue(scraped.storageKey()).refreshedWith(scraped).toStoredExtractedProfile()
+                        },
+                    )
                 },
             )
         }
@@ -887,17 +893,6 @@ class RealPirRepository(
             },
         )
 
-    /**
-     * Identifies a record within the unique index on the extracted profiles table.
-     */
-    private data class ExtractedProfileStorageKey(
-        val profileQueryId: Long,
-        val brokerName: String,
-        val name: String,
-        val profileUrl: String,
-        val identifier: String,
-    )
-
     private fun ExtractedProfile.storageKey(): ExtractedProfileStorageKey =
         ExtractedProfileStorageKey(
             profileQueryId = this.profileQueryId,
@@ -1017,6 +1012,17 @@ class RealPirRepository(
     private suspend fun extractedProfileDao(): ExtractedProfileDao? = database.await()?.extractedProfileDao()
 
     private suspend fun userProfileDao(): UserProfileDao? = database.await()?.userProfileDao()
+
+    /**
+     * Identifies a record within the unique index on the extracted profiles table.
+     */
+    private data class ExtractedProfileStorageKey(
+        val profileQueryId: Long,
+        val brokerName: String,
+        val name: String,
+        val profileUrl: String,
+        val identifier: String,
+    )
 
     companion object {
         private const val EMAIL_DATA_BATCH_SIZE = 100
