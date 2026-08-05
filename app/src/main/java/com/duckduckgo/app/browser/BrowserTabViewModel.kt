@@ -2572,12 +2572,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun evaluateDuckAIPage(url: String?) {
         url?.let {
-            if (duckAiFeatureState.showFullScreenMode.value) {
-                if (duckChat.isDuckChatUrl(Uri.parse(it))) {
-                    command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
-                } else {
-                    command.value = Command.DuckAIFullScreenDisabled(url)
-                }
+            if (duckChat.isDuckChatUrl(Uri.parse(it))) {
+                command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
+            } else {
+                command.value = Command.DuckAIFullScreenDisabled(url)
             }
         }
     }
@@ -5536,35 +5534,21 @@ class BrowserTabViewModel @Inject constructor(
     /**
      * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
      * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
-     * selected. Under fullscreen mode the query opens in a new tab so the current tab is
-     * preserved; on the NTP we reuse the empty tab instead of spawning another. Outside
-     * fullscreen mode we fall back to the legacy Intent-based path.
+     * selected. The query opens in a new tab so the current tab is preserved; on the NTP we
+     * reuse the empty tab instead of spawning another.
      */
     fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
-        if (!duckAiFeatureState.showFullScreenMode.value) {
-            if (autoPrompt) {
-                duckChat.openDuckChatWithAutoPrompt(query)
-            } else {
-                duckChat.openDuckChatWithPrefill(query)
-            }
-            return
-        }
         navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
     }
 
     /**
      * Entry point for "open an existing Duck.ai chat" from the unified input — taps on a
      * chat-history suggestion which already carries a Duck.ai URL with the chatId. Same
-     * new-tab-or-stay-on-NTP rule as [openDuckAiQuery]; outside fullscreen mode the URL is
-     * routed through the normal submit path which lands in the legacy Intent flow.
+     * new-tab-or-stay-on-NTP rule as [openDuckAiQuery].
      */
     fun openDuckAiChatById(chatUrl: String) {
         browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
-        if (!duckAiFeatureState.showFullScreenMode.value) {
-            onUserSubmittedQuery(chatUrl)
-            return
-        }
         navigateToDuckAi(chatUrl)
     }
 
@@ -5637,15 +5621,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onDuckChatMenuClicked() {
-        viewModelScope.launch {
-            command.value = HideKeyboardForChat
-            val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
-        }
-        duckChat.openDuckChat()
-    }
-
     fun collectPageContext() {
         viewModelScope.launch {
             val subscriptionEvent = pageContextJSHelper.collectPageContext()
@@ -5679,7 +5654,7 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = Command.ShowDuckAIContextualMode(tabId)
             }
 
-            duckAiFeatureState.showFullScreenMode.value -> {
+            else -> {
                 val url = when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
                     hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
@@ -5687,15 +5662,6 @@ class BrowserTabViewModel @Inject constructor(
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
                 onUserSubmittedQuery(url)
-            }
-
-            else -> {
-                when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> onUserSubmittedQuery(query ?: "")
-                    hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
-                    else -> duckChat.openDuckChat()
-                }
             }
         }
     }

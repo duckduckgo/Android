@@ -183,8 +183,6 @@ class TabSwitcherViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
-
     private lateinit var testee: TabSwitcherViewModel
 
     private var tabList = listOf(
@@ -207,7 +205,6 @@ class TabSwitcherViewModelTest {
         whenever(mockTabSwitcherPrefsDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
-        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
@@ -864,29 +861,25 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
+    fun `when Duck Chat menu item clicked and it wasn't used before then send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         testee.onDuckAIButtonClicked()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "0"))
-        verify(duckChatMock).openDuckChat()
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it was used before then open Duck Chat and send a pixel`() = runTest {
+    fun `when Duck Chat menu item clicked and it was used before then send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
 
         testee.onDuckAIButtonClicked()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
-        verify(duckChatMock).openDuckChat()
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and fullscreen mode enabled then new tab created and screen closed`() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-
+    fun `when Duck Chat menu item clicked then new tab created and screen closed`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
