@@ -77,6 +77,7 @@ class DuckChatContextualViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val contextualSheetImprovementsToggle: Toggle = mock()
+    private val contextualSuggestedPromptsToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
@@ -89,6 +90,8 @@ class DuckChatContextualViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatFeature.contextualSuggestedPrompts()).thenReturn(contextualSuggestedPromptsToggle)
+        whenever(contextualSuggestedPromptsToggle.isEnabled()).thenReturn(true)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(

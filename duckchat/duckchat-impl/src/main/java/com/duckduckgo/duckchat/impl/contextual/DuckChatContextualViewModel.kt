@@ -202,6 +202,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
                     showChatsIcon = isContextualSheetImprovementsEnabled,
+                    contextualSuggestionsEnabled = duckChatFeature.contextualSuggestedPrompts().isEnabled(),
                 )
             }
             if (isContextualSheetImprovementsEnabled) {
@@ -252,6 +253,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val recentChats: List<ChatHistoryItem> = emptyList(),
         val nativeChatInputEnabled: Boolean = false,
         val contextualNativeInputEnabled: Boolean = false,
+        val contextualSuggestionsEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {

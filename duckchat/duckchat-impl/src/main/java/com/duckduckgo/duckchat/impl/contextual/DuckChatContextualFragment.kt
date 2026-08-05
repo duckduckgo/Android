@@ -47,6 +47,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.setFragmentResult
@@ -125,6 +126,7 @@ import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class DuckChatContextualFragment :
@@ -245,6 +247,9 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
+                    if (!imeVisible) {
+                        reserveSpaceForSuggestions()
+                    }
                     val composerHasFocus = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                         binding.contextualNativeInputWidget.hasFocus()
                     } else {
@@ -264,6 +269,9 @@ class DuckChatContextualFragment :
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.onSheetClosed()
+                }
+                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                    bottomSheet.requestLayout()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
                 updateContentAreaHeight()
@@ -538,6 +546,28 @@ class DuckChatContextualFragment :
         configureBehaviour(bottomSheetBehavior)
         configureButtons()
         configureSuggestions()
+        binding.contextualModeRoot.doOnNextLayout { reserveSpaceForSuggestions() }
+        binding.contextualInputContainer.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) reserveSpaceForSuggestions()
+        }
+    }
+
+    private fun reserveSpaceForSuggestions() {
+        if (!viewModel.viewState.value.contextualSuggestionsEnabled) return
+        if (isKeyboardVisible) return
+        val sheet = binding.contextualModeRoot.parent as? View ?: return
+        val coordinatorHeight = (sheet.parent as? View)?.height?.takeIf { it > 0 } ?: return
+        val prompts = binding.contextualModePrompts.getChildAt(0) ?: return
+        val cardHeight = binding.contextualPromptQuickAction.height + resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+        val reservedSpace = binding.contextualModeButtons.height + binding.contextualInputContainer.height +
+            prompts.paddingTop + prompts.paddingBottom + MAX_PROMPT_CARDS * cardHeight
+        val ratio = (reservedSpace.toFloat() / coordinatorHeight).coerceIn(HALF_EXPANDED_RATIO, MAX_HALF_EXPANDED_RATIO)
+        if (bottomSheetBehavior.halfExpandedRatio != ratio) {
+            bottomSheetBehavior.halfExpandedRatio = ratio
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                sheet.requestLayout()
+            }
+        }
     }
 
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -573,7 +603,8 @@ class DuckChatContextualFragment :
         val sheet = binding.contextualModeRoot.parent as? View ?: return
         val coordinatorHeight = (sheet.parent as? View)?.height ?: return
         if (coordinatorHeight <= 0) return
-        val visibleSheetHeight = (coordinatorHeight - sheet.top).coerceAtLeast(0)
+        val halfExpandedHeight = (coordinatorHeight * bottomSheetBehavior.halfExpandedRatio).toInt()
+        val visibleSheetHeight = (coordinatorHeight - sheet.top).coerceAtLeast(halfExpandedHeight)
         val chromeHeight = binding.contextualModeButtons.height + binding.contextualInputContainer.height
         val contentHeight = (visibleSheetHeight - chromeHeight).coerceAtLeast(0)
         // Size the middle to the visible sheet minus header + input, so the input sits on the visible edge.
@@ -1300,6 +1331,8 @@ class DuckChatContextualFragment :
 
     companion object {
         private const val HALF_EXPANDED_RATIO = 0.5f
+        private const val MAX_HALF_EXPANDED_RATIO = 0.9f
+        private const val MAX_PROMPT_CARDS = 4
         private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
