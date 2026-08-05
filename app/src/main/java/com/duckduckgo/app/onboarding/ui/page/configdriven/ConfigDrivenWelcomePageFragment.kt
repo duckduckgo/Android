@@ -60,6 +60,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBo
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.toPx
@@ -312,7 +313,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             is ConfigDrivenOnboardingPageViewModel.Command.ShowDefaultBrowserDialog ->
                 defaultBrowserRoleManagerDialog.launch(command.intent)
             ConfigDrivenOnboardingPageViewModel.Command.LaunchAddWidgetPrompt ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
+                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.ONBOARDING)
             ConfigDrivenOnboardingPageViewModel.Command.Finish -> onContinuePressed()
             is ConfigDrivenOnboardingPageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
