@@ -77,6 +77,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.performance.PerfTracer
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
@@ -205,6 +206,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
         webTrackersBlockedDao: WebTrackersBlockedDao,
+        perfTracer: PerfTracer,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -227,6 +229,7 @@ class BrowserModule {
             appCoroutineScope,
             isMainProcess,
             webTrackersBlockedDao,
+            perfTracer,
         )
 
     @Provides

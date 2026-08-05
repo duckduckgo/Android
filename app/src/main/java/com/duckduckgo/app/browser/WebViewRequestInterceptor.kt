@@ -45,6 +45,8 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
+import com.duckduckgo.common.utils.performance.PerfTracer
+import com.duckduckgo.common.utils.performance.trace
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
@@ -90,6 +92,21 @@ interface RequestInterceptor {
     fun addExemptedMaliciousSite(url: Uri, feed: Feed)
 }
 
+// Sub-sections of ddg.interceptRequest. The enclosing section shows that ~73% of per-request time is
+// interception logic rather than waiting; these split that share by the fix each part would need.
+private const val TRACE_MALICIOUS_SITE = "ddg.intercept.maliciousSite"
+private const val TRACE_AD_CLICK = "ddg.intercept.adClick"
+private const val TRACE_HTTPS_UPGRADE = "ddg.intercept.httpsUpgrade"
+private const val TRACE_DUCK_PLAYER = "ddg.intercept.duckPlayer"
+private const val TRACE_TRACKER_EVAL = "ddg.intercept.trackerEval"
+private const val TRACE_CNAME_DETECT = "ddg.intercept.cnameDetect"
+private const val TRACE_RECORD_BLOCKED = "ddg.intercept.recordBlocked"
+
+// Main-thread hops beyond the document-URL read already covered by ddg.interceptRequest.mainHop.
+private const val TRACE_HOP_USER_AGENT = "ddg.intercept.hop.userAgent"
+private const val TRACE_HOP_HTTPS_REDIRECT = "ddg.intercept.hop.httpsRedirect"
+private const val TRACE_HOP_GPC = "ddg.intercept.hop.gpc"
+
 class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
@@ -111,6 +128,7 @@ class WebViewRequestInterceptor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
+    private val perfTracer: PerfTracer = PerfTracer.NONE,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -153,8 +171,10 @@ class WebViewRequestInterceptor(
         val urlString = url.toString()
 
         if (!checkMaliciousAfterHttpsUpgrade) {
-            maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
-                handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+            perfTracer.trace(TRACE_MALICIOUS_SITE) {
+                maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+                    handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+                }
             }.let {
                 if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
             }
@@ -162,12 +182,14 @@ class WebViewRequestInterceptor(
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUrlString)) return WebResourceResponse(null, null, null)
 
-        adClickManager.detectAdClick(urlString, request.isForMainFrame)
+        perfTracer.trace(TRACE_AD_CLICK) { adClickManager.detectAdClick(urlString, request.isForMainFrame) }
 
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
-                webView.settings?.userAgentString = it
-                webView.loadUrl(urlString, getHeaders(request))
+                perfTracer.trace(TRACE_HOP_USER_AGENT) {
+                    webView.settings?.userAgentString = it
+                    webView.loadUrl(urlString, getHeaders(request))
+                }
             }
             return WebResourceResponse(null, null, null)
         }
@@ -175,10 +197,12 @@ class WebViewRequestInterceptor(
         if (appUrlPixel(url)) return null
 
         if (shouldUpgrade(request)) {
-            val newUri = url?.let { httpsUpgrader.upgrade(url) }
+            val newUri = perfTracer.trace(TRACE_HTTPS_UPGRADE) { url?.let { httpsUpgrader.upgrade(url) } }
 
             withContext(dispatchers.main()) {
-                webView.loadUrl(newUri.toString(), getHeaders(request))
+                perfTracer.trace(TRACE_HOP_HTTPS_REDIRECT) {
+                    webView.loadUrl(newUri.toString(), getHeaders(request))
+                }
             }
 
             webViewClientListener?.upgradedToHttps()
@@ -187,21 +211,25 @@ class WebViewRequestInterceptor(
         }
 
         if (checkMaliciousAfterHttpsUpgrade) {
-            maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
-                handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+            perfTracer.trace(TRACE_MALICIOUS_SITE) {
+                maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+                    handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+                }
             }.let {
                 if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
             }
         }
 
         if (url != null) {
-            duckPlayer.intercept(request, url, webView)?.let { return it }
+            perfTracer.trace(TRACE_DUCK_PLAYER) { duckPlayer.intercept(request, url, webView) }?.let { return it }
         }
 
         if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
-                webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(urlString, getHeaders(request))
+                perfTracer.trace(TRACE_HOP_GPC) {
+                    webViewClientListener?.redirectTriggeredByGpc()
+                    webView.loadUrl(urlString, getHeaders(request))
+                }
             }
             return WebResourceResponse(null, null, null)
         }
@@ -228,7 +256,9 @@ class WebViewRequestInterceptor(
             return null
         }
 
-        return getWebResourceResponse(request, documentUri, webViewClientListener)
+        return perfTracer.trace(TRACE_TRACKER_EVAL) {
+            getWebResourceResponse(request, documentUri, webViewClientListener)
+        }
     }
 
     override fun shouldOverrideUrlLoading(
@@ -353,16 +383,18 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.status == TrackerStatus.BLOCKED) {
-            recordTrackerBlocked(trackingEvent)
+            perfTracer.trace(TRACE_RECORD_BLOCKED) { recordTrackerBlocked(trackingEvent) }
             return blockRequest(trackingEvent, request, webViewClientListener)
         } else if (trackingEvent == null ||
             trackingEvent.status == TrackerStatus.ALLOWED ||
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
-            cloakedCnameDetector.detectCnameCloakedHost(documentUrl.toString(), request.url)?.let { uncloakedHost ->
+            perfTracer.trace(TRACE_CNAME_DETECT) {
+                cloakedCnameDetector.detectCnameCloakedHost(documentUrl.toString(), request.url)
+            }?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
-                        recordTrackerBlocked(cloakedTrackingEvent)
+                        perfTracer.trace(TRACE_RECORD_BLOCKED) { recordTrackerBlocked(cloakedTrackingEvent) }
                         return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
                     }
                 }

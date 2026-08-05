@@ -110,6 +110,8 @@ private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "java
 private const val TRACE_ON_PAGE_STARTED = "ddg.onPageStarted"
 private const val TRACE_ON_PAGE_FINISHED = "ddg.onPageFinished"
 private const val TRACE_JS_INJECT_ON_PAGE_STARTED = "ddg.jsInject.onPageStarted"
+private const val TRACE_ACTIVE_EXPERIMENTS = "ddg.contentScope.getActiveExperiments"
+private const val TRACE_PAGE_STARTED_LISTENER = "ddg.pageStartedListener"
 private const val TRACE_INTERCEPT_REQUEST = "ddg.interceptRequest"
 private const val TRACE_INTERCEPT_REQUEST_MAIN_HOP = "ddg.interceptRequest.mainHop"
 private const val COUNTER_INTERCEPT_MAIN_HOP_WAIT_US = "ddg.interceptRequest.mainHopWaitUs"
@@ -566,8 +568,15 @@ class BrowserWebViewClient @Inject constructor(
             val navigationList = webView.safeCopyBackForwardList() ?: return@trace
 
             appCoroutineScope.launch(dispatcherProvider.main()) {
-                val activeExperiments = contentScopeExperiments.getActiveExperiments()
-                webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+                // Page start awaits this before content scope can be injected, and resolving it walks every
+                // feature toggle in the app — so it sits on the injection critical path even though it is
+                // neither part of the handler body nor of the plugin loop.
+                val activeExperiments = perfTracer.trace(TRACE_ACTIVE_EXPERIMENTS) {
+                    contentScopeExperiments.getActiveExperiments()
+                }
+                perfTracer.trace(TRACE_PAGE_STARTED_LISTENER) {
+                    webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+                }
                 perfTracer.trace(TRACE_JS_INJECT_ON_PAGE_STARTED) {
                     jsPlugins.getPlugins().forEach {
                         it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)

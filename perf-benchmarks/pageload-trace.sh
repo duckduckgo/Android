@@ -200,10 +200,23 @@ cmd_analyze() {
   }'
   hr
 
+  # Splits the "interception logic" share above by the fix each part would need. Sections nest, so
+  # trackerEval contains cnameDetect and recordBlocked -- read them as a hierarchy, not a sum.
+  echo "INTERCEPTION SUB-SECTIONS (ms)"
+  q "$t" "SELECT name, COUNT(*) AS n, ROUND(AVG(dur)/1e6,3) AS mean, ROUND(SUM(dur)/1e6,1) AS total,
+                 ROUND(MAX(dur)/1e6,2) AS max
+          FROM slice WHERE name GLOB 'ddg.intercept.*'
+          GROUP BY name ORDER BY SUM(dur) DESC;" \
+    | awk -F, '{gsub(/"/,"",$1); printf "  %-36s n=%-6s mean %-8.3f total %8.1f  max %.2f\n", $1, $2, $3+0, $4+0, $5+0}'
+  [ -n "$(q "$t" "SELECT 1 FROM slice WHERE name GLOB 'ddg.intercept.*' LIMIT 1;")" ] \
+    || echo "  (none -- build predates the sub-section instrumentation)"
+  hr
+
   echo "CONTENT SCOPE (ms, max per load where cached)"
   q "$t" "SELECT name, COUNT(*), ROUND(AVG(dur)/1e6,2), ROUND(MAX(dur)/1e6,2)
           FROM slice WHERE name IN ('ddg.contentScope.getScript','ddg.contentScope.dispatchJavascript',
-                                    'ddg.jsInject.onPageStarted')
+                                    'ddg.contentScope.getActiveExperiments','ddg.jsInject.onPageStarted',
+                                    'ddg.pageStartedListener')
           GROUP BY name ORDER BY name;" \
     | awk -F, '{gsub(/"/,"",$1); printf "  %-38s n=%-5s mean %-9.2f max %.2f\n", $1, $2, $3+0, $4+0}'
 

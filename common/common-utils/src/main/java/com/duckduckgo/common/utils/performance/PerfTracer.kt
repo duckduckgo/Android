@@ -57,6 +57,33 @@ interface PerfTracer {
         name: String,
         value: Int,
     )
+
+    companion object {
+        /**
+         * Null object for constructing instrumented classes outside the DI graph — long-parameter
+         * classes built by hand in tests, where tracing is irrelevant. Production always receives the
+         * flavor's bound implementation; never reach for this in `src/main`.
+         */
+        val NONE: PerfTracer = object : PerfTracer {
+            override fun isEnabled(): Boolean = false
+
+            override fun beginSection(name: String) = Unit
+
+            override fun endSection() = Unit
+
+            override fun beginAsyncSection(name: String): Int = 0
+
+            override fun endAsyncSection(
+                name: String,
+                cookie: Int,
+            ) = Unit
+
+            override fun counter(
+                name: String,
+                value: Int,
+            ) = Unit
+        }
+    }
 }
 
 inline fun <T> PerfTracer.trace(
