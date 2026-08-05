@@ -1,6 +1,6 @@
 ---
 description: |
-  Catches semantic drift between the AI-docs files (AGENTS.md, CLAUDE.md, .cursor/rules/*.mdc) and the
+  Catches semantic drift between the AI-docs files (AGENTS.md, CLAUDE.md, .claude/rules/*.md) and the
   code they describe — the kind a deterministic check can't see. Surveys recent develop activity, and when
   a rule's described behaviour no longer matches the code it documents, opens a draft PR fixing the doc.
 
@@ -49,9 +49,8 @@ doc. You never merge PRs yourself.
 ## What is and isn't your job
 
 The `aiConfigCheck` Gradle task (a required check on every PR) already covers the **deterministic** half:
-- CLAUDE.md imports AGENTS.md (`@AGENTS.md`) and indexes every `.cursor/rules/*.mdc`,
+- CLAUDE.md imports AGENTS.md (`@AGENTS.md`) and indexes every `.claude/rules/*.md`,
 - file/module references in the docs resolve (no dangling references),
-- `.cursor/rules` ↔ `.claude/rules` symlink parity and `.claude/skills` ↔ `.cursor/skills` skill-mirror parity,
 - AGENTS.md states no hardcoded tool versions (they live in the build files and are pointed to).
 
 Do not re-do any of that — if it were broken, CI would already be red.
@@ -75,11 +74,11 @@ what changed.
 
 | Rule doc | Code areas it describes |
 |---|---|
-| `.cursor/rules/wide-events.mdc` | `**/wideevents/**`, `**/*WideEvent*.kt`, the wide-events API/impl modules |
-| `.cursor/rules/architecture.mdc` | DI scopes/annotations, the plugin system, module `-api`/`-impl` conventions |
-| `.cursor/rules/android-design-system.mdc` | the design-system module, ADS components, theme attrs |
-| `.cursor/rules/pixels.mdc`, `pixel-definitions.mdc` | pixel senders, pixel-definition JSON |
-| `.cursor/rules/maestro-ui-tests.mdc` | `.maestro/**`, Maestro tags/config |
+| `.claude/rules/wide-events.md` | `**/wideevents/**`, `**/*WideEvent*.kt`, the wide-events API/impl modules |
+| `.claude/rules/architecture.md` | DI scopes/annotations, the plugin system, module `-api`/`-impl` conventions |
+| `.claude/rules/android-design-system.md` | the design-system module, ADS components, theme attrs |
+| `.claude/rules/pixels.md`, `pixel-definitions.md` | pixel senders, pixel-definition JSON |
+| `.claude/rules/maestro-ui-tests.md` | `.maestro/**`, Maestro tags/config |
 
 ## Workflow
 
@@ -103,8 +102,7 @@ can back with a specific code reference. If no documented area changed, there is
 ### Step 4: Open the draft PR
 
 Update only the affected rule doc(s) to match the current behaviour. Keep edits minimal and faithful to
-the code — do not rewrite beyond what drifted. Edit the `.cursor/rules/*.mdc` canonical files, never the
-`.claude/rules/*.md` symlinks.
+the code — do not rewrite beyond what drifted.
 
 Use the repo's PR template (`.github/PULL_REQUEST_TEMPLATE.md`) exactly. Do not add any content above
 the first line of the template.
@@ -138,9 +136,8 @@ If you cannot confidently tell whether a change invalidates a doc:
 
 ## Guidelines
 
-- Scope: only `AGENTS.md` and `.cursor/rules/*.mdc`. Edit the `.cursor/rules/*.mdc` canonical files,
-  never the `.claude/rules/*.md` symlinks. Never modify code.
-- Don't duplicate the gate: indexing, dangling refs, symlink/skill parity, and the AGENTS.md no-version
+- Scope: only `AGENTS.md` and `.claude/rules/*.md`. Never modify code.
+- Don't duplicate the gate: indexing, dangling refs, and the AGENTS.md no-version
   guard belong to `aiConfigCheck`; if you spot a gap there, propose adding a check to `AiConfigChecker`
   instead of fixing it here.
 - One PR per run: never open more than one `[Drift Audit]` PR in a single run.

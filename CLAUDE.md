@@ -6,13 +6,13 @@ The following rule files contain detailed guidance for specific topics. Read the
 
 | File | Covers |
 |---|---|
-| `.cursor/rules/architecture.mdc` | Module structure, dependency injection, plugin system, ViewModels, URL classification, testing, git workflow |
-| `.cursor/rules/android-design-system.mdc` | ADS components, buttons, text, inputs, switches, list items, dialogs, bottom sheets, colors, spacing, lint rules |
-| `.cursor/rules/maestro-ui-tests.mdc` | Maestro test setup, organization, tags, running locally and in CI |
-| `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
-| `.cursor/rules/dependency-updates.mdc` | How to safely update Android library dependencies |
-| `.cursor/rules/contributions.mdc` | Branch naming, commit messages, PR creation workflow |
-| `.cursor/rules/pixels.mdc` | What pixels are, when to use them, privacy requirements, telemetry best practices |
-| `.cursor/rules/pixel-definitions.mdc` | Creating and maintaining pixel definition JSON files for pixels and wide events |
+| `.claude/rules/architecture.md` | Module structure, dependency injection, plugin system, ViewModels, URL classification, testing, git workflow |
+| `.claude/rules/android-design-system.md` | ADS components, buttons, text, inputs, switches, list items, dialogs, bottom sheets, colors, spacing, lint rules |
+| `.claude/rules/maestro-ui-tests.md` | Maestro test setup, organization, tags, running locally and in CI |
+| `.claude/rules/wide-events.md` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
+| `.claude/rules/dependency-updates.md` | How to safely update Android library dependencies |
+| `.claude/rules/contributions.md` | Branch naming, commit messages, PR creation workflow |
+| `.claude/rules/pixels.md` | What pixels are, when to use them, privacy requirements, telemetry best practices |
+| `.claude/rules/pixel-definitions.md` | Creating and maintaining pixel definition JSON files for pixels and wide events |
 
 ---
