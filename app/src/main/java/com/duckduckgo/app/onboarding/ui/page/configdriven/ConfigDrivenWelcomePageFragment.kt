@@ -93,12 +93,10 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
 
-    private var hasRenderedOnce = false
-
     private val requestNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (view?.windowVisibility == View.VISIBLE) {
-            viewModel.notificationPermissionFlowFinished(granted)
-        }
+        // A result pending across a recreation is dispatched before the new view is attached to the window, so gating
+        // this on the view would swallow it and leave the flow parked on this step for good.
+        viewModel.notificationPermissionFlowFinished(granted)
     }
 
     private val defaultBrowserRoleManagerDialog = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -235,14 +233,15 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         // Once the first dialog arrives, if:
         // - intro visuals on screen: clear them and the background cross-fades from them
         // - no intro visual on screen (like a mid-flow re-entry from another activity): nothing to animate from, snap new background
-        // Later renders always animate the background.
-        val animateBackground = if (hasRenderedOnce) {
-            screen.animateEntry
-        } else {
-            hasRenderedOnce = true
-            (intro?.clearForFirstDialog() ?: false) && screen.animateEntry
-        }
-        engine.render(screen.stepId, screen.config, animate = screen.animateEntry, animateBackground = animateBackground)
+        // Later renders always animate the background. The handover is unconditional so that a render which does not
+        // animate still takes the background off the choreographer.
+        val canCrossFadeBackground = intro?.clearForDialog() == true
+        engine.render(
+            screen.stepId,
+            screen.config,
+            animate = screen.animateEntry,
+            animateBackground = canCrossFadeBackground && screen.animateEntry,
+        )
         viewModel.onDialogRendered(screen.stepId)
     }
 
@@ -285,7 +284,6 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         engine = null
         intro?.release()
         intro = null
-        hasRenderedOnce = false
     }
 
     private companion object {

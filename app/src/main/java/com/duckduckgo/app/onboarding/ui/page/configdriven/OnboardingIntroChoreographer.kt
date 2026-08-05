@@ -39,6 +39,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 /**
  * One-time welcome intro/outro choreography for [ConfigDrivenWelcomePageFragment].
+ *
+ * Drives `backgroundPrimary` until [clearForDialog] hands that view to the render engine's `BackgroundController`,
+ * which owns it from then on, so the two never animate it at the same time.
  */
 class OnboardingIntroChoreographer(
     private val binding: ContentOnboardingWelcomePageUpdateBinding,
@@ -48,11 +51,7 @@ class OnboardingIntroChoreographer(
     private var outroAnimatorSet: AnimatorSet? = null
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
 
-    private var visualsOnScreen = false
-
-    private var cleared = false
-
-    private var released = false
+    private val state = OnboardingIntroState()
 
     init {
         binding.logoAnimation.apply {
@@ -186,10 +185,10 @@ class OnboardingIntroChoreographer(
     }
 
     fun play(withDuckAi: Boolean, onFinished: () -> Unit) {
-        visualsOnScreen = true
+        state.play()
         // The animators measure the title's laid-out width and the screen height.
         binding.root.doOnLayout {
-            if (!released) startIntroAnimation(withDuckAi, onFinished)
+            if (state.canStart()) startIntroAnimation(withDuckAi, onFinished)
         }
     }
 
@@ -199,8 +198,7 @@ class OnboardingIntroChoreographer(
      * @return true when this call put visuals on screen, false when they are there already.
      */
     fun restore(withDuckAi: Boolean): Boolean {
-        if (visualsOnScreen) return false
-        visualsOnScreen = true
+        if (!state.restore()) return false
         snapIntroViews()
         if (withDuckAi) {
             prepareDuckAiIntroAnimation()
@@ -214,21 +212,25 @@ class OnboardingIntroChoreographer(
     }
 
     /**
-     * Clears the intro for the arriving first dialog: fades the visuals out when they are on screen, snaps them away
-     * when this view never showed them.
+     * Hands `backgroundPrimary` to an arriving dialog: fades the intro visuals out when they are on screen, snaps them
+     * away when this view never showed them, and does nothing once an earlier dialog has taken over. Safe to call for
+     * every dialog.
      *
-     * @return true if there were intro visuals on screen to fade
+     * @return true when the dialog's background can cross-fade from what is on screen
      */
-    fun clearForFirstDialog(): Boolean {
-        if (cleared) return visualsOnScreen
-        cleared = true
-        if (visualsOnScreen) {
-            settleRunningIntro()
-            playOutro()
-        } else {
-            snapToOutroEndState()
+    fun clearForDialog(): Boolean {
+        val handover = state.handOverToDialog()
+        when (handover) {
+            OnboardingIntroState.Handover.FadeOut -> {
+                settleRunningIntro()
+                playOutro()
+            }
+            OnboardingIntroState.Handover.SnapAway -> snapToOutroEndState()
+            OnboardingIntroState.Handover.AlreadyDismissed,
+            OnboardingIntroState.Handover.AlreadyHandedOver,
+            -> Unit
         }
-        return visualsOnScreen
+        return handover.canCrossFadeBackground
     }
 
     private fun settleRunningIntro() {
@@ -250,9 +252,7 @@ class OnboardingIntroChoreographer(
      * Does nothing if the intro was already on screen or has been cleared.
      */
     fun dismissUnplayed() {
-        if (visualsOnScreen || cleared) return
-        cleared = true
-        snapToOutroEndState()
+        if (state.dismissUnplayed()) snapToOutroEndState()
     }
 
     private fun startIntroAnimation(withDuckAi: Boolean, onFinished: () -> Unit) {
@@ -375,7 +375,7 @@ class OnboardingIntroChoreographer(
     }
 
     fun release() {
-        released = true
+        state.release()
         introAnimatorSet?.removeAllListeners()
         introAnimatorSet?.cancel()
         introAnimatorSet = null
