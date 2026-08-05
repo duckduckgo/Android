@@ -205,3 +205,6 @@ import logcat.logcat   // correct
 - Test files mirror the class: `RealFoo.kt` → `RealFooTest.kt`
 - No coroutine test setup needed for pure logic classes
 - `RobolectricTestRunner` is banned in `@RunWith` (lint)
+
+UI tests are Maestro flows under `.maestro/`, grouped by feature area; the conventions for writing and
+running them are in `.claude/rules/maestro-ui-tests.md`.

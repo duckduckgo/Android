@@ -1,3 +1,9 @@
+---
+description: Instrumenting a multi-step user journey with WideEventClient — flowStart/flowStep/flowFinish, FlowStatus, sampling, CleanupPolicy, and the registry entry a new wide event needs.
+paths:
+  - "**/wideevents/**"
+  - "**/*WideEvent*.kt"
+---
 # Wide Events
 
 Wide events measure a user's complete journey through a multi-step flow, sending a single event when the journey concludes. Use them when a flow has multiple steps that can succeed or fail independently and you need to understand drop-off and errors across the whole journey.
@@ -159,3 +165,16 @@ You don't need to think about transport — just call `flowFinish` and the infra
 ## Feature Flag
 
 Wide events are gated by the `wideEvents` remote feature (`WideEventFeature` in `statistics-impl`). Individual features should also guard their wide event calls behind their own feature flag to avoid sending events when a feature is disabled.
+
+---
+
+## A new wide event needs a registry entry
+
+Code alone is not enough — a wide event with no definition fails the pixel validation CI check.
+
+- Add `PixelDefinitions/pixels/definitions/wide_<name>.json5`, keyed on the pixel name
+  `wide_<kebab-name>`, carrying the payload through the `widePixel*` parameters plus inline
+  `feature.*` / `context.*` keys. The schema and the checklist are in
+  `.claude/rules/pixel-definitions.md`.
+- Apply the `privacy review required` label to the PR — the wide-event definitions live in the pixel
+  registry, so the same privacy triage applies. See `.claude/docs/pixels.md`.

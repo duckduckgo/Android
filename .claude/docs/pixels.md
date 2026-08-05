@@ -64,7 +64,7 @@ Every pixel fired in code **must** have a corresponding entry in a definition fi
 - Match the format of existing entries in the same file
 
 For the definition-file schema, the dictionaries, and the local validation commands, read
-`.claude/docs/pixel-definitions.md`.
+`.claude/rules/pixel-definitions.md`.
 
 ## Privacy Review & Triage
 
@@ -88,4 +88,4 @@ Use a **wide event** rather than a pixel when:
 
 Use **both** when a wide event makes sense but the journey spans a long time period where waiting for completion would delay monitoring.
 
-For designing and implementing wide events, read `.claude/docs/wide-events.md`.
+For designing and implementing wide events, read `.claude/rules/wide-events.md`.

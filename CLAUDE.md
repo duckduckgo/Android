@@ -45,10 +45,7 @@ what you remember of it.
 | `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules — it needs an approved API Proposal and/or Tech Design, and that has to be raised before implementation, not at PR time. Also read it when naming a branch, writing a commit, or opening a PR |
 | `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
-| `.claude/docs/pixels.md` | adding or changing pixel telemetry |
-| `.claude/docs/wide-events.md` | instrumenting a multi-step flow with `WideEventClient` |
-| `.claude/docs/pixel-definitions.md` | writing or editing the pixel/wide-event definition JSON in `PixelDefinitions/` |
-| `.claude/docs/maestro-ui-tests.md` | writing or running Maestro UI tests, incl. remote config patches |
+| `.claude/docs/pixels.md` | adding or changing pixel telemetry — including whether a pixel or a wide event is the right instrument |
 | `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're adding `@InjectWith` |
 | `.claude/docs/navigation.md` | adding a screen, registering it for navigation, or picking a `GlobalActivityStarter` overload |
 | `.claude/docs/url-classification.md` | routing typed input to navigation vs search |
