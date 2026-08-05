@@ -155,6 +155,18 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
+    fun `when page context lacks content then suggestions are not re-targeted`() = runTest {
+        val tailored = ContextualSuggestedPrompt("key-takeaways", "What are the key takeaways?", "Key takeaways?", "summary")
+        stubProvider(listOf(tailored))
+        viewModel.onPageContextUpdated("""{"title":"Page A","url":"https://a.com","content":"a content"}""")
+
+        viewModel.onPageContextUpdated("""{"title":"Page B","url":"https://b.com"}""")
+
+        assertEquals(listOf(tailored), viewModel.viewState.value.suggestions)
+        verify(suggestedPromptsProvider, times(1)).resolveSuggestions(any())
+    }
+
+    @Test
     fun `when page context is not valid json then it is ignored`() = runTest {
         viewModel.load()
         coroutineRule.testDispatcher.scheduler.runCurrent()
