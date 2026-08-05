@@ -54,10 +54,16 @@ class RealContentScopeScriptsTest {
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
     private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
 
+    // mockAppBuildConfig.flavor is stubbed to INTERNAL below (needed for the platform key/value pair
+    // assertions), which would also flip the perf wrapper on and break the script-content assertions.
+    // The wrapper gets its own build config, stubbed to PLAY, so it stays a pass-through in this suite.
+    private val mockPerfWrapperAppBuildConfig: AppBuildConfig = mock()
+
     lateinit var testee: CoreContentScopeScripts
 
     @Before
     fun setup() {
+        whenever(mockPerfWrapperAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         testee = createTestee()
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -854,6 +860,8 @@ class RealContentScopeScriptsTest {
         mockUnprotectedTemporary,
         mockFingerprintProtectionManager,
         contentScopeScriptsFeature,
+        FakePerfTracer(),
+        ContentScopeScriptPerfWrapper(mockPerfWrapperAppBuildConfig),
     )
 
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {

@@ -18,7 +18,7 @@ class ContentScopeScriptsJsInjectorPluginTest {
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts)
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts, FakePerfTracer())
     }
 
     @Test

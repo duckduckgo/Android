@@ -19,6 +19,8 @@ package com.duckduckgo.contentscopescripts.impl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.performance.PerfTracer
+import com.duckduckgo.common.utils.performance.trace
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -61,6 +63,8 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val perfTracer: PerfTracer,
+    private val perfWrapper: ContentScopeScriptPerfWrapper,
 ) : CoreContentScopeScripts {
     // These adapters must be declared before cachedContentScopeJson.
     private val reusableMoshi: Moshi = Builder().build()
@@ -108,22 +112,23 @@ class RealContentScopeScripts @Inject constructor(
     override fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
-    ): String {
-        val optimized = optimizeInjectionEnabled()
-        // The paths keep their own change-detection baselines but write the same JSON caches, so after a
-        // mid-session flag flip a baseline no longer describes what the cache holds. Dropping both together
-        // is the only state either path can safely resume from.
-        if (lastCallWasOptimized != null && lastCallWasOptimized != optimized) {
-            resetCaches()
-        }
-        lastCallWasOptimized = optimized
+    ): String =
+        perfTracer.trace(TRACE_GET_SCRIPT) {
+            val optimized = optimizeInjectionEnabled()
+            // The paths keep their own change-detection baselines but write the same JSON caches, so after a
+            // mid-session flag flip a baseline no longer describes what the cache holds. Dropping both together
+            // is the only state either path can safely resume from.
+            if (lastCallWasOptimized != null && lastCallWasOptimized != optimized) {
+                resetCaches()
+            }
+            lastCallWasOptimized = optimized
 
-        return if (optimized) {
-            getOptimizedScript(isDesktopMode, activeExperiments)
-        } else {
-            getLegacyScript(isDesktopMode, activeExperiments)
+            if (optimized) {
+                getOptimizedScript(isDesktopMode, activeExperiments)
+            } else {
+                getLegacyScript(isDesktopMode, activeExperiments)
+            }
         }
-    }
 
     private fun resetCaches() {
         cachedPluginConfig = ""
@@ -320,7 +325,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun cacheContentScopeJS(optimized: Boolean) {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
 
-        cachedContentScopeJS = if (optimized) {
+        val assembled = if (optimized) {
             assembleContentScopeJS(contentScopeJS)
         } else {
             val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
@@ -330,6 +335,7 @@ class RealContentScopeScripts @Inject constructor(
                 .replace(USER_PREFERENCES, cachedUserPreferencesJson)
                 .replace(MESSAGING_PARAMETERS, messagingParameters)
         }
+        cachedContentScopeJS = perfWrapper.wrap(assembled)
     }
 
     private fun assembleContentScopeJS(template: String): String {
@@ -504,6 +510,7 @@ class RealContentScopeScripts @Inject constructor(
         const val USER_UNPROTECTED_DOMAINS = "\$USER_UNPROTECTED_DOMAINS$"
         const val USER_PREFERENCES = "\$USER_PREFERENCES$"
         const val MESSAGING_PARAMETERS = "\$ANDROID_MESSAGING_PARAMETERS$"
+        private const val TRACE_GET_SCRIPT = "ddg.contentScope.getScript"
 
         private fun getSecret(): String = UUID.randomUUID().toString().replace("-", "")
     }

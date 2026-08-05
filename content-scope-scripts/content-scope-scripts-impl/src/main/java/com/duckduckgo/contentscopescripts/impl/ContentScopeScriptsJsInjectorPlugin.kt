@@ -19,6 +19,8 @@ package com.duckduckgo.contentscopescripts.impl
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.utils.performance.PerfTracer
+import com.duckduckgo.common.utils.performance.trace
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -27,6 +29,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val perfTracer: PerfTracer,
 ) : JsInjectorPlugin {
     override fun onPageStarted(
         webView: WebView,
@@ -35,7 +38,10 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         activeExperiments: List<Toggle>,
     ) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+            val script = coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)
+            perfTracer.trace(TRACE_EVALUATE_JAVASCRIPT) {
+                webView.evaluateJavascript("javascript:$script", null)
+            }
         }
     }
 
@@ -45,5 +51,9 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         site: Site?,
     ) {
         // NOOP
+    }
+
+    companion object {
+        private const val TRACE_EVALUATE_JAVASCRIPT = "ddg.contentScope.evaluateJavascript"
     }
 }
