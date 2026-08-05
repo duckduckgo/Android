@@ -1,6 +1,3 @@
----
-description: Rules for creating and maintaining pixel definition JSON files that document pixels and wide events.
----
 # Pixel Registry Definitions
 
 ## Overview

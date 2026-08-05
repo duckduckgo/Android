@@ -1,9 +1,3 @@
----
-title: "Maestro UI Tests"
-description: "How we use Maestro for UI tests"
-keywords: ["maestro", "ui tests", "testing", "maestro cloud", "tags"]
----
-
 # Running Maestro UI Tests
 
 ## Prerequisites

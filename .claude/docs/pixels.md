@@ -1,6 +1,3 @@
----
-description: What pixels are, when to use them, privacy requirements, and general best practices for pixel telemetry.
----
 # Pixels
 
 Pixels are lightweight telemetry events sent via HTTP with a name and optional parameters. They are used for:

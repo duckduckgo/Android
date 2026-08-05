@@ -1,6 +1,4 @@
----
----
-# Android Architecture Rules
+# Android Architecture
 
 ## Core Principle: Decoupling Over Everything
 
@@ -18,13 +16,45 @@ my-feature/
   my-feature-impl/      ← implementation, UI, DI bindings
 ```
 
-Rules:
 - `my-feature-impl` depends on `my-feature-api`
 - `my-feature-impl` depends on other features' `-api` modules only — never their `-impl`
 - `settings.gradle` auto-discovers modules 2 levels deep — no manual `include` needed
 - New `-impl` modules must be added to `app/build.gradle` to enter the Dagger graph
 - UI resources (layouts, drawables, strings) live inside the `-impl` module, not a separate UI module
 - String resource files are named by feature: `strings-my-feature.xml` (not `strings.xml`)
+
+### Compile-time dependency rules
+
+Enforced in the root `build.gradle`. Violations fail the build.
+
+| Rule | Detail |
+|---|---|
+| API modules cannot use Anvil | No `com.squareup.anvil` plugin in `-api` modules |
+| API modules cannot depend on Dagger | Except `:feature-toggles-api` and `:settings-api` |
+| API modules cannot depend on other APIs | Except `:feature-toggles-api`, `:navigation-api`, `:js-messaging-api` |
+| API modules cannot depend on `:di` | DI wiring belongs in `-impl` |
+| Only `:app` depends on `-impl` modules | Features communicate through `-api` only |
+| `-internal` modules use `internalImplementation` | Excluded from non-internal builds (Play, F-Droid) |
+| No KAPT anywhere (except `:app`) | Use KSP for annotation processing |
+| No `strings.xml` outside `:app` | Use `strings-<feature>.xml` instead |
+| Android tests restricted | Only in: `app`, `sync-lib`, `httpsupgrade-impl`, `pir-impl`, `feature-toggles-impl` |
+| No module can depend on `:app` | App is the composition root |
+
+### Conventions enforced by lint
+
+The `lint-rules` module fails the build on these (UI/design-system rules are covered separately):
+
+- Hardcoded coroutine dispatchers — inject them instead
+- `@Singleton` — use `@SingleInstanceIn`
+- Extending `Fragment` directly — use `DuckDuckGoFragment`
+- `lifecycleScope` inside a Fragment — use `viewLifecycleOwner.lifecycleScope`
+- Registering lifecycle observers directly — drive state from a ViewModel
+- `retrofit.create()` — get the service from DI
+- `NonCancellable` when launching a coroutine
+- `postValue()` on a `SingleLiveEvent`
+- Underscores in a `RemoteFeature` name
+- Raw `WebViewCompat` APIs — use `WebViewCompatWrapper`; post messages via `PostMessageWrapperPlugin`
+- `RobolectricTestRunner` in `@RunWith`
 
 ---
 
@@ -44,41 +74,7 @@ Rules:
 
 Use `@SingleInstanceIn(AppScope::class)` — **not** `@Singleton` (javax). `@Singleton` conflicts with AppComponent's scope.
 
-### Scope hierarchy
-
-The scope hierarchy determines what dependencies each scope can access, where its factory lookup happens, and what `HasDaggerInjector` handles injection. It is encoded implicitly in the Anvil-generated `_SubComponent` files — this diagram is the source of truth:
-
-```
-DuckDuckGoApplication [HasDaggerInjector]
-└── AppComponent [AppScope]
-    │   Factory map contains: ActivityComponent.Factory, ReceiverSubComponent factories,
-    │                         ServiceSubComponent factories, VpnScope factories
-    │
-    ├── ActivityComponent [ActivityScope]  ← subcomponent of AppComponent
-    │   │   Factory map contains: FragmentSubComponent factories, ViewSubComponent factories
-    │   │   Provided bindings: @ActivityContext Context, AppCompatActivity
-    │   │
-    │   ├── EachFragment_SubComponent [FragmentScope]  ← subcomponent of ActivityComponent
-    │   └── EachView_SubComponent [ViewScope]          ← subcomponent of ActivityComponent
-    │
-    ├── EachReceiver_SubComponent [ReceiverScope]  ← subcomponent of AppComponent
-    └── EachService_SubComponent [ServiceScope]    ← subcomponent of AppComponent
-```
-
-**What this means in practice:**
-
-- `FragmentScope` and `ViewScope` subcomponents parent to `ActivityComponent`. Their factory lookup goes through `DaggerActivity.injectorFactoryMap`. A Fragment or View can access `ActivityScope` bindings (e.g. `@ActivityContext Context`).
-- `ReceiverScope` and `ServiceScope` subcomponents parent directly to `AppComponent`. Their factory lookup goes through `DuckDuckGoApplication.injectorFactoryMap`. They can only access `AppScope` bindings — there is no `@ActivityContext` available.
-- `VpnScope` types also parent to `AppComponent` and are only for the VPN secondary process.
-
-**Debugging "could not find dagger component" crashes:**
-
-- Crash in a Fragment/View injection → check `DaggerActivity.injectorFactoryMap` — the class is missing `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
-- Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap` — the class is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
-
-**The parent scope is set by the generated `ParentComponent`'s `@ContributesTo` annotation.** When Anvil processes `@InjectWith(FragmentScope::class)` on a Fragment, it generates a `ParentComponent` annotated with `@ContributesTo(ActivityScope::class)`, which causes the factory to be merged into `ActivityComponent`. For Receivers it generates `@ContributesTo(AppScope::class)`. You do not set this manually — it is determined by the scope you pass to `@InjectWith`.
-
-### Common Annotations
+### Common annotations
 
 ```kotlin
 // Singleton binding
@@ -107,6 +103,39 @@ interface MyFeature : Feature {
 
 `DefaultFeatureValue.INTERNAL` = enabled only in internal/debug builds.
 
+### Scope hierarchy
+
+The scope hierarchy determines what dependencies each scope can access, where its factory lookup happens, and what `HasDaggerInjector` handles injection. It is encoded implicitly in the Anvil-generated `_SubComponent` files — this diagram is the source of truth:
+
+```
+DuckDuckGoApplication [HasDaggerInjector]
+└── AppComponent [AppScope]
+    │   Factory map contains: ActivityComponent.Factory, ReceiverSubComponent factories,
+    │                         ServiceSubComponent factories, VpnScope factories
+    │
+    ├── ActivityComponent [ActivityScope]  ← subcomponent of AppComponent
+    │   │   Factory map contains: FragmentSubComponent factories, ViewSubComponent factories
+    │   │   Provided bindings: @ActivityContext Context, AppCompatActivity
+    │   │
+    │   ├── EachFragment_SubComponent [FragmentScope]  ← subcomponent of ActivityComponent
+    │   └── EachView_SubComponent [ViewScope]          ← subcomponent of ActivityComponent
+    │
+    ├── EachReceiver_SubComponent [ReceiverScope]  ← subcomponent of AppComponent
+    └── EachService_SubComponent [ServiceScope]    ← subcomponent of AppComponent
+```
+
+**What this means in practice:**
+
+- `FragmentScope` and `ViewScope` subcomponents parent to `ActivityComponent`. Their factory lookup goes through `DaggerActivity.injectorFactoryMap`. A Fragment or View can access `ActivityScope` bindings (e.g. `@ActivityContext Context`).
+- `ReceiverScope` and `ServiceScope` subcomponents parent directly to `AppComponent`. Their factory lookup goes through `DuckDuckGoApplication.injectorFactoryMap`. They can only access `AppScope` bindings — there is no `@ActivityContext` available.
+- `VpnScope` types also parent to `AppComponent` and are only for the VPN secondary process.
+- The parent scope follows from the scope passed to `@InjectWith`; Anvil generates the `ParentComponent` and its `@ContributesTo`. You never set it manually.
+
+**Debugging "could not find dagger component" crashes:**
+
+- Crash in a Fragment/View injection → check `DaggerActivity.injectorFactoryMap` — the class is missing `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
+- Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap` — the class is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
+
 ### Activity Context
 
 `@ActivityContext Context` and `AppCompatActivity` are provided at `ActivityScope` via `DaggerActivityScopedModule`. Inject them with:
@@ -128,160 +157,13 @@ Never pass `Context` as a parameter through an interface if DI can provide it at
 
 ---
 
-## `lateinit var` initialization hazards
-
-Reading a `lateinit var` before it has been assigned throws `UninitializedPropertyAccessException` at runtime. There is no compile-time check — only review and runtime crashes catch it. When writing or reviewing code that declares or reads a `lateinit var`, walk through these cases.
-
-### View subclasses with `@Inject lateinit var`
-
-A View annotated with `@InjectWith(ViewScope::class)` injects its `@Inject lateinit var` members inside `onAttachedToWindow()`, via `AndroidSupportInjection.inject(this)`. The fields are uninitialized between construction and attach.
-
-The trap: a parent or manager class can call a public/internal/override method on the view immediately after `addView(…)` — before the view tree is attached. If that method reads an `@Inject lateinit var` directly, it crashes.
-
-When reviewing a View subclass, treat every `public` / `internal` / `override` method that reads an `@Inject lateinit var` as suspect. It is safe only if at least one is true:
-
-- the read happens in `onAttachedToWindow()` (after `inject(this)`) or `onDetachedFromWindow()`
-- the read is inside `doOnAttach { … }` (from `androidx.core.view`)
-- the read is inside a lambda that only fires post-attach (click listener, flow collector that is `launchIn(…)` started inside `onAttachedToWindow`, `post { … }`, etc.)
-- the read is guarded by `::propertyName.isInitialized`
-- the method is `private` and every call site is one of the above (verify by checking each caller — do not assume)
-
-When in doubt, the standard fix is to wrap the body in `doOnAttach { … }`. It runs immediately if the view is already attached, and defers otherwise — same behaviour as before in the common case, no crash in the edge case.
-
-Real-world bugs caused by missing this:
-
-- **PR #8424** — `NativeInputModeWidget.configure()` / `configureContextual()` / `setWidgetPosition()` read `viewModel` (a `@Inject lateinit var`) directly; `RealNativeInputManager.attachWidget()` called them right after `addView()`, before attach. Fix: wrap each body in `doOnAttach { … }`.
-- **PR #8461** — `DuckDuckGoWebView.setContentAllowsSwipeToRefresh()` read `browserUiLockFeature` unconditionally. Fix: `if (!allowed || (::browserUiLockFeature.isInitialized && browserUiLockFeature.self().isEnabled()))`.
-- **PR #8577** — `NativeInputModeWidget.applyDefaultTogglePosition()` read injected state directly. Fix: wrap in `doOnAttach { … }`.
-
-### Construction-time reads in any class
-
-Independent of class type — even a plain Kotlin class with no DI involvement — a `lateinit var` is also uninitialized during the primary constructor's run, which includes:
-
-- property initializers (`val x = lateinitProp.foo()`)
-- `init { … }` blocks
-- secondary constructor bodies that delegate to the primary
-
-If a property initializer or init block reads a `lateinit var` before any earlier init block or initializer has assigned it, that read crashes. The order is **source declaration order**, not visual placement of the `lateinit var` declaration.
-
-```kotlin
-class Foo {
-    lateinit var bar: String
-    val length: Int = bar.length          // ❌ crash — bar not assigned yet
-    init { bar = "x" }                    // assignment runs after the val above
-}
-```
-
-```kotlin
-class Foo {
-    lateinit var bar: String
-    init { bar = "x" }                    // assigns first
-    val length: Int = bar.length          // ✓ safe — bar already assigned
-}
-```
-
-For Fragments, Activities, Services, ViewModels and other framework-managed classes, the construction-time hazard still applies even though their *regular* method bodies are safe (those run post-injection in `onAttach` / `onCreate`). Concretely:
-
-- Fragment/Activity: an `init { … }` or property initializer reading an `@Inject lateinit var` crashes — injection has not run yet. By the time `onCreate` / `onAttach` runs, the read is safe.
-- ViewModel with `@Inject constructor(…)`: prefer constructor-injected `val` for required deps. `lateinit var` on a ViewModel is a smell — if you see it, ask why it isn't a constructor parameter.
-
-The universal escape hatch — `if (::propertyName.isInitialized) { … }` — works for any class type. Reach for it only when the access really is optional. If the property is *required*, fix the initialization order instead, don't paper over it with the guard.
-
----
-
-## Plugin System
-
-Two kinds of plugin points exist. Pick based on whether you need remote feature flag control.
-
-### `@ContributesPluginPoint` — basic
-
-`PluginPoint<T>` — Dagger multibinding under the hood. Returns all registered plugins, no runtime filtering.
-
-```kotlin
-// Declare (in -api or -impl module)
-@ContributesPluginPoint(AppScope::class)
-interface MyPlugin { fun doThing() }
-
-// Contribute
-@ContributesMultibinding(AppScope::class)
-class MyPluginImpl @Inject constructor() : MyPlugin
-
-// Contribute with explicit ordering (lower value = higher priority)
-@ContributesMultibinding(AppScope::class)
-@PriorityKey(100)
-class MyPluginImpl @Inject constructor() : MyPlugin
-
-// Consume
-class Foo @Inject constructor(private val plugins: PluginPoint<MyPlugin>)
-// plugins.getPlugins() → all plugins, in priority order if @PriorityKey is used
-```
-
-### `@ContributesActivePluginPoint` — with remote feature flags + codegen
-
-`ActivePluginPoint<T>` — wraps a regular plugin point with two levels of feature-flag gating. The annotation processor generates all the boilerplate: a remote feature for the plugin point itself, a remote feature per plugin, a `MultiProcessStore`, and a wrapper that applies both guards at runtime.
-
-**Plugin point must be declared on a private interface** (the codegen is the only consumer):
-```kotlin
-// The plugin interface must extend ActivePlugin
-interface MyPlugin : ActivePlugin { fun doThing() }
-
-// Declared with a private trigger interface (in -impl)
-@ContributesActivePluginPoint(
-    scope = AppScope::class,
-    boundType = MyPlugin::class,
-    featureName = "pluginPointMyPlugin",  // required, must start with "pluginPoint"
-)
-private interface MyPluginPointTrigger
-```
-
-**Contribute a plugin:**
-```kotlin
-@ContributesActivePlugin(
-    scope = AppScope::class,
-    boundType = MyPlugin::class,
-    featureName = "pluginMyPluginImpl",            // required, must start with "plugin" (not "pluginPoint")
-    parentFeatureName = "pluginPointMyPlugin",     // required, must match an existing plugin point's featureName
-)
-class MyPluginImpl @Inject constructor() : MyPlugin {
-    // isActive() is generated — backed by its own remote feature flag
-}
-```
-
-**Consume:**
-```kotlin
-class Foo @Inject constructor(private val plugins: ActivePluginPoint<MyPlugin>)
-// plugins.getPlugins() → only plugins whose feature flag is enabled AND isActive() == true
-```
-
-**How the gating works at runtime:**
-1. If the plugin point's own `self()` toggle is OFF → `emptyList()` immediately
-2. Otherwise, filter each plugin by its individual `pluginXxx()` toggle (via `isActive()`)
-
-**Naming conventions** (enforced at compile time):
-
-| Parameter | Prefix | Example |
-|---|---|---|
-| `@ContributesActivePluginPoint.featureName` | `pluginPoint` | `"pluginPointMyPlugin"` |
-| `@ContributesActivePlugin.featureName` | `plugin` (not `pluginPoint`) | `"pluginMyPluginImpl"` |
-| `@ContributesActivePlugin.parentFeatureName` | `pluginPoint` | `"pluginPointMyPlugin"` |
-
-- `featureName` and `parentFeatureName` are **required** — blank or missing values fail the build.
-- `parentFeatureName` must match an existing `@ContributesActivePluginPoint`'s `featureName`. This is validated at compile time across modules (including sibling modules that don't depend on each other) via a sentinel/deferred-marker mechanism. A typo in `parentFeatureName` will fail the build.
-
-All flags default to `TRUE` so newly contributed plugins are on by default and can be killed remotely.
-
-### Notable active plugin points in the browser
-- `JsInjectorPlugin` — hooks into `onPageStarted` / `onPageFinished` on the browser WebView
-- `ContentScopeJsMessageHandlersPlugin` — handles JS→native messages via content scope scripts
-
----
-
 ## UI Patterns
 
 ### Activity and Fragment base classes
 
-Activities extend `DuckDuckGoActivity`, fragments extend `DuckDuckGoFragment`. These are not optional
-conveniences: they are the `DaggerActivity`/`DaggerFragment` subclasses carrying
+Activities extend `DuckDuckGoActivity`, fragments extend `DuckDuckGoFragment` (lint enforces the
+latter). These are not optional conveniences: they are the `DaggerActivity`/`DaggerFragment`
+subclasses carrying
 `@HasMemberInjections`, so a screen that extends `AppCompatActivity` or `Fragment` directly gets no
 member injection and no `viewModelFactory`. `DuckDuckGoActivity` additionally applies the stored
 theme, listens for theme changes, and handles edge-to-edge setup.
@@ -306,6 +188,9 @@ Prefer `ConflatedJob` over a raw `Job` variable or a `Map<Key, Job>` when you ne
 private var dwellJob by ConflatedJob()
 dwellJob = scope.launch { /* cancels previous */ }
 ```
+
+In a Fragment, collect on `viewLifecycleOwner.lifecycleScope`, never the Fragment's own
+`lifecycleScope` — the latter outlives the view and leaks collectors across view recreation.
 
 ---
 
@@ -335,11 +220,16 @@ Use `screenName` to opt into deeplink support:
 
 ### Starting a screen — choose the right overload
 
+For `ActivityParams`:
+
 | Situation | Use |
 |---|---|
 | Fire and forget | `globalActivityStarter.start(context, params)` |
 | Need a result back | `globalActivityStarter.startForResult(context, params, launcher)` |
 | Need the raw `Intent` (e.g. `PendingIntent` for a notification) | `globalActivityStarter.startIntent(context, params)` |
+
+Each takes an optional trailing `options: Bundle?`, and each has a `DeeplinkActivityParams`
+counterpart for deeplink entry points.
 
 **Do not** use `startIntent()` + `launcher.launch(intent)` — use `startForResult()` instead. The `startIntent()` path returns a nullable `Intent` and calling `launch(null)` will crash.
 
@@ -383,3 +273,4 @@ import logcat.logcat   // correct
 - Coroutines: `CoroutineTestRule` + `runTest { }`
 - Test files mirror the class: `RealFoo.kt` → `RealFooTest.kt`
 - No coroutine test setup needed for pure logic classes
+- `RobolectricTestRunner` is banned in `@RunWith` (lint)
