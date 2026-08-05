@@ -90,7 +90,7 @@ class PageLoadTraceMarkerTest {
 
     @Test
     fun whenPageCommitVisibleThenZeroLengthTickIsEmitted() {
-        testee.onPageCommitVisible()
+        testee.onPageCommitVisible(HTTPS_URL)
 
         assertEquals(2, tracer.asyncEvents.size)
         assertEquals("ddg.pageCommitVisible", tracer.asyncEvents[0].name)
@@ -98,6 +98,15 @@ class PageLoadTraceMarkerTest {
         assertEquals("ddg.pageCommitVisible", tracer.asyncEvents[1].name)
         assertTrue(!tracer.asyncEvents[1].begin)
         assertEquals(tracer.asyncEvents[0].cookie, tracer.asyncEvents[1].cookie)
+    }
+
+    @Test
+    fun whenNonHttpPageCommitsVisibleThenNothingIsEmitted() {
+        testee.onPageCommitVisible("about:blank")
+        testee.onPageCommitVisible(null)
+        testee.onPageCommitVisible("duck://player/1234")
+
+        assertTrue(tracer.asyncEvents.isEmpty())
     }
 
     companion object {

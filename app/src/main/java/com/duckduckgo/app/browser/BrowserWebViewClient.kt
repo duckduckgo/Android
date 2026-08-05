@@ -487,7 +487,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
-        pageLoadTraceMarker.onPageCommitVisible()
+        pageLoadTraceMarker.onPageCommitVisible(url)
         pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {

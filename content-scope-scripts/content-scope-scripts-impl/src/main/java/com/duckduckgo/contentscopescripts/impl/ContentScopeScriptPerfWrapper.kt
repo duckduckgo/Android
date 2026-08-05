@@ -66,6 +66,9 @@ class ContentScopeScriptPerfWrapper @Inject constructor(
         """.trimMargin()
 
     companion object {
-        private const val PROLOGUE = "performance.mark('ddg-cs-start');\n"
+        // Guarded because this is PREPENDED: an unguarded throw here (a page that clobbers
+        // window.performance, as anti-bot scripts do) would abort evaluation before the bundle's
+        // first statement, silently disabling every content-scope protection for that page load.
+        private const val PROLOGUE = "try { performance.mark('ddg-cs-start') } catch (e) {}\n"
     }
 }

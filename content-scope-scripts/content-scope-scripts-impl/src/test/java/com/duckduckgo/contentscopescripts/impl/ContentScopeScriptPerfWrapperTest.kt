@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -123,12 +122,39 @@ class ContentScopeScriptPerfWrapperTest {
     }
 
     @Test
-    fun whenBuildIsInternalThenBundleIsNotItselfWrappedInTryCatch() {
+    fun whenBuildIsInternalThenStartMarkIsGuardedAgainstThrowingIntoThePage() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
         val wrapped = testee.wrap(BUNDLE)
+        val beforeBundle = wrapped.substring(0, wrapped.indexOf(BUNDLE))
 
-        assertFalse(wrapped.indexOf("try {") < wrapped.indexOf(BUNDLE))
+        // The prologue is PREPENDED, so an unguarded throw here (e.g. a page that clobbers
+        // window.performance) would abort evaluation before the bundle's first statement. The try/catch
+        // must open and close around the mark call, entirely before the bundle begins.
+        val tryIndex = beforeBundle.indexOf("try {")
+        val markIndex = beforeBundle.indexOf("performance.mark('ddg-cs-start')")
+        val catchIndex = beforeBundle.indexOf("catch (e) {}")
+
+        assertTrue("try must be present before the mark call", tryIndex in 0 until markIndex)
+        assertTrue("catch must be present after the mark call, still before the bundle", catchIndex > markIndex)
+    }
+
+    @Test
+    fun whenBuildIsInternalThenBundleIsNotEnclosedInAnOpenBlock() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        val wrapped = testee.wrap(BUNDLE)
+        val bundleStart = wrapped.indexOf(BUNDLE)
+        val bundleEnd = bundleStart + BUNDLE.length
+        val beforeBundle = wrapped.substring(0, bundleStart)
+
+        // A string-literal check for "try {" can be satisfied trivially (e.g. "try{" with no space) while
+        // still leaving the bundle inside an open block. Balanced braces before the bundle is the real
+        // invariant: it proves no block — try or otherwise — is still open where the bundle begins. The
+        // guarded prologue also contains a "try {", so the epilogue's must be located by searching after
+        // the bundle, not by the first occurrence in the whole string.
+        assertEquals(beforeBundle.count { it == '{' }, beforeBundle.count { it == '}' })
+        assertTrue("the epilogue's try must still run after the bundle", wrapped.indexOf("try {", bundleEnd) > bundleEnd)
     }
 
     companion object {

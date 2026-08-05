@@ -51,7 +51,8 @@ class PageLoadTraceMarker(
         }
     }
 
-    fun onPageCommitVisible() {
+    fun onPageCommitVisible(url: String?) {
+        if (!url.isHttp()) return
         tracer.endAsyncSection(PAGE_COMMIT_VISIBLE, tracer.beginAsyncSection(PAGE_COMMIT_VISIBLE))
     }
 

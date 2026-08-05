@@ -640,7 +640,7 @@ class RealContentScopeScriptsTest {
 
         val js = perfWrapperTestee.getScript(null, listOf())
 
-        assertTrue(js.startsWith("performance.mark('ddg-cs-start');"))
+        assertTrue(js.startsWith("try { performance.mark('ddg-cs-start') } catch (e) {}"))
         assertTrue(js.trimEnd().endsWith("//# sourceURL=ddg-contentscope.js"))
     }
 
