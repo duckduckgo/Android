@@ -396,6 +396,39 @@ class BrokerActionFailedEventHandlerTest {
     }
 
     @Test
+    fun whenActionErrorCarriesMismatchedActionIdThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        // A leftover 60s local-timeout timer from an earlier action fires with that action's id
+        // while a later action is current; the stale error must not fail the current action.
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = testScanStep(
+                actions = listOf(
+                    BrokerAction.Navigate(id = "current-action-id", url = "https://example.com"),
+                ),
+            ),
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = BrokerActionFailed(
+            error = PirError.ActionError.JsActionFailed(
+                actionID = "some-other-action-id",
+                message = "Local timeout",
+            ),
+            allowRetry = true,
+        )
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
     fun whenConditionActionFailedInScanThenSkipsToNextActionInsteadOfRetryingOrFailing() = runTest {
         // A condition whose expectation is not met reports a JsActionFailed (or "Local timeout").
         // For a condition this is not fatal: skip to the next action instead of retrying then failing
