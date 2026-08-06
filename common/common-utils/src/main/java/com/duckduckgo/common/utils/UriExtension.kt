@@ -25,6 +25,8 @@ import java.net.InetAddress
 import java.net.URLEncoder
 import java.util.*
 
+const val LOCALHOST = "localhost"
+
 val IP_REGEX =
     Regex(
         "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$",
@@ -82,7 +84,7 @@ val Uri.isLocalUrl: Boolean
         if (scheme == "file") return true
 
         val host = this.host?.lowercase() ?: return false
-        if (host == "localhost") return true
+        if (host == LOCALHOST) return true
 
         // Use InetAddresses.parseNumericAddress (API 29+) which only parses numeric IPs
         // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only

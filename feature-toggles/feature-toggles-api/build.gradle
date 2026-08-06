@@ -38,5 +38,6 @@ dependencies {
     implementation "org.apache.commons:commons-math3:_"
     implementation("com.google.guava:guava:_")
     implementation KotlinX.coroutines.core
+    api project(':unified-url-model-api')
 }
 

@@ -178,6 +178,7 @@ subprojects {
                                 && dependencyPath != ":js-messaging-api"
                                 && dependencyPath != ":browser-api"
                                 && dependencyPath != ":browser-mode-api"
+                                && dependencyPath != ":unified-url-model-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"

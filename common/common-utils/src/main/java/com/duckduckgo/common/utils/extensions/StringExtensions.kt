@@ -68,7 +68,7 @@ fun String.toTldPlusOne(): String? {
  */
 fun String.toTldPlusOneOrSelf(): String = if (isIpv4Literal()) this else toTldPlusOne() ?: this
 
-private fun String.isIpv4Literal(): Boolean {
+fun String.isIpv4Literal(): Boolean {
     val octets = split('.')
     if (octets.size != 4) return false
     return octets.all { octet ->
