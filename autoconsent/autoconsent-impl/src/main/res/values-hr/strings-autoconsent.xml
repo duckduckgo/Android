@@ -29,7 +29,7 @@
     <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Možemo ti uštedjeti klik i prihvatiti ove kolačiće umjesto tebe."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Prihvati kolačiće koji se ne mogu odbiti"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Nastavit ću ih prihvaćati sam"</string>
-    <string name="autoconsentPopupTitleWithFeatureDisabled">"Umoran si od skočnih prozora kolačića koji te ne ostavljaju na miru?"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Umoran si od skočnih prozora za kolačiće koji te ne ostavljaju na miru?"</string>
     <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Pokušat ćemo odbiti što je više moguće kolačića. Ako ne postoji opcija odbijanja, uštedjet ćemo ti klik i umjesto tebe prihvatiti te kolačiće."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Odbij kada je moguće, ili prihvati umjesto mene"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Nastavit ću njima upravljati sam"</string>
