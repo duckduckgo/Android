@@ -52,6 +52,11 @@ interface ModalEvaluatorCompletionStore {
      * @return true if blocked (within 24 hours of last completion)
      */
     suspend fun isBlockedBy24HourWindow(): Boolean
+
+    /**
+     * Clears the last completion timestamp, so the next evaluation pass is not blocked by the 24-hour window.
+     */
+    suspend fun resetCooldown()
 }
 
 @ContributesBinding(AppScope::class)
@@ -94,6 +99,14 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         }
         if (timestamp == NO_COMPLETION) return false
         return System.currentTimeMillis() - timestamp < TWENTY_FOUR_HOURS_MILLIS
+    }
+
+    override suspend fun resetCooldown() {
+        lastCompletionTimestamp.set(NO_COMPLETION)
+        withContext(dispatchers.io()) {
+            val key = getKeyCompletionTimestamp()
+            store.edit { it.remove(key) }
+        }
     }
 
     private suspend fun getLastCompletionTimestamp(): Long? {
