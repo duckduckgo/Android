@@ -399,6 +399,31 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfiguredForEditThenPublishesUnderTheSyntheticKeyOnly() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+        advanceUntilIdle()
+
+        val editKey = NativeInputModeWidgetViewModel.editStateKey("session-1")
+        assertEquals(
+            NativeInputState.InputContext.DUCK_AI,
+            nativeInputStateProvider.stateForTab(editKey).value.inputContext,
+        )
+        assertEquals(
+            NativeInputState.InputContext.BROWSER,
+            nativeInputStateProvider.stateForTab("test-tab").value.inputContext,
+        )
+    }
+
+    @Test
+    fun whenConfiguredForEditThenContextIsDuckAiAndToggleIsDuckAi() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+
+        val state = testee.state.first()
+        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, state.toggleSelection)
+    }
+
+    @Test
     fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
