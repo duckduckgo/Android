@@ -299,17 +299,6 @@
     </issue>
 
     <issue
-        id="TextFields"
-        message="This text field does not specify an `inputType`"
-        errorLine1="                    &lt;EditText"
-        errorLine2="                     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="104"
-            column="22"/>
-    </issue>
-
-    <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
         errorLine1="                    &lt;EditText"
@@ -317,17 +306,6 @@
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
             line="182"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="                    &lt;EditText"
-        errorLine2="                     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="104"
             column="22"/>
     </issue>
 

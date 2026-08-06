@@ -123,14 +123,14 @@ interface DuckChatInternal : DuckChat {
     fun observeLastUsedTogglePosition(): Flow<String?>
 
     /**
-     * Updates the live input-mode selection. Called by [InputModeWidget] when its tab
+     * Updates the live input-mode selection. Called by [NativeInputModeWidget] when its tab
      * selection changes, and on attach/detach to keep [DuckChatInputModeState.displayedMode]
      * in sync with the actual widget state.
      */
     fun setSelectedMode(mode: InputMode)
 
     /**
-     * Updates the live input query. Called by [InputModeWidget] as the user types (on either tab) and
+     * Updates the live input query. Called by [NativeInputModeWidget] as the user types (on either tab) and
      * on attach/detach, to keep [DuckChatInputModeState.inputQuery] in sync with the shared input field.
      */
     fun setInputQuery(query: String)

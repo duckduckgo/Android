@@ -20,4 +20,5 @@
     <item name="startChatContainer" type="id"/>
     <item name="attachButtonContainer" type="id"/>
     <item name="optionsButtonContainer" type="id"/>
+    <item name="attachmentsContainer" type="id"/>
 </resources>
