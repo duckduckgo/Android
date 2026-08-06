@@ -39,6 +39,11 @@
             android:name=".subscription.DuckAiPaidSettingsActivity"
             android:exported="false"
             android:label="@string/duck_ai_paid_settings_title"/>
+        <activity
+            android:name=".ui.nativeinput.edit.EditPromptActivity"
+            android:exported="false"
+            android:label="@string/duck_ai_edit_prompt_title"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <service
             android:name=".ui.DuckChatVoiceMicrophoneService"
