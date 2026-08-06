@@ -748,6 +748,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
         }
+        if (pluginView is OptionsView) {
+            pluginView.isEditMode = isEditWidget
+        }
+        if (pluginView is ModelPickerView) {
+            pluginView.isEditMode = isEditWidget
+        }
+        if (pluginView is ReasoningModePickerView) {
+            pluginView.isEditMode = isEditWidget
+        }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
             picker.onMenuDismissed = {
