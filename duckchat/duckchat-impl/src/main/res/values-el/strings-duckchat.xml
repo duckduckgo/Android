@@ -74,7 +74,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Ρωτήστε το Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Θέλετε πιο εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
@@ -155,7 +154,6 @@
     <string name="duckAiEndCtaTitle">Το έχεις!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Χρησιμοποίησε τη γραμμή διευθύνσεων για αναζήτηση και επίσκεψη σε ιστότοπους ή πήγαινε στο Duck.ai για ιδιωτική συνομιλία με τεχνητή νοημοσύνη.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
     <string name="duckAiEndCtaButton">Κόλλα πέντε!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Ξεκίνα μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη (AI) με το Duck.ai ή πέρνα σε Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Συνομιλίες</string>

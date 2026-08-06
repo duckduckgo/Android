@@ -45,9 +45,6 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -61,6 +58,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.history.api.NavigationHistory
@@ -114,7 +113,6 @@ class NativeInputModeWidgetViewModelTest {
     private val autoComplete: AutoComplete = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
-    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
@@ -166,7 +164,6 @@ class NativeInputModeWidgetViewModelTest {
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
         testee = createViewModel()
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
@@ -186,7 +183,6 @@ class NativeInputModeWidgetViewModelTest {
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             dispatchers = coroutineRule.testDispatcherProvider,
-            inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             duckChatPixels = duckChatPixels,
             nativeInputStatePublisher = nativeInputStatePublisher,

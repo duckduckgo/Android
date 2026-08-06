@@ -74,7 +74,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Želiš lakši pristup privatnom AI čavrljanju?</string>
@@ -155,7 +154,6 @@
     <string name="duckAiEndCtaTitle">Možeš ti to!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Koristi adresnu traku za pretraživanje i posjećivanje web-mjesta ili se prebaci na Duck.ai za privatno AI čavrljanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
     <string name="duckAiEndCtaButton">Daj pet!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Čavrljanja</string>

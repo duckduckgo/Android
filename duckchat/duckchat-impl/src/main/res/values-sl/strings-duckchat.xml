@@ -74,7 +74,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Prošnje ni bilo mogoče najti</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Želite lažji dostop do zasebnega klepeta z umetno inteligenco?</string>
@@ -155,7 +154,6 @@
     <string name="duckAiEndCtaTitle">Uspelo vam bo!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Za iskanje in obisk spletnih mest uporabite naslovno vrstico ali preklopite na Duck.ai za zasebni klepet z umetno inteligenco.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
     <string name="duckAiEndCtaButton">Petka!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Klepeti</string>

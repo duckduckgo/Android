@@ -74,7 +74,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Spør Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Programmet ble ikke funnet</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vil du ha enklere tilgang til privat AI-chat?</string>
@@ -155,7 +154,6 @@
     <string name="duckAiEndCtaTitle">Dette går bra!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Bruk adressefeltet til å søke etter og gå til nettsteder, eller bytt til Duck.ai for privat AI-chat.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
     <string name="duckAiEndCtaButton">High five!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chatter</string>

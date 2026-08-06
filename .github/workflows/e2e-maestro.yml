@@ -4,8 +4,8 @@ name: 'End to End Tests - Generic'
 # or set app_flavour to assemble fresh. Known tags:
 #   binaryUpload, customTabsTest, privacyTestInternal, onboardingTest,
 #   navigationTest, adClickTest, privacyTest, securityTest, securityTestInternal,
-#   releaseTest, permissionsTest, androidDesignSystemTest, inputScreenTest,
-#   omnibarTest, duckplayer, syncCriticalPathTest, autofillNoAuthTests,
+#   releaseTest, permissionsTest, androidDesignSystemTest, omnibarTest,
+#   duckplayer, syncCriticalPathTest, autofillNoAuthTests,
 #   autofillBackfillingUsername, autofillPasswordGeneration
 
 on:

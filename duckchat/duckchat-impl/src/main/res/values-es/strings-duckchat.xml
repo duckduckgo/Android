@@ -74,7 +74,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pregúntale a Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">No se pudo encontrar la aplicación</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">¿Quieres un acceso más fácil\nal chat privado de IA?</string>
@@ -155,7 +154,6 @@
     <string name="duckAiEndCtaTitle">¡Lo estás haciendo muy bien!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Usa la barra de direcciones para buscar y visitar sitios web o cambia a Duck.ai para un chat de IA privado.<br/><br/>Puedes usar Duck.ai desde cualquier lugar donde veas el icono de chat]]></string>
     <string name="duckAiEndCtaButton">¡Choca esos cinco!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Inicia un chat privado de IA con Duck.ai o cambia a Búsqueda para navegación protegida.<br/><br/>Puedes usar Duck.ai desde cualquier lugar donde veas el icono de chat]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>

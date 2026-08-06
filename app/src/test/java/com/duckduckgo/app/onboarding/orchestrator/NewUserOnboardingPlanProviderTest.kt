@@ -54,7 +54,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress

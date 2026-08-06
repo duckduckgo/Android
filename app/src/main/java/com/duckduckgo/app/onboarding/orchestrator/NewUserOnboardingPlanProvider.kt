@@ -50,7 +50,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingStep
