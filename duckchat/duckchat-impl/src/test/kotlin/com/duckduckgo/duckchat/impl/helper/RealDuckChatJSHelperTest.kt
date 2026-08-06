@@ -41,14 +41,17 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -62,10 +65,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -1479,14 +1485,111 @@ class RealDuckChatJSHelperTest {
     @Test
     fun whenCancelEditReceivedThenPendingSessionIsCancelled() = runTest {
         whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
-        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val pending = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-1") } doSuspendableAnswer { pending.await() }
+            on { resolve(eq("session-1"), any()) } doAnswer { invocation ->
+                pending.complete(invocation.getArgument<EditPromptResult>(1))
+                Unit
+            }
+        }
         val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        var result: JsCallbackData? = null
+        val editJob = launch {
+            result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+        }
+        advanceUntilIdle()
+        assertTrue(editJob.isActive)
+
+        val cancelResult = testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
+        advanceUntilIdle()
+
+        assertNull(cancelResult)
+        assertTrue(editJob.isCompleted)
+        assertTrue(result!!.params.getBoolean("cancelled"))
+    }
+
+    @Test
+    fun whenCancelEditArrivesAfterAnEarlierEditAlreadyResolvedThenItDoesNotAffectALaterEdit() = runTest {
+        // Reproduces the trace: edit A opens and resolves, edit B opens next and is still pending,
+        // then a stray cancelEdit meant for A arrives. The tracker must have been released when A
+        // resolved, so this cancelEdit must not resolve anything -- in particular not B.
+        whenever(mockEditPromptSessionStore.open(any()))
+            .thenReturn("session-A")
+            .thenReturn("session-B")
+        whenever(mockEditPromptSessionStore.await("session-A")).thenReturn(EditPromptResult.Cancelled)
+        val dataA = JSONObject("""{"prompt": "a", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "id-a", dataA, tabId = "tab-1")
+
+        // Stray cancelEdit for the already-resolved A arrives before B starts.
+        testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
+        verify(mockEditPromptSessionStore, never()).resolve(any(), any())
+
+        val pendingB = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-B") } doSuspendableAnswer { pendingB.await() }
+        }
+        var resultB: JsCallbackData? = null
+        val dataB = JSONObject("""{"prompt": "b", "images": [], "files": [], "hasResponsesToLose": false}""")
+        val editBJob = launch {
+            resultB = testee.processJsCallbackMessage("aiChat", "editPrompt", "id-b", dataB, tabId = "tab-1")
+        }
+        advanceUntilIdle()
+
+        assertTrue(editBJob.isActive)
+        assertNull(resultB)
+        verify(mockEditPromptSessionStore, never()).resolve(eq("session-B"), any())
+
+        editBJob.cancel()
+    }
+
+    @Test
+    fun whenEditPromptHasImagesAndFilesThenParsedPayloadMatchesTheRequest() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject(
+            """
+            {
+              "prompt": "original",
+              "images": [{"data": "img-data", "format": "png"}],
+              "files": [{"data": "file-data", "fileName": "notes.txt", "mimeType": "text/plain"}],
+              "hasResponsesToLose": false
+            }
+            """.trimIndent(),
+        )
+
         testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
 
-        val result = testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
+        val captor = argumentCaptor<EditPromptPayload>()
+        verify(mockEditPromptSessionStore).open(captor.capture())
+        val payload = captor.firstValue
+        assertEquals("original", payload.prompt)
+        assertEquals(listOf(AdoptedImage(data = "img-data", format = "png")), payload.images)
+        assertEquals(listOf(AdoptedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")), payload.files)
+    }
 
-        assertNull(result)
-        verify(mockEditPromptSessionStore).resolve("session-1", EditPromptResult.Cancelled)
+    @Test
+    fun whenEditPromptSubmittedWithFilesThenReplyFilesArrayHasTheCorrectFields() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
+            EditPromptResult.Submitted(
+                prompt = "edited",
+                images = emptyList(),
+                files = listOf(AdoptedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")),
+            ),
+        )
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val files = result!!.params.getJSONArray("files")
+        assertEquals(1, files.length())
+        val file = files.getJSONObject(0)
+        assertEquals("file-data", file.getString("data"))
+        assertEquals("notes.txt", file.getString("fileName"))
+        assertEquals("text/plain", file.getString("mimeType"))
     }
 
     @Test
