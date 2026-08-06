@@ -77,6 +77,11 @@
         "type": "number",
         "description": "Sample rate for this pixel, between 0 and 1"
     },
+    "widePixelIsFirstDailyOccurrence": {
+        "key": "global.is_first_daily_occurrence",
+        "type": "boolean",
+        "description": "Whether this is the first wide event completed with this feature name and status in the current UTC calendar day"
+    },
     "widePixelMetaType": {
         "key": "meta.type",
         "type": "string",
