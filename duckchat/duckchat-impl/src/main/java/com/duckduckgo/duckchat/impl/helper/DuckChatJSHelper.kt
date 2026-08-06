@@ -53,6 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -554,10 +555,16 @@ class RealDuckChatJSHelper @Inject constructor(
         duckChat.requestEditPrompt(
             EditPromptRequest(sessionId = sessionId, tabId = tabId, contextual = mode == Mode.CONTEXTUAL),
         )
-        val result = editPromptSessionStore.await(sessionId)
+        val result = withTimeoutOrNull(EDIT_SESSION_TIMEOUT_MS) { editPromptSessionStore.await(sessionId) }
+        if (result == null) {
+            // Nobody claimed the session in time: force it closed so it doesn't hold its (possibly
+            // multi-MB) attachments in the store forever.
+            editPromptSessionStore.clear(sessionId)
+        }
         // Only clears if still our session: a newer editPrompt may have already claimed the slot.
         activeEditSessionId.compareAndSet(sessionId, null)
         val params = when (result) {
+            null -> JSONObject().apply { put(EDIT_CANCELLED, true) }
             is EditPromptResult.Submitted -> JSONObject().apply {
                 put(EDIT_PROMPT, result.prompt)
                 put(EDIT_IMAGES, result.images.toAdoptedImagesJsonArray())
@@ -699,6 +706,11 @@ class RealDuckChatJSHelper @Inject constructor(
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val METHOD_EDIT_PROMPT = "editPrompt"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
+
+        // Backstop only: the FE owns the primary timeout and sends cancelEdit if it fires. This is long
+        // enough to never interrupt a real edit, just to reclaim a session abandoned before the FE's own
+        // timeout could run (e.g. process death mid-edit).
+        const val EDIT_SESSION_TIMEOUT_MS = 10 * 60 * 1000L
         private const val EDIT_PROMPT = "prompt"
         private const val EDIT_IMAGES = "images"
         private const val EDIT_FILES = "files"

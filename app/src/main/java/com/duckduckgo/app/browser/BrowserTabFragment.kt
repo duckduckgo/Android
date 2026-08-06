@@ -1112,11 +1112,21 @@ class BrowserTabFragment :
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
         observeSubscriptionEventDataChannel()
+        observeDuckChatJsResponseChannel()
     }
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
+    }
+
+    // On the Fragment's own lifecycleScope (not viewLifecycleOwner's), so a DuckChat reply held open
+    // while this fragment is stopped (e.g. EditPromptActivity in front) is still delivered rather than
+    // dropped or delayed until the view is recreated.
+    private fun observeDuckChatJsResponseChannel() {
+        viewModel.duckChatJsResponseFlow.onEach { response ->
+            contentScopeScripts.onResponse(response)
         }.launchIn(lifecycleScope)
     }
 
