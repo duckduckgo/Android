@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
+import com.duckduckgo.pir.impl.scripts.models.ElementSelector
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -153,7 +154,17 @@ class RealBrokerStepsParserTest {
                         "actionType": "fillForm",
                         "id": "fill-1",
                         "selector": "#optout-form",
-                        "elements": []
+                        "elements": [
+                            {
+                                "type": "elementType",
+                                "selector": "#element",
+                                "multiple": true,
+                                "min": "1",
+                                "max": "10",
+                                "failSilently": true,
+                                "format": "elementFormat"
+                            }
+                        ]
                     }
                 ]
             }
@@ -175,6 +186,23 @@ class RealBrokerStepsParserTest {
         assertEquals("optOut", optOutStep1.step.stepType)
         assertEquals("form", optOutStep1.step.optOutType)
         assertEquals(2, optOutStep1.step.actions.size)
+
+        val fillForm = optOutStep1.step.actions[1] as BrokerAction.FillForm
+        assertEquals(
+            listOf(
+                ElementSelector(
+                    type = "elementType",
+                    selector = "#element",
+                    parent = null,
+                    multiple = true,
+                    min = "1",
+                    max = "10",
+                    failSilently = true,
+                    format = "elementFormat",
+                ),
+            ),
+            fillForm.elements,
+        )
 
         val optOutStep2 = result[1] as OptOutStep
         assertEquals(testProfile2, optOutStep2.profileToOptOut)
