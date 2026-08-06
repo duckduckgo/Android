@@ -368,6 +368,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
 
+    // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
+    // attached and the AttachmentView plugin exists, so the values are held here and applied once
+    // wirePluginView() runs.
+    private var pendingAdoptedImages: List<AdoptedImage> = emptyList()
+    private var pendingAdoptedFiles: List<AdoptedFile> = emptyList()
+
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
     // BROWSER-state mutations from the main widget into the contextual UI: both widgets
@@ -747,6 +753,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
+            if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
+                pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
+            }
         }
         if (pluginView is OptionsView) {
             pluginView.isEditMode = isEditWidget
@@ -1612,6 +1621,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         images: List<AdoptedImage>,
         files: List<AdoptedFile>,
     ) {
+        pendingAdoptedImages = images
+        pendingAdoptedFiles = files
         attachmentView?.adoptAttachments(images, files)
     }
 
@@ -2102,6 +2113,16 @@ internal fun shouldShowInputControls(
     onChatTab: Boolean,
     isStreaming: Boolean,
 ): Boolean = onChatTab && !isStreaming
+
+/**
+ * Whether a pending [NativeInputModeWidget.adoptEditAttachments] call still needs to be applied to
+ * the [AttachmentView] plugin once it exists. Derived purely from the pending lists so it is
+ * unit-testable without Robolectric.
+ */
+internal fun hasPendingAdoptedAttachments(
+    pendingImages: List<AdoptedImage>,
+    pendingFiles: List<AdoptedFile>,
+): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
