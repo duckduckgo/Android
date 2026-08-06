@@ -1070,6 +1070,31 @@ class AttachmentViewModelTest {
         assertNull(viewModel.getImageAttachmentsJson())
     }
 
+    @Test
+    fun whenAdoptedFileAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
+        val base64 = Base64.encodeToString(ByteArray(1024), Base64.NO_WRAP)
+        viewModel.adopt(
+            images = emptyList(),
+            files = listOf(AdoptedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+        )
+        val id = viewModel.getFileAttachments().first().id
+
+        viewModel.removeFileAttachment(id)
+
+        assertNull(viewModel.getFileAttachmentsJson())
+    }
+
+    @Test
+    fun whenAdoptCalledAgainThenPreviouslyAdoptedBitmapsAreRecycled() = runTest {
+        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        val firstRoundBitmap = viewModel.getImageAttachments().first().bitmap
+
+        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        advanceUntilIdle()
+
+        assertTrue(firstRoundBitmap.isRecycled)
+    }
+
     private fun validPngBase64(): String {
         val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
         val out = ByteArrayOutputStream()
