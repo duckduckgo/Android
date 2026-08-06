@@ -34,10 +34,13 @@ object DaxUrlResolver {
 
     /** Installs the process-wide provider. Called once at app startup. Later installs overwrite. */
     fun install(provider: DaxUrlProvider) {
+        println("Cris install provider")
         this.provider = provider
     }
 
     fun resolve(domain: String): DaxUrl? = provider?.getUrl(domain)
+
+    fun resolveDomain(host: String): DaxDomain? = (provider?.getDomain(host))
 
     /** Test-only: clears the installed provider so process-global state can't leak across tests. */
     fun reset() {

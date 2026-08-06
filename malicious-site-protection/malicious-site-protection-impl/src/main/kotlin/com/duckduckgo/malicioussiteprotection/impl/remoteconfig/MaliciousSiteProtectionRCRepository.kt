@@ -16,10 +16,12 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
@@ -30,6 +32,7 @@ import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 interface MaliciousSiteProtectionRCRepository {
@@ -50,12 +53,12 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
-) : MaliciousSiteProtectionRCRepository, PrivacyConfigCallbackPlugin {
+) : MaliciousSiteProtectionRCRepository, PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
     @Volatile
     private var exceptionDomains = emptyList<Domain>()
 
-    init {
+    override fun onCreate(owner: LifecycleOwner) {
         loadToMemory()
     }
 
@@ -70,7 +73,9 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     private fun loadToMemory() {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
-                exceptionDomains = feature.self().getExceptions().map { Domain(it.domain) }
+                exceptionDomains = feature.self().getExceptions().also {
+                    logcat("Cris") { "MSP size=${it.size} domain=${it.firstOrNull()?.domain} daxDomain=${it.firstOrNull()?.daxDomain}" }
+                }.map { Domain(it.domain) }
             }
         }
     }

@@ -15,15 +15,28 @@
  */
 package com.duckduckgo.feature.toggles.api
 
-import com.duckduckgo.url.DaxUrl
+import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxUrlResolver
 
 data class FeatureException(val domain: String, val reason: String?) {
+
+    @Transient
+    private var resolved: DaxDomain? = null
+
     /**
-     * Semantic [DaxUrl] built from [domain], resolved through the process-wide
-     * [DaxUrlResolver] (flag-gated legacy-vs-new). Null until a provider is installed at startup.
-     * Computed, not stored: it has no backing field, so Moshi never (de)serializes it — consumers
-     * don't need any URL adapter.
+     * The normalized [DaxDomain] for this exception, or null when a provider hasn't been installed
+     * yet or [domain] has no resolvable host.
+     *
+     * Resolved once and pinned: the result is a pure function of the immutable [domain] string, so
+     * caching it is as safe as caching [domain] itself. Only non-null results are cached — a null
+     * (provider not yet installed at first access) is retried on the next call, so late provider
+     * installation still works. Matching via [DaxDomain.sameOrSubdomain] is then parse-free.
+     *
+     * The cache is [Transient] (kept out of Moshi (de)serialization) and lives outside the primary
+     * constructor, so `equals`/`hashCode`/`copy` remain by [domain]/[reason]. The write is unguarded
+     * on purpose: a reference write is atomic and every resolution of the same [domain] yields an
+     * equal [DaxDomain], so a race only costs a redundant lookup, never a wrong value.
      */
-    val url: DaxUrl? get() = DaxUrlResolver.resolve(domain)
+    val daxDomain: DaxDomain?
+        get() = resolved ?: DaxUrlResolver.resolveDomain(domain)?.also { resolved = it }
 }

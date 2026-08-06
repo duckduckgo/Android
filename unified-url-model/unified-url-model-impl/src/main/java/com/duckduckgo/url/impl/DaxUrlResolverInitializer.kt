@@ -25,12 +25,16 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 /**
- * Installs the app-scoped [DaxUrlProvider] into the process-wide [DaxUrlResolver] so that
- * `FeatureException.url` (a non-injectable data-class property) can resolve through it.
+ * Fallback installer for the app-scoped [DaxUrlProvider] into the process-wide [DaxUrlResolver], so
+ * that `FeatureException.daxDomain` (a non-injectable data-class property) can resolve through it.
  *
- * `onCreate` is early enough: `FeatureException.url` is only read during URL matching (page
- * navigation), which always happens after process `ON_CREATE`. Parsing/populating exceptions never
- * evaluates the getter.
+ * The primary install happens earlier, in `DuckDuckGoApplication.onMainProcessCreate` right after the
+ * Dagger graph is built. This observer re-installs the same app-scoped singleton at `ON_CREATE` as a
+ * safety net; [DaxUrlResolver.install] is idempotent, so running twice is harmless.
+ *
+ * Neither install point is load-bearing for correctness: `FeatureException.daxDomain` caches only
+ * non-null results and retries on null, so any read that races installation self-heals on the next
+ * access. Early install merely shrinks the window in which that read returns null.
  */
 @ContributesMultibinding(
     scope = AppScope::class,

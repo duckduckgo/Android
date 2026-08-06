@@ -16,12 +16,15 @@
 
 package com.duckduckgo.url.impl
 
+import androidx.core.net.toUri
+import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.url.DaxDomain
+import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
 import com.duckduckgo.url.DaxUrlProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -30,18 +33,24 @@ class RealDaxUrlProvider @Inject constructor(
     private val unifiedUrlModelFeature: UnifiedUrlModelFeature,
 ) : DaxUrlProvider {
 
-    // Instances are cached per domain so repeated reads (e.g. per exception on the hot path) reuse
-    // the same memoized model rather than re-parsing. Both variants produce identical matches()
-    // results, so keeping a cached variant across a flag flip only affects performance, not behavior.
-    private val cache = ConcurrentHashMap<String, DaxUrl>()
+    // Read once (not per call): keeps the hot path off the toggle store and makes resolution
+    // single-variant for the process lifetime, so which path a URL takes can't change mid-session.
+    // A flag flip therefore takes effect on next process start — the right granularity for an
+    // implementation switch (no swapping the URL model mid-session).
+    private val useUnifiedUrl by lazy { unifiedUrlModelFeature.useUnifiedUrl().isEnabled() }
 
-    override fun getUrl(domain: String): DaxUrl {
-        return cache.getOrPut(domain) {
-            if (unifiedUrlModelFeature.useUnifiedUrl().isEnabled()) {
-                NewDaxUrl(domain)
-            } else {
-                LegacyDaxUrl(domain)
-            }
-        }
+    // No dedup cache: each call builds a fresh model. Reuse is the caller's job — resolve once at the
+    // entry boundary and hold the DaxUrl/DaxDomain, rather than re-resolving the same String downstream.
+    override fun getUrl(url: String): DaxUrl = RealDaxUrl(url, memoize = useUnifiedUrl)
+
+    override fun getDomain(host: String): DaxDomain? = getUrl(host).domain
+
+    // Every DaxUrl is produced by this provider (no public constructor), so it is always a
+    // RealDaxUrl — the cast is intentional.
+    override fun withScheme(url: DaxUrl, scheme: DaxScheme): DaxUrl = withScheme((url as RealDaxUrl).raw, scheme)
+
+    override fun withScheme(url: String, scheme: DaxScheme): DaxUrl {
+        val rewritten = url.toUri().withScheme().buildUpon().scheme(scheme.value).build().toString()
+        return getUrl(rewritten)
     }
 }

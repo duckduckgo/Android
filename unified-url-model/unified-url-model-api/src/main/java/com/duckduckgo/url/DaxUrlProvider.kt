@@ -16,7 +16,21 @@
 
 package com.duckduckgo.url
 
+/**
+ * Single factory for the semantic URL types. Construction — and any operation that *produces* a
+ * new [DaxUrl]/[DaxDomain] — lives here rather than on the interfaces, because parsing needs
+ * `android.net.Uri` (impl-only) and instances are cache-managed.
+ */
 interface DaxUrlProvider {
 
-    fun getUrl(domain: String): DaxUrl
+    fun getUrl(url: String): DaxUrl
+
+    /** Parses [host] into a normalized [DaxDomain], or null when it has no resolvable host. */
+    fun getDomain(host: String): DaxDomain?
+
+    /** Returns a new [DaxUrl] with [url]'s scheme rewritten to [scheme] (was `Uri.toHttps`). */
+    fun withScheme(url: DaxUrl, scheme: DaxScheme): DaxUrl
+
+    /** Convenience overload for raw-String callers. */
+    fun withScheme(url: String, scheme: DaxScheme): DaxUrl
 }
