@@ -24,6 +24,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -86,9 +88,12 @@ class WideEventRepositoryImpl @Inject constructor(
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
 
+            val dbStatus = status.mapToDbWideEventStatus()
+
             event.copy(
-                status = status.mapToDbWideEventStatus(),
+                status = dbStatus,
                 metadata = mergeMetadata(event.metadata, metadata),
+                isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
             )
         }
     }
@@ -181,9 +186,24 @@ class WideEventRepositoryImpl @Inject constructor(
         return duration
     }
 
+    private suspend fun recordDailyOccurrence(
+        eventName: String,
+        status: WideEventEntity.WideEventStatus,
+    ): Boolean {
+        val dedupKey = "$eventName:${status.statusCode}"
+        val today = LocalDate.ofInstant(timeProvider.getCurrentTime(), ZoneOffset.UTC)
+
+        if (wideEventDao.getLastDailyOccurrenceDate(dedupKey) == today) return false
+
+        wideEventDao.upsertDailyOccurrence(
+            WideEventDailyOccurrenceEntity(dedupKey = dedupKey, lastOccurrenceDate = today),
+        )
+        return true
+    }
+
     private suspend fun updateWideEvent(
         id: Long,
-        updateAction: (WideEventEntity) -> WideEventEntity,
+        updateAction: suspend (WideEventEntity) -> WideEventEntity,
     ) {
         database.withTransaction {
             val event =
