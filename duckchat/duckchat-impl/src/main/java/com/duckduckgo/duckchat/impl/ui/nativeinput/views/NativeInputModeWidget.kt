@@ -446,6 +446,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val duckChatTabSelectedListener =
         object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                // Same rationale as the attach/detach guards: this listener only pushes shared
+                // browser-wide omnibar state, which the edit widget (editing an unrelated message)
+                // must not touch.
+                if (isEditWidget) return
                 val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
                 duckChatInternal.setSelectedMode(mode)
                 // inputQuery tracks the shared input field, not the selected tab — the field is shared
