@@ -29,7 +29,7 @@
     <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Możemy zaoszczędzić Ci kliknięcia i zaakceptować te pliki cookie za Ciebie."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Akceptuj pliki cookie, których nie można odrzucić"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Nadal będę je akceptować samodzielnie"</string>
-    <string name="autoconsentPopupTitleWithFeatureDisabled">"Masz dość wyskakujących okienek z informacją o plikach cookie, które nie dają Ci spokoju?"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Masz dość wyskakujących okienek z informacją o plikach cookie, które nie dają ci spokoju?"</string>
     <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Postaramy się odrzucić jak najwięcej plików cookie. Jeśli nie będzie opcji odrzucenia, zaoszczędzimy Ci kliknięcia i zaakceptujemy te pliki cookie za Ciebie."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Odrzucaj, gdy to możliwe, lub akceptuj za mnie"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Będę się nimi zajmować samodzielnie"</string>
