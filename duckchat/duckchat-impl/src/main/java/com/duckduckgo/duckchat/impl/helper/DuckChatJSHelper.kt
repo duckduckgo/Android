@@ -560,9 +560,9 @@ class RealDuckChatJSHelper @Inject constructor(
         duckChat.requestEditPrompt(
             EditPromptRequest(sessionId = sessionId, tabId = tabId, contextual = mode == Mode.CONTEXTUAL),
         )
-        // Not cleared here: cancelEdit only fires while this await is still suspended, and a stale
-        // reference after resolution just makes a later resolve() a no-op in the store.
         val result = editPromptSessionStore.await(sessionId)
+        // Only clears if still our session: a newer editPrompt may have already claimed the slot.
+        activeEditSessionId.compareAndSet(sessionId, null)
         val params = when (result) {
             is EditPromptResult.Submitted -> JSONObject().apply {
                 put(EDIT_PROMPT, result.prompt)
