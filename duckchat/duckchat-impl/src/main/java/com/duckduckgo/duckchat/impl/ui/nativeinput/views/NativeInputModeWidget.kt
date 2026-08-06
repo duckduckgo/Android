@@ -87,6 +87,8 @@ import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
@@ -274,6 +276,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private var activeTabId: String? = null
 
     private var tabCountLiveData: LiveData<Int>? = null
@@ -298,6 +303,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
+    private var editPromptJob: Job? = null
     private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
@@ -669,6 +675,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeNativeInputState()
         observeSubmitEnabled()
         observeOpenModelPicker()
+        observeEditPromptRequests()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
@@ -819,6 +826,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         submitEnabledJob = null
         openModelPickerJob?.cancel()
         openModelPickerJob = null
+        editPromptJob?.cancel()
+        editPromptJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -1842,6 +1851,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 modelPickerView?.openPicker()
             }
             .launchIn(scope ?: return)
+    }
+
+    // The edit screen hosts its own instance of this widget (see configureForEdit); that instance
+    // must not re-open itself when the FE asks the original tab's widget to launch the edit screen.
+    private fun observeEditPromptRequests() {
+        if (isEditWidget) return
+        editPromptJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        editPromptJob = viewModel.editPromptRequests
+            .onEach { request ->
+                globalActivityStarter.start(context, EditPromptScreenParams(sessionId = request.sessionId))
+            }
+            .launchIn(scope)
     }
 
     private fun observeNativeInputState() {
