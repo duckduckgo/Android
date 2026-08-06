@@ -646,6 +646,12 @@ class BrowserTabViewModel @Inject constructor(
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
     val subscriptionEventDataFlow: Flow<SubscriptionEventData> = _subscriptionEventDataChannel.receiveAsFlow()
 
+    // DuckChat replies can be held open for a long time (the edit screen suspends this reply until the
+    // user submits or cancels) while the fragment is stopped, so this can't share the single-slot
+    // command LiveData: a command set while stopped would overwrite the pending reply and lose it.
+    private val _duckChatJsResponseChannel = Channel<JsCallbackData>(capacity = Channel.BUFFERED)
+    val duckChatJsResponseFlow: Flow<JsCallbackData> = _duckChatJsResponseChannel.receiveAsFlow()
+
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
         val bookmarks: List<String> = emptyList(),
@@ -4981,7 +4987,10 @@ class BrowserTabViewModel @Inject constructor(
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
-                            command.value = SendResponseToJs(it)
+                            // Not command.value: this reply can be held open for minutes (the edit
+                            // screen) while the fragment is stopped, and the single-slot LiveData
+                            // would drop it if any other command is set in the meantime.
+                            _duckChatJsResponseChannel.send(it)
                         }
                         if (method == "responseReceived") {
                             unblockDuckAiOnboardingCta()

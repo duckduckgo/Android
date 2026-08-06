@@ -52,7 +52,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -1483,6 +1485,27 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenEditPromptSessionNeverResolvesThenBackstopTimeoutResolvesAsCancelledAndClearsSession() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        val neverCompletes = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-1") } doSuspendableAnswer { neverCompletes.await() }
+        }
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        var result: JsCallbackData? = null
+        val editJob = launch {
+            result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+        }
+        advanceTimeBy(RealDuckChatJSHelper.EDIT_SESSION_TIMEOUT_MS + 1_000)
+        advanceUntilIdle()
+
+        assertTrue(editJob.isCompleted)
+        assertTrue(result!!.params.getBoolean("cancelled"))
+        verify(mockEditPromptSessionStore).clear("session-1")
+    }
+
+    @Test
     fun whenCancelEditReceivedThenPendingSessionIsCancelled() = runTest {
         whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
         val pending = CompletableDeferred<EditPromptResult>()
@@ -1499,7 +1522,9 @@ class RealDuckChatJSHelperTest {
         val editJob = launch {
             result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
         }
-        advanceUntilIdle()
+        // runCurrent(), not advanceUntilIdle(): the latter would fast-forward straight through the
+        // backstop timeout's scheduled delay, completing the job before cancelEdit ever runs.
+        runCurrent()
         assertTrue(editJob.isActive)
 
         val cancelResult = testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
@@ -1536,7 +1561,8 @@ class RealDuckChatJSHelperTest {
         val editBJob = launch {
             resultB = testee.processJsCallbackMessage("aiChat", "editPrompt", "id-b", dataB, tabId = "tab-1")
         }
-        advanceUntilIdle()
+        // runCurrent(), not advanceUntilIdle(): see the note in whenCancelEditReceivedThenPendingSessionIsCancelled.
+        runCurrent()
 
         assertTrue(editBJob.isActive)
         assertNull(resultB)
