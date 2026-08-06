@@ -303,6 +303,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -324,6 +325,36 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingEnabledThenCapabilityIsTrue() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativePromptEditing"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingDisabledThenCapabilityIsFalse() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativePromptEditing"))
     }
 
     @Test
@@ -645,6 +676,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -743,6 +775,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -903,6 +936,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1006,6 +1040,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1052,6 +1087,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
@@ -1098,6 +1134,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1411,6 +1448,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
@@ -1454,6 +1492,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", true)
             put("supportsNativePrompt", true)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1497,6 +1536,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1541,6 +1581,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
