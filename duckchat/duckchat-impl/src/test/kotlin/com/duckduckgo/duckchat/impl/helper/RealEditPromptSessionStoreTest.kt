@@ -50,8 +50,9 @@ class RealEditPromptSessionStoreTest {
     @Test
     fun whenResolvedWithSubmissionThenAwaitReturnsIt() = runTest {
         val sessionId = testee.open(EditPromptPayload("original", emptyList(), emptyList()))
-        val awaiting = async { testee.await(sessionId) }
+        val awaiting = async(coroutineRule.testDispatcher) { testee.await(sessionId) }
 
+        assertEquals(true, awaiting.isActive)
         testee.resolve(sessionId, EditPromptResult.Submitted("edited", emptyList(), emptyList()))
 
         assertEquals(EditPromptResult.Submitted("edited", emptyList(), emptyList()), awaiting.await())
@@ -60,8 +61,9 @@ class RealEditPromptSessionStoreTest {
     @Test
     fun whenResolvedTwiceThenTheFirstResultWins() = runTest {
         val sessionId = testee.open(EditPromptPayload("original", emptyList(), emptyList()))
-        val awaiting = async { testee.await(sessionId) }
+        val awaiting = async(coroutineRule.testDispatcher) { testee.await(sessionId) }
 
+        assertEquals(true, awaiting.isActive)
         testee.resolve(sessionId, EditPromptResult.Cancelled)
         testee.resolve(sessionId, EditPromptResult.Submitted("edited", emptyList(), emptyList()))
 
@@ -71,8 +73,9 @@ class RealEditPromptSessionStoreTest {
     @Test
     fun whenClearedThenPayloadIsGoneAndAwaitCancels() = runTest {
         val sessionId = testee.open(EditPromptPayload("original", emptyList(), emptyList()))
-        val awaiting = async { testee.await(sessionId) }
+        val awaiting = async(coroutineRule.testDispatcher) { testee.await(sessionId) }
 
+        assertEquals(true, awaiting.isActive)
         testee.clear(sessionId)
 
         assertNull(testee.payload(sessionId))
