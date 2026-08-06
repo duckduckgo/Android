@@ -690,7 +690,11 @@ class BrowserWebViewClient @Inject constructor(
                             duckPlayer.duckPlayerNavigatedToYoutube()
                         }
                     }
-                    uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+                    uriLoadedManager.sendUriLoadedPixels()
+                    // Duck.ai loads in this WebView too, and its own surface pixel already counts it.
+                    if (!duckChat.isDuckChatUrl(url.toUri())) {
+                        uriLoadedManager.sendSurfaceUsagePixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+                    }
 
                     webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
 

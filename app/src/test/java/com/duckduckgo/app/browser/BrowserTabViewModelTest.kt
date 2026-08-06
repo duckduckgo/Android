@@ -2151,24 +2151,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed() = runTest {
-        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
-        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
-            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
-        )
-        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
-            flowOf(listOf(Favorite("abc", "query", "https://example.com", position = 1, lastModified = null))),
-        )
-        whenever(mockNavigationHistory.getHistory()).thenReturn(
-            flowOf(listOf(VisitedPage("https://foo.com".toUri(), "query", listOf(LocalDateTime.now())))),
-        )
-        whenever(mockTabRepository.flowTabs).thenReturn(
-            flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "query"))),
-        )
-        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+    fun whenAutoCompleteSuggestionsShownThenFireAutocompleteDisplayed() = runTest {
+        stubAutoCompleteSourcesForQuery()
 
-        whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsShownAndThenSelectedThenAutocompleteDisplayedFiredOnce() = runTest {
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockOmnibarConverter.convertQueryToUrl("query", null)).thenReturn("https://example.com")
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+        testee.userSelectedAutocomplete(AutoCompleteDefaultSuggestion("query"))
+        delay(500)
+
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsShownAndThenGoneThenAutocompleteDisplayedFiredOnce() = runTest {
+        stubAutoCompleteSourcesForQuery()
 
         testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
         delay(500)
@@ -2179,12 +2188,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun wheneverAutoCompleteIsGoneAndSuggestionsIsEmptyDoNotFireAutocompleteDisplayed() = runTest {
+    fun whenAutoCompleteSuggestionsShownAgainForNewQueryThenFireAutocompleteDisplayedAgain() = runTest {
+        stubAutoCompleteSourcesForQuery()
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+        testee.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+
+        verify(mockPixel, times(2)).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel, times(2)).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsAreEmptyThenDoNotFireAutocompleteDisplayed() = runTest {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
 
-        testee.autoCompleteStateFlow.value = "query"
-        testee.autoCompleteSuggestionsGone()
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
 
         verify(mockPixel, never()).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
         verify(mockPixel, never()).fire(
@@ -2245,8 +2268,7 @@ class BrowserTabViewModelTest {
 
         testee.autoCompleteSuggestionsGone()
 
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
     }
 
     @Test
@@ -2285,13 +2307,8 @@ class BrowserTabViewModelTest {
         assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
     }
 
-    /**
-     * Common setup mirroring [wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed]'s
-     * sources so the AutoCompleteApi produces a non-empty result for "query", then triggers the cache pipeline.
-     * Caller still needs to wait for the debounce.
-     */
-    private suspend fun primeOmnibarAutocompleteCacheForQuery() {
-        nativeInputUserSettingFlow.value = true
+    /** Stubs every autocomplete source so the AutoCompleteApi produces a non-empty result for "query". */
+    private suspend fun stubAutoCompleteSourcesForQuery() {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
@@ -2308,6 +2325,15 @@ class BrowserTabViewModelTest {
         )
         whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+    }
+
+    /**
+     * Stubs the autocomplete sources for "query" and triggers the omnibar cache pipeline.
+     * Caller still needs to wait for the debounce.
+     */
+    private suspend fun primeOmnibarAutocompleteCacheForQuery() {
+        nativeInputUserSettingFlow.value = true
+        stubAutoCompleteSourcesForQuery()
 
         testee.onOmnibarTextRendered("query")
     }
