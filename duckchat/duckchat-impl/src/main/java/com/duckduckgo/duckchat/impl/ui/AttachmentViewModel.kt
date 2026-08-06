@@ -41,6 +41,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -161,6 +163,43 @@ class AttachmentViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Takes attachments that are already encoded (an edit of a sent message) straight into state:
+     * no validation or limit accounting, because an edit can only remove attachments.
+     */
+    fun adopt(
+        images: List<AdoptedImage>,
+        files: List<AdoptedFile>,
+    ) {
+        imageAttachments.value = images.map { image ->
+            val bytes = decodeBase64(image.data)
+            // The image stays in state even when it cannot be rendered, so submitting preserves it
+            // and the user can still remove it.
+            val bitmap = bytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size) } ?: placeholderBitmap()
+            ImageAttachment(
+                id = UUID.randomUUID().toString(),
+                bitmap = bitmap,
+                base64Data = image.data,
+                format = image.format,
+            )
+        }
+        _fileAttachments.value = files.map { file ->
+            FileAttachment(
+                id = UUID.randomUUID().toString(),
+                uri = Uri.EMPTY,
+                fileName = file.fileName,
+                mimeType = file.mimeType,
+                sizeBytes = decodeBase64(file.data)?.size?.toLong() ?: 0L,
+                base64Data = file.data,
+            )
+        }
+    }
+
+    private fun decodeBase64(data: String): ByteArray? = runCatching { Base64.decode(data, Base64.DEFAULT) }.getOrNull()
+
+    private fun placeholderBitmap(): Bitmap =
+        Bitmap.createBitmap(PLACEHOLDER_BITMAP_SIZE_PX, PLACEHOLDER_BITMAP_SIZE_PX, Bitmap.Config.ARGB_8888)
 
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
@@ -429,6 +468,7 @@ class AttachmentViewModel @Inject constructor(
     companion object {
         private const val COMPRESSION_QUALITY = 85
         private const val MAX_DIMENSION_PX = 512
+        private const val PLACEHOLDER_BITMAP_SIZE_PX = 96
         private const val FILE_VALIDATION_SIZE_EXCEEDED = "size_exceeded"
         private const val FILE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
         private const val FILE_VALIDATION_PAGE_COUNT_EXCEEDED = "page_count_exceeded"
