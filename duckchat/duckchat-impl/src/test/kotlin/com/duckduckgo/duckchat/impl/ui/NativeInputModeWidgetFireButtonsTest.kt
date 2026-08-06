@@ -67,6 +67,13 @@ class NativeInputModeWidgetFireButtonsTest {
     fun `no fire buttons in edit mode`() {
         val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI)
         assertFalse(state.shouldShowLeadingFireButton(isEditing = true))
+    }
+
+    @Test
+    fun `trailing fire is hidden in edit mode even when otherwise shown`() {
+        val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER)
+
+        assertTrue(state.shouldShowTrailingFireButton(isEditing = false))
         assertFalse(state.shouldShowTrailingFireButton(isEditing = true))
     }
 
