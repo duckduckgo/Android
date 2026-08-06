@@ -97,6 +97,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -104,8 +105,10 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1449,7 +1452,81 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(pageLoadWideEvent).onPageStarted(tabId, EXAMPLE_URL)
+        verify(pageLoadWideEvent).onPageStarted(eq(tabId), eq(EXAMPLE_URL), any())
+    }
+
+    @Test
+    fun whenPageStartedThenJsInjectionCompleteRecordedOnlyAfterEveryPluginRan() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val tabId = "test-tab-123"
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        var pluginsStartedWhenRecorded = -1
+        doAnswer { pluginsStartedWhenRecorded = jsPlugins.plugin.countStarted }
+            .whenever(pageLoadWideEvent).onJsInjectionComplete(any(), any())
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+
+        assertEquals(1, pluginsStartedWhenRecorded)
+        val navigationId = argumentCaptor<Long>()
+        verify(pageLoadWideEvent).onPageStarted(eq(tabId), eq(EXAMPLE_URL), navigationId.capture())
+        inOrder(pageLoadWideEvent, listener).apply {
+            verify(pageLoadWideEvent).onContentScopeExperimentsResolved(tabId, navigationId.firstValue)
+            verify(listener).pageStarted(any(), any())
+            verify(pageLoadWideEvent).onJsInjectionComplete(tabId, navigationId.firstValue)
+        }
+    }
+
+    @Test
+    fun whenPageStartedAgainMidLoadThenOnlyTheNavigationThatStartedTheFlowReportsMeasurements() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val tabId = "test-tab-123"
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        // A hop within the same load does not start a flow, so its deferred measurements have no navigation to land on.
+        testee.onPageStarted(mockWebView, "$EXAMPLE_URL/redirected", null)
+
+        verify(pageLoadWideEvent, times(1)).onPageStarted(any(), any(), any())
+        verify(pageLoadWideEvent, times(1)).onContentScopeExperimentsResolved(any(), any())
+        verify(pageLoadWideEvent, times(1)).onJsInjectionComplete(any(), any())
+    }
+
+    @Test
+    fun whenPageStartedTwiceForSeparateLoadsThenEachReportsItsOwnNavigationId() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val tabId = "test-tab-123"
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+
+        val navigationIds = argumentCaptor<Long>()
+        verify(pageLoadWideEvent, times(2)).onPageStarted(eq(tabId), eq(EXAMPLE_URL), navigationIds.capture())
+        assertNotEquals(navigationIds.firstValue, navigationIds.secondValue)
+        verify(pageLoadWideEvent).onJsInjectionComplete(tabId, navigationIds.firstValue)
+        verify(pageLoadWideEvent).onJsInjectionComplete(tabId, navigationIds.secondValue)
+    }
+
+    @Test
+    fun whenPageStartedWithoutTabIdThenJsInjectionCompleteNotRecorded() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.getCurrentTabId()).thenReturn(null)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+
+        verify(pageLoadWideEvent, never()).onContentScopeExperimentsResolved(any(), any())
+        verify(pageLoadWideEvent, never()).onJsInjectionComplete(any(), any())
     }
 
     @Test
@@ -1460,7 +1537,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
         testee.onPageStarted(mockWebView, "about:blank", null)
-        verify(pageLoadWideEvent, never()).onPageStarted(any(), any())
+        verify(pageLoadWideEvent, never()).onPageStarted(any(), any(), any())
     }
 
     @Test
@@ -1470,7 +1547,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(null)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(pageLoadWideEvent, never()).onPageStarted(any(), any())
+        verify(pageLoadWideEvent, never()).onPageStarted(any(), any(), any())
     }
 
     @Test

@@ -99,6 +99,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
@@ -528,12 +529,15 @@ class BrowserWebViewClient @Inject constructor(
 
         lastInterceptedAppSchemeUrl = null
 
+        var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
                 webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadWideEvent.onPageStarted(tabId, it)
+                    val navigationId = wideEventNavigationIdCounter.incrementAndGet()
+                    pageLoadWideEvent.onPageStarted(tabId, it, navigationId)
+                    wideEventNavigation = tabId to navigationId
                 }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
@@ -552,9 +556,15 @@ class BrowserWebViewClient @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.main()) {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            wideEventNavigation?.let { (tabId, navigationId) ->
+                pageLoadWideEvent.onContentScopeExperimentsResolved(tabId, navigationId)
+            }
             webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
             jsPlugins.getPlugins().forEach {
                 it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            }
+            wideEventNavigation?.let { (tabId, navigationId) ->
+                pageLoadWideEvent.onJsInjectionComplete(tabId, navigationId)
             }
         }
         if (url != null && url == lastPageStarted) {
@@ -993,6 +1003,12 @@ class BrowserWebViewClient @Inject constructor(
 
     companion object {
         val parallelRequestCounter = AtomicInteger(0)
+
+        // Identifies each navigation that starts a page load wide event flow, so a measurement reported once that
+        // navigation may already be over cannot be attributed to a later one. Static, because a tab's client is
+        // recreated with the tab's fragment while the flows and the coroutines reporting into them outlive it.
+        private val wideEventNavigationIdCounter = AtomicLong(0)
+
         private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
         private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
 
