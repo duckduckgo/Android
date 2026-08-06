@@ -75,12 +75,12 @@ what changed.
 | Rule doc | Code areas it describes |
 |---|---|
 | `.claude/rules/wide-events.md` | `**/wideevents/**`, `**/*WideEvent*.kt`, the wide-events API/impl modules |
-| `.claude/rules/architecture.md` | DI scopes/annotations, module `-api`/`-impl` conventions, lint-enforced conventions |
+| `.claude/docs/architecture.md` | DI scopes/annotations, module `-api`/`-impl` conventions, lint-enforced conventions |
 | `.claude/docs/dagger-scopes.md` | the Anvil-generated subcomponents and `injectorFactoryMap` lookups |
 | `.claude/docs/navigation.md`, `.claude/docs/url-classification.md` | `GlobalActivityStarter`, `@ContributeToActivityStarter`, `QueryUrlPredictor` |
 | `.claude/docs/plugin-system.md` | `@ContributesPluginPoint` / `@ContributesActivePluginPoint` codegen and validation |
 | `.claude/docs/lateinit-hazards.md` | `@Inject lateinit var` in Views, `@InjectWith(ViewScope::class)` |
-| `.claude/rules/android-design-system.md` | the design-system module, ADS components, theme attrs |
+| `.claude/docs/android-design-system.md` | the design-system module, ADS components, theme attrs |
 | `.claude/docs/pixels.md`, `.claude/rules/pixel-definitions.md` | pixel senders, pixel-definition JSON |
 | `.claude/rules/maestro-ui-tests.md` | `.maestro/**`, Maestro tags/config |
 
