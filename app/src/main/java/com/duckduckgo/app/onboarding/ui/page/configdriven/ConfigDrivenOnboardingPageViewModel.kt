@@ -128,8 +128,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     /** Last step id a [DialogConfig] was published for; drives the [ViewState.animateEntry] policy. */
     private var lastPresentedStepId: LinearOnboardingStepId? = null
 
-    private var introStarted = false
-
     private var notificationPermissionFlowStarted = false
 
     private var addWidgetPromptFlowStarted = false
@@ -156,7 +154,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     }
 
     fun onIntroAnimationStarted() {
-        introStarted = true
         _viewState.update { state ->
             val screen = state.screen
             if (screen is Screen.Intro.Play) {
@@ -274,7 +271,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         if (dialog is NewUserOnboardingActivityDialog.IntroAnimation) {
             _viewState.update {
                 it.copy(
-                    screen = if (introStarted) {
+                    screen = if (it.screen is Screen.Intro.Restore) {
                         Screen.Intro.Restore(withDuckAi = dialog.withDuckAi)
                     } else {
                         Screen.Intro.Play(withDuckAi = dialog.withDuckAi)
