@@ -20,6 +20,10 @@
     <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
     <dimen name="inputScreenMarginHorizontal">0dp</dimen>
     <dimen name="nativeInputModeWidgetMarginHorizontal">4dp</dimen>
+    <dimen name="nativeInputDuckAiCardContentPaddingHorizontal">@dimen/keyline_2</dimen>
+    <dimen name="nativeInputDuckAiBottomRowPaddingHorizontal">@dimen/keyline_2</dimen>
+    <dimen name="nativeInputDuckAiControlSpacing">6dp</dimen>
+    <dimen name="nativeInputDuckAiModelPickerSpacing">@dimen/keyline_1</dimen>
     <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
     <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
