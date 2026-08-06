@@ -57,6 +57,12 @@ class NativeInputPluginVisibilityTest {
         assertTrue(state.shouldShowPluginControls())
     }
 
+    @Test
+    fun `plugin controls hidden in edit mode`() {
+        val state = stateOf(ToggleSelection.DUCK_AI, isChatStreaming = false)
+        assertFalse(state.shouldShowPluginControls(isEditing = true))
+    }
+
     private fun stateOf(
         toggleSelection: ToggleSelection,
         isChatStreaming: Boolean,
