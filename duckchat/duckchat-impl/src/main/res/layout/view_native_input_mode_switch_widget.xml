@@ -30,7 +30,7 @@
         android:id="@+id/inputModeWidgetLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_empty"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"

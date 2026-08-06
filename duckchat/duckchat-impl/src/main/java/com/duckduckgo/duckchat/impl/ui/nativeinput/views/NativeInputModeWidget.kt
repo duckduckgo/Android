@@ -131,7 +131,7 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
-    fun beginEnterAnimationPreview(isBottom: Boolean)
+    fun beginEnterAnimationPreview(isBottom: Boolean, inputMode: NativeInputState.InputMode)
     fun endEnterAnimationPreview()
     fun selectAllText()
     fun selectChatTab()
@@ -618,7 +618,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             } else {
                 inputModeCardExtendedEndMargin
             }
-            marginStart = inputModeCardExtendedEndMargin
         }
     }
 
@@ -1317,7 +1316,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun beginEnterAnimationPreview(isBottom: Boolean) {
+    override fun beginEnterAnimationPreview(isBottom: Boolean, inputMode: NativeInputState.InputMode) {
         doOnAttach {
             if (inputField.hasFocus()) return@doOnAttach
             if (nativeInputState == null) {
@@ -1331,7 +1330,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     ?.takeIf { ::nativeInputStateProvider.isInitialized }
                     ?.let { nativeInputStateProvider.stateForTab(it).value }
                 applyState(
-                    publishedState ?: NativeInputState.zero().copy(
+                    (publishedState ?: NativeInputState.zero()).copy(
+                        inputMode = inputMode,
                         inputPosition = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP,
                     ),
                 )
@@ -1600,17 +1600,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val lp = card.layoutParams as? MarginLayoutParams ?: return
         // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
-        if (state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible && !state.isBottom) {
+        val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
+        if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-            val targetStartMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-            val targetEndMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+            val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
             card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
             lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetStartMargin - card.paddingLeft
-            lp.marginEnd = targetEndMargin - card.paddingRight
+            lp.marginStart = targetHorizontalMargin - card.paddingLeft
+            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+        } else if (isBrowserSearchOnly && state.isBottom) {
+            // Bottom search-only omnibar: 16dp leading (paddingStart keyline_2 + this keyline_2) and 16dp
+            // trailing (paddingEnd keyline_1 + this) so the field is centred when full-width.
+            lp.marginStart = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+            lp.marginEnd = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal) -
+                card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         } else {
             // Reset the start margin so the omnibar value doesn't leak onto the shared Duck.ai card.
+            // The bottom card keeps keyline_1 (Duck.ai needs 8dp with the wrapper's paddingEnd).
             lp.marginStart = 0
+            lp.marginEnd = if (state.isBottom) card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1) else 0
         }
         card.layoutParams = lp
     }
