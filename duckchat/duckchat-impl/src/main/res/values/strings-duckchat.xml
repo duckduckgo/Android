@@ -342,4 +342,9 @@
 
     <!-- File/image attachment menu options -->
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
+
+    <!-- Edit message -->
+    <string name="duck_ai_edit_prompt_title">Edit message</string>
+    <string name="duck_ai_edit_prompt_cancel">Cancel</string>
+    <string name="duck_ai_edit_prompt_lose_responses_warning">Submitting removes the responses after this message.</string>
 </resources>
