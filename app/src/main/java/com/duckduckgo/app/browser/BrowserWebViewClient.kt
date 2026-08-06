@@ -554,10 +554,6 @@ class BrowserWebViewClient @Inject constructor(
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
 
-        // This coroutine can outlive the navigation that scheduled it, so the measurements below are reported against
-        // the tab and navigation captured when the flow was started: the listener can be gone by then (tab closed
-        // mid-navigation), and the tab can already be loading something else, which must not claim them. Only a page
-        // start that began a flow reports them, so a mid-load hop leaves wideEventNavigation null.
         appCoroutineScope.launch(dispatcherProvider.main()) {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()
             wideEventNavigation?.let { (tabId, navigationId) ->
