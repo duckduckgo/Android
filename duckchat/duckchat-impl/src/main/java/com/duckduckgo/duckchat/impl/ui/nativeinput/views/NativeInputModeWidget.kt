@@ -85,6 +85,8 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
@@ -175,6 +177,8 @@ interface NativeInputWidget {
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual(tabId: String)
+    fun configureForEdit(sessionId: String)
+    fun adoptEditAttachments(images: List<AdoptedImage>, files: List<AdoptedFile>)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -374,6 +378,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
     // toggle row and reset the parent card's corners.
     private var isContextualWidget: Boolean = false
+
+    // True when this widget instance is hosting the fullscreen edit-message surface, configured
+    // via configureForEdit() against a synthetic per-tab state key rather than a real tab.
+    private var isEditWidget: Boolean = false
 
     // Held during the enter animation so padding/bottom-row compute as if focused; without
     // it they'd flip from 4dp→8dp after focusInput and look like a second step.
@@ -696,13 +704,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         // The start-chat shortcut is a search-only address-bar affordance; it has no place
                         // in the contextual sheet's Duck.ai composer (and reads the shared per-tab state,
                         // which can be search-only), so skip it there.
-                        if (isContextualWidget && plugin.containerId == R.id.startChatContainer) continue
+                        if ((isContextualWidget || isEditWidget) && plugin.containerId == R.id.startChatContainer) continue
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
                         if (plugin.containerId != R.id.startChatContainer) {
-                            container.isVisible = isChatTabSelected()
+                            container.isVisible = isChatTabSelected() && !isEditWidget
                         }
                         if (pluginView is ModelPicker) {
                             modelPickerView = pluginView
@@ -737,6 +745,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.isContextual = pendingIsContextual
+            pluginView.isEditMode = isEditWidget
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
@@ -927,7 +936,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
         val suppress = nativeInputState?.shouldSuppressBottomRow() == true
         val visible = isChatTabSelected() &&
-            (inputField.hasFocus() || previewEnterFocus || isContextualWidget) &&
+            (inputField.hasFocus() || previewEnterFocus || isContextualWidget || isEditWidget) &&
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
@@ -956,7 +965,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyToggleVisibility(visible: Boolean) {
         // Contextual sheet always hides the toggle row, regardless of what state the per-tab
         // store emits — the main widget can publish toggleVisible=true for the same tabId.
-        val effective = visible && !isContextualWidget
+        // Edit mode has no mode switch at all.
+        val effective = visible && !isContextualWidget && !isEditWidget
         findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
     }
 
@@ -1007,10 +1017,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateVoiceButtonVisibility() {
         val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
-        setVoiceButtonVisible(voiceSearchAvailable && isBlank)
+        setVoiceButtonVisible(!isEditWidget && voiceSearchAvailable && isBlank)
         val host = voiceHostButtons()
         host?.setVoiceSearchVisible(false)
-        host?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
+        host?.setVoiceChatVisible(!isEditWidget && voiceChatAvailable && isBlank && !isStreaming)
     }
 
     private fun updateSendButtonVisibility() {
@@ -1035,7 +1045,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateNewLineButtonVisibility() {
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
-        val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
+        val visible = (isBrowserContext || isEditWidget) && isChatTabSelected() && hasText && !isStreaming
         // Only the top-bar floating row hosts the new-line button. Bottom-bar mode has no
         // on-screen new-line; carriage return there is the IME enter key while on a Duck.ai
         // page (see `applyChatInputType`: IME_ACTION_NONE + TYPE_TEXT_FLAG_MULTI_LINE).
@@ -1109,9 +1119,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBackButtons(state: NativeInputState) {
         inputModeWidgetBack.visibility =
-            if (state.shouldShowToggleRowBack(navBarVisible)) VISIBLE else GONE
+            if (state.shouldShowToggleRowBack(navBarVisible, isEditing = isEditWidget)) VISIBLE else GONE
         inputModeWidgetUnifiedBack.visibility =
-            if (state.shouldShowCardRowBack()) VISIBLE else GONE
+            if (state.shouldShowCardRowBack(isEditing = isEditWidget)) VISIBLE else GONE
         inputModeWidgetBack.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
@@ -1127,10 +1137,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * typing and the chrome around the input should yield space to the keyboard / input area.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
-        val showLeading = state.shouldShowLeadingFireButton() && !inputField.hasFocus()
+        val showLeading = state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
         leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
         fireButton.visibility =
-            if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
+            if (state.shouldShowTrailingFireButton(isEditing = isEditWidget)) VISIBLE else GONE
     }
 
     // Onboarding rendering for the leading (Duck.ai) fire button. The lock/dim comes from interactionLock; the
@@ -1597,6 +1607,22 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configureContextual(tabId)
             selectChatTab()
         }
+    }
+
+    override fun configureForEdit(sessionId: String) {
+        isEditWidget = true
+        attachmentView?.isEditMode = true
+        doOnAttach {
+            viewModel.configureForEdit(sessionId)
+            selectChatTab()
+        }
+    }
+
+    override fun adoptEditAttachments(
+        images: List<AdoptedImage>,
+        files: List<AdoptedFile>,
+    ) {
+        attachmentView?.adoptAttachments(images, files)
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState?.isBottom ?: false

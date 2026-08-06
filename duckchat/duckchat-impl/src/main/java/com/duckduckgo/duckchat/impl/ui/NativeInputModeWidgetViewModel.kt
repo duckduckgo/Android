@@ -544,6 +544,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         replayPendingState(tabId)
     }
 
+    /**
+     * The edit screen hosts a second widget for a tab that already has one. Publishing under a
+     * synthetic key keeps it from overwriting the real tab's state, which nothing would repair:
+     * `state` only re-publishes when a value changes.
+     */
+    fun configureForEdit(sessionId: String) {
+        activeTabId.value = editStateKey(sessionId)
+        widgetConfig.value = WidgetConfig(
+            inputContext = NativeInputState.InputContext.DUCK_AI,
+            inputPosition = NativeInputState.InputPosition.TOP,
+            toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+        )
+    }
+
     fun cancelChatSuggestions() {
         chatSuggestionsReader.tearDown()
         lastChatUrlSuggestions = emptyList()
@@ -661,4 +675,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             NativeInputState.InputMode.SEARCH_ONLY
         }
+
+    companion object {
+        fun editStateKey(sessionId: String): String = "edit:$sessionId"
+    }
 }
