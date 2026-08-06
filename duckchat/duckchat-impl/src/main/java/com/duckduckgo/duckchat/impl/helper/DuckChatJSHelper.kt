@@ -41,8 +41,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -553,8 +553,8 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData {
         val payload = EditPromptPayload(
             prompt = data?.optString(EDIT_PROMPT) ?: "",
-            images = data?.optJSONArray(EDIT_IMAGES).toAdoptedImages(),
-            files = data?.optJSONArray(EDIT_FILES).toAdoptedFiles(),
+            images = data?.optJSONArray(EDIT_IMAGES).toSubmittedImages(),
+            files = data?.optJSONArray(EDIT_FILES).toSubmittedFiles(),
         )
         val sessionId = editPromptSessionStore.open(payload)
         activeEditSessionId.set(sessionId)
@@ -567,28 +567,28 @@ class RealDuckChatJSHelper @Inject constructor(
         val params = when (result) {
             is EditPromptResult.Submitted -> JSONObject().apply {
                 put(EDIT_PROMPT, result.prompt)
-                put(EDIT_IMAGES, result.images.toAdoptedImagesJsonArray())
-                put(EDIT_FILES, result.files.toAdoptedFilesJsonArray())
+                put(EDIT_IMAGES, result.images.toSubmittedImagesJsonArray())
+                put(EDIT_FILES, result.files.toSubmittedFilesJsonArray())
             }
             EditPromptResult.Cancelled -> JSONObject().apply { put(EDIT_CANCELLED, true) }
         }
         return JsCallbackData(params, featureName, method, id)
     }
 
-    private fun JSONArray?.toAdoptedImages(): List<AdoptedImage> {
+    private fun JSONArray?.toSubmittedImages(): List<SubmittedImage> {
         val array = this ?: return emptyList()
         return (0 until array.length()).mapNotNull { index ->
             array.optJSONObject(index)?.let {
-                AdoptedImage(data = it.optString("data"), format = it.optString("format"))
+                SubmittedImage(data = it.optString("data"), format = it.optString("format"))
             }
         }
     }
 
-    private fun JSONArray?.toAdoptedFiles(): List<AdoptedFile> {
+    private fun JSONArray?.toSubmittedFiles(): List<SubmittedFile> {
         val array = this ?: return emptyList()
         return (0 until array.length()).mapNotNull { index ->
             array.optJSONObject(index)?.let {
-                AdoptedFile(
+                SubmittedFile(
                     data = it.optString("data"),
                     fileName = it.optString("fileName"),
                     mimeType = it.optString("mimeType"),
@@ -597,7 +597,7 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
-    private fun List<AdoptedImage>.toAdoptedImagesJsonArray(): JSONArray = JSONArray().also { array ->
+    private fun List<SubmittedImage>.toSubmittedImagesJsonArray(): JSONArray = JSONArray().also { array ->
         forEach { image ->
             array.put(
                 JSONObject().apply {
@@ -608,7 +608,7 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
-    private fun List<AdoptedFile>.toAdoptedFilesJsonArray(): JSONArray = JSONArray().also { array ->
+    private fun List<SubmittedFile>.toSubmittedFilesJsonArray(): JSONArray = JSONArray().also { array ->
         forEach { file ->
             array.put(
                 JSONObject().apply {

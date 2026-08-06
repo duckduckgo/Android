@@ -75,8 +75,8 @@ class EditPromptActivity : DuckDuckGoActivity() {
             sessionId,
             EditPromptResult.Submitted(
                 prompt = binding.editPromptInput.text,
-                images = binding.editPromptInput.getImageAttachmentsJson().toAdoptedImages(),
-                files = binding.editPromptInput.getFileAttachmentsJson().toAdoptedFiles(),
+                images = binding.editPromptInput.getImageAttachmentsJson().toSubmittedImages(),
+                files = binding.editPromptInput.getFileAttachmentsJson().toSubmittedFiles(),
             ),
         )
         finish()
@@ -91,20 +91,20 @@ class EditPromptActivity : DuckDuckGoActivity() {
     }
 
     // Mirrors the shape AttachmentViewModel.getImageAttachmentsJson() produces: {"data", "format"}.
-    private fun JSONArray?.toAdoptedImages(): List<AdoptedImage> {
+    private fun JSONArray?.toSubmittedImages(): List<SubmittedImage> {
         if (this == null) return emptyList()
         return (0 until length()).map { index ->
             val json = getJSONObject(index)
-            AdoptedImage(data = json.getString("data"), format = json.getString("format"))
+            SubmittedImage(data = json.getString("data"), format = json.getString("format"))
         }
     }
 
     // Mirrors the shape AttachmentViewModel.getFileAttachmentsJson() produces: {"data", "fileName", "mimeType"}.
-    private fun JSONArray?.toAdoptedFiles(): List<AdoptedFile> {
+    private fun JSONArray?.toSubmittedFiles(): List<SubmittedFile> {
         if (this == null) return emptyList()
         return (0 until length()).map { index ->
             val json = getJSONObject(index)
-            AdoptedFile(
+            SubmittedFile(
                 data = json.getString("data"),
                 fileName = json.getString("fileName"),
                 mimeType = json.getString("mimeType"),

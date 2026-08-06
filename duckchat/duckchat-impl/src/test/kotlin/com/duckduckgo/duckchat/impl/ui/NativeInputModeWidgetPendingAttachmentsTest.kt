@@ -16,8 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.hasPendingAdoptedAttachments
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -32,14 +32,14 @@ class NativeInputModeWidgetPendingAttachmentsTest {
 
     @Test
     fun `pending attachments to apply when an image is queued`() {
-        val images = listOf(AdoptedImage(data = "base64", format = "png"))
+        val images = listOf(SubmittedImage(data = "base64", format = "png"))
 
         assertTrue(hasPendingAdoptedAttachments(pendingImages = images, pendingFiles = emptyList()))
     }
 
     @Test
     fun `pending attachments to apply when a file is queued`() {
-        val files = listOf(AdoptedFile(data = "base64", fileName = "report.pdf", mimeType = "application/pdf"))
+        val files = listOf(SubmittedFile(data = "base64", fileName = "report.pdf", mimeType = "application/pdf"))
 
         assertTrue(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = files))
     }

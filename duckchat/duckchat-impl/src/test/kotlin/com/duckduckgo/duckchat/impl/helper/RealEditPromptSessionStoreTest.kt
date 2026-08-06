@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
@@ -38,7 +38,7 @@ class RealEditPromptSessionStoreTest {
     fun whenSessionOpenedThenPayloadIsReadableById() = runTest {
         val payload = EditPromptPayload(
             prompt = "original",
-            images = listOf(AdoptedImage(data = "abc", format = "png")),
+            images = listOf(SubmittedImage(data = "abc", format = "png")),
             files = emptyList(),
         )
 

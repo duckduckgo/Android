@@ -41,8 +41,8 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -1439,7 +1439,7 @@ class RealDuckChatJSHelperTest {
         whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
             EditPromptResult.Submitted(
                 prompt = "edited",
-                images = listOf(AdoptedImage(data = "img", format = "png")),
+                images = listOf(SubmittedImage(data = "img", format = "png")),
                 files = emptyList(),
             ),
         )
@@ -1566,8 +1566,8 @@ class RealDuckChatJSHelperTest {
         verify(mockEditPromptSessionStore).open(captor.capture())
         val payload = captor.firstValue
         assertEquals("original", payload.prompt)
-        assertEquals(listOf(AdoptedImage(data = "img-data", format = "png")), payload.images)
-        assertEquals(listOf(AdoptedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")), payload.files)
+        assertEquals(listOf(SubmittedImage(data = "img-data", format = "png")), payload.images)
+        assertEquals(listOf(SubmittedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")), payload.files)
     }
 
     @Test
@@ -1577,7 +1577,7 @@ class RealDuckChatJSHelperTest {
             EditPromptResult.Submitted(
                 prompt = "edited",
                 images = emptyList(),
-                files = listOf(AdoptedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")),
+                files = listOf(SubmittedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")),
             ),
         )
         val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")

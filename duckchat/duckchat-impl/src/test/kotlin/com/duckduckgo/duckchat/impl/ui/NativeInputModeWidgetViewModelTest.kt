@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
@@ -74,6 +75,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -147,6 +150,7 @@ class NativeInputModeWidgetViewModelTest {
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val modelStateFlow = MutableStateFlow(ModelState())
     private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val editPromptRequestsFlow = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
@@ -163,6 +167,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
+        whenever(duckChatInternal.editPromptRequests).thenReturn(editPromptRequestsFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
@@ -425,6 +430,36 @@ class NativeInputModeWidgetViewModelTest {
         val state = testee.state.first()
         assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
         assertEquals(NativeInputState.ToggleSelection.DUCK_AI, state.toggleSelection)
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabThenItIsEmitted() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        // Advance once to establish the collector's subscription before emitting — tryEmit on a
+        // replay=0 SharedFlow is lost if no subscriber has started collecting yet.
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = false))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsAnotherTabThenItIsIgnored() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-2", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
     }
 
     @Test

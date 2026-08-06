@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
@@ -28,15 +28,15 @@ import javax.inject.Inject
 
 data class EditPromptPayload(
     val prompt: String,
-    val images: List<AdoptedImage>,
-    val files: List<AdoptedFile>,
+    val images: List<SubmittedImage>,
+    val files: List<SubmittedFile>,
 )
 
 sealed interface EditPromptResult {
     data class Submitted(
         val prompt: String,
-        val images: List<AdoptedImage>,
-        val files: List<AdoptedFile>,
+        val images: List<SubmittedImage>,
+        val files: List<SubmittedFile>,
     ) : EditPromptResult
 
     data object Cancelled : EditPromptResult
