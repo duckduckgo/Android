@@ -29,7 +29,7 @@
     <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Μπορούμε να σας γλιτώσουμε ένα κλικ και να αποδεχτούμε αυτά τα cookie για εσάς."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Αποδοχή cookie που δεν μπορούν να απορριφθούν"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Θα συνεχίσω να τα αποδέχομαι εγώ προσωπικά"</string>
-    <string name="autoconsentPopupTitleWithFeatureDisabled">"Κουραστήκατε από τα αναδυόμενα παράθυρα για cookie που δεν σας αφήνουν σε ησυχία;"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Κουράστηκες από τα αναδυόμενα παράθυρα για cookie που δεν σε αφήνουν σε ησυχία;"</string>
     <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Θα προσπαθήσουμε να απορρίψουμε όσο το δυνατόν περισσότερα cookie. Εάν δεν υπάρχει επιλογή απόρριψης, θα σας γλιτώσουμε ένα κλικ και θα αποδεχτούμε αυτά τα cookie για εσάς."</string>
     <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Απόρριψη όποτε είναι εφικτό ή αποδοχή για μένα"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Θα συνεχίσω να τα διαχειρίζομαι εγώ προσωπικά"</string>
