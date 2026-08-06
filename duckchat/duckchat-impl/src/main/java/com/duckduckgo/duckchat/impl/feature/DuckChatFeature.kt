@@ -149,6 +149,12 @@ interface DuckChatFeature {
     fun nativeChatInput(): Toggle
 
     /**
+     * Delegates editing an already-sent prompt to the native input instead of the Duck.ai inline editor.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativePromptEditing(): Toggle
+
+    /**
      * @return `true` when the native input top nav bar (fire / tabs / menu) may be shown. This is a
      * guardrail on top of the input mode: the bar shows only when this is enabled AND the address bar
      * is in Search & Duck.ai mode. Search-only users, or users with this disabled, never see it.
