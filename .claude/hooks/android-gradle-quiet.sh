@@ -17,7 +17,8 @@ if [[ ! "$cmd" =~ (^|[[:space:]])\./gradlew($|[[:space:]]) ]]; then
   exit 0
 fi
 
-if [[ "$cmd" =~ (^|[[:space:]])(-q|-w|-i|-d|--quiet|--warn|--info|--debug)($|[[:space:]]) ]]; then
+gradlew_segments=$(printf '%s' "$cmd" | grep -oE '\./gradlew[^&|;]*')
+if printf '%s' "$gradlew_segments" | grep -qE '(^|[[:space:]])(-q|-w|-i|-d|--quiet|--warn|--info|--debug)($|[[:space:]])'; then
   echo '{}'
   exit 0
 fi
