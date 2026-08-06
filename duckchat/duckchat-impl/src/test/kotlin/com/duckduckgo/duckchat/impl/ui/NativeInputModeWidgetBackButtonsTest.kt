@@ -133,6 +133,13 @@ class NativeInputModeWidgetBackButtonsTest {
     fun `no back arrows in edit mode`() {
         val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER)
         assertFalse(state.shouldShowToggleRowBack(isNavBarVisible = false, isEditing = true))
+    }
+
+    @Test
+    fun `card row back is hidden in edit mode even when otherwise shown`() {
+        val state = stateOf(InputMode.SEARCH_ONLY, InputContext.BROWSER)
+
+        assertTrue(state.shouldShowCardRowBack(isEditing = false))
         assertFalse(state.shouldShowCardRowBack(isEditing = true))
     }
 
