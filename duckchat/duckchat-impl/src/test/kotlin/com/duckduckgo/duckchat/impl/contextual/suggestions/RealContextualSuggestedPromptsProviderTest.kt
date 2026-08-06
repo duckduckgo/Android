@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.R
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -103,6 +104,40 @@ class RealContextualSuggestedPromptsProviderTest {
 
         assertEquals(1, provider.maxSuggestedPrompts())
         assertEquals(emptySet<String>(), provider.prioritySuggestionIds())
+    }
+
+    @Test
+    fun whenSuggestionHasLocalizedCopyThenCatalogCopyIsReplaced() = runTest {
+        provider.catalogAssetPath = "TestSuggestionsCatalogDivergentCopy.json"
+
+        val result = provider.resolveSuggestions(
+            ResolvePageSuggestionsInput(
+                pageTypeSignals = PageTypeSignals(jsonLdType = emptyList(), ogType = null, lang = "fr"),
+                url = "https://example.com",
+                uiLocale = "en-US",
+            ),
+        )
+
+        val translate = result.first { it.id == "translate-page" }
+        assertEquals(context.getString(R.string.duckAiSuggestionTranslatePageLabel), translate.label)
+        assertEquals("Translate this page into English.", translate.prompt)
+    }
+
+    @Test
+    fun whenSuggestionHasNoLocalizedCopyThenCatalogCopyIsKept() = runTest {
+        provider.catalogAssetPath = "TestSuggestionsCatalogDivergentCopy.json"
+
+        val result = provider.resolveSuggestions(
+            ResolvePageSuggestionsInput(
+                pageTypeSignals = PageTypeSignals(jsonLdType = emptyList(), ogType = null, lang = "fr"),
+                url = "https://example.com",
+                uiLocale = "en-US",
+            ),
+        )
+
+        val mystery = result.first { it.id == "mystery-id" }
+        assertEquals("FE Mystery", mystery.label)
+        assertEquals("FE Mystery.", mystery.prompt)
     }
 
     @Test

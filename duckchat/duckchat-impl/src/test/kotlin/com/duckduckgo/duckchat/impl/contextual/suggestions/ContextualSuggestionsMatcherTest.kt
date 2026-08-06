@@ -258,6 +258,13 @@ class ContextualSuggestionsMatcherTest {
     }
 
     @Test
+    fun whenPromptUsesPositionalFormatArgThenLanguageNameIsSubstituted() {
+        val result = ContextualSuggestionsMatcher.applyTemplate("Translate this page into %1\$s.", input(uiLocale = "en-US"))
+
+        assertEquals("Translate this page into English.", result)
+    }
+
+    @Test
     fun whenPromptHasNoPlaceholderThenLeftUnchanged() {
         val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog)
 
