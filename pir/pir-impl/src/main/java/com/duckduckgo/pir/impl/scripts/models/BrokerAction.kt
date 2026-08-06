@@ -160,6 +160,7 @@ data class ElementSelector(
     val min: String?,
     val max: String?,
     val failSilently: Boolean?,
+    val format: String? = null,
 )
 
 data class ParentElement(
