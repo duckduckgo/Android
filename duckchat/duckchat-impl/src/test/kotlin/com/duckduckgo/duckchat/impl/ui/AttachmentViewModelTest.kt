@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -41,6 +42,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUs
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,6 +66,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -1016,5 +1020,60 @@ class AttachmentViewModelTest {
         viewModel.clearAttachments()
 
         assertNull(viewModel.attachmentState.value.pageContext)
+    }
+
+    @Test
+    fun whenAdoptingImagesThenTheyAppearInStateWithBase64Preserved() = runTest {
+        val png = validPngBase64()
+
+        viewModel.adopt(images = listOf(AdoptedImage(data = png, format = "png")), files = emptyList())
+
+        val adopted = viewModel.getImageAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals(png, adopted.first().base64Data)
+        assertEquals("png", adopted.first().format)
+    }
+
+    @Test
+    fun whenAdoptingAnUndecodableImageThenItIsStillAdoptedWithAPlaceholderBitmap() = runTest {
+        viewModel.adopt(images = listOf(AdoptedImage(data = "not-base64-image-bytes", format = "png")), files = emptyList())
+
+        val adopted = viewModel.getImageAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals("not-base64-image-bytes", adopted.first().base64Data)
+        assertFalse(adopted.first().bitmap.isRecycled)
+    }
+
+    @Test
+    fun whenAdoptingFilesThenSizeIsDerivedFromTheDecodedBytes() = runTest {
+        val base64 = Base64.encodeToString(ByteArray(1024), Base64.NO_WRAP)
+
+        viewModel.adopt(
+            images = emptyList(),
+            files = listOf(AdoptedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+        )
+
+        val adopted = viewModel.getFileAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals("doc.pdf", adopted.first().fileName)
+        assertEquals(1024L, adopted.first().sizeBytes)
+        assertNull(adopted.first().pageCount)
+    }
+
+    @Test
+    fun whenAdoptedAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
+        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        val id = viewModel.getImageAttachments().first().id
+
+        viewModel.removeImageAttachment(id)
+
+        assertNull(viewModel.getImageAttachmentsJson())
+    }
+
+    private fun validPngBase64(): String {
+        val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
+        val out = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        return Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
     }
 }
