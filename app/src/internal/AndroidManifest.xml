@@ -34,6 +34,10 @@
             android:name="com.duckduckgo.app.dev.settings.onboarding.OnboardingDevSettingsActivity"
             android:label="@string/onboardingDevSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.modals.ModalCoordinatorDevSettingsActivity"
+            android:label="@string/modalCoordinatorDevSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 
 </manifest>
