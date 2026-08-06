@@ -362,7 +362,7 @@
 
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Inserisci il codice di sincronizzazione</string>
-    <string name="sync_simplified_scanner_manual_entry_header_body">Apri l\'altra <annotation type="icon">￼</annotation> <b><annotation type="highlight">app DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Vai a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizza con un altro dispositivo</annotation> › <annotation type="highlight">Copia codice di testo</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Apri l\'altra <annotation type="icon">￼</annotation> <b><annotation type="highlight">app DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Vai a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizza con un altro dispositivo</annotation> › <annotation type="highlight">Copia codice di testo</annotation></string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Codice di esempio:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Incolla codice di sincronizzazione</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Spiacenti, il codice incollato non è valido.</string>
