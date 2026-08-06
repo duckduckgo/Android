@@ -2018,11 +2018,13 @@ internal fun NativeInputState.chatHintRes(): Int =
 // The nav bar carries its own back arrow, so this one fills in as the back affordance only while the nav
 // bar is hidden — the two are never visible at once (browser only; this arrow never renders in Duck.ai /
 // contextual, where toggleVisible is false).
-internal fun NativeInputState.shouldShowToggleRowBack(isNavBarVisible: Boolean): Boolean =
-    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && !isNavBarVisible
+internal fun NativeInputState.shouldShowToggleRowBack(
+    isNavBarVisible: Boolean,
+    isEditing: Boolean = false,
+): Boolean = !isEditing && toggleVisible && inputContext == NativeInputState.InputContext.BROWSER && !isNavBarVisible
 
-internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
-    !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+internal fun NativeInputState.shouldShowCardRowBack(isEditing: Boolean = false): Boolean =
+    !isEditing && !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
 
 /**
  * Whether to synchronously show the chat-suggestions list (an opaque overlay) when the Duck.ai tab is
@@ -2040,12 +2042,12 @@ internal fun shouldShowChatSuggestionsCoverOnSelect(
 ): Boolean = inputText.isNotEmpty() || recentChatsExpected
 
 /** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
-internal fun NativeInputState.shouldShowLeadingFireButton(): Boolean =
-    inputContext == NativeInputState.InputContext.DUCK_AI
+internal fun NativeInputState.shouldShowLeadingFireButton(isEditing: Boolean = false): Boolean =
+    !isEditing && inputContext == NativeInputState.InputContext.DUCK_AI
 
 /** Trailing fire button (in the buttons row next to tabs/menu) — hidden in fullscreen Duck.ai chat, otherwise shown. */
-internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
-    inputContext != NativeInputState.InputContext.DUCK_AI
+internal fun NativeInputState.shouldShowTrailingFireButton(isEditing: Boolean = false): Boolean =
+    !isEditing && inputContext != NativeInputState.InputContext.DUCK_AI
 
 /**
  * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
@@ -2071,5 +2073,5 @@ internal fun shouldShowInputControls(
  * the Duck.ai chat tab and only when no chat is streaming. Derived purely from [NativeInputState]
  * so it is unit-testable without Robolectric.
  */
-internal fun NativeInputState.shouldShowPluginControls(): Boolean =
-    toggleSelection == NativeInputState.ToggleSelection.DUCK_AI && !isChatStreaming
+internal fun NativeInputState.shouldShowPluginControls(isEditing: Boolean = false): Boolean =
+    !isEditing && toggleSelection == NativeInputState.ToggleSelection.DUCK_AI && !isChatStreaming
