@@ -172,6 +172,7 @@ class AttachmentViewModel @Inject constructor(
         images: List<AdoptedImage>,
         files: List<AdoptedFile>,
     ) {
+        val toRecycle = imageAttachments.value
         imageAttachments.value = images.map { image ->
             val bytes = decodeBase64(image.data)
             // The image stays in state even when it cannot be rendered, so submitting preserves it
@@ -184,6 +185,7 @@ class AttachmentViewModel @Inject constructor(
                 format = image.format,
             )
         }
+        viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
         _fileAttachments.value = files.map { file ->
             FileAttachment(
                 id = UUID.randomUUID().toString(),
