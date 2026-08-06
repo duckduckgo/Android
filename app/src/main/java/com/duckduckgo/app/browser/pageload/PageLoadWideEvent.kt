@@ -159,7 +159,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
                 result.onSuccess { flowId ->
                     activeFlows[tabId] = PageLoadState(flowId, url, navigationId, startedAt)
-                    logcat { "Page load flow started: tabId=$tabId, url=$url, flowId=$flowId" }
+                    logcat { "Page load flow started: tabId=$tabId, url=$url, flowId=$flowId, navigationId=$navigationId" }
 
                     wideEventClient.flowStep(
                         wideEventId = flowId,
