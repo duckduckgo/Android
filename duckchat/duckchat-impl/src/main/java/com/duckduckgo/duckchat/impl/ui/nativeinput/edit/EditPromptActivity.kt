@@ -84,7 +84,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         params?.sessionId?.let { sessionId ->
-            if (!submitted) editPromptSessionStore.resolve(sessionId, EditPromptResult.Cancelled)
+            if (!submitted && !isChangingConfigurations) editPromptSessionStore.resolve(sessionId, EditPromptResult.Cancelled)
             nativeInputStatePublisher.clearTab(NativeInputModeWidgetViewModel.editStateKey(sessionId))
         }
         super.onDestroy()
