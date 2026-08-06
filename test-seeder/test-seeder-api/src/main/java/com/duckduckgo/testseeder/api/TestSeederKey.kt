@@ -45,4 +45,21 @@ enum class TestSeederKey(val key: String, val description: String) {
             |https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android&referrer=origin%3Dfunnel_appnosupport_website%26onboarding%3Dai
         """.trimMargin(),
     ),
+    FEATURE_FLAGS(
+        key = "featureFlags",
+        description = """
+            |Semicolon-separated list of feature flag assignments applied at launch.
+            |"myFeature=true" targets the feature's self() toggle. "myFeature.mySubFeature=true" targets a sub-feature.
+            |Accepted values: true | false | invert.
+            |"invert" flips the flag's state as of launch. On a fresh cleared install, before any remote
+            |config lands, that means flipping the build's default. If the flag already has stored state,
+            |the starting point is unreliable, so seeding throws instead. Use true or false in that case.
+            |Caveats:
+            |- If remote config contains the targeted flag, a config download mid-test overwrites the
+            |seeded state — pair with a config patch that removes the flag from the downloaded config
+            |(see privacy-config/privacy-config-internal/README.md).
+            |- If the flag is in the bundled local config (privacy-config-impl/src/main/res/raw/privacy_config.json),
+            |don't use this mechanism — a startup race can overwrite the seeded state and there is currently no workaround.
+        """.trimMargin(),
+    ),
 }

@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":feature-toggles-api")
 	implementation project(":feature-toggles-impl")
+	implementation project(":test-seeder-api")
 
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
@@ -48,6 +49,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
