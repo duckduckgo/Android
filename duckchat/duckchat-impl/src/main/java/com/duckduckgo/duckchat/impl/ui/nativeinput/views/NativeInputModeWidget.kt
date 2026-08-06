@@ -499,7 +499,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 // Guard on attach: duckChatInternal is injected in onAttachedToWindow, but the field can
                 // be set before then (e.g. omnibar prefill); onAttachedToWindow publishes the initial
                 // query, so nothing is lost by skipping the pre-attach changes here.
-                if (isAttachedToWindow) {
+                if (isAttachedToWindow && !isEditWidget) {
                     duckChatInternal.setInputQuery(liveQuery)
                 }
                 when (inputModeSwitch.selectedTabPosition) {
