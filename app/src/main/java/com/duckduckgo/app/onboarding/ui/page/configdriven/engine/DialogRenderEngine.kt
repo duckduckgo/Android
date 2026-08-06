@@ -67,11 +67,14 @@ class DialogRenderEngine(
      *
      * Re-rendering the [stepId] + [config] that is currently bound is a no-op, [animate] included, so a caller that can fire more
      * than once for one state does not need to de-duplicate itself.
+     *
+     * [animateBackground] splits the background off the [animate] policy, where needed.
      */
     fun render(
         stepId: LinearOnboardingStepId,
         config: DialogConfig,
         animate: Boolean,
+        animateBackground: Boolean = animate,
     ) {
         if (stepId == previousStepId && config == previous && bound != null) return
 
@@ -80,7 +83,7 @@ class DialogRenderEngine(
         unbindCurrent()
         if (freshStage) content.resetStage()
 
-        background.apply(previous?.background, config.background, animate)
+        background.apply(previous?.background, config.background, animateBackground)
         stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animate)
         cardArrow.apply(previous?.cardArrow, config.cardArrow, animate)
 

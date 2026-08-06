@@ -30,7 +30,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -89,14 +88,13 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     }
 
     private var engine: DialogRenderEngine? = null
+    private var intro: OnboardingIntroChoreographer? = null
 
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
 
     private val requestNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (view?.windowVisibility == View.VISIBLE) {
-            viewModel.notificationPermissionFlowFinished(granted)
-        }
+        viewModel.notificationPermissionFlowFinished(granted)
     }
 
     private val defaultBrowserRoleManagerDialog = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -143,6 +141,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
         val cardAnchor = CardAnchorControllerImpl(binding, CardAnchorResolver(deviceInfo.isTablet()))
 
+        intro = OnboardingIntroChoreographer(binding)
+
         engine = DialogRenderEngine(
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
@@ -178,7 +178,14 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { state -> if (state.config != null) renderConfig(state) }
+            .onEach { state ->
+                when (val screen = state.screen) {
+                    is ConfigDrivenOnboardingPageViewModel.Screen.Intro -> showIntro(screen)
+                    is ConfigDrivenOnboardingPageViewModel.Screen.Dialog -> renderDialog(screen)
+                    ConfigDrivenOnboardingPageViewModel.Screen.None -> intro?.dismissUnplayed()
+                    null -> Unit
+                }
+            }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.commands
@@ -187,18 +194,20 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    /**
-     * Temporary until the intro animators are implemented in the follow-up.
-     */
-    private fun settleIntroViews() {
-        binding.logoAnimation.isVisible = false
-        binding.welcomeTitle.alpha = 0f
-        binding.duckAiIntroAnimation.isVisible = false
+    private fun showIntro(screen: ConfigDrivenOnboardingPageViewModel.Screen.Intro) {
+        when (screen) {
+            is ConfigDrivenOnboardingPageViewModel.Screen.Intro.Play -> {
+                viewModel.onIntroAnimationStarted()
+                intro?.play(withDuckAi = screen.withDuckAi) { viewModel.onIntroAnimationFinished() }
+            }
+            is ConfigDrivenOnboardingPageViewModel.Screen.Intro.Restore -> {
+                if (intro?.restore(withDuckAi = screen.withDuckAi) == true) viewModel.onIntroAnimationFinished()
+            }
+        }
     }
 
-    private fun renderConfig(state: ConfigDrivenOnboardingPageViewModel.ViewState) {
+    private fun renderDialog(screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog) {
         val engine = engine ?: return
-        settleIntroViews()
 
         // A retained view model emits before a recreated view has been laid out, and the decoration fit
         // check measures the root's height, so measuring at 0 would hide the decoration for good.
@@ -206,22 +215,32 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             binding.root.doOnLayout {
                 // isLaidOut is only set after the layout listeners have run, it still reads false from in here,
                 // so we need to dispatch to a separate function
-                render(engine, viewModel.viewState.value)
+                (viewModel.viewState.value.screen as? ConfigDrivenOnboardingPageViewModel.Screen.Dialog)?.let { render(engine, it) }
             }
             return
         }
 
-        render(engine, state)
+        render(engine, screen)
     }
 
     private fun render(
         engine: DialogRenderEngine,
-        state: ConfigDrivenOnboardingPageViewModel.ViewState,
+        screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
-        val stepId = state.stepId ?: return
-        val config = state.config ?: return
-        engine.render(stepId, config, state.animateEntry)
-        viewModel.onDialogRendered(stepId)
+        // We assume that if intro is played, it's always done so before any dialog is rendered.
+        // Once the first dialog arrives, if:
+        // - intro visuals on screen: clear them and the background cross-fades from them
+        // - no intro visual on screen (like a mid-flow re-entry from another activity): nothing to animate from, snap new background
+        // Later renders always animate the background. The handover is unconditional so that a render which does not
+        // animate still takes the background off the choreographer.
+        val canCrossFadeBackground = intro?.clearForDialog() == true
+        engine.render(
+            screen.stepId,
+            screen.config,
+            animate = screen.animateEntry,
+            animateBackground = canCrossFadeBackground && screen.animateEntry,
+        )
+        viewModel.onDialogRendered(screen.stepId)
     }
 
     private fun handleCommand(command: ConfigDrivenOnboardingPageViewModel.Command) {
@@ -261,6 +280,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         super.onDestroyView()
         engine?.release()
         engine = null
+        intro?.release()
+        intro = null
     }
 
     private companion object {

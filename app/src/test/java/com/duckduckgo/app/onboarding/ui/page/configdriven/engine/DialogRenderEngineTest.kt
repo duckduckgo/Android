@@ -150,6 +150,15 @@ class DialogRenderEngineTest {
     }
 
     @Test
+    fun `a snapped background still lets the card and its embellishments animate`() = runTest {
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true, animateBackground = false)
+
+        assertFalse(background.animated)
+        assertEquals(listOf(true, true, true), cardStage.animateFlags)
+        assertTrue(embellishments.animated)
+    }
+
+    @Test
     fun `an emit cta forwards its event as-is`() = runTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
 
