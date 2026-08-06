@@ -266,7 +266,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
-        val inputScreenEnabled: Boolean = false,
         val isSearchOnly: Boolean = false,
         val searchOnlyRestoreEnabled: Boolean = false,
         val showFindInPage: Boolean = false,
@@ -291,15 +290,14 @@ class OmnibarLayoutViewModel @Inject constructor(
             get() = isNativeInputEnabled && viewMode !is NewTab && !isSearchOnly
 
         /**
-         * The click catcher routes an omnibar tap to the native input overlay. Shown when the
-         * input-screen feature is on, or the native field is on and we should use it for the current
-         * context — i.e. we're in Duck.ai (always UTI) or not in search-only. In search-only the
-         * browser omnibar keeps the catcher hidden so its text input stays focusable and a tap
-         * focuses it directly. Derived from flags + viewMode so it can't drift out of sync.
+         * The click catcher routes an omnibar tap to the native input overlay. Shown when the native
+         * field is on and we should use it for the current context — i.e. we're in Duck.ai (always
+         * UTI) or not in search-only. In search-only the browser omnibar keeps the catcher hidden so
+         * its text input stays focusable and a tap focuses it directly. Derived from flags + viewMode
+         * so it can't drift out of sync.
          */
         val showTextInputClickCatcher: Boolean
-            get() = inputScreenEnabled ||
-                (isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly || searchOnlyRestoreEnabled))
+            get() = isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly || searchOnlyRestoreEnabled)
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -334,7 +332,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         ) : Command()
         data object AdBlockingAnimationSuppressed : Command()
         data object MoveCaretToFront : Command()
-        data class LaunchInputScreen(val query: String) : Command()
+        data class LaunchNativeInput(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
         data class CopyUrlToClipboard(val url: String) : Command()
@@ -357,15 +355,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     init {
         logVoiceSearchAvailability()
         combine(
-            duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
             nativeInputSearchOnlyFeature.self().enabled(),
-        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
+        ) { nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
             _viewState.update {
                 it.copy(
-                    inputScreenEnabled = inputScreenEnabled,
                     isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
                     isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
@@ -1284,7 +1280,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             } else {
                 omnibarText
             }
-            command.send(Command.LaunchInputScreen(query = textToPreFill))
+            command.send(Command.LaunchNativeInput(query = textToPreFill))
         }
     }
 

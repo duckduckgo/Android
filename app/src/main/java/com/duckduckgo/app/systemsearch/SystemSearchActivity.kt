@@ -30,7 +30,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
@@ -63,7 +62,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DeleteFavor
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.DismissKeyboard
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.EditQuery
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchAssistSearch
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowser
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowserAndSwitchToTab
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDeviceApplication
@@ -90,13 +88,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -133,9 +125,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
     @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
@@ -165,32 +154,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var omnibarDivider: View
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
-
-    @Inject
     lateinit var duckChat: DuckChat
-
-    private val inputScreenLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            when (result.resultCode) {
-                InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    result.data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
-                        viewModel.onInputScreenQuerySubmitted(query)
-                        launchBrowser(query)
-                    } ?: finish()
-                }
-
-                InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    result.data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        launchBrowser(query = "", openExistingTabId = tabId)
-                    } ?: finish()
-                }
-
-                RESULT_CANCELED -> {
-                    finish()
-                }
-            }
-        }
 
     private val textChangeWatcher =
         object : TextChangedWatcher() {
@@ -261,12 +225,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             intent?.let {
                 sendLaunchPixels(it)
                 if (launchedFromAssist(it)) {
-                    handleDigitalAssistIntent(it)
+                    handleDigitalAssistIntent()
                 } else {
-                    val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = it)
-                    if (!inputScreenLaunched) {
-                        handleVoiceSearchLaunch(it)
-                    }
+                    handleVoiceSearchLaunch(it)
                 }
             }
         }
@@ -302,39 +263,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         sendLaunchPixels(intent)
         if (launchedFromAssist(intent)) {
-            handleDigitalAssistIntent(intent)
+            handleDigitalAssistIntent()
             return
         }
-        val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = intent)
-        if (!inputScreenLaunched) {
-            handleVoiceSearchLaunch(intent)
-        }
-    }
-
-    /**
-     * @return `true` if the Input Screen was successfully launched, `false` otherwise.
-     */
-    private fun launchInputScreen(
-        isTopOmnibar: Boolean,
-        intent: Intent,
-    ): Boolean {
-        return if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value && !launchedFromSearchOnlyWidget(intent)) {
-            globalActivityStarter.startIntent(
-                this,
-                InputScreenActivityParams(
-                    query = "",
-                    isTopOmnibar = isTopOmnibar,
-                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
-                    showInstalledApps = true,
-                    launchWithVoice = launchVoice(intent),
-                ),
-            )?.let {
-                inputScreenLauncher.launch(it)
-                true
-            } ?: false
-        } else {
-            false
-        }
+        handleVoiceSearchLaunch(intent)
     }
 
     private fun sendLaunchPixels(intent: Intent) {
@@ -353,8 +285,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun handleDigitalAssistIntent(intent: Intent) {
-        viewModel.onDigitalAssistOpened(intent)
+    private fun handleDigitalAssistIntent() {
+        viewModel.onDigitalAssistOpened()
     }
 
     private fun configureFlowCollectors() {
@@ -624,8 +556,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 duckChat.openVoiceDuckChat()
                 finish()
             }
-
-            is LaunchAssistSearch -> launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = command.intent)
         }
     }
 

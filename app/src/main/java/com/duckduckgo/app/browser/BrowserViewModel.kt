@@ -182,7 +182,6 @@ class BrowserViewModel @Inject constructor(
             val duckChatUrl: String?,
             val duckChatSessionActive: Boolean,
             val withTransition: Boolean,
-            val tabs: Int,
         ) : Command()
     }
 
@@ -542,8 +541,7 @@ class BrowserViewModel @Inject constructor(
         withTransition: Boolean,
     ) {
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        val tabsCount = tabs.value?.size ?: 0
-        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
+        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition))
     }
 
     fun sendPixelEventForLandscapeOrientation() {
