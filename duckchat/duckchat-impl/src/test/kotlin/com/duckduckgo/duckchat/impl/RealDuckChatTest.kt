@@ -493,6 +493,30 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenNativePromptEditingToggleEnabledAndNativeChatInputEnabledThenNativePromptEditingEnabled() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.nativePromptEditing().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.isNativePromptEditingEnabled())
+    }
+
+    @Test
+    fun whenNativeChatInputDisabledThenNativePromptEditingDisabled() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        duckChatFeature.nativePromptEditing().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.isNativePromptEditingEnabled())
+    }
+
+    @Test
     fun whenDuckChatUserDisabledThenShowVoiceChatEntryIsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
