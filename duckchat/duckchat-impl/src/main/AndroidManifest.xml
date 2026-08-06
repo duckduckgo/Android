@@ -41,6 +41,7 @@
             android:label="@string/duck_ai_paid_settings_title"/>
         <activity
             android:name=".ui.nativeinput.edit.EditPromptActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
             android:label="@string/duck_ai_edit_prompt_title"
             android:windowSoftInputMode="stateVisible|adjustResize" />
