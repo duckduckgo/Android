@@ -58,6 +58,8 @@ data class WideEventEntity(
     val metaType: String,
     @ColumnInfo(name = "meta_version")
     val metaVersion: String,
+    @ColumnInfo(name = "is_first_daily_occurrence", defaultValue = "0")
+    val isFirstDailyOccurrence: Boolean = false,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
