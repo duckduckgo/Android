@@ -8620,7 +8620,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() =
+    fun whenProcessJsCallbackMessageForDuckChatThenEmitOnDuckChatJsResponseFlow() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
@@ -8653,11 +8653,17 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
             )
-            assertCommandIssued<Command.SendResponseToJs>()
+            // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
+            // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
+            testee.duckChatJsResponseFlow.test {
+                assertEquals(jsCallbackData, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
     @Test
-    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
+    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenNoResponseEmitted() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             whenever(
@@ -8689,6 +8695,10 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
             )
+            testee.duckChatJsResponseFlow.test {
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 

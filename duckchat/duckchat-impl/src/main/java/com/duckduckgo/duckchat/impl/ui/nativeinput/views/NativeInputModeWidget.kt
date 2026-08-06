@@ -664,9 +664,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         super.onAttachedToWindow()
         observeAttachmentChangesEnabled()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
-        val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
-        duckChatInternal.setSelectedMode(mode)
-        duckChatInternal.setInputQuery(currentInputQuery())
+        if (!isEditWidget) {
+            // The edit widget's mode/query are the message being edited, not the shared browser-wide
+            // omnibar state that this drives (NewTabPageView, wide-event data): pushing it here would
+            // stomp whatever the real omnibar widget legitimately has showing underneath.
+            val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
+            duckChatInternal.setSelectedMode(mode)
+            duckChatInternal.setInputQuery(currentInputQuery())
+        }
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
@@ -776,6 +781,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (pluginView is ReasoningModePickerView) {
             pluginView.isEditMode = isEditWidget
         }
+        if (pluginView is StopStreamingView) {
+            pluginView.isEditMode = isEditWidget
+        }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
             picker.onMenuDismissed = {
@@ -803,8 +811,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
-        duckChatInternal.setSelectedMode(InputMode.SEARCH)
-        duckChatInternal.setInputQuery("")
+        if (!isEditWidget) {
+            // See the matching guard in onAttachedToWindow: the edit widget must not reset the shared
+            // browser-wide omnibar state, or it would blank out whatever the real omnibar has showing.
+            duckChatInternal.setSelectedMode(InputMode.SEARCH)
+            duckChatInternal.setInputQuery("")
+        }
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null

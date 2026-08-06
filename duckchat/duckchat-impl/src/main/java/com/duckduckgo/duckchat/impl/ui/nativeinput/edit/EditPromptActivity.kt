@@ -64,6 +64,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
             adoptEditAttachments(payload.images, payload.files)
             text = payload.prompt
             onChatSent = { submit(sessionId) }
+            hideMainButtons()
             focusInput(this@EditPromptActivity)
         }
         binding.editPromptCancel.setOnClickListener { finish() }
