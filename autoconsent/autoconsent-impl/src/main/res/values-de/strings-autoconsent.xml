@@ -34,7 +34,7 @@
     <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Wenn möglich ablehnen oder für mich akzeptieren"</string>
     <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Ich kümmere mich weiter selbst darum"</string>
     <string name="autoconsentPopupConfirmButton">"Bestätigen"</string>
-    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Du kannst das jederzeit unter <b>Einstellungen > Cookie-Pop-up-Schutz</b>anpassen.]]></string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Du kannst das jederzeit unter <b>Einstellungen > Cookie-Pop-up-Schutz</b> anpassen.]]></string>
 
 
 </resources>
