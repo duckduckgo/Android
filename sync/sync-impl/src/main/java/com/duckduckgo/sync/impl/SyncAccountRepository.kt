@@ -170,6 +170,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
+    private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -1276,6 +1277,11 @@ class AppSyncAccountRepository @Inject constructor(
                     }
                     result.data.keys?.let { keys ->
                         logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
+                    }
+
+                    // Best-effort unified-device-list write; gated internally and never fails the login.
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        loginDeviceInfoWriter.onLogin(result.data.keys)
                     }
                 }
 
