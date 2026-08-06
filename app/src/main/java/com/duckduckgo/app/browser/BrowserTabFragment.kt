@@ -4166,6 +4166,11 @@ class BrowserTabFragment :
                 setAlgorithmicDarkeningAllowed(this)
             }
 
+            lifecycleScope.launch {
+                val stripImeInsets = withContext(dispatchers.io()) { androidBrowserConfigFeature.stripWebViewImeInsets().isEnabled() }
+                it.setStripImeInsetsEnabled(stripImeInsets)
+            }
+
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 lifecycleScope.launch(dispatchers.main()) {
                     viewModel.requestFileDownload(it, url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
