@@ -45,7 +45,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/cookie_popups_check_128" />
+                app:srcCompat="@drawable/cookie_popups_check_96" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/autoconsentTitle"

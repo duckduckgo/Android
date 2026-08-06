@@ -151,7 +151,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 viewState.autoconsentEnabled
             }
             autoconsentHeaderImage.setImageResource(
-                if (isProtectionEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
+                if (isProtectionEnabled) R.drawable.cookie_popups_check_96 else R.drawable.cookie_block_128,
             )
             autoconsentStatusIndicator.setStatus(isProtectionEnabled)
             autoconsentToggle.isVisible = !showCookiePopUpPreferenceSetting
