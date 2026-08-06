@@ -58,7 +58,7 @@ class SyncThisDeviceViewModelTest {
     private val syncPixels = mock<SyncPixels>()
     private val syncSetupWideEvent = mock<SyncSetupWideEvent>()
 
-    private val testee = SyncThisDeviceViewModel(
+    private fun createTestee() = SyncThisDeviceViewModel(
         syncAccountRepository,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
@@ -74,6 +74,8 @@ class SyncThisDeviceViewModelTest {
     fun `when the user is already signed in then syncing finishes`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             assertIs<FinishSyncing>(awaitItem())
@@ -86,6 +88,8 @@ class SyncThisDeviceViewModelTest {
     fun `when syncing finishes then the connected device is included`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             assertEquals(connectedDevice, (awaitItem() as FinishSyncing).device)
@@ -97,6 +101,8 @@ class SyncThisDeviceViewModelTest {
     @Test
     fun `when the user is already signed in then no account is created`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
@@ -114,6 +120,8 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             assertIs<FinishSyncing>(awaitItem())
@@ -130,6 +138,8 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = "foo")
             skipItems(1)
@@ -145,6 +155,8 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             skipItems(1)
@@ -158,6 +170,8 @@ class SyncThisDeviceViewModelTest {
     @Test
     fun `when syncing this device then the sync enabled event is tracked`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
@@ -174,6 +188,8 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             skipItems(1)
@@ -188,6 +204,8 @@ class SyncThisDeviceViewModelTest {
     fun `when account creation fails then an error is shown`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
@@ -204,6 +222,8 @@ class SyncThisDeviceViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
 
+        val testee = createTestee()
+
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
             assertIs<ShowError>(awaitItem())
@@ -216,6 +236,8 @@ class SyncThisDeviceViewModelTest {
     fun `when the connected device cannot be retrieved then the account creation failed event is tracked`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
@@ -231,6 +253,8 @@ class SyncThisDeviceViewModelTest {
     fun `when syncing this device then the syncing state is shown and then cleared`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
+        val testee = createTestee()
+
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
@@ -244,6 +268,8 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when the user chooses to sync with another device then that flow starts`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onSyncWithAnotherDeviceClicked()
             assertIs<SyncWithAnotherDevice>(awaitItem())
@@ -254,6 +280,8 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when the user closes the screen then syncing is aborted`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onCloseClicked()
             assertIs<AbortSyncing>(awaitItem())
@@ -264,6 +292,8 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when the user dismisses the error then syncing is aborted`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onErrorDismissed()
             assertIs<AbortSyncing>(awaitItem())
@@ -274,17 +304,23 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when the view model is created then the another device prompt shown pixel is fired`() = runTest {
+        createTestee()
+
         verify(syncPixels).fireSyncAnotherDevicePromptShown()
     }
 
     @Test
     fun `when the view model is created then the intro screen shown event is tracked`() = runTest {
+        createTestee()
+
         verify(syncSetupWideEvent).onIntroScreenShown()
     }
 
     @Test
     fun `when syncing this device then the this device only option pixel is fired`() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.syncThisDevice(launchSource = null)
@@ -298,6 +334,8 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when the user chooses to sync with another device then the another device option pixel is fired`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onSyncWithAnotherDeviceClicked()
             skipItems(1)
