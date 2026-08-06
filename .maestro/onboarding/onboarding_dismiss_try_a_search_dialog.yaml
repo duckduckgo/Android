@@ -10,6 +10,9 @@ tags:
     commands:
       - launchApp:
           clearState: true
+          arguments:
+            isMaestro: "true"
+            featureFlags: "${typeof ONBOARDING_FEATURE_FLAGS === 'undefined' ? '' : ONBOARDING_FEATURE_FLAGS}"
       - runFlow: ../shared/pre_onboarding.yaml
       - tapOn:
           id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
