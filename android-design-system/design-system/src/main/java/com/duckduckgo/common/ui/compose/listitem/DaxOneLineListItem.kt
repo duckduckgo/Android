@@ -123,6 +123,18 @@ private fun DaxOneLineListItemPreview() {
 
 @PreviewLightDark
 @Composable
+private fun DaxOneLineListItemWithIconAndTrailingIconPreview() {
+    PreviewSurface {
+        DaxOneLineListItem(
+            primaryText = "Item With Trailing Icon",
+            trailingContent = { Icon(painterResource(R.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+            onClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
 private fun DaxOneLineListItemWithIconAndSwitchPreview() {
     PreviewSurface {
         DaxOneLineListItem(

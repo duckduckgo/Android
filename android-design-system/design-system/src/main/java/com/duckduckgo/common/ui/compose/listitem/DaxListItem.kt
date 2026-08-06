@@ -40,10 +40,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemDefaults.HorizontalPadding
 import com.duckduckgo.common.ui.compose.pill.DaxPill
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -114,7 +116,7 @@ internal fun DaxListItem(
             .fillMaxWidth()
             .then(interaction)
             .heightIn(min = minHeight)
-            .padding(horizontal = DaxListItemDefaults.HorizontalPadding),
+            .padding(start = HorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (leadingContent != null) {
@@ -122,7 +124,9 @@ internal fun DaxListItem(
             Spacer(Modifier.width(DaxListItemDefaults.LeadingGap))
         }
 
-        Column(Modifier.weight(1f).alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha)) {
+        Column(Modifier
+            .weight(1f)
+            .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DaxText(
                     text = primaryText,
@@ -150,6 +154,8 @@ internal fun DaxListItem(
         if (trailingContent != null) {
             Spacer(Modifier.width(DaxListItemDefaults.TrailingGap))
             trailingScope.trailingContent()
+        } else {
+            Spacer(Modifier.width(HorizontalPadding))
         }
     }
 }
@@ -240,7 +246,11 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
     ) {
-        DaxSwitch(checked = checked, onCheckedChange = onCheckedChange, modifier = modifier, enabled = enabled && parentEnabled)
+        Row {
+            DaxSwitch(checked = checked, onCheckedChange = onCheckedChange, modifier = modifier, enabled = enabled && parentEnabled)
+
+            Spacer(Modifier.width(HorizontalPadding))
+        }
     }
 
     /**
@@ -265,31 +275,36 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
         tint: Color? = null,
         enabled: Boolean = true,
     ) {
-        val effectiveEnabled = enabled && parentEnabled
-        val iconDp = when (size) {
-            DaxListItemTrailingIconSize.Small -> DaxListItemDefaults.TrailingIconSmall
-            DaxListItemTrailingIconSize.Medium -> DaxListItemDefaults.TrailingIconMedium
-        }
+        Row {
+            val effectiveEnabled = enabled && parentEnabled
+            val iconDp = when (size) {
+                DaxListItemTrailingIconSize.Small -> DaxListItemDefaults.TrailingIconSmall
+                DaxListItemTrailingIconSize.Medium -> DaxListItemDefaults.TrailingIconMedium
+            }
 
-        if (onClick != null) {
-            DaxIconButton(
-                onClick = onClick,
-                iconPainter = painter,
-                contentDescription = contentDescription,
-                enabled = effectiveEnabled,
-                modifier = modifier
-                    .size(iconDp)
-                    .alpha(if (effectiveEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
-            )
-        } else {
-            M3Icon(
-                painter = painter,
-                contentDescription = contentDescription,
-                tint = tint ?: Color.Unspecified,
-                modifier = modifier
-                    .size(iconDp)
-                    .alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
-            )
+            if (onClick != null) {
+                DaxIconButton(
+                    onClick = onClick,
+                    iconPainter = painter,
+                    contentDescription = contentDescription,
+                    enabled = effectiveEnabled,
+                    modifier = modifier
+                        .alpha(if (effectiveEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
+                )
+
+                Spacer(Modifier.width(6.dp))
+            } else {
+                M3Icon(
+                    painter = painter,
+                    contentDescription = contentDescription,
+                    tint = tint ?: Color.Unspecified,
+                    modifier = modifier
+                        .size(iconDp)
+                        .alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
+                )
+
+                Spacer(Modifier.width(HorizontalPadding))
+            }
         }
     }
 
@@ -318,7 +333,10 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
      * @param modifier Modifier applied to the indicator.
      */
     @Composable
-    fun StatusIndicator(status: Status, modifier: Modifier = Modifier) {
+    fun StatusIndicator(
+        status: Status,
+        modifier: Modifier = Modifier
+    ) {
         DaxStatusIndicator(status = status, modifier = modifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha))
     }
 }
