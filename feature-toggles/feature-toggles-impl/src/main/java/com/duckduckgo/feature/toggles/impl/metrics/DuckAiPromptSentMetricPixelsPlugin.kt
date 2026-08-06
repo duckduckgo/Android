@@ -29,69 +29,17 @@ import javax.inject.Inject
 class DuckAiPromptSentMetricPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
-        return inventory.getAllActiveExperimentToggles().flatMap { toggle ->
-            listOf(
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "1",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 0, upperWindow = 0),
-                        ConversionWindow(lowerWindow = 1, upperWindow = 1),
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "4",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "6",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "11",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "21",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "duck_ai_prompt_sent",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "30",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                    ),
+        return inventory.getAllActiveExperimentToggles().map { toggle ->
+            MetricsPixel(
+                metric = "duck_ai_prompt_sent",
+                type = MetricType.COUNT_WHEN_IN_WINDOW,
+                value = "1",
+                toggle = toggle,
+                conversionWindow = listOf(
+                    ConversionWindow(lowerWindow = 0, upperWindow = 0),
+                    ConversionWindow(lowerWindow = 1, upperWindow = 1),
+                    ConversionWindow(lowerWindow = 5, upperWindow = 7),
+                    ConversionWindow(lowerWindow = 8, upperWindow = 14),
                 ),
             )
         }
