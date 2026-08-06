@@ -7736,6 +7736,14 @@
     const zipCode = generateRandomInt(1e4, 99999).toString();
     return zipCode;
   }
+  function generateDateOfBirth(age, today = /* @__PURE__ */ new Date()) {
+    const dob = new Date(today.getFullYear() - age, today.getMonth(), today.getDate());
+    if (dob.getMonth() !== today.getMonth()) dob.setDate(0);
+    dob.setDate(dob.getDate() - generateRandomInt(0, 364));
+    const month = (dob.getMonth() + 1).toString().padStart(2, "0");
+    const day = dob.getDate().toString().padStart(2, "0");
+    return `${dob.getFullYear()}-${month}-${day}`;
+  }
   function generateStreetAddress() {
     const streetDigits = generateRandomInt(1, 5);
     const streetNumber = generateRandomInt(2, streetDigits * 1e3);
@@ -7794,6 +7802,23 @@
         results.push(setValueForInput(inputElem, generatePhoneNumber()));
       } else if (element.type === "$generated_zip_code$") {
         results.push(setValueForInput(inputElem, generateZipCode()));
+      } else if (element.type === "$generated_dob$") {
+        if (!Object.prototype.hasOwnProperty.call(data2, "age")) {
+          results.push({
+            result: false,
+            error: `element found with selector '${element.selector}', but data didn't contain an 'age' to generate a date of birth from`
+          });
+          continue;
+        }
+        const age = parseInt(data2.age, 10);
+        if (!Number.isFinite(age) || age < 0) {
+          results.push({
+            result: false,
+            error: `element found with selector '${element.selector}', but data contained an 'age' that wasn't a non-negative number`
+          });
+          continue;
+        }
+        results.push(setValueForInput(inputElem, generateDateOfBirth(age)));
       } else if (element.type === "$generated_random_number$") {
         if (!element.min || !element.max) {
           results.push({
