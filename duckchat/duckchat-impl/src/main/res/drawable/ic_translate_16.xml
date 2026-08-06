@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <group>
+    <clip-path
+        android:pathData="M0,0h16v16h-16z"/>
+    <path
+        android:pathData="M5.625,0C5.97,0 6.25,0.28 6.25,0.625V1.75H10.375L10.407,1.751C10.737,1.768 11,2.041 11,2.375C11,2.709 10.737,2.982 10.407,2.999L10.375,3H8.999C9.014,4.743 8.425,6.444 7.321,7.855C7.073,8.173 6.8,8.47 6.509,8.748C7.102,9.125 7.754,9.425 8.449,9.638L10.313,5.375L10.332,5.333C10.439,5.131 10.648,5.002 10.879,5C11.125,4.998 11.349,5.14 11.452,5.363L15.942,15.113C16.087,15.427 15.95,15.798 15.637,15.942C15.323,16.087 14.952,15.95 14.808,15.637L13.708,13.25H8.235L7.198,15.625C7.06,15.941 6.691,16.086 6.375,15.948C6.059,15.81 5.915,15.441 6.053,15.125L7.946,10.789C7.065,10.505 6.239,10.097 5.5,9.578C4.609,10.203 3.594,10.671 2.505,10.95C2.171,11.036 1.83,10.834 1.744,10.5C1.658,10.166 1.86,9.825 2.194,9.739C3.023,9.526 3.797,9.189 4.49,8.748C4.199,8.47 3.927,8.173 3.679,7.855C2.575,6.444 1.987,4.743 2.001,3H0.625C0.28,3 0,2.72 0,2.375C0,2.03 0.28,1.75 0.625,1.75H5V0.625C5,0.28 5.28,0 5.625,0ZM8.781,12H13.133L10.899,7.151L8.781,12ZM3.25,3C3.236,4.456 3.726,5.887 4.663,7.085C4.914,7.406 5.195,7.706 5.5,7.981C5.805,7.706 6.086,7.406 6.337,7.085C7.274,5.887 7.764,4.456 7.75,3H3.25Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+  </group>
+</vector>

@@ -73,6 +73,7 @@ dependencies {
 
     implementation Square.retrofit2.retrofit
     implementation Square.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

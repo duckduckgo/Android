@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -76,6 +77,7 @@ class DuckChatContextualViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val contextualSheetImprovementsToggle: Toggle = mock()
+    private val contextualSuggestedPromptsToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
@@ -88,6 +90,8 @@ class DuckChatContextualViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatFeature.contextualSuggestedPrompts()).thenReturn(contextualSuggestedPromptsToggle)
+        whenever(contextualSuggestedPromptsToggle.isEnabled()).thenReturn(true)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
@@ -2756,6 +2760,92 @@ class DuckChatContextualViewModelTest {
             pinned = false,
             lastEditMillis = lastEditMillis,
         )
+
+    @Test
+    fun `when suggestion selected with valid page context then context is attached and submitted`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = """{"title":"Recipe","url":"https://bbc.co.uk/food","content":"ingredients"}"""
+        val suggestion = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
+    fun `when suggestion selected without valid page context then submitted without context`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = ""
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithoutContextNative()
+    }
+
+    @Test
+    fun `when user removed context then suggestion tap re-attaches it`() = runTest {
+        testee = buildViewModel()
+        testee.currentPageContext = """{"title":"Recipe","url":"https://bbc.co.uk/food","content":"ingredients"}"""
+        testee.removePageContext()
+        val suggestion = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
+    fun `when suggestion selected then prompt submitted and chat opened`() = runTest {
+        testee = buildViewModel()
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onSuggestionSelected(suggestion, currentInput = "")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            awaitItem()
+            assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when suggestion selected with typed text then draft carried into new chat input`() = runTest {
+        testee = buildViewModel()
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.commands.test {
+            testee.onSuggestionSelected(suggestion, currentInput = "Hello")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val command = awaitItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
+            assertEquals("Hello", (command as DuckChatContextualViewModel.Command.ChangeSheetState).prefillNativeInput)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when new chat requested then page context is re-requested before the sheet state change`() = runTest {
+        testee = buildViewModel()
+        testee.onSheetOpened("tab")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            awaitItem()
+
+            testee.onNewChatRequested()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(awaitItem() is DuckChatContextualViewModel.Command.RequestPageContext)
+            assertTrue(testee.isPageContextRequested)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun buildViewModel() = DuckChatContextualViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,

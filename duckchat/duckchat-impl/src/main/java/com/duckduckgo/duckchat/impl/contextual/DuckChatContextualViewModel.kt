@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -201,6 +202,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
                     showChatsIcon = isContextualSheetImprovementsEnabled,
+                    contextualSuggestionsEnabled = duckChatFeature.contextualSuggestedPrompts().isEnabled(),
                 )
             }
             if (isContextualSheetImprovementsEnabled) {
@@ -251,6 +253,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val recentChats: List<ChatHistoryItem> = emptyList(),
         val nativeChatInputEnabled: Boolean = false,
         val contextualNativeInputEnabled: Boolean = false,
+        val contextualSuggestionsEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
@@ -669,21 +672,24 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPlaceholderContextTapped()
         }
         viewModelScope.launch {
-            val isContextValid = isContextValid(currentPageContext, reportInvalidPixels = true)
-            if (isContextValid) {
-                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
-                val json = JSONObject(currentPageContext)
+            if (isContextValid(currentPageContext, reportInvalidPixels = true)) {
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
-                _viewState.update { current ->
-                    logcat { "Duck.ai Contextual: addPageContext $current context $currentPageContext" }
-                    current.copy(
-                        showContext = true,
-                        userRemovedContext = false,
-                        contextTitle = json.optString("title"),
-                        contextUrl = json.optString("url"),
-                    )
-                }
+                attachCurrentPageContext()
             }
+        }
+    }
+
+    private fun attachCurrentPageContext() {
+        pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
+        val json = JSONObject(currentPageContext)
+        _viewState.update { current ->
+            logcat { "Duck.ai Contextual: attachCurrentPageContext $current context $currentPageContext" }
+            current.copy(
+                showContext = true,
+                userRemovedContext = false,
+                contextTitle = json.optString("title"),
+                contextUrl = json.optString("url"),
+            )
         }
     }
 
@@ -780,6 +786,23 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onSuggestionSelected(
+        suggestion: ContextualSuggestedPrompt,
+        currentInput: String,
+    ) {
+        attachPageContextForSuggestion()
+        onPromptSent(
+            prompt = suggestion.prompt,
+            followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+        )
+    }
+
+    private fun attachPageContextForSuggestion() {
+        if (_viewState.value.showContext) return
+        if (!isContextValid(currentPageContext)) return
+        attachCurrentPageContext()
     }
 
     fun onAskAboutPageClicked() {
@@ -992,6 +1015,12 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
+                if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                    withContext(dispatchers.main()) {
+                        isPageContextRequested = true
+                        commandChannel.trySend(Command.RequestPageContext)
+                    }
+                }
                 contextualDataStore.clearTabChatUrl(currentTabId)
 
                 withContext(dispatchers.main()) {

@@ -412,6 +412,11 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
+        val supportsSuggestions = withContext(dispatcherProvider.io()) {
+            duckChat.isDuckChatContextualModeEnabled() &&
+                mode == Mode.CONTEXTUAL &&
+                duckChatFeature.contextualSuggestedPrompts().isEnabled()
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -433,6 +438,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
+                put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
@@ -618,6 +624,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
+        private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
