@@ -67,12 +67,11 @@ class LaunchViewModel @Inject constructor(
     }
 
     private suspend fun seedTestScenario(intent: Intent) {
-        runCatching {
-            testScenarioSeeder.seedIfNeeded(intent.extras.toStringMap())
-        }
-        // runCatching swallows CancellationException; re-check so a cancelled viewModelScope
-        // (activity finished mid-launch) stops the rest of start() instead of routing into a dead UI.
-        currentCoroutineContext().ensureActive()
+        runCatching { intent.extras.toStringMap() }
+            .getOrNull()
+            ?.let { extras ->
+                testScenarioSeeder.seedIfNeeded(extras)
+            }
     }
 
     private fun Bundle?.toStringMap(): Map<String, String> {
