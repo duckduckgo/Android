@@ -108,7 +108,7 @@ class RealContextualSuggestedPromptsProviderTest {
 
     @Test
     fun whenSuggestionHasLocalizedCopyThenCatalogCopyIsReplaced() = runTest {
-        provider.catalogAssetPath = "TestSuggestionsCatalogDivergentCopy.json"
+        provider.catalogAssetPath = "TestSuggestionsCatalog.json"
 
         val result = provider.resolveSuggestions(
             ResolvePageSuggestionsInput(
@@ -125,7 +125,7 @@ class RealContextualSuggestedPromptsProviderTest {
 
     @Test
     fun whenSuggestionHasNoLocalizedCopyThenCatalogCopyIsKept() = runTest {
-        provider.catalogAssetPath = "TestSuggestionsCatalogDivergentCopy.json"
+        provider.catalogAssetPath = "TestSuggestionsCatalog.json"
 
         val result = provider.resolveSuggestions(
             ResolvePageSuggestionsInput(
@@ -135,9 +135,9 @@ class RealContextualSuggestedPromptsProviderTest {
             ),
         )
 
-        val mystery = result.first { it.id == "mystery-id" }
-        assertEquals("FE Mystery", mystery.label)
-        assertEquals("FE Mystery.", mystery.prompt)
+        val unknown = result.first { it.id == "unknown-id" }
+        assertEquals("Unknown", unknown.label)
+        assertEquals("Unknown.", unknown.prompt)
     }
 
     @Test
