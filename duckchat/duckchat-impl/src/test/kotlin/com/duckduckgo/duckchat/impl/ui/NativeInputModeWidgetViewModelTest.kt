@@ -445,6 +445,7 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
         job.cancel()
     }
 
@@ -456,6 +457,20 @@ class NativeInputModeWidgetViewModelTest {
         val job = launch { testee.editPromptRequests.toList(emissions) }
         advanceUntilIdle()
         editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-2", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabButWrongSurfaceThenItIsIgnored() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-2", "tab-1", contextual = false))
         advanceUntilIdle()
 
         assertTrue(emissions.isEmpty())
