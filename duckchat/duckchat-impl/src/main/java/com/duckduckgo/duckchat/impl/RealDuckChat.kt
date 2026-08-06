@@ -71,6 +71,12 @@ import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
+data class EditPromptRequest(
+    val sessionId: String,
+    val tabId: String,
+    val contextual: Boolean,
+)
+
 interface DuckChatInternal : DuckChat {
     /**
      * Set user setting to determine whether DuckChat should be enabled or disabled.
@@ -220,6 +226,16 @@ interface DuckChatInternal : DuckChat {
      * Events asking the native input to open the model picker.
      */
     val showModelPickerEvents: Flow<String>
+
+    /**
+     * Asks the native input on [EditPromptRequest.tabId] to open the edit screen for a pending session.
+     */
+    fun requestEditPrompt(request: EditPromptRequest)
+
+    /**
+     * Events asking the native input to open the edit screen.
+     */
+    val editPromptRequests: Flow<EditPromptRequest>
 
     /**
      * Returns whether image upload is enabled or not.
@@ -456,6 +472,7 @@ class RealDuckChat @Inject constructor(
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _nativeInputNavBarEnabled = MutableStateFlow(false)
@@ -647,6 +664,12 @@ class RealDuckChat @Inject constructor(
     }
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
+    override fun requestEditPrompt(request: EditPromptRequest) {
+        _editPromptRequests.tryEmit(request)
+    }
+
+    override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
 
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
