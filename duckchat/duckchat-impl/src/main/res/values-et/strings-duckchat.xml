@@ -59,7 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
-    <string name="input_screen_search_only_hint">Otsi</string>
+    <string name="input_screen_search_only_hint">Otsing</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
     <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
