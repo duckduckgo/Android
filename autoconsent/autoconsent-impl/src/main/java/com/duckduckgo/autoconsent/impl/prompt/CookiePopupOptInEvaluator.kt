@@ -22,6 +22,7 @@ import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
@@ -43,6 +44,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val applicationContext: Context,
     private val autoconsentFeature: AutoconsentFeature,
     private val dispatchers: DispatcherProvider,
+    private val settingsRepository: AutoconsentSettingsRepository,
 ) : ModalEvaluator {
 
     override val priority: Int = 6
@@ -50,7 +52,12 @@ class CookiePopupOptInEvaluator @Inject constructor(
     override val evaluatorId: String = "cookie_popup_opt_in"
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
-        if (!autoconsentFeature.cookiePopUpOptInPrompt().isEnabled()) {
+        val eligible = autoconsentFeature.self().isEnabled() &&
+            autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled() &&
+            autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() &&
+            !settingsRepository.clickAcceptEnabled
+
+        if (!eligible) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 

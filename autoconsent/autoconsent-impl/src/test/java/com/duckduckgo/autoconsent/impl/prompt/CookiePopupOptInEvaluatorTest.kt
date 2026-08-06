@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.prompt
 
 import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -27,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,6 +44,7 @@ class CookiePopupOptInEvaluatorTest {
 
     private val application: Application get() = RuntimeEnvironment.getApplication()
     private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
+    private val settingsRepository = FakeSettingsRepository()
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -49,7 +52,16 @@ class CookiePopupOptInEvaluatorTest {
             applicationContext = application,
             autoconsentFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
+            settingsRepository = settingsRepository,
         )
+    }
+
+    @Before
+    fun setup() {
+        feature.self().setRawStoredState(Toggle.State(enable = true))
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.clickAcceptEnabled = false
     }
 
     @Test
@@ -61,9 +73,31 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
-    fun whenPromptToggleEnabledThenModalShownAndActivityLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+    fun whenAutoconsentSelfDisabledThenSkipped() = runTest {
+        feature.self().setRawStoredState(Toggle.State(enable = false))
 
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenCookiePopUpPreferenceSettingDisabledThenSkipped() = runTest {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenClickAcceptEnabledThenSkipped() = runTest {
+        settingsRepository.clickAcceptEnabled = true
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenAllConditionsMetThenModalShownAndActivityLaunched() = runTest {
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
 
         val launched = shadowOf(application).nextStartedActivity
