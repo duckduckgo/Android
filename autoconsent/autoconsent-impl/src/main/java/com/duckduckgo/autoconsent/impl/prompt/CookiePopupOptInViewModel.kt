@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.prompt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -30,11 +31,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class CookiePopupOptInViewModel @Inject constructor() : ViewModel() {
+class CookiePopupOptInViewModel @Inject constructor(
+    private val autoconsent: Autoconsent,
+) : ViewModel() {
 
     enum class Choice { MAX, KEEP_CURRENT }
 
-    data class ViewState(val selected: Choice)
+    /**
+     * Whether Cookie Pop-Up Protection is already on decides what we are offering to change, and so the
+     * copy: the screen itself is identical for both.
+     */
+    enum class Variant { PROTECTION_ON, PROTECTION_OFF }
+
+    data class ViewState(
+        val variant: Variant,
+        val selected: Choice = Choice.MAX,
+    )
 
     sealed class Command {
         data object Close : Command()
@@ -42,13 +54,17 @@ class CookiePopupOptInViewModel @Inject constructor() : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private val viewStateFlow = MutableStateFlow(ViewState(selected = Choice.MAX))
+    private val viewStateFlow = MutableStateFlow(
+        ViewState(
+            variant = if (autoconsent.isSettingEnabled()) Variant.PROTECTION_ON else Variant.PROTECTION_OFF,
+        ),
+    )
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     fun onOptionSelected(choice: Choice) {
-        viewStateFlow.value = ViewState(selected = choice)
+        viewStateFlow.value = viewStateFlow.value.copy(selected = choice)
     }
 
     fun onConfirmClicked() {

@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,6 +34,7 @@ import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityCookiePopupOptInBinding
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Choice
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Command
+import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Variant
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -103,8 +105,6 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     private fun setupOptions() {
-        binding.cookiePopupOptInMaxOption.optionText.setText(R.string.autoconsentPopupDefaultOptionWithFeatureEnabled)
-        binding.cookiePopupOptInKeepCurrentOption.optionText.setText(R.string.autoconsentPopupRejectOptionWithFeatureEnabled)
         binding.cookiePopupOptInSettingsHint.text = getString(R.string.autoconsentPopupSettingsHint).html(this)
 
         binding.cookiePopupOptInMaxOption.optionText.setTextAppearance(CommonR.style.Typography_DuckDuckGo_Onboarding_Body_InContext)
@@ -137,10 +137,39 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
+        val text = viewState.variant.textResources()
+        binding.cookiePopupOptInTitle.setText(text.title)
+        binding.cookiePopupOptInDescription.setText(text.description)
+        binding.cookiePopupOptInMaxOption.optionText.setText(text.maxOption)
+        binding.cookiePopupOptInKeepCurrentOption.optionText.setText(text.keepCurrentOption)
+
         val maxSelected = viewState.selected == Choice.MAX
         binding.cookiePopupOptInMaxOption.root.isSelected = maxSelected
         binding.cookiePopupOptInKeepCurrentOption.root.isSelected = !maxSelected
     }
+
+    private fun Variant.textResources(): TextResources = when (this) {
+        Variant.PROTECTION_ON -> TextResources(
+            title = R.string.autoconsentPopupTitleWithFeatureEnabled,
+            description = R.string.autoconsentPopupDescriptionWithFeatureEnabled,
+            maxOption = R.string.autoconsentPopupDefaultOptionWithFeatureEnabled,
+            keepCurrentOption = R.string.autoconsentPopupRejectOptionWithFeatureEnabled,
+        )
+
+        Variant.PROTECTION_OFF -> TextResources(
+            title = R.string.autoconsentPopupTitleWithFeatureDisabled,
+            description = R.string.autoconsentPopupDescriptionWithFeatureDisabled,
+            maxOption = R.string.autoconsentPopupDefaultOptionWithFeatureDisabled,
+            keepCurrentOption = R.string.autoconsentPopupRejectOptionWithFeatureDisabled,
+        )
+    }
+
+    private data class TextResources(
+        @StringRes val title: Int,
+        @StringRes val description: Int,
+        @StringRes val maxOption: Int,
+        @StringRes val keepCurrentOption: Int,
+    )
 
     private fun processCommand(command: Command) {
         when (command) {
