@@ -16,17 +16,8 @@
             "widePixelAppName",
             "widePixelFormFactor",
             "widePixelDevMode",
-            {
-                "key": "meta.type",
-                "type": "string",
-                "description": "Wide event type identifier (platform-prefixed)",
-                "enum": ["android-post-idle-session"]
-            },
-            {
-                "key": "meta.version",
-                "type": "string",
-                "description": "Composed semver: <base_major>.<event_minor>.<event_patch>"
-            },
+            "widePixelMetaType",
+            "widePixelMetaVersion",
             {
                 "key": "global.is_first_daily_occurrence",
                 "type": "boolean",

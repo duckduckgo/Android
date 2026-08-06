@@ -76,6 +76,23 @@ FlowStatus.Unknown   // unexpected termination; always pair with a last_step in 
 
 When a flow is sampled out, `flowStart` returns a sentinel ID. All subsequent calls (`flowStep`, `flowFinish`, etc.) with that ID are silent no-ops with zero disk I/O — no special handling needed at the call site. The probability is persisted with the event and sent to the backend so it can weight the data correctly.
 
+### Meta parameters
+
+Every event is sent with `meta.type` and `meta.version`, which together identify the event definition it validates against. Both come from the optional `definition` parameter of `flowStart`, and the defaults are what almost every event wants:
+
+```kotlin
+wideEventClient.flowStart(
+    name = "my-feature-action",
+    definition = WideEventDefinition(
+        version = Version(minor = 1, patch = 0),   // defaults to Version.INITIAL (0.0)
+        type = "android-my-feature-action",        // defaults to android-{name}
+    ),
+)
+```
+
+- `meta.type` defaults to `android-{name}` with underscores normalized to hyphens (`page-load` becomes `android-page-load`), which matches the `ios-*` / `macos-*` / `win-*` identifiers of the other platforms. Keep flow names kebab-case and you never need to set it — an explicit type is an override, not the norm.
+- `meta.version` is a composed semver `<base_major>.<minor>.<patch>`. You declare only MINOR and PATCH, in step with the event's definition; MAJOR tracks the base template shared by every wide event and is added by the client. **Bump PATCH when you add an optional parameter to an event, MINOR when you rename, remove, or retype one** — a new event starts at `Version.INITIAL` (`0.0`), and the client prepends whichever base template major is current.
+
 ### CleanupPolicy
 
 Defines what happens to flows abandoned due to app termination or timeout:
