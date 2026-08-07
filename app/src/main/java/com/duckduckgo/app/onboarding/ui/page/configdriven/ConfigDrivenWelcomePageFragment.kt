@@ -51,6 +51,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.ContentControll
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.DialogRenderEngine
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.EmbellishmentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.StepIndicatorControllerImpl
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
@@ -135,8 +136,11 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 topMargin = insets.top
             }
             // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows,
-            // which would leave the card measuring against a gap that is about to disappear.
-            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime())) {
+            // which would leave the card measuring against a gap that is about to disappear. Unless the focus
+            // is inside the card: the keyboard is then the card's own, and reserving its height is what
+            // constrains the card above it, so the content it would otherwise cover stays scrollable.
+            val cardOwnsTheKeyboard = v.findFocus() != null
+            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
                 cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             }
             windowInsets
@@ -198,7 +202,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     }
 
     /**
-     * The shared layout holds the values from before onboardingImprovementsV2, which that flag flips at runtime.
+     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2], which that flag flips at runtime.
      * This renderer only ever runs with those improvements on, so it applies them unconditionally.
      *
      * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go. The card wraps a `ScrollView`, and
