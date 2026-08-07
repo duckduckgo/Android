@@ -125,7 +125,7 @@ class RealContextualSuggestedPromptsProviderTest {
             ),
         )
 
-        val translate = result.first { it.id == "translate-page" }
+        val translate = result.suggestions.first { it.id == "translate-page" }
         assertEquals(context.getString(R.string.duckAiSuggestionTranslatePageLabel), translate.label)
         assertEquals("Translate this page into English.", translate.prompt)
     }
@@ -142,7 +142,7 @@ class RealContextualSuggestedPromptsProviderTest {
             ),
         )
 
-        val unknown = result.first { it.id == "unknown-id" }
+        val unknown = result.suggestions.first { it.id == "unknown-id" }
         assertEquals("Unknown", unknown.label)
         assertEquals("Unknown.", unknown.prompt)
     }
