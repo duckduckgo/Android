@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.internal.ui.component.cards
+package com.duckduckgo.common.ui.internal.ui.component.navigation
 
 import com.duckduckgo.common.ui.internal.ui.component.Component
 import com.duckduckgo.common.ui.internal.ui.component.ComponentFragment
 
-class ComponentLayoutsFragment : ComponentFragment() {
+class ComponentNavigationFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.CARD)
+        return listOf(Component.TOP_APP_BAR)
     }
 }
