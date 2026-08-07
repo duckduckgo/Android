@@ -270,7 +270,6 @@
                     android:gravity="center_vertical"
                     android:text="@string/duck_ai_edit_prompt_lose_responses_warning"
                     android:visibility="gone"
-                    android:textAlignment="center"
                     app:textType="secondary"
                     app:typography="caption" />
 
