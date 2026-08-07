@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Juba sünkroonitud.</string>
     <string name="sync_v2_already_paired_message">Need seadmed on juba Sync &amp; Backupiga ühendatud.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Hoia DuckDuckGo sünkroonis!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo on sünkroonitud.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Sünkrooni ja varunda oma automaatse täitmise andmed ja järjehoidjad, otspunktkrüpteeritult kõigis oma DuckDuckGo rakendustes.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Sünkrooni ja varunda oma automaatse täitmise andmeid, järjehoidjaid ja Duck.ai vestlusi, mis on otspunktkrüpteeritud kõigis sinu DuckDuckGo rakendustes.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Sinu järjehoidjad ja automaatse täitmise andmed sünkroonitakse ja varundatakse otspunktkrüpteerimisega.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Sinu järjehoidjad, automaatse täitmise andmed ja Duck.ai vestlused sünkroonitakse ja varundatakse otspunktkrüpteerimisega.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Sünkrooni see seade</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Sünkrooni teise seadmega</string>
+    <string name="sync_simplified_settings_recover_section_header">Taasta sünkroonitud andmed</string>
+    <string name="sync_simplified_settings_recover_data_item">Mul on taastamiskood</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Minu seadmed</string>
+    <string name="sync_simplified_settings_local_device_item_hint">See seade</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Sünkrooni teise seadmega</string>
+    <string name="sync_simplified_settings_download_section_header">Laadi alla</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Järjehoidjad</string>
+    <string name="sync_simplified_settings_recovery_section_header">Taastamine</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Taasta andmed rakenduse uuesti installimisel</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Kui installid DuckDuckGo rakenduse uuesti, küsime, kas soovid oma andmed selles seadmes taastada.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Kopeeri oma taastamiskood</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Laadi oma taastamiskood alla</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele – hoia seda turvalises kohas.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Funktsiooni Sync &amp; Backup andmeid ei saa taastada pärast 18-kuulist mitteaktiivsust. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Lülita välja ja kustuta serveri andmed</string>
+    <string name="sync_simplified_settings_storage_permission_message">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Teavitused on välja lülitatud</string>
+    <string name="sync_simplified_settings_notify_me_body">Saad teavituse, kui funktsiooniga Sync &amp; Backup tekib tõrge.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Hangi DuckDuckGo teistele seadmetele</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Hangi töölaua brauser</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Kas lülitada Sync &amp; Backup välja ja kustutada serveri andmed?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Kõigi Sync &amp; Backup kasutavate seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Kustuta serveri andmed</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Tühista</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Funktsiooni Sync &amp; Backup kasutamiseks kindlusta oma seade</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Seadme lukustusmuster, PIN-kood või biomeetria on vajalik funktsiooni Sync &amp; Backup kasutamiseks.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Ava Sätted</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Sünkrooni see seade lähedalasuva arvutiga.</string>
+    <string name="sync_simplified_setup_header_body">Aitame sul seadmed sünkroonida.</string>
+    <string name="sync_simplified_setup_primary_button">Sünkrooni teise seadmega</string>
+    <string name="sync_simplified_setup_secondary_button">Sünkrooni ainult see seade</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Ühendamine...</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Oma sünkroonitud andmete taastamine</string>
+    <string name="sync_simplified_recover_data_body">Sul on vaja taastamiskoodi, mille said funktsiooni Sync &amp; Backup seadistamisel. Võimalik, et salvestasid selle PDF-failina seadmesse, mida kasutasid.</string>
+    <string name="sync_simplified_recover_data_primary_button">Taasta sünkroonitud andmed</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Sinu eelmine Sync &amp; Backupi seanss on valmis.</string>
+    <string name="sync_simplified_previous_session_body">Jätka Sync &amp; Backupi seanssi, et taastada järjehoidjad, paroolid ja muu või jätka uue seadistusega.</string>
+    <string name="sync_simplified_previous_session_primary_button">Jätka funktsiooniga Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Uue sünkroonimise seadistamine</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Kuva QR-kood</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Skanni QR-kood</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Sisesta kood</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Sünkroonimiseks skanni QR-kood</string>
+    <string name="sync_simplified_scanner_camera_header_body">Ava <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>ja mine <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Olen skannimiseks valmis</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Kahjuks on skannitud kood kehtetu.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Kaamera luba on vajalik</string>
+    <string name="sync_simplified_scanner_no_permission_body">Ava oma seadme seaded ja anna sellele rakendusele luba juurdepääsuks kaamerale.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Ava Sätted</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Kaamera pole saadaval</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Sisesta sünkroonimiskood</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Ava oma teine <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo rakendus</annotation></b>\n<annotation type="gap">\n</annotation>Vali <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation> › <annotation type="highlight">Kopeeri tekstikood</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Näidiskood:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Kleebi sünkroonimiskood</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Kahjuks on kleebitud kood kehtetu.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR-kood</string>
+    <string name="sync_simplified_qr_code_header_headline">Skanni teisest seadmest</string>
+    <string name="sync_simplified_qr_code_header_body">Ava teises seadmes <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ja mine menüüsse <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation> ja skanni see kood:</string>
+    <string name="sync_simplified_qr_code_copy_button">Kopeeri tekstikood</string>
+    <string name="sync_simplified_qr_code_share_button">Jaga</string>
+    <string name="sync_simplified_qr_code_copied_message">Taastamiskood kopeeritud</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup on kõigis sinu seadmetes otspunktkrüpeeritud.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Andmete taastamine</string>
+    <string name="sync_simplified_pairing_body">Ühendamine...</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Kas sünkroonida uus seade?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Sünkrooni kohe</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Tühista</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Kas sünkroonida uus seade?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Sünkrooni kohe</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Tühista</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Kinnita oma teises seadmes…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Sain aru</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s on lisatud Sync &amp; Backupi.</string>
+    <string name="sync_simplified_recovery_code_body">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele. Hoia seda kindlas kohas.</string>
+    <string name="sync_simplified_recovery_code_label">Taastamiskood</string>
+    <string name="sync_simplified_recovery_code_download_button">Laadi oma taastamiskood alla</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Taasta andmed rakenduse uuesti installimisel</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Kui installid DuckDuckGo rakenduse uuesti, küsime, kas soovid oma andmed selles seadmes taastada.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Valmis</string>
+    <string name="sync_simplified_recovery_code_copied_message">Taastamiskood kopeeritud</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Sünkroonitud</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Muuda nime</string>
+    <string name="sync_simplified_edit_device_remove_item">Eemalda seade</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Sünkrooni see seade</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">See seade ei pääse enam sinu sünkroonitud andmetele ligi, kui selle eemaldad.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">See seade ei pääse enam sinu sünkroonitud andmetele ligi, kui see on välja lülitatud.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Muuda nime</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Valmis</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Tühista</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Kas seade eemaldada?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ei pääse enam sinu sünkroonitud andmetele ligi.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Eemalda</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Tühista</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Kas lülitada Sync &amp; Backup välja?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">See seade ei pääse enam ligi sinu sünkroonitud andmetele teistes seadmetes.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Lülita välja</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Tühista</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">OK</string>
+    <string name="sync_simplified_error_dialog_generic_body">Midagi läks valesti</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Seadme nime ei saa uuendada.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Taaste-PDFi ei saa luua.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Taastamiskoodi ei saa kätte.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Midagi läks valesti.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Kas sünkroonida uus seade?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ saab ligi sinu sünkroniseeritud DuckDuckGo andmetele.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Sünkrooni kohe</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Tühista</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Seadista Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Ava seade, et seadistada Sync &amp; Backup</string>
 </resources>

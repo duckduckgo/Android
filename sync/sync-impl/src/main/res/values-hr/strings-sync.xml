@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Već sinkronizirano.</string>
     <string name="sync_v2_already_paired_message">Ovi su uređaji već povezani s uslugom Sync &amp; Backup.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Održavaj DuckDuckGo sinkroniziranim!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo je sinkroniziran.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Sinkroniziraj i sigurnosno pohrani svoje podatke za automatsko popunjavanje i oznake uz end-to-end enkripciju u svim svojim DuckDuckGo aplikacijama.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Sinkroniziraj i sigurnosno pohrani svoje podatke za automatsko popunjavanje, oznake i Duck.ai čavrljanja, uz end-to-end enkripciju, u svim svojim DuckDuckGo aplikacijama.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Tvoje oznake i podaci za automatsko popunjavanje sinkroniziraju se i sigurnosno pohranjuju uz end-to-end enkripciju.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Tvoje oznake, podaci za automatsko popunjavanje i Duck.ai čavrljanja sinkroniziraju se i sigurnosno pohranjuju uz end-to-end enkripciju.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Sinkroniziraj ovaj uređaj</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_simplified_settings_recover_section_header">Oporavak sinkroniziranih podataka</string>
+    <string name="sync_simplified_settings_recover_data_item">Imam kôd za oporavak</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Moji uređaji</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Ovaj uređaj</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_simplified_settings_download_section_header">Preuzmi</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Knjižne oznake</string>
+    <string name="sync_simplified_settings_recovery_section_header">Oporavak</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Vraćanje prilikom ponovne instalacije aplikacije</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Ako ponovno instaliraš aplikaciju DuckDuckGo, pitat ćemo te želiš li vratiti podatke na ovom uređaju.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Kopiraj svoj kôd za oporavak</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Preuzmi svoj kôd za oporavak</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Upotrijebi ovaj kôd za oporavak podataka ako izgubiš pristup ovom uređaju — čuvaj ga na sigurnom.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Podaci Sync &amp; Backup ne mogu se oporaviti nakon 18 mjeseci neaktivnosti. <annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Isključi i izbriši podatke poslužitelja</string>
+    <string name="sync_simplified_settings_storage_permission_message">Spremanje PDF-a za oporavak zahtijeva dopuštenje za pohranu</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Obavijesti su onemogućene</string>
+    <string name="sync_simplified_settings_notify_me_body">Primi obavijest u slučaju da Sync &amp; Backup naiđe na pogrešku.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Nabavi DuckDuckGo na drugim uređajima</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Nabavi preglednik za PC</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Isključi Sync &amp; Backup i izbriši podatke poslužitelja?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Svi uređaji koji koriste Sync &amp; Backup bit će isključeni, a tvoji sinkronizirani podaci bit će izbrisani s poslužitelja.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Brisanje podataka poslužitelja</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Otkaži</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Zaštiti svoj uređaj za korištenje značajke Sync &amp; Backup</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Za korištenje Sync &amp; Backupa potreban je uzorak za zaključavanje uređaja, PIN ili biometrija.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Idi na Postavke</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Sinkroniziraj ovaj uređaj s obližnjim računalom.</string>
+    <string name="sync_simplified_setup_header_body">Pomoći ćemo ti sinkronizirati uređaje.</string>
+    <string name="sync_simplified_setup_primary_button">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_simplified_setup_secondary_button">Sinkroniziraj samo ovaj uređaj</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Povezivanje u tijeku...</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Oporavi sinkronizirane podatke</string>
+    <string name="sync_simplified_recover_data_body">Trebat će ti kôd za oporavak koji si dobio prilikom postavljanja Sync &amp; Backup. Možda si ga spremio kao PDF na uređaju koji si koristio.</string>
+    <string name="sync_simplified_recover_data_primary_button">Oporavak sinkroniziranih podataka</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Tvoja prethodna sesija Sync &amp; Backup je spremna.</string>
+    <string name="sync_simplified_previous_session_body">Nastavi sesiju Sync &amp; Backup kako bi vratio oznake, lozinke i još mnogo toga - ili nastavi s novim postavljanjem.</string>
+    <string name="sync_simplified_previous_session_primary_button">Nastavi Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Postavljanje nove sinkronizacije</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Pokaži QR kôd</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Skeniraj QR</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Unesi kôd</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Skeniraj QR kôd za sinkronizaciju</string>
+    <string name="sync_simplified_scanner_camera_header_body">Otvori <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo za računala</annotation></b>\n<annotation type="gap">\n</annotation>i idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Spreman sam za skeniranje</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Nažalost, skenirani je kôd nevažeći.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Potrebna je dozvola za kameru</string>
+    <string name="sync_simplified_scanner_no_permission_body">Idi na postavke svog uređaja i dopusti ovoj aplikaciji pristup tvojoj kameri.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Idi na Postavke</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Kamera nije dostupna</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Unesi kôd za sinkronizaciju</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Otvori svoju drugu <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikaciju DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation> › <annotation type="highlight">Kopiraj tekstualni kôd</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Primjer kôda:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Zalijepi kôd za sinkronizaciju</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Nažalost, zalijepljeni je kôd nevažeći.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR kôd</string>
+    <string name="sync_simplified_qr_code_header_headline">Skeniraj s drugog uređaja</string>
+    <string name="sync_simplified_qr_code_header_body">Na drugom uređaju otvori <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>i idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation> i skeniraj ovaj kôd:</string>
+    <string name="sync_simplified_qr_code_copy_button">Kopiraj tekstnu šifru</string>
+    <string name="sync_simplified_qr_code_share_button">Podijeli</string>
+    <string name="sync_simplified_qr_code_copied_message">Šifra za oporavak je kopirana</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Opcija Sync &amp; Backup šifrirana je metodom \"od kraja do kraja\" (end-to-end) na svim tvojim uređajima.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Obnavljanje podataka</string>
+    <string name="sync_simplified_pairing_body">Povezivanje u tijeku...</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Sinkronizirati novi uređaj?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Sinkroniziraj</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Otkaži</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Sinkronizirati novi uređaj?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Sinkroniziraj</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Otkaži</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Potvrdi na drugom uređaju…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Shvaćam</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s je dodan u Sync &amp; Backup.</string>
+    <string name="sync_simplified_recovery_code_body">Upotrijebi ovaj kôd za vraćanje podataka ako izgubiš pristup ovom uređaju. Čuvaj ga na sigurnom.</string>
+    <string name="sync_simplified_recovery_code_label">Kôd za oporavak</string>
+    <string name="sync_simplified_recovery_code_download_button">Preuzmi svoj kôd za oporavak</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Vraćanje prilikom ponovne instalacije aplikacije</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Ako ponovno instaliraš aplikaciju DuckDuckGo, pitat ćemo te želiš li vratiti podatke na ovom uređaju.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Gotovo</string>
+    <string name="sync_simplified_recovery_code_copied_message">Kôd za oporavak je kopiran</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Spremanje PDF-a za oporavak zahtijeva dopuštenje za pohranu</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Sinkronizirano</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Uredi ime</string>
+    <string name="sync_simplified_edit_device_remove_item">Ukloni uređaj</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Sinkroniziraj ovaj uređaj</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Ovaj uređaj više neće moći pristupiti tvojim sinkroniziranim podacima ako ga ukloniš.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Ovaj uređaj više neće moći pristupiti tvojim sinkroniziranim podacima ako se ovo isključi.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Uredi ime</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Gotovo</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Otkaži</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Želiš li ukloniti uređaj?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” više neće moći pristupiti tvojim sinkroniziranim podacima.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Ukloni</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Otkaži</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Isključiti Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Ovaj uređaj više neće moći pristupiti tvojim sinkroniziranim podacima na drugim uređajima.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Isključi</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Otkaži</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">U redu</string>
+    <string name="sync_simplified_error_dialog_generic_body">Nešto nije bilo kako treba</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Nije moguće spojiti se na poslužitelj.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Nije moguće ažurirati naziv uređaja.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Nije moguće izraditi PDF za oporavak.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Nije moguće dohvatiti kôd za oporavak.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Nešto nije bilo kako treba.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Sinkronizirati novi uređaj?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” će moći pristupiti tvojim sinkroniziranim podacima DuckDuckGoa.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Sinkroniziraj</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Otkaži</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Postavi Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Otključaj uređaj za postavljanje opcije Sync &amp; Backup</string>
 </resources>

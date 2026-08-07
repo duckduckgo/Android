@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Вече е синхронизирано.</string>
     <string name="sync_v2_already_paired_message">Тези устройства вече са свързани към „Sync &amp; Backup“.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Поддържайте DuckDuckGo синхронизиран!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo е синхронизиран.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Синхронизирайте и архивирайте данните за автоматично попълване и отметките с криптиране от край до край във всички приложения на DuckDuckGo.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Синхронизирайте и архивирайте данните за автоматично попълване, отметките и чатовете с Duck.ai, криптирани от край до край в приложенията на DuckDuckGo.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Вашите отметки и данни за автоматично попълване се синхронизират и архивират с криптиране от край до край.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Вашите отметки, данни за автоматично попълване и чатове с Duck.ai се синхронизират и архивират с криптиране от край до край.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Синхронизиране на това устройство</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Синхронизиране с друго устройство</string>
+    <string name="sync_simplified_settings_recover_section_header">Възстановяване на синхронизирани данни</string>
+    <string name="sync_simplified_settings_recover_data_item">Имам код за възстановяване</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Моите устройства</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Това устройство</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Синхронизиране с друго устройство</string>
+    <string name="sync_simplified_settings_download_section_header">Изтегляне</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Отметки</string>
+    <string name="sync_simplified_settings_recovery_section_header">Възстановяване</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Възстановяване при преинсталиране на приложението</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Ако преинсталирате приложението DuckDuckGo, ще Ви попитаме дали искате да възстановите данните на това устройство.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Копиране на кода за възстановяване</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Изтегляне на кода за възстановяване</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Използвайте този код, за да възстановите данните си, ако загубите достъп до това устройство — съхранявайте го на сигурно място.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Данните в Sync &amp; Backup не могат да бъдат възстановени след 18 месеца неактивност. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Изключване и изтриване на данните от сървъра</string>
+    <string name="sync_simplified_settings_storage_permission_message">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Известията са деактивирани</string>
+    <string name="sync_simplified_settings_notify_me_body">Получаване на известие, ако възникне грешка при Sync &amp; Backup.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Вземете DuckDuckGo на други устройства</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Вземете браузъра за настолен компютър</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Изключване на Sync &amp; Backup и изтриване на данните от сървъра?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Връзката на всички устройства, които използват Sync &amp; Backup, ще бъде премахната, а синхронизираните данни ще бъдат изтрити от сървъра.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Изтриване на данните от сървъра</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Отмяна</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Защитете устройството си, за да използвате Sync &amp; Backup</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">За да използвате Sync &amp; Backup, е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Влезте в Настройки</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Синхронизирайте това устройство с компютър наблизо.</string>
+    <string name="sync_simplified_setup_header_body">Ще помогнем да синхронизирате устройствата си.</string>
+    <string name="sync_simplified_setup_primary_button">Синхронизиране с друго устройство</string>
+    <string name="sync_simplified_setup_secondary_button">Синхронизиране само на това устройство</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Свързване…</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Възстановяване на синхронизираните данни</string>
+    <string name="sync_simplified_recover_data_body">Ще трябва да въведете кода за възстановяване, който сте получили при настройка на Sync &amp; Backup. Може да сте го запазили като PDF файл на устройството, което сте използвали.</string>
+    <string name="sync_simplified_recover_data_primary_button">Възстановяване на синхронизирани данни</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Вашата предишна сесия на Sync &amp; Backup е готова.</string>
+    <string name="sync_simplified_previous_session_body">Възобновете сесията на Sync &amp; Backup, за да възстановите отметките, паролите и други данни, или продължете с нови настройки.</string>
+    <string name="sync_simplified_previous_session_primary_button">Възобновяване на Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Настройка на нова синхронизация</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Показване на QR код</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Сканиране на QR код</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Въвеждане на код</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Сканиране на QR код за синхронизиране</string>
+    <string name="sync_simplified_scanner_camera_header_body">Отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo за настолен компютър</annotation></b>\n<annotation type="gap">\n</annotation>и отворете <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Готов съм за сканиране</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Съжаляваме, сканираният код е невалиден.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Изисква се разрешение за камерата</string>
+    <string name="sync_simplified_scanner_no_permission_body">Влезте в настройките на устройството и дайте на това приложение разрешение за достъп до камерата.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Влезте в Настройки</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Камерата не е достъпна</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Въвеждане на код за синхронизация</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Отворете другото <annotation type="icon">￼</annotation> <b><annotation type="highlight">приложение DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Влезте в <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation> › <annotation type="highlight">Копиране на текстов код</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Примерен код:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Поставяне на код за синхронизация</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Съжаляваме, поставеният код е невалиден.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR код</string>
+    <string name="sync_simplified_qr_code_header_headline">Сканиране от друго устройство</string>
+    <string name="sync_simplified_qr_code_header_body">На друго устройство отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>и влезте в <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation> и сканирайте този код:</string>
+    <string name="sync_simplified_qr_code_copy_button">Копиране на текстов код</string>
+    <string name="sync_simplified_qr_code_share_button">Споделяне</string>
+    <string name="sync_simplified_qr_code_copied_message">Кодът за възстановяване е копиран</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup е криптирано от край до край на всички устройства.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Възстановяване на данни</string>
+    <string name="sync_simplified_pairing_body">Свързване…</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Синхронизиране на ново устройство?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Синхронизиране сега</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Отмяна</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Синхронизиране на ново устройство?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Синхронизиране сега</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Отмяна</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Потвърдете на другото устройство…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Разбрах</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s е добавено към Sync &amp; Backup.</string>
+    <string name="sync_simplified_recovery_code_body">Използвайте този код, за да възстановите данните си, ако загубите достъп до това устройство. Съхранявайте го на сигурно място.</string>
+    <string name="sync_simplified_recovery_code_label">Код за възстановяване</string>
+    <string name="sync_simplified_recovery_code_download_button">Изтегляне на кода за възстановяване</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Възстановяване при преинсталиране на приложението</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Ако преинсталирате приложението DuckDuckGo, ще Ви попитаме дали искате да възстановите данните на това устройство.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Готово</string>
+    <string name="sync_simplified_recovery_code_copied_message">Кодът за възстановяване е копиран</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Синхронизирано</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Редактиране на името</string>
+    <string name="sync_simplified_edit_device_remove_item">Премахване на устройство</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Синхронизиране на това устройство</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Ако премахнете това устройство, то вече няма да има достъп до синхронизираните данни.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Ако бъде изключено, това устройство вече няма да има достъп до синхронизираните данни.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Редактиране на името</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Готово</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Отмяна</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Премахване на устройство?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Премахване</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Отмяна</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Изключване на Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Това устройство вече няма да има достъп до синхронизираните Ви данни на други устройства.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Изключване</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Отмяна</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">ОК</string>
+    <string name="sync_simplified_error_dialog_generic_body">Възникна някаква грешка</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Не може да се осъществи връзка със сървъра.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Името на устройството не може да бъде актуализирано.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Не може да бъде създаден PDF файл за възстановяване.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Не може да бъде получен код за възстановяване.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Възникна някаква грешка.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Синхронизиране на ново устройство?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ще има достъп до синхронизираните Ви данни от DuckDuckGo.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Синхронизиране сега</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Отмяна</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Настройка на Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Отключете устройството, за да настроите Sync &amp; Backup</string>
 </resources>

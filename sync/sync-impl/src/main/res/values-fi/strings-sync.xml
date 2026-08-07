@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Jo synkronoitu.</string>
     <string name="sync_v2_already_paired_message">Nämä laitteet on jo kytketty Sync &amp; Backupiin.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Pidä DuckDuckGo synkronoituna!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo on synkronoitu.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Synkronoi ja varmuuskopioi automaattisen täytön tiedot ja kirjanmerkit päästä päähän -salauksella DuckDuckGo-sovellustesi välillä.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Synkronoi ja varmuuskopioi automaattisen täytön tiedot, kirjanmerkit ja Duck.ai-keskustelut päästä päähän -salauksella DuckDuckGo-sovellustesi välillä.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Kirjanmerkkisi ja automaattisen täytön tietosi synkronoidaan ja varmuuskopioidaan päästä päähän -salauksella.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Kirjanmerkkisi, automaattisen täytön tietosi ja Duck.ai-keskustelusi synkronoidaan ja varmuuskopioidaan päästä päähän -salauksella.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Synkronoi tämä laite</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Synkronoi toisen laitteen kanssa</string>
+    <string name="sync_simplified_settings_recover_section_header">Palauta synkronoidut tiedot</string>
+    <string name="sync_simplified_settings_recover_data_item">Minulla on palautuskoodi</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Omat laitteet</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Tämä laite</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Synkronoi toisen laitteen kanssa</string>
+    <string name="sync_simplified_settings_download_section_header">Lataa</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Kirjanmerkit</string>
+    <string name="sync_simplified_settings_recovery_section_header">Palautus</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Palauta sovelluksen uudelleenasennuksen yhteydessä</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Jos asennat DuckDuckGo-sovelluksen uudelleen, kysymme, haluatko palauttaa tällä laitteella olevat tietosi.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Kopioi palautuskoodisi</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Lataa palautuskoodisi</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Käytä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen – pidä se turvassa.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden käyttämättömyyden jälkeen. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Poista palvelin käytöstä ja poista sen tiedot</string>
+    <string name="sync_simplified_settings_storage_permission_message">Palautus-PDF:n tallentaminen edellyttää tallennustilan käyttöoikeutta.</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Ilmoitukset on poistettu käytöstä</string>
+    <string name="sync_simplified_settings_notify_me_body">Saat ilmoituksen, jos Sync &amp; Backup -toiminnossa tapahtuu virhe.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Hanki DuckDuckGo toiselle laitteelle</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Hanki pöytäkoneselain</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Poistetaanko Sync &amp; Backup -toiminto käytöstä ja poistetaanko palvelintiedot?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Kaikki Sync &amp; Backup -toimintoa käyttävien laitteiden yhteys katkaistaan ja synkronoidut tietosi poistetaan palvelimelta.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Poista palvelintiedot</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Peruuta</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Ota laitteen suojaus käyttöön, jotta voit käyttää Sync &amp; Backup -toimintoa</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Sync &amp; Backup -toiminnon käyttöön vaaditaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Siirry asetuksiin</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Synkronoi tämä laite lähellä olevan tietokoneen kanssa.</string>
+    <string name="sync_simplified_setup_header_body">Autamme sinua synkronoimaan laitteesi.</string>
+    <string name="sync_simplified_setup_primary_button">Synkronoi toisen laitteen kanssa</string>
+    <string name="sync_simplified_setup_secondary_button">Synkronoi vain tämä laite</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Yhdistetään…</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Palauta synkronoidut tiedot</string>
+    <string name="sync_simplified_recover_data_body">Tarvitset palautuskoodin, jonka sait Sync &amp; Backup -toiminnon määrityksen yhteydessä. Olet ehkä tallentanut sen PDF-tiedostona käyttämällesi laitteelle.</string>
+    <string name="sync_simplified_recover_data_primary_button">Palauta synkronoidut tiedot</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Edellinen Sync &amp; Backup -istuntosi on valmis.</string>
+    <string name="sync_simplified_previous_session_body">Jatka Sync &amp; Backup -istuntoa palauttaaksesi kirjanmerkit, salasanat ja muut tiedot tai jatka uudella määrityksellä.</string>
+    <string name="sync_simplified_previous_session_primary_button">Jatka Sync &amp; Backup -istuntoa</string>
+    <string name="sync_simplified_previous_session_secondary_button">Määritä uusi synkronointi</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Näytä QR-koodi</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Skannaa QR-koodi</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Lisää koodi</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Skannaa QR-koodi synkronointia varten</string>
+    <string name="sync_simplified_scanner_camera_header_body">Avaa <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-työpöytäsovellus</annotation></b>\n<annotation type="gap">\n</annotation>ja siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Olen valmis skannaamaan</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Tämä skannattu koodi ei kelpaa.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Kameran käyttölupa tarvitaan</string>
+    <string name="sync_simplified_scanner_no_permission_body">Siirry laitteesi asetuksiin ja anna tälle sovellukselle kameran käyttölupa.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Siirry asetuksiin</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Kamera ei ole käytettävissä</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Lisää synkronointikoodi</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Avaa toinen <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-sovelluksesi</annotation></b>\n<annotation type="gap">\n</annotation>Siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation> › <annotation type="highlight">Kopioi tekstikoodi</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Esimerkkikoodi:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Liitä synkronointikoodi</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Liittämäsi koodi ei kelpaa.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR-koodi</string>
+    <string name="sync_simplified_qr_code_header_headline">Skannaa toiselta laitteelta</string>
+    <string name="sync_simplified_qr_code_header_body">Avaa toisella laitteella <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ja siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation> ja skannaa tämä koodi:</string>
+    <string name="sync_simplified_qr_code_copy_button">Kopioi tekstikoodi</string>
+    <string name="sync_simplified_qr_code_share_button">Jaa</string>
+    <string name="sync_simplified_qr_code_copied_message">Palautuskoodi kopioitu</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup on päästä päähän salattu kaikilla laitteillasi.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Palautetaan tietoja</string>
+    <string name="sync_simplified_pairing_body">Yhdistetään…</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Synkronoidaanko uusi laite?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Synkronoi nyt</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Peruuta</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Synkronoidaanko uusi laite?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Synkronoi nyt</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Peruuta</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Vahvista toisella laitteellasi…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Selvä</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s on lisätty Sync &amp; Backup-toimintoon.</string>
+    <string name="sync_simplified_recovery_code_body">Käytä tätä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen. Pidä se tallessa.</string>
+    <string name="sync_simplified_recovery_code_label">Palautuskoodi</string>
+    <string name="sync_simplified_recovery_code_download_button">Lataa palautuskoodisi</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Palauta sovelluksen uudelleenasennuksen yhteydessä</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Jos asennat DuckDuckGo-sovelluksen uudelleen, kysymme, haluatko palauttaa tällä laitteella olevat tietosi.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Valmis</string>
+    <string name="sync_simplified_recovery_code_copied_message">Palautuskoodi kopioitu</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Palautus-PDF:n tallentaminen edellyttää tallennustilan käyttöoikeutta.</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Synkronoitu</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Muokkaa nimeä</string>
+    <string name="sync_simplified_edit_device_remove_item">Poista laite</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Synkronoi tämä laite</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos poistat sen.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos tämä ominaisuus on poistettu käytöstä.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Muokkaa nimeä</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Valmis</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Peruuta</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Poistetaanko laite?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää synkronoituja tietojasi.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Poista</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Peruuta</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Poistetaanko Sync &amp; Backup käytöstä?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Tämä laite ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Poista käytöstä</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Peruuta</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">OK</string>
+    <string name="sync_simplified_error_dialog_generic_body">Jokin meni pieleen</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Palvelimeen ei saada yhteyttä.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Laitteen nimeä ei voitu päivittää.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Palautus-PDF-tiedoston luominen epäonnistui.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Palautuskoodin hakeminen epäonnistui.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Jokin meni pieleen.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Synkronoidaanko uusi laite?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” voi käyttää synkronoituja DuckDuckGo-tietojasi.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Synkronoi nyt</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Peruuta</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Määritä Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Avaa laitteen lukitus ja määritä Sync &amp; Backup</string>
 </resources>
