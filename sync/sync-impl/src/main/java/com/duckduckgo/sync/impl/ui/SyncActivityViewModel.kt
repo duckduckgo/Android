@@ -125,6 +125,7 @@ class SyncActivityViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     init {
+        syncPixels.fireSyncSettingsShown()
         viewModelScope.launch {
             syncFeature.updateSyncActivityViewStateAtomically().enabled().collect { isAtomicViewStateUpdateEnabled = it }
         }
@@ -292,6 +293,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onSyncThisDevice(source: String? = null) {
+        syncPixels.fireBackupThisDeviceTapped()
         updateViewState { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
@@ -309,6 +311,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onRecoverYourSyncedData() {
+        syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
                 if (syncAutoRestore.canRestore()) {

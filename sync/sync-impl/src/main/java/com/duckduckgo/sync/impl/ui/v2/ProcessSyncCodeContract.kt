@@ -18,10 +18,12 @@ package com.duckduckgo.sync.impl.ui.v2
 
 import android.content.Context
 import android.content.Intent
+import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeContract.Input
 import com.duckduckgo.sync.impl.ui.v2.ProcessSyncCodeContract.Output
+import kotlinx.parcelize.Parcelize
 
 class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
@@ -30,9 +32,7 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     ): Intent {
         return ProcessSyncCodeActivity.intent(
             context = context,
-            syncCode = input.syncCode,
-            syncEntryPoint = input.syncEntryPoint,
-            launchSource = input.launchSource,
+            codeSource = input.source,
         )
     }
 
@@ -53,9 +53,7 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val syncCode: String,
-        val syncEntryPoint: SyncEntryPoint,
-        val launchSource: String?,
+        val source: SyncCodeSource,
     )
 
     sealed interface Output {
@@ -64,5 +62,40 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
         ) : Output
 
         data object Dismissed : Output
+    }
+}
+
+/** A [code] the user is setting up with, together with how it reached [ProcessSyncCodeActivity]. */
+sealed interface SyncCodeSource : Parcelable {
+    val code: String
+    val entryPoint: SyncEntryPoint
+
+    /** A code the user scanned with the camera. */
+    @Parcelize
+    data class Scanned(
+        override val code: String,
+        override val entryPoint: SyncEntryPoint,
+    ) : SyncCodeSource
+
+    /** A code the user pasted into manual entry. */
+    @Parcelize
+    data class Pasted(
+        override val code: String,
+        override val entryPoint: SyncEntryPoint,
+    ) : SyncCodeSource
+
+    /** A code that arrived from an external deep link. */
+    @Parcelize
+    data class DeepLink(
+        override val code: String,
+        override val entryPoint: SyncEntryPoint,
+    ) : SyncCodeSource
+
+    /** A stored recovery code replayed by the settings "restore previous session" path. */
+    @Parcelize
+    data class Restored(
+        override val code: String,
+    ) : SyncCodeSource {
+        override val entryPoint: SyncEntryPoint get() = SyncEntryPoint.RECOVER_SYNCED_DATA
     }
 }

@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -79,12 +80,14 @@ class RealSyncPixelsTest {
 
         testee.fireDailySuccessRatePixel()
 
-        val payload = mapOf(
-            SyncPixelParameters.COUNT to dailyStats.attempts,
-            SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats)
-
-        verify(pixel).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL,
+            buildMap {
+                put(SyncPixelParameters.COUNT, dailyStats.attempts)
+                put(SyncPixelParameters.DATE, dailyStats.date)
+                putAll(dailyStats.apiErrorStats)
+            },
+        )
     }
 
     @Test
@@ -94,45 +97,76 @@ class RealSyncPixelsTest {
         testee.fireDailySuccessRatePixel()
         testee.fireDailySuccessRatePixel()
 
-        val payload = mapOf(
-            SyncPixelParameters.COUNT to dailyStats.attempts,
-            SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
-
-        verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
+        verify(pixel, times(1)).fire(
+            SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL,
+            buildMap {
+                put(SyncPixelParameters.COUNT, dailyStats.attempts)
+                put(SyncPixelParameters.DATE, dailyStats.date)
+                putAll(dailyStats.apiErrorStats)
+                putAll(dailyStats.operationErrorStats)
+            },
+        )
     }
 
     @Test
     fun whenLoginPixelCalledThenPixelFired() {
         testee.fireLoginPixel()
 
-        verify(pixel).fire(SyncPixelName.SYNC_LOGIN)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_LOGIN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
     }
 
     @Test
     fun whenSignupDirectPixelCalledWithNoSourceThenPixelFired() {
         testee.fireSignupDirectPixel(source = null)
 
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
     }
 
     @Test
     fun whenSignupDirectPixelCalledWithSourceThenPixelFiredIncludesSource() {
         testee.fireSignupDirectPixel(source = "foo")
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT, mapOf("source" to "foo"))
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                "source" to "foo",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
     }
 
     @Test
     fun whenSignupConnectPixelCalledWithNoSourceThenPixelFired() {
         testee.fireSignupConnectPixel(source = null)
 
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_CONNECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
     }
 
     @Test
     fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
         testee.fireSignupConnectPixel(source = "foo")
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_CONNECT,
+            mapOf(
+                "source" to "foo",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
     }
 
     @Test
@@ -147,6 +181,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -163,6 +198,41 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenScanCodeScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireScanCodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_SCAN_QR_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenScanCodeScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireScanCodeScreenShown(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_SCAN_QR_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -179,6 +249,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -195,6 +266,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -212,6 +284,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -230,6 +303,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "recovery",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -248,6 +322,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "linking",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -265,6 +340,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -281,6 +357,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -297,6 +374,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -313,6 +391,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -330,6 +409,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -354,6 +434,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_PEER_KIND to "3party",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -380,6 +461,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_PEER_KIND to "ddg",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -397,6 +479,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -419,6 +502,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -444,6 +528,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -469,6 +554,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -485,6 +571,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -505,6 +592,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -525,6 +613,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -579,6 +668,7 @@ class RealSyncPixelsTest {
             mapOf(
                 SyncPixelParameters.ERROR_CODE to "401",
                 SyncPixelParameters.ERROR_REASON to "unauthorized",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -648,6 +738,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -665,6 +756,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -685,6 +777,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -705,6 +798,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_creation_failed",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -725,6 +819,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_upgrade_failed",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -745,6 +840,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -764,6 +860,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -789,6 +886,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE to "waiting_for_confirmation",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }
@@ -809,6 +907,158 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_REASON to "protocol_error",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenLoginPixelCalledAndSimplifiedSyncEnabledThenUiVersionIsV2() {
+        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
+
+        testee.fireLoginPixel()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_LOGIN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSignupDirectPixelCalledAndSimplifiedSyncEnabledThenUiVersionIsV2() {
+        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
+
+        testee.fireSignupDirectPixel(source = "foo")
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                "source" to "foo",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScreenShownAndSimplifiedSyncEnabledThenUiVersionIsV2() {
+        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedAndSimplifiedSyncEnabledButV2FlowDisabledThenUiVersionV2AndFlowVersionV1() {
+        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSyncSettingsShownThenPixelFiredWithUiVersion() {
+        testee.fireSyncSettingsShown()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireBackupThisDeviceTappedThenPixelFiredWithUiVersion() {
+        testee.fireBackupThisDeviceTapped()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_BACK_UP_THIS_DEVICE_TAPPED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireRecoverSyncDataTappedThenPixelFiredWithUiVersion() {
+        testee.fireRecoverSyncDataTapped()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireRecoverSyncDataConfirmedThenPixelFiredWithUiVersion() {
+        testee.fireRecoverSyncDataConfirmed()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSyncAnotherDevicePromptShownThenPixelFiredWithUiVersion() {
+        testee.fireSyncAnotherDevicePromptShown()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSyncAnotherDevicePromptOptionTappedForThisDeviceOnlyThenPixelFiredWithOptionAndUiVersion() {
+        testee.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED,
+            mapOf(
+                SyncPixelParameters.OPTION to "this_device_only",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSyncAnotherDevicePromptOptionTappedForWithAnotherDeviceThenPixelFiredWithOptionAndUiVersion() {
+        testee.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED,
+            mapOf(
+                SyncPixelParameters.OPTION to "sync_another_device",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v1",
             ),
         )
     }

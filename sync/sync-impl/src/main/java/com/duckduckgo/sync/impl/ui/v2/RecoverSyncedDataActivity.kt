@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2RecoverSyncedDataBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import javax.inject.Inject
 
@@ -39,6 +40,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var syncPixels: SyncPixels
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
@@ -85,6 +89,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
     private fun configureRecoverDataCta() {
         binding.recoverDataButton.setOnClickListener {
+            syncPixels.fireRecoverSyncDataConfirmed()
             readSyncCodeLauncher.launch(
                 ReadSyncCodeContract.Input(
                     syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,

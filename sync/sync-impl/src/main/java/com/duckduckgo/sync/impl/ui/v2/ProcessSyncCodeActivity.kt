@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
@@ -79,18 +80,13 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val syncCode
-        get() = requireNotNull(intent.getStringExtra(SYNC_CODE_EXTRA_KEY)) {
-            "Missing intent extra: '$SYNC_CODE_EXTRA_KEY'"
-        }
-
-    private val syncEntryPoint
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
-            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+    private val source
+        get() = requireNotNull(IntentCompat.getParcelableExtra(intent, SYNC_CODE_SOURCE_EXTRA_KEY, SyncCodeSource::class.java)) {
+            "Missing intent extra: '$SYNC_CODE_SOURCE_EXTRA_KEY'"
         }
 
     private val viewModel by viewModels<ProcessSyncCodeViewModel> {
-        Provider(vmFactory, syncCode, syncEntryPoint)
+        Provider(vmFactory, source)
     }
 
     private var acknowledgementDialog: TextAlertDialogBuilder? = null
@@ -112,6 +108,7 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
         configureHeadline()
         configureAcknowledgementAnimation()
         configureConnectingLabel()
+        configureBackHandling()
 
         observeViewModel()
     }
@@ -264,8 +261,15 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applySystemBarInsets(binding.root)
     }
 
+    private fun configureBackHandling() {
+        onBackPressedDispatcher.addCallback(this) {
+            viewModel.onUserCanceled()
+            finish()
+        }
+    }
+
     private fun configureHeadline() {
-        val text = if (syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
+        val text = if (source.entryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
             R.string.sync_simplified_pairing_headline_recovery
         } else {
             R.string.sync_simplified_pairing_headline
@@ -300,20 +304,14 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val SYNC_CODE_EXTRA_KEY = "sync_code"
-        private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
-        private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
+        private const val SYNC_CODE_SOURCE_EXTRA_KEY = "code_source"
 
         fun intent(
             context: Context,
-            syncCode: String,
-            syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            codeSource: SyncCodeSource,
         ): Intent {
             return Intent(context, ProcessSyncCodeActivity::class.java).apply {
-                putExtra(SYNC_CODE_EXTRA_KEY, syncCode)
-                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
+                putExtra(SYNC_CODE_SOURCE_EXTRA_KEY, codeSource)
             }
         }
     }

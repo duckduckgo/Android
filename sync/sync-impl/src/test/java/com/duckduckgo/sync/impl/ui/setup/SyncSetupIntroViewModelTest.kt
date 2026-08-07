@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.setup
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -42,8 +43,9 @@ class SyncSetupIntroViewModelTest {
 
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
+    private val syncPixels: SyncPixels = mock()
 
-    private val testee = SyncSetupIntroViewModel(syncFeatureToggle, coroutineTestRule.testDispatcherProvider, syncSetupWideEvent)
+    private val testee = SyncSetupIntroViewModel(syncFeatureToggle, coroutineTestRule.testDispatcherProvider, syncSetupWideEvent, syncPixels)
 
     @Test
     fun whenSyncIntroArgumentThenIntroCreateAccountScreenShown() = runTest {
@@ -108,6 +110,13 @@ class SyncSetupIntroViewModelTest {
             Assert.assertTrue(command is RecoverDataFlow)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOnStartRecoveryDataClickedThenRecoverSyncDataConfirmedPixelFired() = runTest {
+        testee.onStartRecoverDataClicked()
+
+        verify(syncPixels).fireRecoverSyncDataConfirmed()
     }
 
     @Test

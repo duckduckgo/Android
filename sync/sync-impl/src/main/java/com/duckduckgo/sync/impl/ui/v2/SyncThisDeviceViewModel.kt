@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +51,15 @@ class SyncThisDeviceViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
+    init {
+        syncPixels.fireSyncAnotherDevicePromptShown()
+        viewModelScope.launch {
+            syncSetupWideEvent.onIntroScreenShown()
+        }
+    }
+
     fun syncThisDevice(launchSource: String?) {
+        syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
         _viewState.update { it.copy(isSyncing = true) }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -94,13 +103,8 @@ class SyncThisDeviceViewModel @Inject constructor(
         }
     }
 
-    fun onScreenShown() {
-        viewModelScope.launch {
-            syncSetupWideEvent.onIntroScreenShown()
-        }
-    }
-
     fun onSyncWithAnotherDeviceClicked() {
+        syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
         viewModelScope.launch {
             _commands.send(Command.SyncWithAnotherDevice)
         }

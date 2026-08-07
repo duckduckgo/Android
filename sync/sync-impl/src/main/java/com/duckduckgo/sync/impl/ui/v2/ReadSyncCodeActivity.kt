@@ -22,6 +22,8 @@ import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.activity.addCallback
+import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
@@ -29,6 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.toPx
@@ -53,7 +56,12 @@ import javax.inject.Inject
 class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncV2ReadSyncCodeBinding>()
 
-    private val viewModel by bindViewModel<ReadSyncCodeViewModel>()
+    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val syncEntryPoint
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
+            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+        }
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
@@ -61,12 +69,12 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    @Inject
+    lateinit var vmFactory: ReadSyncCodeViewModel.Factory
 
-    private val syncEntryPoint
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
-            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
-        }
+    private val viewModel by viewModels<ReadSyncCodeViewModel> {
+        ReadSyncCodeViewModel.Factory.Provider(vmFactory, syncEntryPoint)
+    }
 
     private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
 
@@ -103,6 +111,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureContentAdapter()
         configureContentCorners()
+        configureBackHandling()
 
         observeViewModel()
     }
@@ -120,9 +129,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
             is StartSyncProcess -> {
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        syncCode = command.syncCode,
-                        syncEntryPoint = syncEntryPoint,
-                        launchSource = launchSource,
+                        source = command.source,
                     ),
                 )
             }
@@ -144,8 +151,16 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentPager, drawBehindGestureNav = false)
     }
 
+    private fun configureBackHandling() {
+        onBackPressedDispatcher.addCallback(this) {
+            viewModel.onUserCanceled()
+            finish()
+        }
+    }
+
     private fun configureToolbar() {
         binding.closeButton.setOnClickListener {
+            viewModel.onUserCanceled()
             finish()
         }
         binding.showQrCodeButton.isGone = isRecoveryFlow
@@ -166,8 +181,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    SCANNER_POSITION -> ReadSyncCodeCameraFragment()
-                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment()
+                    SCANNER_POSITION -> ReadSyncCodeCameraFragment.instance(syncEntryPoint)
+                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment.instance(syncEntryPoint)
                     else -> error("Unknown position: $position")
                 }
             }
@@ -180,6 +195,22 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
             }
         }
         mediator.attach()
+
+        binding.contentPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        SCANNER_POSITION -> {
+                            viewModel.onScannerScreenShown()
+                        }
+
+                        MANUAL_CODE_ENTRY_POSITION -> {
+                            viewModel.onManualEntryScreenShown()
+                        }
+                    }
+                }
+            },
+        )
     }
 
     private fun configureContentCorners() {
