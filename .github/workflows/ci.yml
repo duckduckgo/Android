@@ -77,9 +77,8 @@ jobs:
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
 
-  # E2E source patches are only applied by nightly workflows, so without this a patch that stopped
-  # applying would go unnoticed until the nightly, and the suite it feeds would quietly test the
-  # unpatched build. Checking here surfaces the rot on the PR that causes it.
+  # Verify that source patches used for tests still apply.
+  # If the PR introduces a patch breakage, it might otherwise only surface in nightly test suites.
   source_patches:
     name: E2E Source Patches
     needs: [check_changes]

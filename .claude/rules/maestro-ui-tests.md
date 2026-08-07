@@ -134,13 +134,10 @@ is now missing and either rewrite the patch or delete it together with the job t
 `E2E Source Patches` job in `ci.yml` runs that check on every PR so the breakage surfaces there
 rather than in the next nightly.
 
-Work out what to patch from the coverage the flavours already give you, and patch only the gap.
+Work out what to patch from the coverage the flavors already give you, and patch only the gap.
 A `DefaultFeatureValue.INTERNAL` default resolves against the build flavour, so the play and
-internal binaries already cover both arms — but only for the flows each flavour runs, which is why
-`config_driven_dialogs_disabled.patch` builds one internal APK for the flows that would otherwise
-never see the arm production ships. A `TRUE` or `FALSE` default is flavour-independent, so a single
-patched build covers the other arm for everything.
+internal binaries already cover both arms — but only for the flows each flavour runs.
+A `TRUE` or `FALSE` default is flavor-independent.
 
-Patching source is the heaviest option: it needs a dedicated build, and the whole suite runs against
-one arm. Reach for it only when the flag is genuinely read too early for a config patch, and only
-for the flows the unpatched builds leave uncovered.
+Patching source is the heaviest option, reach for it only when the flag is genuinely read too early
+for a config patch, and only for the flows the unpatched builds leave uncovered.
