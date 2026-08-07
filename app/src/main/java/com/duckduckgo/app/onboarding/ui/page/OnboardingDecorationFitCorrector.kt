@@ -36,13 +36,10 @@ class OnboardingDecorationFitCorrector(
     var enabled: Boolean = false
 
     /**
-     * Whether a card anchored above a decoration still reserves the part of its bottom inset that the decoration
-     * does not already cover. Only the config-driven renderer sets this: its undecorated band anchors the card on
-     * screens the legacy renderer pinned to the parent bottom, so without this the card has no way to clear an
-     * inset taller than the band, i.e. the keyboard.
-     *
-     * The whole reservation hangs off this flag, so the legacy renderer's geometry is untouched: the reserved
-     * inset stays out of the decoration's fit, and the card's span above the decoration is what clamps it.
+     * Whether a card anchored above a decoration also reserves the part of its bottom inset the decoration does not
+     * cover. Only the config-driven renderer needs it: its undecorated band anchors the card on screens the legacy
+     * renderer pinned to the parent bottom, so otherwise the card cannot clear an inset taller than the band, i.e.
+     * the keyboard.
      */
     var reservesInsetAboveDecoration: Boolean = false
 
@@ -89,7 +86,7 @@ class OnboardingDecorationFitCorrector(
         // The card reserves the bottom-bar inset when it is the bottom-most element: bottom-anchored AND no
         // decoration shown below it. A shown decoration is at least its min height, which exceeds any bar
         // inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace and hide
-        // that very decoration. See [reservesInsetAboveDecoration] for the insets a decoration cannot cover.
+        // that very decoration.
         if (syncCardBottomInset(decorationShown)) return false
 
         // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
@@ -114,10 +111,9 @@ class OnboardingDecorationFitCorrector(
         val overflow = (cardContainerHeight - viewportHeight).coerceAtLeast(0)
         val available = root.height - root.paddingTop - root.paddingBottom
         val dialogParams = dialog.layoutParams as ViewGroup.MarginLayoutParams
-        // An inset reserved above the decoration buys room the decoration is not competing for: a keyboard
-        // overlays the window rather than shrinking it, so `available` already covers the room the card gave up.
-        // Counting it would shrink the decoration, which grows the inset, which shrinks the decoration, until it
-        // is gone. Without that reservation the margin is 0 here anyway, a decoration being shown.
+        // A keyboard overlays the window rather than shrinking it, so `available` already covers the room the card
+        // gave up above the decoration. Counting it would shrink the decoration, which grows the inset, which
+        // shrinks the decoration again, until it is gone.
         val cardBottomMargin = if (reservesInsetAboveDecoration) 0 else dialogParams.bottomMargin
         val dialogSpace = dialogHeight + overflow + dialogParams.topMargin + cardBottomMargin
         val decorationParams = deco.layoutParams as ViewGroup.MarginLayoutParams
@@ -177,8 +173,7 @@ class OnboardingDecorationFitCorrector(
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
         val roomBelowCard = when {
             params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID -> 0
-            // Anchored above a decoration: unclamped the card overruns it instead of scrolling, so a card lifted
-            // clear of the keyboard would still spill under it.
+            // Anchored above a decoration: unclamped, the card overruns it instead of scrolling.
             params.bottomToTop != ConstraintLayout.LayoutParams.UNSET ->
                 decoration?.takeIf { !it.isGone }?.let { roomBelowCard(it) } ?: return false
             else -> return false

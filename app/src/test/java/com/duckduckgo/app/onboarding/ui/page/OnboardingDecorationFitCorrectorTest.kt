@@ -507,9 +507,6 @@ class OnboardingDecorationFitCorrectorTest {
         assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
     }
 
-    // reservesInsetAboveDecoration opts a renderer into the card also reserving whatever part of the inset the
-    // decoration it is anchored above cannot cover — the config-driven undecorated band versus the keyboard.
-
     @Test
     fun whenInsetExceedsTheDecorationBelowThenCardReservesTheRemainder() {
         val h = harness(
@@ -579,8 +576,6 @@ class OnboardingDecorationFitCorrectorTest {
 
     @Test
     fun whenDecorationBelowIsGoneThenTheHostReanchorsInsteadOfTheCardReservingTheInset() {
-        // A gone decoration means onDecorationHidden has already asked the host to re-anchor the card, after
-        // which the bottom-anchored branch reserves the whole inset. Reserving it here too would double up.
         val h = harness(
             rootHeight = 1200,
             dialogHeight = 600,
@@ -627,8 +622,6 @@ class OnboardingDecorationFitCorrectorTest {
 
     @Test
     fun whenCardReservesAnInsetAboveTheDecorationThenThatInsetDoesNotShrinkTheDecoration() {
-        // The reserved inset buys room out from under a keyboard, which the decoration is not competing for.
-        // Counting it against the decoration shrinks it, which grows the inset, until the decoration is gone.
         val h = harness(
             rootHeight = 1752,
             dialogHeight = 873,
@@ -649,7 +642,7 @@ class OnboardingDecorationFitCorrectorTest {
         assertFalse(h.corrector.correctOnce()) // reserves 863 - 422 = 441
         assertEquals(441, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
 
-        // Settles there: the decoration keeps its height, so the reservation does not grow on the next pass.
+        // Settles: the decoration keeps its height, so the reservation does not grow on the next pass.
         h.corrector.correctOnce()
         h.corrector.correctOnce()
         assertEquals(422, h.decoration.layoutParams.height)
@@ -660,8 +653,6 @@ class OnboardingDecorationFitCorrectorTest {
     @Test
     fun whenCardAboveDecorationOverflowsItsRemainingSpanThenClampEnabled() {
         // span = 1752 - 64 (top margin) - 441 (reserved inset) - 422 (decoration) = 825 < content 873.
-        // Without the clamp the card overruns the decoration instead of scrolling, so a card lifted clear of
-        // the keyboard still spills under it.
         val h = harness(
             rootHeight = 1752,
             dialogHeight = 873,
@@ -711,8 +702,6 @@ class OnboardingDecorationFitCorrectorTest {
 
     @Test
     fun whenNotReservingAnInsetAboveTheDecorationThenAnOverflowingCardIsNotClamped() {
-        // Legacy inertness: the card is anchored above a decoration and overflows the span that leaves it, but
-        // without the reservation the corrector must not touch the card's wrap.
         val h = harness(
             rootHeight = 1752,
             dialogHeight = 873,

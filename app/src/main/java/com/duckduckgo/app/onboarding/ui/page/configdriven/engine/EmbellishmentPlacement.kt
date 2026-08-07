@@ -28,8 +28,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 object EmbellishmentPlacement {
 
     fun of(embellishment: Embellishment): Placement = when (embellishment) {
-        // Bias 1 keeps the card pressed down against the dax on a phone; a tablet has room to spare above the
-        // dax, so the card centres in it instead of hanging off the artwork.
+        // Bias 1 presses the card down against the dax on a phone; a tablet has room to spare above it, so the
+        // card centres instead of hanging off the artwork.
         Embellishment.WalkingDax -> Placement(anchorsCardOnPhone = true, biasPhone = 1f, biasTablet = 0.5f, drawsArtwork = true)
         Embellishment.BottomWing -> Placement(anchorsCardOnPhone = true, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = true)
         // The side decorations reserve no room on a phone, where the card runs down past them instead.

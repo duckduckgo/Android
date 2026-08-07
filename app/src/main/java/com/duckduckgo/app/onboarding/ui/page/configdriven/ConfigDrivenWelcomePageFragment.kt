@@ -136,9 +136,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 topMargin = insets.top
             }
             // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows,
-            // which would leave the card measuring against a gap that is about to disappear. Unless the focus
-            // is inside the card: the keyboard is then the card's own, and reserving its height is what
-            // constrains the card above it, so the content it would otherwise cover stays scrollable.
+            // which would leave the card measuring against a gap that is about to disappear. Unless the focus is
+            // inside the card: reserving the keyboard's height is then what keeps the card's content scrollable.
             val cardOwnsTheKeyboard = v.findFocus() != null
             if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
                 cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
@@ -202,14 +201,13 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     }
 
     /**
-     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2], which that flag flips at runtime.
-     * This renderer only ever runs with those improvements on, so it applies them unconditionally.
+     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2],
+     * which that flag flips at runtime. This renderer only ever runs with those improvements on.
      *
-     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go. The card wraps a `ScrollView`, and
+     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go: the card wraps a `ScrollView`, and
      * inside a wrap_content parent ConstraintLayout resolves the wrap before `constraintWidth_max` narrows the
-     * card, so a body line that will wrap in the final card is still on one line. Under either flag the card keeps
-     * that short height and its content scrolls with room to spare. The corrector still owns the flag on the card
-     * root, and puts it back the moment a bottom-anchored card genuinely overflows.
+     * card, so the card keeps a height measured for text that will wrap and scrolls with room to spare. The
+     * corrector puts the flag back on the card root once the card genuinely overflows.
      */
     private fun applyLayoutOverrides() {
         binding.bottomWingAnimation.adjustViewBounds = true
@@ -254,9 +252,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         engine: DialogRenderEngine,
         screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
-        // We assume that if intro is played, it's always done so before any dialog is rendered.
-        // The handover is unconditional so that a render which does not animate still takes the background
-        // off the choreographer.
+        // We assume that if intro is played, it's always done so before any dialog is rendered. The handover is
+        // unconditional so that a render which does not animate still takes the background off the choreographer.
         intro?.clearForDialog()
         engine.render(
             screen.stepId,
