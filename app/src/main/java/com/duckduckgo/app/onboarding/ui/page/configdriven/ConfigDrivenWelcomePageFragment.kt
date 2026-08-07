@@ -201,14 +201,18 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
      * The shared layout holds the values from before onboardingImprovementsV2, which that flag flips at runtime.
      * This renderer only ever runs with those improvements on, so it applies them unconditionally.
      *
-     * The card's own [ConstraintLayout.LayoutParams.constrainedHeight] has to go: the card wraps a `ScrollView`,
-     * and inside a wrap_content parent ConstraintLayout resolves the wrap at the pre-`constraintWidth_max` width,
-     * where a body line that will wrap in the capped card still fits on one line. The card then keeps that short
-     * height and its content scrolls even with room to spare.
+     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go. The card wraps a `ScrollView`, and
+     * inside a wrap_content parent ConstraintLayout resolves the wrap before `constraintWidth_max` narrows the
+     * card, so a body line that will wrap in the final card is still on one line. Under either flag the card keeps
+     * that short height and its content scrolls with room to spare. The corrector still owns the flag on the card
+     * root, and puts it back the moment a bottom-anchored card genuinely overflows.
      */
     private fun applyLayoutOverrides() {
         binding.bottomWingAnimation.adjustViewBounds = true
         binding.daxDialogCta.cardView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
+        binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
             constrainedHeight = false
         }
     }
