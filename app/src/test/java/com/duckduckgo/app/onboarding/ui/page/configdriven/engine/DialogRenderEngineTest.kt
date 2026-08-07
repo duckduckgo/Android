@@ -83,6 +83,7 @@ class DialogRenderEngineTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
 
         assertTrue(content.stageReset)
+        assertTrue(embellishments.stageReset)
         assertEquals(null to OnboardingBackgroundStep.ComparisonChart, background.applied)
         assertEquals(null to Embellishment.BottomWing, embellishments.applied)
         assertEquals(null to CardArrowConfig.AtEnd, cardArrow.applied)
@@ -93,10 +94,12 @@ class DialogRenderEngineTest {
     fun `second render diffs each axis against the previous config`() = runTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
         content.stageReset = false
+        embellishments.stageReset = false
 
         testee.render(ADDRESS_BAR_STEP, addressBarConfig(), animate = true)
 
         assertFalse(content.stageReset)
+        assertFalse(embellishments.stageReset)
         assertEquals(OnboardingBackgroundStep.ComparisonChart to OnboardingBackgroundStep.AddressBar, background.applied)
         assertEquals(Embellishment.BottomWing to Embellishment.BobbingDax, embellishments.applied)
         assertEquals(
@@ -618,8 +621,13 @@ private class FakeEmbellishmentController : EmbellishmentController {
     var animated = false
     var skipped = false
     var released = false
+    var stageReset = false
 
     var settledResult: SettledDecoration? = null
+
+    override fun resetStage() {
+        stageReset = true
+    }
 
     override fun transition(
         previous: Embellishment?,

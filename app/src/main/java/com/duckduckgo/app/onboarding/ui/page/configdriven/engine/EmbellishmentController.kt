@@ -37,6 +37,12 @@ import com.duckduckgo.common.ui.view.toPx
 
 interface EmbellishmentController {
     /**
+     * Clears every decoration off the stage, so a render with no predecessor to exit does not inherit the layout
+     * footprint of whichever decorations the XML leaves visible.
+     */
+    fun resetStage()
+
+    /**
      * Returns what the fit check settled on, synchronously: the caller anchors the card to it in the same frame,
      * so the card's reposition is picked up by the render's card morph instead of snapping into place later.
      */
@@ -94,6 +100,10 @@ class EmbellishmentControllerImpl(
     init {
         fitCorrector.enabled = true
         fitCorrector.attach()
+    }
+
+    override fun resetStage() {
+        decorations.values.forEach { it.hide() }
     }
 
     override fun transition(

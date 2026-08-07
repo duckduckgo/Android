@@ -89,7 +89,10 @@ class DialogRenderEngine(
         val freshStage = previous == null
         skipRunningAnimations()
         unbindCurrent()
-        if (freshStage) content.resetStage()
+        if (freshStage) {
+            content.resetStage()
+            embellishments.resetStage()
+        }
 
         background.apply(previous?.background, config.background, animateBackground)
         stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animate)
