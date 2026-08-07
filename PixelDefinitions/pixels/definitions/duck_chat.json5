@@ -1561,7 +1561,7 @@
         "parameters": ["appVersion"]
     },
     "aichat_contextual_suggestion_selected": {
-        "description": "User tapped a suggested prompt on the contextual Duck.ai sheet start surface. suggestionId=ask-about-page represents the Ask About Page quick action tap while contextual suggestions are enabled, which additionally fires the legacy m_aichat_contextual_quick_action_ask_about_page_selected pixel.",
+        "description": "User tapped a suggested prompt on the contextual Duck.ai sheet start surface. The Ask About Page quick action reports as suggestionId=ask-about-page and also fires m_aichat_contextual_quick_action_ask_about_page_selected.",
         "owners": ["joshliebe"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
@@ -1599,7 +1599,7 @@
         ]
     },
     "aichat_contextual_suggestions_viewed": {
-        "description": "Suggested prompts became visible on the contextual Duck.ai sheet start surface. Fires once per continuous display; a fresh impression is counted when the start surface reloads (sheet reopened or New Chat). Loading or empty surfaces never fire.",
+        "description": "Suggested prompts became visible on the contextual Duck.ai sheet start surface. Fires once per display; only a reload (sheet reopened, or returning from an open chat) counts a fresh impression.",
         "owners": ["joshliebe"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
