@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.view.View
@@ -245,18 +244,10 @@ class EmbellishmentControllerImpl(
             enter = {
                 view.isVisible = true
                 view.alpha = 0f
-                val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
-                    .setDuration(WALKING_DAX_FADE_DURATION)
-                val slide = ObjectAnimator.ofFloat(
-                    view,
-                    View.TRANSLATION_X,
-                    -WALKING_DAX_START_X_DP.toPx().toFloat(),
-                    -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
-                ).setDuration(WALKING_DAX_SLIDE_DURATION)
-                val set = AnimatorSet().apply {
+                val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f).apply {
                     interpolator = WALKING_DAX_INTERPOLATOR
                     startDelay = WALKING_DAX_DELAY
-                    playTogether(fade, slide)
+                    duration = WALKING_DAX_FADE_DURATION
                     addListener(
                         object : AnimatorListenerAdapter() {
                             override fun onAnimationStart(animation: Animator) {
@@ -265,8 +256,19 @@ class EmbellishmentControllerImpl(
                         },
                     )
                 }
-                set.start()
-                listOf(set)
+                val slide = ObjectAnimator.ofFloat(
+                    view,
+                    View.TRANSLATION_X,
+                    -WALKING_DAX_START_X_DP.toPx().toFloat(),
+                    -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
+                ).apply {
+                    interpolator = WALKING_DAX_INTERPOLATOR
+                    startDelay = WALKING_DAX_DELAY
+                    duration = WALKING_DAX_SLIDE_DURATION
+                }
+                fade.start()
+                slide.start()
+                listOf(fade, slide)
             },
             exit = {
                 hide()
