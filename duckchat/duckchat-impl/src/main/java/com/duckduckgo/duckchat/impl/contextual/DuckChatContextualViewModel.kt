@@ -329,9 +329,6 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
-                if (_viewState.value.showsAttachContextPlaceholder()) {
-                    duckChatPixels.reportContextualPlaceholderContextShown()
-                }
                 if (_viewState.value.showsAskAboutPageQuickAction()) {
                     duckChatPixels.reportContextualAskAboutPageShown()
                 }
@@ -626,23 +623,14 @@ class DuckChatContextualViewModel @Inject constructor(
                 },
             )
         }
-        if (_viewState.value.showsAttachContextPlaceholder()) {
-            duckChatPixels.reportContextualPlaceholderContextShown()
-        }
         if (_viewState.value.showsAskAboutPageQuickAction()) {
             duckChatPixels.reportContextualAskAboutPageShown()
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
-    // fromPlaceholderTap distinguishes a tap on the duckAiAttachContextLayout placeholder (which
-    // reports the placeholder-tapped pixel) from internal reuse such as the ASK_ABOUT_PAGE quick
-    // action, which attaches the same context but is not a placeholder tap.
-    fun addPageContext(fromPlaceholderTap: Boolean = false) {
+    fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
-        if (fromPlaceholderTap) {
-            duckChatPixels.reportContextualPlaceholderContextTapped()
-        }
         viewModelScope.launch {
             if (isContextValid(currentPageContext, reportInvalidPixels = true)) {
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
@@ -689,14 +677,6 @@ class DuckChatContextualViewModel @Inject constructor(
         }
         return title != null && content != null
     }
-
-    // Mirrors the Fragment's visibility logic for the "attach page content" placeholder
-    // (duckAiAttachContextLayout): it is only shown in INPUT mode, when not in the
-    // ASK_ABOUT_PAGE quick action, and when no context is currently attached.
-    private fun ViewState.showsAttachContextPlaceholder(): Boolean =
-        sheetMode == SheetMode.INPUT &&
-            quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
-            !showContext
 
     private fun ViewState.showsAskAboutPageQuickAction(): Boolean =
         sheetMode == SheetMode.INPUT &&
@@ -968,9 +948,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     }
                     sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }
 
-                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
-                        duckChatPixels.reportContextualPlaceholderContextShown()
-                    }
                     if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAskAboutPageQuickAction()) {
                         duckChatPixels.reportContextualAskAboutPageShown()
                     }

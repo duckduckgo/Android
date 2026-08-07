@@ -553,13 +553,12 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext(fromPlaceholderTap = true)
+            testee.addPageContext()
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
             assertFalse(state.showContext)
             assertFalse(state.userRemovedContext)
-            verify(duckChatPixels).reportContextualPlaceholderContextTapped()
             verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
         }
 
@@ -620,13 +619,12 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext(fromPlaceholderTap = true)
+            testee.addPageContext()
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
             assertTrue(state.showContext)
             assertFalse(state.userRemovedContext)
-            verify(duckChatPixels).reportContextualPlaceholderContextTapped()
             verify(duckChatPixels).reportContextualPageContextManuallyAttachedNative()
         }
 
@@ -2017,9 +2015,6 @@ class DuckChatContextualViewModelTest {
 
         testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click — should not re-attach
 
-        // ASK_ABOUT_PAGE attaches context internally; it is not a placeholder tap, so the
-        // placeholder-tapped pixel must not fire on this path.
-        verify(duckChatPixels, never()).reportContextualPlaceholderContextTapped()
         verify(duckChatPixels, times(1)).reportContextualPageContextManuallyAttachedNative()
     }
 
@@ -2174,34 +2169,26 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
-        testee.onContextualFireConfirmed()
-        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
-    }
-
-    @Test
-    fun `when sheet opened in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+    fun `when sheet opened then quickActionState is ASK_ABOUT_PAGE`() = runTest {
         val testee = buildViewModel()
 
         testee.onSheetOpened("tab-1")
 
         assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
-        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
     }
 
     @Test
-    fun `when new chat triggered in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+    fun `when new chat triggered from ASK_ABOUT_PAGE then quickActionState stays ASK_ABOUT_PAGE`() = runTest {
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
 
         testee.onNewChatRequested()
 
         assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
-        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
     }
 
     @Test
-    fun `when removePageContext reverts to ASK_ABOUT_PAGE then placeholder shown pixel is not fired but removed pixel is`() = runTest {
+    fun `when removePageContext reverts to ASK_ABOUT_PAGE then removed pixel is fired`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
@@ -2213,7 +2200,6 @@ class DuckChatContextualViewModelTest {
 
         assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
         verify(duckChatPixels).reportContextualPageContextRemovedNative()
-        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
     }
 
     @Test
