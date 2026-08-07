@@ -116,7 +116,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when content scope measurements taken then bucketed durations are recorded as step metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(777L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_030L, 1_260L)
 
@@ -140,7 +140,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when measurement is faster than the smallest bucket then it is recorded as zero`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(777L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_002L)
 
@@ -158,7 +158,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when a measurement is taken twice for the same navigation then the first one is kept`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(778L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_030L, 1_500L)
 
@@ -178,7 +178,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when a measurement is taken before the flow start is processed then it is still recorded`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(780L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_060L)
 
@@ -197,7 +197,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when measurement is for a navigation the flow did not start with then it is not recorded`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(779L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_030L)
 
@@ -213,7 +213,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when a stale measurement arrives after the same url reloaded then the new flow keeps its own`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(783L))
             .thenReturn(Result.success(784L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 5_000L, 5_040L, 5_100L)
@@ -243,7 +243,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when a measurement is taken after the flow finished then it is not recorded`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(782L))
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(1_000L, 1_030L)
 
@@ -267,7 +267,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when content scope optimizations differ then each one is reported under its own key`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(781L))
         contentScopeOptimizations.state = ContentScopeOptimizations.State(
             injectionOptimized = true,
