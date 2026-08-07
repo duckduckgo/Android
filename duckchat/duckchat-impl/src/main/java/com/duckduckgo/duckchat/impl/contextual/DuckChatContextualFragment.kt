@@ -698,7 +698,7 @@ class DuckChatContextualFragment :
             } else {
                 binding.legacyInputField.text.toString()
             }
-            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.pageTypePixelValue())
+            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.currentPageType())
         }
     }
 

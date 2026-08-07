@@ -24,6 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
+import com.duckduckgo.duckchat.impl.contextual.suggestions.SuggestionsPageType
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -975,7 +976,7 @@ class DuckChatContextualViewModelTest {
         val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
         testee.onPageContextReceived("tab-1", pageContext)
 
-        testee.onQuickActionClicked("", suggestionsPageType = "article")
+        testee.onQuickActionClicked("", suggestionsPageType = SuggestionsPageType.ARTICLE)
 
         verify(duckChatPixels).reportContextualAskAboutPageSelected()
         verify(duckChatPixels).reportContextualAskAboutPageSuggestionSelected("article")

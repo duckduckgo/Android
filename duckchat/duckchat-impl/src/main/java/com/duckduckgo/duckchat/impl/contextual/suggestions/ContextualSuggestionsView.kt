@@ -113,9 +113,9 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         }
     }
 
-    fun pageTypePixelValue(): String {
-        if (!isAttachedToWindow) return SuggestionsPageType.NONE.pixelValue
-        return viewModel.pageTypePixelValue()
+    fun currentPageType(): SuggestionsPageType {
+        if (!isAttachedToWindow) return SuggestionsPageType.NONE
+        return viewModel.currentPageType()
     }
 
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
