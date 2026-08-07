@@ -30,6 +30,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.slider.Slider
@@ -140,6 +142,15 @@ fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
         view = parent
     }
 }
+
+/**
+ * The bottom inset (navigation bars + display cutout) the view overflows into under edge-to-edge. Used when a
+ * bottom bar must translate past the transparent gesture navigation bar instead of leaving a strip visible.
+ */
+fun View.bottomNavigationBarInset(): Int =
+    ViewCompat.getRootWindowInsets(this)
+        ?.getInsets(WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout())
+        ?.bottom ?: 0
 
 fun View.setAllParentsClip(enabled: Boolean = false) {
     var view = this

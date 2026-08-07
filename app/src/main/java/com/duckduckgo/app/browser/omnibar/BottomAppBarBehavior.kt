@@ -28,6 +28,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
+import com.duckduckgo.common.ui.view.bottomNavigationBarInset
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
@@ -109,14 +110,14 @@ class BottomAppBarBehavior<V : View>(
 
             // only hide the app bar in the browser layout
             if (target.id == R.id.browserWebView) {
-                toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
+                toolbar.translationY = max(0f, min(omnibar.hiddenTranslation(), toolbar.translationY + dy))
             }
         }
     }
 
     private fun offsetBottomByToolbar(view: View?) {
         (view?.layoutParams as? CoordinatorLayout.LayoutParams)?.let { layoutParams ->
-            val newBottomMargin = omnibar.measuredHeight() - omnibar.getTranslation().roundToInt()
+            val newBottomMargin = max(0, omnibar.measuredHeight() - omnibar.getTranslation().roundToInt())
             if (layoutParams.bottomMargin != newBottomMargin) {
                 layoutParams.bottomMargin = newBottomMargin
                 view.postOnAnimation {
@@ -152,7 +153,7 @@ class BottomAppBarBehavior<V : View>(
         if (animate) {
             animateToolbarVisibility(expanded)
         } else {
-            val targetTranslation = if (expanded) 0f else omnibar.height().toFloat()
+            val targetTranslation = if (expanded) 0f else omnibar.hiddenTranslation()
             omnibar.setTranslation(targetTranslation)
         }
     }
@@ -172,10 +173,13 @@ class BottomAppBarBehavior<V : View>(
             omnibar.setTranslation(animatedValue)
         }
 
-        val targetTranslation = if (isVisible) 0f else omnibar.height().toFloat()
+        val targetTranslation = if (isVisible) 0f else omnibar.hiddenTranslation()
         offsetAnimator?.setFloatValues(omnibar.getTranslation(), targetTranslation)
         offsetAnimator?.start()
     }
+
+    private fun OmnibarBehaviour.hiddenTranslation(): Float =
+        height().toFloat() + ((this as? View)?.bottomNavigationBarInset() ?: 0)
 
     @SuppressLint("RestrictedApi")
     private fun updateSnackbar(

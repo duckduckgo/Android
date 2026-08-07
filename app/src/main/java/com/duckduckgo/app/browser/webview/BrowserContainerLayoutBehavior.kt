@@ -132,7 +132,7 @@ private fun offsetByBottomElementVisibleHeight(
         if (dependency.isGone) {
             0
         } else {
-            dependency.measuredHeight - dependency.translationY.toInt()
+            (dependency.measuredHeight - dependency.translationY.toInt()).coerceAtLeast(0)
         }
     return if (child.paddingBottom != newBottomPadding) {
         child.setPadding(

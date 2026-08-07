@@ -49,6 +49,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.browser.ui.PulseAnimation
+import com.duckduckgo.common.ui.view.bottomNavigationBarInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -289,7 +290,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             if (dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT) {
                 val dependencyOffset = abs(dependency.top)
                 val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
-                val childHeight = child.measuredHeight
+                val childHeight = child.measuredHeight + child.bottomNavigationBarInset()
                 val childOffset = childHeight * offsetPercentage
                 child.translationY = childOffset
                 return true
