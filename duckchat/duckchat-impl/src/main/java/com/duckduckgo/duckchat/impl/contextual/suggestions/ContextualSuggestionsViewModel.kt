@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private val suggestedPromptsProvider: ContextualSuggestedPromptsProvider,
     private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     data class ViewState(
@@ -54,27 +56,38 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var maxSuggestedPrompts: Int = 1
     private var prioritySuggestionIds: Set<String> = emptySet()
     private var reservedQuickActionSlots: Int = 0
+    private var pageType: SuggestionsPageType = SuggestionsPageType.NONE
+    private var isSmart: Boolean = false
+    private var suggestionsVisible = false
 
     fun load() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            val enabled = withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
-            if (!enabled) {
-                _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+            if (!suggestionsEnabled()) {
+                hideSuggestions()
                 return@launch
             }
+            suggestionsVisible = false
             _viewState.value = ViewState(suggestions = emptyList(), loading = true)
             delay(TIMEOUT_MS)
             if (_viewState.value.loading) {
+                duckChatPixels.reportContextualSuggestionsContextCollectionTimedOut()
                 resolve(url = null, pageTypeSignals = null)
             }
         }
     }
 
+    fun onSuggestionSelected(suggestionId: String) {
+        duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
+    }
+
+    fun pageTypePixelValue(): String = pageType.pixelValue
+
     fun onPageContextUpdated(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
         if (json.optString("title").isBlank() || json.optString("content").isBlank()) return
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             resolve(
                 url = json.optString("url").takeIf { it.isNotBlank() },
                 pageTypeSignals = parsePageTypeSignals(json),
@@ -85,7 +98,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun clear() {
         loadJob?.cancel()
         resolvedSuggestions = emptyList()
-        _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+        hideSuggestions()
     }
 
     fun onReservedQuickActionSlotsChanged(count: Int) {
@@ -107,11 +120,21 @@ class ContextualSuggestionsViewModel @Inject constructor(
         url: String?,
         pageTypeSignals: PageTypeSignals?,
     ) {
-        val enabled = withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
-        if (!enabled) {
-            _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+        if (!suggestionsEnabled()) {
+            hideSuggestions()
             return
         }
+        fetchSuggestions(url, pageTypeSignals)
+        showSuggestions()
+    }
+
+    private suspend fun suggestionsEnabled(): Boolean =
+        withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
+
+    private suspend fun fetchSuggestions(
+        url: String?,
+        pageTypeSignals: PageTypeSignals?,
+    ) {
         val input = ResolvePageSuggestionsInput(
             pageTypeSignals = pageTypeSignals,
             url = url,
@@ -120,8 +143,25 @@ class ContextualSuggestionsViewModel @Inject constructor(
         val resolved = suggestedPromptsProvider.resolveSuggestions(input)
         maxSuggestedPrompts = suggestedPromptsProvider.maxSuggestedPrompts()
         prioritySuggestionIds = suggestedPromptsProvider.prioritySuggestionIds()
-        resolvedSuggestions = resolved
-        _viewState.value = ViewState(suggestions = visibleSuggestions(), loading = false)
+        resolvedSuggestions = resolved.suggestions
+        pageType = resolved.pageType
+        isSmart = resolved.isSmart
+    }
+
+    private fun showSuggestions() {
+        val suggestions = visibleSuggestions()
+        _viewState.value = ViewState(suggestions = suggestions, loading = false)
+        if (suggestions.isEmpty()) {
+            suggestionsVisible = false
+        } else if (!suggestionsVisible) {
+            suggestionsVisible = true
+            duckChatPixels.reportContextualSuggestionsViewed(isSmart, pageType.pixelValue)
+        }
+    }
+
+    private fun hideSuggestions() {
+        suggestionsVisible = false
+        _viewState.value = ViewState(suggestions = emptyList(), loading = false)
     }
 
     private fun parsePageTypeSignals(pageContextJson: JSONObject): PageTypeSignals? {

@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual.suggestions
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -45,11 +46,13 @@ class ContextualSuggestionsViewModelTest {
     private val suggestedPromptsProvider: ContextualSuggestedPromptsProvider = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val suggestedPromptsToggle: Toggle = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
 
     private val viewModel = ContextualSuggestionsViewModel(
         suggestedPromptsProvider = suggestedPromptsProvider,
         duckChatFeature = duckChatFeature,
         dispatchers = coroutineRule.testDispatcherProvider,
+        duckChatPixels = duckChatPixels,
     )
 
     @Before
@@ -63,8 +66,13 @@ class ContextualSuggestionsViewModelTest {
         }
     }
 
-    private suspend fun stubProvider(result: List<ContextualSuggestedPrompt>) {
-        whenever(suggestedPromptsProvider.resolveSuggestions(any())).thenReturn(result)
+    private suspend fun stubProvider(
+        result: List<ContextualSuggestedPrompt>,
+        isSmart: Boolean = false,
+        pageType: SuggestionsPageType = SuggestionsPageType.NONE,
+    ) {
+        whenever(suggestedPromptsProvider.resolveSuggestions(any()))
+            .thenReturn(ResolvedPageSuggestions(suggestions = result, isSmart = isSmart, pageType = pageType))
     }
 
     @Test
@@ -290,5 +298,89 @@ class ContextualSuggestionsViewModelTest {
 
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertFalse(viewModel.viewState.value.loading)
+    }
+
+    @Test
+    fun `when suggestions become visible then viewed pixel fired once with smartness and page type`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSuggestionsViewed(true, "recipe")
+    }
+
+    @Test
+    fun `when suggestions stay visible across a re-resolve then viewed pixel not fired again`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com/2","content":"c"}""")
+
+        verify(duckChatPixels, times(1)).reportContextualSuggestionsViewed(true, "recipe")
+    }
+
+    @Test
+    fun `when suggestions cleared and shown again then viewed pixel fires a fresh impression`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        viewModel.clear()
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        verify(duckChatPixels, times(2)).reportContextualSuggestionsViewed(true, "recipe")
+    }
+
+    @Test
+    fun `when resolve returns no suggestions then viewed pixel not fired`() = runTest {
+        stubProvider(emptyList())
+
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        verify(duckChatPixels, never()).reportContextualSuggestionsViewed(any(), any())
+    }
+
+    @Test
+    fun `when load times out without page context then timed out pixel fired`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSuggestionsContextCollectionTimedOut()
+    }
+
+    @Test
+    fun `when page context arrives before timeout then timed out pixel not fired`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, never()).reportContextualSuggestionsContextCollectionTimedOut()
+    }
+
+    @Test
+    fun `when suggestion selected then selected pixel fired with suggestion id and page type`() = runTest {
+        val tailored = ContextualSuggestedPrompt("summarize-video", "Summarize this video", "Summarize this video.", "summary")
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.VIDEO)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        viewModel.onSuggestionSelected("summarize-video")
+
+        verify(duckChatPixels).reportContextualSuggestionSelected("summarize-video", "video")
+    }
+
+    @Test
+    fun `when suggestions resolved then page type pixel value reflects the resolved page type`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+
+        assertEquals("recipe", viewModel.pageTypePixelValue())
     }
 }
