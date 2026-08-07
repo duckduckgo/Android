@@ -170,6 +170,18 @@ class ModelPickerViewModel @Inject constructor(
     private val modelChangeChannel = Channel<PickerModelChange>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val modelChanges: Flow<PickerModelChange> = modelChangeChannel.receiveAsFlow()
 
+    /** Subscription-funnel impression: the model picker was shown to the user. */
+    fun onPickerShown(surface: PickerSurface) {
+        duckChatPixels.fireModelPickerShown(effectiveOrigin(surface))
+    }
+
+    /**
+     * The subscription-funnel origin for [surface]. [SWITCH_MODEL_ORIGIN] is used when
+     * the picker is open in the FE model-recovery ("switch model") flow.
+     */
+    private fun effectiveOrigin(surface: PickerSurface): String =
+        if (modelChangeMode) SWITCH_MODEL_ORIGIN else surface.origin
+
     fun onModelTapped(model: AIChatModel, surface: PickerSurface) {
         if (model.isAccessible) {
             if (modelChangeMode) {
@@ -197,12 +209,14 @@ class ModelPickerViewModel @Inject constructor(
             logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin, modelState.isSubscriptionEligible)?.let { upsell ->
+        val origin = effectiveOrigin(surface)
+        routeUpsell(userTier, requiredTier, origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
                 source = "model_picker",
                 currentTier = userTier.toParam(),
                 requiredTier = requiredTier.toParam(),
                 flowType = upsell.toFlowTypeParam(),
+                origin = origin,
             )
             command.trySend(upsell)
         }

@@ -91,6 +91,32 @@ object SubscriptionsConstants {
     const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
     const val SUBSCRIPTIONS_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
+
+    // Subscription-funnel origin for the app-settings "Get Subscription" entry point. Used both to
+    // launch the buy webview (ProSettingView) and on the app-settings click pixel (SubscriptionPixelSender).
+    const val ORIGIN_APP_SETTINGS = "funnel_appsettings_android"
+
+    // Allowlist of funnel entry-point origins permitted on subscription telemetry. The offer/subscribe
+    // origin can arrive from a web-supplied `?origin=` URL param, so it is bounded to this set.
+    // TODO: Consider moving this list to the remove privacy configuration if it will change regularly.
+    val FUNNEL_ORIGIN_ALLOWLIST = setOf(
+        "funnel_addressbar_android__aitoggle",
+        "funnel_addressbar_android__modelpicker",
+        "funnel_addressbar_android__reasoningdropdown",
+        "funnel_appmenu_android",
+        "funnel_appsettings_android",
+        "funnel_duckai_android__freelabel",
+        "funnel_duckai_android__modelpicker",
+        "funnel_duckai_android__reasoningdropdown",
+        "funnel_duckai_android__switchmodel",
+        "funnel_modal_android__skippedonboardingupsell",
+        "funnel_modal_android__subscriptionnudge",
+        "funnel_onboarding_android",
+        "funnel_playstore",
+        "funnel_purchase_offer_page_android",
+        "funnel_restore_android__viewplans",
+        "funnel_subscriptionsettings_android__viewplans",
+    )
 }
 
 enum class SubscriptionTier(val value: String) {

@@ -75,7 +75,13 @@ class RealDuckChatPixelsPickerTest {
 
     @Test
     fun whenUpsellTriggeredThenSingleCountWithAllParams() = runTest {
-        testee.fireSubscriptionUpsellTriggered(source = "model_picker", currentTier = "free", requiredTier = "plus", flowType = "purchase")
+        testee.fireSubscriptionUpsellTriggered(
+            source = "model_picker",
+            currentTier = "free",
+            requiredTier = "plus",
+            flowType = "purchase",
+            origin = "funnel_duckai_android__modelpicker",
+        )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED,
             parameters = mapOf(
@@ -83,6 +89,7 @@ class RealDuckChatPixelsPickerTest {
                 DuckChatPixelParameters.UPSELL_CURRENT_TIER to "free",
                 DuckChatPixelParameters.UPSELL_REQUIRED_TIER to "plus",
                 DuckChatPixelParameters.UPSELL_FLOW_TYPE to "purchase",
+                DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__modelpicker",
             ),
         )
     }
@@ -126,6 +133,26 @@ class RealDuckChatPixelsPickerTest {
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
             parameters = params,
             type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenModelPickerShownThenFiresShownPixelWithOrigin() = runTest {
+        testee.fireModelPickerShown(origin = "funnel_duckai_android__modelpicker")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__modelpicker"),
+        )
+    }
+
+    @Test
+    fun whenReasoningEffortPickerShownThenFiresShownPixelWithOrigin() = runTest {
+        testee.fireReasoningEffortPickerShown(origin = "funnel_addressbar_android__reasoningdropdown")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_addressbar_android__reasoningdropdown"),
         )
     }
 }

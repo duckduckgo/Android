@@ -158,8 +158,12 @@ class ReasoningModePickerView @JvmOverloads constructor(
         }
 
     private fun showMenu() {
+        // Guard against a re-tap opening an already-showing popup.
+        if (popupWindow?.isShowing == true) return
         val state = viewModel.state.value
         if (!state.visible) return
+
+        viewModel.onPickerShown(currentSurface())
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
