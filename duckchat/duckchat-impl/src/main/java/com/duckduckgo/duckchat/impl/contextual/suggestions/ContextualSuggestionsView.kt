@@ -113,6 +113,11 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         }
     }
 
+    fun pageTypePixelValue(): String {
+        if (!isAttachedToWindow) return SuggestionsPageType.NONE.pixelValue
+        return viewModel.pageTypePixelValue()
+    }
+
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
 
     private fun render(viewState: ContextualSuggestionsViewModel.ViewState) {
@@ -125,7 +130,10 @@ class ContextualSuggestionsView @JvmOverloads constructor(
                 val itemBinding = ItemContextualSuggestionBinding.inflate(inflater, cardsContainer, false)
                 itemBinding.suggestionLabel.text = suggestion.label
                 itemBinding.suggestionLabel.setCompoundDrawablesRelativeWithIntrinsicBounds(iconResFor(suggestion.icon), 0, 0, 0)
-                itemBinding.root.setOnClickListener { onSuggestionSelected?.invoke(suggestion) }
+                itemBinding.root.setOnClickListener {
+                    viewModel.onSuggestionSelected(suggestion.id)
+                    onSuggestionSelected?.invoke(suggestion)
+                }
                 cardsContainer.addView(itemBinding.root)
             }
         }
