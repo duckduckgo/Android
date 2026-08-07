@@ -46,7 +46,7 @@
 
             <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
                 android:id="@+id/inputModeWidget"
-                android:paddingHorizontal="8dp"
+                android:paddingHorizontal="@dimen/keyline_1"
                 android:paddingVertical="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -61,6 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="top"
+            android:layout_marginStart="-12dp"
             android:layout_marginEnd="@dimen/keyline_1"
             android:layout_marginTop="-2dp"
             android:visibility="gone" />

@@ -81,6 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="bottom"
+            android:layout_marginStart="-8dp"
             android:layout_marginBottom="-2dp"
             android:visibility="gone" />
 

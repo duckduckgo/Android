@@ -1270,7 +1270,7 @@ class RealNativeInputManager @Inject constructor(
         val omnibarCard = omnibarController.getCardView() ?: return false
         // Apply focused-state layout so the widget is measured at its final size; otherwise
         // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
-        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom)
+        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom, inputModeCapability)
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
