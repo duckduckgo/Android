@@ -20,6 +20,7 @@ enum class Component {
     BUTTON,
     FAB,
     CARD,
+    SCAFFOLD,
     TOP_APP_BAR,
     CHIP,
     DRAWER,
