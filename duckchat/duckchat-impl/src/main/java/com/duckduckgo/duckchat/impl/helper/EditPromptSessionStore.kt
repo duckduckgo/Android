@@ -67,7 +67,13 @@ class RealEditPromptSessionStore @Inject constructor() : EditPromptSessionStore 
 
     override fun open(payload: EditPromptPayload): String {
         val sessionId = UUID.randomUUID().toString()
-        sessions[sessionId] = Session(payload)
+        val session = Session(payload)
+        // Tied to the deferred's own completion, not to any one await() caller's coroutine being
+        // cancelled — the JS helper and EditPromptActivity can both await the same session (e.g.
+        // across a config change that recreates the Activity) without one's cancellation evicting
+        // it out from under the other.
+        session.result.invokeOnCompletion { sessions.remove(sessionId) }
+        sessions[sessionId] = session
         return sessionId
     }
 
@@ -75,11 +81,7 @@ class RealEditPromptSessionStore @Inject constructor() : EditPromptSessionStore 
 
     override suspend fun await(sessionId: String): EditPromptResult {
         val session = sessions[sessionId] ?: return EditPromptResult.Cancelled
-        return try {
-            session.result.await()
-        } finally {
-            sessions.remove(sessionId)
-        }
+        return session.result.await()
     }
 
     override fun resolve(
@@ -92,6 +94,6 @@ class RealEditPromptSessionStore @Inject constructor() : EditPromptSessionStore 
     }
 
     override fun clear(sessionId: String) {
-        sessions.remove(sessionId)?.result?.complete(EditPromptResult.Cancelled)
+        sessions[sessionId]?.result?.complete(EditPromptResult.Cancelled)
     }
 }
