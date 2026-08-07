@@ -165,6 +165,11 @@ interface DuckChatPixels {
     fun reportContextualPageContextInvalidNoTitle()
     fun reportContextualPageContextInvalidNoContent()
 
+    fun reportContextualSuggestionSelected(suggestionId: String, pageType: String)
+    fun reportContextualSuggestionsViewed(isSmart: Boolean, pageType: String)
+    fun reportContextualSuggestionsContextCollectionTimedOut()
+    fun reportContextualSuggestionsCatalogLoadFailed()
+
     fun reportContextualFireButtonTapped()
     fun reportContextualFireButtonConfirmed()
 
@@ -266,6 +271,48 @@ class RealDuckChatPixels @Inject constructor(
 
     private fun surfaceParams(surface: DuckChatPixelSurface): Map<String, String> =
         mapOf(DuckChatPixelParameters.SURFACE to surface.value)
+
+    override fun reportContextualSuggestionSelected(
+        suggestionId: String,
+        pageType: String,
+    ) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY,
+            mapOf(
+                DuckChatPixelParameters.SUGGESTION_ID to suggestionId,
+                DuckChatPixelParameters.PAGE_TYPE to pageType,
+            ),
+        )
+    }
+
+    override fun reportContextualSuggestionsViewed(
+        isSmart: Boolean,
+        pageType: String,
+    ) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY,
+            mapOf(
+                DuckChatPixelParameters.IS_SMART to isSmart.toString(),
+                DuckChatPixelParameters.PAGE_TYPE to pageType,
+            ),
+        )
+    }
+
+    override fun reportContextualSuggestionsContextCollectionTimedOut() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY,
+        )
+    }
+
+    override fun reportContextualSuggestionsCatalogLoadFailed() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY,
+        )
+    }
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -1003,6 +1050,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_DAILY("m_aichat_contextual_quick_action_ask_about_page_selected_daily"),
     DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SHOWN_COUNT("m_aichat_contextual_quick_action_ask_about_page_shown_count"),
     DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SHOWN_DAILY("m_aichat_contextual_quick_action_ask_about_page_shown_daily"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT("aichat_contextual_suggestion_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY("aichat_contextual_suggestion_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT("aichat_contextual_suggestions_viewed_count"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY("aichat_contextual_suggestions_viewed_daily"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT("debug_aichat_contextual_suggestions_context_collection_timed_out_count"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY("debug_aichat_contextual_suggestions_context_collection_timed_out_daily"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT("debug_aichat_contextual_suggestions_catalog_load_failed_count"),
+    DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY("debug_aichat_contextual_suggestions_catalog_load_failed_daily"),
     DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_COUNT("m_aichat_contextual_chats_button_tapped_count"),
     DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_DAILY("m_aichat_contextual_chats_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_COUNT("m_aichat_contextual_recent_chats_popup_displayed_count"),
@@ -1163,6 +1218,9 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
 
 object DuckChatPixelParameters {
     const val WAS_USED_BEFORE = "was_used_before"
+    const val SUGGESTION_ID = "suggestionId"
+    const val PAGE_TYPE = "pageType"
+    const val IS_SMART = "isSmart"
     const val DELTA_TIMESTAMP_PARAMETERS = "delta-timestamp-minutes"
     const val INPUT_SCREEN_MODE = "mode"
     const val TEXT_LENGTH_BUCKET = "text_length_bucket"
@@ -1334,6 +1392,14 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT.pixelName to PixelParameter.removeAtb(),
