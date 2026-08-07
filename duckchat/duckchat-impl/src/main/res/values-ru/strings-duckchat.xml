@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Введите поисковый запрос или адрес сайта</string>
     <string name="input_screen_search_only_hint">Поиск</string>
-    <string name="input_screen_chat_hint">Задать вопрос (конфиденциально)</string>
     <string name="input_screen_user_pref_without_ai">Только поиск</string>
     <string name="input_screen_user_pref_with_ai">Поиск и Duck.ai</string>
     <string name="input_screen_user_pref_description">Новая функция! Вопрос чат-боту Duck.ai прямо из адресной строки. <annotation type="share_feedback">Оставить отзыв</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Кратко изложи содержимое страницы</string>
     <string name="duckAIContextualAutomaticContextTitle">Автоматически отправлять содержимое страницы</string>
     <string name="duckAIContextualAutomaticContextMessage">Автоматически отправлять содержимое страницы в Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Добавить содержимое страницы</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Задайте вопрос о странице</string>
@@ -346,6 +344,5 @@
     <string name="duckAiSettingsTitle">Настройки Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Задать вопрос о вкладке</string>
     <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
 </resources>

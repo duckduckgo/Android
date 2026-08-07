@@ -59,7 +59,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Search or enter address</string>
     <string name="input_screen_search_only_hint">Search</string>
-    <string name="input_screen_chat_hint">Ask privately</string>
     <string name="input_screen_user_pref_without_ai">Search Only</string>
     <string name="input_screen_user_pref_with_ai">Search &amp; Duck.ai</string>
     <string name="input_screen_user_pref_description">Try the new option to ask Duck.ai directly from the Address Bar. <annotation type="share_feedback">Share Feedback</annotation></string>
@@ -120,7 +119,6 @@
     <string name="duckAIContextualPromptSummarize">Summarize This Page</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatically Send Page Content</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatically send page content to Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Attach Page Content</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Ask About Page</string>
@@ -205,7 +203,7 @@
     <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person's background">Summarize their background</string>
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person's background">Summarize the background and notable work of this person.</string>
 
-    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <!-- Contextual sheet input hint -->
     <string name="contextualSheetImprovedHint">Ask anything privately</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Recent Chats</string>
 
@@ -343,6 +341,5 @@
     <string name="duckAiSettingsTitle">Duck.ai Settings</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Ask About Tab</string>
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
 </resources>

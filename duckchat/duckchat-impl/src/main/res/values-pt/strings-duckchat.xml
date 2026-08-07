@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Pesquisar ou inserir endereço</string>
     <string name="input_screen_search_only_hint">Pesquisar</string>
-    <string name="input_screen_chat_hint">Perguntar em privado</string>
     <string name="input_screen_user_pref_without_ai">Pesquisar apenas</string>
     <string name="input_screen_user_pref_with_ai">Pesquisa e Duck.ai</string>
     <string name="input_screen_user_pref_description">Utiliza a nova opção para perguntar diretamente ao Duck.ai na barra de endereço. <annotation type="share_feedback">Partilhar comentários</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Resumir esta página</string>
     <string name="duckAIContextualAutomaticContextTitle">Enviar automaticamente o conteúdo da página</string>
     <string name="duckAIContextualAutomaticContextMessage">Enviar automaticamente o conteúdo da página para o Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Anexar contexto da página</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Pergunta sobre a página</string>
@@ -344,6 +342,5 @@
     <string name="duckAiSettingsTitle">Definições do Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Perguntar sobre o separador</string>
     <string name="duckChatContextualAskAboutPage">Perguntar sobre a página</string>
 </resources>
