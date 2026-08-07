@@ -127,21 +127,14 @@ class DialogRenderEngineTest {
 
     @Test
     fun `a card entry that follows the background waits for the background transition to end`() = runTest {
-        testee.render(WELCOME_STEP, welcomeConfig(), animate = true, animateBackground = true)
+        testee.render(WELCOME_STEP, welcomeConfig(), animate = true)
 
         assertEquals(listOf(OnboardingBackgroundAnimator.EXIT_DURATION), cardStage.revealDelaysMs)
     }
 
     @Test
-    fun `a card entry that follows the background does not wait when the background snaps`() = runTest {
-        testee.render(WELCOME_STEP, welcomeConfig(), animate = true, animateBackground = false)
-
-        assertEquals(listOf(0L), cardStage.revealDelaysMs)
-    }
-
-    @Test
     fun `an immediate card entry never waits for the background`() = runTest {
-        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true, animateBackground = true)
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
 
         assertEquals(listOf(0L), cardStage.revealDelaysMs)
     }
@@ -180,15 +173,6 @@ class DialogRenderEngineTest {
         assertFalse(background.animated)
         assertFalse(embellishments.animated)
         assertEquals(1, cardStage.fadeCount)
-    }
-
-    @Test
-    fun `a snapped background still lets the card and its embellishments animate`() = runTest {
-        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true, animateBackground = false)
-
-        assertFalse(background.animated)
-        assertEquals(listOf(true, true, true), cardStage.animateFlags)
-        assertTrue(embellishments.animated)
     }
 
     @Test

@@ -75,14 +75,11 @@ class DialogRenderEngine(
      *
      * Re-rendering the [stepId] + [config] that is currently bound is a no-op, [animate] included, so a caller that can fire more
      * than once for one state does not need to de-duplicate itself.
-     *
-     * [animateBackground] splits the background off the [animate] policy, where needed.
      */
     fun render(
         stepId: LinearOnboardingStepId,
         config: DialogConfig,
         animate: Boolean,
-        animateBackground: Boolean = animate,
     ) {
         if (stepId == previousStepId && config == previous && bound != null) return
 
@@ -94,7 +91,7 @@ class DialogRenderEngine(
             embellishments.resetStage()
         }
 
-        background.apply(previous?.background, config.background, animateBackground)
+        background.apply(previous?.background, config.background, animate)
         stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animate)
         cardArrow.apply(previous?.cardArrow, config.cardArrow, animate)
 
@@ -118,7 +115,7 @@ class DialogRenderEngine(
         cardAnchor.apply(settledDecoration)
 
         // A snapped background is already in place, so there is nothing for the card to wait on.
-        val revealDelayMs = if (config.cardEntry == CardEntry.AfterBackgroundTransition && animateBackground) {
+        val revealDelayMs = if (config.cardEntry == CardEntry.AfterBackgroundTransition && animate) {
             OnboardingBackgroundAnimator.EXIT_DURATION
         } else {
             0L

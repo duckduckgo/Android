@@ -255,17 +255,13 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
         // We assume that if intro is played, it's always done so before any dialog is rendered.
-        // Once the first dialog arrives, if:
-        // - intro visuals on screen: clear them and the background cross-fades from them
-        // - no intro visual on screen (like a mid-flow re-entry from another activity): nothing to animate from, snap new background
-        // Later renders always animate the background. The handover is unconditional so that a render which does not
-        // animate still takes the background off the choreographer.
-        val canCrossFadeBackground = intro?.clearForDialog() == true
+        // The handover is unconditional so that a render which does not animate still takes the background
+        // off the choreographer.
+        intro?.clearForDialog()
         engine.render(
             screen.stepId,
             screen.config,
             animate = screen.animateEntry,
-            animateBackground = canCrossFadeBackground && screen.animateEntry,
         )
         viewModel.onDialogRendered(screen.stepId)
     }
