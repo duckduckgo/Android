@@ -112,7 +112,6 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
-        whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
@@ -268,30 +267,6 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndUserDisabledThenShowFullScreenModeIsTrue() = runTest {
-        duckChatFeature.self().setRawStoredState(State(true))
-        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertTrue(testee.showFullScreenMode.value)
-    }
-
-    @Test
-    fun whenFeatureDisabledThenShowFullScreenModeIsFalse() = runTest {
-        duckChatFeature.self().setRawStoredState(State(false))
-        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertFalse(testee.showFullScreenMode.value)
     }
 
     @Test

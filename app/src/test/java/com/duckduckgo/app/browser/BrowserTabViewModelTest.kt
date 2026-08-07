@@ -533,8 +533,6 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
 
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
-
     private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
 
     private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
@@ -713,9 +711,6 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(true)
-
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
@@ -835,7 +830,6 @@ class BrowserTabViewModelTest {
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
-            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -8374,9 +8368,8 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptInFullScreenModeOnBrowserTabThenOpensInNewTab() =
+    fun whenUserSelectedAutocompleteDuckAiPromptOnBrowserTabThenOpensInNewTab() =
         runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
             setBrowserShowing(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
             whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
@@ -8393,24 +8386,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptInLegacyModeThenOpensViaDuckChat() =
-        runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-            whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
-            whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
-            whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-
-            val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
-            testee.userSelectedAutocomplete(duckPrompt)
-
-            verify(mockDuckChat).openDuckChatWithAutoPrompt("title")
-            assertCommandNotIssued<Command.OpenInNewTab>()
-        }
-
-    @Test
-    fun whenOpenDuckAiQueryInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiQueryOnBrowserTabThenOpensInNewTab() = runTest {
         setBrowserShowing(true)
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
@@ -8423,8 +8399,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiQueryInFullScreenModeOnNtpThenStaysInTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiQueryOnNtpThenStaysInTab() = runTest {
         setBrowserShowing(false)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
@@ -8435,30 +8410,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiQueryInLegacyModeWithAutoPromptThenCallsOpenDuckChatWithAutoPrompt() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt("hello")
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiQueryInLegacyModeWithoutAutoPromptThenCallsOpenDuckChatWithPrefill() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-
-        testee.openDuckAiQuery(query = "hello", autoPrompt = false)
-
-        verify(mockDuckChat).openDuckChatWithPrefill("hello")
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiChatByIdInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiChatByIdOnBrowserTabThenOpensInNewTab() = runTest {
         setBrowserShowing(true)
         val chatUrl = "https://duck.ai/chat?chatId=abc"
 
@@ -8470,20 +8422,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiChatByIdInFullScreenModeOnNtpThenStaysInTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiChatByIdOnNtpThenStaysInTab() = runTest {
         setBrowserShowing(false)
-        val chatUrl = "https://duck.ai/chat?chatId=abc"
-        whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
-
-        testee.openDuckAiChatById(chatUrl)
-
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiChatByIdInLegacyModeThenFallsThroughToOnUserSubmittedQuery() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
         val chatUrl = "https://duck.ai/chat?chatId=abc"
         whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
 
@@ -8496,18 +8436,19 @@ class BrowserTabViewModelTest {
     fun whenOpenDuckAiQueryThenFiresOnInputSubmittedOnBrowserInteractionsPlugins() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
 
-        verify(plugin).onInputSubmitted()
+        // Fires once from openDuckAiQuery itself and once more from the onUserSubmittedQuery it
+        // routes through via navigateToDuckAi — pre-existing on this path, not new here.
+        verify(plugin, times(2)).onInputSubmitted()
     }
 
     @Test
     fun whenOpenDuckAiChatByIdThenFiresOnChatSelectedOnBrowserInteractionsPlugins() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
         setBrowserShowing(true)
 
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
@@ -8742,73 +8683,52 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenDuckChatMenuItemClickedAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() =
-        runTest {
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
-            verify(mockDuckChat).openDuckChat()
-        }
-
-    @Test
-    fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() =
-        runTest {
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
-            verify(mockDuckChat).openDuckChat()
-        }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "")
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(true), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = false)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = " ", hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(" "), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
     }
 
     @Test
@@ -8824,27 +8744,17 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnDuckChatOmnibarButtonClickedFocusedWithContextualModeThenOpensDuckChatNotContextualSheet() {
         mockDuckAiContextualModeFlow.value = true
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
 
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() {
-        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
-        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
-        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Navigate })
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryInFullScreenModeThenNavigateInsteadOfOpeningDuckChat() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() = runTest {
         whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
 
@@ -8861,15 +8771,14 @@ class BrowserTabViewModelTest {
         whenever(mockQueryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com", null)).thenReturn("https://example.com")
         testee.onDuckChatOmnibarButtonClicked(query = "https://example.com", hasFocus = true, isNtp = false)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).getDuckChatUrl(any(), any(), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpUnfocusedThenNavigatesToDuckChatUrl() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
@@ -8878,8 +8787,6 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue as Navigate
         assertEquals(duckAIUrl, command.url)
-
-        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
@@ -9672,7 +9579,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -9689,8 +9595,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
-
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -9705,7 +9609,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -9910,7 +9813,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
@@ -9930,7 +9832,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
@@ -9951,7 +9852,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
 
@@ -9971,7 +9871,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         favouriteLogoFlow.value = null
@@ -9992,7 +9891,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoClearedOnSerpPageThenSerpLogoSetToNormal() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         loadUrl(ddgUrl)
@@ -10025,7 +9923,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoClearedOnNonSerpPageThenSerpLogoUnchanged() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
@@ -10527,9 +10424,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckChatMenuItemClickedAndFullScreenModeDisabledThenDontOpenDuckChatScreen() =
+    fun whenDuckChatMenuItemClickedThenOpenNewDuckChatTab() =
         runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
             whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
@@ -10681,9 +10577,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
+    fun whenNonDuckAiPageFinishedThenDisabledDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -10699,9 +10594,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenDuckAiPageFinishedThenEnableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         givenCurrentSite("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -10717,37 +10611,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
-
-        val nonDdgUrl = "https://example.com/search?q=test"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-    }
-
-    @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
-
-        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithDuckAIUrlThenEnableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(
@@ -10765,9 +10630,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithNonDuckAIUrlThenDisableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(
@@ -10781,42 +10645,6 @@ class BrowserTabViewModelTest {
 
         val commands = commandCaptor.allValues
         assertTrue(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-
-        testee.navigationStateChanged(
-            buildWebNavigation(
-                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-                originalUrl = "https://www.example.com",
-            ),
-        )
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-
-        testee.navigationStateChanged(
-            buildWebNavigation(
-                currentUrl = "https://test.com",
-                originalUrl = "https://www.example.com",
-            ),
-        )
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -10952,7 +10780,6 @@ class BrowserTabViewModelTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
 
         mockDuckAiContextualModeFlow.emit(true)
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
 
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
