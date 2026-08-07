@@ -62,12 +62,12 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun load() {
         loadJob?.cancel()
+        suggestionsVisible = false
         loadJob = viewModelScope.launch {
             if (!suggestionsEnabled()) {
                 hideSuggestions()
                 return@launch
             }
-            suggestionsVisible = false
             _viewState.value = ViewState(suggestions = emptyList(), loading = true)
             delay(TIMEOUT_MS)
             if (_viewState.value.loading) {

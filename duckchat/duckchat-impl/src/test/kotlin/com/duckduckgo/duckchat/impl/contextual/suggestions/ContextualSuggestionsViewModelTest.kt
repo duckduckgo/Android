@@ -325,6 +325,20 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
+    fun `when sheet reopened then viewed pixel fires a fresh impression even if page context wins the race`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.load()
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, times(2)).reportContextualSuggestionsViewed(true, "recipe")
+    }
+
+    @Test
     fun `when suggestions cleared and shown again then viewed pixel fires a fresh impression`() = runTest {
         val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
         stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
