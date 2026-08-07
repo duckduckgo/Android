@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Sök eller ange adress</string>
     <string name="input_screen_search_only_hint">Sökning</string>
-    <string name="input_screen_chat_hint">Fråga privat</string>
     <string name="input_screen_user_pref_without_ai">Sök endast</string>
     <string name="input_screen_user_pref_with_ai">Sök &amp; Duck.ai</string>
     <string name="input_screen_user_pref_description">Prova den nya funktionen att fråga Duck.ai direkt från adressfältet. <annotation type="share_feedback">Berätta vad du tycker</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Sammanfatta denna sida</string>
     <string name="duckAIContextualAutomaticContextTitle">Skicka sidinnehåll automatiskt</string>
     <string name="duckAIContextualAutomaticContextMessage">Skicka sidinnehåll automatiskt till Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Bifoga sidans innehåll</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Fråga om sidan</string>
@@ -264,6 +262,5 @@
     <string name="duckAiSettingsTitle">Duck.ai-inställningar</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Fråga om fliken</string>
     <string name="duckChatContextualAskAboutPage">Fråga om sidan</string>
 </resources>

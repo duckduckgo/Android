@@ -682,11 +682,8 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
-            // Clear the field directly: typed text isn't mirrored into viewState.prompt, so relying on
-            // onPromptCleared() alone is a no-op re-render (prompt is usually already empty) and the
-            // visible text would stay. Still notify the ViewModel to keep prompt state consistent.
+            // Typed text lives only in the EditText (it isn't mirrored into the ViewModel), so clear it directly.
             clearInputField()
-            viewModel.onPromptCleared()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -694,9 +691,6 @@ class DuckChatContextualFragment :
         }
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
-        }
-        binding.duckAiAttachContextLayout.setOnClickListener {
-            viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
             val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
@@ -860,11 +854,9 @@ class DuckChatContextualFragment :
         }
 
         applyQuickActionVisibility(viewState)
-        binding.legacyInputField.setHint(viewState.chatHintResId)
+        binding.legacyInputField.setHint(R.string.contextualSheetImprovedHint)
 
-        if (viewState.showChatsIcon) {
-            binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
-        }
+        binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
@@ -875,11 +867,7 @@ class DuckChatContextualFragment :
                 )
                 contextualNativeInputManager.onInputMode()
 
-                if (viewState.showChatsIcon) {
-                    binding.contextualNewChat.show()
-                } else {
-                    binding.contextualNewChat.gone()
-                }
+                binding.contextualNewChat.show()
                 binding.contextualFire.gone()
 
                 if (viewState.contextualNativeInputEnabled) {
@@ -891,26 +879,14 @@ class DuckChatContextualFragment :
 
                     renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                    when {
-                        viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        viewState.showContext -> {
-                            binding.duckAiContextualLayout.show()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        else -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.show()
-                        }
-                    }
-                    if (viewState.prompt.isNotEmpty()) {
-                        binding.legacyInputField.setText(viewState.prompt)
-                        binding.legacyInputField.setSelection(viewState.prompt.length)
+                    if (viewState.quickActionState != DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE &&
+                        viewState.showContext
+                    ) {
+                        binding.duckAiContextualLayout.show()
                     } else {
-                        clearInputField()
+                        binding.duckAiContextualLayout.gone()
                     }
+                    clearInputField()
                 }
             }
 
@@ -943,8 +919,7 @@ class DuckChatContextualFragment :
 
     private fun applyQuickActionVisibility(viewState: DuckChatContextualViewModel.ViewState) {
         val isSummarizeQuickAction =
-            viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE ||
-                viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE
+            viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE
 
         binding.contextualSuggestionsView.setReservedQuickActionSlots(
             if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) 1 else 0,

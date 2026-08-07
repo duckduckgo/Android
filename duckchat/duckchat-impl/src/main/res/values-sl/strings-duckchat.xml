@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_search_only_hint">Iskanje</string>
-    <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
     <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
     <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Vprašajte o strani</string>
@@ -266,6 +264,5 @@
     <string name="duckAiSettingsTitle">Nastavitve Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Vprašajte o zavihku</string>
     <string name="duckChatContextualAskAboutPage">Vprašajte o strani</string>
 </resources>

@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Wyszukaj lub wprowadź adres</string>
     <string name="input_screen_search_only_hint">Szukaj</string>
-    <string name="input_screen_chat_hint">Zapytaj prywatnie</string>
     <string name="input_screen_user_pref_without_ai">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai">Wyszukiwanie i Duck.ai</string>
     <string name="input_screen_user_pref_description">Wypróbuj nową opcję umożliwiającą zapytanie Duck.ai bezpośrednio z paska adresu. <annotation type="share_feedback">Podziel się opinią</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Podsumuj tę stronę</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Zapytaj o stronę</string>
@@ -266,6 +264,5 @@
     <string name="duckAiSettingsTitle">Ustawienia Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Zapytaj o kartę</string>
     <string name="duckChatContextualAskAboutPage">Zapytaj o stronę</string>
 </resources>

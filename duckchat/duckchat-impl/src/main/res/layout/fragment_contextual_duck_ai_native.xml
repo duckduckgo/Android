@@ -249,7 +249,7 @@
                             android:background="@null"
                             android:fontFamily="sans-serif"
                             android:gravity="start|top"
-                            android:hint="@string/input_screen_chat_hint"
+                            android:hint="@string/contextualSheetImprovedHint"
                             android:lineSpacingMultiplier="1.2"
                             android:minHeight="40dp"
                             android:paddingVertical="@dimen/keyline_2"
@@ -338,41 +338,6 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:srcCompat="@drawable/ic_close_24_small" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/duckAiAttachContextLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/keyline_2"
-                        android:layout_marginTop="@dimen/keyline_2"
-                        android:background="@drawable/background_dashed_outline">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/duckAiContextualAttachContextIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            android:src="@drawable/ic_page_content_attach_24"
-                            app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
-                            android:importantForAccessibility="no" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/duckAiContextualAttachContextLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:textType="secondary"
-                            android:text="@string/duckAIContextualAttachPageContent"
-                            android:paddingEnd="@dimen/keyline_2"
-                            android:layout_marginStart="@dimen/keyline_2"
-                            app:typography="body2_bold"
-                            app:layout_constraintStart_toEndOf="@+id/duckAiContextualAttachContextIcon"
-                            app:layout_constraintTop_toTopOf="@id/duckAiContextualAttachContextIcon"
-                            app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualAttachContextIcon" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

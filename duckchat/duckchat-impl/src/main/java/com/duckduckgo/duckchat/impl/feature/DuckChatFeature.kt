@@ -279,13 +279,6 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when the contextual Duck.ai sheet improvements are enabled.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun contextualSheetImprovements(): Toggle
-
-    /**
      * @return `true` when context-aware suggested prompts are shown on the contextual Duck.ai start surface.
      * If the remote feature is not present defaults to `internal`.
      */
