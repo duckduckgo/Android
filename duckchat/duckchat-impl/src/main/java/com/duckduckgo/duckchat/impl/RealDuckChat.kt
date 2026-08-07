@@ -335,6 +335,37 @@ enum class ReportMetric(
     USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
     USER_DID_TAP_KEYBOARD_RETURN_KEY("userDidTapKeyboardReturnKey"),
     USER_DID_ACCEPT_TERMS_AND_CONDITIONS("userDidAcceptTermsAndConditions"),
+
+    // Subscription-funnel impression/click events from the Duck.ai website (FE).
+    USER_DID_VIEW_AI_SIDEBAR_UPGRADE_BUTTON("userDidViewAiSidebarUpgradeButton"),
+    USER_DID_CLICK_AI_SIDEBAR_UPGRADE_BUTTON("userDidClickAiSidebarUpgradeButton"),
+    USER_DID_VIEW_ACTIVATE_SUBSCRIPTION_BANNER("userDidViewActivateSubscriptionBanner"),
+    USER_DID_CLICK_ACTIVATE_SUBSCRIPTION_BUTTON("userDidClickActivateSubscriptionButton"),
+    USER_DID_VIEW_FREE_PLAN_BADGE("userDidViewFreePlanBadge"),
+    USER_DID_CLICK_FREE_PLAN_UPGRADE_BUTTON("userDidClickFreePlanUpgradeButton"),
+    USER_DID_VIEW_FREE_LIMIT_MESSAGE("userDidViewFreeLimitMessage"),
+    USER_DID_CLICK_FREE_LIMIT_SUBSCRIBE_LINK("userDidClickFreeLimitSubscribeLink"),
+    USER_DID_VIEW_IMAGE_GENERATION_LIMIT_MESSAGE("userDidViewImageGenerationLimitMessage"),
+    USER_DID_CLICK_IMAGE_GENERATION_LIMIT_SUBSCRIBE_BUTTON("userDidClickImageGenerationLimitSubscribeButton"),
+    USER_DID_VIEW_PLUS_LIMIT_MESSAGE("userDidViewPlusLimitMessage"),
+    USER_DID_CLICK_PLUS_LIMIT_UPGRADE_LINK("userDidClickPlusLimitUpgradeLink"),
+    USER_DID_VIEW_PROMOTION_CARD("userDidViewPromotionCard"),
+    USER_DID_CLICK_PROMOTION_CARD_BUTTON("userDidClickPromotionCardButton"),
+    USER_DID_VIEW_SETTINGS_SUBSCRIBE_BUTTON("userDidViewSettingsSubscribeButton"),
+    USER_DID_CLICK_SETTINGS_SUBSCRIBE_BUTTON("userDidClickSettingsSubscribeButton"),
+    USER_DID_VIEW_VOICE_CHAT_DURATION_LIMIT_MODAL("userDidViewVoiceChatDurationLimitModal"),
+    USER_DID_CLICK_VOICE_CHAT_DURATION_LIMIT_MODAL_SUBSCRIBE_BUTTON("userDidClickVoiceChatDurationLimitModalSubscribeButton"),
+    USER_DID_VIEW_VOICE_CHAT_LIMIT_MODAL("userDidViewVoiceChatLimitModal"),
+    USER_DID_CLICK_VOICE_CHAT_LIMIT_MODAL_SUBSCRIBE_BUTTON("userDidClickVoiceChatLimitModalSubscribeButton"),
+    USER_DID_VIEW_PRO_UPGRADE_DISCLAIMER_BANNER("userDidViewProUpgradeDisclaimerBanner"),
+    USER_DID_CLICK_PRO_UPGRADE_DISCLAIMER_BANNER_BUTTON("userDidClickProUpgradeDisclaimerBannerButton"),
+
+    // Subscribe / upgrade modal events. FE sends the funnel entry point as `source`, which forms the origin.
+    USER_DID_OPEN_SUBSCRIBE_MODAL("userDidOpenSubscribeModal"),
+    USER_DID_CLICK_SUBSCRIBE_ON_SUBSCRIBE_MODAL("userDidClickSubscribeOnSubscribeModal"),
+    USER_DID_CLICK_ACTIVATE_ON_SUBSCRIBE_MODAL("userDidClickActivateOnSubscribeModal"),
+    USER_DID_OPEN_UPGRADE_TO_PRO_MODAL("userDidOpenUpgradeToProModal"),
+    USER_DID_CLICK_UPGRADE_ON_UPGRADE_TO_PRO_MODAL("userDidClickUpgradeOnUpgradeToProModal"),
     ;
 
     companion object {
@@ -352,6 +383,34 @@ enum class ModelTier(val model: String) {
 
     companion object {
         fun fromValue(v: String?): ModelTier? = entries.firstOrNull { it.model.equals(v, ignoreCase = true) }
+    }
+}
+
+// Funnel entry point supplied by the FE as `source` on the subscribe/upgrade modal events. Parsed from
+// the raw value and falls back to [UNKNOWN].
+enum class SubscriptionFunnelSource(val value: String) {
+    MODEL_PICKER("modelpicker"),
+    REASONING_PICKER("reasoningpicker"),
+    REASONING_DROPDOWN("reasoningdropdown"),
+    AI_SIDEBAR("aisidebar"),
+    ACTIVATE_SUBSCRIPTION("activatesubscription"),
+    FREE_LABEL("freelabel"),
+    FREE_LIMIT("freelimit"),
+    IMAGE_GENERATION_LIMIT("imagegenerationlimit"),
+    PLUS_LIMIT("pluslimit"),
+    PROMOTION_CARD("promotioncard"),
+    SETTINGS("settings"),
+    SWITCH_MODEL("switchmodel"),
+    VOICE_CHAT_DURATION_LIMIT("voicechatdurationlimit"),
+    VOICE_CHAT_LIMIT("voicechatlimit"),
+    DISCLAIMER_BANNER("disclaimerbanner"),
+    UNKNOWN("unknown"),
+    ;
+
+    val origin: String get() = "funnel_duckai_android__$value"
+
+    companion object {
+        fun fromValue(v: String?): SubscriptionFunnelSource = entries.firstOrNull { it.value == v } ?: UNKNOWN
     }
 }
 

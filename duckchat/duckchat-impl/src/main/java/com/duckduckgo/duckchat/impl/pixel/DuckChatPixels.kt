@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.SubscriptionFunnelSource
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
@@ -135,7 +136,7 @@ enum class DuckChatPixelSurface(val value: String) {
 }
 
 interface DuckChatPixels {
-    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
+    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null, source: String? = null)
     fun reportOpen()
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -267,7 +268,7 @@ class RealDuckChatPixels @Inject constructor(
     private fun surfaceParams(surface: DuckChatPixelSurface): Map<String, String> =
         mapOf(DuckChatPixelParameters.SURFACE to surface.value)
 
-    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
+    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?, source: String?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
             val sessionParams = mapOf(
@@ -299,6 +300,52 @@ class RealDuckChatPixels @Inject constructor(
                     }
                     DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS to emptyMap()
                 }
+
+                // Subscription-funnel events from the Duck.ai website (FE): impression/click pixel + origin.
+                ReportMetric.USER_DID_VIEW_AI_SIDEBAR_UPGRADE_BUTTON -> subscriptionFunnelImpression("funnel_duckai_android__aisidebar")
+                ReportMetric.USER_DID_CLICK_AI_SIDEBAR_UPGRADE_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__aisidebar")
+                ReportMetric.USER_DID_VIEW_ACTIVATE_SUBSCRIPTION_BANNER -> subscriptionFunnelImpression("funnel_duckai_android__activatesubscription")
+                ReportMetric.USER_DID_CLICK_ACTIVATE_SUBSCRIPTION_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__activatesubscription")
+                ReportMetric.USER_DID_VIEW_FREE_PLAN_BADGE -> subscriptionFunnelImpression("funnel_duckai_android__freelabel")
+                ReportMetric.USER_DID_CLICK_FREE_PLAN_UPGRADE_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__freelabel")
+                ReportMetric.USER_DID_VIEW_FREE_LIMIT_MESSAGE -> subscriptionFunnelImpression("funnel_duckai_android__freelimit")
+                ReportMetric.USER_DID_CLICK_FREE_LIMIT_SUBSCRIBE_LINK -> subscriptionFunnelClick("funnel_duckai_android__freelimit")
+                ReportMetric.USER_DID_VIEW_IMAGE_GENERATION_LIMIT_MESSAGE -> subscriptionFunnelImpression(
+                    "funnel_duckai_android__imagegenerationlimit",
+                )
+                ReportMetric.USER_DID_CLICK_IMAGE_GENERATION_LIMIT_SUBSCRIBE_BUTTON -> subscriptionFunnelClick(
+                    "funnel_duckai_android__imagegenerationlimit",
+                )
+                ReportMetric.USER_DID_VIEW_PLUS_LIMIT_MESSAGE -> subscriptionFunnelImpression("funnel_duckai_android__pluslimit")
+                ReportMetric.USER_DID_CLICK_PLUS_LIMIT_UPGRADE_LINK -> subscriptionFunnelClick("funnel_duckai_android__pluslimit")
+                ReportMetric.USER_DID_VIEW_PROMOTION_CARD -> subscriptionFunnelImpression("funnel_duckai_android__promotioncard")
+                ReportMetric.USER_DID_CLICK_PROMOTION_CARD_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__promotioncard")
+                ReportMetric.USER_DID_VIEW_SETTINGS_SUBSCRIBE_BUTTON -> subscriptionFunnelImpression("funnel_duckai_android__settings")
+                ReportMetric.USER_DID_CLICK_SETTINGS_SUBSCRIBE_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__settings")
+                ReportMetric.USER_DID_VIEW_VOICE_CHAT_DURATION_LIMIT_MODAL -> subscriptionFunnelImpression(
+                    "funnel_duckai_android__voicechatdurationlimit",
+                )
+                ReportMetric.USER_DID_CLICK_VOICE_CHAT_DURATION_LIMIT_MODAL_SUBSCRIBE_BUTTON -> subscriptionFunnelClick(
+                    "funnel_duckai_android__voicechatdurationlimit",
+                )
+                ReportMetric.USER_DID_VIEW_VOICE_CHAT_LIMIT_MODAL -> subscriptionFunnelImpression("funnel_duckai_android__voicechatlimit")
+                ReportMetric.USER_DID_CLICK_VOICE_CHAT_LIMIT_MODAL_SUBSCRIBE_BUTTON -> subscriptionFunnelClick(
+                    "funnel_duckai_android__voicechatlimit",
+                )
+                ReportMetric.USER_DID_VIEW_PRO_UPGRADE_DISCLAIMER_BANNER -> subscriptionFunnelImpression("funnel_duckai_android__disclaimerbanner")
+                ReportMetric.USER_DID_CLICK_PRO_UPGRADE_DISCLAIMER_BANNER_BUTTON -> subscriptionFunnelClick("funnel_duckai_android__disclaimerbanner")
+
+                // Subscribe/upgrade modal events: distinct pixels (mirroring Windows), origin from the FE source.
+                ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL ->
+                    DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION to subscriptionModalOrigin(source)
+                ReportMetric.USER_DID_CLICK_SUBSCRIBE_ON_SUBSCRIBE_MODAL ->
+                    DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_SUBSCRIBE_CLICK to subscriptionModalOrigin(source)
+                ReportMetric.USER_DID_CLICK_ACTIVATE_ON_SUBSCRIBE_MODAL ->
+                    DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_ACTIVATE_CLICK to subscriptionModalOrigin(source)
+                ReportMetric.USER_DID_OPEN_UPGRADE_TO_PRO_MODAL ->
+                    DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_IMPRESSION to subscriptionModalOrigin(source)
+                ReportMetric.USER_DID_CLICK_UPGRADE_ON_UPGRADE_TO_PRO_MODAL ->
+                    DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_UPGRADE_CLICK to subscriptionModalOrigin(source)
             }
 
             withContext(dispatcherProvider.main()) {
@@ -310,6 +357,16 @@ class RealDuckChatPixels @Inject constructor(
             }
         }
     }
+
+    private fun subscriptionFunnelImpression(origin: String) =
+        DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_IMPRESSION to mapOf(DuckChatPixelParameters.ORIGIN to origin)
+
+    private fun subscriptionFunnelClick(origin: String) =
+        DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_CLICK to mapOf(DuckChatPixelParameters.ORIGIN to origin)
+
+    // Origin param for the subscribe/upgrade modal pixels, parsed from the FE `source`.
+    private fun subscriptionModalOrigin(source: String?) =
+        mapOf(DuckChatPixelParameters.ORIGIN to SubscriptionFunnelSource.fromValue(source).origin)
 
     override fun reportOpen() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -935,6 +992,13 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OPEN_HISTORY("aichat_open_history"),
     DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT("aichat_open_most_recent_history_chat"),
     DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT("aichat_sent_prompt_ongoing_chat"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_IMPRESSION("m_aichat_subscription-funnel_impression"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_CLICK("m_aichat_subscription-funnel_click"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION("m_aichat_subscription-funnel_subscribe-modal_impression"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_SUBSCRIBE_CLICK("m_aichat_subscription-funnel_subscribe-modal_subscribe_click"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_ACTIVATE_CLICK("m_aichat_subscription-funnel_subscribe-modal_activate_click"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_IMPRESSION("m_aichat_subscription-funnel_upgrade-to-pro-modal_impression"),
+    DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_UPGRADE_CLICK("m_aichat_subscription-funnel_upgrade-to-pro-modal_upgrade_click"),
     DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED("m_privacy-pro_settings_paid-ai-chat_click"),
     DUCK_CHAT_PAID_SETTINGS_OPENED("m_privacy-pro_settings_paid-ai-chat_impression"),
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY("m_aichat_experimental_omnibar_shown"),

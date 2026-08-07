@@ -1341,6 +1341,55 @@
             }
         ]
     },
+    "m_aichat_subscription-funnel_subscribe-modal_impression": {
+        "description": "Subscription-funnel impression: the subscribe modal was shown. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_subscribe-modal_subscribe_click": {
+        "description": "Subscription-funnel click: the user tapped Subscribe on the subscribe modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_subscribe-modal_activate_click": {
+        "description": "Subscription-funnel click: the user tapped Activate on the subscribe modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_upgrade-to-pro-modal_impression": {
+        "description": "Subscription-funnel impression: the upgrade-to-Pro modal was shown. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_upgrade-to-pro-modal_upgrade_click": {
+        "description": "Subscription-funnel click: the user tapped Upgrade on the upgrade-to-Pro modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_impression": {
+        "description": "Subscription-funnel impression relayed from the Duck.ai website (FE reportMetric). Carries the funnel entry-point origin.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_click": {
+        "description": "Subscription-funnel click relayed from the Duck.ai website (FE reportMetric). Carries the funnel entry-point origin.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
     "m_aichat_unified_input_model_picker_shown": {
         "description": "Subscription-funnel impression: the Unified Input model picker was shown to the user",
         "owners": ["YoussefKeyrouz"],
