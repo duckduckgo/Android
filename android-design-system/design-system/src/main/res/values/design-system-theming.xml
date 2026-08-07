@@ -270,6 +270,7 @@
         <item name="daxColorButtonBrandContainer">@color/pollen40</item>
         <item name="daxColorButtonBrandContainerPressed">@color/pollen60</item>
         <item name="daxColorButtonBrandText">@color/pollen100</item>
+        <item name="daxColorRebrandAccentBlue">@color/pondwater40</item>
         <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater40</item>
         <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater60</item>
         <item name="daxColorRebrandButtonPrimaryText">@color/eggshell90</item>
@@ -430,6 +431,7 @@
         <item name="daxColorButtonBrandContainer">@color/mandarin50</item>
         <item name="daxColorButtonBrandContainerPressed">@color/mandarin70</item>
         <item name="daxColorButtonBrandText">@color/white</item>
+        <item name="daxColorRebrandAccentBlue">@color/pondwater60</item>
         <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater60</item>
         <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater80</item>
         <item name="daxColorRebrandButtonPrimaryText">@color/white</item>
