@@ -115,7 +115,7 @@ patch in the repo and apply it when CI prepares the build.
   .maestro/
     onboarding/
       source_patches/
-        config_driven_dialogs_enabled.patch
+        config_driven_dialogs_disabled.patch
       onboarding.yaml
   ```
 - Generate with minimal context so the hunk is pinned by the declaration it targets rather than by
@@ -128,10 +128,19 @@ patch in the repo and apply it when CI prepares the build.
   more than one). A patch that does not apply fails the build; it is never skipped.
 - Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
 
-A source patch is written against the current default, so it always builds the arm production does
-not ship. When the default flips, the patch stops applying and CI fails — update it to flip the
-other way, or delete it together with the job that uses it. The `E2E Source Patches` job in
-`ci.yml` runs that check on every PR so the breakage surfaces before the nightly.
+A source patch is written against the current default, so it stops applying the moment that default
+changes and CI fails. That is deliberate: whoever changes the default has to decide what coverage
+is now missing and either rewrite the patch or delete it together with the job that uses it. The
+`E2E Source Patches` job in `ci.yml` runs that check on every PR so the breakage surfaces there
+rather than in the next nightly.
+
+Work out what to patch from the coverage the flavours already give you, and patch only the gap.
+A `DefaultFeatureValue.INTERNAL` default resolves against the build flavour, so the play and
+internal binaries already cover both arms — but only for the flows each flavour runs, which is why
+`config_driven_dialogs_disabled.patch` builds one internal APK for the flows that would otherwise
+never see the arm production ships. A `TRUE` or `FALSE` default is flavour-independent, so a single
+patched build covers the other arm for everything.
 
 Patching source is the heaviest option: it needs a dedicated build, and the whole suite runs against
-one arm. Reach for it only when the flag is genuinely read too early for a config patch.
+one arm. Reach for it only when the flag is genuinely read too early for a config patch, and only
+for the flows the unpatched builds leave uncovered.

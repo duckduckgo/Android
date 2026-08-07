@@ -58,6 +58,6 @@ interface OnboardingBrandDesignUpdateToggles {
     /**
      * Selects the config-driven renderer for the brand-design onboarding dialogs.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun configDrivenDialogs(): Toggle
 }
