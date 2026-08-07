@@ -955,13 +955,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyVerticalPaddingForFocus() {
-        // 4dp when minimized, 8dp when expanded on focus. The browser omnibar with the toggle
-        // disabled stays minimized regardless of focus; everywhere else (duck.ai omnibar,
-        // duck.ai contextual, browser omnibar with toggle enabled) expands on focus.
+        // 4dp when minimized, 8dp when expanded. The browser omnibar with the toggle disabled stays
+        // minimized regardless of focus; the duck.ai omnibar and browser omnibar with toggle enabled
+        // expand on focus; the duck.ai contextual sheet is always expanded.
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = !isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus)
+        val expanded = isContextualWidget || (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
