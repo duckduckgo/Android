@@ -1639,6 +1639,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun configureForEdit(sessionId: String) {
         isEditWidget = true
         attachmentView?.isEditMode = true
+        findViewById<View?>(R.id.editModeWarningDivider)?.isVisible = true
+        findViewById<View?>(R.id.editModeWarning)?.isVisible = true
         doOnAttach {
             viewModel.configureForEdit(sessionId)
             selectChatTab()
