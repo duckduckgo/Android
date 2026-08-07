@@ -14,119 +14,120 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground">
+    android:background="?attr/daxColorBackground"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/subscriptionOnboardingFeaturesIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:src="@drawable/subscription_ddg_feature_128"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingFeaturesTitle"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingFeaturesTitle"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesIcon"
-        app:typography="h1" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingFeaturesDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingFeaturesDescription"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesTitle"
-        app:typography="body1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/subscriptionOnboardingFeaturesVPN"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesDescription"
-        app:leadingIcon="@drawable/vpn_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature1Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature1Description" />
+            <ImageView
+                android:id="@+id/subscriptionOnboardingFeaturesIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:src="@drawable/subscription_ddg_feature_128" />
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/onboardingSubscriptionFeaturesDivider1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingFeaturesVPN"
-        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingFeaturesVPN"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesVPN" />
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingFeaturesTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingFeaturesTitle"
+                app:typography="h1" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/subscriptionOnboardingFeaturesITR"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        app:layout_constraintTop_toBottomOf="@id/onboardingSubscriptionFeaturesDivider1"
-        app:leadingIcon="@drawable/identity_theft_restoration_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature2Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature2Description" />
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingFeaturesDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingFeaturesDescription"
+                app:typography="body1" />
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/onboardingSubscriptionFeaturesDivider2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingFeaturesITR"
-        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingFeaturesITR"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesITR" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/background_grey_rounded_corners"
+                android:orientation="vertical"
+                android:paddingVertical="@dimen/keyline_2">
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/subscriptionOnboardingFeaturesAi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        app:layout_constraintTop_toBottomOf="@id/onboardingSubscriptionFeaturesDivider2"
-        app:leadingIcon="@drawable/ai_general_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature3Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature3Description" />
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/subscriptionOnboardingFeaturesVPN"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/vpn_color_24"
+                    app:primaryText="@string/subscriptionOnboardingFeature1Title"
+                    app:secondaryText="@string/subscriptionOnboardingFeature1Description" />
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/onboardingSubscriptionFeaturesDivider3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingFeaturesAi"
-        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingFeaturesAi"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingFeaturesAi" />
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/onboardingSubscriptionFeaturesDivider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/subscriptionOnboardingFeaturesPIR"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        app:layout_constraintTop_toBottomOf="@id/onboardingSubscriptionFeaturesDivider3"
-        app:leadingIcon="@drawable/identity_blocked_pir_color_24"
-        app:primaryText="@string/subscriptionOnboardingFeature4Title"
-        app:secondaryText="@string/subscriptionOnboardingFeature4Description" />
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/subscriptionOnboardingFeaturesITR"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/identity_theft_restoration_color_24"
+                    app:primaryText="@string/subscriptionOnboardingFeature2Title"
+                    app:secondaryText="@string/subscriptionOnboardingFeature2Description" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/onboardingSubscriptionFeaturesDivider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/subscriptionOnboardingFeaturesAi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ai_general_color_24"
+                    app:primaryText="@string/subscriptionOnboardingFeature3Title"
+                    app:secondaryText="@string/subscriptionOnboardingFeature3Description" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/onboardingSubscriptionFeaturesDivider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/subscriptionOnboardingFeaturesPIR"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/identity_blocked_pir_color_24"
+                    app:primaryText="@string/subscriptionOnboardingFeature4Title"
+                    app:secondaryText="@string/subscriptionOnboardingFeature4Description" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingFeaturesPrimaryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
         android:text="@string/subscriptionOnboardingFeaturesPrimaryButton"
-        app:daxButtonSize="large"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:daxButtonSize="large" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
