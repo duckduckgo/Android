@@ -62,6 +62,7 @@ data class SuggestionCatalog(
 object ContextualSuggestionsMatcher {
 
     private const val LANGUAGE_TEMPLATE = "{language}"
+    private const val LANGUAGE_FORMAT_ARG = "%1\$s"
     private const val CONDITION_DIFFERENT_LANGUAGE = "differentLanguage"
 
     fun resolve(
@@ -156,12 +157,13 @@ object ContextualSuggestionsMatcher {
         }
     }
 
-    private fun applyTemplate(
+    internal fun applyTemplate(
         prompt: String,
         input: ResolvePageSuggestionsInput,
     ): String {
-        if (!prompt.contains(LANGUAGE_TEMPLATE)) return prompt
-        return prompt.replace(LANGUAGE_TEMPLATE, languageDisplayName(input.uiLocale))
+        if (prompt.contains(LANGUAGE_TEMPLATE)) return prompt.replace(LANGUAGE_TEMPLATE, languageDisplayName(input.uiLocale))
+        if (prompt.contains(LANGUAGE_FORMAT_ARG)) return prompt.replace(LANGUAGE_FORMAT_ARG, languageDisplayName(input.uiLocale))
+        return prompt
     }
 
     private fun pageLanguageSubtag(tag: String): String {
