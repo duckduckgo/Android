@@ -348,6 +348,17 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportContextualAskAboutPageSuggestionSelected then fires selected pixel with the reserved id`() = runTest {
+        testee.reportContextualAskAboutPageSuggestionSelected("article")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "ask-about-page", "pageType" to "article")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun `when reportContextualSuggestionSelected then fires count and daily with suggestion id and page type`() = runTest {
         testee.reportContextualSuggestionSelected("summarize-video", "video")
 
