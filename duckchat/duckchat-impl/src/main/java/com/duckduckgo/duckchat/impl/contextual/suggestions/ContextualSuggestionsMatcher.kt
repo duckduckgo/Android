@@ -26,6 +26,17 @@ data class ContextualSuggestedPrompt(
     val icon: String?,
 )
 
+data class ResolvedPageSuggestions(
+    val suggestions: List<ContextualSuggestedPrompt>,
+    val isSmart: Boolean,
+    val pageType: SuggestionsPageType,
+)
+
+enum class SuggestionsPageType {
+    RECIPE, PRODUCT, ARTICLE, VIDEO, JOB, BOOK, EVENT, PLACE, FORUM, CODE, COURSE, REVIEW, PERSON, HOWTO, FAQ, NONE;
+    val pixelValue: String get() = name.lowercase()
+}
+
 data class PageTypeSignals(
     val jsonLdType: List<String> = emptyList(),
     val ogType: String? = null,
@@ -68,9 +79,9 @@ object ContextualSuggestionsMatcher {
     fun resolve(
         input: ResolvePageSuggestionsInput,
         catalog: SuggestionCatalog,
-    ): List<ContextualSuggestedPrompt> {
+    ): ResolvedPageSuggestions {
         val cap = maxOf(1, catalog.maxSuggestedPrompts)
-        val candidateIds = collectCandidateIds(input, catalog, cap)
+        val (candidateIds, isSmart) = collectCandidateIds(input, catalog, cap)
         val seen = mutableSetOf<String>()
         val resolved = mutableListOf<ContextualSuggestedPrompt>()
 
@@ -90,14 +101,29 @@ object ContextualSuggestionsMatcher {
                 ),
             )
         }
-        return resolved
+        return ResolvedPageSuggestions(
+            suggestions = resolved,
+            isSmart = isSmart,
+            pageType = classifyPageType(input.pageTypeSignals),
+        )
+    }
+
+    fun classifyPageType(signals: PageTypeSignals?): SuggestionsPageType {
+        if (signals == null) return SuggestionsPageType.NONE
+        for (type in signals.jsonLdType) {
+            jsonLdTypeToPageType[type.trim().lowercase()]?.let { return it }
+        }
+        signals.ogType?.trim()?.lowercase()?.let { ogType ->
+            ogTypeToPageType[ogType]?.let { return it }
+        }
+        return SuggestionsPageType.NONE
     }
 
     private fun collectCandidateIds(
         input: ResolvePageSuggestionsInput,
         catalog: SuggestionCatalog,
         cap: Int,
-    ): List<String> {
+    ): Pair<List<String>, Boolean> {
         var contextual: List<String>? = null
 
         input.pageTypeSignals?.let { signals ->
@@ -123,8 +149,50 @@ object ContextualSuggestionsMatcher {
 
         val body = contextual ?: floorDefaults
         val bodyBudget = (cap - priorityDefaults.size).coerceAtLeast(0)
-        return body.take(bodyBudget) + priorityDefaults
+        return body.take(bodyBudget) + priorityDefaults to (contextual != null)
     }
+
+    private val jsonLdTypeToPageType = mapOf(
+        "recipe" to SuggestionsPageType.RECIPE,
+        "product" to SuggestionsPageType.PRODUCT,
+        "article" to SuggestionsPageType.ARTICLE,
+        "newsarticle" to SuggestionsPageType.ARTICLE,
+        "reportagenewsarticle" to SuggestionsPageType.ARTICLE,
+        "liveblogposting" to SuggestionsPageType.ARTICLE,
+        "blogposting" to SuggestionsPageType.ARTICLE,
+        "scholarlyarticle" to SuggestionsPageType.ARTICLE,
+        "videoobject" to SuggestionsPageType.VIDEO,
+        "movie" to SuggestionsPageType.VIDEO,
+        "tvseries" to SuggestionsPageType.VIDEO,
+        "jobposting" to SuggestionsPageType.JOB,
+        "book" to SuggestionsPageType.BOOK,
+        "course" to SuggestionsPageType.COURSE,
+        "event" to SuggestionsPageType.EVENT,
+        "restaurant" to SuggestionsPageType.PLACE,
+        "foodestablishment" to SuggestionsPageType.PLACE,
+        "localbusiness" to SuggestionsPageType.PLACE,
+        "discussionforumposting" to SuggestionsPageType.FORUM,
+        "qapage" to SuggestionsPageType.FORUM,
+        "faqpage" to SuggestionsPageType.FAQ,
+        "softwaresourcecode" to SuggestionsPageType.CODE,
+        "review" to SuggestionsPageType.REVIEW,
+        "aggregaterating" to SuggestionsPageType.REVIEW,
+        "person" to SuggestionsPageType.PERSON,
+        "howto" to SuggestionsPageType.HOWTO,
+    )
+
+    private val ogTypeToPageType = mapOf(
+        "article" to SuggestionsPageType.ARTICLE,
+        "product" to SuggestionsPageType.PRODUCT,
+        "product.item" to SuggestionsPageType.PRODUCT,
+        "video" to SuggestionsPageType.VIDEO,
+        "video.other" to SuggestionsPageType.VIDEO,
+        "video.movie" to SuggestionsPageType.VIDEO,
+        "video.episode" to SuggestionsPageType.VIDEO,
+        "video.tv_show" to SuggestionsPageType.VIDEO,
+        "book" to SuggestionsPageType.BOOK,
+        "profile" to SuggestionsPageType.PERSON,
+    )
 
     private fun matchByJsonLdType(
         types: List<String>,
