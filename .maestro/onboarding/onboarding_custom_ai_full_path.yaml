@@ -10,7 +10,6 @@ tags:
           clearState: true
           arguments:
             isMaestro: "true"
-            featureFlags: "${typeof ONBOARDING_FEATURE_FLAGS === 'undefined' ? '' : ONBOARDING_FEATURE_FLAGS}"
             referrer: "onboarding=ai"
       - assertVisible:
           text: "Ready to chat privately with ChatGPT, Claude, and other AIs.*"

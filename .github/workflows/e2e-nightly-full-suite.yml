@@ -230,34 +230,6 @@ jobs:
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
-      # The baseline onboarding suites above (plus the preonboarding run in the non-blockers
-      # suite) cover the default state of onboardingBrandDesignUpdate.configDrivenDialogs. This run
-      # covers the other arm via the invert seeder value, so both arms stay covered when the flag's
-      # compile-time default flips, without a run that duplicates the default state. Non-blocking:
-      # the inverted arm is not what production ships, so it should not gate a release.
-      - name: Onboarding Flows (inverted configDrivenDialogs FF, non-blocking)
-        id: maestro-onboarding-inverted-config-driven-dialogs
-        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
-        continue-on-error: true
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: onboardingInvertedConfigDrivenDialogs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 36
-          maestro_include_tags: onboardingTest,onboardingInternalTest,onboardingNonReleaseBlockingTest
-          maestro_env: ONBOARDING_FEATURE_FLAGS=onboardingBrandDesignUpdate.configDrivenDialogs=invert
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Onboarding Flows, inverted configDrivenDialogs FF (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: false
-
       - name: Deeplink tests
         id: maestro-deeplink
         # Run regardless of earlier suite failures, but only if the release binary uploaded.

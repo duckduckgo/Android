@@ -9,9 +9,6 @@ tags:
       # First launch as a fresh install
       - launchApp:
           clearState: true
-          arguments:
-            isMaestro: "true"
-            featureFlags: "${typeof ONBOARDING_FEATURE_FLAGS === 'undefined' ? '' : ONBOARDING_FEATURE_FLAGS}"
       # Wait for the welcome dialog so we create the reinstaller marker before relaunch
       - assertVisible:
           text: "Let's get started!"
@@ -20,7 +17,6 @@ tags:
           clearState: true
           arguments:
             isMaestro: "true"
-            featureFlags: "${typeof ONBOARDING_FEATURE_FLAGS === 'undefined' ? '' : ONBOARDING_FEATURE_FLAGS}"
             referrer: "onboarding=ai"
       - assertVisible:
           text: "Ready to chat privately with ChatGPT, Claude, and other AIs.*"
