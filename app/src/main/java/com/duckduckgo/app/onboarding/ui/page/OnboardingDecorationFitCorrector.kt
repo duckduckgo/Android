@@ -35,6 +35,14 @@ class OnboardingDecorationFitCorrector(
     // TODO: remove when onboardingImprovementsV2 flag is removed
     var enabled: Boolean = false
 
+    /**
+     * Whether a card anchored above a decoration still reserves the part of its bottom inset that the decoration
+     * does not already cover. Only the config-driven renderer sets this: its undecorated band anchors the card on
+     * screens the legacy renderer pinned to the parent bottom, so without this the card has no way to clear an
+     * inset taller than the band, i.e. the keyboard.
+     */
+    var reservesInsetAboveDecoration: Boolean = false
+
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
@@ -75,10 +83,10 @@ class OnboardingDecorationFitCorrector(
 
         val deco = decoration
         val decorationShown = deco != null && !deco.isGone
-        // The card reserves the bottom-bar inset only when it is the bottom-most element: bottom-anchored
-        // AND no decoration shown below it. A shown decoration is at least its min height, which exceeds
-        // any bar inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace
-        // and hide that very decoration.
+        // The card reserves the bottom-bar inset when it is the bottom-most element: bottom-anchored AND no
+        // decoration shown below it. A shown decoration is at least its min height, which exceeds any bar
+        // inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace and hide
+        // that very decoration. See [reservesInsetAboveDecoration] for the insets a decoration cannot cover.
         if (syncCardBottomInset(decorationShown)) return false
 
         // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
@@ -130,11 +138,29 @@ class OnboardingDecorationFitCorrector(
 
     private fun syncCardBottomInset(decorationShown: Boolean): Boolean {
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
-        val bottomAnchored = params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID
-        val desired = if (enabled && bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
+        val desired = desiredCardBottomInset(params, decorationShown)
         if (params.bottomMargin == desired) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = desired }
         return true
+    }
+
+    private fun desiredCardBottomInset(
+        params: ConstraintLayout.LayoutParams,
+        decorationShown: Boolean,
+    ): Int {
+        if (!enabled) return 0
+        if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) {
+            return if (decorationShown) 0 else cardBottomInsetPx()
+        }
+        val deco = decoration?.takeIf { decorationShown && reservesInsetAboveDecoration } ?: return 0
+        return (cardBottomInsetPx() - roomBelowCard(deco)).coerceAtLeast(0)
+    }
+
+    private fun roomBelowCard(decoration: View): Int {
+        val params = decoration.layoutParams as ViewGroup.MarginLayoutParams
+        // The applied height, not the laid-out one: the corrector runs before the frame that lays the shrink out.
+        val height = params.height.takeIf { it > 0 } ?: decoration.measuredHeight
+        return height + params.bottomMargin
     }
 
     // Clamp only on overflow: constrainedHeight rounds a fitting wrap down a pixel → a permanent scrollbar.
