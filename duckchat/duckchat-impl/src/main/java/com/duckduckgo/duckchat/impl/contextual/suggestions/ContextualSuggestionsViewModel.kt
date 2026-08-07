@@ -86,11 +86,13 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun onPageContextUpdated(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
         if (json.optString("title").isBlank() || json.optString("content").isBlank()) return
+        val pageTypeSignals = parsePageTypeSignals(json)
+        pageType = ContextualSuggestionsMatcher.classifyPageType(pageTypeSignals)
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             resolve(
                 url = json.optString("url").takeIf { it.isNotBlank() },
-                pageTypeSignals = parsePageTypeSignals(json),
+                pageTypeSignals = pageTypeSignals,
             )
         }
     }

@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -32,6 +33,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -322,6 +324,24 @@ class ContextualSuggestionsViewModelTest {
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com/2","content":"c"}""")
 
         verify(duckChatPixels, times(1)).reportContextualSuggestionsViewed(true, "recipe")
+    }
+
+    @Test
+    fun `when page context arrives then page type is reported before suggestions finish resolving`() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        whenever(suggestedPromptsProvider.resolveSuggestions(any())).doSuspendableAnswer {
+            gate.await()
+            ResolvedPageSuggestions(emptyList(), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+        }
+
+        viewModel.load()
+        viewModel.onPageContextUpdated(
+            """{"title":"T","url":"https://example.com","content":"c","pageTypeSignals":{"jsonLdType":["Recipe"],"lang":"en"}}""",
+        )
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertEquals("recipe", viewModel.pageTypePixelValue())
+        gate.complete(Unit)
     }
 
     @Test
