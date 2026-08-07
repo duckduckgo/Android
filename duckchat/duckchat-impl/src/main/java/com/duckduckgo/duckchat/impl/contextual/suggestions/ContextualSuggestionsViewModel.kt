@@ -62,7 +62,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun load() {
         loadJob?.cancel()
-        suggestionsVisible = false
+        resetResolvedState()
         loadJob = viewModelScope.launch {
             if (!suggestionsEnabled()) {
                 hideSuggestions()
@@ -160,8 +160,14 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun hideSuggestions() {
-        suggestionsVisible = false
+        resetResolvedState()
         _viewState.value = ViewState(suggestions = emptyList(), loading = false)
+    }
+
+    private fun resetResolvedState() {
+        suggestionsVisible = false
+        pageType = SuggestionsPageType.NONE
+        isSmart = false
     }
 
     private fun parsePageTypeSignals(pageContextJson: JSONObject): PageTypeSignals? {

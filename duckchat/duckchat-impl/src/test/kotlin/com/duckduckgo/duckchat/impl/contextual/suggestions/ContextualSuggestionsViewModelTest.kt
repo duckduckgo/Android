@@ -325,6 +325,31 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
+    fun `when suggestions cleared then page type no longer reports the previous page`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        assertEquals("recipe", viewModel.pageTypePixelValue())
+
+        viewModel.clear()
+
+        assertEquals("none", viewModel.pageTypePixelValue())
+    }
+
+    @Test
+    fun `when a new load starts then page type no longer reports the previous page`() = runTest {
+        val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
+        stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
+        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
+        assertEquals("recipe", viewModel.pageTypePixelValue())
+
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertEquals("none", viewModel.pageTypePixelValue())
+    }
+
+    @Test
     fun `when sheet reopened then viewed pixel fires a fresh impression even if page context wins the race`() = runTest {
         val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
         stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
