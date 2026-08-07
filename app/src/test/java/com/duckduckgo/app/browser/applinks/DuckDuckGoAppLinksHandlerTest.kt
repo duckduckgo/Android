@@ -427,6 +427,63 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenNoGestureAndNotTrustedCallerButIsInAlwaysTriggerListThenLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "app.digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("app.digid.nl/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenNoGestureAndSameDomainAndHasTriggeredButIsInAlwaysTriggerListThenLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "digid.nl/something"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "app.digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("app.digid.nl/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenNoGestureAndNotTrustedCallerAndParentOfAlwaysTriggerDomainThenReturnFalseAndDoNotLaunch() {
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
     fun whenFixDisabledThenNoGestureAndNotTrustedCallerStillLaunchesAppLink() {
         androidBrowserConfigFeature.customTabEndlessLoopFix().setRawStoredState(State(false))
         testee.isAUserQuery = false
