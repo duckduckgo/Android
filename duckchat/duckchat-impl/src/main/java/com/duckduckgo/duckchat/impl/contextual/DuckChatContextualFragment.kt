@@ -704,7 +704,7 @@ class DuckChatContextualFragment :
             } else {
                 binding.legacyInputField.text.toString()
             }
-            viewModel.onQuickActionClicked(currentInput)
+            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.pageTypePixelValue())
         }
     }
 
@@ -804,7 +804,9 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
-                        binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        if (viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
