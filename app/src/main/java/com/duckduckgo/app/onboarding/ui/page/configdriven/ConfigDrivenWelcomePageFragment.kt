@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
@@ -123,6 +124,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyLayoutOverrides()
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
@@ -192,6 +195,22 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { command -> handleCommand(command) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    /**
+     * The shared layout holds the values from before onboardingImprovementsV2, which that flag flips at runtime.
+     * This renderer only ever runs with those improvements on, so it applies them unconditionally.
+     *
+     * The card's own [ConstraintLayout.LayoutParams.constrainedHeight] has to go: the card wraps a `ScrollView`,
+     * and inside a wrap_content parent ConstraintLayout resolves the wrap at the pre-`constraintWidth_max` width,
+     * where a body line that will wrap in the capped card still fits on one line. The card then keeps that short
+     * height and its content scrolls even with room to spare.
+     */
+    private fun applyLayoutOverrides() {
+        binding.bottomWingAnimation.adjustViewBounds = true
+        binding.daxDialogCta.cardView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
     }
 
     private fun showIntro(screen: ConfigDrivenOnboardingPageViewModel.Screen.Intro) {
