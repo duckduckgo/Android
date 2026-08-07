@@ -96,6 +96,7 @@ class PixelWideEventSenderTest {
                     "global.platform" to "Android",
                     "global.type" to "app",
                     "global.sample_rate" to "1.0",
+                    "global.is_first_daily_occurrence" to "false",
                     "app.name" to "DuckDuckGo Android",
                     "app.version" to "5.123.0",
                     "app.form_factor" to "phone",
@@ -146,6 +147,62 @@ class PixelWideEventSenderTest {
             )
         }
 
+    @Test
+    fun `when event is the first daily occurrence then count and daily pixels report it`() =
+        runTest {
+            val event =
+                createWideEvent(
+                    id = 456L,
+                    name = "some-event",
+                    status = WideEventRepository.WideEventStatus.SUCCESS,
+                    isFirstDailyOccurrence = true,
+                )
+
+            pixelWideEventSender.sendWideEvent(event)
+
+            verify(pixel).enqueueFire(
+                pixelName = eq("wide_some-event_c"),
+                parameters = argThat { get("global.is_first_daily_occurrence") == "true" },
+                encodedParameters = any(),
+                type = any(),
+            )
+
+            verify(pixel).enqueueFire(
+                pixelName = eq("wide_some-event_d"),
+                parameters = argThat { get("global.is_first_daily_occurrence") == "true" },
+                encodedParameters = any(),
+                type = any<Pixel.PixelType.Daily>(),
+            )
+        }
+
+    @Test
+    fun `when event is not the first daily occurrence then count and daily pixels report it`() =
+        runTest {
+            val event =
+                createWideEvent(
+                    id = 456L,
+                    name = "some-event",
+                    status = WideEventRepository.WideEventStatus.SUCCESS,
+                    isFirstDailyOccurrence = false,
+                )
+
+            pixelWideEventSender.sendWideEvent(event)
+
+            verify(pixel).enqueueFire(
+                pixelName = eq("wide_some-event_c"),
+                parameters = argThat { get("global.is_first_daily_occurrence") == "false" },
+                encodedParameters = any(),
+                type = any(),
+            )
+
+            verify(pixel).enqueueFire(
+                pixelName = eq("wide_some-event_d"),
+                parameters = argThat { get("global.is_first_daily_occurrence") == "false" },
+                encodedParameters = any(),
+                type = any<Pixel.PixelType.Daily>(),
+            )
+        }
+
     private fun createWideEvent(
         id: Long,
         name: String,
@@ -156,6 +213,7 @@ class PixelWideEventSenderTest {
         samplingProbability: Float = 1.0f,
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
+        isFirstDailyOccurrence: Boolean = false,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -174,5 +232,6 @@ class PixelWideEventSenderTest {
         samplingProbability = samplingProbability,
         metaType = metaType,
         metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
     )
 }

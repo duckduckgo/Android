@@ -16,6 +16,7 @@
             "widePixelDevMode",
             "widePixelMetaType",
             "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
             {
                 "key": "feature.name",
                 "description": "Feature identifier for this wide event",

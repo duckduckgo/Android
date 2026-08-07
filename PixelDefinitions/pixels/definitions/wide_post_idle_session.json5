@@ -18,11 +18,7 @@
             "widePixelDevMode",
             "widePixelMetaType",
             "widePixelMetaVersion",
-            {
-                "key": "global.is_first_daily_occurrence",
-                "type": "boolean",
-                "description": "Whether this is the first occurrence of the event for the user today"
-            },
+            "widePixelIsFirstDailyOccurrence",
             {
                 "key": "feature.name",
                 "type": "string",

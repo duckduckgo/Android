@@ -35,6 +35,7 @@ data class GlobalSection(
     @field:Json(name = "platform") val platform: String,
     @field:Json(name = "type") val type: String,
     @field:Json(name = "sample_rate") val sampleRate: Float,
+    @field:Json(name = "is_first_daily_occurrence") val isFirstDailyOccurrence: Boolean,
 )
 
 data class AppSection(

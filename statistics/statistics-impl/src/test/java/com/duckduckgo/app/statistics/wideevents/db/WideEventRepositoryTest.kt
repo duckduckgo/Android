@@ -738,6 +738,106 @@ class WideEventRepositoryTest {
         assertEquals("-1", event.metadata["interval_1"])
     }
 
+    @Test
+    fun `when an event is the first completed today for its name and status, it is marked as the first daily occurrence`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(eventId))
+    }
+
+    @Test
+    fun `when an event with the same name and status already completed today, it is not the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+        assertFalse(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when events share a name but differ in status, each is the first daily occurrence`() = runTest {
+        val successEventId = insertEvent(name = "test_event")
+        val failureEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = successEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = failureEventId, status = FAILURE, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(successEventId))
+        assertTrue(isFirstDailyOccurrence(failureEventId))
+    }
+
+    @Test
+    fun `when events share a status but differ in name, each is the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event_1")
+        val secondEventId = insertEvent(name = "test_event_2")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+        assertTrue(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when the same name and status completes later on the same UTC day, it is not the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        timeProvider.currentTime = Instant.parse("2025-12-03T23:59:59.00Z")
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertFalse(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when the same name and status completes on the next UTC day, it is the first daily occurrence again`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        timeProvider.currentTime = Instant.parse("2025-12-04T00:00:00.00Z")
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when an event is still active, it is not marked as the first daily occurrence`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        assertFalse(isFirstDailyOccurrence(eventId))
+    }
+
+    @Test
+    fun `when an event completes, it does not affect the daily occurrence of an event completed earlier`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+    }
+
+    private suspend fun insertEvent(name: String): Long =
+        wideEventRepository.insertWideEvent(
+            name = name,
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-${name.replace('_', '-')}",
+            metaVersion = "1.0.0",
+        )
+
+    private suspend fun isFirstDailyOccurrence(eventId: Long): Boolean =
+        wideEventRepository.getWideEvents(setOf(eventId)).single().isFirstDailyOccurrence
+
     companion object {
         val DEFAULT_CLEANUP_POLICY =
             WideEventRepository.CleanupPolicy.OnTimeout(
