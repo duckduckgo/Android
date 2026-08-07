@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
+import com.duckduckgo.duckchat.impl.contextual.suggestions.SuggestionsPageType
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -756,7 +757,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onQuickActionClicked(
         currentInput: String,
-        suggestionsPageType: String = "none",
+        suggestionsPageType: SuggestionsPageType = SuggestionsPageType.NONE,
     ) {
         when (_viewState.value.quickActionState) {
             QuickActionState.LEGACY_SUMMARIZE -> {
@@ -771,7 +772,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
                 if (_viewState.value.contextualSuggestionsEnabled) {
-                    duckChatPixels.reportContextualAskAboutPageSuggestionSelected(suggestionsPageType)
+                    duckChatPixels.reportContextualAskAboutPageSuggestionSelected(suggestionsPageType.pixelValue)
                 }
                 addPageContext()
                 commandChannel.trySend(Command.FocusInput)

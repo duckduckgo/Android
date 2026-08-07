@@ -81,7 +81,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
         duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
     }
 
-    fun pageTypePixelValue(): String = pageType.pixelValue
+    fun currentPageType(): SuggestionsPageType = pageType
 
     fun onPageContextUpdated(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return

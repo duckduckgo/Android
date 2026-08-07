@@ -340,7 +340,7 @@ class ContextualSuggestionsViewModelTest {
         )
         coroutineRule.testDispatcher.scheduler.runCurrent()
 
-        assertEquals("recipe", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
         gate.complete(Unit)
     }
 
@@ -349,11 +349,11 @@ class ContextualSuggestionsViewModelTest {
         val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
         stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
-        assertEquals("recipe", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
 
         viewModel.clear()
 
-        assertEquals("none", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.NONE, viewModel.currentPageType())
     }
 
     @Test
@@ -361,12 +361,12 @@ class ContextualSuggestionsViewModelTest {
         val tailored = ContextualSuggestedPrompt("shopping-list", "Generate a shopping list", "Create a shopping list.", null)
         stubProvider(listOf(tailored), isSmart = true, pageType = SuggestionsPageType.RECIPE)
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
-        assertEquals("recipe", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
 
         viewModel.load()
         coroutineRule.testDispatcher.scheduler.runCurrent()
 
-        assertEquals("none", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.NONE, viewModel.currentPageType())
     }
 
     @Test
@@ -440,6 +440,6 @@ class ContextualSuggestionsViewModelTest {
 
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
 
-        assertEquals("recipe", viewModel.pageTypePixelValue())
+        assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
     }
 }
