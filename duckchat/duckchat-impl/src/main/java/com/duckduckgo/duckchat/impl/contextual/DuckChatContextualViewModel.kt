@@ -754,7 +754,10 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onQuickActionClicked(currentInput: String) {
+    fun onQuickActionClicked(
+        currentInput: String,
+        suggestionsPageType: String = "none",
+    ) {
         when (_viewState.value.quickActionState) {
             QuickActionState.LEGACY_SUMMARIZE -> {
                 duckChatPixels.reportContextualSummarizePromptSelected()
@@ -767,6 +770,9 @@ class DuckChatContextualViewModel @Inject constructor(
                     return
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
+                if (_viewState.value.contextualSuggestionsEnabled) {
+                    duckChatPixels.reportContextualAskAboutPageSuggestionSelected(suggestionsPageType)
+                }
                 addPageContext()
                 commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {
