@@ -19,46 +19,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/daxColorBackground"
-    android:orientation="vertical"
-    android:padding="@dimen/keyline_4">
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <LinearLayout
+        android:id="@+id/editPromptContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/editPromptCancel"
-            android:layout_width="@dimen/toolbarIcon"
-            android:layout_height="@dimen/toolbarIcon"
-            android:background="@drawable/selectable_item_rounded_corner_background"
-            android:contentDescription="@string/duck_ai_edit_prompt_cancel"
-            android:scaleType="center"
-            app:srcCompat="@drawable/ic_close_24"
-            app:tint="?attr/daxColorPrimaryIcon" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/editPromptInputCard"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:text="@string/duck_ai_edit_prompt_title"
-            app:typography="h3" />
+            android:layout_margin="@dimen/keyline_4"
+            app:cardBackgroundColor="?attr/daxColorWindow"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="false">
+
+            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                android:id="@+id/editPromptInput"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:text="@string/duck_ai_edit_prompt_lose_responses_warning"
-        app:textType="secondary"
-        app:typography="caption" />
-
-    <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-        android:id="@+id/editPromptInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2" />
 
 </LinearLayout>

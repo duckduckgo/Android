@@ -17,12 +17,17 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.edit
 
 import android.os.Bundle
+import androidx.core.view.doOnAttach
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityEditPromptBinding
 import com.duckduckgo.duckchat.impl.helper.EditPromptResult
 import com.duckduckgo.duckchat.impl.helper.EditPromptSessionStore
@@ -41,6 +46,12 @@ class EditPromptActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var nativeInputStatePublisher: NativeInputStatePublisher
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityEditPromptBinding by viewBinding()
 
     private val params by lazy { intent.getActivityParams(EditPromptScreenParams::class.java) }
@@ -49,7 +60,24 @@ class EditPromptActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
+        with(binding.includeToolbar.toolbar) {
+            setupToolbar(this)
+            title = getString(R.string.duck_ai_edit_prompt_title)
+            setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+            navigationContentDescription = getString(R.string.duck_ai_edit_prompt_cancel)
+            setNavigationOnClickListener { finish() }
+        }
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         val sessionId = params?.sessionId
         val payload = sessionId?.let { editPromptSessionStore.payload(it) }
@@ -65,9 +93,18 @@ class EditPromptActivity : DuckDuckGoActivity() {
             text = payload.prompt
             onChatSent = { submit(sessionId) }
             hideMainButtons()
-            focusInput(this@EditPromptActivity)
+            // configureForEdit's own widget setup runs on attach; focusing before that leaves the
+            // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
+            asView().doOnAttach { focusInput(this@EditPromptActivity) }
         }
-        binding.editPromptCancel.setOnClickListener { finish() }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        // Nothing else consumes the bottom/IME inset once edge-to-edge is on, so the keyboard
+        // would otherwise overlap the card instead of pushing it up.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.editPromptContent)
     }
 
     private fun submit(sessionId: String) {
