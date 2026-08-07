@@ -348,6 +348,48 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportContextualSuggestionSelected then fires count and daily with suggestion id and page type`() = runTest {
+        testee.reportContextualSuggestionSelected("summarize-video", "video")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "summarize-video", "pageType" to "video")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsViewed then fires count and daily with smartness and page type`() = runTest {
+        testee.reportContextualSuggestionsViewed(isSmart = true, pageType = "recipe")
+
+        advanceUntilIdle()
+
+        val params = mapOf("isSmart" to "true", "pageType" to "recipe")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsContextCollectionTimedOut then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsContextCollectionTimedOut()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsCatalogLoadFailed then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsCatalogLoadFailed()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun `when reportChatSyncActive then fires daily pixel`() {
         testee.reportChatSyncActive()
 
