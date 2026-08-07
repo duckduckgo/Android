@@ -154,10 +154,10 @@ private fun SearchModeBar(
 
     Box(
         modifier = Modifier
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .clipToBounds()
-            .heightIn(min = DaxTopAppBarDefaults.Height)
+            .heightIn(min = DaxSearchTopAppBarDefaults.Height)
             .fillMaxWidth()
             .background(DaxTopAppBarDefaults.colors.containerColor)
             .padding(DaxSearchTopAppBarDefaults.Margin),
@@ -166,7 +166,9 @@ private fun SearchModeBar(
         Surface(
             shape = DaxSearchTopAppBarDefaults.shape,
             color = DaxSearchTopAppBarDefaults.colors.surfaceColor,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = DaxSearchTopAppBarDefaults.SearchFieldHeight),
         ) {
             Row(
                 modifier = Modifier.padding(DaxSearchTopAppBarDefaults.ContentPadding),
@@ -249,6 +251,10 @@ internal object DaxSearchTopAppBarDefaults {
     val ContentPadding: PaddingValues = PaddingValues(start = 4.dp, end = 8.dp)
 
     val Spacing: Dp = 16.dp
+
+    val Height: Dp = 60.dp
+
+    val SearchFieldHeight: Dp = 44.dp
 }
 
 @PreviewLightDark

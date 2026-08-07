@@ -71,8 +71,8 @@ fun DaxTopAppBar(
 ) {
     Row(
         modifier = modifier
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
             .clipToBounds()
             .heightIn(min = DaxTopAppBarDefaults.Height)
             .fillMaxWidth()
