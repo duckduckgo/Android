@@ -95,6 +95,36 @@ class NoMaterial3ScaffoldUsageDetectorTest {
     }
 
     @Test
+    fun whenNonMaterial3ScaffoldUsedThenNoError() {
+        lint()
+            .files(
+                kotlin(
+                    """
+                    package com.example.widgets
+
+                    fun Scaffold(
+                        content: () -> Unit,
+                    ) {}
+                    """.trimIndent(),
+                ).indented(),
+                kotlin(
+                    """
+                    package com.example.test
+
+                    import com.example.widgets.Scaffold
+
+                    fun MyScreen() {
+                        Scaffold(content = {})
+                    }
+                    """.trimIndent(),
+                ).indented(),
+            )
+            .issues(NO_MATERIAL3_SCAFFOLD_USAGE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun whenNoScaffoldUsedThenNoError() {
         lint()
             .files(

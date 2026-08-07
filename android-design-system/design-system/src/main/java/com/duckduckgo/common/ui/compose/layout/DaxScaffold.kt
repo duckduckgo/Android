@@ -19,14 +19,16 @@ package com.duckduckgo.common.ui.compose.layout
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.duckduckgo.common.ui.compose.appbars.DaxSearchTopAppBar
 import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBar
 import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBarNavigationIcon
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
@@ -68,7 +70,7 @@ fun DaxScaffold(
     )
 }
 
-object DaxScaffoldDefaults {
+internal object DaxScaffoldDefaults {
     val containerColor: Color
         @Composable
         get() = DuckDuckGoTheme.colors.backgrounds.background
@@ -78,7 +80,6 @@ object DaxScaffoldDefaults {
         get() = DuckDuckGoTheme.colors.text.primary
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
 private fun DaxScaffoldPreview() {
@@ -95,6 +96,49 @@ private fun DaxScaffoldPreview() {
                             onClick = { },
                         )
                     },
+                )
+            },
+        ) { paddingValues ->
+            DaxText(
+                text = "Content goes here",
+                modifier = Modifier.padding(paddingValues),
+            )
+        }
+    }
+}
+
+@PreviewFontScale
+@Composable
+private fun DaxScaffoldFontScalePreview() {
+    DuckDuckGoTheme {
+        DaxScaffold(
+            topBar = {
+                DaxTopAppBar(
+                    title = "Bookmarks",
+                    navigationIcon = DaxTopAppBarNavigationIcon.Back { },
+                )
+            },
+        ) { paddingValues ->
+            DaxText(
+                text = "Content goes here",
+                modifier = Modifier.padding(paddingValues),
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxScaffoldSearchTopAppBarPreview() {
+    DuckDuckGoTheme {
+        DaxScaffold(
+            topBar = {
+                DaxSearchTopAppBar(
+                    title = "Bookmarks",
+                    searchActive = true,
+                    searchState = rememberTextFieldState("query"),
+                    searchPlaceholder = "Search…",
+                    navigationIcon = DaxTopAppBarNavigationIcon.Back { },
                 )
             },
         ) { paddingValues ->

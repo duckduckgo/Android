@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -875,7 +874,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_scaffold)) {
-        @OptIn(ExperimentalMaterial3Api::class)
         override fun bind(component: Component) {
             view.setupThemedComposeView(R.id.composeScaffold, isDarkTheme) {
                 val searchState = rememberTextFieldState()
