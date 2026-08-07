@@ -1,0 +1,214 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.common.ui.compose.appbars
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.PreviewFontScale
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
+
+/**
+ * DuckDuckGo themed top app bar.
+ *
+ * @param title The title to display in the top app bar.
+ * @param modifier Modifier for this top app bar.
+ * @param shadow Whether to display a shadow below the top app bar.
+ * @param navigationIcon The navigation icon to display, or null for none.
+ * @param actions Composable for the action icons, if any.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215793353260352
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=20800-183716&m=dev
+ */
+@Composable
+fun DaxTopAppBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    shadow: Boolean = false,
+    navigationIcon: DaxTopAppBarNavigationIcon? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    Row(
+        modifier = modifier
+            .topAppBarContainer(shadow = shadow, minHeight = DaxTopAppBarDefaults.Height)
+            .padding(paddingValues = DaxTopAppBarDefaults.ContentPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (navigationIcon != null) {
+            NavigationIconButton(navigationIcon)
+            Spacer(Modifier.width(DaxTopAppBarDefaults.Spacing))
+        }
+        DaxText(
+            text = title,
+            modifier = Modifier
+                .weight(1f)
+                .semantics { heading() },
+            style = DaxTopAppBarDefaults.style,
+            color = DaxTopAppBarDefaults.colors.titleColor,
+            maxLines = 1,
+        )
+        actions(this)
+    }
+}
+
+/**
+ * The shared container of every top app bar mode: window insets, optional shadow, height and background.
+ *
+ * The shadow node is sized by the modifiers that follow it, so the insets must be applied before it and the
+ * sizing after it, otherwise the shadow is drawn around the bar plus the status bar inset region.
+ */
+@Composable
+internal fun Modifier.topAppBarContainer(
+    shadow: Boolean,
+    minHeight: Dp,
+): Modifier = this
+    .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+    .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
+    .clipToBounds()
+    .heightIn(min = minHeight)
+    .fillMaxWidth()
+    .background(DaxTopAppBarDefaults.colors.containerColor)
+
+@Composable
+private fun NavigationIconButton(icon: DaxTopAppBarNavigationIcon) {
+    val iconRes: Int
+    val descriptionRes: Int
+    when (icon) {
+        is DaxTopAppBarNavigationIcon.Back -> {
+            iconRes = R.drawable.ic_arrow_left_24
+            descriptionRes = R.string.dax_top_app_bar_back_content_description
+        }
+        is DaxTopAppBarNavigationIcon.Close -> {
+            iconRes = R.drawable.ic_close_24
+            descriptionRes = R.string.dax_top_app_bar_close_content_description
+        }
+    }
+    DaxIconButton(
+        onClick = icon.onClick,
+        iconPainter = painterResource(iconRes),
+        contentDescription = stringResource(descriptionRes),
+    )
+}
+
+@Immutable
+internal data class DaxTopAppBarColors(
+    val containerColor: Color,
+    val titleColor: Color,
+)
+
+internal object DaxTopAppBarDefaults {
+    val colors: DaxTopAppBarColors
+        @Composable
+        get() = DaxTopAppBarColors(
+            containerColor = DuckDuckGoTheme.colors.backgrounds.background,
+            titleColor = DuckDuckGoTheme.colors.text.primary,
+        )
+
+    val style: DuckDuckGoTextStyle
+        @Composable
+        get() = DuckDuckGoTheme.typography.h2
+
+    val ContentPadding: PaddingValues = PaddingValues(start = 6.dp, end = 2.dp, top = 8.dp, bottom = 8.dp)
+
+    val Spacing: Dp = 24.dp
+
+    val Elevation: Dp = 2.dp
+
+    val Height: Dp = 56.dp
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTopAppBarDefaultPreview() {
+    PreviewBox {
+        DaxTopAppBar(
+            title = "Title",
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
+            actions = {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_find_search_24),
+                    contentDescription = "Search",
+                )
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTopAppBarLongTitlePreview() {
+    PreviewBox {
+        DaxTopAppBar(
+            title = "A very long title that should be truncated with an ellipsis at the end",
+            navigationIcon = DaxTopAppBarNavigationIcon.Close { },
+            shadow = true,
+            actions = {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_find_search_24),
+                    contentDescription = "Search",
+                )
+            },
+        )
+    }
+}
+
+@PreviewFontScale
+@Composable
+private fun DaxTopAppBarFontScalePreview() {
+    PreviewBox {
+        DaxTopAppBar(
+            title = "Title",
+            navigationIcon = DaxTopAppBarNavigationIcon.Back { },
+            actions = {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_find_search_24),
+                    contentDescription = "Search",
+                )
+            },
+        )
+    }
+}
