@@ -48,7 +48,7 @@ import com.duckduckgo.mobile.android.R
  * @param modifier Modifier applied to the list item container.
  * @param primaryTextColor Primary label colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
  * @param secondaryTextColor Secondary caption colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
- * @param pillText Optional pill rendered inline after the primary text; `null` = no pill.
+ * @param inlineContent Optional slot rendered inline after the primary text — use [DaxListItemInlineScope] members.
  * @param leadingContent Optional leading slot — use [DaxListItemLeadingScope] members.
  * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when set the item becomes clickable.
@@ -64,7 +64,7 @@ fun DaxTwoLineListItem(
     modifier: Modifier = Modifier,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
     secondaryTextColor: Color = DuckDuckGoTheme.textColors.secondary,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -77,7 +77,7 @@ fun DaxTwoLineListItem(
         primaryText = AnnotatedString(primaryText),
         modifier = modifier,
         secondaryText = AnnotatedString(secondaryText),
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryTextColor = primaryTextColor,
         secondaryTextColor = secondaryTextColor,
         primaryMaxLines = primaryMaxLines,
@@ -102,7 +102,7 @@ fun DaxTwoLineListItem(
     modifier: Modifier = Modifier,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
     secondaryTextColor: Color = DuckDuckGoTheme.textColors.secondary,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -115,7 +115,7 @@ fun DaxTwoLineListItem(
         primaryText = AnnotatedString(primaryText),
         modifier = modifier,
         secondaryText = secondaryText,
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryTextColor = primaryTextColor,
         secondaryTextColor = secondaryTextColor,
         primaryMaxLines = primaryMaxLines,
@@ -140,7 +140,7 @@ fun DaxTwoLineListItem(
     modifier: Modifier = Modifier,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
     secondaryTextColor: Color = DuckDuckGoTheme.textColors.secondary,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -153,7 +153,7 @@ fun DaxTwoLineListItem(
         primaryText = primaryText,
         modifier = modifier,
         secondaryText = secondaryText,
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryTextColor = primaryTextColor,
         secondaryTextColor = secondaryTextColor,
         primaryMaxLines = primaryMaxLines,
@@ -242,7 +242,7 @@ private fun DaxTwoLineListItemLeadingAndTrailingPreview() {
 private fun DaxTwoLineListItemPillAndUnboundedPreview() {
     PreviewSurface {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DaxTwoLineListItem(primaryText = "With Beta pill", secondaryText = "Supporting text", pillText = "Beta", onClick = {})
+            DaxTwoLineListItem(primaryText = "With Beta pill", secondaryText = "Supporting text", inlineContent = { Pill("Beta") }, onClick = {})
             DaxTwoLineListItem(
                 primaryText = "Unbounded secondary",
                 secondaryText = "This supporting caption is intentionally long so it wraps over several lines, " +

@@ -66,7 +66,7 @@ import androidx.compose.material3.Icon as M3Icon
  * @param primaryText Primary label.
  * @param modifier Modifier applied to the list item row.
  * @param secondaryText Secondary caption shown beneath the primary label; `null` = one-line layout.
- * @param pillText Optional pill rendered inline after the primary text; `null` = no pill.
+ * @param inlineContent Optional slot rendered inline after the primary text — use [DaxListItemInlineScope] members.
  * @param primaryTextColor Primary label colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
  * @param secondaryTextColor Secondary caption colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
  * @param primaryMaxLines Maximum lines for the primary label.
@@ -75,15 +75,16 @@ import androidx.compose.material3.Icon as M3Icon
  * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when non-null the row becomes clickable.
  * @param onLongClick Optional long-click handler; when non-null the row becomes long-clickable.
- * @param enabled Whether the row is enabled and interactive. Disabled rows are dimmed, and both
- * scopes pass the state on to their members so slot content is disabled rather than only dimmed.
+ * @param enabled Whether the row is enabled and interactive. Disabled rows are dimmed, and the
+ * leading and trailing scopes pass the state on to their members so slot content is disabled rather
+ * than only dimmed.
  */
 @Composable
 internal fun DaxListItem(
     primaryText: AnnotatedString,
     modifier: Modifier = Modifier,
     secondaryText: AnnotatedString? = null,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
     secondaryTextColor: Color = DuckDuckGoTheme.textColors.secondary,
     primaryMaxLines: Int = 1,
@@ -124,9 +125,11 @@ internal fun DaxListItem(
             Spacer(Modifier.width(DaxListItemDefaults.LeadingGap))
         }
 
-        Column(Modifier
-            .weight(1f)
-            .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha),
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DaxText(
                     text = primaryText,
@@ -135,9 +138,9 @@ internal fun DaxListItem(
                     maxLines = primaryMaxLines,
                     modifier = Modifier.weight(1f, fill = false),
                 )
-                if (pillText != null) {
+                if (inlineContent != null) {
                     Spacer(Modifier.width(DaxListItemDefaults.PillGap))
-                    DaxPill(text = pillText)
+                    DaxListItemInlineScope.inlineContent()
                 }
             }
 
@@ -216,6 +219,27 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
                 modifier = Modifier.size(iconDp),
             )
         }
+    }
+}
+
+/**
+ * Receiver scope for the slot rendered inline after a list item's primary text.
+ *
+ * Typing the slot as a receiver on this scope is what restricts inline content to the design
+ * system's own composables; the `DaxListItemContentDetector` lint rule enforces it at build time.
+ *
+ * Members take no enabled state: the slot sits inside the text column, which the row already dims
+ * as a whole when disabled.
+ */
+@Stable
+object DaxListItemInlineScope {
+
+    @Composable
+    fun Pill(
+        text: String,
+        modifier: Modifier = Modifier,
+    ) {
+        DaxPill(text = text, modifier = modifier)
     }
 }
 
@@ -335,7 +359,7 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
     @Composable
     fun StatusIndicator(
         status: Status,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
     ) {
         DaxStatusIndicator(status = status, modifier = modifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha))
     }

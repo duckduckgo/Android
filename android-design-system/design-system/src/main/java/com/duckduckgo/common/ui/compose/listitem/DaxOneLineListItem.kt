@@ -45,7 +45,7 @@ import com.duckduckgo.mobile.android.R
  * @param primaryText Primary label.
  * @param modifier Modifier applied to the list item container.
  * @param primaryTextColor Text colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
- * @param pillText Optional pill rendered inline after the primary text; `null` = no pill.
+ * @param inlineContent Optional slot rendered inline after the primary text — use [DaxListItemInlineScope] members.
  * @param leadingContent Optional leading slot — use [DaxListItemLeadingScope] members.
  * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when non-null the item becomes clickable.
@@ -58,7 +58,7 @@ fun DaxOneLineListItem(
     primaryText: String,
     modifier: Modifier = Modifier,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -69,7 +69,7 @@ fun DaxOneLineListItem(
     DaxListItem(
         primaryText = AnnotatedString(primaryText),
         modifier = modifier,
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryTextColor = primaryTextColor,
         primaryMaxLines = primaryMaxLines,
         leadingContent = leadingContent,
@@ -91,7 +91,7 @@ fun DaxOneLineListItem(
     primaryText: AnnotatedString,
     modifier: Modifier = Modifier,
     primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -102,7 +102,7 @@ fun DaxOneLineListItem(
     DaxListItem(
         primaryText = primaryText,
         modifier = modifier,
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryTextColor = primaryTextColor,
         primaryMaxLines = primaryMaxLines,
         leadingContent = leadingContent,
@@ -151,7 +151,7 @@ private fun DaxOneLineListItemWithIconAndSwitchPreview() {
 @Composable
 private fun DaxOneLineListItemWithPillPreview() {
     PreviewSurface {
-        DaxOneLineListItem(primaryText = "Feature", pillText = "New", onClick = {})
+        DaxOneLineListItem(primaryText = "Feature", inlineContent = { Pill("New") }, onClick = {})
     }
 }
 

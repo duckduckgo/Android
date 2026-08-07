@@ -1196,7 +1196,7 @@ private fun ComposeOneLineLongTextTruncated() {
 @Composable
 private fun ComposeOneLineNewPill() {
     ComposeCaption()
-    DaxOneLineListItem(primaryText = "Item with New Pill", pillText = "New", onClick = {})
+    DaxOneLineListItem(primaryText = "Item with New Pill", inlineContent = { Pill("New") }, onClick = {})
 }
 
 @Composable
@@ -1215,7 +1215,7 @@ private fun ComposeOneLineExtras() {
         primaryText = "Trailing button",
         trailingContent = { Button(text = "Action", onClick = {}) },
     )
-    DaxOneLineListItem(primaryText = "With Beta pill", pillText = "Beta", onClick = {})
+    DaxOneLineListItem(primaryText = "With Beta pill", inlineContent = { Pill("Beta") }, onClick = {})
     DaxOneLineListItem(
         primaryText = "Disabled with checked switch",
         enabled = false,
@@ -1347,7 +1347,7 @@ private fun ComposeTwoLineMediumTrailingOnly() {
 @Composable
 private fun ComposeTwoLineBetaPill() {
     ComposeCaption()
-    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "With Beta Pill", pillText = "Beta", onClick = {})
+    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "With Beta Pill", inlineContent = { Pill("Beta") }, onClick = {})
 }
 
 @Composable
@@ -1399,7 +1399,7 @@ private fun ComposeTwoLineSwitchPill() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Beta Pill and Switch",
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
     )
 }
@@ -1411,7 +1411,7 @@ private fun ComposeTwoLineSwitchTruncated() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two Line Item Two Line Item Two Line Item",
         secondaryText = "In disabled state",
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
         primaryMaxLines = 1,
@@ -1424,7 +1424,7 @@ private fun ComposeTwoLineDisabled() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two Line Item Two Line Item Two Line Item",
         secondaryText = "In disabled state",
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = false, onCheckedChange = {}) },
         enabled = false,
@@ -1437,7 +1437,7 @@ private fun ComposeTwoLineSwitchChecked() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two",
         secondaryText = "Checked in disabled state",
-        pillText = "Whatever",
+        inlineContent = { Pill("Whatever") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = true, onCheckedChange = {}) },
         enabled = false,
@@ -1450,7 +1450,7 @@ private fun ComposeTwoLineSwitchDisabledChecked() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two",
         secondaryText = "Checked with switch in disabled state",
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = true, onCheckedChange = {}, enabled = false) },
     )
@@ -1564,7 +1564,7 @@ private fun ComposeSettingsBeta() {
     DaxSettingsListItem(
         primaryText = "Settings List Item with Beta Pill",
         status = Status.On,
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
         onClick = {},
     )
@@ -1576,7 +1576,7 @@ private fun ComposeSettingsBetaLongText() {
     DaxSettingsListItem(
         primaryText = "Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap",
         status = Status.On,
-        pillText = "Beta",
+        inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
         onClick = {},
     )
@@ -1588,7 +1588,7 @@ private fun ComposeSettingsNew() {
     DaxSettingsListItem(
         primaryText = "Settings List Item with New Pill",
         status = Status.On,
-        pillText = "New",
+        inlineContent = { Pill("New") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
         onClick = {},
     )

@@ -27,10 +27,12 @@ class DaxListItemContentDetectorTest {
         package com.duckduckgo.common.ui.compose.listitem
         object DaxListItemTrailingScope { fun Switch() {}; fun Icon() {} }
         object DaxListItemLeadingScope { fun Icon() {} }
+        object DaxListItemInlineScope { fun Pill() {} }
         fun DaxOneLineListItem(
             text: String,
             leadingContent: (DaxListItemLeadingScope.() -> Unit)? = null,
             trailingContent: (DaxListItemTrailingScope.() -> Unit)? = null,
+            inlineContent: (DaxListItemInlineScope.() -> Unit)? = null,
         ) {}
         fun DaxTwoLineListItem(
             primaryText: String,
@@ -51,6 +53,7 @@ class DaxListItemContentDetectorTest {
         import com.duckduckgo.common.ui.compose.listitem.*
         fun BadSwitch() {}
         fun BadIcon() {}
+        fun BadPill() {}
         fun screen() { $body }
         """,
     ).indented()
@@ -63,6 +66,16 @@ class DaxListItemContentDetectorTest {
     @Test
     fun whenSlotUsesScopeMemberThenNoWarning() {
         run("""DaxOneLineListItem(text = "x", trailingContent = { Switch() })""").expectClean()
+    }
+
+    @Test
+    fun whenInlineContentUsesScopeMemberThenNoWarning() {
+        run("""DaxOneLineListItem(text = "x", inlineContent = { Pill() })""").expectClean()
+    }
+
+    @Test
+    fun whenInlineContentUsesArbitraryComposableThenWarning() {
+        run("""DaxOneLineListItem(text = "x", inlineContent = { BadPill() })""").expectWarningCount(1)
     }
 
     @Test

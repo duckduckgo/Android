@@ -43,11 +43,13 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
 
         private val leadingMembers by lazy { membersOf(LEADING_SCOPE) }
         private val trailingMembers by lazy { membersOf(TRAILING_SCOPE) }
+        private val inlineMembers by lazy { membersOf(INLINE_SCOPE) }
 
         override fun visitCallExpression(node: UCallExpression) {
             if (node.methodName !in LIST_ITEM_COMPOSABLES) return
             check(node, "leadingContent", leadingMembers)
             check(node, "trailingContent", trailingMembers)
+            check(node, "inlineContent", inlineMembers)
         }
 
         private fun check(node: UCallExpression, paramName: String, allowed: List<String>) {
@@ -79,15 +81,17 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
     companion object {
         private const val LEADING_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemLeadingScope"
         private const val TRAILING_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingScope"
+        private const val INLINE_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemInlineScope"
         private val LIST_ITEM_COMPOSABLES = setOf("DaxOneLineListItem", "DaxTwoLineListItem", "DaxSettingsListItem")
 
         val INVALID_DAX_LIST_ITEM_CONTENT_USAGE: Issue = Issue
             .create(
                 id = "InvalidDaxListItemContentUsage",
-                briefDescription = "List-item leading/trailing slots should only use DaxListItem*Scope composables",
+                briefDescription = "List-item slots should only use DaxListItem*Scope composables",
                 explanation = """
-                    Use composables from DaxListItemLeadingScope / DaxListItemTrailingScope for the
-                    leadingContent / trailingContent slots, to keep list items consistent with the design system.
+                    Use composables from DaxListItemLeadingScope / DaxListItemTrailingScope / DaxListItemInlineScope
+                    for the leadingContent / trailingContent / inlineContent slots, to keep list items consistent
+                    with the design system.
                 """.trimIndent(),
                 moreInfo = "",
                 category = CUSTOM_LINT_CHECKS,

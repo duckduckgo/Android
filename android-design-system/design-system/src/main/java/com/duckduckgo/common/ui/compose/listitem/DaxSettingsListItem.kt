@@ -39,7 +39,7 @@ import com.duckduckgo.mobile.android.R
  * @param primaryText Primary label.
  * @param status Status to display in the trailing slot — one of [Status.AlwaysOn], [Status.On], [Status.Off].
  * @param modifier Modifier applied to the list item row.
- * @param pillText Optional pill rendered inline after the primary text; `null` = no pill.
+ * @param inlineContent Optional slot rendered inline after the primary text — use [DaxListItemInlineScope] members.
  * @param leadingContent Optional leading slot — use [DaxListItemLeadingScope] members.
  * @param onClick Optional click handler; when non-null the row becomes clickable.
  * @param enabled Whether the row is enabled; disabled rows are dimmed and non-interactive.
@@ -49,7 +49,7 @@ fun DaxSettingsListItem(
     primaryText: String,
     status: Status,
     modifier: Modifier = Modifier,
-    pillText: String? = null,
+    inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
@@ -57,7 +57,7 @@ fun DaxSettingsListItem(
     DaxListItem(
         primaryText = AnnotatedString(primaryText),
         modifier = modifier,
-        pillText = pillText,
+        inlineContent = inlineContent,
         primaryMaxLines = Int.MAX_VALUE,
         leadingContent = leadingContent,
         trailingContent = { StatusIndicator(status) },
@@ -78,7 +78,7 @@ private fun DaxSettingsListItemPreview() {
 @Composable
 private fun DaxSettingsListItemWithPillPreview() {
     PreviewSurface {
-        DaxSettingsListItem(primaryText = "VPN", status = Status.On, pillText = "Beta", onClick = {})
+        DaxSettingsListItem(primaryText = "VPN", status = Status.On, inlineContent = { Pill("Beta") }, onClick = {})
     }
 }
 
