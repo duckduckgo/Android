@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Søk eller skriv inn adresse</string>
     <string name="input_screen_search_only_hint">Søk</string>
-    <string name="input_screen_chat_hint">Spør privat</string>
     <string name="input_screen_user_pref_without_ai">Bare søk</string>
     <string name="input_screen_user_pref_with_ai">Søk og Duck.ai</string>
     <string name="input_screen_user_pref_description">Prøv den nye valgmuligheten for å spørre Duck.ai direkte fra adressefeltet. <annotation type="share_feedback">Del tilbakemelding</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Oppsummer denne siden</string>
     <string name="duckAIContextualAutomaticContextTitle">Send sideinnhold automatisk</string>
     <string name="duckAIContextualAutomaticContextMessage">Send sideinnhold automatisk til Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Legg ved sideinnhold</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Spør om siden</string>
@@ -264,6 +262,5 @@
     <string name="duckAiSettingsTitle">Innstillinger for Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Spør om fanen</string>
     <string name="duckChatContextualAskAboutPage">Spør om siden</string>
 </resources>

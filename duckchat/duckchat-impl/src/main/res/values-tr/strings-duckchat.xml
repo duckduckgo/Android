@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Adres ara veya gir</string>
     <string name="input_screen_search_only_hint">Arama yap</string>
-    <string name="input_screen_chat_hint">Özel olarak sor</string>
     <string name="input_screen_user_pref_without_ai">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai</string>
     <string name="input_screen_user_pref_description">Adres Çubuğundan doğrudan Duck.ai\'a soru sormanızı sağlayan yeni seçeneği deneyin. <annotation type="share_feedback">Geri Bildirim Paylaş</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Bu Sayfayı Özetle</string>
     <string name="duckAIContextualAutomaticContextTitle">Sayfa İçeriğini Otomatik Olarak Gönder</string>
     <string name="duckAIContextualAutomaticContextMessage">Sayfa içeriğini otomatik olarak Duck.ai\'a gönder</string>
-    <string name="duckAIContextualAttachPageContent">Sayfa İçeriğini Ekle</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Sayfa Hakkında Soru Sor</string>
@@ -264,6 +262,5 @@
     <string name="duckAiSettingsTitle">Duck.ai Ayarları</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Sekme Hakkında Soru Sor</string>
     <string name="duckChatContextualAskAboutPage">Sayfa Hakkında Soru Sor</string>
 </resources>

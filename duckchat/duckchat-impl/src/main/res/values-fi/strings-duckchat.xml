@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Hae tai anna osoite</string>
     <string name="input_screen_search_only_hint">Hae</string>
-    <string name="input_screen_chat_hint">Kysy yksityisesti</string>
     <string name="input_screen_user_pref_without_ai">Vain haku</string>
     <string name="input_screen_user_pref_with_ai">Haku ja Duck.ai</string>
     <string name="input_screen_user_pref_description">Kokeile uutta vaihtoehtoa kysyä Duck.ai:lta suoraan osoiteriviltä. <annotation type="share_feedback">Anna palautetta</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Yhteenveto tästä sivusta</string>
     <string name="duckAIContextualAutomaticContextTitle">Lähetä sivun sisältö automaattisesti</string>
     <string name="duckAIContextualAutomaticContextMessage">Lähetä sivun sisältö automaattisesti Duck.ai:lle</string>
-    <string name="duckAIContextualAttachPageContent">Liitä sivun sisältö</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Kysy sivusta</string>
@@ -264,6 +262,5 @@
     <string name="duckAiSettingsTitle">Duck.ai-asetukset</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Kysy välilehdestä</string>
     <string name="duckChatContextualAskAboutPage">Kysy sivusta</string>
 </resources>

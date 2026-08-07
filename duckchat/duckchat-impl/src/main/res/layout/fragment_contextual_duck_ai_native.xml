@@ -249,7 +249,7 @@
                             android:background="@null"
                             android:fontFamily="sans-serif"
                             android:gravity="start|top"
-                            android:hint="@string/input_screen_chat_hint"
+                            android:hint="@string/contextualSheetImprovedHint"
                             android:lineSpacingMultiplier="1.2"
                             android:minHeight="40dp"
                             android:paddingVertical="@dimen/keyline_2"
