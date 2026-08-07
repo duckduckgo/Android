@@ -166,6 +166,7 @@ interface DuckChatPixels {
 
     fun reportContextualSuggestionSelected(suggestionId: String, pageType: String)
     fun reportContextualSuggestionsViewed(isSmart: Boolean, pageType: String)
+    fun reportContextualAskAboutPageSuggestionSelected(pageType: String)
     fun reportContextualSuggestionsContextCollectionTimedOut()
     fun reportContextualSuggestionsCatalogLoadFailed()
 
@@ -297,6 +298,10 @@ class RealDuckChatPixels @Inject constructor(
                 DuckChatPixelParameters.PAGE_TYPE to pageType,
             ),
         )
+    }
+
+    override fun reportContextualAskAboutPageSuggestionSelected(pageType: String) {
+        reportContextualSuggestionSelected("ask-about-page", pageType)
     }
 
     override fun reportContextualSuggestionsContextCollectionTimedOut() {
