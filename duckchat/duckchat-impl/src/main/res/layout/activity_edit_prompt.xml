@@ -25,35 +25,42 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <LinearLayout
+    <ScrollView
         android:id="@+id/editPromptContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/editPromptInputCard"
-            android:theme="?attr/daxInputModeCardThemeOverlay"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
-            app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="false">
+            android:orientation="vertical">
 
-            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                android:id="@+id/editPromptInput"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="200dp" />
 
-        </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/editPromptInputCard"
+                android:theme="?attr/daxInputModeCardThemeOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4"
+                app:cardBackgroundColor="?attr/daxColorWindow"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="false">
 
-    </LinearLayout>
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                    android:id="@+id/editPromptInput"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
