@@ -692,9 +692,6 @@ class DuckChatContextualFragment :
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
         }
-        binding.duckAiAttachContextLayout.setOnClickListener {
-            viewModel.addPageContext(fromPlaceholderTap = true)
-        }
         binding.contextualPromptQuickAction.setOnClickListener {
             val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                 binding.contextualNativeInputWidget.text
@@ -882,19 +879,12 @@ class DuckChatContextualFragment :
 
                     renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                    when {
-                        viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        viewState.showContext -> {
-                            binding.duckAiContextualLayout.show()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        else -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.show()
-                        }
+                    if (viewState.quickActionState != DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE &&
+                        viewState.showContext
+                    ) {
+                        binding.duckAiContextualLayout.show()
+                    } else {
+                        binding.duckAiContextualLayout.gone()
                     }
                     clearInputField()
                 }

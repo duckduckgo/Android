@@ -134,34 +134,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_page_context_placeholder_shown_count": {
-        "description": "User has seen the page context placeholder presented in the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_shown_daily": {
-        "description": "(Daily Pixel) User has seen the page context placeholder presented in the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_tapped_count": {
-        "description": "User has added the page context via the placeholder shown in the native side of the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_tapped_daily": {
-        "description": "(Daily Pixel) User has added the page context via the placeholder shown in the native side of the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
     "m_aichat_contextual_page_context_invalid_empty": {
         "description": "User attempted to attach page context but the context string was empty",
         "owners": ["malmstein"],
