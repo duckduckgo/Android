@@ -171,6 +171,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
+    private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -1111,6 +1112,14 @@ class AppSyncAccountRepository @Inject constructor(
 
         val credentialId = if (syncFeature.canUseV2ConnectFlow().isEnabled()) CREDENTIAL_ID_DDG else null
 
+        // Unified device list: mint the account_info key locally and encrypt device_info so both are included in the signup request.
+        // Best-effort — null means we sign up without them (if feature flag is off, or mint/encrypt failed) and migration/login backfills later.
+        val unifiedDeviceInfo = if (credentialId == CREDENTIAL_ID_DDG) {
+            signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
+        } else {
+            null
+        }
+
         val result = try {
             runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
             syncApi.createAccount(
@@ -1121,6 +1130,8 @@ class AppSyncAccountRepository @Inject constructor(
                 encryptedDeviceName,
                 encryptedDeviceType,
                 credentialId,
+                deviceInfo = unifiedDeviceInfo?.deviceInfo,
+                keys = unifiedDeviceInfo?.keys,
             )
         } finally {
             runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
@@ -1136,6 +1147,12 @@ class AppSyncAccountRepository @Inject constructor(
                 if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
                     logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
                     syncStore.credentialId = CREDENTIAL_ID_DDG
+                }
+                unifiedDeviceInfo?.let {
+                    // cache the pubkey and mark migration done
+                    syncStore.accountInfoPublicKey = it.publicKey
+                    syncStore.unifiedDeviceListMigratedForUserId = account.userId
+                    logcat { "Sync-UnifiedDevices: signup wrote device_info + account_info key (kid=${it.publicKey.keyId})" }
                 }
                 try {
                     runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
