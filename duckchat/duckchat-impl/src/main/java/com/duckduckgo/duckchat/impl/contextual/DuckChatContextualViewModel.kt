@@ -682,7 +682,10 @@ class DuckChatContextualViewModel @Inject constructor(
         sheetMode == SheetMode.INPUT &&
             quickActionState == QuickActionState.ASK_ABOUT_PAGE
 
-    fun onQuickActionClicked(currentInput: String) {
+    fun onQuickActionClicked(
+        currentInput: String,
+        suggestionsPageType: String = "none",
+    ) {
         when (_viewState.value.quickActionState) {
             QuickActionState.ASK_ABOUT_PAGE -> {
                 if (!isContextValid(currentPageContext)) {
@@ -690,6 +693,9 @@ class DuckChatContextualViewModel @Inject constructor(
                     return
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
+                if (_viewState.value.contextualSuggestionsEnabled) {
+                    duckChatPixels.reportContextualAskAboutPageSuggestionSelected(suggestionsPageType)
+                }
                 addPageContext()
                 commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {

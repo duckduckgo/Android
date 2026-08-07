@@ -52,6 +52,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -962,6 +963,53 @@ class DuckChatContextualViewModelTest {
         testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click -> fires summarize pixel
 
         verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when ask about page quick action clicked with suggestions enabled then suggestion selected pixel fired alongside legacy pixel`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("", suggestionsPageType = "article")
+
+        verify(duckChatPixels).reportContextualAskAboutPageSelected()
+        verify(duckChatPixels).reportContextualAskAboutPageSuggestionSelected("article")
+    }
+
+    @Test
+    fun `when ask about page quick action clicked with suggestions disabled then suggestion selected pixel not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(contextualSuggestedPromptsToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("")
+
+        verify(duckChatPixels).reportContextualAskAboutPageSelected()
+        verify(duckChatPixels, never()).reportContextualAskAboutPageSuggestionSelected(any())
+    }
+
+    @Test
+    fun `when ask about page quick action clicked without valid context then neither selected pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onQuickActionClicked("")
+
+        verify(duckChatPixels, never()).reportContextualAskAboutPageSelected()
+        verify(duckChatPixels, never()).reportContextualAskAboutPageSuggestionSelected(any())
     }
 
     @Test
