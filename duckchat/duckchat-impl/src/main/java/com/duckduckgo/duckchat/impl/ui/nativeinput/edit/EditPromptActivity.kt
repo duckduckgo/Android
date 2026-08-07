@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.edit
 
 import android.os.Bundle
 import androidx.core.view.doOnAttach
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -33,6 +34,7 @@ import com.duckduckgo.duckchat.impl.helper.EditPromptResult
 import com.duckduckgo.duckchat.impl.helper.EditPromptSessionStore
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.navigation.api.getActivityParams
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -97,14 +99,23 @@ class EditPromptActivity : DuckDuckGoActivity() {
             // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
             asView().doOnAttach { focusInput(this@EditPromptActivity) }
         }
+
+        // The store's CompletableDeferred fans out to any number of awaiters, so this doesn't race
+        // submit()/onDestroy()'s own resolve() calls — it just closes the screen if the session gets
+        // resolved from outside it, e.g. a cancelEdit fired while the FE's own timeout expired.
+        lifecycleScope.launch {
+            editPromptSessionStore.await(sessionId)
+            if (!isFinishing && !isDestroyed) finish()
+        }
     }
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Nothing else consumes the bottom/IME inset once edge-to-edge is on, so the keyboard
-        // would otherwise overlap the card instead of pushing it up.
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.editPromptContent)
+        // editPromptContent is a ScrollView (so a squeezed keyboard scrolls the card into view
+        // instead of clipping it) — use the scrollable variant so the last item still clears
+        // the nav bar/IME rather than the static-content padding.
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.editPromptContent)
     }
 
     private fun submit(sessionId: String) {
