@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -29,7 +30,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface ContextualSuggestedPromptsProvider {
-    suspend fun resolveSuggestions(input: ResolvePageSuggestionsInput): List<ContextualSuggestedPrompt>
+    suspend fun resolveSuggestions(input: ResolvePageSuggestionsInput): ResolvedPageSuggestions
     suspend fun maxSuggestedPrompts(): Int
     suspend fun prioritySuggestionIds(): Set<String>
 }
@@ -38,6 +39,7 @@ interface ContextualSuggestedPromptsProvider {
 class RealContextualSuggestedPromptsProvider @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : ContextualSuggestedPromptsProvider {
 
     internal var catalogAssetPath: String = CATALOG_ASSET_PATH
@@ -50,11 +52,22 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
 
     override suspend fun resolveSuggestions(
         input: ResolvePageSuggestionsInput,
-    ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
-        val catalog = bundledCatalog ?: return@withContext emptyList()
-        ContextualSuggestionsMatcher.resolve(input, catalog)
-            .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
-            .map { localize(it, input) }
+    ): ResolvedPageSuggestions = withContext(dispatcherProvider.io()) {
+        val catalog = bundledCatalog
+        if (catalog == null) {
+            duckChatPixels.reportContextualSuggestionsCatalogLoadFailed()
+            return@withContext ResolvedPageSuggestions(
+                suggestions = emptyList(),
+                isSmart = false,
+                pageType = ContextualSuggestionsMatcher.classifyPageType(input.pageTypeSignals),
+            )
+        }
+        val resolved = ContextualSuggestionsMatcher.resolve(input, catalog)
+        resolved.copy(
+            suggestions = resolved.suggestions
+                .filterNot { it.id == SUGGESTION_ID_SUMMARIZE_PAGE }
+                .map { localize(it, input) },
+        )
     }
 
     private fun localize(
