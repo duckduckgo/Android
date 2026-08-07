@@ -127,6 +127,10 @@ patch in the repo and apply it when CI prepares the build.
 - Apply in CI through the `source_patches` input on `checkout-and-assemble` (newline-separated for
   more than one). A patch that does not apply fails the build; it is never skipped.
 - Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
+- Never pass `source_patches` alongside `-PuseUploadSigning` in `gradle_flags` — that is the real
+  distribution signing path (`release_upload_play_store.yml`, `release_upload_internal.yml`), and
+  `checkout-and-assemble` hard-fails the build if it sees both, so a patched toggle default can
+  never ship to users even if a job gets copy-pasted into the wrong workflow.
 
 A source patch is written against the current default, so it stops applying the moment that default
 changes and CI fails. That is deliberate: whoever changes the default has to decide what coverage

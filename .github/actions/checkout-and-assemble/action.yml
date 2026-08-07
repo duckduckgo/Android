@@ -28,6 +28,9 @@ inputs:
       Newline-separated Git patch files applied to the checkout before assembling, for test builds
       that need a source change the app cannot make at runtime. A patch that does not apply fails
       the build rather than being skipped, so a build never silently ships the unpatched behaviour.
+      For E2E test builds only — never combine with -PuseUploadSigning in gradle_flags. Real store
+      uploads (release_upload_play_store.yml, release_upload_internal.yml) don't call this action;
+      if that ever changes, this input must not reach that path.
     required: false
     default: ''
   develocity_access_key:
@@ -59,6 +62,22 @@ runs:
       with:
         ref: ${{ inputs.commit }}
         submodules: recursive
+
+    - name: Refuse source patches on a signed shipping build
+      # useUploadSigning is what release_upload_play_store.yml and release_upload_internal.yml pass
+      # to sign a build for real distribution. This action isn't currently used by either, but a
+      # copy-paste of a source_patches snippet into a shipping job would silently ship a patched
+      # toggle default to users — this stops that regardless of how the two inputs got combined.
+      if: ${{ inputs.source_patches != '' }}
+      shell: bash
+      env:
+        GRADLE_FLAGS: ${{ inputs.gradle_flags }}
+      run: |
+        set -euo pipefail
+        if [[ "$GRADLE_FLAGS" == *"useUploadSigning"* ]]; then
+          echo "::error::source_patches is set together with -PuseUploadSigning. source_patches changes a compile-time default and must never be applied to a build signed for real distribution."
+          exit 1
+        fi
 
     - name: Apply source patches
       if: ${{ inputs.source_patches != '' }}
