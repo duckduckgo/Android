@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
@@ -511,6 +512,114 @@ class RealDuckChatPixelsTest {
         verify(mockPixel).fire(
             pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED,
             parameters = mapOf(DuckChatPixelParameters.INPUT_SCREEN_MODE to "search"),
+        )
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with website impression event then fires funnel impression pixel with android origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_VIEW_FREE_LIMIT_MESSAGE)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with website click event then fires funnel click pixel with android origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_FREE_LIMIT_SUBSCRIBE_LINK)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when open subscribe modal with source then fires subscribe-modal impression with source origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL, source = "disclaimerbanner")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__disclaimerbanner"),
+        )
+    }
+
+    @Test
+    fun `when subscribe click on subscribe modal with source then fires subscribe-modal subscribe click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_SUBSCRIBE_ON_SUBSCRIBE_MODAL, source = "freelimit")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_SUBSCRIBE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when activate click on subscribe modal with source then fires subscribe-modal activate click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_ACTIVATE_ON_SUBSCRIBE_MODAL, source = "aisidebar")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_ACTIVATE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__aisidebar"),
+        )
+    }
+
+    @Test
+    fun `when open upgrade modal with source then fires upgrade-to-pro-modal impression with source origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_UPGRADE_TO_PRO_MODAL, source = "pluslimit")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__pluslimit"),
+        )
+    }
+
+    @Test
+    fun `when upgrade click on upgrade modal with source then fires upgrade-to-pro-modal upgrade click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_UPGRADE_ON_UPGRADE_TO_PRO_MODAL, source = "disclaimerbanner")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_UPGRADE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__disclaimerbanner"),
+        )
+    }
+
+    @Test
+    fun `when modal event with unrecognised source then origin falls back to unknown`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL, source = "somethingnotinthelist")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
+        )
+    }
+
+    @Test
+    fun `when modal event with no source then origin falls back to unknown`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
         )
     }
 }
