@@ -16,11 +16,25 @@
 
 package com.duckduckgo.common.ui.internal.ui.component.navigation
 
+import android.os.Bundle
+import android.view.View
 import com.duckduckgo.common.ui.internal.ui.component.Component
 import com.duckduckgo.common.ui.internal.ui.component.ComponentFragment
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.mobile.android.R
 
 class ComponentNavigationFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
         return listOf(Component.TOP_APP_BAR)
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceBundle: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceBundle)
+
+        // Top app bars are daxColorBackground, so they are invisible against the default page background.
+        view.setBackgroundColor(view.context.getColorFromAttr(R.attr.daxColorSurface))
     }
 }
