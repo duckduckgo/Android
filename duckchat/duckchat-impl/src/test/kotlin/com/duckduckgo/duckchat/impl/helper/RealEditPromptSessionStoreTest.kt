@@ -86,4 +86,26 @@ class RealEditPromptSessionStoreTest {
     fun whenAwaitingAnUnknownSessionThenCancelled() = runTest {
         assertEquals(EditPromptResult.Cancelled, testee.await("no-such-session"))
     }
+
+    @Test
+    fun whenOneAwaiterIsCancelledThenTheSessionSurvivesForAnother() = runTest {
+        val payload = EditPromptPayload("original", emptyList(), emptyList())
+        val sessionId = testee.open(payload)
+        val firstAwaiter = async(coroutineRule.testDispatcher) { testee.await(sessionId) }
+        assertEquals(true, firstAwaiter.isActive)
+
+        // Simulates EditPromptActivity's own observer coroutine being cancelled by a config change
+        // not covered by android:configChanges — the session (and the JS helper's own still-pending
+        // await, represented here by a second awaiter) must survive it.
+        firstAwaiter.cancel()
+        firstAwaiter.join()
+
+        assertEquals(payload, testee.payload(sessionId))
+        val secondAwaiter = async(coroutineRule.testDispatcher) { testee.await(sessionId) }
+        assertEquals(true, secondAwaiter.isActive)
+
+        testee.resolve(sessionId, EditPromptResult.Submitted("edited", emptyList(), emptyList()))
+
+        assertEquals(EditPromptResult.Submitted("edited", emptyList(), emptyList()), secondAwaiter.await())
+    }
 }
