@@ -3,6 +3,7 @@
 # stays small enough for an agent to read. A deliberate log-level flag always wins.
 # No-ops silently if jq is missing, leaving the command untouched.
 set -uo pipefail
+# ci-trigger-test: jibberish, safe to ignore, will be removed
 
 input=$(cat)
 cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)
