@@ -102,3 +102,36 @@ Key points for Maestro tests:
   maestro test .maestro/my-feature/my_test.yaml
   ```
 - In CI, pass the flag via `gradle_flags` on `checkout-and-assemble` with `flavours: 'internal'` — see the README for the full workflow snippet
+
+## Source Patches
+
+Remote config patches and the test seeder both apply at runtime, so neither can set a flag that is
+read during app launch — config has not landed yet, and any `AppScope` class can read a toggle as
+soon as it is constructed. For those flags, change the default at compile time instead: keep a Git
+patch in the repo and apply it when CI prepares the build.
+
+- Store patches under a `source_patches/` subdirectory next to the tests that need them:
+  ```
+  .maestro/
+    onboarding/
+      source_patches/
+        config_driven_dialogs_enabled.patch
+      onboarding.yaml
+  ```
+- Generate with minimal context so the hunk is pinned by the declaration it targets rather than by
+  its neighbours: `git diff -U1 -- <file>`. Drop the `index` line — it only enables `--3way`, and a
+  patch that needs a merge to apply should fail instead.
+- Start the file with a plain-text header explaining what it flips, which workflow job applies it,
+  and what to do when it stops applying. `git apply` ignores everything before the first
+  `diff --git` line.
+- Apply in CI through the `source_patches` input on `checkout-and-assemble` (newline-separated for
+  more than one). A patch that does not apply fails the build; it is never skipped.
+- Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
+
+A source patch is written against the current default, so it always builds the arm production does
+not ship. When the default flips, the patch stops applying and CI fails — update it to flip the
+other way, or delete it together with the job that uses it. The `E2E Source Patches` job in
+`ci.yml` runs that check on every PR so the breakage surfaces before the nightly.
+
+Patching source is the heaviest option: it needs a dedicated build, and the whole suite runs against
+one arm. Reach for it only when the flag is genuinely read too early for a config patch.

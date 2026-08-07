@@ -203,3 +203,122 @@ jobs:
           asana-task-name: GH Workflow Failure - End to End tests${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
           asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+  # The onboarding suites in the release-blocking nightly cover whichever renderer the compile-time
+  # default of onboardingBrandDesignUpdate.configDrivenDialogs selects. The flag is read during app
+  # launch, before any config has landed, so the other renderer can only be reached by changing the
+  # default at build time. This job builds once from a patched checkout and runs the same onboarding
+  # flows against it, so both renderers stay covered and the coverage follows the default when it
+  # flips — the patch stops applying and fails this job until someone updates it.
+  onboarding_flipped_config_driven_dialogs:
+    runs-on: ubuntu-latest
+    name: Onboarding, flipped configDrivenDialogs
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble APKs with configDrivenDialogs flipped
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          commit: ${{ inputs.commit }}
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: '-Pddg.di=${{ env.DDG_DI }}'
+          source_patches: .maestro/onboarding/source_patches/config_driven_dialogs_enabled.patch
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+
+      - name: Upload Internal Binary to Maestro
+        id: maestro-upload-internal-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_internal_upload_flipped_config_driven_dialogs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+          maestro_api_level: 34
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Binary Upload, flipped configDrivenDialogs${{ env.DI_PAREN_SUFFIX }}
+
+      - name: Upload Release Binary to Maestro
+        id: maestro-upload-release-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_release_upload_flipped_config_driven_dialogs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: 34
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Release Binary Upload, flipped configDrivenDialogs${{ env.DI_PAREN_SUFFIX }}
+
+      # Mirrors the release-blocking "Onboarding flows" suite: same flows, same flavour, same API
+      # level, opposite renderer.
+      - name: Onboarding Flows
+        id: maestro-onboarding-flipped
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: onboardingFlippedConfigDrivenDialogs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 34
+          maestro_include_tags: onboardingTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Onboarding, flipped configDrivenDialogs${{ env.DI_PAREN_SUFFIX }}
+
+      # The internal-only onboarding flows and the preonboarding flows, which the blocking and
+      # non-blocking nightlies run separately, are covered in one run here — a single API level is
+      # enough for a suite that only has to prove the other renderer works.
+      - name: Internal Onboarding Flows
+        id: maestro-internal-onboarding-flipped
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: internalOnboardingFlippedConfigDrivenDialogs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 36
+          maestro_include_tags: onboardingInternalTest,onboardingNonReleaseBlockingTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Onboarding, flipped configDrivenDialogs${{ env.DI_PAREN_SUFFIX }}
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - End to End tests, flipped configDrivenDialogs${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
+          asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} for the flipped configDrivenDialogs onboarding renderer has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). If the failure is `Source patch does not apply`, the flag's compile-time default changed — update or delete `.maestro/onboarding/source_patches/config_driven_dialogs_enabled.patch`. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
