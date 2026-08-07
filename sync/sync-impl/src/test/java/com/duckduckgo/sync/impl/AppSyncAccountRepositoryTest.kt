@@ -80,6 +80,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
@@ -95,6 +96,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.check
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -132,6 +134,7 @@ class AppSyncAccountRepositoryTest {
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter = mock()
+    private val signupAccountInfoBuilder: SignupAccountInfoBuilder = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -156,6 +159,7 @@ class AppSyncAccountRepositoryTest {
             thirdPartyCredentialManager = thirdPartyCredentialManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
             loginDeviceInfoWriter = loginDeviceInfoWriter,
+            signupAccountInfoBuilder = signupAccountInfoBuilder,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
@@ -195,7 +199,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(accountCreatedFailDupUser)
 
         val result = syncRepo.createAccount() as Error
@@ -207,7 +211,7 @@ class AppSyncAccountRepositoryTest {
     fun whenCreateAccountGenerateKeysFailsThenReturnCreateAccountError() {
         prepareToProvideDeviceIds()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeysFailed)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(accountCreatedSuccess)
 
         val result = syncRepo.createAccount() as Error
@@ -1122,12 +1126,24 @@ class AppSyncAccountRepositoryTest {
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
     }
 
+    private fun anyCreateAccountCall() = syncApi.createAccount(
+        anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull(),
+    )
+
     private fun prepareForCreateAccountSuccess() {
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(Success(AccountCreatedResponse(userId, token)))
     }
+
+    private fun unifiedAccountInfoEntry() = ProtectedKeyEntry(
+        kid = "kid-1",
+        purpose = SYNC_PURPOSE_ACCOUNT_INFO,
+        encryptedWith = CREDENTIAL_ID_DDG,
+        encryptedPrivateKey = "ddg-wrapped-private-key",
+        publicKey = RsaJwk(n = "n", e = "AQAB"),
+    )
 
     private fun prepareForEncryption() {
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
@@ -1259,7 +1275,9 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.createAccount()
 
-        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"))
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"), anyOrNull(), anyOrNull(),
+        )
     }
 
     @Test
@@ -1270,7 +1288,51 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.createAccount()
 
-        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null))
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null), anyOrNull(), anyOrNull(),
+        )
+        // Unified device_info is only built on the v2/ddg signup path.
+        verify(signupAccountInfoBuilder, never()).build(any(), any(), any())
+    }
+
+    @Test
+    fun whenSignupAccountInfoBuilderReturnsAdditionsThenIncludedInSignupAndCached() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+        val publicKey = AccountInfoPublicKey(keyId = "kid-1", modulus = "n", exponent = "AQAB")
+        whenever(signupAccountInfoBuilder.build(any(), any(), any()))
+            .thenReturn(SignupAccountInfo(deviceInfo = "deviceInfoJwe", keys = listOf(unifiedAccountInfoEntry()), publicKey = publicKey))
+
+        syncRepo.createAccount()
+
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"),
+            eq("deviceInfoJwe"),
+            check { keys ->
+                assertEquals(1, keys?.size)
+                assertEquals(CREDENTIAL_ID_DDG, keys?.first()?.encryptedWith)
+                assertEquals(SYNC_PURPOSE_ACCOUNT_INFO, keys?.first()?.purpose)
+            },
+        )
+        verify(syncStore).accountInfoPublicKey = publicKey
+        verify(syncStore).unifiedDeviceListMigratedForUserId = userId
+    }
+
+    @Test
+    fun whenSignupAccountInfoBuilderReturnsNullThenNoDeviceInfoOrKeysAndSignupStillSucceeds() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+        whenever(signupAccountInfoBuilder.build(any(), any(), any())).thenReturn(null)
+
+        val result = syncRepo.createAccount()
+
+        assertEquals(Success(true), result)
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"), eq(null), eq(null),
+        )
+        verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
     }
 
     // ---- Delegation to ThirdPartyCredentialManager ----

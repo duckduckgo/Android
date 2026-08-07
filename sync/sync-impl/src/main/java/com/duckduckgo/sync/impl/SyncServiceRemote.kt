@@ -39,6 +39,8 @@ interface SyncApi {
         deviceName: String,
         deviceType: String,
         credentialId: String? = null,
+        deviceInfo: String? = null,
+        keys: List<ProtectedKeyEntry>? = null,
     ): Result<AccountCreatedResponse>
 
     fun login(
@@ -202,6 +204,8 @@ class SyncServiceRemote @Inject constructor(
         deviceName: String,
         deviceType: String,
         credentialId: String?,
+        deviceInfo: String?,
+        keys: List<ProtectedKeyEntry>?,
     ): Result<AccountCreatedResponse> {
         val response = runCatching {
             val call = syncService.signup(
@@ -213,6 +217,8 @@ class SyncServiceRemote @Inject constructor(
                     deviceName = deviceName,
                     deviceType = deviceType,
                     credentialId = credentialId,
+                    deviceInfo = deviceInfo,
+                    keys = keys,
                 ),
             )
             call.execute()
