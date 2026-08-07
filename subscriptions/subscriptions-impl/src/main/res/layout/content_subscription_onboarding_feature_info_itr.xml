@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem1Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem1Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem2Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem2Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem3Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem3Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem4Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem4Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem5Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem5Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem6Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem6Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem7Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem7Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem8Description"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem8Title" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:text="@string/subscriptionOnboardingFeatureInfoItrLegalFooter"
+        app:textType="secondary"
+        app:typography="caption" />
+
+</merge>

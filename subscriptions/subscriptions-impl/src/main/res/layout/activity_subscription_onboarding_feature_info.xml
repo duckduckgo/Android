@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_5"
-                android:src="@drawable/vpn_color_24"
+                android:src="@drawable/vpn_feature_128"
                 tools:ignore="ContentDescription" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -52,25 +52,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/subscriptionOnboardingFeatureInfoTitle"
-                app:typography="h1" />
+                app:typography="h1"
+                tools:text="@string/subscriptionOnboardingFeatureInfoVpnTitle" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionOnboardingFeatureInfoDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
-                android:text="@string/subscriptionOnboardingFeatureInfoDescription"
-                app:typography="body1" />
+                app:typography="body1"
+                tools:text="@string/subscriptionOnboardingFeatureInfoVpnDescription" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/subscriptionOnboardingFeatureInfoItem1"
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingFeatureInfoContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
-                app:primaryText="@string/subscriptionOnboardingFeatureInfoItemPlaceholder"
-                app:secondaryText="@string/subscriptionOnboardingFeatureInfoDescription" />
+                android:orientation="vertical" />
 
         </LinearLayout>
 

@@ -20,6 +20,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -27,17 +29,43 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingFeatureInfoBinding
 
-/** Which onboarding feature a [SubscriptionOnboardingFeatureInfoActivity] describes. */
-enum class OnboardingFeature(@DrawableRes val iconRes: Int) {
-    VPN(R.drawable.vpn_color_24),
-    ITR(R.drawable.identity_theft_restoration_color_24),
-    DUCK_AI(R.drawable.ai_general_color_24),
-    PIR(R.drawable.identity_blocked_pir_color_24),
+/** Which onboarding feature a [SubscriptionOnboardingFeatureInfoActivity] describes, with its screen content. */
+enum class OnboardingFeature(
+    @DrawableRes val iconRes: Int,
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int,
+    @LayoutRes val contentRes: Int,
+) {
+    VPN(
+        iconRes = R.drawable.vpn_feature_128,
+        titleRes = R.string.subscriptionOnboardingFeatureInfoVpnTitle,
+        descriptionRes = R.string.subscriptionOnboardingFeatureInfoVpnDescription,
+        contentRes = R.layout.content_subscription_onboarding_feature_info_vpn,
+    ),
+    ITR(
+        iconRes = R.drawable.vpn_feature_128,
+        titleRes = R.string.subscriptionOnboardingFeatureInfoItrTitle,
+        descriptionRes = R.string.subscriptionOnboardingFeatureInfoItrDescription,
+        contentRes = R.layout.content_subscription_onboarding_feature_info_itr,
+    ),
+    DUCK_AI(
+        iconRes = R.drawable.vpn_feature_128,
+        titleRes = R.string.subscriptionOnboardingFeatureInfoDuckAiTitle,
+        descriptionRes = R.string.subscriptionOnboardingFeatureInfoDuckAiDescription,
+        contentRes = R.layout.content_subscription_onboarding_feature_info_duckai,
+    ),
+    PIR(
+        iconRes = R.drawable.vpn_feature_128,
+        titleRes = R.string.subscriptionOnboardingFeatureInfoPirTitle,
+        descriptionRes = R.string.subscriptionOnboardingFeatureInfoPirDescription,
+        contentRes = R.layout.content_subscription_onboarding_feature_info_pir,
+    ),
 }
 
 /**
- * WIP full-screen detail for a single subscription feature, opened from the features-summary step. Toolbar
- * shows a close (X) and no title; closing returns to the features step. Per-feature content is added later.
+ * Full-screen detail for a single subscription feature, opened from the features-summary step. Toolbar
+ * shows a close (X) and no title; closing returns to the features step. Per-feature copy and highlights
+ * come from [OnboardingFeature], whose content layout is inflated into the screen.
  */
 @InjectWith(ActivityScope::class)
 class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
@@ -55,6 +83,9 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
         supportActionBar?.title = ""
         binding.subscriptionOnboardingFeatureInfoIcon.setImageResource(feature.iconRes)
+        binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
+        binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
+        layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
     }
 
     companion object {

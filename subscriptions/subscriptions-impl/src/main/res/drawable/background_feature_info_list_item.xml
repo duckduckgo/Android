@@ -14,11 +14,11 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners
-        android:topLeftRadius="28dp"
-        android:topRightRadius="28dp"
-        android:bottomLeftRadius="28dp"
-        android:bottomRightRadius="28dp"/>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="26dp" />
     <solid android:color="?attr/daxColorSurface" />
+    <stroke
+        android:width="2dp"
+        android:color="#17000000" />
 </shape>

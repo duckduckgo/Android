@@ -14,11 +14,21 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners
-        android:topLeftRadius="28dp"
-        android:topRightRadius="28dp"
-        android:bottomLeftRadius="28dp"
-        android:bottomRightRadius="28dp"/>
-    <solid android:color="?attr/daxColorSurface" />
-</shape>
+<resources>
+
+    <declare-styleable name="FeatureInfoListItemView">
+        <attr name="featureInfoIcon" format="reference" />
+        <attr name="featureInfoTitle" format="reference|string" />
+        <attr name="featureInfoDescription" format="reference|string" />
+    </declare-styleable>
+
+    <declare-styleable name="PlatformIconsView">
+        <attr name="platformsVisible">
+            <flag name="ios" value="1" />
+            <flag name="android" value="2" />
+            <flag name="mac" value="4" />
+            <flag name="windows" value="8" />
+        </attr>
+    </declare-styleable>
+
+</resources>
