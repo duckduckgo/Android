@@ -1,3 +1,6 @@
+<!-- ci-trigger-test: jibberish line, safe to ignore, will be removed -->
+<!-- flibbertigibbet -->
+
 # CLAUDE.md — DuckDuckGo Android Browser
 
 DuckDuckGo Android is a privacy-focused browser built as a large multi-module Gradle project,
