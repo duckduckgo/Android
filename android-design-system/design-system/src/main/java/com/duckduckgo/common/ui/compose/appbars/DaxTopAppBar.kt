@@ -71,12 +71,7 @@ fun DaxTopAppBar(
 ) {
     Row(
         modifier = modifier
-            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
-            .clipToBounds()
-            .heightIn(min = DaxTopAppBarDefaults.Height)
-            .fillMaxWidth()
-            .background(DaxTopAppBarDefaults.colors.containerColor)
+            .topAppBarContainer(shadow = shadow, minHeight = DaxTopAppBarDefaults.Height)
             .padding(paddingValues = DaxTopAppBarDefaults.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -96,6 +91,24 @@ fun DaxTopAppBar(
         actions(this)
     }
 }
+
+/**
+ * The shared container of every top app bar mode: window insets, optional shadow, height and background.
+ *
+ * The shadow node is sized by the modifiers that follow it, so the insets must be applied before it and the
+ * sizing after it, otherwise the shadow is drawn around the bar plus the status bar inset region.
+ */
+@Composable
+internal fun Modifier.topAppBarContainer(
+    shadow: Boolean,
+    minHeight: Dp,
+): Modifier = this
+    .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+    .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
+    .clipToBounds()
+    .heightIn(min = minHeight)
+    .fillMaxWidth()
+    .background(DaxTopAppBarDefaults.colors.containerColor)
 
 @Composable
 private fun NavigationIconButton(icon: DaxTopAppBarNavigationIcon) {

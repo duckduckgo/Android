@@ -20,7 +20,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,7 +29,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
@@ -39,15 +37,12 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -74,7 +69,8 @@ import com.duckduckgo.mobile.android.R
  * DuckDuckGo themed top app bar with a search mode.
  *
  * The bar is in exactly one mode at a time: title mode (title + navigation icon + actions) or
- * search mode (a search input). The two modes crossfade; the bar is never composed twice at once.
+ * search mode (a search input). The two modes are never stacked as two independently measured bars;
+ * they crossfade, so both are briefly composed together for the duration of the transition.
  * On entering search mode the input field takes focus and raises the keyboard.
  *
  * Search state is caller-owned; this bar does not intercept the system back button. Callers that
@@ -154,12 +150,7 @@ private fun SearchModeBar(
 
     Box(
         modifier = Modifier
-            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-            .then(if (shadow) Modifier.shadow(elevation = DaxTopAppBarDefaults.Elevation) else Modifier)
-            .clipToBounds()
-            .heightIn(min = DaxSearchTopAppBarDefaults.Height)
-            .fillMaxWidth()
-            .background(DaxTopAppBarDefaults.colors.containerColor)
+            .topAppBarContainer(shadow = shadow, minHeight = DaxSearchTopAppBarDefaults.Height)
             .padding(DaxSearchTopAppBarDefaults.Margin),
         contentAlignment = Alignment.Center,
     ) {
