@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companio
 import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -71,6 +72,7 @@ class FavoritesQuickAccessAdapter(
 
         private var itemState: ItemState = ItemState.Stale
         private var popupMenu: PopupMenu? = null
+        private var faviconJob: Job? = null
 
         sealed class ItemState {
             data object Stale : ItemState()
@@ -94,6 +96,7 @@ class FavoritesQuickAccessAdapter(
         }
 
         fun bind(item: QuickAccessFavorite) {
+            faviconJob?.cancel()
             with(item.favorite) {
                 binding.quickAccessTitle.text = title
                 loadFavicon(url)
@@ -135,6 +138,7 @@ class FavoritesQuickAccessAdapter(
                 }
 
                 bundle[DIFF_KEY_URL]?.let {
+                    faviconJob?.cancel()
                     loadFavicon(it as String)
                 }
 
@@ -192,7 +196,7 @@ class FavoritesQuickAccessAdapter(
         }
 
         private fun loadFavicon(url: String) {
-            lifecycleOwner.lifecycleScope.launch {
+            faviconJob = lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.quickAccessFavicon)
             }
         }
