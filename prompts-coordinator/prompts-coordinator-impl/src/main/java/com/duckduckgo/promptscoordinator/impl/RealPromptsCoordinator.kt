@@ -28,13 +28,10 @@ import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.di.PromptsCoordinatorStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
@@ -49,20 +46,17 @@ class RealPromptsCoordinator @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : PromptsCoordinator {
 
-    /**
-     * Guards [owner] and the gap stamp. Never held across the wait in [tryClaim], so a claimant
-     * waiting for the surface cannot block the current owner from releasing it.
-     */
+    /** Guards [owner] and the gap stamp. */
     private val claimMutex = Mutex()
 
     /**
-     * The live claim. Null = surface free. Observable so a waiting [tryClaim] is woken by the release
-     * rather than polling.
+     * The live claim. Null = surface free. Claims are never speculative — a claim is taken only when
+     * a prompt is definitely about to show — so a busy surface is a final answer, never waited out.
      *
      * In-memory by design: a claim that outlived its process would have nobody left to release it.
      * The quiet gap is persisted separately, so a restart cannot skip it.
      */
-    private val owner = MutableStateFlow<PromptType?>(null)
+    private var owner: PromptType? = null
 
     private val lastPromptAt = AtomicLong(UNINITIALIZED)
 
@@ -73,57 +67,24 @@ class RealPromptsCoordinator @Inject constructor(
     override suspend fun tryClaim(type: PromptType): Boolean = withContext(dispatchers.io()) {
         if (!feature.self().isEnabled()) return@withContext true
 
-        when (val immediate = attemptClaim(type)) {
-            is ClaimOutcome.Settled -> return@withContext immediate.granted
-            ClaimOutcome.SurfaceBusy -> Unit
-        }
+        claimMutex.withLock {
+            val currentOwner = owner
+            if (currentOwner != null) {
+                if (isNtpCardReclaim(type, currentOwner)) return@withLock true
+                logcat { "PromptsCoordinator: $type claim refused, surface owned by $currentOwner" }
+                return@withLock false
+            }
 
-        // A claim that never becomes a prompt is released within milliseconds, so a short wait turns
-        // most collisions into a granted claim. Only the wait is bounded, never the check-and-set: a
-        // timeout cancelling a granted claim would leak the surface.
-        val surfaceAvailable = withTimeoutOrNull(CLAIM_WAIT_TIMEOUT_MILLIS) {
-            // Available to *this* type, not strictly free: owner conflates, so a card waiting only
-            // for null can miss a release that another card claims in the same breath.
-            owner.first { it == null || isNtpCardReclaim(type, it) }
+            val sinceLastPrompt = currentTimeProvider.currentTimeMillis() - lastPromptDoneTimestamp()
+            if (sinceLastPrompt < type.cooldownMillis) {
+                logcat { "PromptsCoordinator: $type claim refused, gap not elapsed (${sinceLastPrompt}ms since last prompt)" }
+                return@withLock false
+            }
+
+            owner = type
+            logcat { "PromptsCoordinator: surface claimed by $type" }
             true
-        } ?: false
-
-        if (!surfaceAvailable) {
-            logcat {
-                "PromptsCoordinator: $type claim refused, surface still owned by " +
-                    "${owner.value} after ${CLAIM_WAIT_TIMEOUT_MILLIS}ms"
-            }
-            return@withContext false
         }
-
-        when (val afterWait = attemptClaim(type)) {
-            is ClaimOutcome.Settled -> afterWait.granted
-            ClaimOutcome.SurfaceBusy -> {
-                logcat { "PromptsCoordinator: $type claim refused, surface reclaimed by ${owner.value} while waiting" }
-                false
-            }
-        }
-    }
-
-    /** A busy surface is reported back so [tryClaim] can wait it out; the gap cannot clear in that window. */
-    private suspend fun attemptClaim(type: PromptType): ClaimOutcome = claimMutex.withLock {
-        val now = currentTimeProvider.currentTimeMillis()
-
-        val currentOwner = owner.value
-        if (currentOwner != null) {
-            if (isNtpCardReclaim(type, currentOwner)) return@withLock ClaimOutcome.Settled(granted = true)
-            return@withLock ClaimOutcome.SurfaceBusy
-        }
-
-        val sinceLastPrompt = now - lastPromptDoneTimestamp()
-        if (sinceLastPrompt < type.cooldownMillis) {
-            logcat { "PromptsCoordinator: $type claim refused, gap not elapsed (${sinceLastPrompt}ms since last prompt)" }
-            return@withLock ClaimOutcome.Settled(granted = false)
-        }
-
-        owner.value = type
-        logcat { "PromptsCoordinator: surface claimed by $type" }
-        ClaimOutcome.Settled(granted = true)
     }
 
     /**
@@ -133,17 +94,10 @@ class RealPromptsCoordinator @Inject constructor(
     private fun isNtpCardReclaim(type: PromptType, currentOwner: PromptType) =
         currentOwner == PromptType.NTP_CARD && type == PromptType.NTP_CARD
 
-    private sealed interface ClaimOutcome {
-        data class Settled(val granted: Boolean) : ClaimOutcome
-
-        /** Held by another prompt, so the claim is still worth retrying once the surface frees up. */
-        data object SurfaceBusy : ClaimOutcome
-    }
-
     override suspend fun onClaimDone(type: PromptType) = withContext(dispatchers.io()) {
         claimMutex.withLock {
-            if (owner.value == type) {
-                owner.value = null
+            if (owner == type) {
+                owner = null
                 stampLastPromptDone()
                 logcat { "PromptsCoordinator: $type claim done, gap timestamp stamped" }
             }
@@ -152,8 +106,8 @@ class RealPromptsCoordinator @Inject constructor(
 
     override suspend fun onClaimCancelled(type: PromptType) = withContext(dispatchers.io()) {
         claimMutex.withLock {
-            if (owner.value == type) {
-                owner.value = null
+            if (owner == type) {
+                owner = null
                 logcat { "PromptsCoordinator: $type claim cancelled, no stamp" }
             }
         }
@@ -180,7 +134,5 @@ class RealPromptsCoordinator @Inject constructor(
 
         private const val UNINITIALIZED = -1L
         private const val NO_PROMPT = 0L
-
-        private const val CLAIM_WAIT_TIMEOUT_MILLIS = 1_000L
     }
 }

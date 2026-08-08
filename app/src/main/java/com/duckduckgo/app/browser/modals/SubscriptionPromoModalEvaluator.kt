@@ -47,18 +47,21 @@ class SubscriptionPromoModalEvaluator @Inject constructor(
         val decision = decider.decide()
             ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
+        // Paced and resolved here rather than inside the show action: both can still decline, and a
+        // claim held while deciding refuses a competing prompt that would otherwise have its turn.
+        //
+        // The delay stays ahead of the lookup: the process resumes from Activity.onResume, while the
+        // tab registers its presenter when fragments resume afterwards, so looking first would race
+        // registration and skip the promo on resume.
         delay(MODAL_DISPLAY_DELAY)
         val presenter = presenterRegistry.current()
         if (presenter == null) {
-            logcat { "SubscriptionPromoModalEvaluator: no presenter registered, skipping" }
+            logcat { "SubscriptionPromoModalEvaluator: skipped, no presenter registered" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
-        val shown = presenter.showSubscriptionPromo(decision.flow, decision.isFreeTrialCopy)
-        if (shown) {
-            ModalEvaluator.EvaluationResult.ModalShown
-        } else {
-            ModalEvaluator.EvaluationResult.Skipped
+        ModalEvaluator.EvaluationResult.WantsToShow {
+            presenter.showSubscriptionPromo(decision.flow, decision.isFreeTrialCopy)
         }
     }
 
