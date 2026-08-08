@@ -184,6 +184,7 @@ class PirScanWideEventImpl @Inject constructor(
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            scheduling = schedulingMetadataValue(),
         )
     }
 
@@ -255,6 +256,7 @@ class PirScanWideEventImpl @Inject constructor(
                 KEY_BROKER_COUNT to "0",
                 KEY_TOTAL_SCAN_JOBS to "0",
                 KEY_WEB_VIEW_COUNT to "0",
+                KEY_SCHEDULING to schedulingMetadataValue(),
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(
                 duration = TIMEOUT_DURATION,
@@ -282,6 +284,10 @@ class PirScanWideEventImpl @Inject constructor(
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
         pirRemoteFeatures.sendScanWideEvent().isEnabled()
+    }
+
+    private suspend fun schedulingMetadataValue(): String = withContext(dispatchers.io()) {
+        if (pirRemoteFeatures.workQueueScheduling().isEnabled()) SCHEDULING_QUEUE else SCHEDULING_STATIC
     }
 
     /**
@@ -349,6 +355,7 @@ class PirScanWideEventImpl @Inject constructor(
             batteryOptimizationsEnabled: Boolean,
             notificationsPermissionGranted: Boolean,
             isTrackerBlockingEnabled: Boolean,
+            scheduling: String,
         ) {
             mutex.withLock {
                 // Finish any stale in-memory flow with Cancelled so we don't leave two open flows of
@@ -388,6 +395,7 @@ class PirScanWideEventImpl @Inject constructor(
                         KEY_VPN_CONNECTION_STATE to isVpnConnected.toVpnConnectionState(),
                         KEY_NOTIFICATIONS_PERMISSION_GRANTED to notificationsPermissionGranted.toString(),
                         KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
+                        KEY_SCHEDULING to scheduling,
                     ),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
                         duration = TIMEOUT_DURATION,
@@ -675,10 +683,14 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_VPN_CONNECTION_STATE = "vpn_connection_state"
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
+        const val KEY_SCHEDULING = "scheduling"
         const val KEY_LAST_STEP = "last_step"
         const val KEY_LAST_STEP_ELAPSED = "last_step_elapsed_ms_bucketed"
         const val KEY_CANCELLATION_REASON = "cancellation_reason"
         const val KEY_DID_CRASH = "did_crash"
+
+        const val SCHEDULING_QUEUE = "queue"
+        const val SCHEDULING_STATIC = "static"
 
         const val STEP_STARTED = "started"
         const val STEP_PROGRESS_PREFIX = "progress_"

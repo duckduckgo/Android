@@ -124,9 +124,8 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 2,
             attemptId = "attempt-123",
@@ -160,9 +159,8 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.CAPTCHA_SEND,
@@ -188,7 +186,7 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
             currentActionIndex = 2,
             transactionID = "",
@@ -216,7 +214,7 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
             currentActionIndex = 1,
             actionRetryCount = 3,
@@ -245,7 +243,7 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
@@ -276,9 +274,8 @@ class CaptchaInfoReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             brokerStepStartTime = 10000L,
             pendingUrl = "https://example.com",
@@ -293,7 +290,6 @@ class CaptchaInfoReceivedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(RunType.SCHEDULED, result.nextState.runType)
-        assertEquals(0, result.nextState.currentBrokerStepIndex)
         assertEquals(1, result.nextState.currentActionIndex)
         assertEquals(10000L, result.nextState.brokerStepStartTime)
         assertEquals("https://example.com", result.nextState.pendingUrl)

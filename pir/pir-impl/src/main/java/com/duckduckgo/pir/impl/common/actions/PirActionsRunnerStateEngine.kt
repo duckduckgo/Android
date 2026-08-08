@@ -41,13 +41,18 @@ interface PirActionsRunnerStateEngine {
     fun dispatch(event: Event)
 
     /**
+     * Cancels this engine's event collection. Dispatching after close is a no-op.
+     * An engine is single-use: one broker step per engine.
+     */
+    fun close()
+
+    /**
      * Model representing the running state of the engine
      */
     data class State(
         val runType: RunType,
-        val brokerStepsToExecute: List<BrokerStep>,
+        val brokerStep: BrokerStep,
         val profileQuery: ProfileQuery,
-        val currentBrokerStepIndex: Int = 0,
         val currentActionIndex: Int = 0,
         val brokerStepStartTime: Long = -1L,
         val transactionID: String = "",
@@ -87,7 +92,7 @@ interface PirActionsRunnerStateEngine {
             val generatedEmailData: GeneratedEmailData,
         ) : Event()
 
-        data object ExecuteNextBrokerStep : Event()
+        data object ExecuteBrokerStep : Event()
 
         data class ExecuteBrokerStepAction(
             val actionRequestData: PirScriptRequestData,

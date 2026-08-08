@@ -32,8 +32,8 @@ import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
+import com.duckduckgo.pir.impl.common.PirWorkDistributor
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
-import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -44,8 +44,6 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -114,6 +112,7 @@ class RealPirOptOut @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val webViewDataCleaner: PirWebViewDataCleaner,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
+    private val pirWorkDistributor: PirWorkDistributor,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -162,27 +161,7 @@ class RealPirOptOut @Inject constructor(
             runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
         }
 
-        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
-
-        logcat { "PIR-OPT-OUT: Total parts ${jobRecordsParts.size}" }
-
-        jobRecordsParts.mapIndexed { index, partSteps ->
-            logcat { "PIR-OPT-OUT: Record part [$index] -> ${partSteps.size}" }
-            async {
-                partSteps.map { (profileQuery, step) ->
-                    logcat {
-                        "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.broker.name} profile=${profileQuery.id}"
-                    }
-                    runners[index].start(profileQuery, listOf(step))
-                    runners[index].stop()
-                    logcat {
-                        "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.broker.name} profile=${profileQuery.id}"
-                    }
-                }
-            }
-        }.awaitAll()
+        pirWorkDistributor.executeAll(runners = runners, work = processedJobRecords)
 
         completeOptOut()
         return@withContext Result.success(Unit)
@@ -304,11 +283,10 @@ class RealPirOptOut @Inject constructor(
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
-        // Execute each steps sequentially on the single runner
+        // Execute each steps sequentially on the single runner, reusing the caller's WebView
         allSteps.forEach { (profileQuery, step) ->
             logcat { "PIR-OPT-OUT: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
-            runners[0].startOn(webView, profileQuery, listOf(step))
-            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
+            runners[0].executeOn(webView, profileQuery, step)
             logcat { "PIR-OPT-OUT: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
         }
 
@@ -352,7 +330,6 @@ class RealPirOptOut @Inject constructor(
         maxWebViewCount = minOf(allSteps.size, pirWebViewCountProvider.getMaxWebViewCount())
 
         // Assign steps to runners based on the maximum number of WebViews we can use
-        val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)
 
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
@@ -361,17 +338,7 @@ class RealPirOptOut @Inject constructor(
             runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
         }
 
-        // Execute the steps on all runners in parallel
-        stepsPerRunner.mapIndexed { index, partSteps ->
-            async {
-                partSteps.map { (profileQuery, step) ->
-                    logcat { "PIR-OPT-OUT: Start opt-out on runner=$index, profile=$profileQuery and step=$step" }
-                    runners[index].start(profileQuery, listOf(step))
-                    runners[index].stop()
-                    logcat { "PIR-OPT-OUT: Finish opt-out on runner=$index, profile=$profileQuery and step=$step" }
-                }
-            }
-        }.awaitAll()
+        pirWorkDistributor.executeAll(runners = runners, work = allSteps)
 
         completeOptOut()
         return@withContext Result.success(Unit)
