@@ -117,6 +117,7 @@ class BrowserModule {
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         serpSettingsFeature: SerpSettingsFeature,
+        serpHostProvider: DuckDuckGoSerpHostProvider,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
             urlDetector,
@@ -126,6 +127,7 @@ class BrowserModule {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            serpHostProvider,
         )
     }
 

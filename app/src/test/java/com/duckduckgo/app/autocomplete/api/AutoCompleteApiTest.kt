@@ -17,11 +17,13 @@
 package com.duckduckgo.app.autocomplete.api
 
 import android.content.Intent
+import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
+import com.duckduckgo.app.browser.DuckDuckGoSerpHostProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.systemsearch.DeviceApp
@@ -65,9 +67,13 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -102,6 +108,10 @@ class AutoCompleteApiTest {
 
     @Mock
     private lateinit var mockHistory: NavigationHistory
+
+    private val mockSerpHostProvider: DuckDuckGoSerpHostProvider = mock {
+        on { searchHost() } doReturn "duckduckgo.com"
+    }
 
     @Mock
     private lateinit var mockPixel: Pixel
@@ -550,6 +560,35 @@ class AutoCompleteApiTest {
             ),
             value.suggestions,
         )
+    }
+
+    @Test
+    fun whenSerpHostProviderReturnsNoAiHostThenVisitedSerpUrlScoredWithThatHost() = runTest {
+        whenever(mockSerpHostProvider.searchHost()).thenReturn("noai.duckduckgo.com")
+        val mockScorer: AutoCompleteScorer = mock()
+        whenever(mockScorer.score(anyOrNull(), any(), any(), any(), anyOrNull())).thenReturn(100)
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
+                listOf(
+                    VisitedSERP(
+                        "https://duckduckgo.com?q=query".toUri(),
+                        "title",
+                        "query",
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(listOf()))
+
+        val testee = createTestee(scorer = mockScorer)
+        testee.autoComplete("query").first()
+
+        val urlCaptor = argumentCaptor<Uri>()
+        verify(mockScorer, times(1)).score(anyOrNull(), urlCaptor.capture(), any(), any(), anyOrNull())
+        assertEquals("noai.duckduckgo.com", urlCaptor.firstValue.host)
     }
 
     @Test
@@ -2161,12 +2200,15 @@ class AutoCompleteApiTest {
         ),
     )
 
-    private fun createTestee(config: AutoComplete.Config = AutoComplete.Config()): AutoCompleteApi {
+    private fun createTestee(
+        config: AutoComplete.Config = AutoComplete.Config(),
+        scorer: AutoCompleteScorer = RealAutoCompleteScorer(),
+    ): AutoCompleteApi {
         return AutoCompleteApi(
             mockAutoCompleteService,
             mockSavedSitesRepository,
             mockNavigationHistory,
-            RealAutoCompleteScorer(),
+            scorer,
             mockTabRepositoryProvider,
             BrowserMode.REGULAR,
             mockAutocompleteTabsFeature,
@@ -2176,6 +2218,7 @@ class AutoCompleteApiTest {
             mockPixel,
             mockDeviceAppLookup,
             coroutineTestRule.testScope,
+            mockSerpHostProvider,
             config,
         )
     }

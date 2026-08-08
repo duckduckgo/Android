@@ -70,6 +70,7 @@ class QueryUrlConverterTest {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            RealDuckDuckGoSerpHostProvider(duckChat, androidBrowserConfigFeature),
         )
     private val testee: QueryUrlConverter = createTestee(useUrlPredictorEnabled = false)
 
@@ -79,6 +80,7 @@ class QueryUrlConverterTest {
         whenever(duckChat.isEnabled()).thenReturn(true)
         whenever(queryUrlPredictor.isReady()).thenReturn(true)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(false))
     }
 
     @Test
@@ -491,6 +493,57 @@ class QueryUrlConverterTest {
         assertDuckDuckGoSearchQuery("Visit%20example.com%20or%20test.com%20for%20info", result)
     }
 
+    @Test
+    fun `when flag enabled and ai disabled then search query uses noai host`() {
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(true))
+        whenever(duckChat.isEnabled()).thenReturn(false)
+
+        val result = testee.convertQueryToUrl("foo", queryOrigin = QueryOrigin.FromUser)
+
+        assertEquals("noai.duckduckgo.com", Uri.parse(result).host)
+    }
+
+    @Test
+    fun `when flag enabled and ai enabled then search query uses default host`() {
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(true))
+        whenever(duckChat.isEnabled()).thenReturn(true)
+
+        val result = testee.convertQueryToUrl("foo", queryOrigin = QueryOrigin.FromUser)
+
+        assertEquals("duckduckgo.com", Uri.parse(result).host)
+    }
+
+    @Test
+    fun `when flag disabled and ai disabled then search query uses default host`() {
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(false))
+        whenever(duckChat.isEnabled()).thenReturn(false)
+
+        val result = testee.convertQueryToUrl("foo", queryOrigin = QueryOrigin.FromUser)
+
+        assertEquals("duckduckgo.com", Uri.parse(result).host)
+    }
+
+    @Test
+    fun `when flag disabled and ai enabled then search query uses default host`() {
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(false))
+        whenever(duckChat.isEnabled()).thenReturn(true)
+
+        val result = testee.convertQueryToUrl("foo", queryOrigin = QueryOrigin.FromUser)
+
+        assertEquals("duckduckgo.com", Uri.parse(result).host)
+    }
+
+    @Test
+    fun `when flag enabled and ai disabled and input is a url then host is not rewritten`() {
+        // Guard: the noai host applies only to generated search queries, never to a typed URL.
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(true))
+        whenever(duckChat.isEnabled()).thenReturn(false)
+
+        val result = testee.convertQueryToUrl("http://example.com", queryOrigin = QueryOrigin.FromUser)
+
+        assertEquals("http://example.com", result)
+    }
+
     private fun createTestee(useUrlPredictorEnabled: Boolean): QueryUrlConverter {
         androidBrowserConfigFeature.useUrlPredictor().setRawStoredState(State(useUrlPredictorEnabled))
         val converter = QueryUrlConverter(
@@ -499,6 +552,7 @@ class QueryUrlConverterTest {
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
             queryUrlPredictor,
+            RealDuckDuckGoSerpHostProvider(duckChat, androidBrowserConfigFeature),
         )
         return converter
     }
