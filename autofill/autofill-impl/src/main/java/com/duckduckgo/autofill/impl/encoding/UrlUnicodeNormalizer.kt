@@ -31,32 +31,39 @@ interface UrlUnicodeNormalizer {
 class UrlUnicodeNormalizerImpl @Inject constructor() : UrlUnicodeNormalizer {
 
     override fun normalizeAscii(url: String?): String? {
+        return normalizeUrl(url) { hostname, sb, info ->
+            IDNA.getUTS46Instance(IDNA.DEFAULT).nameToASCII(hostname, sb, info)
+        }
+    }
+
+    override fun normalizeUnicode(url: String?): String? {
+        return normalizeUrl(url) { hostname, sb, info ->
+            IDNA.getUTS46Instance(IDNA.DEFAULT).nameToUnicode(hostname, sb, info)
+        }
+    }
+
+    private fun normalizeUrl(
+        url: String?,
+        idnaProcessor: (hostname: String, sb: StringBuilder, info: IDNA.Info) -> Unit,
+    ): String? {
         if (url == null) return null
 
         val originalScheme = url.scheme() ?: ""
         val noScheme = url.removePrefix(originalScheme)
 
-        val sb = StringBuilder()
-        val info = IDNA.Info()
-        IDNA.getUTS46Instance(IDNA.DEFAULT).nameToASCII(noScheme, sb, info)
-        if (info.hasErrors()) {
-            logcat { "Unable to convert to ASCII: $url" }
-            return url
-        }
-        return "${originalScheme}$sb"
-    }
-
-    override fun normalizeUnicode(url: String?): String? {
-        if (url == null) return null
+        // Extract just the hostname/domain part for IDNA processing
+        val hostEndIndex = noScheme.indexOfFirst { it == '/' || it == '?' || it == '#' }
+        val hostname = if (hostEndIndex == -1) noScheme else noScheme.substring(0, hostEndIndex)
+        val pathAndQuery = if (hostEndIndex == -1) "" else noScheme.substring(hostEndIndex)
 
         val sb = StringBuilder()
         val info = IDNA.Info()
-        IDNA.getUTS46Instance(IDNA.DEFAULT).nameToUnicode(url, sb, info)
+        idnaProcessor(hostname, sb, info)
         if (info.hasErrors()) {
-            logcat { "Unable to convert to unicode: $url" }
+            logcat { "Unable to convert hostname: $hostname" }
             return url
         }
-        return sb.toString()
+        return "${originalScheme}$sb$pathAndQuery"
     }
 }
 
