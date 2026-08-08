@@ -215,12 +215,9 @@ class OnboardingIntroChoreographer(
      * Hands `backgroundPrimary` to an arriving dialog: fades the intro visuals out when they are on screen, snaps them
      * away when this view never showed them, and does nothing once an earlier dialog has taken over. Safe to call for
      * every dialog.
-     *
-     * @return true when the dialog's background can cross-fade from what is on screen
      */
-    fun clearForDialog(): Boolean {
-        val handover = state.handOverToDialog()
-        when (handover) {
+    fun clearForDialog() {
+        when (state.handOverToDialog()) {
             OnboardingIntroState.Handover.FadeOut -> {
                 settleRunningIntro()
                 playOutro()
@@ -230,7 +227,6 @@ class OnboardingIntroChoreographer(
             OnboardingIntroState.Handover.AlreadyHandedOver,
             -> Unit
         }
-        return handover.canCrossFadeBackground
     }
 
     private fun settleRunningIntro() {

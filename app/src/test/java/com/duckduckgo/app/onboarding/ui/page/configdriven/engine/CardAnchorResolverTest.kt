@@ -74,11 +74,19 @@ class CardAnchorResolverTest {
     }
 
     @Test
-    fun `the walking dax presses the card down onto itself`() {
+    fun `on a phone the walking dax presses the card down onto itself`() {
         val resolution = CardAnchorResolver(isTablet = false).resolve(settled(Embellishment.WalkingDax))
 
         assertSame(decorationView, resolution.anchorTo)
         assertEquals(1f, resolution.verticalBias)
+    }
+
+    @Test
+    fun `on a tablet the walking dax anchors the card above it without pressing it down`() {
+        val resolution = CardAnchorResolver(isTablet = true).resolve(settled(Embellishment.WalkingDax))
+
+        assertSame(decorationView, resolution.anchorTo)
+        assertEquals(0.5f, resolution.verticalBias)
     }
 
     @Test

@@ -66,20 +66,17 @@ class OnboardingIntroState {
         released = true
     }
 
-    /**
-     * @param canCrossFadeBackground true when the arriving dialog's background can cross-fade from what is on screen
-     */
-    enum class Handover(val canCrossFadeBackground: Boolean) {
+    enum class Handover {
         /** The intro visuals are on screen, fade them out. */
-        FadeOut(canCrossFadeBackground = true),
+        FadeOut,
 
         /** This view never showed the intro, snap the views past it. */
-        SnapAway(canCrossFadeBackground = false),
+        SnapAway,
 
         /** The intro was already snapped away unplayed. */
-        AlreadyDismissed(canCrossFadeBackground = false),
+        AlreadyDismissed,
 
         /** An earlier dialog already took the background over. */
-        AlreadyHandedOver(canCrossFadeBackground = true),
+        AlreadyHandedOver,
     }
 }

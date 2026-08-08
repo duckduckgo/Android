@@ -18,17 +18,29 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 class DialogConfigResolverTest {
 
-    private val testee = DialogConfigResolver()
+    private val searchOptions = listOf(DaxDialogIntroOption(optionText = "search", iconRes = 0, link = "how to fix a bike"))
+    private val chatSuggestions = listOf(DaxDialogIntroOption(optionText = "chat", iconRes = 0, link = "explain quantum computing"))
+    private val onboardingStore: OnboardingStore = mock {
+        on { getSearchOptions() } doReturn searchOptions
+        on { getChatSuggestions() } doReturn chatSuggestions
+    }
+
+    private val testee = DialogConfigResolver(onboardingStore)
 
     @Test
     fun `resolves the comparison chart with the browser chart config`() {
@@ -83,8 +95,173 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves no config for a dialog that has no config-driven screen yet`() {
-        assertNull(testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false))
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.NotificationPermission, isCustomAiFlow = false))
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false))
+    }
+
+    @Test
+    fun `resolves the initial welcome dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves the reinstall welcome dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InitialReinstallUser, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves the sync restore dialog with a card entry that follows the background`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.SyncRestore, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves a mid-flow dialog with an immediate card entry`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ComparisonChart, isCustomAiFlow = false)!!
+
+        assertEquals(CardEntry.Immediate, config.cardEntry)
+    }
+
+    @Test
+    fun `resolves the initial welcome dialog with a continue cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(Embellishment.WalkingDax, config.embellishment)
+        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
+                body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the initial welcome dialog with single line html copy in the custom ai flow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = true)!!
+
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBodyCustomAi),
+                body2 = null,
+            ),
+            config.content,
+        )
+    }
+
+    @Test
+    fun `resolves the reinstall welcome dialog with a skip secondary cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InitialReinstallUser, isCustomAiFlow = false)!!
+
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+                body1 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody1),
+                body2 = TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingDaxDialog1SecondaryButton),
+                CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+            config.secondaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves the sync restore dialog with its own copy and restore cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.SyncRestore, isCustomAiFlow = true)!!
+
+        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
+                body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
+                body2 = null,
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.syncRestoreDialogPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.RestoreRequested),
+            ),
+            config.primaryCta,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.syncRestoreDialogSecondaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+            config.secondaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves the input screen with a submitting cta and ai preselected`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(Embellishment.LeftWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        val content = config.content as ContentConfig.InputScreen
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated), content.title)
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputScreenDescription), content.description)
+        assertEquals(InputScreenContentState(withAi = true), content.initialState())
+        assertEquals(
+            CtaConfig(TextConfig.Resource(R.string.preOnboardingInputScreenButton), CtaAction.Submit),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the input screen preview with store suggestions and no cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true), isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(Embellishment.None, config.embellishment)
+        assertEquals(CardArrowConfig.Hidden, config.cardArrow)
+        assertEquals(
+            ContentConfig.InputScreenPreview(
+                title = TextConfig.Resource(R.string.preOnboardingInputModeDemoTitle),
+                isSearchDefault = true,
+                showModeToggle = true,
+                searchSuggestions = searchOptions,
+                chatSuggestions = chatSuggestions,
+            ),
+            config.content,
+        )
+        assertNull(config.primaryCta)
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the input screen preview without a mode toggle in the custom ai flow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false), isCustomAiFlow = true)!!
+
+        val content = config.content as ContentConfig.InputScreenPreview
+        assertEquals(TextConfig.Resource(R.string.preOnboardingInputModeDemoTitleCustomAi), content.title)
+        assertFalse(content.showModeToggle)
+        assertEquals(InputScreenPreviewContentState(isSearchSelected = false), content.initialState())
     }
 }

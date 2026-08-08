@@ -35,6 +35,14 @@ class OnboardingDecorationFitCorrector(
     // TODO: remove when onboardingImprovementsV2 flag is removed
     var enabled: Boolean = false
 
+    /**
+     * Whether a card anchored above a decoration also reserves the part of its bottom inset the decoration does not
+     * cover. Only the config-driven renderer needs it: its undecorated band anchors the card on screens the legacy
+     * renderer pinned to the parent bottom, so otherwise the card cannot clear an inset taller than the band, i.e.
+     * the keyboard.
+     */
+    var reservesInsetAboveDecoration: Boolean = false
+
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
@@ -75,19 +83,20 @@ class OnboardingDecorationFitCorrector(
 
         val deco = decoration
         val decorationShown = deco != null && !deco.isGone
-        // The card reserves the bottom-bar inset only when it is the bottom-most element: bottom-anchored
-        // AND no decoration shown below it. A shown decoration is at least its min height, which exceeds
-        // any bar inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace
-        // and hide that very decoration.
+        // The card reserves the bottom-bar inset when it is the bottom-most element: bottom-anchored AND no
+        // decoration shown below it. A shown decoration is at least its min height, which exceeds any bar
+        // inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace and hide
+        // that very decoration.
         if (syncCardBottomInset(decorationShown)) return false
 
         // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
         // has already reverted any reserved inset, and the shrink/hide logic below must not run.
         if (!enabled) return true
 
-        if (deco == null) return !syncBottomAnchoredClamp()
+        if (deco == null) return !syncCardClamp()
         if (deco.isGone) return true
         if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
+        if (reservesInsetAboveDecoration && syncCardClamp()) return false
 
         val viewport = cardContainer.parent as? View ?: return true
 
@@ -102,7 +111,11 @@ class OnboardingDecorationFitCorrector(
         val overflow = (cardContainerHeight - viewportHeight).coerceAtLeast(0)
         val available = root.height - root.paddingTop - root.paddingBottom
         val dialogParams = dialog.layoutParams as ViewGroup.MarginLayoutParams
-        val dialogSpace = dialogHeight + overflow + dialogParams.topMargin + dialogParams.bottomMargin
+        // A keyboard overlays the window rather than shrinking it, so `available` already covers the room the card
+        // gave up above the decoration. Counting it would shrink the decoration, which grows the inset, which
+        // shrinks the decoration again, until it is gone.
+        val cardBottomMargin = if (reservesInsetAboveDecoration) 0 else dialogParams.bottomMargin
+        val dialogSpace = dialogHeight + overflow + dialogParams.topMargin + cardBottomMargin
         val decorationParams = deco.layoutParams as ViewGroup.MarginLayoutParams
 
         val target = BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
@@ -130,19 +143,44 @@ class OnboardingDecorationFitCorrector(
 
     private fun syncCardBottomInset(decorationShown: Boolean): Boolean {
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
-        val bottomAnchored = params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID
-        val desired = if (enabled && bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
+        val desired = desiredCardBottomInset(params, decorationShown)
         if (params.bottomMargin == desired) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = desired }
         return true
     }
 
+    private fun desiredCardBottomInset(
+        params: ConstraintLayout.LayoutParams,
+        decorationShown: Boolean,
+    ): Int {
+        if (!enabled) return 0
+        if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) {
+            return if (decorationShown) 0 else cardBottomInsetPx()
+        }
+        val deco = decoration?.takeIf { decorationShown && reservesInsetAboveDecoration } ?: return 0
+        return (cardBottomInsetPx() - roomBelowCard(deco)).coerceAtLeast(0)
+    }
+
+    private fun roomBelowCard(decoration: View): Int {
+        val params = decoration.layoutParams as ViewGroup.MarginLayoutParams
+        // The applied height, not the laid-out one: the corrector runs before the frame that lays the shrink out.
+        val height = params.height.takeIf { it > 0 } ?: decoration.measuredHeight
+        return height + params.bottomMargin
+    }
+
     // Clamp only on overflow: constrainedHeight rounds a fitting wrap down a pixel → a permanent scrollbar.
-    private fun syncBottomAnchoredClamp(): Boolean {
+    private fun syncCardClamp(): Boolean {
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
-        if (params.bottomToBottom != ConstraintLayout.LayoutParams.PARENT_ID) return false
+        val roomBelowCard = when {
+            params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID -> 0
+            // Anchored above a decoration: unclamped, the card overruns it instead of scrolling.
+            params.bottomToTop != ConstraintLayout.LayoutParams.UNSET ->
+                decoration?.takeIf { !it.isGone }?.let { roomBelowCard(it) } ?: return false
+            else -> return false
+        }
         val content = cardContainer.measuredHeight.takeIf { it > 0 } ?: return false
-        val span = root.height - root.paddingTop - root.paddingBottom - params.topMargin - params.bottomMargin
+        val span = root.height - root.paddingTop - root.paddingBottom -
+            params.topMargin - params.bottomMargin - roomBelowCard
         val shouldClamp = dialog.paddingTop + content > span
         if (params.constrainedHeight == shouldClamp) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { constrainedHeight = shouldClamp }

@@ -28,6 +28,7 @@ data class DialogConfig(
     val background: OnboardingBackgroundStep,
     val embellishment: Embellishment = Embellishment.None,
     val cardArrow: CardArrowConfig = CardArrowConfig.Hidden,
+    val cardEntry: CardEntry = CardEntry.Immediate,
     val content: ContentConfig,
     val primaryCta: CtaConfig? = null,
     val secondaryCta: CtaConfig? = null,
@@ -38,6 +39,9 @@ data class DialogConfig(
 enum class Embellishment { WalkingDax, BobbingDax, BottomWing, LeftWing, None }
 
 enum class CardArrowConfig { Hidden, AtStart, AtEnd }
+
+/** When the card's one-time fade-in starts. [AfterBackgroundTransition] holds it back until an animated background transition has finished. */
+enum class CardEntry { Immediate, AfterBackgroundTransition }
 
 data class CtaConfig(
     val text: TextConfig,

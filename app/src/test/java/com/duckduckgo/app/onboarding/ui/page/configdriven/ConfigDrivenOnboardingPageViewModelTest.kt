@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
@@ -30,6 +31,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Screen
@@ -57,6 +59,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -73,6 +77,8 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
+    private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockShownPixels: OnboardingDialogShownPixels = mock()
 
     // Default harness: mock orchestrator left NotStarted, so the view model renders no dialog and emits no
     // commands on its own — the interaction tests drive a single method and assert exactly what it emits.
@@ -105,7 +111,8 @@ class ConfigDrivenOnboardingPageViewModelTest {
     ): ConfigDrivenOnboardingPageViewModel = ConfigDrivenOnboardingPageViewModel(
         orchestrator = orchestrator,
         newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
-        dialogConfigResolver = DialogConfigResolver(),
+        dialogConfigResolver = DialogConfigResolver(mockOnboardingStore),
+        shownPixels = mockShownPixels,
         dispatchers = coroutineRule.testDispatcherProvider,
         widgetCapabilities = mockWidgetCapabilities,
         defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
@@ -377,5 +384,45 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(NewUserOnboardingEvent.IntroAnimationFinished), recordedEvents)
+    }
+
+    @Test
+    fun `forwards a submitted input demo query to the orchestrator`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        testee.onContentInteraction(ContentInteraction.SubmitInputPreview(query = "cats", isChat = true, fromSuggestion = true))
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = true)),
+            recordedEvents,
+        )
+    }
+
+    @Test
+    fun `fires the shown pixel for a dialog it renders`() = runTest {
+        startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        verify(mockShownPixels).fireFor(NewUserOnboardingActivityDialog.ComparisonChart)
+    }
+
+    @Test
+    fun `fires no shown pixel for a command only dialog`() = runTest {
+        startAt(NewUserOnboardingActivityDialog.NotificationPermission)
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockShownPixels)
+    }
+
+    @Test
+    fun `renders the sync restore dialog instead of skipping onboarding`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SyncRestore)
+        advanceUntilIdle()
+
+        val content = (testee.viewState.value.screen as Screen.Dialog).config.content as ContentConfig.Welcome
+        assertEquals(TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle), content.title)
+        assertTrue(recordedEvents.isEmpty())
     }
 }

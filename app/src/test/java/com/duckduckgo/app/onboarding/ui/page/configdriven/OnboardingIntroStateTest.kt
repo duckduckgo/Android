@@ -40,13 +40,10 @@ class OnboardingIntroStateTest {
     }
 
     @Test
-    fun `a dialog arriving over a playing intro fades it out and can cross-fade the background`() {
+    fun `a dialog arriving over a playing intro fades it out`() {
         testee.play()
 
-        val handover = testee.handOverToDialog()
-
-        assertEquals(Handover.FadeOut, handover)
-        assertTrue(handover.canCrossFadeBackground)
+        assertEquals(Handover.FadeOut, testee.handOverToDialog())
     }
 
     @Test
@@ -57,32 +54,23 @@ class OnboardingIntroStateTest {
     }
 
     @Test
-    fun `a dialog arriving with no intro on screen snaps it away and snaps the background`() {
-        val handover = testee.handOverToDialog()
-
-        assertEquals(Handover.SnapAway, handover)
-        assertFalse(handover.canCrossFadeBackground)
+    fun `a dialog arriving with no intro on screen snaps it away`() {
+        assertEquals(Handover.SnapAway, testee.handOverToDialog())
     }
 
     @Test
-    fun `later dialogs leave the intro alone and keep animating the background`() {
+    fun `later dialogs leave the intro alone`() {
         testee.play()
         testee.handOverToDialog()
 
-        val handover = testee.handOverToDialog()
-
-        assertEquals(Handover.AlreadyHandedOver, handover)
-        assertTrue(handover.canCrossFadeBackground)
+        assertEquals(Handover.AlreadyHandedOver, testee.handOverToDialog())
     }
 
     @Test
-    fun `a dialog arriving after the intro was dismissed unplayed snaps the background`() {
+    fun `a dialog arriving after the intro was dismissed unplayed leaves it alone`() {
         assertTrue(testee.dismissUnplayed())
 
-        val handover = testee.handOverToDialog()
-
-        assertEquals(Handover.AlreadyDismissed, handover)
-        assertFalse(handover.canCrossFadeBackground)
+        assertEquals(Handover.AlreadyDismissed, testee.handOverToDialog())
     }
 
     @Test
