@@ -264,9 +264,6 @@ class NetpAppExclusionListActivity :
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
 
             is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
-            else -> {
-                /* noop */
-            }
         }
     }
 
