@@ -56,6 +56,16 @@ sealed interface ContentConfig {
         override fun initialState() = InputScreenContentState(withAi = initialWithAi)
     }
 
+    data class AddToDock(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    data class WidgetPrompt(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
     data class InputScreenPreview(
         override val title: TextConfig,
         val isSearchDefault: Boolean,
@@ -65,6 +75,23 @@ sealed interface ContentConfig {
     ) : ContentConfig, Stateful<InputScreenPreviewContentState> {
         override fun initialState() = InputScreenPreviewContentState(isSearchSelected = isSearchDefault)
     }
+
+    data class QuickSetup(
+        override val title: TextConfig,
+        val showSplitOption: Boolean,
+        val hideSetDefaultBrowserRow: Boolean,
+        val hideAddWidgetRow: Boolean,
+        val hideAddressBarRow: Boolean,
+        val initialAddressBarPosition: OmnibarType,
+        val initialWithAi: Boolean,
+    ) : ContentConfig, Stateful<QuickSetupContentState> {
+        override fun initialState() = QuickSetupContentState(
+            defaultBrowserChecked = false,
+            widgetChecked = false,
+            addressBarPosition = initialAddressBarPosition,
+            withAi = initialWithAi,
+        )
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -72,3 +99,10 @@ data class AddressBarContentState(val position: OmnibarType)
 data class InputScreenContentState(val withAi: Boolean)
 
 data class InputScreenPreviewContentState(val isSearchSelected: Boolean)
+
+data class QuickSetupContentState(
+    val defaultBrowserChecked: Boolean,
+    val widgetChecked: Boolean,
+    val addressBarPosition: OmnibarType,
+    val withAi: Boolean,
+)
