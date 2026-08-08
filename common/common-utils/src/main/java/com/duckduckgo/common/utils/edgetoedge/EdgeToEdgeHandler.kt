@@ -90,6 +90,29 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
+     * Adds the status-bar + cutout inset as [view]'s top margin; [view] must use [ViewGroup.MarginLayoutParams].
+     *
+     * Use instead of [applyStatusBarInsets] for a view whose background fills its whole box — a
+     * [com.google.android.material.button.MaterialButton] pill grows with padding, so only its label moves down.
+     */
+    fun applyStatusBarInsetsAsMargin(view: View) {
+        val initialTop = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
+        view.applyInsets { insets ->
+            val top = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+            ).top
+
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialTop + top
+                if (lp.topMargin != newMargin) {
+                    lp.topMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
+    }
+
+    /**
      * Pads [view]'s bottom by the navigation-bar (plus display cutout and IME) inset.
      *
      * When [drawBehindGestureNav] is true, the padding uses the *tappable* navigation inset, which is
