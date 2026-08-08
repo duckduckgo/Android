@@ -35,4 +35,7 @@
     <dimen name="browserModeToggleSegmentHeight">40dp</dimen>
     <dimen name="longPressMenuWidth">240dp</dimen>
     <dimen name="longPressMenuLeadingIconSize">24dp</dimen>
+    <dimen name="changeAppIconSpacing">24dp</dimen>
+    <dimen name="changeAppIconSelectionStrokeWidth">2dp</dimen>
+    <dimen name="changeAppIconSelectionGap">2dp</dimen>
 </resources>

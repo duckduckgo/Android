@@ -21,6 +21,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
@@ -34,16 +35,21 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -83,6 +89,12 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAddressBarTrackersAnimationManager: com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 
+    @Mock
+    private lateinit var mockAppBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -95,6 +107,7 @@ internal class AppearanceViewModelTest {
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
+        whenever(mockAppBrandDesignUpdateToggles.appIcon()).thenReturn(disabledToggle)
         runTest {
             whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         }
@@ -112,6 +125,7 @@ internal class AppearanceViewModelTest {
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
                 mockAddressBarTrackersAnimationManager,
+                mockAppBrandDesignUpdateToggles,
                 mockOmnibarFeatureRepository,
             )
     }
@@ -124,6 +138,29 @@ internal class AppearanceViewModelTest {
 
                 assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, value.theme)
                 assertEquals(AppIcon.DEFAULT, value.appIcon)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenAppIconFlagDisabledThenAppIconSettingIsNotShownFirst() =
+        runTest {
+            testee.viewState().test {
+                assertFalse(awaitItem().showAppIconSettingFirst)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenAppIconFlagEnabledThenAppIconSettingIsShownFirst() =
+        runTest {
+            whenever(mockAppBrandDesignUpdateToggles.appIcon()).thenReturn(enabledToggle)
+            initializeViewModel()
+
+            testee.viewState().test {
+                assertTrue(awaitItem().showAppIconSettingFirst)
 
                 cancelAndConsumeRemainingEvents()
             }
