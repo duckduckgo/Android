@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -40,6 +41,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -50,9 +53,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicReference
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -116,9 +121,11 @@ class RealDuckChatJSHelper @Inject constructor(
     private val appInstall: AppInstall,
     private val appBuildConfig: AppBuildConfig,
     private val subscriptions: Subscriptions,
+    private val editPromptSessionStore: EditPromptSessionStore,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
+    private val activeEditSessionId = AtomicReference<String?>(null)
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -229,6 +236,14 @@ class RealDuckChatJSHelper @Inject constructor(
                     val selector = extractOpenKeyboardSelector(data) ?: DEFAULT_SELECTOR
                     getOpenKeyboardResponse(featureName, method, it, selector)
                 }
+
+            METHOD_EDIT_PROMPT ->
+                id?.let { editPrompt(featureName, method, it, data, mode, tabId) }
+
+            METHOD_CANCEL_EDIT -> {
+                activeEditSessionId.get()?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
+                null
+            }
 
             REPORT_METRIC -> {
                 val reportMetric = ReportMetric.fromValue(data?.optString("metricName"))
@@ -523,6 +538,94 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    /**
+     * Suspends until the edit screen resolves: the reply to this request *is* the submission, so the
+     * frontend applies the edit through its existing path. The FE owns the timeout and falls back to
+     * `cancelEdit`.
+     */
+    private suspend fun editPrompt(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+        mode: Mode,
+        tabId: String,
+    ): JsCallbackData {
+        val payload = EditPromptPayload(
+            prompt = data?.optString(EDIT_PROMPT) ?: "",
+            images = data?.optJSONArray(EDIT_IMAGES).toAdoptedImages(),
+            files = data?.optJSONArray(EDIT_FILES).toAdoptedFiles(),
+        )
+        val sessionId = editPromptSessionStore.open(payload)
+        activeEditSessionId.set(sessionId)
+        duckChat.requestEditPrompt(
+            EditPromptRequest(sessionId = sessionId, tabId = tabId, contextual = mode == Mode.CONTEXTUAL),
+        )
+        val result = withTimeoutOrNull(EDIT_SESSION_TIMEOUT_MS) { editPromptSessionStore.await(sessionId) }
+        if (result == null) {
+            // Nobody claimed the session in time: force it closed so it doesn't hold its (possibly
+            // multi-MB) attachments in the store forever.
+            editPromptSessionStore.clear(sessionId)
+        }
+        // Only clears if still our session: a newer editPrompt may have already claimed the slot.
+        activeEditSessionId.compareAndSet(sessionId, null)
+        val params = when (result) {
+            null -> JSONObject().apply { put(EDIT_CANCELLED, true) }
+            is EditPromptResult.Submitted -> JSONObject().apply {
+                put(EDIT_PROMPT, result.prompt)
+                put(EDIT_IMAGES, result.images.toAdoptedImagesJsonArray())
+                put(EDIT_FILES, result.files.toAdoptedFilesJsonArray())
+            }
+            EditPromptResult.Cancelled -> JSONObject().apply { put(EDIT_CANCELLED, true) }
+        }
+        return JsCallbackData(params, featureName, method, id)
+    }
+
+    private fun JSONArray?.toAdoptedImages(): List<AdoptedImage> {
+        val array = this ?: return emptyList()
+        return (0 until array.length()).mapNotNull { index ->
+            array.optJSONObject(index)?.let {
+                AdoptedImage(data = it.optString("data"), format = it.optString("format"))
+            }
+        }
+    }
+
+    private fun JSONArray?.toAdoptedFiles(): List<AdoptedFile> {
+        val array = this ?: return emptyList()
+        return (0 until array.length()).mapNotNull { index ->
+            array.optJSONObject(index)?.let {
+                AdoptedFile(
+                    data = it.optString("data"),
+                    fileName = it.optString("fileName"),
+                    mimeType = it.optString("mimeType"),
+                )
+            }
+        }
+    }
+
+    private fun List<AdoptedImage>.toAdoptedImagesJsonArray(): JSONArray = JSONArray().also { array ->
+        forEach { image ->
+            array.put(
+                JSONObject().apply {
+                    put("data", image.data)
+                    put("format", image.format)
+                },
+            )
+        }
+    }
+
+    private fun List<AdoptedFile>.toAdoptedFilesJsonArray(): JSONArray = JSONArray().also { array ->
+        forEach { file ->
+            array.put(
+                JSONObject().apply {
+                    put("data", file.data)
+                    put("fileName", file.fileName)
+                    put("mimeType", file.mimeType)
+                },
+            )
+        }
+    }
+
     private fun getEmptyPageContextResponse(
         featureName: String,
         method: String,
@@ -607,6 +710,17 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_SHOW_MODEL_PICKER = "showModelPicker"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val METHOD_EDIT_PROMPT = "editPrompt"
+        private const val METHOD_CANCEL_EDIT = "cancelEdit"
+
+        // Backstop only: the FE owns the primary timeout and sends cancelEdit if it fires. This is long
+        // enough to never interrupt a real edit, just to reclaim a session abandoned before the FE's own
+        // timeout could run (e.g. process death mid-edit).
+        const val EDIT_SESSION_TIMEOUT_MS = 10 * 60 * 1000L
+        private const val EDIT_PROMPT = "prompt"
+        private const val EDIT_IMAGES = "images"
+        private const val EDIT_FILES = "files"
+        private const val EDIT_CANCELLED = "cancelled"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"
         private const val METHOD_VOICE_SESSION_ENDED = "voiceSessionEnded"

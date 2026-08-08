@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -172,6 +173,14 @@ class FakeDuckChatInternal(
     }
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
+    private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
+
+    override fun requestEditPrompt(request: EditPromptRequest) {
+        _editPromptRequests.tryEmit(request)
+    }
+
+    override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
 
     override fun isImageUploadEnabled(): Boolean = false
 

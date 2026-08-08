@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
@@ -179,6 +180,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
         .filter { it == activeTabId.value }
         .map { }
+
+    /**
+     * Edit-screen requests for this widget's tab. Both the omnibar and the contextual sheet widget can
+     * be configured with the same tabId, so the surface has to match too or both would launch.
+     */
+    val editPromptRequests: Flow<EditPromptRequest> = duckChatInternal.editPromptRequests
+        .filter { it.tabId == activeTabId.value && it.contextual == isContextualSurface() }
+
+    private fun isContextualSurface(): Boolean =
+        widgetConfig.value.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled

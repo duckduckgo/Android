@@ -87,6 +87,8 @@ import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
@@ -274,6 +276,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private var activeTabId: String? = null
 
     private var tabCountLiveData: LiveData<Int>? = null
@@ -298,6 +303,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
+    private var editPromptJob: Job? = null
     private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
@@ -368,6 +374,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
 
+    // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
+    // attached and the AttachmentView plugin exists, so the values are held here and applied once
+    // wirePluginView() runs.
+    private var pendingAdoptedImages: List<AdoptedImage> = emptyList()
+    private var pendingAdoptedFiles: List<AdoptedFile> = emptyList()
+
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
     // BROWSER-state mutations from the main widget into the contextual UI: both widgets
@@ -431,6 +443,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val duckChatTabSelectedListener =
         object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                // Same rationale as the attach/detach guards: this listener only pushes shared
+                // browser-wide omnibar state, which the edit widget (editing an unrelated message)
+                // must not touch.
+                if (isEditWidget) return
                 val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
                 duckChatInternal.setSelectedMode(mode)
                 // inputQuery tracks the shared input field, not the selected tab — the field is shared
@@ -487,7 +503,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 // Guard on attach: duckChatInternal is injected in onAttachedToWindow, but the field can
                 // be set before then (e.g. omnibar prefill); onAttachedToWindow publishes the initial
                 // query, so nothing is lost by skipping the pre-attach changes here.
-                if (isAttachedToWindow) {
+                if (isAttachedToWindow && !isEditWidget) {
                     duckChatInternal.setInputQuery(liveQuery)
                 }
                 when (inputModeSwitch.selectedTabPosition) {
@@ -648,9 +664,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
-        val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
-        duckChatInternal.setSelectedMode(mode)
-        duckChatInternal.setInputQuery(currentInputQuery())
+        if (!isEditWidget) {
+            // The edit widget's mode/query are the message being edited, not the shared browser-wide
+            // omnibar state that this drives (NewTabPageView, wide-event data): pushing it here would
+            // stomp whatever the real omnibar widget legitimately has showing underneath.
+            val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
+            duckChatInternal.setSelectedMode(mode)
+            duckChatInternal.setInputQuery(currentInputQuery())
+        }
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
@@ -662,6 +683,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeNativeInputState()
         observeSubmitEnabled()
         observeOpenModelPicker()
+        observeEditPromptRequests()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
@@ -746,6 +768,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
+            if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
+                pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
+            }
         }
         if (pluginView is OptionsView) {
             pluginView.isEditMode = isEditWidget
@@ -754,6 +779,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.isEditMode = isEditWidget
         }
         if (pluginView is ReasoningModePickerView) {
+            pluginView.isEditMode = isEditWidget
+        }
+        if (pluginView is StopStreamingView) {
             pluginView.isEditMode = isEditWidget
         }
         (pluginView as? ModelPicker)?.let { picker ->
@@ -783,8 +811,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
-        duckChatInternal.setSelectedMode(InputMode.SEARCH)
-        duckChatInternal.setInputQuery("")
+        if (!isEditWidget) {
+            // See the matching guard in onAttachedToWindow: the edit widget must not reset the shared
+            // browser-wide omnibar state, or it would blank out whatever the real omnibar has showing.
+            duckChatInternal.setSelectedMode(InputMode.SEARCH)
+            duckChatInternal.setInputQuery("")
+        }
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null
@@ -809,6 +841,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         submitEnabledJob = null
         openModelPickerJob?.cancel()
         openModelPickerJob = null
+        editPromptJob?.cancel()
+        editPromptJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -826,6 +860,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = viewModel.chatState
             .drop(1)
             .onEach { state ->
+                // The edit widget edits a message on a separate chat; the globally-active chat's state
+                // (e.g. HIDE while streaming) must not hide its keyboard or clear its focus.
+                if (isEditWidget) return@onEach
                 setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
                 when (state) {
                     ChatState.HIDE -> {
@@ -1602,6 +1639,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun configureForEdit(sessionId: String) {
         isEditWidget = true
         attachmentView?.isEditMode = true
+        findViewById<View?>(R.id.editModeWarningDivider)?.isVisible = true
+        findViewById<View?>(R.id.editModeWarning)?.isVisible = true
         doOnAttach {
             viewModel.configureForEdit(sessionId)
             selectChatTab()
@@ -1612,6 +1651,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         images: List<AdoptedImage>,
         files: List<AdoptedFile>,
     ) {
+        pendingAdoptedImages = images
+        pendingAdoptedFiles = files
         attachmentView?.adoptAttachments(images, files)
     }
 
@@ -1842,6 +1883,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 modelPickerView?.openPicker()
             }
             .launchIn(scope ?: return)
+    }
+
+    // The edit screen hosts its own instance of this widget (see configureForEdit); that instance
+    // must not re-open itself when the FE asks the original tab's widget to launch the edit screen.
+    private fun observeEditPromptRequests() {
+        if (isEditWidget) return
+        editPromptJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        editPromptJob = viewModel.editPromptRequests
+            .onEach { request ->
+                globalActivityStarter.start(context, EditPromptScreenParams(sessionId = request.sessionId))
+            }
+            .launchIn(scope)
     }
 
     private fun observeNativeInputState() {
@@ -2110,6 +2164,16 @@ internal fun shouldShowInputControls(
     onChatTab: Boolean,
     isStreaming: Boolean,
 ): Boolean = onChatTab && !isStreaming
+
+/**
+ * Whether a pending [NativeInputModeWidget.adoptEditAttachments] call still needs to be applied to
+ * the [AttachmentView] plugin once it exists. Derived purely from the pending lists so it is
+ * unit-testable without Robolectric.
+ */
+internal fun hasPendingAdoptedAttachments(
+    pendingImages: List<AdoptedImage>,
+    pendingFiles: List<AdoptedFile>,
+): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on

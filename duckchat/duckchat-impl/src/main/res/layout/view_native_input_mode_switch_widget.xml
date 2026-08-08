@@ -250,6 +250,27 @@
 
                 </FrameLayout>
 
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/editModeWarningDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/editModeWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:drawableStart="@drawable/ic_info_feedback_color_24"
+                    android:drawablePadding="@dimen/keyline_2"
+                    android:gravity="center_vertical"
+                    android:text="@string/duck_ai_edit_prompt_lose_responses_warning"
+                    android:visibility="gone"
+                    app:textType="secondary"
+                    app:typography="caption" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
