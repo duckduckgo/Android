@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo centīsies atlasīt visprivātākos pieejamos iestatījumus un paslēpt uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAutoManageToggle">Automātiski pārvaldīt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAutoManageDescription">Mēs centīsimies tavā vietā atlasīt tikai visprivātākās pieejamās sīkfailu opcijas un pēc tam aizvērt šos uznirstošos logus.</string>
+    <string name="autoconsentAutoManageToggle">Noraidīt neobligātos sīkfailus</string>
+    <string name="autoconsentAutoManageDescription">Mēs centīsimies tavā vietā noraidīt pēc iespējas vairāk sīkfailu un pēc tam aizvērt uznirstošos logus.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo var automātiski pārvaldīt sīkfailu preferences, lai maksimāli palielinātu privātumu, samazinātu sīkfailus un aizvērtu šos uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Uznirstošie logi bez atteikšanās iespējas</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ļauj arī DuckDuckGo ietaupīt tev klikšķi, tavā vārdā pieņemot sīkfailus, lai aizvērtu uznirstošos logus, no kuriem nav iespējams atteikties.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pieņemt sīkfailus, no kuriem nevar atteikties</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ja nav noraidīšanas iespējas, mēs ietaupīsim tev klikšķi, pieņemsim šos sīkfailus tavā vietā un aizvērsim uznirstošos logus.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Vai esi noguris no sīkfailu uznirstošajiem logiem, no kuriem nevar atteikties?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Mēs varam ietaupīt tev klikšķi un pieņemt šos sīkfailus tavā vietā."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Pieņemt sīkfailus, no kuriem nevar atteikties"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Es turpināšu tos pieņemt pats"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Apnikuši uznirstošie logi ar paziņojumiem par sīkfailiem?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Mēs centīsimies noraidīt pēc iespējas vairāk sīkfailu. Ja nav noraidīšanas iespējas, mēs ietaupīsim tev klikšķi un pieņemsim šos sīkfailus tavā vietā."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Noraidīt, ja iespējams, vai pieņemt manā vietā"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Es turpināšu tos pārvaldīt pats"</string>
+    <string name="autoconsentPopupConfirmButton">"Apstiprināt"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[To vari jebkurā laikā mainīt sadaļā <b>Iestatījumi > Sīkfailu uznirstošo logu aizsardzība.</b>]]></string>
+
+
 </resources>

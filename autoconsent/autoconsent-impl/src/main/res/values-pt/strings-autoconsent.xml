@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Proteção contra pop-ups de cookies</string>
     <string name="autoconsentDescription"><![CDATA[O DuckDuckGo vai tentar selecionar as definições mais privadas disponíveis e ocultar pop-ups.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="autoconsentToggle">Permitir que o DuckDuckGo lide com pop-ups de cookies</string>
-    <string name="autoconsentAutoManageToggle">Gerir automaticamente pop-ups de cookies</string>
-    <string name="autoconsentAutoManageDescription">Vamos tentar selecionar apenas as opções de cookies mais privadas disponíveis por ti e, em seguida, fechar estes pop-ups.</string>
+    <string name="autoconsentAutoManageToggle">Rejeitar cookies opcionais</string>
+    <string name="autoconsentAutoManageDescription">Vamos tentar rejeitar o máximo de cookies possível por ti e, em seguida, fechar os pop-ups.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[O DuckDuckGo pode gerir automaticamente as tuas preferências de cookies para maximizar a privacidade, minimizar os cookies e fechar estes pop-ups.\n<a href=\"\">Sabe mais</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pop-ups sem opção de exclusão</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Permite também que o DuckDuckGo te poupe um clique, aceitando cookies em teu nome para fechar pop-ups sem opção de exclusão.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Aceitar cookies que não podem ser rejeitados</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Se não houver opção de rejeição, vamos poupar-te um clique, aceitar estes cookies por ti e fechar os pop-ups.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Cansado de pop-ups de cookies sem opção de exclusão?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Podemos poupar-te um clique e aceitar estes cookies por ti."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Aceitar cookies que não podem ser rejeitados"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Prefiro continuar eu a aceitá-los"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Cansado de pop-ups de cookies que não te deixam em paz?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Vamos tentar rejeitar o máximo de cookies possível. Se não houver opção de rejeição, vamos poupar-te um clique e aceitar estes cookies por ti."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Rejeitar quando possível ou aceitar por mim"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Prefiro continuar eu a geri-los"</string>
+    <string name="autoconsentPopupConfirmButton">"Confirmar"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Podes ajustar em qualquer altura em <b>Definições > Proteção contra pop-ups de cookies.</b>]]></string>
+
+
 </resources>

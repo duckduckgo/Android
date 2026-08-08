@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo spróbuje wybrać najbardziej prywatne dostępne ustawienia i ukryć te wyskakujące okienka.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="autoconsentToggle">Pozwól DuckDuckGo zajmować się wyskakującymi okienkami plików cookie</string>
-    <string name="autoconsentAutoManageToggle">Automatycznie zarządzaj okienkami z prośbą o zgodę</string>
-    <string name="autoconsentAutoManageDescription">Postaramy się wybrać dla Ciebie tylko najbardziej prywatne dostępne opcje plików cookie, a następnie zamknąć wyskakujące okienka.</string>
+    <string name="autoconsentAutoManageToggle">Odrzuć opcjonalne pliki cookie</string>
+    <string name="autoconsentAutoManageDescription">Postaramy się odrzucić dla Ciebie jak najwięcej plików cookie, a następnie zamknąć wyskakujące okienka.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo może automatycznie zarządzać preferencjami dotyczącymi plików cookie, aby zmaksymalizować prywatność, zminimalizować liczbę plików cookie i zamknąć wyskakujące okienka.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Wyskakujące okienka bez możliwości rezygnacji</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Pozwól też DuckDuckGo zaoszczędzić Ci kliknięcie, akceptując w Twoim imieniu pliki cookie, aby zamknąć wyskakujące okienka, z których nie możesz zrezygnować.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Akceptuj pliki cookie, których nie można odrzucić</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Jeśli nie będzie opcji odrzucenia, zaoszczędzimy Ci kliknięcia, zaakceptujemy te pliki cookie za Ciebie i zamkniemy wyskakujące okienka.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Masz dość wyskakujących okienek z plikami cookie, z których nie możesz zrezygnować?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Możemy zaoszczędzić Ci kliknięcia i zaakceptować te pliki cookie za Ciebie."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Akceptuj pliki cookie, których nie można odrzucić"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Nadal będę je akceptować samodzielnie"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Masz dość wyskakujących okienek z informacją o plikach cookie, które nie dają ci spokoju?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Postaramy się odrzucić jak najwięcej plików cookie. Jeśli nie będzie opcji odrzucenia, zaoszczędzimy Ci kliknięcia i zaakceptujemy te pliki cookie za Ciebie."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Odrzucaj, gdy to możliwe, lub akceptuj za mnie"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Będę się nimi zajmować samodzielnie"</string>
+    <string name="autoconsentPopupConfirmButton">"Potwierdź"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Możesz to zawsze zmienić, wybierając <b>Ustawienia > Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie.</b>]]></string>
+
+
 </resources>

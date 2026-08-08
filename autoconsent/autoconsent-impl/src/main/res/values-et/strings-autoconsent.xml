@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Küpsiste hüpikakna kaitse</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo proovib valida kõige privaatsemad saadaolevad seaded ja peita need hüpikaknad sinu eest.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="autoconsentToggle">Lase DuckDuckGol küpsiste hüpikaknaid hallata</string>
-    <string name="autoconsentAutoManageToggle">Halda küpsiste hüpikaknaid automaatselt</string>
-    <string name="autoconsentAutoManageDescription">Proovime sinu jaoks valida ainult kõige privaatsemad saadaolevad küpsisevalikud, seejärel sulgeda need hüpikaknad.</string>
+    <string name="autoconsentAutoManageToggle">Keeldu valikulistest küpsistest</string>
+    <string name="autoconsentAutoManageDescription">Püüame sinu jaoks blokeerida nii palju küpsiseid kui võimalik, seejärel sulgeda hüpikaknad.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo saab automaatselt hallata sinu küpsiste eelistusi, et maksimeerida privaatsust, minimeerida küpsiseid ja sulgeda need hüpikaknad.\n<a href=\"\">Loe edasi</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Hüpikaknad ilma loobumisvõimaluseta</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Luba DuckDuckGo\'l säästa sind klikkimisest, nõustudes sinu eest küpsistega, et sulgeda hüpikaknad, mis ei võimalda neist keelduda.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Nõustu küpsistega, millest ei saa loobuda</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Kui keeldumisvõimalust pole, säästame sulle ühe klõpsu, nõustume sinu eest nende küpsistega ja sulgeme hüpikaknad.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Oled väsinud küpsiste hüpikakendest, mis ei lase sul neist keelduda?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Saame säästa sind ühest klõpsust ja nõustuda nende küpsistega sinu eest."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Nõustu küpsistega, millest ei saa loobuda"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Ma nõustun nendega ka edaspidi ise"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Oled väsinud küpsiste hüpikakendest, mis ei jäta sind rahule?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Püüame blokeerida nii palju küpsiseid kui võimalik. Kui keeldumisvõimalust pole, säästame sulle ühe klõpsu ja nõustume nende küpsistega sinu eest."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Keeldu võimalusel või nõustu minu eest"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Ma jätkan nende haldamist ise"</string>
+    <string name="autoconsentPopupConfirmButton">"Kinnita"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[Saad seda igal ajal muuta jaotises <b>Seaded > Küpsiste hüpikakna kaitse.</b>]]></string>
+
+
 </resources>

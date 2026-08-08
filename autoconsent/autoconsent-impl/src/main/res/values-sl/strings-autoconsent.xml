@@ -20,9 +20,21 @@
     <string name="autoconsentTitle">Zaščita pred pojavnimi okni piškotkov</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo bo poskusil izbrati najbolj zasebne nastavitve, ki so na voljo, in skriti ta pojavna okna za vas.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="autoconsentToggle">Naj DuckDuckGo poskrbi za pojavna okna piškotkov</string>
-    <string name="autoconsentAutoManageToggle">Samodejno upravljanje pojavnih oken za piškotke</string>
-    <string name="autoconsentAutoManageDescription">Poskušali bomo izbrati le najbolj zasebne možnosti piškotkov, ki so na voljo za vas, nato pa zapreti ta pojavna okna.</string>
+    <string name="autoconsentAutoManageToggle">Zavrni izbirne piškotke</string>
+    <string name="autoconsentAutoManageDescription">Poskušali bomo zavrniti čim več piškotkov za vas, nato pa zapreti pojavna okna.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo lahko samodejno upravlja nastavitve piškotkov za povečanje zasebnosti, zmanjšanje števila piškotkov in zapiranje teh pojavnih oken.\n<a href=\"\">Več o tem</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pojavna okna brez možnosti zavrnitve</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Prav tako vam DuckDuckGo prihrani klik tako, da namesto vas sprejme piškotke za zapiranje pojavnih oken, ki vam ne omogočajo zavrnitve.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Sprejmi piškotke, ki jih ni mogoče zavrniti</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Če možnost zavrnitve ne bo na voljo, vam bomo prihranili klik, te piškotke sprejeli namesto vas in zaprli pojavna okna.</string>
+    <string name="autoconsentPopupTitleWithFeatureEnabled">"Ste naveličani pojavnih oken s piškotki, ki vam ne omogočajo, da jih zavrnete?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureEnabled">"Prihranimo vam lahko klik in te piškotke sprejmemo namesto vas."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureEnabled">"Sprejmi piškotke, ki jih ni mogoče zavrniti"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureEnabled">"Sprejemanje bom še naprej urejal/-a sam/-a"</string>
+    <string name="autoconsentPopupTitleWithFeatureDisabled">"Vas motijo pojavna okna za piškotke, ki vas ne pustijo pri miru?"</string>
+    <string name="autoconsentPopupDescriptionWithFeatureDisabled">"Poskušali bomo zavrniti čim več piškotkov. Če možnost zavrnitve ne bo na voljo, vam bomo prihranili klik in te piškotke sprejeli namesto vas."</string>
+    <string name="autoconsentPopupDefaultOptionWithFeatureDisabled">"Zavrni, ko je mogoče, ali sprejmi zame"</string>
+    <string name="autoconsentPopupRejectOptionWithFeatureDisabled">"Upravljanje bom še naprej urejal/-a sam/-a"</string>
+    <string name="autoconsentPopupConfirmButton">"Potrdi"</string>
+    <string name="autoconsentPopupSettingsHint" instruction="Bold part is a navigation path in the app: the Settings screen and the Cookie Pop-Up Protection section within it. Keep the &gt; separator."><![CDATA[To lahko kadar koli prilagodite v razdelku <b>Nastavitve > Zaščita pred pojavnimi okni piškotkov.</b>]]></string>
+
+
 </resources>
