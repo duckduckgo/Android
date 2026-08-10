@@ -194,7 +194,7 @@ interface DuckChatPixels {
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
-    fun fireSentPromptInChat()
+    fun fireSentPromptInChat(surface: DuckChatPixelSurface)
     fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface)
     fun fireReasoningEffortSelected(effortLevel: String, surface: DuckChatPixelSurface)
 
@@ -630,9 +630,10 @@ class RealDuckChatPixels @Inject constructor(
         )
     }
 
-    override fun fireSentPromptInChat() = fireCountAndDaily(
+    override fun fireSentPromptInChat(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY,
+        surfaceParams(surface),
     )
 
     override fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface) {

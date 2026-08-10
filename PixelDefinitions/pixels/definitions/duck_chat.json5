@@ -1258,14 +1258,14 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_daily": {
         "description": "(Daily Pixel) User submitted a prompt from the Unified Input while in a Duck.ai chat context. Fires alongside m_aichat_unified_input_prompt_submitted_daily.",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_stop_generation_tapped": {
         "description": "User tapped the stop generation button in the Unified Input",

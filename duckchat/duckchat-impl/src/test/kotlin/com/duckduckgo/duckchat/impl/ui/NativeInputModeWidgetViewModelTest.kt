@@ -1624,6 +1624,28 @@ class NativeInputModeWidgetViewModelTest {
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
     }
 
+    @Test
+    fun whenSentPromptInChatFromDuckAiTabThenDuckAiSurface() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSentPromptInChat()
+
+        verify(duckChatPixels).fireSentPromptInChat(DuckChatPixelSurface.DUCK_AI)
+    }
+
+    @Test
+    fun whenSentPromptInChatFromContextualSheetThenContextualSurface() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireSentPromptInChat()
+
+        verify(duckChatPixels).fireSentPromptInChat(DuckChatPixelSurface.CONTEXTUAL_CHAT)
+    }
+
     // endregion
 
     // region voice / stop pixels
