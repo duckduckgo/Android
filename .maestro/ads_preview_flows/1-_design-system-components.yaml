@@ -105,6 +105,8 @@ tags:
             id: "com.duckduckgo.mobile.android:id/primaryCta"
         - tapOn: "LAYOUTS"
         - assertVisible: "Dax Dialog Card"
+        - tapOn: "NAVIGATION"
+        - assertVisible: "Top bar"
         - tapOn: "INTERACTIVE"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/dax_switch_one"
@@ -175,6 +177,7 @@ tags:
         - tapOn: "TEXT INPUT"
         - tapOn: "DIALOGS"
         - tapOn: "LAYOUTS"
+        - tapOn: "NAVIGATION"
         - tapOn: "INTERACTIVE"
         - tapOn: "MESSAGING"
         - tapOn: "LIST ITEMS"
