@@ -463,13 +463,18 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun whenFireSentPromptInChatThenCountAndDailyFired() = runTest {
-        testee.fireSentPromptInChat()
+    fun whenFireSentPromptInChatThenCountAndDailyFiredWithSurface() = runTest {
+        testee.fireSentPromptInChat(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY, type = Pixel.PixelType.Daily())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
