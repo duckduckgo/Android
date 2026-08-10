@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoPirItem1Description"
+        app:featureInfoIcon="@drawable/device_all_24"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoPirItem1Title">
 
         <com.duckduckgo.subscriptions.impl.onboarding.features.PlatformIconsView
@@ -41,6 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoPirItem2Description"
+        app:featureInfoIcon="@drawable/reload_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoPirItem2Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -48,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoPirItem3Description"
+        app:featureInfoIcon="@drawable/device_laptop_lock_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoPirItem3Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -55,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoPirItem4Description"
+        app:featureInfoIcon="@drawable/form_autofill_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoPirItem4Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -62,6 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoPirItem5Description"
+        app:featureInfoIcon="@drawable/support_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoPirItem5Title" />
 
 </merge>

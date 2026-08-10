@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoDuckAiItem1Description"
+        app:featureInfoIcon="@drawable/ai_general_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoDuckAiItem1Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoDuckAiItem2Description"
+        app:featureInfoIcon="@drawable/shield_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoDuckAiItem2Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -40,6 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoDuckAiItem3Description"
+        app:featureInfoIcon="@drawable/price_tag_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoDuckAiItem3Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoDuckAiItem4Description"
+        app:featureInfoIcon="@drawable/globe_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoDuckAiItem4Title" />
 
 </merge>

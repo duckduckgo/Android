@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 app:typography="body1"
+                app:textType="secondary"
                 tools:text="@string/subscriptionOnboardingFeatureInfoVpnDescription" />
 
             <LinearLayout

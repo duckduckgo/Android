@@ -43,19 +43,19 @@ enum class OnboardingFeature(
         contentRes = R.layout.content_subscription_onboarding_feature_info_vpn,
     ),
     ITR(
-        iconRes = R.drawable.vpn_feature_128,
+        iconRes = R.drawable.identity_theft_restoration_feature_128,
         titleRes = R.string.subscriptionOnboardingFeatureInfoItrTitle,
         descriptionRes = R.string.subscriptionOnboardingFeatureInfoItrDescription,
-        contentRes = R.layout.content_subscription_onboarding_feature_info_itr,
+        contentRes = R.layout.content_subscription_onboarding_feature_info_idtr,
     ),
     DUCK_AI(
-        iconRes = R.drawable.vpn_feature_128,
+        iconRes = R.drawable.duckai_ddg_feature_128,
         titleRes = R.string.subscriptionOnboardingFeatureInfoDuckAiTitle,
         descriptionRes = R.string.subscriptionOnboardingFeatureInfoDuckAiDescription,
         contentRes = R.layout.content_subscription_onboarding_feature_info_duckai,
     ),
     PIR(
-        iconRes = R.drawable.vpn_feature_128,
+        iconRes = R.drawable.personal_information_remover_feature_128,
         titleRes = R.string.subscriptionOnboardingFeatureInfoPirTitle,
         descriptionRes = R.string.subscriptionOnboardingFeatureInfoPirDescription,
         contentRes = R.layout.content_subscription_onboarding_feature_info_pir,

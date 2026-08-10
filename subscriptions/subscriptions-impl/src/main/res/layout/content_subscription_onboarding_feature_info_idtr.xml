@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem1Description"
+        app:featureInfoIcon="@drawable/currency_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem1Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem2Description"
+        app:featureInfoIcon="@drawable/card_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem2Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -40,6 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem3Description"
+        app:featureInfoIcon="@drawable/credit_card_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem3Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem4Description"
+        app:featureInfoIcon="@drawable/support_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem4Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -54,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem5Description"
+        app:featureInfoIcon="@drawable/clock_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem5Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -61,6 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem6Description"
+        app:featureInfoIcon="@drawable/currency_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem6Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -68,6 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem7Description"
+        app:featureInfoIcon="@drawable/announce_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem7Title" />
 
     <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
@@ -75,12 +82,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoItrItem8Description"
+        app:featureInfoIcon="@drawable/profile_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem8Title" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/subscriptionOnboardingFeatureInfoItrLegalFooter"
         app:textType="secondary"
         app:typography="caption" />
