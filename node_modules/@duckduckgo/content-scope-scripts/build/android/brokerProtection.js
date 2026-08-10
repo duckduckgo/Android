@@ -7819,6 +7819,26 @@
     const day = dob.getDate().toString().padStart(2, "0");
     return `${dob.getFullYear()}-${month}-${day}`;
   }
+  var DEFAULT_DATE_OF_BIRTH_FORMAT = "YYYY-MM-DD";
+  var DATE_OF_BIRTH_TOKENS = {
+    YYYY: { year: "numeric" },
+    YY: { year: "2-digit" },
+    MMMM: { month: "long" },
+    MMM: { month: "short" },
+    MM: { month: "2-digit" },
+    M: { month: "numeric" },
+    DD: { day: "2-digit" },
+    D: { day: "numeric" }
+  };
+  var DATE_OF_BIRTH_TOKEN = new RegExp(
+    Object.keys(DATE_OF_BIRTH_TOKENS).sort((a2, b2) => b2.length - a2.length).join("|"),
+    "g"
+  );
+  function formatDateOfBirth(dateOfBirth, format = DEFAULT_DATE_OF_BIRTH_FORMAT) {
+    const [year, month, day] = dateOfBirth.split("-");
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    return format.replace(DATE_OF_BIRTH_TOKEN, (token) => new Intl.DateTimeFormat("en-US", DATE_OF_BIRTH_TOKENS[token]).format(date));
+  }
   function generateStreetAddress() {
     const streetDigits = generateRandomInt(1, 5);
     const streetNumber = generateRandomInt(2, streetDigits * 1e3);
@@ -7867,6 +7887,7 @@
     const results = [];
     const address = selectAddress(data2.addresses, userProfile?.addresses);
     const extras = { ...data2.extras, ...address?.extras };
+    let dateOfBirth = null;
     for (const element of elements) {
       const inputElem = getElement(root, element.selector);
       if (!inputElem) {
@@ -7880,22 +7901,25 @@
       } else if (element.type === "$generated_zip_code$") {
         results.push(setValueForInput(inputElem, generateZipCode()));
       } else if (element.type === "$generated_dob$") {
-        if (!Object.prototype.hasOwnProperty.call(data2, "age")) {
-          results.push({
-            result: false,
-            error: `element found with selector '${element.selector}', but data didn't contain an 'age' to generate a date of birth from`
-          });
-          continue;
+        if (dateOfBirth === null) {
+          if (!Object.prototype.hasOwnProperty.call(data2, "age")) {
+            results.push({
+              result: false,
+              error: `element found with selector '${element.selector}', but data didn't contain an 'age' to generate a date of birth from`
+            });
+            continue;
+          }
+          const age = parseInt(data2.age, 10);
+          if (!Number.isFinite(age) || age < 0) {
+            results.push({
+              result: false,
+              error: `element found with selector '${element.selector}', but data contained an 'age' that wasn't a non-negative number`
+            });
+            continue;
+          }
+          dateOfBirth = generateDateOfBirth(age);
         }
-        const age = parseInt(data2.age, 10);
-        if (!Number.isFinite(age) || age < 0) {
-          results.push({
-            result: false,
-            error: `element found with selector '${element.selector}', but data contained an 'age' that wasn't a non-negative number`
-          });
-          continue;
-        }
-        results.push(setValueForInput(inputElem, generateDateOfBirth(age)));
+        results.push(setValueForInput(inputElem, formatDateOfBirth(dateOfBirth, element.format)));
       } else if (element.type === "$generated_random_number$") {
         if (!element.min || !element.max) {
           results.push({
