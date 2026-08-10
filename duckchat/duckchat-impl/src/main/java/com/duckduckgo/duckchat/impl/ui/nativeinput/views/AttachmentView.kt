@@ -46,8 +46,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
@@ -132,8 +132,8 @@ class AttachmentView(
     fun clearAttachments() = viewModel?.clearAttachments()
 
     fun adoptAttachments(
-        images: List<AdoptedImage>,
-        files: List<AdoptedFile>,
+        images: List<SubmittedImage>,
+        files: List<SubmittedFile>,
     ) = viewModel?.adopt(images, files)
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()

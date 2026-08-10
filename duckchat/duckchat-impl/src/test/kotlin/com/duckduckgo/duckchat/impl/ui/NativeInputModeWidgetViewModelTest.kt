@@ -562,6 +562,16 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun `state isChatStreaming is false for the edit widget even when chatState is STREAMING`() = runTest {
+        // chatState is global, not scoped to a tab — a real chat streaming on another tab must not
+        // leak into the edit widget's own synthetic-key state.
+        chatStateFlow.value = ChatState.STREAMING
+        testee.configureForEdit(sessionId = "session-1")
+
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
     fun whenChatStateFlowEmitsThenViewModelChatStateMirrorsIt() = runTest {
         chatStateFlow.value = ChatState.STREAMING
 

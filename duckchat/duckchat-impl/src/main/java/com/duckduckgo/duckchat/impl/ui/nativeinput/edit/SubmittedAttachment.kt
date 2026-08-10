@@ -17,12 +17,12 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.edit
 
 /** An attachment already on a sent message, handed to the native input as base64 by the frontend. */
-data class AdoptedImage(
+data class SubmittedImage(
     val data: String,
     val format: String,
 )
 
-data class AdoptedFile(
+data class SubmittedFile(
     val data: String,
     val fileName: String,
     val mimeType: String,
