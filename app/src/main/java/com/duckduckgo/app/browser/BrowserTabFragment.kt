@@ -1194,6 +1194,15 @@ class BrowserTabFragment :
 
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
             edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+            val hasBottomBar = !tabDisplayedInCustomTabScreen &&
+                (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
+            if (hasBottomBar) {
+                edgeToEdgeHandler.applyNavigationBarScrim(
+                    binding.rootView,
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
+                    coverGestureNav = true,
+                )
+            }
         }
 
         if (savedInstanceState == null) {
