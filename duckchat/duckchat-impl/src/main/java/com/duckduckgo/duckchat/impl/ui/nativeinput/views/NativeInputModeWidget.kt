@@ -85,8 +85,8 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
@@ -178,7 +178,7 @@ interface NativeInputWidget {
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
-    fun adoptEditAttachments(images: List<AdoptedImage>, files: List<AdoptedFile>)
+    fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -1628,8 +1628,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun adoptEditAttachments(
-        images: List<AdoptedImage>,
-        files: List<AdoptedFile>,
+        images: List<SubmittedImage>,
+        files: List<SubmittedFile>,
     ) {
         attachmentView?.adoptAttachments(images, files)
     }

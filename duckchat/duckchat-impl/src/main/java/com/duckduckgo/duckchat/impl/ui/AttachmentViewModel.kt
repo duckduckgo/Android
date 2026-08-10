@@ -41,8 +41,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,32 +169,42 @@ class AttachmentViewModel @Inject constructor(
      * no validation or limit accounting, because an edit can only remove attachments.
      */
     fun adopt(
-        images: List<AdoptedImage>,
-        files: List<AdoptedFile>,
+        images: List<SubmittedImage>,
+        files: List<SubmittedFile>,
     ) {
-        val toRecycle = imageAttachments.value
-        imageAttachments.value = images.map { image ->
-            val bytes = decodeBase64(image.data)
-            // The image stays in state even when it cannot be rendered, so submitting preserves it
-            // and the user can still remove it.
-            val bitmap = bytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size) } ?: placeholderBitmap()
-            ImageAttachment(
-                id = UUID.randomUUID().toString(),
-                bitmap = bitmap,
-                base64Data = image.data,
-                format = image.format,
-            )
-        }
-        viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
-        _fileAttachments.value = files.map { file ->
-            FileAttachment(
-                id = UUID.randomUUID().toString(),
-                uri = Uri.EMPTY,
-                fileName = file.fileName,
-                mimeType = file.mimeType,
-                sizeBytes = decodeBase64(file.data)?.size?.toLong() ?: 0L,
-                base64Data = file.data,
-            )
+        viewModelScope.launch {
+            // Base64 decode + bitmap decode of full attachment payloads is real work — off the
+            // calling thread (typically main, via EditPromptActivity.onCreate), same as onImagesPicked.
+            val adoptedImages = withContext(dispatchers.io()) {
+                images.map { image ->
+                    val bytes = decodeBase64(image.data)
+                    // The image stays in state even when it cannot be rendered, so submitting preserves it
+                    // and the user can still remove it.
+                    val bitmap = bytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size) } ?: placeholderBitmap()
+                    ImageAttachment(
+                        id = UUID.randomUUID().toString(),
+                        bitmap = bitmap,
+                        base64Data = image.data,
+                        format = image.format,
+                    )
+                }
+            }
+            val adoptedFiles = withContext(dispatchers.io()) {
+                files.map { file ->
+                    FileAttachment(
+                        id = UUID.randomUUID().toString(),
+                        uri = Uri.EMPTY,
+                        fileName = file.fileName,
+                        mimeType = file.mimeType,
+                        sizeBytes = decodeBase64(file.data)?.size?.toLong() ?: 0L,
+                        base64Data = file.data,
+                    )
+                }
+            }
+            val toRecycle = imageAttachments.value
+            imageAttachments.value = adoptedImages
+            _fileAttachments.value = adoptedFiles
+            viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
         }
     }
 

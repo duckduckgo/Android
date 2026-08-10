@@ -42,8 +42,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUs
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.AdoptedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -1026,7 +1026,7 @@ class AttachmentViewModelTest {
     fun whenAdoptingImagesThenTheyAppearInStateWithBase64Preserved() = runTest {
         val png = validPngBase64()
 
-        viewModel.adopt(images = listOf(AdoptedImage(data = png, format = "png")), files = emptyList())
+        viewModel.adopt(images = listOf(SubmittedImage(data = png, format = "png")), files = emptyList())
 
         val adopted = viewModel.getImageAttachments()
         assertEquals(1, adopted.size)
@@ -1036,7 +1036,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenAdoptingAnUndecodableImageThenItIsStillAdoptedWithAPlaceholderBitmap() = runTest {
-        viewModel.adopt(images = listOf(AdoptedImage(data = "not-base64-image-bytes", format = "png")), files = emptyList())
+        viewModel.adopt(images = listOf(SubmittedImage(data = "not-base64-image-bytes", format = "png")), files = emptyList())
 
         val adopted = viewModel.getImageAttachments()
         assertEquals(1, adopted.size)
@@ -1050,7 +1050,7 @@ class AttachmentViewModelTest {
 
         viewModel.adopt(
             images = emptyList(),
-            files = listOf(AdoptedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+            files = listOf(SubmittedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
         )
 
         val adopted = viewModel.getFileAttachments()
@@ -1062,7 +1062,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenAdoptedAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
-        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
         val id = viewModel.getImageAttachments().first().id
 
         viewModel.removeImageAttachment(id)
@@ -1071,11 +1071,11 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenAdoptedFileAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
+    fun whenSubmittedFileAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
         val base64 = Base64.encodeToString(ByteArray(1024), Base64.NO_WRAP)
         viewModel.adopt(
             images = emptyList(),
-            files = listOf(AdoptedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+            files = listOf(SubmittedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
         )
         val id = viewModel.getFileAttachments().first().id
 
@@ -1086,10 +1086,10 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenAdoptCalledAgainThenPreviouslyAdoptedBitmapsAreRecycled() = runTest {
-        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
         val firstRoundBitmap = viewModel.getImageAttachments().first().bitmap
 
-        viewModel.adopt(images = listOf(AdoptedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
         advanceUntilIdle()
 
         assertTrue(firstRoundBitmap.isRecycled)
