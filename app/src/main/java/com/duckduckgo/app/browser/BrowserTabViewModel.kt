@@ -2181,7 +2181,8 @@ class BrowserTabViewModel @Inject constructor(
                 addToHomeEnabled = domain != null,
                 canSharePage = domain != null,
                 showPrivacyShield = HighlightableButton.Visible(enabled = true),
-                canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
+                // Duck.ai issues aren't site breakage, they go through the feedback flow instead
+                canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url) && !duckChat.isDuckChatUrl(url.toUri()),
                 canChangePrivacyProtection = domain != null && !duckPlayer.isDuckPlayerUri(url),
                 isPrivacyProtectionDisabled = false,
                 canFindInPage = true,

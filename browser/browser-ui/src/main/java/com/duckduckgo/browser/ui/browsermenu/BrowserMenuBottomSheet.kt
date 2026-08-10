@@ -454,7 +454,8 @@ class BrowserMenuBottomSheet(
         settingsMenuItem.isEnabled = true
 
         refreshMenuItem.isVisible = true
-        brokenSiteMenuItem.isVisible = viewState.canReportSite
+        // Duck.ai issues aren't site breakage, they go through the feedback flow instead
+        brokenSiteMenuItem.isVisible = false
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
