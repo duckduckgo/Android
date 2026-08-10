@@ -1,7 +1,7 @@
 {
   "name": "PersonSearchers",
   "url": "personsearchers.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.personsearchers.com/optOut/name/landing",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "url": "https://www.personsearchers.com/name/search-result",
           "id": "ab2b7b28-4204-48a5-9366-2697382fdcfe"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-3b691469-ddc9-48fd-85a7-1ef165bb423e"
         },
         {
           "actionType": "expectation",
