@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground">
+    android:background="?attr/daxColorSurface">
 
     <include
         android:id="@+id/includeToolbar"
@@ -50,7 +50,7 @@
                 android:id="@+id/subscriptionOnboardingFeatureInfoTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
                 app:typography="h1"
                 tools:text="@string/subscriptionOnboardingFeatureInfoVpnTitle" />

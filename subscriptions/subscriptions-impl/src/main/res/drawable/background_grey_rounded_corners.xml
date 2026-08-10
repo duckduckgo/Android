@@ -20,5 +20,5 @@
         android:topRightRadius="28dp"
         android:bottomLeftRadius="28dp"
         android:bottomRightRadius="28dp"/>
-    <solid android:color="?attr/daxColorSurface" />
+    <solid android:color="?attr/daxColorBackground" />
 </shape>
