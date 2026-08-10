@@ -233,9 +233,10 @@ class RealDuckChatJSHelper @Inject constructor(
             REPORT_METRIC -> {
                 val reportMetric = ReportMetric.fromValue(data?.optString("metricName"))
                 val modelTier = ModelTier.fromValue(data?.optString("modelTier"))
+                val source = data?.optString("source")?.takeIf { it.isNotBlank() }
 
                 reportMetric?.let {
-                    duckChatPixels.sendReportMetricPixel(it, modelTier)
+                    duckChatPixels.sendReportMetricPixel(it, modelTier, source)
                 }
                 null
             }
