@@ -24,6 +24,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -98,6 +99,10 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
         supportActionBar?.title = ""
+
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
+        binding.includeToolbar.toolbar.setBackgroundColor(surfaceColor)
         binding.subscriptionOnboardingFeatureInfoIcon.setImageResource(feature.iconRes)
         binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
         binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
@@ -105,7 +110,7 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
 
         if (edgeToEdgeEnabled) {
             edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
             edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
         }
     }
