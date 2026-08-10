@@ -25,9 +25,13 @@ import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingFeatureInfoBinding
+import javax.inject.Inject
 
 /** Which onboarding feature a [SubscriptionOnboardingFeatureInfoActivity] describes, with its screen content. */
 enum class OnboardingFeature(
@@ -70,6 +74,12 @@ enum class OnboardingFeature(
 @InjectWith(ActivityScope::class)
 class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivitySubscriptionOnboardingFeatureInfoBinding by viewBinding()
 
     private val feature: OnboardingFeature by lazy {
@@ -78,6 +88,12 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
@@ -86,6 +102,12 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
         binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
         layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
+
+        if (edgeToEdgeEnabled) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
+        }
     }
 
     companion object {

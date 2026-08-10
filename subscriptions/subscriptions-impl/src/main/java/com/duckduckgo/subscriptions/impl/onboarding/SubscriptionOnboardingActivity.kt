@@ -29,6 +29,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
@@ -56,13 +59,31 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var controller: SubscriptionOnboardingController
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: SubscriptionOnboardingViewModel by bindViewModel()
     private val binding: ActivitySubscriptionOnboardingBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.subscriptionOnboardingContainer, drawBehindGestureNav = false)
+        }
 
         // System back and the toolbar up arrow both go through the controller.
         onBackPressedDispatcher.addCallback(
