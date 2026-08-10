@@ -46,8 +46,6 @@ class FakeDuckChatInternal(
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.READY)
-    private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
-    private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
@@ -196,10 +194,6 @@ class FakeDuckChatInternal(
     override fun isChatSyncFeatureEnabled(): Boolean = true
 
     override fun canHandleOnAiWebView(url: String): Boolean = false
-
-    override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled
-
-    override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         chatSuggestionsUserSettingEnabled.value = enabled
