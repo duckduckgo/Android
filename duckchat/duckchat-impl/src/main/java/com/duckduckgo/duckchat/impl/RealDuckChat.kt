@@ -285,6 +285,11 @@ interface DuckChatInternal : DuckChat {
     fun isContextualNativeInputEnabled(): Boolean
 
     /**
+     * True when editing a sent prompt is handled by the native input. Requires the native chat input.
+     */
+    fun isNativePromptEditingEnabled(): Boolean
+
+    /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
      */
     fun areMultipleContentAttachmentsEnabled(): Boolean
@@ -447,6 +452,7 @@ class RealDuckChat @Inject constructor(
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isContextualNativeInputEnabled: Boolean = false
+    private var isNativePromptEditingEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -525,6 +531,8 @@ class RealDuckChat @Inject constructor(
     override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
 
     override fun isContextualNativeInputEnabled(): Boolean = isContextualNativeInputEnabled
+
+    override fun isNativePromptEditingEnabled(): Boolean = isNativePromptEditingEnabled
 
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
@@ -939,6 +947,7 @@ class RealDuckChat @Inject constructor(
             // Contextual native INPUT mode is gated by nativeChatInput AND the contextualNativeInput flag.
             // Read synchronously via isContextualNativeInputEnabled() — no flow needed (static per session).
             isContextualNativeInputEnabled = isNativeChatInputEnabled && duckChatFeature.contextualNativeInput().isEnabled()
+            isNativePromptEditingEnabled = isNativeChatInputEnabled && duckChatFeature.nativePromptEditing().isEnabled()
             _nativeInputNavBarEnabled.value = duckChatFeature.nativeInputNavBar().isEnabled()
             val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
 
