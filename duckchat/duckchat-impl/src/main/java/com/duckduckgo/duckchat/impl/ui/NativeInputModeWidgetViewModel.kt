@@ -334,15 +334,25 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.duckAiFireButtonHighlighted }
         .distinctUntilChanged()
 
+    // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of its
+    // own streaming, so it must never inherit whatever the real tab is doing.
+    private val isChatStreamingForThisWidget: Flow<Boolean> = combine(
+        duckChatInternal.chatState,
+        activeTabId,
+    ) { chatState, tabId ->
+        val isEditWidget = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true
+        !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING)
+    }
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
-        duckChatInternal.chatState,
+        isChatStreamingForThisWidget,
         activeChatId,
         interactionLock,
         duckAiFireButtonHighlighted,
-    ) { state, chatState, chatId, lock, fireHighlighted ->
+    ) { state, isStreaming, chatId, lock, fireHighlighted ->
         state.copy(
-            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
+            isChatStreaming = isStreaming,
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
@@ -534,6 +544,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         replayPendingState(tabId)
     }
 
+    /**
+     * The edit screen hosts a second widget for a tab that already has one. Publishing under a
+     * synthetic key keeps it from overwriting the real tab's state, which nothing would repair:
+     * `state` only re-publishes when a value changes.
+     */
+    fun configureForEdit(sessionId: String) {
+        activeTabId.value = editStateKey(sessionId)
+        widgetConfig.value = WidgetConfig(
+            inputContext = NativeInputState.InputContext.DUCK_AI,
+            inputPosition = NativeInputState.InputPosition.TOP,
+            toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+        )
+    }
+
     fun cancelChatSuggestions() {
         chatSuggestionsReader.tearDown()
         lastChatUrlSuggestions = emptyList()
@@ -651,4 +675,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             NativeInputState.InputMode.SEARCH_ONLY
         }
+
+    companion object {
+        private const val EDIT_STATE_KEY_PREFIX = "edit:"
+        fun editStateKey(sessionId: String): String = "$EDIT_STATE_KEY_PREFIX$sessionId"
+    }
 }
