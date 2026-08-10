@@ -820,6 +820,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun observeChatState() {
+        // chatState is global, not scoped to a tab — the edit widget has no chat of its own to
+        // reflect, and reacting to it would hijack the submit button or hide the whole screen
+        // whenever an unrelated surface starts streaming or hides its input.
+        if (isEditWidget) return
         var isFocussed = false
 
         chatStateJob?.cancel()
