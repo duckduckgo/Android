@@ -1,7 +1,7 @@
 {
   "name": "SealedRecords",
   "url": "sealedrecords.net",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.sealedrecords.net/optOut/name/landing",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "url": "https://www.sealedrecords.net/name/search-result",
           "id": "c8a32ec6-d560-4ecb-92f6-e83033fd317a"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-da7a8927-1dfc-4c1c-82fe-90c2b0aba562"
         },
         {
           "actionType": "expectation",
