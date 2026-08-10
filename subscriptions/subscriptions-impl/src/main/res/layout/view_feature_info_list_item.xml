@@ -25,6 +25,8 @@
         android:id="@+id/featureInfoItemIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/background_feature_info_icon"
+        android:padding="@dimen/keyline_2"
         android:src="@drawable/device_all_24"
         tools:ignore="ContentDescription" />
 
