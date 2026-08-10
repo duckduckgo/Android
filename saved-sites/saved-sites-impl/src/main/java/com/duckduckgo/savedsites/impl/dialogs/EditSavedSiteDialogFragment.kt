@@ -20,18 +20,21 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
 import android.view.View
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circular
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.text.TextChangedWatcher
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 
+@InjectWith(FragmentScope::class)
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
