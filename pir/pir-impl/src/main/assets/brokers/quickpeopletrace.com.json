@@ -1,7 +1,7 @@
 {
   "name": "Quick People Trace",
   "url": "quickpeopletrace.com",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.quickpeopletrace.com/contact-us/",
@@ -18,7 +18,7 @@
         {
           "actionType": "extract",
           "id": "54cdba05-95bd-4142-b97c-4cafc59059df",
-          "selector": "//table/tbody/tr[position() > 1]",
+          "selector": "//table/tbody/tr[td[2]]",
           "noResultsSelector": "//div[contains(@class, 'alert') and contains(text(), 'no results')]",
           "profile": {
             "name": {
