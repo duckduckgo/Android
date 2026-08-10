@@ -23,7 +23,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** Step 1 (Welcome) of the subscription onboarding, contributed from `subscriptions-impl` itself. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(100)
 class SubscriptionOnboardingWelcomeStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {

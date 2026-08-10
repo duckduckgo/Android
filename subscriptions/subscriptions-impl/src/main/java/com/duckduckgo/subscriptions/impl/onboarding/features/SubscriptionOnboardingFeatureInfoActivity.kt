@@ -34,7 +34,6 @@ import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingFeatureInfoBinding
 import javax.inject.Inject
 
-/** Which onboarding feature a [SubscriptionOnboardingFeatureInfoActivity] describes, with its screen content. */
 enum class OnboardingFeature(
     @DrawableRes val iconRes: Int,
     @StringRes val titleRes: Int,

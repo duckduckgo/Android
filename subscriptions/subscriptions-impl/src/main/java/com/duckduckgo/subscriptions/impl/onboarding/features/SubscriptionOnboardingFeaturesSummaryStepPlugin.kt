@@ -23,7 +23,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** Features-summary step of the subscription onboarding, shown between the welcome and VPN steps. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(150)
 class SubscriptionOnboardingFeaturesSummaryStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
