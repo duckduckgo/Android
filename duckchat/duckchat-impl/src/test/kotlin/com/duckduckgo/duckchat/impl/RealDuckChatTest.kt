@@ -119,6 +119,9 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        // Both default to true in DuckChatFeature; pinned off here so each test opts in explicitly.
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
@@ -319,6 +322,14 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
+    }
+
+    @Test
+    fun whenNoRemoteConfigThenNativeInputFlagsDefaultToEnabled() {
+        val freshFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+
+        assertTrue(freshFeature.nativeInputField().isEnabled())
+        assertTrue(freshFeature.nativeChatInput().isEnabled())
     }
 
     @Test

@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 // Native input is now controlled by the `nativeInputField` feature flag (default
-// INTERNAL), not a user setting. This plugin is retained so existing Maestro flows
+// true), not a user setting. This plugin is retained so existing Maestro flows
 // can keep passing `nativeInputToggle` without erroring; it's a no-op.
 @ContributesMultibinding(AppScope::class)
 class NativeInputToggleSeederPlugin @Inject constructor() : TestSeederPlugin {

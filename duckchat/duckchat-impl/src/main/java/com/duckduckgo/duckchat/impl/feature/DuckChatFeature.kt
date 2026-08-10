@@ -98,9 +98,10 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
+     * If the remote feature is not present defaults to `true`.
      */
     @InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeInputField(): Toggle
 
     /**
@@ -116,8 +117,9 @@ interface DuckChatFeature {
      * `supportsNativePrompt` JS flags). Has no effect unless [nativeInputField]
      * is also enabled. When disabled, Duck.ai contextual and full modes fall
      * back to the web input.
+     * If the remote feature is not present defaults to `true`.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeChatInput(): Toggle
 
     /**
