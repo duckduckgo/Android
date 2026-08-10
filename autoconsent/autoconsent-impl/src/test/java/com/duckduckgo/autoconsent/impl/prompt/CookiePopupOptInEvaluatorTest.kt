@@ -97,10 +97,35 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
+    fun whenChoiceAlreadyMadeThenSkipped() = runTest {
+        settingsRepository.optInPromptChoiceMade = true
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenAlreadyShownMaxTimesThenSkipped() = runTest {
+        settingsRepository.optInPromptShownCount = 3
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
     fun whenAllConditionsMetThenModalShownAndActivityLaunched() = runTest {
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
 
         val launched = shadowOf(application).nextStartedActivity
         assertEquals(CookiePopupOptInActivity::class.java.name, launched.component?.className)
+    }
+
+    @Test
+    fun whenModalShownThenShownCountIncremented() = runTest {
+        settingsRepository.optInPromptShownCount = 2
+
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+        assertEquals(3, settingsRepository.optInPromptShownCount)
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
     }
 }

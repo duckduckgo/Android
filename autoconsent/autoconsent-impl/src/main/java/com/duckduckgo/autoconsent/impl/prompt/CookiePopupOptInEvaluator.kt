@@ -55,11 +55,15 @@ class CookiePopupOptInEvaluator @Inject constructor(
         val eligible = autoconsentFeature.self().isEnabled() &&
             autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled() &&
             autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() &&
-            !settingsRepository.clickAcceptEnabled
+            !settingsRepository.clickAcceptEnabled &&
+            !settingsRepository.optInPromptChoiceMade &&
+            settingsRepository.optInPromptShownCount < MAX_PROMPT_DISPLAYS
 
         if (!eligible) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
+
+        settingsRepository.optInPromptShownCount++
 
         delay(MODAL_DISPLAY_DELAY)
         appCoroutineScope.launch(dispatchers.main()) {
@@ -75,5 +79,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
     companion object {
         private const val MODAL_DISPLAY_DELAY = 250L
+        private const val MAX_PROMPT_DISPLAYS = 3
     }
 }
