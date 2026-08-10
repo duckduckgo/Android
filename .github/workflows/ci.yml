@@ -39,12 +39,12 @@ jobs:
             exit 0
           fi
           echo "Changed files:"; echo "$CHANGED"
-          if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)') || \
+          if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/|^\.claude/)') || \
              echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
             echo "Code or required CI workflow changes detected — running checks"
             echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Only docs or optional workflow changes detected — skipping checks"
+            echo "Only docs, Claude tooling, or optional workflow changes detected — skipping checks"
             echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
 
