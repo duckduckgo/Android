@@ -77,6 +77,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
@@ -101,6 +102,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import javax.inject.Inject
@@ -269,6 +271,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var duckChatFeature: DuckChatFeature
+
+    private var attachmentChangesEnabled: Boolean = false
 
     private var activeTabId: String? = null
 
@@ -639,6 +646,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            attachmentChangesEnabled = withContext(dispatchers.io()) {
+                duckChatFeature.nativeInputAttachmentChanges().isEnabled()
+            }
+            applyAttachmentPlacement()
+            applyVerticalPaddingForFocus()
+        }
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
@@ -954,14 +968,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
     }
 
+    private fun applyAttachmentPlacement() {
+        // When enabled, the attachment row sits above the text input instead of below it.
+        if (!attachmentChangesEnabled) return
+        val container = findViewById<ViewGroup>(R.id.inputModeWidgetContentContainer) ?: return
+        val attachments = findViewById<View>(R.id.attachmentsContainer) ?: return
+        val inputRow = findViewById<View>(R.id.inputModeWidgetCardContent) ?: return
+        if (container.indexOfChild(attachments) == container.indexOfChild(inputRow) - 1) return
+        container.removeView(attachments)
+        container.addView(attachments, container.indexOfChild(inputRow))
+    }
+
     private fun applyVerticalPaddingForFocus() {
         // 4dp when minimized, 8dp when expanded. The browser omnibar with the toggle disabled stays
         // minimized regardless of focus; the duck.ai omnibar and browser omnibar with toggle enabled
-        // expand on focus; the duck.ai contextual sheet is always expanded.
+        // expand on focus; the duck.ai contextual sheet is always expanded when the attachment changes
+        // are enabled.
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = isContextualWidget || (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
+        val expanded = (attachmentChangesEnabled && isContextualWidget) ||
+            (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
