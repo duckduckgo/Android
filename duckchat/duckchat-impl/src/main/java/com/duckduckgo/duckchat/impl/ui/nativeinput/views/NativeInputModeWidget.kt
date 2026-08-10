@@ -820,16 +820,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun observeChatState() {
-        // chatState is global, not scoped to a tab — the edit widget has no chat of its own to
-        // reflect, and reacting to it would hijack the submit button or hide the whole screen
-        // whenever an unrelated surface starts streaming or hides its input.
-        if (isEditWidget) return
         var isFocussed = false
 
         chatStateJob?.cancel()
         chatStateJob = viewModel.chatState
             .drop(1)
             .onEach { state ->
+                // chatState is global, not scoped to a tab — the edit widget has no chat of its own
+                // to reflect, and reacting to it would hijack the submit button or hide the whole
+                // screen whenever an unrelated surface starts streaming or hides its input. Checked
+                // per emission, not just at subscribe time: if this ever subscribes before
+                // configureForEdit() flips the flag (e.g. an addView-then-configure caller), the
+                // subscription must still stay inert rather than act once on a stale isEditWidget.
+                if (isEditWidget) return@onEach
                 setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
                 when (state) {
                     ChatState.HIDE -> {
