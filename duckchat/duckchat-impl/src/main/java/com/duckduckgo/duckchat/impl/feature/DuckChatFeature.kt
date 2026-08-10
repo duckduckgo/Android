@@ -62,28 +62,6 @@ interface DuckChatFeature {
     fun duckAiInputScreen(): Toggle
 
     /**
-     * @return `true` when the Input Screen should open automatically when user creates a New Tab
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenAutomaticallyOnNewTab(): Toggle
-
-    /**
-     * @return `true` when the Input Screen should be shown when user open the app from system widgets
-     * If the remote feature is not present defaults to `disabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenOnSystemSearchLaunch(): Toggle
-
-    /**
-     * @return `true` when the Input Screen can present a bottom input box, if user has the omnibar also set to the bottom position.
-     * If disabled, the Input Screen should always show the input box at the top of the screen.
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun inputScreenBottomBarSupport(): Toggle
-
-    /**
      * @return `true` when the new address bar option choice screen should be shown.
      * If the remote feature is not present defaults to `internal`.
      */
@@ -96,12 +74,6 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun clearHistory(): Toggle
-
-    /**
-     * @return `true` when the new input screen should show the three main buttons (fire, tabs, menu)
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showMainButtonsInInputScreen(): Toggle
 
     /**
      * @return `true` when the remote config has the "duckAiVoiceSearch"
