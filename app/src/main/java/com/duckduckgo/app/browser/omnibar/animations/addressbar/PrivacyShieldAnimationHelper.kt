@@ -24,9 +24,14 @@ import com.duckduckgo.app.global.model.PrivacyShield
 interface PrivacyShieldAnimationHelper {
 
     /**
-     * This method will setup into [holder] a LottieAnimation based on [PrivacyShield] state.
+     * This method will setup into [holder] a LottieAnimation or static drawable based on [PrivacyShield] state.
      *
      * @param useLightAnimation if specified, determines whether to use light (true) or dark (false) animation variant. If null, uses system theme.
      */
-    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: ViewMode, useLightAnimation: Boolean? = null)
+    fun setAnimationView(
+        holder: LottieAnimationView,
+        privacyShield: PrivacyShield,
+        viewMode: ViewMode,
+        useLightAnimation: Boolean? = null,
+    ): Boolean
 }

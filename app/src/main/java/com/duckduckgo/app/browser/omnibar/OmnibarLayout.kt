@@ -277,6 +277,10 @@ class OmnibarLayout @JvmOverloads constructor(
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
+    private val shieldIconBoxSize by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
+    }
+
     private var focusAnimator: ValueAnimator? = null
 
     init {
@@ -1267,7 +1271,15 @@ class OmnibarLayout @JvmOverloads constructor(
                 else -> null // Use default theme-based selection
             }
 
-            privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
+            val boxed = privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
+            if (boxed) {
+                shieldIconView.updateLayoutParams<MarginLayoutParams> {
+                    width = shieldIconBoxSize
+                    height = shieldIconBoxSize
+                    marginStart = 2.toPx(context)
+                }
+                shieldIconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            }
         }
     }
 
