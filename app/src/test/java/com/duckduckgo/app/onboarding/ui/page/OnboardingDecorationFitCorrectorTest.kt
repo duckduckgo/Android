@@ -577,6 +577,36 @@ class OnboardingDecorationFitCorrectorTest {
     }
 
     @Test
+    fun whenDecorationBelowHasNoAppliedHeightThenItsMeasuredHeightCountsAsRoomItCovers() {
+        // The engine applies an explicit height before handing the decoration over, so this pins the
+        // fallback: should that invariant ever break, the reservation must come from the measured height
+        // rather than silently treating WRAP_CONTENT as the room the decoration covers.
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 500,
+            reservesInsetAboveDecoration = true,
+        )
+        (h.decoration.layoutParams as ViewGroup.MarginLayoutParams).height = ViewGroup.LayoutParams.WRAP_CONTENT
+        h.decoration.measure(
+            View.MeasureSpec.makeMeasureSpec(200, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(200, View.MeasureSpec.EXACTLY),
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(300, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
     fun whenDecorationBelowHasABottomMarginThenThatCountsAsRoomItCovers() {
         val h = harness(
             rootHeight = 1200,
