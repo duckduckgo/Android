@@ -19,6 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/keyline_1"
     android:background="@drawable/background_image_attachment_chip"
     android:clickable="true"
     android:focusable="true"
@@ -47,12 +48,13 @@
 
     <ImageView
         android:id="@+id/thumbnailRemove"
-        android:layout_width="@dimen/keyline_4"
-        android:layout_height="@dimen/keyline_4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         android:layout_marginStart="@dimen/keyline_2"
+        android:background="@drawable/background_image_attachment_remove"
         android:contentDescription="@string/duckChatImageAttachmentRemoveContentDescription"
-        android:scaleType="center"
-        app:srcCompat="@drawable/ic_close_16"
-        app:tint="?attr/daxColorSecondaryIcon" />
+        android:padding="@dimen/keyline_1"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_close_16" />
 
 </LinearLayout>
