@@ -77,7 +77,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
@@ -102,7 +101,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import javax.inject.Inject
@@ -272,9 +270,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var duckChatFeature: DuckChatFeature
-
     private var attachmentChangesEnabled: Boolean = false
 
     private var activeTabId: String? = null
@@ -286,6 +281,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
+    private var attachmentChangesJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
@@ -646,13 +642,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            attachmentChangesEnabled = withContext(dispatchers.io()) {
-                duckChatFeature.nativeInputAttachmentChanges().isEnabled()
-            }
-            applyAttachmentPlacement()
-            applyVerticalPaddingForFocus()
-        }
+        observeAttachmentChangesEnabled()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
@@ -786,6 +776,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = null
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = null
+        attachmentChangesJob?.cancel()
+        attachmentChangesJob = null
         tierJob?.cancel()
         tierJob = null
         nativeInputStateJob?.cancel()
@@ -1804,6 +1796,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = viewModel.chatSuggestionsUserEnabled
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun observeAttachmentChangesEnabled() {
+        attachmentChangesJob?.cancel()
+        attachmentChangesJob = viewModel.attachmentChangesEnabled
+            .onEach { enabled ->
+                attachmentChangesEnabled = enabled
+                applyAttachmentPlacement()
+                applyVerticalPaddingForFocus()
+            }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
