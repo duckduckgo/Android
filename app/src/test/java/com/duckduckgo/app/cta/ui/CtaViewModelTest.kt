@@ -452,6 +452,24 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenOnboardingCompletedAndPrivacyOffForSiteThenReturnBrokenSitePrompt() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(true)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+        val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
     fun whenContextualCtaSuppressorPluginSuppressesButOnboardingCompletedThenReturnBrokenSitePrompt() = runTest {
         canShowContextualCta = false
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
