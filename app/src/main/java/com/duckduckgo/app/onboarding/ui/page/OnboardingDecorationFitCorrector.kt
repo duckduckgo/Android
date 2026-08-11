@@ -107,11 +107,11 @@ class OnboardingDecorationFitCorrector(
         val overflow = (cardContainerHeight - viewportHeight).coerceAtLeast(0)
         val available = root.height - root.paddingTop - root.paddingBottom
         val dialogParams = dialog.layoutParams as ViewGroup.MarginLayoutParams
-        // A keyboard overlays the window rather than shrinking it, so `available` already covers the room the card
-        // gave up above the decoration. Counting it would shrink the decoration, which grows the inset, which
-        // shrinks the decoration again, until it is gone.
-        val cardBottomMargin = if (reservesInsetAboveDecoration) 0 else dialogParams.bottomMargin
-        val dialogSpace = dialogHeight + overflow + dialogParams.topMargin + cardBottomMargin
+        // The card's bottom margin never counts against the decoration's room. With a decoration shown it is
+        // either zero (synced above) or a reserved inset, and the keyboard that inset clears overlays the
+        // window rather than shrinking it, so `available` already covers the room the card gave up. Counting
+        // it would shrink the decoration, which grows the inset, which shrinks it again, until it is gone.
+        val dialogSpace = dialogHeight + overflow + dialogParams.topMargin
         val decorationParams = deco.layoutParams as ViewGroup.MarginLayoutParams
 
         val target = BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
