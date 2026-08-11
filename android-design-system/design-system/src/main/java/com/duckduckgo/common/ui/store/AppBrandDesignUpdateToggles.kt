@@ -46,4 +46,11 @@ interface AppBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun theme(): Toggle
+
+    /**
+     * Gates the address bar icons and Lotties: shield, cookies, ad-blocking and Duck Player
+     * assets, and the 40dp shield icon box. Temporary — delete once the rebrand ships.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun addressBarIcons(): Toggle
 }
