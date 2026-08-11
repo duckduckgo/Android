@@ -252,8 +252,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         engine: DialogRenderEngine,
         screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
-        // We assume that if intro is played, it's always done so before any dialog is rendered. The handover is
-        // unconditional so that a render which does not animate still takes the background off the choreographer.
+        // Not gated on animateEntry: a render that does not animate must still take the background over
+        // from the choreographer, or the intro visuals stay behind the dialog.
         intro?.clearForDialog()
         engine.render(
             screen.stepId,
