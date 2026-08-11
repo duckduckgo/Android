@@ -45,7 +45,7 @@
         android:maxWidth="120dp"
         android:maxLines="1"
         app:textType="primary"
-        app:typography="body2_bold" />
+        app:typography="body2" />
 
     <ImageView
         android:id="@+id/fileRemove"
