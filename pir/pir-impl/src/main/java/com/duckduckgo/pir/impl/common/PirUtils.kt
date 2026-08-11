@@ -123,9 +123,9 @@ internal fun ExtractedProfile.hasMatchingProfileOnParent(extractedProfiles: List
 
 internal fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
     return this.name == extractedProfile.name && this.age == extractedProfile.age &&
-            this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
-            this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
-            this.addresses.withoutExtras().isASubSetOrSuperSetOf(extractedProfile.addresses.withoutExtras())
+        this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
+        this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
+        this.addresses.withoutExtras().isASubSetOrSuperSetOf(extractedProfile.addresses.withoutExtras())
 }
 
 private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
