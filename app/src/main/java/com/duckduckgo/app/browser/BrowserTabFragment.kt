@@ -6554,6 +6554,8 @@ class BrowserTabFragment :
             addNewTabPageContent()
             newBrowserTab.newTabRootLayout.show()
             newBrowserTab.newTabLayout.show()
+            binding.browserLayout.gone()
+            webViewContainer.gone()
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
