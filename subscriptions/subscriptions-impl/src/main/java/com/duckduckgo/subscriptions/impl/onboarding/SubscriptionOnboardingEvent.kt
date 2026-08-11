@@ -25,7 +25,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
  * [StepFinished] for the current step, which advances the plan. The toolbar / system back becomes [BackPressed].
  */
 sealed interface SubscriptionOnboardingEvent : LinearOnboardingEvent {
+    /** The current step finished with [outcome] (completed vs skipped). */
     data class StepFinished(val stepId: String, val outcome: SubscriptionOnboardingStepOutcome) : SubscriptionOnboardingEvent
 
+    /** The user asked to go back (toolbar up arrow or system back). */
     data object BackPressed : SubscriptionOnboardingEvent
 }

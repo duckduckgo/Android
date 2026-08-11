@@ -43,7 +43,6 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(buildViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    // The screen is only shown right after purchase, so the free trial starts today.
     private fun buildViewState(): ViewState {
         val startDate = currentTimeProvider.localDateTimeNow().toLocalDate()
         return ViewState(

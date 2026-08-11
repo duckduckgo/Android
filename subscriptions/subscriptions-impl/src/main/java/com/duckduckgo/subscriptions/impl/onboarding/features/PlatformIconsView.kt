@@ -27,18 +27,12 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewPlatformIconItemBinding
 
-/**
- * Shows the platforms a feature is available on as a two-column grid of icon + name pairs. Which
- * platforms appear is driven by the [R.styleable.PlatformIconsView_platformsVisible] flags attribute,
- * e.g. {@code app:platformsVisible="ios|android|mac|windows"}.
- */
 class PlatformIconsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : GridLayout(context, attrs, defStyleAttr) {
 
-    /** A platform that can be surfaced, paired with the flag bit that selects it in XML. */
     enum class Platform(
         val flag: Int,
         @DrawableRes val iconRes: Int,
@@ -59,9 +53,6 @@ class PlatformIconsView @JvmOverloads constructor(
         render(visible)
     }
 
-    /** Replaces the shown platforms with those whose [Platform.flag] bit is set in [flags]. */
-    fun setPlatforms(flags: Int) = render(flags)
-
     private fun render(flags: Int) {
         removeAllViews()
         Platform.entries
@@ -76,6 +67,8 @@ class PlatformIconsView @JvmOverloads constructor(
     }
 
     private val cellSpacing: Int get() = 12.toPx()
+
+    fun setPlatforms(flags: Int) = render(flags)
 
     private companion object {
         private const val COLUMN_COUNT = 2

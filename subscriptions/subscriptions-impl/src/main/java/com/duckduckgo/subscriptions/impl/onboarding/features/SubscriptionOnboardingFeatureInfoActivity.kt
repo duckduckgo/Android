@@ -16,12 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding.features
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -30,9 +29,64 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingFeatureInfoBinding
 import javax.inject.Inject
+
+/**
+ * Full-screen detail for a single subscription feature, opened from the features-summary step. Toolbar
+ * shows a close (X) and no title; closing returns to the features step. Per-feature copy and highlights
+ * come from [OnboardingFeature], whose content layout is inflated into the screen.
+ */
+@InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SubscriptionOnboardingFeatureInfoScreen::class)
+class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    private val binding: ActivitySubscriptionOnboardingFeatureInfoBinding by viewBinding()
+
+    private val feature: OnboardingFeature by lazy {
+        val screenFeature = intent.getActivityParams(SubscriptionOnboardingFeatureInfoScreen::class.java)?.feature
+            ?: SubscriptionOnboardingFeature.VPN
+        OnboardingFeature.valueOf(screenFeature.name)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
+        binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+        supportActionBar?.title = ""
+
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
+        binding.includeToolbar.toolbar.setBackgroundColor(surfaceColor)
+        binding.subscriptionOnboardingFeatureInfoIcon.setImageResource(feature.iconRes)
+        binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
+        binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
+        layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
+
+        if (edgeToEdgeEnabled) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
+        }
+    }
+}
 
 enum class OnboardingFeature(
     @DrawableRes val iconRes: Int,
@@ -64,64 +118,4 @@ enum class OnboardingFeature(
         descriptionRes = R.string.subscriptionOnboardingFeatureInfoPirDescription,
         contentRes = R.layout.content_subscription_onboarding_feature_info_pir,
     ),
-}
-
-/**
- * Full-screen detail for a single subscription feature, opened from the features-summary step. Toolbar
- * shows a close (X) and no title; closing returns to the features step. Per-feature copy and highlights
- * come from [OnboardingFeature], whose content layout is inflated into the screen.
- */
-@InjectWith(ActivityScope::class)
-class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
-    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
-
-    private val binding: ActivitySubscriptionOnboardingFeatureInfoBinding by viewBinding()
-
-    private val feature: OnboardingFeature by lazy {
-        OnboardingFeature.valueOf(intent.getStringExtra(EXTRA_FEATURE) ?: OnboardingFeature.VPN.name)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
-
-        setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
-        binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
-        supportActionBar?.title = ""
-
-        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
-        binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
-        binding.includeToolbar.toolbar.setBackgroundColor(surfaceColor)
-        binding.subscriptionOnboardingFeatureInfoIcon.setImageResource(feature.iconRes)
-        binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
-        binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
-        layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
-
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
-        }
-    }
-
-    companion object {
-        private const val EXTRA_FEATURE = "extra_feature"
-
-        fun intent(
-            context: Context,
-            feature: OnboardingFeature,
-        ): Intent = Intent(context, SubscriptionOnboardingFeatureInfoActivity::class.java).apply {
-            putExtra(EXTRA_FEATURE, feature.name)
-        }
-    }
 }

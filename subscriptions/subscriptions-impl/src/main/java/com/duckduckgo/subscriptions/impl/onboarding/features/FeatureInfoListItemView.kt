@@ -26,13 +26,6 @@ import androidx.core.content.withStyledAttributes
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewFeatureInfoListItemBinding
 
-/**
- * A single feature highlight on a subscription onboarding feature-info screen: a rounded card with a
- * leading icon, an [R.attr.featureInfoTitle] title and an [R.attr.featureInfoDescription] description.
- *
- * Items that also list supported platforms nest a [PlatformIconsView] (optionally preceded by a divider)
- * as a child of this view in XML; those children render below the description inside the same card.
- */
 class FeatureInfoListItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

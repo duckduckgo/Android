@@ -28,6 +28,9 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingFeaturesSummaryBinding
 import com.duckduckgo.subscriptions.impl.onboarding.features.SubscriptionOnboardingFeaturesSummaryViewModel.ViewState
@@ -42,6 +45,9 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val binding: FragmentSubscriptionOnboardingFeaturesSummaryBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingFeaturesSummaryViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingFeaturesSummaryViewModel::class.java]
@@ -50,10 +56,10 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
-            subscriptionOnboardingFeaturesVPN.setClickListener { openFeatureInfo(OnboardingFeature.VPN) }
-            subscriptionOnboardingFeaturesITR.setClickListener { openFeatureInfo(OnboardingFeature.ITR) }
-            subscriptionOnboardingFeaturesAi.setClickListener { openFeatureInfo(OnboardingFeature.DUCK_AI) }
-            subscriptionOnboardingFeaturesPIR.setClickListener { openFeatureInfo(OnboardingFeature.PIR) }
+            subscriptionOnboardingFeaturesVPN.setClickListener { openFeatureInfo(SubscriptionOnboardingFeature.VPN) }
+            subscriptionOnboardingFeaturesITR.setClickListener { openFeatureInfo(SubscriptionOnboardingFeature.ITR) }
+            subscriptionOnboardingFeaturesAi.setClickListener { openFeatureInfo(SubscriptionOnboardingFeature.DUCK_AI) }
+            subscriptionOnboardingFeaturesPIR.setClickListener { openFeatureInfo(SubscriptionOnboardingFeature.PIR) }
             subscriptionOnboardingFeaturesPrimaryButton.setOnClickListener { viewModel.onPrimaryCtaClicked() }
         }
         viewModel.viewState
@@ -76,7 +82,7 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
         onboardingSubscriptionFeaturesDivider3.isVisible = viewState.aiVisible && viewState.pirVisible
     }
 
-    private fun openFeatureInfo(feature: OnboardingFeature) {
-        startActivity(SubscriptionOnboardingFeatureInfoActivity.intent(requireContext(), feature))
+    private fun openFeatureInfo(feature: SubscriptionOnboardingFeature) {
+        globalActivityStarter.start(requireContext(), SubscriptionOnboardingFeatureInfoScreen(feature))
     }
 }

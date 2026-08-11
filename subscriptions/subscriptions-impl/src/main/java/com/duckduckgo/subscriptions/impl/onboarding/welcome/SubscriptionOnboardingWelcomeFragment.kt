@@ -34,11 +34,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-/**
- * Step 1 of the native subscription onboarding: a welcome screen showing the free-trial banner. Reports back
- * through [SubscriptionOnboardingController][com.duckduckgo.subscriptions.api.SubscriptionOnboardingController]
- * via its [SubscriptionOnboardingWelcomeViewModel].
- */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_welcome) {
 
