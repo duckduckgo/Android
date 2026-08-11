@@ -28,9 +28,11 @@ import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RawRes
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
@@ -55,6 +57,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
     private val addressBarTrackersAnimator: AddressBarTrackersAnimator,
     private val commonAddressBarAnimationHelper: CommonAddressBarAnimationHelper,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -365,11 +368,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
         cookieView.show()
         cookieView.alpha = 0F
-        if (cookieUseLightAnimation ?: theme.isLightModeEnabled()) {
-            cookieView.setAnimation(R.raw.cookie_icon_animated_light)
-        } else {
-            cookieView.setAnimation(R.raw.cookie_icon_animated_dark)
-        }
+        cookieView.setAnimation(
+            resolveCookieAnimation(
+                isLightMode = cookieUseLightAnimation ?: theme.isLightModeEnabled(),
+                brandIconsEnabled = appBrandDesignUpdateToggles.addressBarIcons().isEnabled(),
+            ),
+        )
         cookieView.progress = 0F
 
         val slideInCookiesTransition: Transition = createSlideTransition()
@@ -562,6 +566,17 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
+    }
+
+    @RawRes
+    internal fun resolveCookieAnimation(
+        isLightMode: Boolean,
+        brandIconsEnabled: Boolean,
+    ): Int = when {
+        brandIconsEnabled && isLightMode -> R.raw.cookie_icon_animated_light_brand_update
+        brandIconsEnabled -> R.raw.cookie_icon_animated_dark_brand_update
+        isLightMode -> R.raw.cookie_icon_animated_light
+        else -> R.raw.cookie_icon_animated_dark
     }
 
     companion object {
