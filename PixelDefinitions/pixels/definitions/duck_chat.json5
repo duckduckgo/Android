@@ -1594,29 +1594,7 @@
                 "description": "Catalog key of the selected suggestion (e.g. summarize-page, translate-page, key-takeaways) or ask-about-page for the quick action. Bounded by the bundled PageSuggestionsCatalog ids.",
                 "examples": ["summarize-page", "translate-page", "key-takeaways", "ask-about-page"]
             },
-            {
-                "key": "pageType",
-                "type": "string",
-                "description": "Coarse page-type bucket computed natively from page-type signals. Never a URL, domain or page content.",
-                "enum": [
-                    "recipe",
-                    "product",
-                    "article",
-                    "video",
-                    "job",
-                    "book",
-                    "event",
-                    "place",
-                    "forum",
-                    "code",
-                    "course",
-                    "review",
-                    "person",
-                    "howto",
-                    "faq",
-                    "none"
-                ]
-            }
+            "contextualSuggestionsPageType"
         ]
     },
     "aichat_contextual_suggestions_viewed": {
@@ -1631,29 +1609,7 @@
                 "type": "boolean",
                 "description": "Whether the displayed suggestions were contextually matched to the page (JSON-LD, og:type or domain) rather than generic defaults."
             },
-            {
-                "key": "pageType",
-                "type": "string",
-                "description": "Coarse page-type bucket computed natively from page-type signals. Never a URL, domain or page content.",
-                "enum": [
-                    "recipe",
-                    "product",
-                    "article",
-                    "video",
-                    "job",
-                    "book",
-                    "event",
-                    "place",
-                    "forum",
-                    "code",
-                    "course",
-                    "review",
-                    "person",
-                    "howto",
-                    "faq",
-                    "none"
-                ]
-            }
+            "contextualSuggestionsPageType"
         ]
     },
     "debug_aichat_contextual_suggestions_catalog_load_failed": {

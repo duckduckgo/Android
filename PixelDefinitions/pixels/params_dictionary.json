@@ -15,6 +15,29 @@
         "description": "The Unified Input surface the pixel was fired from, distinguishing the contextual chat sheet from the Duck.ai tab and the address bar",
         "enum": ["address_bar", "duck_ai", "contextual_chat"]
     },
+    "contextualSuggestionsPageType": {
+        "key": "pageType",
+        "type": "string",
+        "description": "Coarse page-type bucket computed natively from page-type signals. Never a URL, domain or page content.",
+        "enum": [
+            "recipe",
+            "product",
+            "article",
+            "video",
+            "job",
+            "book",
+            "event",
+            "place",
+            "forum",
+            "code",
+            "course",
+            "review",
+            "person",
+            "howto",
+            "faq",
+            "none"
+        ]
+    },
     "osVersion": {
         "key": "os_version",
         "type": "integer",
