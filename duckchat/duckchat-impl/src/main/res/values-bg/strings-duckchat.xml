@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_search_only_hint">Търсене</string>
-    <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>
     <string name="input_screen_user_pref_without_ai">Само търсене</string>
     <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai</string>
     <string name="input_screen_user_pref_description">Изпробвайте новата опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Обобщи тази страница</string>
     <string name="duckAIContextualAutomaticContextTitle">Автоматично изпращане на съдържанието на страницата</string>
     <string name="duckAIContextualAutomaticContextMessage">Автоматично изпращане на съдържанието на страницата до Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Прикачи съдържанието на страницата</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Попитайте за страницата</string>
@@ -344,6 +342,5 @@
     <string name="duckAiSettingsTitle">Настройки на Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Попитайте за раздела</string>
     <string name="duckChatContextualAskAboutPage">Попитайте за страницата</string>
 </resources>

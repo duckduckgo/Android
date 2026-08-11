@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Rechercher ou saisir une adresse</string>
     <string name="input_screen_search_only_hint">Rechercher</string>
-    <string name="input_screen_chat_hint">Demander en privé</string>
     <string name="input_screen_user_pref_without_ai">Recherche uniquement</string>
     <string name="input_screen_user_pref_with_ai">Recherche et Duck.ai</string>
     <string name="input_screen_user_pref_description">Essayez la nouvelle option pour interroger Duck.ai directement à partir de la barre d\'adresse. <annotation type="share_feedback">Partagez vos commentaires</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Résumer cette page</string>
     <string name="duckAIContextualAutomaticContextTitle">Envoyer automatiquement le contenu de la page</string>
     <string name="duckAIContextualAutomaticContextMessage">Envoyer automatiquement le contenu de la page à Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Joindre le contenu de la page</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Posez des questions sur la page</string>
@@ -344,6 +342,5 @@
     <string name="duckAiSettingsTitle">Paramètres Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Posez des questions sur l\'onglet</string>
     <string name="duckChatContextualAskAboutPage">Posez des questions sur la page</string>
 </resources>

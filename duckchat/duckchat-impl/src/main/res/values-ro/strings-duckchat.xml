@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_search_only_hint">Caută</string>
-    <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
     <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Rezumă această pagină</string>
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Întreabă despre pagină</string>
@@ -345,6 +343,5 @@
     <string name="duckAiSettingsTitle">Setări Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Întreabă despre filă</string>
     <string name="duckChatContextualAskAboutPage">Întreabă despre pagină</string>
 </resources>

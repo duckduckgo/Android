@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Zoek of voer een adres in</string>
     <string name="input_screen_search_only_hint">Zoeken</string>
-    <string name="input_screen_chat_hint">Vraag privé</string>
     <string name="input_screen_user_pref_without_ai">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai">Zoeken en Duck.ai</string>
     <string name="input_screen_user_pref_description">Probeer de nieuwe optie om direct een vraag te stellen aan Duck.ai vanuit de adresbalk. <annotation type="share_feedback">Feedback delen</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Deze pagina samenvatten</string>
     <string name="duckAIContextualAutomaticContextTitle">Pagina-inhoud automatisch verzenden</string>
     <string name="duckAIContextualAutomaticContextMessage">Pagina-inhoud automatisch naar Duck.ai verzenden</string>
-    <string name="duckAIContextualAttachPageContent">Pagina-inhoud bijvoegen</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Stel een vraag over de pagina</string>
@@ -344,6 +342,5 @@
     <string name="duckAiSettingsTitle">Instellingen Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Stel een vraag over het tabblad</string>
     <string name="duckChatContextualAskAboutPage">Stel een vraag over de pagina</string>
 </resources>

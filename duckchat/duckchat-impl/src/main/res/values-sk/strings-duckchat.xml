@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Vyhľadajte alebo zadajte adresu</string>
     <string name="input_screen_search_only_hint">Vyhľadávať</string>
-    <string name="input_screen_chat_hint">Spýtaj sa súkromne</string>
     <string name="input_screen_user_pref_without_ai">Len vyhľadávanie</string>
     <string name="input_screen_user_pref_with_ai">Vyhľadávanie &amp; Duck.ai</string>
     <string name="input_screen_user_pref_description">Vyskúšaj novú možnosť pýtať sa Duck.ai priamo z panela s adresou. <annotation type="share_feedback">Zdieľaj spätnú väzbu</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Zhrň túto stránku</string>
     <string name="duckAIContextualAutomaticContextTitle">Automaticky odoslať obsah stránky</string>
     <string name="duckAIContextualAutomaticContextMessage">Automaticky odoslať obsah stránky do Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Pripoj obsah stránky</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Opýtaj sa na stránku</string>
@@ -346,6 +344,5 @@
     <string name="duckAiSettingsTitle">Nastavenia Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Opýtaj sa na kartu</string>
     <string name="duckChatContextualAskAboutPage">Opýtaj sa na stránku</string>
 </resources>

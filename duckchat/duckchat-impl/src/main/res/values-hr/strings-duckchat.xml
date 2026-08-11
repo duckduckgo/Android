@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
     <string name="input_screen_search_only_hint">Pretraživanje</string>
-    <string name="input_screen_chat_hint">Pitaj privatno</string>
     <string name="input_screen_user_pref_without_ai">Samo pretraživanje</string>
     <string name="input_screen_user_pref_with_ai">Pretraživanje i Duck.ai</string>
     <string name="input_screen_user_pref_description">Isprobaj novu opciju za izravno postavljanje pitanja s adresne trake usluzi Duck.ai. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
@@ -121,7 +120,6 @@
     <string name="duckAIContextualPromptSummarize">Sažmi ovu stranicu</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatski pošalji sadržaj stranice</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatski pošalji sadržaj stranice Duck.ai-ju</string>
-    <string name="duckAIContextualAttachPageContent">Priloži sadržaj stranice</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Pitaj o stranici</string>
@@ -346,6 +344,5 @@
     <string name="duckAiSettingsTitle">Postavke usluge Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Pitaj o kartici</string>
     <string name="duckChatContextualAskAboutPage">Pitaj o stranici</string>
 </resources>

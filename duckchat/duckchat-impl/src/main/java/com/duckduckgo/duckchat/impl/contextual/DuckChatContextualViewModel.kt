@@ -94,10 +94,6 @@ class DuckChatContextualViewModel @Inject constructor(
         @field:StringRes val labelResId: Int,
         @field:DrawableRes val iconResId: Int,
     ) {
-        LEGACY_SUMMARIZE(
-            labelResId = R.string.duckAIContextualPromptSummarize,
-            iconResId = com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
-        ),
         ASK_ABOUT_PAGE(
             labelResId = R.string.duckAIContextualPromptAskAboutPage,
             iconResId = R.drawable.ic_page_content_attach_16,
@@ -173,41 +169,22 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextUrl = "",
                 contextTitle = "",
                 tabId = "",
-                prompt = "",
                 isFireButtonEnabled = false,
-                quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                quickActionState = QuickActionState.ASK_ABOUT_PAGE,
                 contextualNativeInputEnabled = duckChatInternal.isContextualNativeInputEnabled(),
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    private var isContextualSheetImprovementsEnabled: Boolean = false
-
     init {
         viewModelScope.launch(dispatchers.io()) {
-            isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
-            val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
-                QuickActionState.ASK_ABOUT_PAGE
-            } else {
-                QuickActionState.LEGACY_SUMMARIZE
-            }
-            val chatHintResId = if (isContextualSheetImprovementsEnabled) {
-                R.string.contextualSheetImprovedHint
-            } else {
-                R.string.input_screen_chat_hint
-            }
             _viewState.update {
                 it.copy(
                     isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled(),
-                    quickActionState = initialQuickActionState,
-                    chatHintResId = chatHintResId,
-                    showChatsIcon = isContextualSheetImprovementsEnabled,
                     contextualSuggestionsEnabled = duckChatFeature.contextualSuggestedPrompts().isEnabled(),
                 )
             }
-            if (isContextualSheetImprovementsEnabled) {
-                observeRecentChats()
-            }
+            observeRecentChats()
         }
 
         duckChat.observeNativeChatInputEnabled()
@@ -244,12 +221,8 @@ class DuckChatContextualViewModel @Inject constructor(
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
-        val prompt: String = "",
         val isFireButtonEnabled: Boolean = false,
-        val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
-        @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
-        // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
-        val showChatsIcon: Boolean = false,
+        val quickActionState: QuickActionState = QuickActionState.ASK_ABOUT_PAGE,
         val recentChats: List<ChatHistoryItem> = emptyList(),
         val nativeChatInputEnabled: Boolean = false,
         val contextualNativeInputEnabled: Boolean = false,
@@ -356,9 +329,6 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
-                if (_viewState.value.showsAttachContextPlaceholder()) {
-                    duckChatPixels.reportContextualPlaceholderContextShown()
-                }
                 if (_viewState.value.showsAskAboutPageQuickAction()) {
                     duckChatPixels.reportContextualAskAboutPageShown()
                 }
@@ -417,7 +387,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
-                        prompt = "",
                         // The context has already been captured in contextPrompt above, so drop the
                         // page-context chip from the input once the prompt is sent — mirroring how image
                         // attachments are cleared on submit.
@@ -654,23 +623,14 @@ class DuckChatContextualViewModel @Inject constructor(
                 },
             )
         }
-        if (_viewState.value.showsAttachContextPlaceholder()) {
-            duckChatPixels.reportContextualPlaceholderContextShown()
-        }
         if (_viewState.value.showsAskAboutPageQuickAction()) {
             duckChatPixels.reportContextualAskAboutPageShown()
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
-    // fromPlaceholderTap distinguishes a tap on the duckAiAttachContextLayout placeholder (which
-    // reports the placeholder-tapped pixel) from internal reuse such as the ASK_ABOUT_PAGE quick
-    // action, which attaches the same context but is not a placeholder tap.
-    fun addPageContext(fromPlaceholderTap: Boolean = false) {
+    fun addPageContext() {
         logcat { "Duck.ai Contextual: addPageContext" }
-        if (fromPlaceholderTap) {
-            duckChatPixels.reportContextualPlaceholderContextTapped()
-        }
         viewModelScope.launch {
             if (isContextValid(currentPageContext, reportInvalidPixels = true)) {
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
@@ -718,49 +678,12 @@ class DuckChatContextualViewModel @Inject constructor(
         return title != null && content != null
     }
 
-    // Mirrors the Fragment's visibility logic for the "attach page content" placeholder
-    // (duckAiAttachContextLayout): it is only shown in INPUT mode, when not in the
-    // ASK_ABOUT_PAGE quick action, and when no context is currently attached.
-    private fun ViewState.showsAttachContextPlaceholder(): Boolean =
-        sheetMode == SheetMode.INPUT &&
-            quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
-            !showContext
-
     private fun ViewState.showsAskAboutPageQuickAction(): Boolean =
         sheetMode == SheetMode.INPUT &&
             quickActionState == QuickActionState.ASK_ABOUT_PAGE
 
-    fun replacePrompt(
-        input: String,
-        prompt: String,
-    ) {
-        logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
-        viewModelScope.launch {
-            val newPrompt = if (input.isEmpty()) {
-                prompt
-            } else {
-                input.plus(" ").plus(prompt)
-            }
-            val hasValidContext = isContextValid(currentPageContext)
-            if (hasValidContext) {
-                pageContextState = pageContextState.copy(attachedPage = pageContextState.currentPage)
-            }
-            _viewState.update { current ->
-                current.copy(
-                    prompt = newPrompt,
-                    showContext = hasValidContext,
-                )
-            }
-        }
-    }
-
     fun onQuickActionClicked(currentInput: String) {
         when (_viewState.value.quickActionState) {
-            QuickActionState.LEGACY_SUMMARIZE -> {
-                duckChatPixels.reportContextualSummarizePromptSelected()
-                replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
-            }
-
             QuickActionState.ASK_ABOUT_PAGE -> {
                 if (!isContextValid(currentPageContext)) {
                     // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
@@ -813,17 +736,6 @@ class DuckChatContextualViewModel @Inject constructor(
         addPageContext()
         commandChannel.trySend(Command.FocusInput)
         _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
-    }
-
-    fun onPromptCleared() {
-        logcat { "Duck.ai Contextual: onPromptCleared" }
-        viewModelScope.launch {
-            _viewState.update { current ->
-                current.copy(
-                    prompt = "",
-                )
-            }
-        }
     }
 
     fun onFullModeRequested() {
@@ -907,8 +819,8 @@ class DuckChatContextualViewModel @Inject constructor(
                         showContext = showContext,
                         userRemovedContext = remainsUserRemoved,
                         quickActionState = when {
-                            isContextualSheetImprovementsEnabled && newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
-                            isContextualSheetImprovementsEnabled && dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
+                            newlyAutoAttached -> QuickActionState.SUBMIT_SUMMARIZE
+                            dropStaleAttachment -> QuickActionState.ASK_ABOUT_PAGE
                             else -> inputMode.quickActionState
                         },
                     )
@@ -962,12 +874,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onChatsIconClicked() {
         val state = _viewState.value
         logcat {
-            "Duck.ai Contextual: onChatsIconClicked improvementsEnabled=$isContextualSheetImprovementsEnabled " +
-                "recentChats=${state.recentChats.size} sheetMode=${state.sheetMode}"
-        }
-        if (!isContextualSheetImprovementsEnabled) {
-            onNewChatRequested()
-            return
+            "Duck.ai Contextual: onChatsIconClicked recentChats=${state.recentChats.size} sheetMode=${state.sheetMode}"
         }
         duckChatPixels.reportContextualChatsMenuTapped()
         if (state.recentChats.isEmpty()) {
@@ -1026,17 +933,11 @@ class DuckChatContextualViewModel @Inject constructor(
                 withContext(dispatchers.main()) {
                     clearSheetUrl()
                     pageContextState = pageContextState.copy(attachedPage = "")
-                    val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
-                        QuickActionState.ASK_ABOUT_PAGE
-                    } else {
-                        QuickActionState.LEGACY_SUMMARIZE
-                    }
                     _viewState.update {
                         it.copy(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
-                            prompt = "",
-                            quickActionState = resetQuickActionState,
+                            quickActionState = QuickActionState.ASK_ABOUT_PAGE,
                             // Reset the page-context attachment so a fresh chat doesn't silently inherit
                             // the previous chat's context: generateContextPrompt() keys off showContext, and
                             // resetQuickActionState hides the attached-context chip, so a stale showContext
@@ -1047,9 +948,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     }
                     sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }
 
-                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
-                        duckChatPixels.reportContextualPlaceholderContextShown()
-                    }
                     if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAskAboutPageQuickAction()) {
                         duckChatPixels.reportContextualAskAboutPageShown()
                     }
