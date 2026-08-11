@@ -102,3 +102,46 @@ Key points for Maestro tests:
   maestro test .maestro/my-feature/my_test.yaml
   ```
 - In CI, pass the flag via `gradle_flags` on `checkout-and-assemble` with `flavours: 'internal'` — see the README for the full workflow snippet
+
+## Source Patches
+
+Remote config patches and the test seeder both apply at runtime, so neither can set a flag that is
+read during app launch — config has not landed yet, and any `AppScope` class can read a toggle as
+soon as it is constructed. For those flags, change the default at compile time instead: keep a Git
+patch in the repo and apply it when CI prepares the build.
+
+- Store patches under a `source_patches/` subdirectory next to the tests that need them:
+  ```
+  .maestro/
+    onboarding/
+      source_patches/
+        config_driven_dialogs_disabled.patch
+      onboarding.yaml
+  ```
+- Generate with minimal context so the hunk is pinned by the declaration it targets rather than by
+  its neighbours: `git diff -U1 -- <file>`. Drop the `index` line — it only enables `--3way`, and a
+  patch that needs a merge to apply should fail instead.
+- Start the file with a plain-text header explaining what it flips, which workflow job applies it,
+  and what to do when it stops applying. `git apply` ignores everything before the first
+  `diff --git` line.
+- Apply in CI through the `source_patches` input on `checkout-and-assemble` (newline-separated for
+  more than one). A patch that does not apply fails the build; it is never skipped.
+- Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
+- Never pass `source_patches` alongside `-PuseUploadSigning` in `gradle_flags` — that is the real
+  distribution signing path (`release_upload_play_store.yml`, `release_upload_internal.yml`), and
+  `checkout-and-assemble` hard-fails the build if it sees both, so a patched toggle default can
+  never ship to users even if a job gets copy-pasted into the wrong workflow.
+
+A source patch is written against the current default, so it stops applying the moment that default
+changes and CI fails. That is deliberate: whoever changes the default has to decide what coverage
+is now missing and either rewrite the patch or delete it together with the job that uses it. The
+`E2E Source Patches` job in `ci.yml` runs that check on every PR so the breakage surfaces there
+rather than in the next nightly.
+
+Work out what to patch from the coverage the flavors already give you, and patch only the gap.
+A `DefaultFeatureValue.INTERNAL` default resolves against the build flavour, so the play and
+internal binaries already cover both arms — but only for the flows each flavour runs.
+A `TRUE` or `FALSE` default is flavor-independent.
+
+Patching source is the heaviest option, reach for it only when the flag is genuinely read too early
+for a config patch, and only for the flows the unpatched builds leave uncovered.

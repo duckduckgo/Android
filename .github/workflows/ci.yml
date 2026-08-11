@@ -77,6 +77,38 @@ jobs:
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
 
+  # Verify that source patches used for tests still apply.
+  # If the PR introduces a patch breakage, it might otherwise only surface in nightly test suites.
+  source_patches:
+    name: E2E Source Patches
+    needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check E2E source patches still apply
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          patches=(.maestro/**/source_patches/*.patch)
+          if [ ${#patches[@]} -eq 0 ]; then
+            echo "No E2E source patches to check."
+            exit 0
+          fi
+          failed=0
+          for patch in "${patches[@]}"; do
+            if git apply --check "$patch"; then
+              echo "OK: $patch"
+            else
+              echo "::error file=$patch::Source patch no longer applies. The code it targets changed — update the patch, or delete it along with the workflow job that uses it if the behaviour it covers has been retired."
+              failed=1
+            fi
+          done
+          exit "$failed"
+
   unit_tests:
     name: ${{ matrix.di == 'AnvilDagger' && 'Unit tests' || format('Unit tests ({0})', matrix.di) }}
     needs: [check_changes]
