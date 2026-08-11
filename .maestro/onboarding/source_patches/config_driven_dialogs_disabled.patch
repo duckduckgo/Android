@@ -1,25 +1,16 @@
 Pins onboardingBrandDesignUpdate.configDrivenDialogs to FALSE so the nightly E2E suite can run
-the internal-flavour onboarding flows against the legacy renderer.
-
-The flag defaults to INTERNAL, which resolves to the build flavour: the play build ships FALSE
-and the internal build gets TRUE (FeatureToggles.kt, loadToggleMethod). That gives every
-onboarding flow one arm for free — the play flows cover FALSE, the internal flows cover TRUE —
-but it leaves the internal-only and preonboarding flows with no FALSE coverage at all, and FALSE
-is what production ships for as long as the flag stays on INTERNAL.
-
-The flag is read during app launch, before any config — bundled or remote — has landed, so
-nothing applied at runtime can pin it. Changing the default at compile time is the only
-mechanism that does not race normal startup.
+the internal-flavour onboarding flows against the legacy renderer — the renderer production
+ships while the flag sits on INTERNAL. The flag is read during app launch, so only a
+compile-time change can pin it.
 
 Applied only by the "Onboarding, legacy renderer on internal" job in
-.github/workflows/e2e-nightly-non-blockers-suite.yml, through the source_patches input on
-.github/actions/checkout-and-assemble. Never applied to a build that ships.
+.github/workflows/e2e-nightly-non-blockers-suite.yml.
 
 This patch is meant to stop applying once the default moves off INTERNAL. CI fails loudly at
 that point, and whoever changes the default decides what coverage is still missing:
 
-  - default becomes TRUE: every flavour renders config-driven, so this patch should be rewritten
-    to pin FALSE against TRUE and run on the play binary, until the legacy renderer is deleted.
+  - default becomes TRUE: rewrite this patch to pin FALSE against TRUE and run on the play
+    binary, until the legacy renderer is deleted.
   - legacy renderer deleted: delete this patch and the job that applies it.
 
 See .claude/rules/maestro-ui-tests.md for the full mechanism.

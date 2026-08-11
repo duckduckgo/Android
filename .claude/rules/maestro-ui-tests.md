@@ -128,20 +128,15 @@ patch in the repo and apply it when CI prepares the build.
   more than one). A patch that does not apply fails the build; it is never skipped.
 - Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
 - Never pass `source_patches` alongside `-PuseUploadSigning` in `gradle_flags` — that is the real
-  distribution signing path (`release_upload_play_store.yml`, `release_upload_internal.yml`), and
-  `checkout-and-assemble` hard-fails the build if it sees both, so a patched toggle default can
-  never ship to users even if a job gets copy-pasted into the wrong workflow.
+  distribution signing path, and `checkout-and-assemble` hard-fails the combination so a patched
+  toggle default can never ship.
 
-A source patch is written against the current default, so it stops applying the moment that default
-changes and CI fails. That is deliberate: whoever changes the default has to decide what coverage
-is now missing and either rewrite the patch or delete it together with the job that uses it. The
-`E2E Source Patches` job in `ci.yml` runs that check on every PR so the breakage surfaces there
-rather than in the next nightly.
+A source patch stops applying the moment the default it targets changes, and CI fails — the
+`E2E Source Patches` job in `ci.yml` checks every PR, so the breakage surfaces there rather than
+in the next nightly. That is deliberate: whoever changes the default decides what coverage is now
+missing and either rewrites the patch or deletes it together with the job that uses it.
 
-Work out what to patch from the coverage the flavors already give you, and patch only the gap.
-A `DefaultFeatureValue.INTERNAL` default resolves against the build flavour, so the play and
-internal binaries already cover both arms — but only for the flows each flavour runs.
-A `TRUE` or `FALSE` default is flavor-independent.
-
-Patching source is the heaviest option, reach for it only when the flag is genuinely read too early
-for a config patch, and only for the flows the unpatched builds leave uncovered.
+Patching source is the heaviest option: reach for it only when the flag is genuinely read too
+early for a config patch, and only for the flow/arm combinations the unpatched builds leave
+uncovered — a `DefaultFeatureValue.INTERNAL` default already covers both arms across the play and
+internal binaries, but only for the flows each flavour runs.
