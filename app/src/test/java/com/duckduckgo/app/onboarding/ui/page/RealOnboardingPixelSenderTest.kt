@@ -44,6 +44,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -91,7 +92,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -118,11 +119,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
             mapOf(
-                "it" to "reinstall",
+                "installType" to "reinstall",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "3",
-                "e" to "clicked",
+                "daysSinceInstall" to "1-3",
+                "event" to "clicked",
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_engage"),
@@ -138,11 +139,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "dismiss",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_dismiss"),
@@ -158,11 +159,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_ADDRESS_BAR_POSITION,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "split",
             ),
             type = Unique(tag = "onboarding_address-bar-position_clicked_split"),
@@ -178,11 +179,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_EXPERIENCE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "search_plus_duckai",
             ),
             type = Unique(tag = "onboarding_search-experience_clicked_search_plus_duckai"),
@@ -198,11 +199,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_EXPERIENCE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "search_only",
             ),
             type = Unique(tag = "onboarding_search-experience_clicked_search_only"),
@@ -218,11 +219,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "confirmed",
+                "daysSinceInstall" to "0",
+                "event" to "confirmed",
                 "value" to "ddg",
             ),
             type = Unique(tag = "onboarding_set-default_confirmed_ddg"),
@@ -238,11 +239,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "confirmed",
+                "daysSinceInstall" to "0",
+                "event" to "confirmed",
                 "value" to "other",
             ),
             type = Unique(tag = "onboarding_set-default_confirmed_other"),
@@ -258,11 +259,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_set-default_clicked_engage"),
@@ -279,11 +280,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_NOTIFICATIONS,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "tablet",
-                "d" to "0",
-                "e" to "confirmed",
+                "daysSinceInstall" to "0",
+                "event" to "confirmed",
                 "value" to "denied",
             ),
             type = Unique(tag = "onboarding_notifications_confirmed_denied"),
@@ -311,7 +312,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
-            mapOf("it" to "reinstall", "flow" to "default", "pixelSource" to "phone", "d" to "3", "e" to "shown"),
+            mapOf("installType" to "reinstall", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "1-3", "event" to "shown"),
             type = Unique(tag = "onboarding_quick-setup_shown"),
         )
     }
@@ -346,11 +347,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
             mapOf(
-                "it" to "reinstall",
+                "installType" to "reinstall",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "set_as_default:off,widget:off,address_bar:top,input_type:search_and_duckai",
             ),
             type = Unique(
@@ -390,11 +391,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
             mapOf(
-                "it" to "reinstall",
+                "installType" to "reinstall",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "set_as_default:on,widget:off,address_bar:bottom,input_type:search",
             ),
             type = Unique(
@@ -434,11 +435,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
             mapOf(
-                "it" to "reinstall",
+                "installType" to "reinstall",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
             ),
             type = Unique(
@@ -457,7 +458,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "flow" to "duckai", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "duckai", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -486,12 +487,12 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "duckai",
                 "variant" to "search_plus_duckai-chat",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "shown",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
             ),
             type = Unique(tag = "onboarding_set-default_shown"),
         )
@@ -520,12 +521,12 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_ADDRESS_BAR_POSITION,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "variant" to "search_plus_duckai-search",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "shown",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
             ),
             type = Unique(tag = "onboarding_address-bar-position_shown"),
         )
@@ -539,7 +540,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -553,11 +554,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_engage"),
@@ -573,11 +574,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "dismiss",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_dismiss"),
@@ -592,7 +593,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_search-chat-toggle_shown"),
         )
     }
@@ -609,11 +610,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "suggested_search",
             ),
             type = Unique(tag = "onboarding_search-chat-toggle_clicked_suggested_search"),
@@ -632,11 +633,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "custom_chat",
             ),
             type = Unique(tag = "onboarding_search-chat-toggle_clicked_custom_chat"),
@@ -651,7 +652,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_ai-intro_shown"),
         )
     }
@@ -665,11 +666,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_ai-intro_clicked_engage"),
@@ -685,11 +686,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_SEARCH,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "suggested",
             ),
             type = Unique(tag = "onboarding_search_clicked_suggested"),
@@ -705,11 +706,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_VISIT_SITE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "custom",
             ),
             type = Unique(tag = "onboarding_visit-site_clicked_custom"),
@@ -724,7 +725,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
             type = Unique(tag = "onboarding_search_shown"),
         )
     }
@@ -737,7 +738,14 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "engage"),
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "engage",
+            ),
             type = Unique(tag = "onboarding_search_clicked"),
         )
     }
@@ -751,12 +759,26 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "engage"),
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "engage",
+            ),
             type = Unique(tag = "onboarding_search_clicked"),
         )
         verify(mockPixel).fire(
             ONBOARDING_SEARCH,
-            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "dismiss"),
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "dismiss",
+            ),
             type = Unique(tag = "onboarding_search_clicked"),
         )
     }
@@ -770,11 +792,11 @@ class RealOnboardingPixelSenderTest {
         verify(mockPixel).fire(
             ONBOARDING_VISIT_SITE,
             mapOf(
-                "it" to "new",
+                "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
                 "value" to "suggested",
             ),
             type = Unique(tag = "onboarding_visit-site_clicked"),
@@ -784,5 +806,55 @@ class RealOnboardingPixelSenderTest {
     @Test(expected = IllegalStateException::class)
     fun whenFireContextualCalledWithUnsupportedActionThenThrows() = runTest {
         testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
+    }
+
+    @Test
+    fun whenInstalledTodayThenDaysSinceInstallBucketIsZero() = runTest {
+        fireWelcomeShownInstalledDaysAgo(0L)
+
+        verifyWelcomeShownWithDaysSinceInstall("0")
+    }
+
+    @Test
+    fun whenInstalledOneToThreeDaysAgoThenDaysSinceInstallBucketIsOneToThree() = runTest {
+        fireWelcomeShownInstalledDaysAgo(1L, 3L)
+
+        verifyWelcomeShownWithDaysSinceInstall("1-3", times = 2)
+    }
+
+    @Test
+    fun whenInstalledFourToTenDaysAgoThenDaysSinceInstallBucketIsFourToTen() = runTest {
+        fireWelcomeShownInstalledDaysAgo(4L, 10L)
+
+        verifyWelcomeShownWithDaysSinceInstall("4-10", times = 2)
+    }
+
+    @Test
+    fun whenInstalledElevenToTwentyEightDaysAgoThenDaysSinceInstallBucketIsElevenToTwentyEight() = runTest {
+        fireWelcomeShownInstalledDaysAgo(11L, 28L)
+
+        verifyWelcomeShownWithDaysSinceInstall("11-28", times = 2)
+    }
+
+    @Test
+    fun whenInstalledMoreThanTwentyEightDaysAgoThenDaysSinceInstallBucketIsOverTwentyEight() = runTest {
+        fireWelcomeShownInstalledDaysAgo(29L, 400L)
+
+        verifyWelcomeShownWithDaysSinceInstall("28+", times = 2)
+    }
+
+    private fun fireWelcomeShownInstalledDaysAgo(vararg daysAgo: Long) {
+        daysAgo.forEach {
+            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it))
+            testee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
+        }
+    }
+
+    private fun verifyWelcomeShownWithDaysSinceInstall(bucket: String, times: Int = 1) {
+        verify(mockPixel, times(times)).fire(
+            ONBOARDING_WELCOME,
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to bucket, "event" to "shown"),
+            type = Unique(tag = "onboarding_welcome_shown"),
+        )
     }
 }
