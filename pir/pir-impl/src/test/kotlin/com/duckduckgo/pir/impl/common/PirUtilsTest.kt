@@ -20,6 +20,7 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -670,5 +671,49 @@ class PirUtilsTest {
         val result = stored.refreshedWith(scraped)
 
         assertEquals(listOf(AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101"))), result.addresses)
+    }
+
+    @Test
+    fun whenToKeyAndOnlyScrapedDetailDiffersThenKeysAreEqual() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            profileUrl = "https://example.com/profile/100",
+            identifier = "id100",
+            age = "35",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL")),
+            alternativeNames = listOf("Johnny Doe"),
+            relatives = listOf("Jane Doe"),
+            extras = mapOf("county" to "Sangamon"),
+        )
+
+        val scraped = stored.copy(
+            dbId = 0L,
+            age = "36",
+            addresses = listOf(AddressCityState(city = "Boston", state = "MA")),
+            alternativeNames = emptyList(),
+            relatives = emptyList(),
+            extras = emptyMap(),
+        )
+
+        assertEquals(stored.toKey(), scraped.toKey())
+    }
+
+    @Test
+    fun whenToKeyAndAnIndexedFieldDiffersThenKeysAreNotEqual() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            profileUrl = "https://example.com/profile/100",
+            identifier = "id100",
+        )
+
+        assertNotEquals(profile.toKey(), profile.copy(profileQueryId = 456L).toKey())
+        assertNotEquals(profile.toKey(), profile.copy(brokerName = "other-broker").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(name = "Jane Doe").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(profileUrl = "https://example.com/profile/200").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(identifier = "id200").toKey())
     }
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.common.refreshedWith
+import com.duckduckgo.pir.impl.common.toKey
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
@@ -561,31 +562,29 @@ class RealPirRepository(
             val dao = db.extractedProfileDao()
             val profileQueryId = extractedProfiles.first().profileQueryId
 
-            db.runInTransaction(
-                Runnable {
-                    if (userProfileDao.getUserProfile(profileQueryId)?.deprecated == true) {
-                        // we should not store any new extracted profiles for a deprecated user profile
-                        // also don't mark them as deprecated as we still want to show them on the UI
-                        return@Runnable
-                    }
+            db.runInTransaction {
+                if (userProfileDao.getUserProfile(profileQueryId)?.deprecated == true) {
+                    // we should not store any new extracted profiles for a deprecated user profile
+                    // also don't mark them as deprecated as we still want to show them on the UI
+                    return@runInTransaction
+                }
 
-                    val storedProfiles = extractedProfiles
-                        .map { it.brokerName }
-                        .distinct()
-                        .flatMap { dao.getExtractedProfilesForBrokerAndProfile(it, profileQueryId) }
-                        .map { it.toExtractedProfile() }
-                        .associateBy { it.storageKey() }
+                val storedProfiles = extractedProfiles
+                    .map { it.brokerName }
+                    .distinct()
+                    .flatMap { dao.getExtractedProfilesForBrokerAndProfile(it, profileQueryId) }
+                    .map { it.toExtractedProfile() }
+                    .associateBy { it.toKey() }
 
-                    val (alreadyStored, newlyFound) = extractedProfiles.partition { it.storageKey() in storedProfiles }
+                val (alreadyStored, newlyFound) = extractedProfiles.partition { it.toKey() in storedProfiles }
 
-                    dao.insertNewExtractedProfiles(newlyFound.map { it.toStoredExtractedProfile() })
-                    dao.updateExtractedProfiles(
-                        alreadyStored.map { scraped ->
-                            storedProfiles.getValue(scraped.storageKey()).refreshedWith(scraped).toStoredExtractedProfile()
-                        },
-                    )
-                },
-            )
+                dao.insertNewExtractedProfiles(newlyFound.map { it.toStoredExtractedProfile() })
+                dao.updateExtractedProfiles(
+                    alreadyStored.map { scraped ->
+                        storedProfiles.getValue(scraped.toKey()).refreshedWith(scraped).toStoredExtractedProfile()
+                    },
+                )
+            }
         }
     }
 
@@ -893,15 +892,6 @@ class RealPirRepository(
             },
         )
 
-    private fun ExtractedProfile.storageKey(): ExtractedProfileStorageKey =
-        ExtractedProfileStorageKey(
-            profileQueryId = this.profileQueryId,
-            brokerName = this.brokerName,
-            name = this.name,
-            profileUrl = this.profileUrl,
-            identifier = this.identifier,
-        )
-
     private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile =
         ExtractedProfile(
             dbId = this.id,
@@ -1012,17 +1002,6 @@ class RealPirRepository(
     private suspend fun extractedProfileDao(): ExtractedProfileDao? = database.await()?.extractedProfileDao()
 
     private suspend fun userProfileDao(): UserProfileDao? = database.await()?.userProfileDao()
-
-    /**
-     * Identifies a record within the unique index on the extracted profiles table.
-     */
-    private data class ExtractedProfileStorageKey(
-        val profileQueryId: Long,
-        val brokerName: String,
-        val name: String,
-        val profileUrl: String,
-        val identifier: String,
-    )
 
     companion object {
         private const val EMAIL_DATA_BATCH_SIZE = 100

@@ -98,6 +98,23 @@ internal fun ExtractedProfile.refreshedWith(scraped: ExtractedProfile): Extracte
  */
 internal fun List<AddressCityState>.withoutExtras(): List<AddressCityState> = this.map { it.copy(extras = emptyMap()) }
 
+internal data class ExtractedProfileKey(
+    val profileQueryId: Long,
+    val brokerName: String,
+    val name: String,
+    val profileUrl: String,
+    val identifier: String,
+)
+
+internal fun ExtractedProfile.toKey(): ExtractedProfileKey =
+    ExtractedProfileKey(
+        profileQueryId = this.profileQueryId,
+        brokerName = this.brokerName,
+        name = this.name,
+        profileUrl = this.profileUrl,
+        identifier = this.identifier,
+    )
+
 internal fun ExtractedProfile.hasMatchingProfileOnParent(extractedProfiles: List<ExtractedProfile>): Boolean {
     return extractedProfiles.any {
         it.brokerName == this.brokerName && this.matches(it)
@@ -106,9 +123,9 @@ internal fun ExtractedProfile.hasMatchingProfileOnParent(extractedProfiles: List
 
 internal fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
     return this.name == extractedProfile.name && this.age == extractedProfile.age &&
-        this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
-        this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
-        this.addresses.withoutExtras().isASubSetOrSuperSetOf(extractedProfile.addresses.withoutExtras())
+            this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
+            this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
+            this.addresses.withoutExtras().isASubSetOrSuperSetOf(extractedProfile.addresses.withoutExtras())
 }
 
 private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
