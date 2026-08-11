@@ -28,6 +28,7 @@ import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
@@ -246,7 +247,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
         adBlockingView.show()
         adBlockingView.alpha = 0F
-        adBlockingView.setImageResource(iconRes)
+        adBlockingView.setImageResource(resolveAdBlockingIcon(iconRes, appBrandDesignUpdateToggles.addressBarIcons().isEnabled()))
         // The static player icon has no built-in inset (unlike the cookie/tracker Lottie compositions,
         // whose artwork fills the badge chip), so pad it to center the glyph in the chip and match their
         // spacing to the text.
@@ -577,6 +578,16 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         brandIconsEnabled -> R.raw.cookie_icon_animated_dark_brand_update
         isLightMode -> R.raw.cookie_icon_animated_light
         else -> R.raw.cookie_icon_animated_dark
+    }
+
+    @DrawableRes
+    internal fun resolveAdBlockingIcon(
+        @DrawableRes legacyRes: Int,
+        rebrandIconsEnabled: Boolean,
+    ): Int = if (rebrandIconsEnabled) {
+        R.drawable.video_player_color_24_brand_update
+    } else {
+        legacyRes
     }
 
     companion object {

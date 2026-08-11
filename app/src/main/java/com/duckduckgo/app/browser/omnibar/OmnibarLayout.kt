@@ -39,6 +39,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -64,6 +65,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -204,6 +206,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -838,6 +843,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 daxIcon.gone()
                 shieldIcon.gone()
                 searchIcon.gone()
+                duckPlayerIcon.setImageResource(resolveDuckPlayerIcon(appBrandDesignUpdateToggles.addressBarIcons().isEnabled()))
                 duckPlayerIcon.show()
             }
 
@@ -1416,6 +1422,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
         logcat { "Omnibar: updateCustomTabTitle $decoration" }
+        val duckPlayerIcon = resolveDuckPlayerIcon(appBrandDesignUpdateToggles.addressBarIcons().isEnabled())
 
         if (omnibarRepository.isNewCustomTabEnabled) {
             with(newCustomTabToolbarContainer) {
@@ -1425,6 +1432,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
                 customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+                customTabDuckPlayerIcon.setImageResource(duckPlayerIcon)
                 customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
             }
         } else {
@@ -1443,6 +1451,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
                 customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+                customTabDuckPlayerIcon.setImageResource(duckPlayerIcon)
                 customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
             }
         }
@@ -1771,3 +1780,11 @@ internal fun shouldShowPlusIcon(
     isDuckAiMode: Boolean,
     isNativeChatInputEnabled: Boolean,
 ): Boolean = showFireIcon && isDuckAiMode && isNativeChatInputEnabled
+
+@DrawableRes
+internal fun resolveDuckPlayerIcon(isAddressBarRebrandEnabled: Boolean): Int =
+    if (isAddressBarRebrandEnabled) {
+        R.drawable.video_player_color_24_brand_update
+    } else {
+        R.drawable.ic_video_player_color_24
+    }
