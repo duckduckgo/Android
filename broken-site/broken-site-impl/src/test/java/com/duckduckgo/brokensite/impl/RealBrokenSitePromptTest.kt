@@ -18,6 +18,8 @@ import org.mockito.MockedStatic
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -97,15 +99,18 @@ class RealBrokenSitePromptTest {
 
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
         testee.pageRefreshed(url)
+        testee.getUserRefreshPatterns()
 
-        verify(mockBrokenSiteReportRepository).addRefresh(url, now)
+        val ownerCaptor = argumentCaptor<RefreshPatternOwner>()
+        verify(mockBrokenSiteReportRepository).addRefresh(ownerCaptor.capture(), eq(url), eq(now))
+        verify(mockBrokenSiteReportRepository).getRefreshPatterns(ownerCaptor.firstValue)
         verify(mockCurrentTimeProvider).localDateTimeNow()
     }
 
     @Test
     fun whenGetUserRefreshPatternsThenStoredPatternsReturnedWithoutReadingClock() {
         val patterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
-        whenever(mockBrokenSiteReportRepository.getRefreshPatterns()).thenReturn(patterns)
+        whenever(mockBrokenSiteReportRepository.getRefreshPatterns(any())).thenReturn(patterns)
 
         assertEquals(patterns, testee.getUserRefreshPatterns())
 

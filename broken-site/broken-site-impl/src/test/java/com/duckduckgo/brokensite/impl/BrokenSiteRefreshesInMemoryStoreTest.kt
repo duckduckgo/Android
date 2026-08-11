@@ -36,6 +36,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     private lateinit var testUrl: Uri
     private lateinit var otherUrl: Uri
     private lateinit var baseTime: LocalDateTime
+    private lateinit var refreshOwner: RefreshPatternOwner
 
     @Before
     fun setup() {
@@ -43,6 +44,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         baseTime = LocalDateTime.of(2025, 1, 1, 12, 0, 0)
         testUrl = mock(Uri::class.java)
         otherUrl = mock(Uri::class.java)
+        refreshOwner = RefreshPatternOwner()
     }
 
     @Test
@@ -101,6 +103,30 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
         assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
         assertTrue(store.getRefreshPatterns().isEmpty())
+    }
+
+    @Test
+    fun whenDifferentOwnerReadsPatternsThenPatternsRemainForDetectionOwner() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        assertTrue(store.getRefreshPatterns(RefreshPatternOwner()).isEmpty())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+    }
+
+    @Test
+    fun whenOwnerChangesThenPreviousOwnersPatternsAreNotMerged() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        val otherOwner = RefreshPatternOwner()
+        store.addRefresh(otherOwner, testUrl, baseTime.plusSeconds(13))
+        store.addRefresh(otherOwner, testUrl, baseTime.plusSeconds(19))
+
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(otherOwner))
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
     }
 
     @Test
@@ -163,5 +189,16 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
 
         assertFalse(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(67)))
+    }
+
+    private fun RealBrokenSiteRefreshesInMemoryStore.addRefresh(
+        url: Uri,
+        localDateTime: LocalDateTime,
+    ) {
+        addRefresh(refreshOwner, url, localDateTime)
+    }
+
+    private fun RealBrokenSiteRefreshesInMemoryStore.getRefreshPatterns(): Set<com.duckduckgo.brokensite.api.RefreshPattern> {
+        return getRefreshPatterns(refreshOwner)
     }
 }

@@ -199,19 +199,21 @@ class RealBrokenSiteReportRepositoryTest {
     fun whenAddRefreshCalledThenAddRefreshIsCalled() = runTest {
         val localDateTime = LocalDateTime.now()
         val url: Uri = mock()
+        val owner = RefreshPatternOwner()
 
-        testee.addRefresh(url, localDateTime)
+        testee.addRefresh(owner, url, localDateTime)
 
-        verify(mockInMemoryStore).addRefresh(url, localDateTime)
+        verify(mockInMemoryStore).addRefresh(owner, url, localDateTime)
     }
 
     @Test
     fun whenGetRefreshPatternsCalledThenReturnStoredPatterns() {
         val patterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
-        whenever(mockInMemoryStore.getRefreshPatterns()).thenReturn(patterns)
+        val owner = RefreshPatternOwner()
+        whenever(mockInMemoryStore.getRefreshPatterns(owner)).thenReturn(patterns)
 
-        assertEquals(patterns, testee.getRefreshPatterns())
-        verify(mockInMemoryStore).getRefreshPatterns()
+        assertEquals(patterns, testee.getRefreshPatterns(owner))
+        verify(mockInMemoryStore).getRefreshPatterns(owner)
     }
 
     @Test

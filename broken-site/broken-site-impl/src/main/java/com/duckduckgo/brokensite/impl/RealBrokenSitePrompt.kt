@@ -36,6 +36,7 @@ class RealBrokenSitePrompt @Inject constructor(
 ) : BrokenSitePrompt {
 
     private val _featureEnabled by lazy { brokenSitePromptRCFeature.self().isEnabled() }
+    private val refreshPatternOwner = RefreshPatternOwner()
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
@@ -58,11 +59,11 @@ class RealBrokenSitePrompt @Inject constructor(
     override fun pageRefreshed(
         url: Uri,
     ) {
-        brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
+        brokenSiteReportRepository.addRefresh(refreshPatternOwner, url, currentTimeProvider.localDateTimeNow())
     }
 
     override fun getUserRefreshPatterns(): Set<RefreshPattern> {
-        return brokenSiteReportRepository.getRefreshPatterns()
+        return brokenSiteReportRepository.getRefreshPatterns(refreshPatternOwner)
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {
