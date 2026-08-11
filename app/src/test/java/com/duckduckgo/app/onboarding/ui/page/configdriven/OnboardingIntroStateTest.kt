@@ -63,14 +63,14 @@ class OnboardingIntroStateTest {
         testee.play()
         testee.handOverToDialog()
 
-        assertEquals(Handover.AlreadyHandedOver, testee.handOverToDialog())
+        assertEquals(Handover.AlreadyGone, testee.handOverToDialog())
     }
 
     @Test
     fun `a dialog arriving after the intro was dismissed unplayed leaves it alone`() {
         assertTrue(testee.dismissUnplayed())
 
-        assertEquals(Handover.AlreadyDismissed, testee.handOverToDialog())
+        assertEquals(Handover.AlreadyGone, testee.handOverToDialog())
     }
 
     @Test

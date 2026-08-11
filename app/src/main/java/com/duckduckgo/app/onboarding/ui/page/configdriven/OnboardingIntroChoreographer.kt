@@ -223,9 +223,7 @@ class OnboardingIntroChoreographer(
                 playOutro()
             }
             OnboardingIntroState.Handover.SnapAway -> snapToOutroEndState()
-            OnboardingIntroState.Handover.AlreadyDismissed,
-            OnboardingIntroState.Handover.AlreadyHandedOver,
-            -> Unit
+            OnboardingIntroState.Handover.AlreadyGone -> Unit
         }
     }
 
