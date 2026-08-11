@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
-import java.util.WeakHashMap
 import javax.inject.Inject
 
 interface BrokenSiteRefreshesInMemoryStore {
@@ -37,7 +36,11 @@ class RefreshPatternOwner
 @SingleInstanceIn(AppScope::class)
 class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRefreshesInMemoryStore {
 
-    private val refreshStates = WeakHashMap<RefreshPatternOwner, RefreshPatternState>()
+    private var lastRefreshOwner: RefreshPatternOwner? = null
+    private var lastRefreshedUrl: Uri? = null
+    private var doubleRefreshTimes = emptyList<LocalDateTime>()
+    private var tripleRefreshTimes = emptyList<LocalDateTime>()
+    private var pendingDetection: RefreshPatternDetection? = null
 
     @Synchronized
     override fun addRefresh(
@@ -45,18 +48,17 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         url: Uri,
         localDateTime: LocalDateTime,
     ) {
-        val state = refreshStates.getOrPut(owner, ::RefreshPatternState)
-        resetIfUrlChanged(state, url)
-        state.doubleRefreshTimes = state.doubleRefreshTimes.plus(localDateTime)
-        state.tripleRefreshTimes = state.tripleRefreshTimes.plus(localDateTime)
-        detectPatterns(state, url, localDateTime)
+        resetIfOwnerOrUrlChanged(owner, url)
+        doubleRefreshTimes = doubleRefreshTimes.plus(localDateTime)
+        tripleRefreshTimes = tripleRefreshTimes.plus(localDateTime)
+        detectPatterns(owner, url, localDateTime)
     }
 
     @Synchronized
     override fun getRefreshPatterns(owner: RefreshPatternOwner): Set<RefreshPattern> {
-        val state = refreshStates[owner] ?: return emptySet()
-        val detection = state.pendingDetection ?: return emptySet()
-        state.pendingDetection = detection.copy(patterns = emptySet())
+        val detection = pendingDetection ?: return emptySet()
+        if (detection.owner !== owner) return emptySet()
+        pendingDetection = detection.copy(patterns = emptySet())
         return detection.patterns
     }
 
@@ -65,59 +67,53 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         url: Uri,
         currentDateTime: LocalDateTime,
     ): Boolean {
-        return refreshStates.values.any { state ->
-            state.pendingDetection?.let { detection ->
-                detection.url == url && !detection.detectedAt.isBefore(currentDateTime.minusSeconds(DETECTION_STALENESS_IN_SECS))
-            } == true
-        }
+        val detection = pendingDetection ?: return false
+        return detection.url == url && !detection.detectedAt.isBefore(currentDateTime.minusSeconds(DETECTION_STALENESS_IN_SECS))
     }
 
-    private fun resetIfUrlChanged(
-        state: RefreshPatternState,
+    private fun resetIfOwnerOrUrlChanged(
+        owner: RefreshPatternOwner,
         url: Uri,
     ) {
-        if (state.lastRefreshedUrl != url) {
-            state.lastRefreshedUrl = url
-            state.doubleRefreshTimes = emptyList()
-            state.tripleRefreshTimes = emptyList()
-            state.pendingDetection = null
+        if (lastRefreshOwner !== owner || lastRefreshedUrl != url) {
+            lastRefreshOwner = owner
+            lastRefreshedUrl = url
+            doubleRefreshTimes = emptyList()
+            tripleRefreshTimes = emptyList()
+            pendingDetection = null
         }
     }
 
     private fun detectPatterns(
-        state: RefreshPatternState,
+        owner: RefreshPatternOwner,
         url: Uri,
         currentDateTime: LocalDateTime,
     ) {
-        pruneOldRefreshes(state, currentDateTime)
+        pruneOldRefreshes(currentDateTime)
         val detectedPatterns = buildSet {
-            if (state.doubleRefreshTimes.size >= TWICE_REFRESH_THRESHOLD) {
+            if (doubleRefreshTimes.size >= TWICE_REFRESH_THRESHOLD) {
                 add(RefreshPattern.TWICE_IN_12_SECONDS)
-                state.doubleRefreshTimes = emptyList()
+                doubleRefreshTimes = emptyList()
             }
-            if (state.tripleRefreshTimes.size >= THRICE_REFRESH_THRESHOLD) {
+            if (tripleRefreshTimes.size >= THRICE_REFRESH_THRESHOLD) {
                 add(RefreshPattern.THRICE_IN_20_SECONDS)
-                state.tripleRefreshTimes = emptyList()
+                tripleRefreshTimes = emptyList()
             }
         }
 
         if (detectedPatterns.isNotEmpty()) {
-            state.pendingDetection = RefreshPatternDetection(
-                patterns = state.pendingDetection?.patterns.orEmpty() + detectedPatterns,
+            pendingDetection = RefreshPatternDetection(
+                patterns = pendingDetection?.patterns.orEmpty() + detectedPatterns,
+                owner = owner,
                 url = url,
                 detectedAt = currentDateTime,
             )
         }
     }
 
-    private fun pruneOldRefreshes(
-        state: RefreshPatternState,
-        currentDateTime: LocalDateTime,
-    ) {
-        state.doubleRefreshTimes =
-            state.doubleRefreshTimes.filter { it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS)) }
-        state.tripleRefreshTimes =
-            state.tripleRefreshTimes.filter { it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)) }
+    private fun pruneOldRefreshes(currentDateTime: LocalDateTime) {
+        doubleRefreshTimes = doubleRefreshTimes.filter { it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS)) }
+        tripleRefreshTimes = tripleRefreshTimes.filter { it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)) }
     }
 
     companion object {
@@ -129,15 +125,9 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
     }
 }
 
-private class RefreshPatternState(
-    var lastRefreshedUrl: Uri? = null,
-    var doubleRefreshTimes: List<LocalDateTime> = emptyList(),
-    var tripleRefreshTimes: List<LocalDateTime> = emptyList(),
-    var pendingDetection: RefreshPatternDetection? = null,
-)
-
 private data class RefreshPatternDetection(
     val patterns: Set<RefreshPattern>,
+    val owner: RefreshPatternOwner,
     val url: Uri,
     val detectedAt: LocalDateTime,
 )

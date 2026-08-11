@@ -116,7 +116,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenOwnerChangesThenPreviousOwnersPatternsAreNotMerged() {
+    fun whenDifferentOwnerAddsRefreshThenPreviousOwnersPatternsReset() {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
@@ -126,7 +126,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(otherOwner, testUrl, baseTime.plusSeconds(19))
 
         assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(otherOwner))
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+        assertTrue(store.getRefreshPatterns().isEmpty())
     }
 
     @Test
