@@ -344,25 +344,21 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.duckAiFireButtonHighlighted }
         .distinctUntilChanged()
 
-    // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of its
-    // own streaming, so it must never inherit whatever the real tab is doing.
-    private val isChatStreamingForThisWidget: Flow<Boolean> = combine(
-        duckChatInternal.chatState,
-        activeTabId,
-    ) { chatState, tabId ->
-        val isEditWidget = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true
-        !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING)
-    }
-
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
-        isChatStreamingForThisWidget,
+        duckChatInternal.chatState,
         activeChatId,
         interactionLock,
         duckAiFireButtonHighlighted,
-    ) { state, isStreaming, chatId, lock, fireHighlighted ->
+    ) { state, chatState, chatId, lock, fireHighlighted ->
+        // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of
+        // its own streaming, so it must never inherit whatever the real tab is doing. Read
+        // synchronously rather than folded into the combine's inputs, so this Flow's shape is
+        // otherwise identical to the pre-edit-mode code (a prior version spliced a derived Flow in
+        // here instead and shipped a regression in the real, non-edit composer's toggle state).
+        val isEditWidget = activeTabId.value?.startsWith(EDIT_STATE_KEY_PREFIX) == true
         state.copy(
-            isChatStreaming = isStreaming,
+            isChatStreaming = !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING),
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
