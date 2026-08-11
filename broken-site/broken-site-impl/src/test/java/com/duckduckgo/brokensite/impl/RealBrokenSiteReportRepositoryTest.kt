@@ -17,13 +17,16 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -200,5 +203,32 @@ class RealBrokenSiteReportRepositoryTest {
         testee.addRefresh(url, localDateTime)
 
         verify(mockInMemoryStore).addRefresh(url, localDateTime)
+    }
+
+    @Test
+    fun whenGetRefreshPatternsCalledThenReturnStoredPatterns() {
+        val patterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockInMemoryStore.getRefreshPatterns()).thenReturn(patterns)
+
+        assertEquals(patterns, testee.getRefreshPatterns())
+        verify(mockInMemoryStore).getRefreshPatterns()
+    }
+
+    @Test
+    fun whenRefreshPatternDetectionIsValidThenReturnTrue() {
+        val url: Uri = mock()
+        val now = LocalDateTime.now()
+        whenever(mockInMemoryStore.isRefreshPatternDetectionValid(url, now)).thenReturn(true)
+
+        assertTrue(testee.isRefreshPatternDetectionValid(url, now))
+    }
+
+    @Test
+    fun whenRefreshPatternDetectionIsInvalidThenReturnFalse() {
+        val url: Uri = mock()
+        val now = LocalDateTime.now()
+        whenever(mockInMemoryStore.isRefreshPatternDetectionValid(url, now)).thenReturn(false)
+
+        assertFalse(testee.isRefreshPatternDetectionValid(url, now))
     }
 }

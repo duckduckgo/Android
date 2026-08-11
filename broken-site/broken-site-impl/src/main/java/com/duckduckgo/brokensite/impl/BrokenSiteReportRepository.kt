@@ -59,7 +59,8 @@ interface BrokenSiteReportRepository {
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
+    fun getRefreshPatterns(): Set<RefreshPattern>
+    fun isRefreshPatternDetectionValid(url: Uri, currentDateTime: LocalDateTime): Boolean
 }
 
 class RealBrokenSiteReportRepository(
@@ -156,8 +157,15 @@ class RealBrokenSiteReportRepository(
         brokenSiteRefreshesInMemoryStore.addRefresh(url, localDateTime)
     }
 
-    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
-        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime)
+    override fun getRefreshPatterns(): Set<RefreshPattern> {
+        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns()
+    }
+
+    override fun isRefreshPatternDetectionValid(
+        url: Uri,
+        currentDateTime: LocalDateTime,
+    ): Boolean {
+        return brokenSiteRefreshesInMemoryStore.isRefreshPatternDetectionValid(url, currentDateTime)
     }
 
     private fun convertToShortDate(dateString: String): String {

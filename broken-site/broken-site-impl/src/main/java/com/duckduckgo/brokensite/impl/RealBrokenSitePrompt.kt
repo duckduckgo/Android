@@ -17,6 +17,7 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -61,7 +62,7 @@ class RealBrokenSitePrompt @Inject constructor(
     }
 
     override fun getUserRefreshPatterns(): Set<RefreshPattern> {
-        return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
+        return brokenSiteReportRepository.getRefreshPatterns()
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {
@@ -74,6 +75,9 @@ class RealBrokenSitePrompt @Inject constructor(
         }
 
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
+        if (!brokenSiteReportRepository.isRefreshPatternDetectionValid(url.toUri(), currentTimestamp)) {
+            return false
+        }
 
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
