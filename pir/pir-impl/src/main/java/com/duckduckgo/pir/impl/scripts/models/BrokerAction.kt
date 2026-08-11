@@ -127,30 +127,12 @@ sealed class BrokerAction(
     ) : BrokerAction(id)
 }
 
-data class ExtractProfileSelectors(
-    val name: ProfileSelector?,
-    val alternativeNamesList: ProfileSelector?,
-    val age: ProfileSelector?,
-    val addressFull: ProfileSelector?,
-    val addressFullList: ProfileSelector?,
-    val addressCityState: ProfileSelector?,
-    val addressCityStateList: ProfileSelector?,
-    val phone: ProfileSelector?,
-    val phoneList: ProfileSelector?,
-    val relativesList: ProfileSelector?,
-    val profileUrl: ProfileSelector?,
-    val reportedId: ProfileSelector?,
-)
-
-data class ProfileSelector(
-    val selector: String?,
-    val findElements: Boolean?,
-    val beforeText: String?,
-    val afterText: String?,
-    val separator: String?,
-    val identifierType: String?,
-    val identifier: String?,
-)
+/**
+ * The `profile` block of an extract action, forwarded to C-S-S untouched. Modelling its shape would drop
+ * whatever a broker config uses that we haven't declared, and C-S-S scrapes fields we don't recognise
+ * into the extracted profile's `extras`.
+ */
+typealias ExtractProfileSelectors = Map<String, Any?>
 
 data class ElementSelector(
     val type: String,
