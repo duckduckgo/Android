@@ -4461,6 +4461,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserInDuckAiThenCannotReportSite() {
+        val duckAiUrl = "https://duck.ai/"
+        whenever(mockDuckChat.isDuckChatUrl(duckAiUrl.toUri())).thenReturn(true)
+
+        loadUrl(duckAiUrl)
+
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
     fun whenUserInDuckPlayerThenCannotAllowList() {
         setupNavigation(skipHome = false, isBrowsing = true)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
