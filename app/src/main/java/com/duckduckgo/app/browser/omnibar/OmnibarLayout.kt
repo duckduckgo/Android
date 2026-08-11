@@ -249,6 +249,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private var easterEggLogoAnimator: ObjectAnimator? = null
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
+    private val omnibarCardView: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
     private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
@@ -286,6 +287,14 @@ class OmnibarLayout @JvmOverloads constructor(
         resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
     }
 
+    private val rebrandAddressBarRadius by lazy {
+        resources.getDimension(CommonR.dimen.rebrandInputRadius)
+    }
+
+    private val legacyAddressBarRadius by lazy {
+        resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
+    }
+
     private var focusAnimator: ValueAnimator? = null
 
     init {
@@ -294,6 +303,14 @@ class OmnibarLayout @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
 
         renderPosition()
+
+        applyAddressBarRebrandRadius(
+            appBrandDesignUpdateToggles.addressBarIcons().isEnabled(),
+            rebrandAddressBarRadius,
+            legacyAddressBarRadius,
+            omnibarCardShadow,
+            omnibarCardView,
+        )
 
         omnibarCardShadow.addBottomShadow()
     }
@@ -634,6 +651,14 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     fun render(viewState: ViewState) {
+        applyAddressBarRebrandRadius(
+            viewState.isAddressBarRebrandEnabled,
+            rebrandAddressBarRadius,
+            legacyAddressBarRadius,
+            omnibarCardShadow,
+            omnibarCardView,
+        )
+
         when (viewState.viewMode) {
             is ViewMode.CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)

@@ -50,6 +50,7 @@
     <dimen name="rebrandButtonLargeTopPadding">18dp</dimen>
     <dimen name="rebrandButtonSmallVerticalInset">4dp</dimen>
     <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
+    <dimen name="rebrandInputRadius">48dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
         <item name="android:textSize">15sp</item>
@@ -155,6 +156,10 @@
         <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
         <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
         <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
+    </style>
+
+    <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
+        <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
     </style>
 
 </resources>

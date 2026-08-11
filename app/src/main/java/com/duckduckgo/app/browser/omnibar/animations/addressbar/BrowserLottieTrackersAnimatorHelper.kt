@@ -25,6 +25,7 @@ import android.transition.Slide
 import android.transition.Transition
 import android.transition.Transition.TransitionListener
 import android.transition.TransitionManager
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
@@ -51,6 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.core.transition.doOnEnd as doOnTransitionEnd
+import com.duckduckgo.mobile.android.R as DesignSystemR
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -240,8 +243,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
         isAdBlockingAnimationRunning = true
 
-        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, context)
-        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, context)
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(adBlockingScene.context, addressBarRebrandEnabled)
+        adBlockingViewBackground.background = ContextCompat.getDrawable(sceneContext, DesignSystemR.drawable.animated_icon_dummy_background)
+        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, sceneContext)
+        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, sceneContext)
 
         hasAdBlockingAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
@@ -354,9 +360,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
-        // Inflate the scene with the scene root's own themed context so the animation follows the
-        // omnibar theme overlay (e.g. the dark omnibar island used in light Fire mode).
-        val sceneContext = cookieScene.context
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(cookieScene.context, addressBarRebrandEnabled)
+        cookieViewBackground.background = ContextCompat.getDrawable(sceneContext, DesignSystemR.drawable.animated_icon_dummy_background)
         if (cookieCosmeticHide) {
             firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, sceneContext)
             secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, sceneContext)
@@ -602,6 +608,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         private const val AD_BLOCKING_ICON_START_PADDING_DP = 9
     }
+}
+
+internal fun addressBarAnimationContext(
+    context: Context,
+    addressBarRebrandEnabled: Boolean,
+): Context = if (addressBarRebrandEnabled) {
+    ContextThemeWrapper(context, DesignSystemR.style.ThemeOverlay_Rebrand_AddressBarAnimation)
+} else {
+    context
 }
 
 sealed class TrackerLogo() {

@@ -30,6 +30,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.transition.addListener
 import androidx.core.view.updateLayoutParams
@@ -88,6 +89,10 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(sceneRoot.context, addressBarRebrandEnabled)
+        animatedIconBackgroundView.background = ContextCompat.getDrawable(sceneContext, CommonR.drawable.animated_icon_dummy_background)
+
         addressBarTrackersBlockedAnimationShieldIcon.renderMode = if (useSoftwareRenderingMode) {
             RenderMode.SOFTWARE
         } else {
@@ -109,7 +114,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         val slideInTrackersTransition: Transition = createSlideTransition()
         val slideOutTrackersTransition: Transition = createSlideTransition()
 
-        val inflater = LayoutInflater.from(sceneRoot.context)
+        val inflater = LayoutInflater.from(sceneContext)
         val scene1Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_1, sceneRoot, false)
         val scene2Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_2, sceneRoot, false)
 
