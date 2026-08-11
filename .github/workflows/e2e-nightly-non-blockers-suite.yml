@@ -173,6 +173,29 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Onboarding${{ env.DI_PAREN_SUFFIX }}
 
+      # onboardingBrandDesignUpdate.configDrivenDialogs defaults to INTERNAL, so this internal
+      # binary already renders the config-driven dialogs while the release-blocking nightly runs
+      # these same flows on the play binary, where the flag resolves to false. Running them here
+      # too covers the config-driven renderer for no extra build.
+      - name: Onboarding, config-driven renderer
+        id: maestro-onboarding-config-driven-renderer
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: onboardingConfigDrivenRenderer${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 34
+          maestro_include_tags: onboardingTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Onboarding, config-driven renderer${{ env.DI_PAREN_SUFFIX }}
+
       - name: SERP Flows
         id: maestro-serp-flows
         # Run regardless of earlier suite failures, but only if the internal binary uploaded.
@@ -202,4 +225,87 @@ jobs:
           asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
           asana-task-name: GH Workflow Failure - End to End tests${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
           asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
+
+  # onboardingBrandDesignUpdate.configDrivenDialogs defaults to INTERNAL, so the flavour decides the
+  # renderer: play gets the legacy one, internal gets the config-driven one. The internal-only and
+  # preonboarding flows therefore only ever run against the config-driven renderer, leaving the
+  # legacy renderer — which is what production ships while the flag sits on INTERNAL — untested for
+  # those flows. The flag is read during app launch, so the only way to pin it is at compile time.
+  # This job builds the internal flavour from a checkout patched back to FALSE and runs those flows
+  # against it. The play flavour is not built: it already resolves to FALSE unpatched.
+  onboarding_legacy_renderer_on_internal:
+    runs-on: ubuntu-latest
+    name: Onboarding, legacy renderer on internal
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble internal APK with configDrivenDialogs pinned to FALSE
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          commit: ${{ inputs.commit }}
+          flavours: 'internal'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: '-Pddg.di=${{ env.DDG_DI }}'
+          source_patches: .maestro/onboarding/source_patches/config_driven_dialogs_disabled.patch
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+
+      - name: Upload Internal Binary to Maestro
+        id: maestro-upload-internal-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_internal_upload_legacy_renderer${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+          maestro_api_level: 34
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Binary Upload, legacy renderer${{ env.DI_PAREN_SUFFIX }}
+
+      # The internal-only onboarding flows and the preonboarding flows, which the blocking and
+      # non-blocking nightlies run separately, are covered in one run here — a single API level is
+      # enough for a suite that only has to prove the legacy renderer still works.
+      - name: Internal Onboarding Flows
+        id: maestro-internal-onboarding-legacy-renderer
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: internalOnboardingLegacyRenderer${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 36
+          maestro_include_tags: onboardingInternalTest,onboardingNonReleaseBlockingTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Onboarding, legacy renderer${{ env.DI_PAREN_SUFFIX }}
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - End to End tests, legacy onboarding renderer${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
+          asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} for the legacy onboarding renderer has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). If the failure is `Source patch does not apply`, the flag's compile-time default changed — see the header of `.maestro/onboarding/source_patches/config_driven_dialogs_disabled.patch` for what to do. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
