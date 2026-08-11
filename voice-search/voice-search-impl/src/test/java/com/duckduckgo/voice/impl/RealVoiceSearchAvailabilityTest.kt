@@ -24,6 +24,9 @@ import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -393,6 +396,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupNewPermissionFlow(enabled = false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
         testee.isVoiceSearchAvailable
@@ -404,11 +408,45 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHadNotPreviouslyAcceptedVoiceRationaleThenDefaultUserSettingsFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupNewPermissionFlow(enabled = false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
         testee.isVoiceSearchAvailable
 
         verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
+    }
+
+    @Test
+    fun whenNewPermissionFlowEnabledAndRationaleNeverAcceptedThenDefaultUserSettingsTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupNewPermissionFlow(enabled = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
+
+        testee.isVoiceSearchAvailable
+
+        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(true))
+    }
+
+    @Test
+    fun whenNewPermissionFlowEnabledAndUserTurnedVoiceSearchOffThenVoiceSearchNotAvailable() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupNewPermissionFlow(enabled = true)
+        setupUserSettings(false)
+
+        assertFalse(testee.isVoiceSearchAvailable)
+    }
+
+    @Test
+    fun whenNewPermissionFlowEnabledThenObservedAvailabilityUsesEnabledByDefault() = runTest {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupNewPermissionFlow(enabled = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
+        whenever(voiceSearchRepository.voiceSearchUserEnabledFlow(eq(true))).thenReturn(flowOf(true))
+
+        assertTrue(testee.observeVoiceSearchAvailability().first())
     }
 
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>, excludedLocales: Array<String>) {
@@ -431,5 +469,9 @@ class RealVoiceSearchAvailabilityTest {
 
     private fun setupUserSettings(enabled: Boolean) {
         whenever(voiceSearchRepository.isVoiceSearchUserEnabled(any())).thenReturn(enabled)
+    }
+
+    private fun setupNewPermissionFlow(enabled: Boolean) {
+        voiceSearchFeature.newPermissionFlow().setRawStoredState(State(enabled))
     }
 }

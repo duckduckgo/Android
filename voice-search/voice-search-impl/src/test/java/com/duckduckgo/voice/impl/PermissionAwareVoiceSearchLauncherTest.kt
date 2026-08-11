@@ -61,7 +61,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(permissionRequest).launch(any())
+        verify(permissionRequest).launch(any(), anyOrNull())
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
@@ -72,7 +72,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(permissionRequest, never()).launch(any())
+        verify(permissionRequest, never()).launch(any(), anyOrNull())
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
@@ -84,7 +84,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(voiceSearchActivityLauncher).launch(any(), anyOrNull())
-        verify(permissionRequest, never()).launch(any())
+        verify(permissionRequest, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -95,7 +95,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
-        verify(permissionRequest, never()).launch(any())
+        verify(permissionRequest, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -106,7 +106,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(activity, VoiceSearchMode.DUCK_AI)
 
-        verify(permissionRequest).launch(activity)
+        verify(permissionRequest).launch(activity, VoiceSearchMode.DUCK_AI)
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
@@ -119,7 +119,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(activity, VoiceSearchMode.DUCK_AI)
 
         verify(voiceSearchActivityLauncher).launch(activity, VoiceSearchMode.DUCK_AI)
-        verify(permissionRequest, never()).launch(any())
+        verify(permissionRequest, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -130,7 +130,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(activity, null)
 
-        verify(permissionRequest).launch(activity)
+        verify(permissionRequest).launch(activity, null)
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 

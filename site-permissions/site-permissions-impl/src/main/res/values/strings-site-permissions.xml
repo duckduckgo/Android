@@ -16,7 +16,7 @@
 
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- DRM Permission -->
     <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" wants to open your Digital Rights Management (DRM) software</string>
     <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">If you pick \"Deny\" videos on the site may become unplayable, but %1$s will not have access to device identifiers provided by DRM software. You can manage permissions at any time in Settings. <annotation type="drm_learn_more_link">Learn More</annotation></string>
@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites can only use your camera and microphone if you allow DuckDuckGo to ask for access.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Open Settings</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Cancel</string>
+    <string name="duckAiMicDeniedSnackBarMessage" tools:ignore="MissingTranslation">Microphone permission needed for voice features</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle" tools:ignore="MissingTranslation">DuckDuckGo needs to access your microphone</string>
+    <string name="duckAiMicPermissionDeniedDialogContent" tools:ignore="MissingTranslation">Microphone permissions are needed if you want to use Voice Chat in Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton" tools:ignore="MissingTranslation">Change Permissions</string>
 
     <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, microphone, or DRM (Digital Rights Management) software. They won’t be able to access these unless you explicitly give them permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>

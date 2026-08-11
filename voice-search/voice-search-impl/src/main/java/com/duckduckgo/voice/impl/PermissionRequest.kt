@@ -23,8 +23,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchPermissionRequest
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,7 +39,10 @@ interface PermissionRequest {
         onVoiceSearchDisabled: () -> Unit = {},
     )
 
-    fun launch(activity: Activity)
+    fun launch(
+        activity: Activity,
+        mode: VoiceSearchMode?,
+    )
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -47,8 +52,16 @@ class MicrophonePermissionRequest @Inject constructor(
     private val voiceSearchPermissionDialogsLauncher: VoiceSearchPermissionDialogsLauncher,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val permissionRationale: PermissionRationale,
+    private val voiceSearchFeature: VoiceSearchFeature,
 ) : PermissionRequest {
     private lateinit var voiceSearchDisabled: () -> Unit
+
+    // Remembered from launch(): the permission result arrives long after, and the denial dialog's copy
+    // and options differ for Duck.ai.
+    private var pendingMode: VoiceSearchMode? = null
+
+    private val newPermissionFlowEnabled: Boolean
+        get() = voiceSearchFeature.newPermissionFlow().isEnabled()
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -59,18 +72,24 @@ class MicrophonePermissionRequest @Inject constructor(
         activityResultLauncherWrapper.register(
             caller,
             Request.Permission { granted ->
-                if (granted) {
-                    onPermissionsGranted()
-                } else if (!permissionRationale.shouldShow(activity)) {
-                    showNoMicAccessDialog(activity)
+                when {
+                    granted -> onPermissionsGranted()
+                    // shouldShow() only stays true while the system is still willing to prompt; once it
+                    // flips to false the user has denied twice and the prompt will never appear again.
+                    permissionRationale.shouldShow(activity) -> showMicPermissionDeniedSnackbar(activity)
+                    else -> showNoMicAccessDialog(activity)
                 }
             },
         )
         voiceSearchDisabled = onVoiceSearchDisabled
     }
 
-    override fun launch(activity: Activity) {
-        if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
+    override fun launch(
+        activity: Activity,
+        mode: VoiceSearchMode?,
+    ) {
+        pendingMode = mode
+        if (newPermissionFlowEnabled || voiceSearchRepository.getHasAcceptedRationaleDialog()) {
             activityResultLauncherWrapper.launch(LaunchPermissionRequest)
         } else {
             voiceSearchPermissionDialogsLauncher.showPermissionRationale(
@@ -81,13 +100,31 @@ class MicrophonePermissionRequest @Inject constructor(
         }
     }
 
+    private fun showMicPermissionDeniedSnackbar(activity: Activity) {
+        if (!newPermissionFlowEnabled) return
+        if (activity.isFinishing || activity.isDestroyed) return
+        voiceSearchPermissionDialogsLauncher.showMicPermissionDeniedSnackbar(
+            activity,
+            onAllowSelected = { activityResultLauncherWrapper.launch(LaunchPermissionRequest) },
+        )
+    }
+
     private fun showNoMicAccessDialog(activity: Activity) {
         if (activity.isFinishing || activity.isDestroyed) return
-        voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
-            activity,
-            { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
-            { showRemoveVoiceSearchDialog(activity) },
-        )
+        if (newPermissionFlowEnabled) {
+            voiceSearchPermissionDialogsLauncher.showMicAccessDeniedDialog(
+                activity,
+                mode = pendingMode,
+                onChangePermissionsSelected = { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
+                onHideVoiceSearchSelected = { disableVoiceSearch() },
+            )
+        } else {
+            voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
+                activity,
+                { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
+                { showRemoveVoiceSearchDialog(activity) },
+            )
+        }
     }
 
     private fun handleRationaleAccepted() {
@@ -104,10 +141,12 @@ class MicrophonePermissionRequest @Inject constructor(
     private fun showRemoveVoiceSearchDialog(context: Context) {
         voiceSearchPermissionDialogsLauncher.showRemoveVoiceSearchDialog(
             context,
-            onRemoveVoiceSearch = {
-                voiceSearchRepository.setVoiceSearchUserEnabled(false)
-                voiceSearchDisabled()
-            },
+            onRemoveVoiceSearch = { disableVoiceSearch() },
         )
+    }
+
+    private fun disableVoiceSearch() {
+        voiceSearchRepository.setVoiceSearchUserEnabled(false)
+        voiceSearchDisabled()
     }
 }
