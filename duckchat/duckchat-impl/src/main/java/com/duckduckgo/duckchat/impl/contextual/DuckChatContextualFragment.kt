@@ -269,6 +269,7 @@ class DuckChatContextualFragment :
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.onSheetClosed()
+                    binding.contextualSuggestionsView.clear()
                 }
                 if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
                     bottomSheet.requestLayout()
@@ -552,6 +553,8 @@ class DuckChatContextualFragment :
         }
     }
 
+    private fun isSheetVisible(): Boolean = bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+
     private fun reserveSpaceForSuggestions() {
         if (!viewModel.viewState.value.contextualSuggestionsEnabled) return
         if (isKeyboardVisible) return
@@ -698,7 +701,7 @@ class DuckChatContextualFragment :
             } else {
                 binding.legacyInputField.text.toString()
             }
-            viewModel.onQuickActionClicked(currentInput)
+            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.currentPageType())
         }
     }
 
@@ -798,7 +801,9 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
-                        binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        if (isSheetVisible() && viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {

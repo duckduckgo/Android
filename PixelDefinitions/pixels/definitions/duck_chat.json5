@@ -1580,5 +1580,50 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "aichat_contextual_suggestion_selected": {
+        "description": "User tapped a suggested prompt on the contextual Duck.ai sheet start surface. The Ask About Page quick action reports as suggestionId=ask-about-page and also fires m_aichat_contextual_quick_action_ask_about_page_selected.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "suggestionId",
+                "type": "string",
+                "description": "Catalog key of the selected suggestion (e.g. summarize-page, translate-page, key-takeaways) or ask-about-page for the quick action. Bounded by the bundled PageSuggestionsCatalog ids.",
+                "examples": ["summarize-page", "translate-page", "key-takeaways", "ask-about-page"]
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "aichat_contextual_suggestions_viewed": {
+        "description": "Suggested prompts became visible on the contextual Duck.ai sheet start surface. Fires once per display; only a reload (sheet reopened, or returning from an open chat) counts a fresh impression.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "isSmart",
+                "type": "boolean",
+                "description": "Whether the displayed suggestions were contextually matched to the page (JSON-LD, og:type or domain) rather than generic defaults."
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "debug_aichat_contextual_suggestions_catalog_load_failed": {
+        "description": "The bundled PageSuggestionsCatalog.json could not be loaded or decoded when resolving contextual suggestions; the start surface falls back to no suggestions.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "debug_aichat_contextual_suggestions_context_collection_timed_out": {
+        "description": "Page context collection did not complete within the timeout while contextual suggestions were loading; suggestions fall back to generic defaults.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
