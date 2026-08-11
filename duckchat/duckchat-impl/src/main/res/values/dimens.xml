@@ -37,7 +37,7 @@
     <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
 
     <!-- Chip-->
-    <dimen name="chipCornerRadius">16dp</dimen>
+    <dimen name="chipCornerRadius">20dp</dimen>
     <dimen name="chipStrokeWidth">1dp</dimen>
     <dimen name="chipImageCornerRadius">6dp</dimen>
 </resources>
