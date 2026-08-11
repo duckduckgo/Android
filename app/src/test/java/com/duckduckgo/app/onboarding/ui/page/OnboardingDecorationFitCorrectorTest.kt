@@ -60,6 +60,7 @@ class OnboardingDecorationFitCorrectorTest {
         viewportMeasuredHeight: Int = viewportHeight,
         bottomOverlapPx: Int = 0,
         cardBottomInsetPx: Int = 0,
+        cardBottomInsetPxProvider: () -> Int = { cardBottomInsetPx },
         enabled: Boolean = true,
         reservesInsetAboveDecoration: Boolean = false,
         onDecorationHidden: () -> Unit = {},
@@ -106,7 +107,7 @@ class OnboardingDecorationFitCorrectorTest {
         }
         decoration.layout(0, 0, 200, decorationHeight)
 
-        val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, { cardBottomInsetPx })
+        val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, cardBottomInsetPxProvider)
         corrector.enabled = enabled
         corrector.reservesInsetAboveDecoration = reservesInsetAboveDecoration
         corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
@@ -552,6 +553,40 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertEquals(300, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenTheInsetDropsThenTheReservationAndTheClampRelease() {
+        // The keyboard hiding must give the card its room back: a reservation that only ever grows parks
+        // the card at the top of the screen for the rest of the flow.
+        var inset = 863
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 422,
+            minHeightPx = 247,
+            maxHeightPx = 422,
+            cardBottomInsetPxProvider = { inset },
+            reservesInsetAboveDecoration = true,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(441, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+
+        inset = 0
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
     }
 
     @Test
