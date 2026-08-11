@@ -399,31 +399,6 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenConfiguredForEditThenPublishesUnderTheSyntheticKeyOnly() = runTest {
-        testee.configureForEdit(sessionId = "session-1")
-        advanceUntilIdle()
-
-        val editKey = NativeInputModeWidgetViewModel.editStateKey("session-1")
-        assertEquals(
-            NativeInputState.InputContext.DUCK_AI,
-            nativeInputStateProvider.stateForTab(editKey).value.inputContext,
-        )
-        assertEquals(
-            NativeInputState.InputContext.BROWSER,
-            nativeInputStateProvider.stateForTab("test-tab").value.inputContext,
-        )
-    }
-
-    @Test
-    fun whenConfiguredForEditThenContextIsDuckAiAndToggleIsDuckAi() = runTest {
-        testee.configureForEdit(sessionId = "session-1")
-
-        val state = testee.state.first()
-        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, state.toggleSelection)
-    }
-
-    @Test
     fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
@@ -558,16 +533,6 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
         chatStateFlow.value = ChatState.HIDE
-        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
-    }
-
-    @Test
-    fun `state isChatStreaming is false for the edit widget even when chatState is STREAMING`() = runTest {
-        // chatState is global, not scoped to a tab — a real chat streaming on another tab must not
-        // leak into the edit widget's own synthetic-key state.
-        chatStateFlow.value = ChatState.STREAMING
-        testee.configureForEdit(sessionId = "session-1")
-
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 

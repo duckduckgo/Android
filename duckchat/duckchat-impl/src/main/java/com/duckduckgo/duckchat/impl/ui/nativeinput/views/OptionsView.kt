@@ -63,8 +63,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     /** Whether the model / reasoning pickers are allowed for the current tool selection. */
     val pickersEnabled: Boolean get() = viewModel.shouldShowPickers
 
-    var isEditMode: Boolean = false
-
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,
@@ -137,7 +135,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun updateContainerVisibility() {
-        val show = shouldShowOptionsContainer(lastNativeInputState, isEditMode)
+        val show = lastNativeInputState?.shouldShowPluginControls() == true
         isVisible = show
         (parent as? View)?.isVisible = show
         refreshOptionsButtonVisibility()
@@ -311,12 +309,3 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         private const val MENU_DISMISS_DELAY_MS = 150L
     }
 }
-
-/**
- * The options container follows the same visibility rule as the other plugin controls: derived
- * purely from [NativeInputState] so it is unit-testable without Robolectric.
- */
-internal fun shouldShowOptionsContainer(
-    nativeInputState: NativeInputState?,
-    isEditMode: Boolean,
-): Boolean = nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true
