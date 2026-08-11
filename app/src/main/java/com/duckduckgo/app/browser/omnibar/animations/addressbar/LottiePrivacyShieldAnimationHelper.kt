@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -43,7 +42,6 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val omnibarRepository: OmnibarRepository,
-    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -51,15 +49,21 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
         useLightAnimation: Boolean?,
+        isAddressBarRebrandEnabled: Boolean,
     ): Boolean {
-        val brandIconsEnabled = appBrandDesignUpdateToggles.addressBarIcons().isEnabled()
         val isLegacyCustomTab = viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabEnabled
         val isLightMode = useLightAnimation ?: appTheme.isLightModeEnabled()
         val trackersAnimationEnabled = runBlocking { addressBarTrackersAnimationManager.isFeatureEnabled() }
 
-        val (assetRes, boxed) = resolveShieldAsset(privacyShield, isLightMode, isLegacyCustomTab, brandIconsEnabled, trackersAnimationEnabled)
+        val (assetRes, boxed) = resolveShieldAsset(
+            privacyShield,
+            isLightMode,
+            isLegacyCustomTab,
+            isAddressBarRebrandEnabled,
+            trackersAnimationEnabled,
+        )
             ?: return false
-        val isStatic = brandIconsEnabled && privacyShield == MALICIOUS
+        val isStatic = isAddressBarRebrandEnabled && privacyShield == MALICIOUS
 
         val currentAsset = holder.tag as? Pair<*, *>
         if (currentAsset != assetRes to isStatic) {

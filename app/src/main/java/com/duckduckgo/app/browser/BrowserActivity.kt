@@ -1697,7 +1697,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun bindMockupToolbars() {
         val mockupBrowserMenuIcon = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBarIcons().isEnabled()
+        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
         val rebrandInputRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius)
         val legacyInputRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
         binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)

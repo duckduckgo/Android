@@ -68,6 +68,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -128,12 +129,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val browserMode: BrowserMode,
+    appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private val isProgressBarIndeterminateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
+    private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
@@ -148,6 +151,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
             isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
+            isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
         ),
     )
 
@@ -278,6 +282,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarUpgradeEnabled: Boolean = false,
         val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
+        val isAddressBarRebrandEnabled: Boolean = false,
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
@@ -314,7 +319,11 @@ class OmnibarLayoutViewModel @Inject constructor(
      * - [NONE]: every button/input is disabled (omnibar locked).
      * - [FIRE_BUTTON_ONLY]: only the fire button is enabled; everything else disabled.
      */
-    enum class EnabledState { ALL, NONE, FIRE_BUTTON_ONLY }
+    enum class EnabledState {
+        ALL,
+        NONE,
+        FIRE_BUTTON_ONLY,
+    }
 
     sealed class Command {
         data object CancelAnimations : Command()
@@ -330,6 +339,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             @field:DrawableRes val icon: Int,
             @field:StringRes val text: Int,
         ) : Command()
+
         data object AdBlockingAnimationSuppressed : Command()
         data object MoveCaretToFront : Command()
         data class LaunchNativeInput(val query: String) : Command()
@@ -425,6 +435,15 @@ class OmnibarLayoutViewModel @Inject constructor(
 
         serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
             this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
+
+        addressBarRebrandToggle.enabled().onEach { isAddressBarRebrandEnabled ->
+            _viewState.update {
+                it.copy(
+                    isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+                )
+            }
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -906,7 +925,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun enabledStateFor(locked: Boolean, fireButtonHighlighted: Boolean): EnabledState = when {
+    private fun enabledStateFor(
+        locked: Boolean,
+        fireButtonHighlighted: Boolean,
+    ): EnabledState = when {
         !locked -> EnabledState.ALL
         fireButtonHighlighted -> EnabledState.FIRE_BUTTON_ONLY
         else -> EnabledState.NONE

@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule

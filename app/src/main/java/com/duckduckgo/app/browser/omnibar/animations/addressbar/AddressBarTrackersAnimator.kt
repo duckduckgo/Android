@@ -36,10 +36,10 @@ import androidx.core.transition.addListener
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -98,7 +98,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         } else {
             RenderMode.AUTOMATIC
         }
-        if (appBrandDesignUpdateToggles.addressBarIcons().isEnabled()) {
+        if (addressBarRebrandEnabled) {
             val boxSize = addressBarTrackersBlockedAnimationShieldIcon.resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
             addressBarTrackersBlockedAnimationShieldIcon.setAnimation(R.raw.shield_color_24)
             addressBarTrackersBlockedAnimationShieldIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {

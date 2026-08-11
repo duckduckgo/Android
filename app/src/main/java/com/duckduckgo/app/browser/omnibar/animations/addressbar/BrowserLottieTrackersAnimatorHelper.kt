@@ -35,9 +35,9 @@ import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -253,7 +253,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
         adBlockingView.show()
         adBlockingView.alpha = 0F
-        adBlockingView.setImageResource(resolveAdBlockingIcon(iconRes, appBrandDesignUpdateToggles.addressBarIcons().isEnabled()))
+        adBlockingView.setImageResource(resolveAdBlockingIcon(iconRes, addressBarRebrandEnabled))
         // The static player icon has no built-in inset (unlike the cookie/tracker Lottie compositions,
         // whose artwork fills the badge chip), so pad it to center the glyph in the chip and match their
         // spacing to the text.
@@ -378,7 +378,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieView.setAnimation(
             resolveCookieAnimation(
                 isLightMode = cookieUseLightAnimation ?: theme.isLightModeEnabled(),
-                brandIconsEnabled = appBrandDesignUpdateToggles.addressBarIcons().isEnabled(),
+                brandIconsEnabled = addressBarRebrandEnabled,
             ),
         )
         cookieView.progress = 0F

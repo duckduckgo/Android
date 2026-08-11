@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -37,7 +36,6 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
         appTheme = mock<AppTheme>(),
         addressBarTrackersAnimationManager = mock<AddressBarTrackersAnimationManager>(),
         omnibarRepository = mock<OmnibarRepository>(),
-        appBrandDesignUpdateToggles = mock<AppBrandDesignUpdateToggles>(),
     )
 
     @Test
