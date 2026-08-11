@@ -968,7 +968,6 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when ask about page quick action clicked with suggestions enabled then suggestion selected pixel fired alongside legacy pixel`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
@@ -984,7 +983,6 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when ask about page quick action clicked with suggestions disabled then suggestion selected pixel not fired`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         whenever(contextualSuggestedPromptsToggle.isEnabled()).thenReturn(false)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
@@ -1001,7 +999,6 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when ask about page quick action clicked without valid context then neither selected pixel fired`() = runTest {
-        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
