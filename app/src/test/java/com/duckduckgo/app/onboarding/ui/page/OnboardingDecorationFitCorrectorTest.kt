@@ -460,6 +460,31 @@ class OnboardingDecorationFitCorrectorTest {
     }
 
     @Test
+    fun whenSideDecorationLeavesCardBottomAnchoredThenCardStillReservesTheInset() {
+        // Config-driven phone regime with a side decoration (LeftWing, BobbingDax): the card stays pinned
+        // to the parent bottom while the decoration sits beside it, covering nothing below the card, so
+        // the card must still clear the full inset — the keyboard.
+        val h = harness(
+            rootHeight = 2000,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 422,
+            minHeightPx = 247,
+            maxHeightPx = 422,
+            cardBottomInsetPx = 863,
+            reservesInsetAboveDecoration = true,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(863, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
     fun whenDecorationShownAboveCardThenNoBottomInset() {
         // Tablet regime: card stacked above a shown decoration (bottomToTop). No inset; a stale one left
         // by a previous bottom-anchored state is cleared so it cannot steal the decoration's fit room.

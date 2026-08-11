@@ -83,10 +83,6 @@ class OnboardingDecorationFitCorrector(
 
         val deco = decoration
         val decorationShown = deco != null && !deco.isGone
-        // The card reserves the bottom-bar inset when it is the bottom-most element: bottom-anchored AND no
-        // decoration shown below it. A shown decoration is at least its min height, which exceeds any bar
-        // inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace and hide
-        // that very decoration.
         if (syncCardBottomInset(decorationShown)) return false
 
         // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
@@ -155,7 +151,12 @@ class OnboardingDecorationFitCorrector(
     ): Int {
         if (!enabled) return 0
         if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) {
-            return if (decorationShown) 0 else cardBottomInsetPx()
+            // On the legacy path a shown decoration exceeds any bar inset and covers it for the card;
+            // reserving the inset then would feed dialogSpace and hide that very decoration. On the
+            // config-driven path a decoration that leaves the card bottom-anchored sits beside or over
+            // it, covering nothing below it, so the card still has to clear the inset — the keyboard.
+            if (decorationShown && !reservesInsetAboveDecoration) return 0
+            return cardBottomInsetPx()
         }
         val deco = decoration?.takeIf { decorationShown && reservesInsetAboveDecoration } ?: return 0
         return (cardBottomInsetPx() - roomBelowCard(deco)).coerceAtLeast(0)
