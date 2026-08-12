@@ -36,6 +36,8 @@ interface PermissionRequest {
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        /** Invoked when the flow ends without voice search starting, so callers can undo anything they staged for it. */
+        onRequestAborted: () -> Unit = {},
         onVoiceSearchDisabled: () -> Unit = {},
     )
 
@@ -55,6 +57,7 @@ class MicrophonePermissionRequest @Inject constructor(
     private val voiceSearchFeature: VoiceSearchFeature,
 ) : PermissionRequest {
     private lateinit var voiceSearchDisabled: () -> Unit
+    private var requestAborted: () -> Unit = {}
 
     // Remembered from launch(): the permission result arrives long after, and the denial dialog's copy
     // and options differ for Duck.ai.
@@ -67,6 +70,7 @@ class MicrophonePermissionRequest @Inject constructor(
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        onRequestAborted: () -> Unit,
         onVoiceSearchDisabled: () -> Unit,
     ) {
         activityResultLauncherWrapper.register(
@@ -76,12 +80,17 @@ class MicrophonePermissionRequest @Inject constructor(
                     granted -> onPermissionsGranted()
                     // shouldShow() only stays true while the system is still willing to prompt; once it
                     // flips to false the user has denied twice and the prompt will never appear again.
-                    permissionRationale.shouldShow(activity) -> showMicPermissionDeniedSnackbar(activity)
+                    permissionRationale.shouldShow(activity) -> {
+                        showMicPermissionDeniedSnackbar(activity)
+                        requestAborted()
+                    }
+
                     else -> showNoMicAccessDialog(activity)
                 }
             },
         )
         voiceSearchDisabled = onVoiceSearchDisabled
+        requestAborted = onRequestAborted
     }
 
     override fun launch(
@@ -110,13 +119,17 @@ class MicrophonePermissionRequest @Inject constructor(
     }
 
     private fun showNoMicAccessDialog(activity: Activity) {
-        if (activity.isFinishing || activity.isDestroyed) return
+        if (activity.isFinishing || activity.isDestroyed) {
+            requestAborted()
+            return
+        }
         if (newPermissionFlowEnabled) {
             voiceSearchPermissionDialogsLauncher.showMicAccessDeniedDialog(
                 activity,
                 mode = pendingMode,
                 onChangePermissionsSelected = { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
                 onHideVoiceSearchSelected = { disableVoiceSearch() },
+                onCancelled = { requestAborted() },
             )
         } else {
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
@@ -142,6 +155,7 @@ class MicrophonePermissionRequest @Inject constructor(
         voiceSearchPermissionDialogsLauncher.showRemoveVoiceSearchDialog(
             context,
             onRemoveVoiceSearch = { disableVoiceSearch() },
+            onRemoveVoiceSearchCancelled = { requestAborted() },
         )
     }
 

@@ -351,6 +351,48 @@ class MicrophonePermissionRequestTest {
         assertTrue(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogOfferedHideVoiceSearch)
     }
 
+    @Test
+    fun whenFirstDenialThenRequestReportedAsAborted() {
+        // The caller pauses the WebView before launching, so it needs to hear that nothing will open.
+        enableNewPermissionFlow()
+        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
+        var aborted = false
+
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+
+        assertTrue(aborted)
+    }
+
+    @Test
+    fun whenDeniedForeverDialogCancelledThenRequestReportedAsAborted() {
+        enableNewPermissionFlow()
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
+        var aborted = false
+
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+        assertFalse(aborted)
+
+        voiceSearchPermissionDialogsLauncher.boundMicAccessDeniedCancelled.invoke()
+
+        assertTrue(aborted)
+    }
+
+    @Test
+    fun whenPermissionGrantedThenRequestNotReportedAsAborted() {
+        enableNewPermissionFlow()
+        var aborted = false
+
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(true)
+
+        assertFalse(aborted)
+    }
+
     private fun enableNewPermissionFlow() {
         voiceSearchFeature.newPermissionFlow().setRawStoredState(State(true))
     }

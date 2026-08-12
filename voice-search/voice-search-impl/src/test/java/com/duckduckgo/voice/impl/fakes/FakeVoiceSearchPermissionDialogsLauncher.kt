@@ -35,6 +35,7 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
     var boundRemoveVoiceSearchAccepted: () -> Unit = {}
     var boundChangePermissionsSelected: () -> Unit = {}
     var boundHideVoiceSearchSelected: () -> Unit = {}
+    var boundMicAccessDeniedCancelled: () -> Unit = {}
     var boundSnackbarAllowSelected: () -> Unit = {}
 
     override fun showNoMicAccessDialog(
@@ -58,6 +59,7 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
         micAccessDeniedDialogOfferedHideVoiceSearch = mode != VoiceSearchMode.DUCK_AI
         boundChangePermissionsSelected = onChangePermissionsSelected
         boundHideVoiceSearchSelected = onHideVoiceSearchSelected
+        boundMicAccessDeniedCancelled = onCancelled
     }
 
     override fun showMicPermissionDeniedSnackbar(

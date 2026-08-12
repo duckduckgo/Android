@@ -149,6 +149,7 @@ class PermissionAwareVoiceSearchLauncherTest {
             any(),
             onPermissionsGrantedCaptor.capture(),
             any(),
+            any(),
         )
 
         whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
@@ -171,6 +172,7 @@ class PermissionAwareVoiceSearchLauncherTest {
             any(),
             any(),
             onPermissionsGrantedCaptor.capture(),
+            any(),
             any(),
         )
 
