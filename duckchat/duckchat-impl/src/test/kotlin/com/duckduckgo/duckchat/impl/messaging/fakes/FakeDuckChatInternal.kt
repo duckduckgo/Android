@@ -46,6 +46,7 @@ class FakeDuckChatInternal(
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.READY)
+    private val _chatInputVisible = MutableStateFlow(true)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
@@ -162,6 +163,12 @@ class FakeDuckChatInternal(
     }
 
     override val chatState: StateFlow<ChatState> = _chatState
+
+    override fun updateChatInputVisibility(visible: Boolean) {
+        _chatInputVisible.value = visible
+    }
+
+    override val chatInputVisible: StateFlow<Boolean> = _chatInputVisible
 
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 

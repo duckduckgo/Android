@@ -378,8 +378,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
+    // Kept for the widget's observeChatState(), which drives the streaming indicator.
     val chatState: Flow<ChatState> = duckChatInternal.chatState
+
+    val chatInputVisible: Flow<Boolean> = duckChatInternal.chatInputVisible
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }

@@ -1341,7 +1341,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenHideChatInputThenUpdateChatStateWithHide() = runTest {
+    fun whenHideChatInputThenHideChatInputWithoutTouchingChatState() = runTest {
         val featureName = "aiChat"
         val method = "hideChatInput"
         val id = "123"
@@ -1356,11 +1356,14 @@ class RealDuckChatJSHelperTest {
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.HIDE)
+        verify(mockDuckChat).updateChatInputVisibility(false)
+        // Visibility must not ride on chatState: a response-status update landing in the same dispatch
+        // window would conflate the command away and strand the input hidden.
+        verify(mockDuckChat, never()).updateChatState(any())
     }
 
     @Test
-    fun whenShowChatInputThenUpdateChatStateWithShow() = runTest {
+    fun whenShowChatInputThenShowChatInputWithoutTouchingChatState() = runTest {
         val featureName = "aiChat"
         val method = "showChatInput"
         val id = "123"
@@ -1375,7 +1378,8 @@ class RealDuckChatJSHelperTest {
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.SHOW)
+        verify(mockDuckChat).updateChatInputVisibility(true)
+        verify(mockDuckChat, never()).updateChatState(any())
     }
 
     @Test

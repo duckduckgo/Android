@@ -278,6 +278,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var floatingButtons: InputScreenButtons? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
+    private var chatInputVisibleJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
@@ -650,6 +651,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeDuckAiFireButtonHighlightSource()
         applyNativeStyling()
         observeChatState()
+        observeChatInputVisibility()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
         observeSubmitEnabled()
@@ -770,6 +772,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null
+        chatInputVisibleJob?.cancel()
+        chatInputVisibleJob = null
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = null
         tierJob?.cancel()
@@ -802,28 +806,33 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun observeChatState() {
-        var isFocussed = false
-
         chatStateJob?.cancel()
         chatStateJob = viewModel.chatState
             .drop(1)
             .onEach { state ->
                 setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
-                when (state) {
-                    ChatState.HIDE -> {
-                        isFocussed = hasInputFocus()
-                        hideKeyboard()
-                        clearInputFocus()
-                        widgetRoot?.visibility = GONE
+            }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun observeChatInputVisibility() {
+        var isFocussed = false
+
+        chatInputVisibleJob?.cancel()
+        chatInputVisibleJob = viewModel.chatInputVisible
+            .drop(1)
+            .onEach { visible ->
+                if (visible) {
+                    widgetRoot?.visibility = VISIBLE
+                    if (isFocussed) {
+                        requestInputFocus()
+                        showKeyboard()
                     }
-                    ChatState.SHOW -> {
-                        widgetRoot?.visibility = VISIBLE
-                        if (isFocussed) {
-                            requestInputFocus()
-                            showKeyboard()
-                        }
-                    }
-                    else -> {}
+                } else {
+                    isFocussed = hasInputFocus()
+                    hideKeyboard()
+                    clearInputFocus()
+                    widgetRoot?.visibility = GONE
                 }
             }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)

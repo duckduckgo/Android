@@ -212,6 +212,21 @@ interface DuckChatInternal : DuckChat {
     val chatState: StateFlow<ChatState>
 
     /**
+     * Shows or hides the native chat input, as requested by the Duck.ai page.
+     *
+     * Deliberately separate from [chatState]: that flow carries response status, and conflating the two
+     * onto one [StateFlow] let a status update land in the same dispatch window as a visibility command
+     * and swallow it, stranding the input hidden.
+     */
+    fun updateChatInputVisibility(visible: Boolean)
+
+    /**
+     * Whether the native chat input should be visible. Defaults to visible; the page hides it when its
+     * own UI takes over the composer (voice mode, for example).
+     */
+    val chatInputVisible: StateFlow<Boolean>
+
+    /**
      * Requests the native model picker to open for [tabId].
      */
     fun requestShowModelPicker(tabId: String)
@@ -455,6 +470,7 @@ class RealDuckChat @Inject constructor(
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _chatInputVisible = MutableStateFlow(true)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
@@ -642,6 +658,10 @@ class RealDuckChat @Inject constructor(
         _chatState.value = state
     }
 
+    override fun updateChatInputVisibility(visible: Boolean) {
+        _chatInputVisible.value = visible
+    }
+
     override fun requestShowModelPicker(tabId: String) {
         _showModelPickerEvents.tryEmit(tabId)
     }
@@ -673,6 +693,8 @@ class RealDuckChat @Inject constructor(
     override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
+
+    override val chatInputVisible: StateFlow<Boolean> = _chatInputVisible.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
 

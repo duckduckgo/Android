@@ -28,8 +28,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
-import com.duckduckgo.duckchat.impl.ChatState.HIDE
-import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
@@ -195,12 +193,12 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_HIDE_CHAT_INPUT -> {
-                duckChat.updateChatState(HIDE)
+                duckChat.updateChatInputVisibility(false)
                 null
             }
 
             METHOD_SHOW_CHAT_INPUT -> {
-                duckChat.updateChatState(SHOW)
+                duckChat.updateChatInputVisibility(true)
                 null
             }
             METHOD_DISABLE_CHAT_INPUT -> {

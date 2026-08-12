@@ -1186,6 +1186,36 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenChatInputVisibilityUpdatedThenChatInputVisibleUpdated() = runTest {
+        assertTrue(testee.chatInputVisible.value)
+
+        testee.updateChatInputVisibility(false)
+
+        assertFalse(testee.chatInputVisible.value)
+    }
+
+    @Test
+    fun whenChatStateUpdatedAfterShowingChatInputThenChatInputStaysVisible() = runTest {
+        // Regression: visibility used to share chatState, so a status update arriving right behind a
+        // show command was conflated over it and the input stayed hidden.
+        testee.updateChatInputVisibility(false)
+        testee.updateChatInputVisibility(true)
+
+        testee.updateChatState(ChatState.READY)
+
+        assertTrue(testee.chatInputVisible.value)
+    }
+
+    @Test
+    fun whenChatStateUpdatedThenChatInputVisibilityUnaffected() = runTest {
+        testee.updateChatInputVisibility(false)
+
+        testee.updateChatState(ChatState.SHOW)
+
+        assertFalse(testee.chatInputVisible.value)
+    }
+
+    @Test
     fun whenImageUploadFeatureDisabledThenDisableImageUpload() = runTest {
         imageUploadFeature.self().setRawStoredState(State(enable = false))
 
