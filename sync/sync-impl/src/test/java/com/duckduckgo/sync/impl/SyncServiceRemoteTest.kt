@@ -111,6 +111,39 @@ class SyncServiceRemoteTest {
     }
 
     @Test
+    fun whenCreateAccountWithDeviceInfoAndKeysThenSentInSignupBody() {
+        val call: Call<AccountCreatedResponse> = mock()
+        val keys = listOf(
+            ProtectedKeyEntry(
+                kid = "kid-1",
+                purpose = "account_info",
+                encryptedWith = "ddg",
+                encryptedPrivateKey = "wrapped",
+                publicKey = RsaJwk(n = "n", e = "AQAB"),
+            ),
+        )
+        val expected = signUpRequest.copy(deviceInfo = "device_info_jwe", keys = keys)
+        whenever(syncService.signup(expected)).thenReturn(call)
+        whenever(call.execute()).thenReturn(signupSuccess)
+
+        val result = with(accountKeys) {
+            syncRemote.createAccount(
+                userId,
+                passwordHash,
+                protectedSecretKey,
+                deviceId,
+                deviceName,
+                deviceFactor,
+                deviceInfo = "device_info_jwe",
+                keys = keys,
+            )
+        }
+
+        assertEquals(accountCreatedSuccess, result)
+        verify(syncService).signup(expected)
+    }
+
+    @Test
     fun whenCreateAccountIsInvalidThenReturnError() {
         val call: Call<AccountCreatedResponse> = mock()
         whenever(syncService.signup(signUpRequest)).thenReturn(call)
