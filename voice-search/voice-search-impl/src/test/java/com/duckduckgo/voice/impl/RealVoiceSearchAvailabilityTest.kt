@@ -393,11 +393,9 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
+    fun whenVoiceSearchSupportedThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupNewPermissionFlow(enabled = false)
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
         testee.isVoiceSearchAvailable
 
@@ -405,45 +403,18 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenDeviceHadNotPreviouslyAcceptedVoiceRationaleThenDefaultUserSettingsFalse() {
+    fun whenUserTurnedVoiceSearchOffThenVoiceSearchNotAvailable() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupNewPermissionFlow(enabled = false)
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-
-        testee.isVoiceSearchAvailable
-
-        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
-    }
-
-    @Test
-    fun whenNewPermissionFlowEnabledAndRationaleNeverAcceptedThenDefaultUserSettingsTrue() {
-        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupNewPermissionFlow(enabled = true)
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-
-        testee.isVoiceSearchAvailable
-
-        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(true))
-    }
-
-    @Test
-    fun whenNewPermissionFlowEnabledAndUserTurnedVoiceSearchOffThenVoiceSearchNotAvailable() {
-        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupNewPermissionFlow(enabled = true)
         setupUserSettings(false)
 
         assertFalse(testee.isVoiceSearchAvailable)
     }
 
     @Test
-    fun whenNewPermissionFlowEnabledThenObservedAvailabilityUsesEnabledByDefault() = runTest {
+    fun whenObservedAvailabilityThenUsesEnabledByDefault() = runTest {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupNewPermissionFlow(enabled = true)
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
         whenever(voiceSearchRepository.voiceSearchUserEnabledFlow(eq(true))).thenReturn(flowOf(true))
 
         assertTrue(testee.observeVoiceSearchAvailability().first())
@@ -469,9 +440,5 @@ class RealVoiceSearchAvailabilityTest {
 
     private fun setupUserSettings(enabled: Boolean) {
         whenever(voiceSearchRepository.isVoiceSearchUserEnabled(any())).thenReturn(enabled)
-    }
-
-    private fun setupNewPermissionFlow(enabled: Boolean) {
-        voiceSearchFeature.newPermissionFlow().setRawStoredState(State(enabled))
     }
 }

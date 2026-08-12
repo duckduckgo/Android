@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Μιλήστε τώρα</string>
     <string name="voiceSearchListeningFooter">Η επεξεργασία του ήχου πραγματοποιείται στη συσκευή. Δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Ακύρωση</string>
-    <string name="voiceSearchPermissionRationaleDescription">Το DuckDuckGo δεν ακούει ποτέ ό,τι λέτε. Η επεξεργασία του ήχου πραγματοποιείται στη συσκευή. Δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Απαιτείται πρόσβαση στο μικρόφωνο για Ιδιωτική φωνητική αναζήτηση</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">Εντάξει</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Για να χρησιμοποιήσετε τη Φωνητική αναζήτηση στο DuckDuckGo, πρέπει να ενεργοποιήσετε την πρόσβαση στο μικρόφωνο από τις ρυθμίσεις του συστήματος.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ρυθμίσεις</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Απαιτείται πρόσβαση στο μικρόφωνο</string>
     <string name="voiceSearchTitle">Φωνητική αναζήτηση</string>
 </resources>

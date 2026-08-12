@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Snakk nå</string>
     <string name="voiceSearchListeningFooter">Lyd behandles på enheten. Den lagres ikke og deles ikke med noen, heller ikke med DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Avbryt</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo lytter aldri til det du sier. Lyd behandles på enheten. Den blir ikke lagret eller delt med noen.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Mikrofontilgang kreves for Privat talesøk</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">For å bruke talesøk i DuckDuckGo må du aktivere mikrofontilgang i systeminnstillingene.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Innstillinger</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofontilgang kreves</string>
     <string name="voiceSearchTitle">Talesøk</string>
 </resources>

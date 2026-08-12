@@ -22,28 +22,14 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.VoiceSearchPermissionDialogsLauncher
 
 class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLauncher {
-    var noMicAccessDialogShown = false
     var micAccessDeniedDialogShown = false
     var micAccessDeniedDialogOfferedHideVoiceSearch = false
     var micAccessDeniedDialogMode: VoiceSearchMode? = null
     var micPermissionDeniedSnackbarShown = false
-    var rationaleDialogShown = false
-    var boundOnRationaleAccepted: () -> Unit = {}
-    var boundOnRationaleDeclined: () -> Unit = {}
-    var boundNoMicAccessDialogDeclined: () -> Unit = {}
     var boundChangePermissionsSelected: () -> Unit = {}
     var boundHideVoiceSearchSelected: () -> Unit = {}
     var boundMicAccessDeniedCancelled: () -> Unit = {}
     var boundSnackbarAllowSelected: () -> Unit = {}
-
-    override fun showNoMicAccessDialog(
-        context: Context,
-        onSettingsLaunchSelected: () -> Unit,
-        onSettingsLaunchDeclined: () -> Unit,
-    ) {
-        noMicAccessDialogShown = true
-        boundNoMicAccessDialogDeclined = onSettingsLaunchDeclined
-    }
 
     override fun showMicAccessDeniedDialog(
         context: Context,
@@ -66,15 +52,5 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
     ) {
         micPermissionDeniedSnackbarShown = true
         boundSnackbarAllowSelected = onAllowSelected
-    }
-
-    override fun showPermissionRationale(
-        context: Context,
-        onRationaleAccepted: () -> Unit,
-        onRationaleDeclined: () -> Unit,
-    ) {
-        rationaleDialogShown = true
-        boundOnRationaleAccepted = onRationaleAccepted
-        boundOnRationaleDeclined = onRationaleDeclined
     }
 }

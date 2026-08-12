@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.view.ViewGroup
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
-import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -31,12 +30,6 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface VoiceSearchPermissionDialogsLauncher {
-    fun showNoMicAccessDialog(
-        context: Context,
-        onSettingsLaunchSelected: () -> Unit = {},
-        onSettingsLaunchDeclined: () -> Unit = {},
-    )
-
     fun showMicAccessDeniedDialog(
         context: Context,
         mode: VoiceSearchMode?,
@@ -49,12 +42,6 @@ interface VoiceSearchPermissionDialogsLauncher {
         activity: Activity,
         onAllowSelected: () -> Unit = {},
     )
-
-    fun showPermissionRationale(
-        context: Context,
-        onRationaleAccepted: () -> Unit = {},
-        onRationaleDeclined: () -> Unit = {},
-    )
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -63,30 +50,6 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
     companion object {
         private const val CHANGE_PERMISSIONS_BUTTON = 0
         private const val HIDE_VOICE_SEARCH_BUTTON = 1
-    }
-
-    override fun showNoMicAccessDialog(
-        context: Context,
-        onSettingsLaunchSelected: () -> Unit,
-        onSettingsLaunchDeclined: () -> Unit,
-    ) {
-        TextAlertDialogBuilder(context)
-            .setTitle(R.string.voiceSearchPermissionRejectedDialogTitle)
-            .setMessage(R.string.voiceSearchPermissionRejectedDialogMessage)
-            .setPositiveButton(R.string.voiceSearchPermissionRejectedDialogPositiveAction)
-            .setNegativeButton(R.string.voiceSearchNegativeAction)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        onSettingsLaunchSelected()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        onSettingsLaunchDeclined()
-                    }
-                },
-            )
-            .show()
     }
 
     override fun showMicAccessDeniedDialog(
@@ -144,30 +107,6 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
         }
         snackbar
             .setAction(R.string.voiceSearchMicPermissionDeniedSnackbarAction) { onAllowSelected() }
-            .show()
-    }
-
-    override fun showPermissionRationale(
-        context: Context,
-        onRationaleAccepted: () -> Unit,
-        onRationaleDeclined: () -> Unit,
-    ) {
-        TextAlertDialogBuilder(context)
-            .setTitle(R.string.voiceSearchPermissionRationaleTitle)
-            .setMessage(R.string.voiceSearchPermissionRationaleDescription)
-            .setPositiveButton(R.string.voiceSearchPermissionRationalePositiveAction)
-            .setNegativeButton(R.string.voiceSearchNegativeAction)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        onRationaleAccepted()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        onRationaleDeclined()
-                    }
-                },
-            )
             .show()
     }
 }

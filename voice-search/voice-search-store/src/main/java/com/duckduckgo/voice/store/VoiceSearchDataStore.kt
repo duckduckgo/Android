@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 interface VoiceSearchDataStore {
-    var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
     var micPermissionPreviouslyDenied: Boolean
     var lastSelectedMode: VoiceSearchMode
@@ -42,7 +41,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 ) : VoiceSearchDataStore {
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
-        const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
         const val KEY_MIC_PERMISSION_PREVIOUSLY_DENIED = "KEY_MIC_PERMISSION_PREVIOUSLY_DENIED"
@@ -50,12 +48,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-
-    override var userAcceptedRationaleDialog: Boolean
-        get() = preferences.getBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, false)
-        set(accept) {
-            updateValue(KEY_RATIONALE_DIALOG_ACCEPTED, accept)
-        }
 
     override var availabilityLogged: Boolean
         get() = preferences.getBoolean(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, false)

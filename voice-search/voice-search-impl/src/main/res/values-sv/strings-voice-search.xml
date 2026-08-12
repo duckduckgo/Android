@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Tala nu</string>
     <string name="voiceSearchListeningFooter">Ljudet bearbetas på enheten. Det lagras inte och delas inte med någon, inte ens DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Avbryt</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo lyssnar aldrig på det du säger. Ljudet bearbetas på enheten. Det lagras inte och delas inte med någon.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Mikrofonåtkomst krävs för privat röstsökning</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">För att kunna använda röstsökning i DuckDuckGo måste du aktivera mikrofonåtkomst i systeminställningarna.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Inställningar</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonåtkomst krävs</string>
     <string name="voiceSearchTitle">Röstsökning</string>
 </resources>

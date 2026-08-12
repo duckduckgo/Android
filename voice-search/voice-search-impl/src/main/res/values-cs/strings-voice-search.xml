@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Řekni něco</string>
     <string name="voiceSearchListeningFooter">Zvuk se zpracovává na zařízení. Nikde ho neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>
     <string name="voiceSearchNegativeAction">Zrušit</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nikdy neposlouchá, co říkáš. Zvuk se zpracovává na zařízení. Nikam se neukládá ani se s nikým nesdílí.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Pro soukromé hlasové vyhledávání je nutný přístup k mikrofonu</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">Dobře</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Jestli chceš v DuckDuckGo používat hlasové vyhledávání, musíš v nastavení systému povolit přístup k mikrofonu.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Nastavení</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Je nutný přístup k mikrofonu</string>
     <string name="voiceSearchTitle">Hlasové vyhledávání</string>
 </resources>

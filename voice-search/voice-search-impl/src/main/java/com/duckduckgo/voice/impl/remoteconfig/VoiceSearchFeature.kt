@@ -43,12 +43,4 @@ interface VoiceSearchFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun restartAfterTimeout(): Toggle
-
-    /**
-     * @return `true` when voice search defaults to on for users who never changed the setting, and the
-     * microphone permission flow goes straight to the system prompt instead of showing our own dialog first
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun newPermissionFlow(): Toggle
 }

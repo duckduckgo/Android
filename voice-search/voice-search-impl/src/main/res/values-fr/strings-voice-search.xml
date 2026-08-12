@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Parlez maintenant</string>
     <string name="voiceSearchListeningFooter">L\'audio est traité directement sur l\'appareil. Il n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Annuler</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo n\'écoute jamais ce que vous dites. L\'audio est traité directement sur l\'appareil. Il n\'est ni stocké ni partagé avec qui que ce soit.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Accès au microphone requis pour la recherche vocale privée</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">Ok</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Pour utiliser la recherche vocale dans DuckDuckGo, vous devez activer l\'accès au microphone dans les paramètres système.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Paramètres</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Accès au microphone requis</string>
     <string name="voiceSearchTitle">Recherche vocale</string>
 </resources>

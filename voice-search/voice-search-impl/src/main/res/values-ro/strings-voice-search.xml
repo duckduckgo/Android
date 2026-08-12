@@ -22,11 +22,5 @@
     <string name="voiceSearchListening">Vorbește acum</string>
     <string name="voiceSearchListeningFooter">Componenta audio este prelucrată pe dispozitiv. Nu este stocată sau distribuită nimănui, nici DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Anulează</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nu ascultă niciodată ceea ce spui. Materialul audio este prelucrat pe dispozitiv. Nu este stocat sau partajat cu nimeni.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Este necesar accesul la microfon pentru Căutarea vocală privată</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Pentru a utiliza căutarea vocală în DuckDuckGo, trebuie să activezi accesul la microfon din setările sistemului.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Setări</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Este necesar accesul la microfon</string>
     <string name="voiceSearchTitle">Căutare vocală</string>
 </resources>

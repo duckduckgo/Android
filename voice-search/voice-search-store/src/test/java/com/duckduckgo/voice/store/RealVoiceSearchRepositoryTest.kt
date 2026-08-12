@@ -38,15 +38,6 @@ class RealVoiceSearchRepositoryTest {
     }
 
     @Test
-    fun whenRationalDialogIsAcceptedThenGetHasAcceptedRationaleDialogShouldBeTrue() {
-        assertFalse(testee.getHasAcceptedRationaleDialog())
-
-        testee.acceptRationaleDialog()
-
-        assertTrue(testee.getHasAcceptedRationaleDialog())
-    }
-
-    @Test
     fun whenAvailabilityIsLoggedThengetHasLoggedAvailabilityShouldBeTrue() {
         assertFalse(testee.getHasLoggedAvailability())
 
@@ -91,7 +82,6 @@ class RealVoiceSearchRepositoryTest {
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
-    override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
     override var micPermissionPreviouslyDenied: Boolean = false
     override var lastSelectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH
