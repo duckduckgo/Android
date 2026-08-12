@@ -24,6 +24,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -256,6 +258,7 @@ interface DuckChatPixels {
 class RealDuckChatPixels @Inject constructor(
     private val pixel: Pixel,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val duckChatInternal: DuckChatInternal,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
@@ -712,6 +715,7 @@ class RealDuckChatPixels @Inject constructor(
         hasText: Boolean,
         surface: DuckChatPixelSurface,
     ) {
+        val defaultMode = duckChatInternal.resolvedTogglePosition().takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
         val params = buildMap {
             put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
             modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
@@ -720,6 +724,7 @@ class RealDuckChatPixels @Inject constructor(
             put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
             put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
             put(DuckChatPixelParameters.SURFACE, surface.value)
+            defaultMode?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
         }
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
@@ -961,10 +966,17 @@ class RealDuckChatPixels @Inject constructor(
     }
 
     override fun fireOmnibarQuerySubmitted(query: String) {
+        // Read before navigation handling writes the new  last-used position.
+        val defaultMode = duckChatInternal.resolvedTogglePosition()
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            val params = buildMap {
+                put(DuckChatPixelParameters.TEXT_LENGTH_BUCKET, toQueryLengthBucket(query.length))
+                put(DuckChatPixelParameters.TOGGLE_VISIBLE, (defaultMode != null).toString())
+                defaultMode?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
+            }
             pixel.fire(
                 pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
-                parameters = mapOf(DuckChatPixelParameters.TEXT_LENGTH_BUCKET to toQueryLengthBucket(query.length)),
+                parameters = params,
             )
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Pixel.PixelType.Daily())
         }
@@ -1330,6 +1342,8 @@ object DuckChatPixelParameters {
     const val HAS_IMAGE_ATTACHMENT = "has_image_attachment"
     const val HAS_FILE_ATTACHMENT = "has_file_attachment"
     const val HAS_TEXT = "has_text"
+    const val DEFAULT_MODE = "default_mode"
+    const val TOGGLE_VISIBLE = "toggle_visible"
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
@@ -1592,3 +1606,8 @@ internal fun toQueryLengthBucket(length: Int): String =
         length <= 100 -> "long"
         else -> "very_long"
     }
+
+internal fun ToggleSelection.pixelValue(): String = when (this) {
+    ToggleSelection.SEARCH -> "search"
+    ToggleSelection.DUCK_AI -> "duck_ai"
+}

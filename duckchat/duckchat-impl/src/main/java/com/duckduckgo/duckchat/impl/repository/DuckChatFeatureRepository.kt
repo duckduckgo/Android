@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 interface DuckChatFeatureRepository {
@@ -99,11 +100,11 @@ interface DuckChatFeatureRepository {
 
     suspend fun getDefaultTogglePosition(): String?
 
-    fun observeDefaultTogglePosition(): Flow<String?>
+    fun observeDefaultTogglePosition(): StateFlow<String?>
 
     suspend fun setLastUsedTogglePosition(position: String)
 
-    fun observeLastUsedTogglePosition(): Flow<String?>
+    fun observeLastUsedTogglePosition(): StateFlow<String?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -215,13 +216,13 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun getDefaultTogglePosition(): String? = duckChatDataStore.getDefaultTogglePosition()
 
-    override fun observeDefaultTogglePosition(): Flow<String?> = duckChatDataStore.observeDefaultTogglePosition()
+    override fun observeDefaultTogglePosition(): StateFlow<String?> = duckChatDataStore.observeDefaultTogglePosition()
 
     override suspend fun setLastUsedTogglePosition(position: String) {
         duckChatDataStore.setLastUsedTogglePosition(position)
     }
 
-    override fun observeLastUsedTogglePosition(): Flow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
+    override fun observeLastUsedTogglePosition(): StateFlow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

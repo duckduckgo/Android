@@ -1474,13 +1474,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 // into the search-only experience.
                 val state = viewModel.state.firstOrNull() ?: return@launch
                 if (!state.toggleVisible) return@launch
-                val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
-                val resolved = if (position == DefaultTogglePosition.LAST_USED) {
-                    DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
-                } else {
-                    position
-                }
-                if (resolved == DefaultTogglePosition.DUCK_AI) {
+                if (viewModel.resolvedTogglePosition() == NativeInputState.ToggleSelection.DUCK_AI) {
                     selectChatTab()
                 }
             }

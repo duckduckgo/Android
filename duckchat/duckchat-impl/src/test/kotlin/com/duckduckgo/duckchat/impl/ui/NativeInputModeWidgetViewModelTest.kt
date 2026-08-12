@@ -1825,4 +1825,18 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     // endregion
+
+    @Test
+    fun whenResolvedTogglePositionThenDelegatesToDuckChat() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun whenNoToggleOfferedThenResolvedTogglePositionIsNull() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(null)
+
+        assertNull(testee.resolvedTogglePosition())
+    }
 }

@@ -40,6 +40,7 @@ class RealDuckChatPixelsPickerTest {
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
 
     private val testee = RealDuckChatPixels(
+        duckChatInternal = mock(),
         pixel = pixel,
         duckChatFeatureRepository = duckChatFeatureRepository,
         appCoroutineScope = coroutineTestRule.testScope,

@@ -512,6 +512,17 @@
                 "type": "string",
                 "description": "Bucketed length of the submitted query",
                 "enum": ["short", "medium", "long", "very_long"]
+            },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
             }
         ]
     },
@@ -1187,6 +1198,12 @@
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
             },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {
                 "key": "reasoning_effort",
@@ -1212,6 +1229,12 @@
                 "type": "string",
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
+            },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
             },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {

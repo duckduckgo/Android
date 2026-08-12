@@ -57,7 +57,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -417,9 +416,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
-    val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()
-
-    val lastUsedTogglePosition: Flow<String?> = duckChatInternal.observeLastUsedTogglePosition()
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection? = duckChatInternal.resolvedTogglePosition()
 
     suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatInternal.saveLastUsedTogglePosition(position)

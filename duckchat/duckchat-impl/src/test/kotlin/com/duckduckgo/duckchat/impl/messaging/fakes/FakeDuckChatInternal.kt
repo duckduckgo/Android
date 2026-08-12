@@ -200,6 +200,8 @@ class FakeDuckChatInternal(
 
     override fun isContextualSheetRedesignEnabled(): Boolean = false
 
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection? = null
+
     override fun isDuckChatFeatureEnabled(): Boolean = true
 
     override fun isChatSyncFeatureEnabled(): Boolean = true
