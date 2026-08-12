@@ -17,7 +17,6 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern.THRICE_IN_20_SECONDS
 import com.duckduckgo.brokensite.api.RefreshPattern.TWICE_IN_12_SECONDS
 import org.junit.Assert.assertEquals
@@ -241,7 +240,6 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         addRefresh(refreshOwner, url, localDateTime)
     }
 
-    private fun RealBrokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
-        return getRefreshPatterns(refreshOwner, currentDateTime)
-    }
+    private fun RealBrokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime: LocalDateTime) =
+        getRefreshPatterns(refreshOwner, currentDateTime)
 }
