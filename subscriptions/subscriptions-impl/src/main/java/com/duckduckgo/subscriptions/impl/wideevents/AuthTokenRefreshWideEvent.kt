@@ -28,11 +28,20 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
+import java.io.Closeable
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 interface AuthTokenRefreshWideEvent {
-    suspend fun onStart(subscriptionStatus: SubscriptionStatus)
+    suspend fun onStart(
+        subscriptionStatus: SubscriptionStatus,
+        serializationEnabled: Boolean,
+    )
+
+    suspend fun onCrossProcessLockAcquired(result: Result<Closeable>)
     suspend fun onTokenRead()
     suspend fun onJwksFetched()
     suspend fun onTokensFetched()
@@ -62,7 +71,10 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
 
     private var ongoingTokenRefreshWideEventId: Long? = null
 
-    override suspend fun onStart(subscriptionStatus: SubscriptionStatus) {
+    override suspend fun onStart(
+        subscriptionStatus: SubscriptionStatus,
+        serializationEnabled: Boolean,
+    ) {
         if (!isFeatureEnabled()) return
 
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
@@ -78,12 +90,35 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
                     KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
+                    KEY_SERIALIZATION_ENABLED to serializationEnabled.toString(),
                 ),
             )
             .getOrNull()
             ?.also { wideEventId ->
                 wideEventClient.intervalStart(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
+                if (serializationEnabled) {
+                    wideEventClient.intervalStart(wideEventId = wideEventId, key = INTERVAL_LOCK_WAIT, buckets = LOCK_WAIT_BUCKETS)
+                }
             }
+    }
+
+    override suspend fun onCrossProcessLockAcquired(result: Result<Closeable>) {
+        if (!isFeatureEnabled()) return
+        ongoingTokenRefreshWideEventId?.let { wideEventId ->
+            wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_LOCK_WAIT)
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_LOCK_ACQUIRE,
+                success = result.isSuccess,
+                metadata = mapOf(KEY_LOCK_OUTCOME to result.toOutcomeValue()),
+            )
+        }
+    }
+
+    private fun Result<Closeable>.toOutcomeValue(): String = when {
+        isSuccess -> "acquired"
+        exceptionOrNull() is TimeoutCancellationException -> "timeout"
+        else -> "error"
     }
 
     override suspend fun onTokenRead() {
@@ -190,16 +225,22 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     private companion object {
         const val AUTH_TOKEN_REFRESH_FEATURE_NAME = "auth-token-refresh"
 
+        const val STEP_LOCK_ACQUIRE = "lock_acquire"
         const val STEP_TOKEN_READ = "token_read"
         const val STEP_JWKS_FETCH = "jwks_fetch"
         const val STEP_TOKEN_REQUEST = "token_request"
         const val STEP_TOKEN_VALIDATION = "token_validation"
         const val STEP_PLAY_LOGIN = "play_login"
 
+        const val INTERVAL_LOCK_WAIT = "token_refresh_lock_wait_ms_bucketed"
         const val INTERVAL_GET_JWKS = "fetch_jwks_latency_ms_bucketed"
         const val INTERVAL_GET_TOKENS = "refresh_access_token_latency_ms_bucketed"
         const val INTERVAL_TOTAL_DURATION = "total_duration_ms_bucketed"
 
+        val LOCK_WAIT_BUCKETS = setOf(100.milliseconds, 500.milliseconds, 1.seconds, 3.seconds, 10.seconds, 30.seconds, 60.seconds)
+
+        const val KEY_LOCK_OUTCOME = "lock_outcome"
+        const val KEY_SERIALIZATION_ENABLED = "serialization_enabled"
         const val KEY_SUBSCRIPTION_STATUS = "subscription_status"
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"

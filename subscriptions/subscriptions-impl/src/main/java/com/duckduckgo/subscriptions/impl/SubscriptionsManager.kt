@@ -762,7 +762,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun refreshAccessToken() {
         try {
-            tokenRefreshWideEvent.onStart(subscriptionStatus())
+            tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = false)
             doRefreshAccessToken()
             tokenRefreshWideEvent.onSuccess()
         } catch (e: Exception) {
