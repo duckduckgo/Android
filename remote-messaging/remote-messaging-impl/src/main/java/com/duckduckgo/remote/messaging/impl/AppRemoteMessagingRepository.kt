@@ -80,6 +80,7 @@ class AppRemoteMessagingRepository(
             messageEntity.copy(
                 shown = true,
                 firstShownDate = messageEntity.firstShownDate ?: currentTimeProvider.currentTimeMillis(),
+                impressions = messageEntity.impressions + 1,
             ),
         )
     }

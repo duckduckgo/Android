@@ -491,6 +491,35 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
+    fun whenMarkAsShownThenImpressionsCounted() {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessage("id"))
+        assertEquals(0, dao.messagesById("id")?.impressions)
+
+        testee.markAsShown(aRemoteMessage("id"))
+        assertEquals(1, dao.messagesById("id")?.impressions)
+
+        testee.markAsShown(aRemoteMessage("id"))
+        assertEquals(2, dao.messagesById("id")?.impressions)
+    }
+
+    @Test
+    fun whenSameMessageRescheduledThenImpressionCountPreserved() {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessage("id"))
+        testee.markAsShown(aRemoteMessage("id"))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        // a config re-push updates the row rather than replacing it, so the count is lifetime
+        testee.activeMessage(aRemoteMessage("id"))
+        assertEquals(2, dao.messagesById("id")?.impressions)
+
+        testee.activeMessage(aRemoteMessage("otherId"))
+        testee.activeMessage(aRemoteMessage("id"))
+        assertEquals(2, dao.messagesById("id")?.impressions)
+    }
+
+    @Test
     fun whenExpiryThresholdReachedThenMessageDismissedAndConfigInvalidated() = runTest {
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(5))
         testee.activeMessage(aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5)))

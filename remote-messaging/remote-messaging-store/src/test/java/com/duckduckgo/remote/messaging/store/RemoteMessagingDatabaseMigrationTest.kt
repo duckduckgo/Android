@@ -59,6 +59,32 @@ class RemoteMessagingDatabaseMigrationTest {
     }
 
     @Test
+    fun whenMigratingFromV3ToV4ThenImpressionsAddedAsZeroAndExistingRowPreserved() {
+        testHelper.createDatabase(TEST_DB_NAME, 3).apply {
+            execSQL(
+                "INSERT INTO remote_message (id, message, status, shown, firstShownDate) " +
+                    "VALUES ('id1', '{}', 'SCHEDULED', 1, 1234)",
+            )
+            close()
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 4, true, *RemoteMessagingDatabase.ALL_MIGRATIONS).apply {
+            val cursor = query(
+                "SELECT message, status, shown, firstShownDate, impressions FROM remote_message WHERE id = 'id1'",
+            )
+            cursor.moveToFirst()
+            assertEquals("{}", cursor.getString(cursor.getColumnIndexOrThrow("message")))
+            assertEquals("SCHEDULED", cursor.getString(cursor.getColumnIndexOrThrow("status")))
+            assertEquals(1, cursor.getInt(cursor.getColumnIndexOrThrow("shown")))
+            assertEquals(1234, cursor.getLong(cursor.getColumnIndexOrThrow("firstShownDate")))
+            // a message shown before the migration starts counting from zero rather than arriving pre-capped
+            assertEquals(0, cursor.getInt(cursor.getColumnIndexOrThrow("impressions")))
+            cursor.close()
+            close()
+        }
+    }
+
+    @Test
     fun whenMigratingToLatestThenValidatesAgainstCurrentSchema() {
         testHelper.createDatabase(TEST_DB_NAME, 2).apply { close() }
 
