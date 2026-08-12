@@ -47,6 +47,7 @@ import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth2.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
@@ -88,6 +89,7 @@ import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -96,6 +98,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -292,6 +296,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
+    private val crossProcessLock: CrossProcessLock,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
@@ -328,6 +333,8 @@ class RealSubscriptionsManager @Inject constructor(
     override val entitlementSet = _entitlementSet.onSubscription { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
+
+    private val tokenRefreshMutex = Mutex()
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
@@ -761,14 +768,46 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        try {
-            tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = false)
-            doRefreshAccessToken()
-            tokenRefreshWideEvent.onSuccess()
-        } catch (e: Exception) {
-            tokenRefreshWideEvent.onFailure(e)
-            throw e
+        val serializeRefresh = withContext(dispatcherProvider.io()) {
+            subscriptionsFeature.get().serializeTokenRefresh().isEnabled()
         }
+
+        if (!serializeRefresh) {
+            try {
+                tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = false)
+                doRefreshAccessToken()
+                tokenRefreshWideEvent.onSuccess()
+            } catch (e: Exception) {
+                tokenRefreshWideEvent.onFailure(e)
+                throw e
+            }
+            return
+        }
+
+        // Moving token refresh to app-scoped coroutine to ensure it's not interrupted by caller cancellation.
+        coroutineScope.async {
+            tokenRefreshMutex.withLock {
+                try {
+                    tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = true)
+
+                    val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
+                    tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
+
+                    try {
+                        doRefreshAccessToken()
+                    } finally {
+                        lockResult.getOrNull()?.let { lockHandle ->
+                            withContext(dispatcherProvider.io()) { lockHandle.close() }
+                        }
+                    }
+
+                    tokenRefreshWideEvent.onSuccess()
+                } catch (e: Exception) {
+                    tokenRefreshWideEvent.onFailure(e)
+                    throw e
+                }
+            }
+        }.await()
     }
 
     private suspend fun doRefreshAccessToken() {
@@ -1350,6 +1389,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     companion object {
         const val SUBSCRIPTION_NOT_FOUND_ERROR = "SubscriptionNotFound"
+        private const val TOKEN_REFRESH_LOCK_KEY = "auth_token_refresh"
     }
 }
 
