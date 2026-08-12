@@ -90,7 +90,26 @@ class FileBasedFaviconPersisterTest {
 
         assertNotNull(file)
         verifyDirectoryUse(file!!.absolutePath, testDirectory)
-        verifyCacheDirectoryUsed(file.absolutePath)
+        verifyExpectedBaseDirectoryUsed(file.absolutePath, testDirectory)
+    }
+
+    @Test
+    fun whenFaviconFileIsForTempDirectoryThenCacheDirUsed() = runTest {
+        createNewFile(FileBasedFaviconPersister.FAVICON_TEMP_DIR)
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_TEMP_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.cacheDir.absolutePath))
+    }
+
+    @Test
+    fun whenFaviconFileIsForPersistedDirectoryThenNonCacheDirUsed() = runTest {
+        createNewFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.filesDir.absolutePath))
+        assertFalse(file.absolutePath.startsWith(context.cacheDir.absolutePath))
     }
 
     @Test
@@ -213,8 +232,11 @@ class FileBasedFaviconPersisterTest {
         assertTrue(path.parent!!.endsWith(subFolder))
     }
 
-    private fun verifyCacheDirectoryUsed(path: String) {
-        assertTrue(path.startsWith(context.cacheDir.absolutePath))
+    private fun verifyExpectedBaseDirectoryUsed(
+        path: String,
+        directory: String,
+    ) {
+        assertTrue(path.startsWith(expectedBaseDir(directory).absolutePath))
     }
 
     private fun verifyDirectoryUse(
@@ -224,15 +246,20 @@ class FileBasedFaviconPersisterTest {
         assertTrue(path.contains("/$directory"))
     }
 
-    private fun createNewFile() {
-        val previewFileDestination = File(File(context.cacheDir, testDirectory), subFolder)
+    // Mirrors FileBasedFaviconPersister's private faviconDirectory() base-dir decision.
+    private fun expectedBaseDir(directory: String): File {
+        return if (directory == FileBasedFaviconPersister.FAVICON_TEMP_DIR) context.cacheDir else context.filesDir
+    }
+
+    private fun createNewFile(directory: String = testDirectory) {
+        val previewFileDestination = File(File(expectedBaseDir(directory), directory), subFolder)
         previewFileDestination.mkdirs()
         val file = File(previewFileDestination, filename(domain))
         writeBytesToFile(file)
     }
 
     private fun getTestFile(): File {
-        val previewFileDestination = File(File(context.cacheDir, testDirectory), subFolder)
+        val previewFileDestination = File(File(expectedBaseDir(testDirectory), testDirectory), subFolder)
         return File(previewFileDestination, filename(domain))
     }
 
@@ -246,9 +273,13 @@ class FileBasedFaviconPersisterTest {
     private fun filename(name: String): String = "${name.sha256}.png"
 
     private fun deleteTestFolders() {
-        val dirToDelete = File(File(context.cacheDir, testDirectory), "")
-        dirToDelete.deleteRecursively()
-        val secondaryDirToDelete = File(File(context.cacheDir, secondaryTestDirectory), "")
-        secondaryDirToDelete.deleteRecursively()
+        listOf(
+            testDirectory,
+            secondaryTestDirectory,
+            FileBasedFaviconPersister.FAVICON_TEMP_DIR,
+            FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
+        ).forEach {
+            File(expectedBaseDir(it), it).deleteRecursively()
+        }
     }
 }
