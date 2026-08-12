@@ -3696,13 +3696,19 @@ class BrowserTabViewModel @Inject constructor(
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshPatterns()
             handleBreakageRefreshPatterns(detectedRefreshPatterns)
+            val currentSite = siteLiveData.value
+            val currentNavigationUrl = webNavigationState?.currentUrl
+            val patternsForCurrentSite =
+                detectedRefreshPatterns.takeIf {
+                    currentNavigationUrl != null && currentSite?.url == currentNavigationUrl
+                } ?: emptySet()
             val cta =
                 withContext(dispatchers.io()) {
                     ctaViewModel.refreshCta(
                         dispatchers.io(),
                         isBrowserShowing && !isErrorShowing,
-                        siteLiveData.value,
-                        detectedRefreshPatterns,
+                        currentSite,
+                        patternsForCurrentSite,
                         suppressDuckAiOnboardingCta,
                     )
                 }

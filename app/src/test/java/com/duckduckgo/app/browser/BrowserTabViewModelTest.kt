@@ -3826,6 +3826,86 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenRefreshPatternsBelongToPreviousNavigationThenCtaReceivesNoPatterns() =
+        runTest {
+            val previousUrl = "https://previous.example"
+            val currentUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            val staleSite = givenCurrentSite(previousUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+            advanceUntilIdle()
+            testee.siteLiveData.value = staleSite
+
+            testee.refreshCta()
+
+            verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
+            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
+                previousUrl,
+                emptySet(),
+            )
+        }
+
+    @Test
+    fun whenRefreshPatternsBelongToCurrentNavigationThenCtaReceivesPatterns() =
+        runTest {
+            val currentUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            val currentSite = givenCurrentSite(currentUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+            advanceUntilIdle()
+            testee.siteLiveData.value = currentSite
+
+            testee.refreshCta()
+
+            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
+                currentUrl,
+                refreshPatterns,
+            )
+        }
+
+    @Test
+    fun whenCurrentNavigationUrlMissingThenCtaReceivesNoPatterns() =
+        runTest {
+            val siteUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            givenCurrentSite(siteUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.refreshCta()
+
+            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
+                siteUrl,
+                emptySet(),
+            )
+        }
+
+    @Test
     fun whenCtaShownThenFirePixel() =
         runTest {
             val cta = HomePanelCta.AddWidgetAutoOnboarding
