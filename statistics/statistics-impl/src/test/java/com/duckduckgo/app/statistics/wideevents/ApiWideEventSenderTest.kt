@@ -94,6 +94,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -138,6 +139,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -177,6 +179,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -216,6 +219,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -255,6 +259,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -292,6 +297,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -334,6 +340,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -405,6 +412,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 0.1f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -444,6 +452,7 @@ class ApiWideEventSenderTest {
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -453,6 +462,45 @@ class ApiWideEventSenderTest {
             ),
             feature = FeatureSection(
                 name = "some-event",
+                status = "SUCCESS",
+                data = null,
+            ),
+            context = null,
+        )
+
+        verify(wideEventService).sendWideEvent(eq(expectedRequest))
+    }
+
+    @Test
+    fun `when event is the first daily occurrence then it is included in request`() = runTest {
+        val event = createWideEvent(
+            id = 800L,
+            name = "first-occurrence-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            isFirstDailyOccurrence = true,
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-first-occurrence-event",
+                version = "1.0.0",
+            ),
+            global = GlobalSection(
+                platform = "Android",
+                type = "app",
+                sampleRate = 1.0f,
+                isFirstDailyOccurrence = true,
+            ),
+            app = AppSection(
+                name = "DuckDuckGo Android",
+                version = "5.123.0",
+                formFactor = "phone",
+                devMode = false,
+            ),
+            feature = FeatureSection(
+                name = "first-occurrence-event",
                 status = "SUCCESS",
                 data = null,
             ),
@@ -488,6 +536,7 @@ class ApiWideEventSenderTest {
         samplingProbability: Float = 1.0f,
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
+        isFirstDailyOccurrence: Boolean = false,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -505,5 +554,6 @@ class ApiWideEventSenderTest {
         samplingProbability = samplingProbability,
         metaType = metaType,
         metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
     )
 }

@@ -58,6 +58,7 @@ class ApiWideEventSender @Inject constructor(
                 platform = PLATFORM,
                 type = TYPE,
                 sampleRate = event.samplingProbability,
+                isFirstDailyOccurrence = event.isFirstDailyOccurrence,
             ),
             app = AppSection(
                 name = APP_NAME,

@@ -80,6 +80,7 @@ interface WideEventRepository {
         val samplingProbability: Float = 1.0f,
         val metaType: String,
         val metaVersion: String,
+        val isFirstDailyOccurrence: Boolean = false,
     )
 
     data class WideEventStep(
