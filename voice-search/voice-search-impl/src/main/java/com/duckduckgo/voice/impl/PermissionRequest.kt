@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.activity.result.ActivityResultCaller
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -49,7 +48,6 @@ interface PermissionRequest {
 
 @ContributesBinding(ActivityScope::class)
 class MicrophonePermissionRequest @Inject constructor(
-    private val pixel: Pixel,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val voiceSearchPermissionDialogsLauncher: VoiceSearchPermissionDialogsLauncher,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
@@ -104,7 +102,7 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showPermissionRationale(
                 activity,
                 { handleRationaleAccepted() },
-                { handleRationaleCancelled(activity) },
+                { showRemoveVoiceSearchDialog(activity) },
             )
         }
     }
@@ -141,14 +139,8 @@ class MicrophonePermissionRequest @Inject constructor(
     }
 
     private fun handleRationaleAccepted() {
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
         voiceSearchRepository.acceptRationaleDialog()
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
-    }
-
-    private fun handleRationaleCancelled(context: Context) {
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
-        showRemoveVoiceSearchDialog(context)
     }
 
     private fun showRemoveVoiceSearchDialog(context: Context) {

@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.view.ViewGroup
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
@@ -65,9 +64,7 @@ interface VoiceSearchPermissionDialogsLauncher {
 }
 
 @ContributesBinding(ActivityScope::class)
-class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
-    val pixel: Pixel,
-) : VoiceSearchPermissionDialogsLauncher {
+class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSearchPermissionDialogsLauncher {
 
     companion object {
         private const val CHANGE_PERMISSIONS_BUTTON = 0
@@ -194,17 +191,13 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         onRemoveVoiceSearch()
-                        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_REMOVE)
                     }
 
                     override fun onNegativeButtonClicked() {
                         onRemoveVoiceSearchCancelled()
-                        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_CANCEL)
                     }
                 },
             )
             .show()
-
-        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_SEEN)
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -42,9 +41,6 @@ import org.mockito.kotlin.whenever
 
 class MicrophonePermissionRequestTest {
     @Mock
-    private lateinit var pixel: Pixel
-
-    @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
     @Mock
@@ -65,7 +61,6 @@ class MicrophonePermissionRequestTest {
         activityResultLauncherWrapper = FakeActivityResultLauncherWrapper()
         voiceSearchFeature.newPermissionFlow().setRawStoredState(State(false))
         testee = MicrophonePermissionRequest(
-            pixel,
             voiceSearchRepository,
             voiceSearchPermissionDialogsLauncher,
             activityResultLauncherWrapper,
@@ -189,27 +184,15 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenRationalDialogShownThenRationalAcceptedInvokedThenFilePixelAndLaunchPermission() {
+    fun whenRationalDialogShownThenRationalAcceptedInvokedThenLaunchPermission() {
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
         testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock(), null)
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleAccepted.invoke()
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
         verify(voiceSearchRepository).acceptRationaleDialog()
         assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
-    }
-
-    @Test
-    fun whenRationalDialogShownThenRationalCancelledInvokedThenFilePixelAndLaunchPermission() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock(), null)
-
-        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
-
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
     }
 
     @Test
