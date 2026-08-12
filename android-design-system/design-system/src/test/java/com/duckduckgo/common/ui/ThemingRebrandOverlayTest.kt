@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("NoImplImportsInAppModule")
-
 package com.duckduckgo.common.ui
 
 import android.content.res.Resources
@@ -23,8 +21,8 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.sync.impl.ui.SyncConnectActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -55,8 +53,12 @@ class ThemingRebrandOverlayTest {
         return value.data != 0
     }
 
+    class FixedThemeActivity : AppCompatActivity() {
+        override fun getLocalClassName(): String = FIXED_THEME_ACTIVITIES.first()
+    }
+
     private fun fixedThemeActivity(themeResId: Int = R.style.Theme_DuckDuckGo_Dark): AppCompatActivity =
-        Robolectric.buildActivity(SyncConnectActivity::class.java).get().apply {
+        Robolectric.buildActivity(FixedThemeActivity::class.java).get().apply {
             setTheme(themeResId)
         }
 
