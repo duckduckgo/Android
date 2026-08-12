@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
@@ -50,6 +51,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.ContentControll
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.DialogRenderEngine
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.EmbellishmentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.StepIndicatorControllerImpl
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
@@ -123,6 +125,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyLayoutOverrides()
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
@@ -132,8 +136,10 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 topMargin = insets.top
             }
             // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows,
-            // which would leave the card measuring against a gap that is about to disappear.
-            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime())) {
+            // which would leave the card measuring against a gap that is about to disappear. Unless the focus is
+            // inside the card: reserving the keyboard's height is then what keeps the card's content scrollable.
+            val cardOwnsTheKeyboard = v.findFocus() != null
+            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
                 cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             }
             windowInsets
@@ -194,6 +200,25 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    /**
+     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2],
+     * which that flag flips at runtime. This renderer only ever runs with those improvements on.
+     *
+     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go: the card wraps a `ScrollView`, and
+     * inside a wrap_content parent ConstraintLayout resolves the wrap before `constraintWidth_max` narrows the
+     * card, so the card keeps a height measured for text that will wrap and scrolls with room to spare. The
+     * corrector puts the flag back on the card root once the card genuinely overflows.
+     */
+    private fun applyLayoutOverrides() {
+        binding.bottomWingAnimation.adjustViewBounds = true
+        binding.daxDialogCta.cardView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
+        binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
+    }
+
     private fun showIntro(screen: ConfigDrivenOnboardingPageViewModel.Screen.Intro) {
         when (screen) {
             is ConfigDrivenOnboardingPageViewModel.Screen.Intro.Play -> {
@@ -227,18 +252,13 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         engine: DialogRenderEngine,
         screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
-        // We assume that if intro is played, it's always done so before any dialog is rendered.
-        // Once the first dialog arrives, if:
-        // - intro visuals on screen: clear them and the background cross-fades from them
-        // - no intro visual on screen (like a mid-flow re-entry from another activity): nothing to animate from, snap new background
-        // Later renders always animate the background. The handover is unconditional so that a render which does not
-        // animate still takes the background off the choreographer.
-        val canCrossFadeBackground = intro?.clearForDialog() == true
+        // Not gated on animateEntry: a render that does not animate must still take the background over
+        // from the choreographer, or the intro visuals stay behind the dialog.
+        intro?.clearForDialog()
         engine.render(
             screen.stepId,
             screen.config,
             animate = screen.animateEntry,
-            animateBackground = canCrossFadeBackground && screen.animateEntry,
         )
         viewModel.onDialogRendered(screen.stepId)
     }

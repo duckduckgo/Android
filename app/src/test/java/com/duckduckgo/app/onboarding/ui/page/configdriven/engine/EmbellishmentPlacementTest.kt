@@ -25,12 +25,12 @@ import org.junit.Test
 class EmbellishmentPlacementTest {
 
     @Test
-    fun `the walking dax presses the card down onto itself on both form factors`() {
+    fun `the walking dax presses the card down onto itself on a phone and centres it on a tablet`() {
         val placement = EmbellishmentPlacement.of(Embellishment.WalkingDax)
 
         assertTrue(placement.anchorsCardOnPhone)
         assertEquals(1f, placement.biasPhone)
-        assertEquals(1f, placement.biasTablet)
+        assertEquals(0.5f, placement.biasTablet)
         assertTrue(placement.drawsArtwork)
     }
 

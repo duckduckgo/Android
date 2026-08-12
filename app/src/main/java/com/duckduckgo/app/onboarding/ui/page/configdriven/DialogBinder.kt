@@ -25,10 +25,23 @@ class BindScope(
     /** Cancelled by the engine at unbind, so state observation dies with the binding. */
     val coroutineScope: CoroutineScope,
     val execute: (ContentInteraction) -> Unit,
+    /**
+     * Asks the card to tween its bounds, over the given duration, into the layout change the binder makes next:
+     * a view it reveals or resizes would otherwise resize the card in a single frame. Call it immediately before
+     * that change. No-op while a snapped or skipped entrance is still landing the screen in place.
+     */
+    val animateCardBounds: (durationMs: Long) -> Unit,
 )
 
 /** Interactions a bound screen raises outside the shared CTA buttons interactions. */
-sealed interface ContentInteraction
+sealed interface ContentInteraction {
+
+    data class SubmitInputPreview(
+        val query: String,
+        val isChat: Boolean,
+        val fromSuggestion: Boolean,
+    ) : ContentInteraction
+}
 
 /** Binds a stateless [ContentConfig] to its include layout. */
 interface DialogBinder<C : ContentConfig> {

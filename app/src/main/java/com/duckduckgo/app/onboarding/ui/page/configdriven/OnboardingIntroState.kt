@@ -27,9 +27,6 @@ class OnboardingIntroState {
     /** The intro is out of play: faded out for a dialog, or snapped away without ever being shown. */
     private var cleared = false
 
-    /** A dialog has taken the background over from the intro. */
-    private var handedOver = false
-
     private var released = false
 
     fun play() {
@@ -48,9 +45,7 @@ class OnboardingIntroState {
 
     /** @return what an arriving dialog leaves the caller to do with the intro views */
     fun handOverToDialog(): Handover {
-        if (handedOver) return Handover.AlreadyHandedOver
-        handedOver = true
-        if (cleared) return Handover.AlreadyDismissed
+        if (cleared) return Handover.AlreadyGone
         cleared = true
         return if (visualsOnScreen) Handover.FadeOut else Handover.SnapAway
     }
@@ -66,20 +61,14 @@ class OnboardingIntroState {
         released = true
     }
 
-    /**
-     * @param canCrossFadeBackground true when the arriving dialog's background can cross-fade from what is on screen
-     */
-    enum class Handover(val canCrossFadeBackground: Boolean) {
+    enum class Handover {
         /** The intro visuals are on screen, fade them out. */
-        FadeOut(canCrossFadeBackground = true),
+        FadeOut,
 
         /** This view never showed the intro, snap the views past it. */
-        SnapAway(canCrossFadeBackground = false),
+        SnapAway,
 
-        /** The intro was already snapped away unplayed. */
-        AlreadyDismissed(canCrossFadeBackground = false),
-
-        /** An earlier dialog already took the background over. */
-        AlreadyHandedOver(canCrossFadeBackground = true),
+        /** The intro is already out of play: an earlier dialog took over, or it was snapped away unplayed. */
+        AlreadyGone,
     }
 }

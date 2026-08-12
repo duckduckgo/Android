@@ -65,6 +65,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
     private val dialogConfigResolver: DialogConfigResolver,
+    private val shownPixels: OnboardingDialogShownPixels,
     private val dispatchers: DispatcherProvider,
     private val widgetCapabilities: WidgetCapabilities,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
@@ -138,7 +139,17 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onEvent(event: NewUserOnboardingEvent) = emit(event)
 
-    fun onContentInteraction(interaction: ContentInteraction) = Unit // No-op until dialogs with local state are implemented in follow-ups.
+    fun onContentInteraction(interaction: ContentInteraction) {
+        when (interaction) {
+            is ContentInteraction.SubmitInputPreview -> emit(
+                NewUserOnboardingEvent.InputDemoQuerySubmitted(
+                    query = interaction.query,
+                    isChat = interaction.isChat,
+                    fromSuggestion = interaction.fromSuggestion,
+                ),
+            )
+        }
+    }
 
     fun onDialogRendered(stepId: LinearOnboardingStepId) {
         _viewState.update { state ->
@@ -283,6 +294,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
         val config = dialogConfigResolver.resolve(dialog, customAiOnboardingStore.isEnabled())
         if (config != null) {
+            shownPixels.fireFor(dialog)
             _viewState.update {
                 it.copy(
                     screen = Screen.Dialog(
@@ -335,23 +347,19 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.SyncRestore -> emit(NewUserOnboardingEvent.SkipRequested)
-
-            NewUserOnboardingActivityDialog.InitialReinstallUser,
-            NewUserOnboardingActivityDialog.Initial,
-            NewUserOnboardingActivityDialog.AddToDock,
-            -> emit(NewUserOnboardingEvent.ContinueClicked)
+            NewUserOnboardingActivityDialog.AddToDock -> emit(NewUserOnboardingEvent.ContinueClicked)
 
             NewUserOnboardingActivityDialog.WidgetPrompt -> emit(NewUserOnboardingEvent.WidgetPromptSkipped)
-
-            NewUserOnboardingActivityDialog.InputScreen -> emit(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
-
-            is NewUserOnboardingActivityDialog.InputScreenPreview -> emit(NewUserOnboardingEvent.ContinueClicked)
 
             is NewUserOnboardingActivityDialog.QuickSetup -> emit(
                 NewUserOnboardingEvent.QuickSetupConfirmed(type = OmnibarType.SINGLE_TOP, withAi = true),
             )
 
+            NewUserOnboardingActivityDialog.SyncRestore,
+            NewUserOnboardingActivityDialog.InitialReinstallUser,
+            NewUserOnboardingActivityDialog.Initial,
+            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
