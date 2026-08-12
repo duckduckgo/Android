@@ -37,10 +37,11 @@ import javax.inject.Inject
 /**
  * Distributes work across a pool of [PirActionsRunner]s.
  *
- * The default scheduling is a shared cost-ordered queue: each runner pulls the next available step
- * until the queue drains, so a runner that finishes a cheap step takes more work instead of idling
- * while others still have steps. Steps are dequeued most-expensive-first, which stops a long step
- * from being picked up last and setting the wall-clock on its own.
+ * The default scheduling is a shared queue: each runner pulls the next available step until the
+ * queue drains, so a runner that finishes a cheap step takes more work instead of idling while
+ * others still have steps. Steps are dequeued most-expensive-first, which stops a long step from
+ * being picked up last and setting the wall-clock on its own, but round-robin across parent brokers, so
+ * that no set of concurrently running steps belongs to a single one.
  */
 interface PirWorkDistributor {
     /**
@@ -51,7 +52,7 @@ interface PirWorkDistributor {
     suspend fun executeAll(
         runners: List<PirActionsRunner>,
         work: List<Pair<ProfileQuery, BrokerStep>>,
-        onStepCompleted: (suspend () -> Unit)? = null,
+        onStepCompleted: suspend () -> Unit = {},
     )
 }
 
@@ -63,7 +64,7 @@ class RealPirWorkDistributor @Inject constructor(
     override suspend fun executeAll(
         runners: List<PirActionsRunner>,
         work: List<Pair<ProfileQuery, BrokerStep>>,
-        onStepCompleted: (suspend () -> Unit)?,
+        onStepCompleted: suspend () -> Unit,
     ) {
         if (work.isEmpty() || runners.isEmpty()) {
             logcat { "PIR-DISTRIBUTOR: Nothing to distribute (work=${work.size}, runners=${runners.size})" }
@@ -80,11 +81,9 @@ class RealPirWorkDistributor @Inject constructor(
     private suspend fun executeQueued(
         runners: List<PirActionsRunner>,
         work: List<Pair<ProfileQuery, BrokerStep>>,
-        onStepCompleted: (suspend () -> Unit)?,
+        onStepCompleted: suspend () -> Unit,
     ) {
-        val queue = ConcurrentLinkedQueue(
-            work.sortedByDescending { (_, brokerStep) -> brokerStep.estimatedCostMs() },
-        )
+        val queue = ConcurrentLinkedQueue(work.orderedForDispatch())
 
         val workers = minOf(runners.size, work.size)
         logcat { "PIR-DISTRIBUTOR: Distributing ${work.size} steps across $workers runners" }
@@ -96,7 +95,7 @@ class RealPirWorkDistributor @Inject constructor(
                         while (true) {
                             val (profileQuery, brokerStep) = queue.poll() ?: break
                             runner.execute(profileQuery, brokerStep)
-                            onStepCompleted?.invoke()
+                            onStepCompleted()
                         }
                     } finally {
                         runner.stop()
@@ -109,7 +108,7 @@ class RealPirWorkDistributor @Inject constructor(
     private suspend fun executeStaticallyPartitioned(
         runners: List<PirActionsRunner>,
         work: List<Pair<ProfileQuery, BrokerStep>>,
-        onStepCompleted: (suspend () -> Unit)?,
+        onStepCompleted: suspend () -> Unit,
     ) {
         val parts = work.splitIntoParts(runners.size)
         logcat { "PIR-DISTRIBUTOR: Statically distributing ${work.size} steps across ${parts.size} runners" }
@@ -120,7 +119,7 @@ class RealPirWorkDistributor @Inject constructor(
                     try {
                         partSteps.forEach { (profileQuery, brokerStep) ->
                             runners[index].execute(profileQuery, brokerStep)
-                            onStepCompleted?.invoke()
+                            onStepCompleted()
                         }
                     } finally {
                         runners[index].stop()
@@ -129,6 +128,25 @@ class RealPirWorkDistributor @Inject constructor(
             }.awaitAll()
         }
     }
+
+    /**
+     * Orders steps so that consecutive queue slots belong to different parent brokers as running multiple child brokers
+     * with same actions in parallel can cause resource starvation issues with anti-bot challenges, which in turn causes timeouts,
+     * so the scan reports no matches for sites that do hold records.
+     */
+    private fun List<Pair<ProfileQuery, BrokerStep>>.orderedForDispatch(): List<Pair<ProfileQuery, BrokerStep>> {
+        val perParentBroker = groupBy { (_, brokerStep) -> brokerStep.parentBroker() }
+            .values
+            .map { steps -> steps.sortedByDescending { (_, brokerStep) -> brokerStep.estimatedCostMs() } }
+            .sortedByDescending { steps -> steps.first().second.estimatedCostMs() }
+
+        val deepest = perParentBroker.maxOfOrNull { it.size } ?: 0
+        return (0 until deepest).flatMap { index ->
+            perParentBroker.mapNotNull { it.getOrNull(index) }
+        }
+    }
+
+    private fun BrokerStep.parentBroker(): String = broker.parent ?: broker.url
 
     private fun BrokerStep.estimatedCostMs(): Long =
         step.actions.count { it is Click || it is Expectation } * GATED_ACTION_PUSH_DELAY_MS +

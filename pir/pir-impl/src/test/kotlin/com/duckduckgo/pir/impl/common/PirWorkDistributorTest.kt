@@ -99,13 +99,14 @@ class PirWorkDistributorTest {
     private fun scanStep(
         brokerName: String,
         actions: List<BrokerAction> = emptyList(),
+        parent: String? = null,
     ): ScanStep = ScanStep(
         broker = Broker(
             name = brokerName,
             fileName = "$brokerName.json",
             url = "https://$brokerName.com",
             version = "1.0",
-            parent = null,
+            parent = parent,
             addedDatetime = 1000L,
             removedAt = 0L,
         ),
@@ -275,5 +276,125 @@ class PirWorkDistributorTest {
         testee.executeAll(listOf(runner), listOf(testProfileQuery to gated, testProfileQuery to captcha))
 
         assertEquals(listOf<BrokerStep>(captcha, gated), runner.executed)
+    }
+
+    @Test
+    fun whenOneOperatorOwnsSeveralStepsThenTheyAreSpacedApartInTheQueue() = runTest {
+        val runner = FakeRunner()
+        val mirrorActions = listOf(navigate("a"), click("b"), click("c"))
+        val mirror1 = scanStep("mirror-1", actions = mirrorActions, parent = "operator.com")
+        val mirror2 = scanStep("mirror-2", actions = mirrorActions, parent = "operator.com")
+        val mirror3 = scanStep("mirror-3", actions = mirrorActions, parent = "operator.com")
+        val other = scanStep("other", actions = listOf(navigate("d"), click("e")))
+        val cheapest = scanStep("cheapest", actions = listOf(navigate("f")))
+
+        testee.executeAll(
+            listOf(runner),
+            listOf(
+                testProfileQuery to mirror1,
+                testProfileQuery to mirror2,
+                testProfileQuery to mirror3,
+                testProfileQuery to other,
+                testProfileQuery to cheapest,
+            ),
+        )
+
+        // The operator's steps still lead (they are the most expensive) but are separated by the
+        // other operators' steps rather than being handed out back to back.
+        assertEquals(
+            listOf<BrokerStep>(mirror1, other, cheapest, mirror2, mirror3),
+            runner.executed,
+        )
+    }
+
+    @Test
+    fun whenOneOperatorDominatesTheWorkThenItDoesNotFillTheFirstWave() = runTest {
+        // Mirrors of one operator share an action template, so they share a cost estimate. Cost
+        // ordering alone would hand the whole first wave to that one operator, which is what
+        // collapsed scan results: its sites then run their identical anti-bot challenge in lockstep.
+        val runnerCount = 20
+        val mirrorActions = listOf(navigate("a"), click("b"), click("c"), click("d"))
+        val mirrors = (1..15).map {
+            testProfileQuery to scanStep("mirror-$it", actions = mirrorActions, parent = "operator.com")
+        }
+        val others = (1..30).map {
+            testProfileQuery to scanStep("other-$it", actions = listOf(navigate("a"), click("b")))
+        }
+        val runners = List(runnerCount) { FakeRunner(stepDurationMs = 1_000) }
+
+        testee.executeAll(runners, mirrors + others)
+
+        val firstWave = runners.mapNotNull { it.executed.firstOrNull() }
+        assertEquals(runnerCount, firstWave.size)
+        val fromOperator = firstWave.count { it.broker.parent == "operator.com" }
+        assertTrue(
+            "one operator took $fromOperator of the $runnerCount steps in the first wave",
+            fromOperator <= 2,
+        )
+        assertEquals(45, runners.flatMap { it.executed }.size)
+    }
+
+    @Test
+    fun whenOperatorsAreFewerThanRunnersThenEachOperatorHoldsRoughlyItsEvenShareOfTheFirstWave() = runTest {
+        // The scan's real shape: 45 steps over 7 operators, run on 20 runners. A 20 wide wave cannot
+        // hold one step per operator when there are only 7 of them, so the bound interleaving gives
+        // is the even share - about runners / operators - rather than one.
+        val runnerCount = 20
+        val operatorSizes = mapOf(
+            "a.com" to 15,
+            "b.com" to 13,
+            "c.com" to 7,
+            "d.com" to 5,
+            "e.com" to 3,
+            "f.com" to 1,
+            "g.com" to 1,
+        )
+        val work = operatorSizes.flatMap { (operator, size) ->
+            (1..size).map {
+                testProfileQuery to scanStep(
+                    brokerName = "$operator-mirror-$it",
+                    actions = listOf(navigate("a"), click("b")),
+                    parent = operator,
+                )
+            }
+        }
+        val runners = List(runnerCount) { FakeRunner(stepDurationMs = 1_000) }
+
+        testee.executeAll(runners, work)
+
+        val firstWave = runners.mapNotNull { it.executed.firstOrNull() }
+        assertEquals(runnerCount, firstWave.size)
+        val worstOperatorShare = firstWave.groupingBy { it.broker.parent }.eachCount().values.max()
+        assertTrue(
+            "one operator took $worstOperatorShare of the $runnerCount steps in the first wave",
+            worstOperatorShare <= 4,
+        )
+        assertEquals(operatorSizes.values.sum(), runners.flatMap { it.executed }.size)
+    }
+
+    @Test
+    fun whenAParentAndItsMirrorsAreQueuedThenTheyCountAsOneOperator() = runTest {
+        val runner = FakeRunner()
+        val sharedActions = listOf(navigate("a"), click("b"))
+        // A mirror's parent is the parent broker's url, so the two belong to the same operator.
+        val parentBroker = scanStep("parent", actions = sharedActions).let {
+            it.copy(broker = it.broker.copy(url = "operator.com"))
+        }
+        val mirror = scanStep("mirror", actions = sharedActions, parent = "operator.com")
+        val unrelated = scanStep("unrelated", actions = sharedActions)
+
+        testee.executeAll(
+            listOf(runner),
+            listOf(
+                testProfileQuery to parentBroker,
+                testProfileQuery to mirror,
+                testProfileQuery to unrelated,
+            ),
+        )
+
+        assertEquals(
+            listOf<BrokerStep>(parentBroker, unrelated, mirror),
+            runner.executed,
+        )
     }
 }

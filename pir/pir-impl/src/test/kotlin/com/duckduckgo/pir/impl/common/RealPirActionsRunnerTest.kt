@@ -205,6 +205,24 @@ class RealPirActionsRunnerTest {
     }
 
     @Test
+    fun whenExecuteIsCancelledMidStepThenOwnedWebViewIsStillDestroyed() = runTest {
+        val deferred = async {
+            testee.execute(testProfileQuery, testScanStep)
+        }
+
+        yield()
+
+        // Cancelling the coroutine driving the step is how a stopped scan worker aborts a runner.
+        // The step teardown drops the runner's WebView reference, so the distributor's following
+        // stop() cannot destroy it - if teardown skips the destroy, nothing else can do it.
+        deferred.cancel()
+        deferred.join()
+        testee.stop()
+
+        verify(mockWebView).destroy()
+    }
+
+    @Test
     fun whenExecutedTwiceThenEachStepGetsItsOwnWebView() = runTest {
         repeat(2) {
             val deferred = async {
