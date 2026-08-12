@@ -20,8 +20,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
-import android.provider.Settings
 import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
@@ -37,6 +35,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.formatWithSpans
+import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -655,7 +654,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        launchApplicationDetailsSettings()
+                        activity.launchApplicationInfoSettings()
                     }
                 },
             )
@@ -678,20 +677,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 object : StackedAlertDialogBuilder.EventListener() {
                     override fun onButtonClicked(position: Int) {
                         if (position == CHANGE_PERMISSIONS_BUTTON) {
-                            launchApplicationDetailsSettings()
+                            activity.launchApplicationInfoSettings()
                         }
                     }
                 },
             )
             .show()
-    }
-
-    private fun launchApplicationDetailsSettings() {
-        val intent = Intent()
-        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.fromParts("package", activity.packageName, null)
-        intent.data = uri
-        activity.startActivity(intent)
     }
 
     private fun storeFavicon(url: String) {

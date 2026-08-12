@@ -18,7 +18,6 @@ package com.duckduckgo.voice.impl
 
 import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
-import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -130,14 +129,14 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showMicAccessDeniedDialog(
                 activity,
                 mode = pendingMode,
-                onChangePermissionsSelected = { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
+                onChangePermissionsSelected = { activity.launchApplicationInfoSettings() },
                 onHideVoiceSearchSelected = { disableVoiceSearch() },
                 onCancelled = { requestAborted() },
             )
         } else {
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 activity,
-                { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
+                { activity.launchApplicationInfoSettings() },
                 { requestAborted() },
             )
         }
