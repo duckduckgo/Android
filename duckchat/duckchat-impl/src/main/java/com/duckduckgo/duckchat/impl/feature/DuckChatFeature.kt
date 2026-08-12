@@ -297,4 +297,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputAttachmentChanges(): Toggle
+
+    /**
+     * @return `true` when the redesigned Duck.ai contextual sheet UI and flow are enabled.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun contextualSheetRedesign(): Toggle
 }
