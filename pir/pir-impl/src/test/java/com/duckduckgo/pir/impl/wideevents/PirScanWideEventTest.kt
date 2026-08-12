@@ -71,7 +71,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -190,7 +190,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunStartedWithWorkQueueEnabledThenSchedulingMetadataIsQueue() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
@@ -199,9 +199,10 @@ class PirScanWideEventTest {
         verify(wideEventClient).flowStart(
             name = any(),
             flowEntryPoint = any(),
-            metadata = org.mockito.kotlin.argThat { this[KEY_SCHEDULING] == SCHEDULING_QUEUE },
+            metadata = argThat { this[KEY_SCHEDULING] == SCHEDULING_QUEUE },
             cleanupPolicy = any(),
-            samplingProbability = anyOrNull(),
+            samplingProbability = any(),
+            definition = any(),
         )
     }
 
@@ -210,7 +211,7 @@ class PirScanWideEventTest {
     fun whenRunStartedWithWorkQueueDisabledThenSchedulingMetadataIsStatic() = runTest {
         // Given
         pirRemoteFeatures.workQueueScheduling().setRawStoredState(Toggle.State(false))
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(12L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(12L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
@@ -219,9 +220,10 @@ class PirScanWideEventTest {
         verify(wideEventClient).flowStart(
             name = any(),
             flowEntryPoint = any(),
-            metadata = org.mockito.kotlin.argThat { this[KEY_SCHEDULING] == SCHEDULING_STATIC },
+            metadata = argThat { this[KEY_SCHEDULING] == SCHEDULING_STATIC },
             cleanupPolicy = any(),
-            samplingProbability = anyOrNull(),
+            samplingProbability = any(),
+            definition = any(),
         )
     }
 
